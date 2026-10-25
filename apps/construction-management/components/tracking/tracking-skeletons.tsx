@@ -297,9 +297,9 @@ export function TaskFilterBarSkeleton() {
       aria-hidden="true"
       className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center"
     >
-      <Skeleton className="h-8 w-full rounded-lg sm:w-56" />
-      <Skeleton className="h-8 w-full rounded-lg sm:w-44" />
-      <Skeleton className="h-8 w-28 rounded-lg" />
+      <Skeleton className="h-10 w-full rounded-lg sm:w-56" />
+      <Skeleton className="h-10 w-full rounded-lg sm:w-44" />
+      <Skeleton className="h-10 w-28 rounded-lg" />
     </div>
   );
 }

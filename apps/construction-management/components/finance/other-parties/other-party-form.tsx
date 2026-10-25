@@ -215,7 +215,6 @@ export function OtherPartyForm({
                       <SelectTrigger
                         id="other-party-state"
                         ref={field.ref}
-                        size="lg"
                         className="w-full min-w-0"
                         aria-invalid={errors.stateCode != null}
                       >

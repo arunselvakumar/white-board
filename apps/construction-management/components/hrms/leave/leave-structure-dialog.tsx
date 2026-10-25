@@ -249,7 +249,7 @@ function StructureForm({
                   <div className="flex items-center gap-2">
                     <Input
                       inputMode="decimal"
-                      className="h-9 w-20"
+                      className="w-20"
                       aria-label={`Days of ${type.name}`}
                       placeholder={String(type.yearlyLimit)}
                       aria-invalid={errors.lines?.[index]?.days != null}

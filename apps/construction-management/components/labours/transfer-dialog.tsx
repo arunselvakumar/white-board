@@ -154,7 +154,6 @@ export function TransferDialog({
             >
               <SelectTrigger
                 id="transfer-project"
-                size="lg"
                 className="w-full min-w-0"
                 aria-required
                 aria-invalid={problem?.field === "project"}

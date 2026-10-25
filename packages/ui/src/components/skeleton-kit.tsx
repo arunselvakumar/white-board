@@ -384,7 +384,7 @@ function FormSkeletonControl({
       return null;
     case "input":
     case "select":
-      return <Skeleton className={cn("h-9 w-full", className)} />;
+      return <Skeleton className={cn("h-10 w-full", className)} />;
   }
 }
 
@@ -405,7 +405,7 @@ function FormSkeleton({
   columns?: 1 | 2 | 3;
   /** The loaded form's field grid gap, e.g. "gap-4". */
   gridClassName?: string;
-  /** The loaded inputs' height, e.g. "h-10" or "h-8". */
+  /** The loaded inputs' height when not the default `h-10`. */
   controlClassName?: string;
   /** Buttons in the footer; 0 for none. */
   actions?: number;
@@ -471,7 +471,7 @@ function FormSkeleton({
       {actions > 0 ? (
         <div className="flex justify-end gap-2">
           {Array.from({ length: actions }, (_, index) => (
-            <Skeleton key={index} className="h-9 w-24" />
+            <Skeleton key={index} className="h-10 w-28" />
           ))}
         </div>
       ) : null}

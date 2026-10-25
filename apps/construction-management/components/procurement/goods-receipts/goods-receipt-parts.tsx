@@ -118,7 +118,6 @@ export function ChoiceSelect({
     >
       <SelectTrigger
         id={id}
-        size="lg"
         aria-label={label}
         aria-invalid={invalid}
         aria-required={required}

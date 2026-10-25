@@ -286,7 +286,6 @@ export function CreateCompanyWizard({
                     >
                       <SelectTrigger
                         id="company-country"
-                        size="lg"
                         className="w-full min-w-0"
                         aria-required
                       >
@@ -325,7 +324,6 @@ export function CreateCompanyWizard({
                     >
                       <SelectTrigger
                         id="company-currency"
-                        size="lg"
                         className="w-full min-w-0"
                         aria-required
                       >

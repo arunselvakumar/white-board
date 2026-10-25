@@ -84,7 +84,7 @@ export function WingChartSkeleton({ projectId }: { projectId: string }) {
                   </td>
                   {[0, 1, 2, 3].map((unit) => (
                     <td key={unit} className="border-b p-1">
-                      <Skeleton className="h-8 w-14 rounded-md" />
+                      <Skeleton className="h-10 w-14 rounded-md" />
                     </td>
                   ))}
                 </tr>

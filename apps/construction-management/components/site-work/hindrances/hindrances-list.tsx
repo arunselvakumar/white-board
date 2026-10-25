@@ -303,7 +303,7 @@ export function HindrancesList({ projectId }: { projectId: string }) {
             <Input
               id="hindrances-from"
               type="date"
-              className="h-8 w-36"
+              className="w-36"
               value={filters.from ?? ""}
               onChange={(event) => {
                 change({ from: event.target.value });
@@ -317,7 +317,7 @@ export function HindrancesList({ projectId }: { projectId: string }) {
             <Input
               id="hindrances-to"
               type="date"
-              className="h-8 w-36"
+              className="w-36"
               value={filters.to ?? ""}
               onChange={(event) => {
                 change({ to: event.target.value });
@@ -329,7 +329,7 @@ export function HindrancesList({ projectId }: { projectId: string }) {
           type="search"
           aria-label="Search by number or activity"
           placeholder="Number or activity"
-          className="h-8 w-full sm:w-52"
+          className="w-full sm:w-52"
           value={filters.search ?? ""}
           onChange={(event) => {
             change({ search: event.target.value });

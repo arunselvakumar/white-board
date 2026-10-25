@@ -500,7 +500,6 @@ function TestForm({
                       <SelectTrigger
                         id="test-student"
                         aria-required
-                        size="lg"
                         className="w-full min-w-0"
                         aria-invalid={errors.studentId != null}
                       >

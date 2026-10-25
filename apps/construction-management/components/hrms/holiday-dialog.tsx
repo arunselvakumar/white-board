@@ -202,7 +202,6 @@ export function HolidayDialog({
                     <SelectTrigger
                       id="holiday-type"
                       aria-required
-                      size="lg"
                       className="w-full min-w-0"
                       aria-invalid={errors.type != null}
                     >

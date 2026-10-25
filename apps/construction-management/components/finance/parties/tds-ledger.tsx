@@ -95,11 +95,7 @@ export function TdsLedgerView({
                   });
               }}
             >
-              <SelectTrigger
-                id="tds-contractor"
-                size="lg"
-                className="w-full min-w-0"
-              >
+              <SelectTrigger id="tds-contractor" className="w-full min-w-0">
                 <SelectValue placeholder="Choose a Contractor" />
               </SelectTrigger>
               <SelectContent align="start" alignItemWithTrigger={false}>
@@ -124,7 +120,7 @@ export function TdsLedgerView({
                 });
             }}
           >
-            <SelectTrigger id="tds-year" size="lg" className="w-full min-w-0">
+            <SelectTrigger id="tds-year" className="w-full min-w-0">
               <SelectValue />
             </SelectTrigger>
             <SelectContent align="start" alignItemWithTrigger={false}>

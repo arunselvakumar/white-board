@@ -202,7 +202,6 @@ export function CreateMaterialDialog({
                     <SelectTrigger
                       id={`${baseId}-unit`}
                       ref={field.ref}
-                      size="lg"
                       className="w-full min-w-0"
                       aria-required
                       aria-invalid={errors.uomId != null}
@@ -251,7 +250,6 @@ export function CreateMaterialDialog({
                   >
                     <SelectTrigger
                       id={`${baseId}-category`}
-                      size="lg"
                       className="w-full min-w-0"
                       aria-invalid={errors.categoryId != null}
                     >

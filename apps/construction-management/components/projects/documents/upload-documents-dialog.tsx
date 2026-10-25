@@ -188,7 +188,6 @@ export function UploadDocumentsDialog({
           >
             <SelectTrigger
               id="upload-document-kind"
-              size="lg"
               className="w-full min-w-0"
               aria-required
             >

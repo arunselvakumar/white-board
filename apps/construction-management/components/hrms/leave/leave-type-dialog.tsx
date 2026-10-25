@@ -381,7 +381,6 @@ function LeaveTypeForm({
                   <SelectTrigger
                     id="leave-type-levels"
                     aria-required
-                    size="lg"
                     className="w-full min-w-0"
                   >
                     <SelectValue />
@@ -484,7 +483,6 @@ function LeaveTypeForm({
                     <SelectTrigger
                       id="leave-type-day"
                       aria-required
-                      size="lg"
                       className="w-32"
                       aria-invalid={errors.accrualDay != null}
                     >

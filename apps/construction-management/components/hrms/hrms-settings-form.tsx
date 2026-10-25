@@ -520,7 +520,6 @@ export function HrmsSettingsForm() {
                       <SelectTrigger
                         id="hrms-approval-levels"
                         aria-required
-                        size="lg"
                         className="w-full min-w-0"
                         aria-describedby="hrms-approval-levels-hint"
                       >
@@ -683,7 +682,6 @@ export function HrmsSettingsForm() {
                         <SelectTrigger
                           id="hrms-salary-day"
                           aria-required
-                          size="lg"
                           className="w-32"
                           aria-describedby="hrms-salary-day-hint"
                           aria-invalid={errors.salaryCalculationDay != null}
@@ -728,7 +726,6 @@ export function HrmsSettingsForm() {
                   >
                     <SelectTrigger
                       id="hrms-pt-state"
-                      size="lg"
                       className="w-full min-w-0"
                       aria-describedby="hrms-pt-state-hint"
                     >

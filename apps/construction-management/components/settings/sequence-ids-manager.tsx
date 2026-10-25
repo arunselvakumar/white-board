@@ -130,11 +130,7 @@ export function SequenceIdsManager({
                 setModule(value);
               }}
             >
-              <SelectTrigger
-                id="sequence-module"
-                size="lg"
-                className="w-full min-w-0"
-              >
+              <SelectTrigger id="sequence-module" className="w-full min-w-0">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent

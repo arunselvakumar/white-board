@@ -335,7 +335,6 @@ function InvoiceForm({
               >
                 <SelectTrigger
                   id="invoice-party"
-                  size="lg"
                   className="w-full min-w-0"
                   aria-required
                   aria-invalid={errors.partyId != null}
@@ -486,7 +485,6 @@ function InvoiceForm({
               >
                 <SelectTrigger
                   id="invoice-department"
-                  size="lg"
                   className="w-full min-w-0"
                   aria-invalid={errors.departmentId != null}
                 >

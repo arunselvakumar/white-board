@@ -116,7 +116,7 @@ function PickerBody({
 
   return (
     <>
-      <InputGroup className="h-9">
+      <InputGroup>
         <InputGroupAddon>
           <Search aria-hidden="true" />
         </InputGroupAddon>

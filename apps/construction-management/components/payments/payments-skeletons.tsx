@@ -116,8 +116,8 @@ export function PayFormSkeleton() {
         ]}
       />
       <div className="flex justify-end gap-2">
-        <Skeleton className="h-9 w-20 rounded-md" />
-        <Skeleton className="h-9 w-24 rounded-md" />
+        <Skeleton className="h-10 w-20 rounded-md" />
+        <Skeleton className="h-10 w-24 rounded-md" />
       </div>
     </SkeletonGroup>
   );

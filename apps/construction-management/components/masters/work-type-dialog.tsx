@@ -206,7 +206,6 @@ export function WorkTypeDialog({
                     >
                       <SelectTrigger
                         id={`${id}-department`}
-                        size="lg"
                         className="w-full min-w-0"
                         aria-required
                         aria-invalid={errors.departmentId != null}

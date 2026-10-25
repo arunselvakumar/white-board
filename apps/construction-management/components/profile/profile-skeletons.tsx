@@ -46,7 +46,7 @@ export function MyProfileSkeleton() {
             <div className="flex flex-wrap items-center gap-4">
               <Skeleton className="size-20 rounded-full" />
               <div className="min-w-0 flex-1 space-y-2">
-                <Skeleton className="h-7 w-24 rounded-lg" />
+                <Skeleton className="h-10 w-24 rounded-lg" />
                 <SkeletonText size="xs" width="14rem" />
               </div>
             </div>

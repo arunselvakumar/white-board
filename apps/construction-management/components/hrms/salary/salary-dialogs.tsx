@@ -460,7 +460,6 @@ function AdvanceForm({
             >
               <SelectTrigger
                 id="salary-advance-member"
-                size="lg"
                 className="w-full min-w-0"
                 aria-required
                 aria-invalid={errors.memberId != null}

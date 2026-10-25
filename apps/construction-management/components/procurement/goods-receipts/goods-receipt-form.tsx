@@ -247,7 +247,7 @@ function OrderLines({
                     <Input
                       aria-label={`Received now, ${field.materialName}`}
                       inputMode="decimal"
-                      className="h-9"
+
                       aria-invalid={lineErrors?.quantity != null}
                       {...form.register(`orderLines.${index}.quantity`)}
                     />
@@ -268,7 +268,7 @@ function OrderLines({
                       <Input
                         aria-label={`GST %, ${field.materialName}`}
                         inputMode="decimal"
-                        className="h-9"
+
                         aria-invalid={lineErrors?.gstRate != null}
                         {...form.register(`orderLines.${index}.gstRate`)}
                       />

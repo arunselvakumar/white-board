@@ -18,8 +18,8 @@ const WIDTHS = ["62%", "48%", "70%", "55%", "66%"];
 
 /**
  * A filter bar: each filter's real label over a control-sized bar.
- * `size="sm"` mirrors the small `FilterSelect` (text-xs label, h-8,
- * sm:w-44); the default the `Label` + h-9 sm:w-48 selects.
+ * `size="sm"` mirrors `FilterSelect` (text-xs label, h-10, sm:w-44); the
+ * default the `Label` + h-10 sm:w-48 selects.
  */
 export function FilterBarSkeleton({
   filters,
@@ -51,7 +51,7 @@ export function FilterBarSkeleton({
           <Skeleton
             className={cn(
               "w-full rounded-md",
-              size === "sm" ? "h-8 sm:w-44" : "h-9",
+              size === "sm" ? "h-10 sm:w-44" : "h-10",
             )}
           />
         </div>

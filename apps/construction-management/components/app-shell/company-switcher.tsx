@@ -39,7 +39,9 @@ export function CompanySwitcher() {
           <Button
             variant="ghost"
             size="sm"
-            className="text-muted-foreground hover:text-foreground min-w-0 gap-2 font-normal"
+            // Shrinks (Buttons don't by default), so a long name truncates
+            // on a phone instead of widening the header past the screen.
+            className="text-muted-foreground hover:text-foreground min-w-0 shrink gap-2 font-normal"
             aria-label={`Active Company: ${company?.name ?? "none"}. Switch Company`}
           />
         }

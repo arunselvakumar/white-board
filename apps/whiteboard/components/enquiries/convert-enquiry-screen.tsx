@@ -354,7 +354,6 @@ function ConvertEnquiryForm({
               <SelectTrigger
                 id="convert-batch"
                 aria-required
-                size="lg"
                 className="w-full min-w-0"
                 aria-invalid={errors.batchId != null}
               >
@@ -415,7 +414,6 @@ function ConvertEnquiryForm({
                 <SelectTrigger
                   id="convert-timing-source"
                   aria-required
-                  size="lg"
                   className="w-full min-w-0"
                 >
                   <SelectValue />
@@ -450,7 +448,6 @@ function ConvertEnquiryForm({
                 <SelectTrigger
                   id="convert-class-mode"
                   aria-required
-                  size="lg"
                   className="w-full min-w-0"
                 >
                   <SelectValue />

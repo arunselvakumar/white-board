@@ -260,7 +260,6 @@ export function EnrollmentDetailScreen({
           >
             <SelectTrigger
               id="moveBatchId"
-              size="lg"
               className="w-full min-w-0"
               aria-label="Move to Batch"
             >

@@ -579,7 +579,6 @@ function MemberRow({
                   <SelectTrigger
                     id={`${prefix}-structure`}
                     aria-required
-                    size="lg"
                     className="w-full min-w-0"
                     aria-invalid={errors?.structureId != null}
                   >
@@ -670,7 +669,6 @@ function MemberRow({
                 >
                   <SelectTrigger
                     id={`${prefix}-gender`}
-                    size="lg"
                     className="w-full min-w-0"
                     aria-describedby={`${prefix}-gender-hint`}
                   >

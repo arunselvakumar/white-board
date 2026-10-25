@@ -753,7 +753,6 @@ function ComponentRow({
                     <SelectTrigger
                       id={`${prefix}-basis`}
                       aria-required
-                      size="lg"
                       className="w-full min-w-0"
                     >
                       <SelectValue />

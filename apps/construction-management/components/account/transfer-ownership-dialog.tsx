@@ -136,7 +136,6 @@ export function TransferOwnershipDialog({
                   >
                     <SelectTrigger
                       id="new-owner"
-                      size="lg"
                       className="w-full min-w-0"
                       aria-required
                       aria-invalid={errors.memberId != null}

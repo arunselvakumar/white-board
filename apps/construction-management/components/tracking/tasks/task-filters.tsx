@@ -117,7 +117,7 @@ export function TaskFilterBar({
           type="search"
           aria-label="Search by Task No. or name"
           placeholder="Task No. or name"
-          className="h-8 w-full sm:w-56"
+          className="w-full sm:w-56"
           value={filters.search ?? ""}
           onChange={(event) => {
             onChange({ search: event.target.value });
@@ -264,7 +264,7 @@ export function TaskFilterBar({
               <Input
                 id="tasks-from"
                 type="date"
-                className="h-8 w-36"
+                className="w-36"
                 value={filters.from ?? ""}
                 onChange={(event) => {
                   onChange({ from: event.target.value });
@@ -278,7 +278,7 @@ export function TaskFilterBar({
               <Input
                 id="tasks-to"
                 type="date"
-                className="h-8 w-36"
+                className="w-36"
                 value={filters.to ?? ""}
                 onChange={(event) => {
                   onChange({ to: event.target.value });

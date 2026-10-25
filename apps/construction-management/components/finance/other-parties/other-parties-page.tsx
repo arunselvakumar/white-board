@@ -92,7 +92,7 @@ export function OtherPartiesPage() {
           meta="Parties you bill or pay that are not Contractors, Suppliers, Labours or Vendors."
           actions={addLink}
         />
-        <InputGroup className="h-9 sm:max-w-xs">
+        <InputGroup className="sm:max-w-xs">
           <InputGroupAddon>
             <Search aria-hidden="true" />
           </InputGroupAddon>

@@ -220,7 +220,7 @@ export function InventoryPage({
           <Button
             variant="ghost"
             size="icon"
-            className="size-8"
+
             aria-label={`Actions for ${row.materialName}`}
           />
         }
@@ -476,7 +476,7 @@ export function InventoryPage({
               type="search"
               aria-label="Search materials"
               placeholder="Search materials"
-              className="h-8 sm:w-64"
+              className="sm:w-64"
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value);

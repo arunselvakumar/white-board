@@ -162,7 +162,6 @@ export function EnrollmentSettingsForm({
               <SelectTrigger
                 id="enrollmentClassMode"
                 aria-required
-                size="lg"
                 className="w-full min-w-0"
               >
                 <SelectValue />
@@ -197,7 +196,6 @@ export function EnrollmentSettingsForm({
               <SelectTrigger
                 id="enrollmentTimingSource"
                 aria-required
-                size="lg"
                 className="w-full min-w-0"
               >
                 <SelectValue />

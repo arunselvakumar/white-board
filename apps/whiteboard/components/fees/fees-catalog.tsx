@@ -200,7 +200,6 @@ export function FeesCatalog({
                 >
                   <SelectTrigger
                     id="fee-dues-sort"
-                    size="lg"
                     className="w-full min-w-0 sm:w-40"
                   >
                     <SelectValue />

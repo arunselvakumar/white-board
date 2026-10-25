@@ -282,7 +282,6 @@ function HomeworkForm({
                   <SelectTrigger
                     id="homework-class-date"
                     aria-required
-                    size="lg"
                     className="w-full min-w-0"
                     aria-invalid={errors.classDate != null}
                   >

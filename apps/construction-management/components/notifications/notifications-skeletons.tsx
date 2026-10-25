@@ -44,8 +44,8 @@ export function NotificationsScreenSkeleton() {
                     <SkeletonText size="xs" width="25%" />
                   </div>
                   <div className="flex gap-2">
-                    <Skeleton className="h-7 w-20 rounded-lg" />
-                    <Skeleton className="h-7 w-16 rounded-lg" />
+                    <Skeleton className="h-10 w-20 rounded-lg" />
+                    <Skeleton className="h-10 w-16 rounded-lg" />
                   </div>
                 </div>
               </li>

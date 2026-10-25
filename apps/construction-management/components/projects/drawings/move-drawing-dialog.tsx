@@ -113,7 +113,6 @@ function MoveDrawingForm({
               >
                 <SelectTrigger
                   id="move-drawing-album"
-                  size="lg"
                   className="w-full min-w-0"
                   aria-required
                   aria-invalid={errors.albumId != null}

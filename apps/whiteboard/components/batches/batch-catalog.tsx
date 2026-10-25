@@ -148,7 +148,6 @@ export function BatchCatalog({
             >
               <SelectTrigger
                 id="batch-course-filter"
-                size="lg"
                 className="w-full max-w-sm min-w-0"
                 aria-label="Filter by Course"
               >

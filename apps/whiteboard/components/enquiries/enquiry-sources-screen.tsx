@@ -340,7 +340,7 @@ function RenameSourceForm({
       <div className="flex flex-col gap-2 sm:flex-row">
         <Input
           id={inputId}
-          className="h-9 sm:max-w-sm"
+          className="sm:max-w-sm"
           maxLength={80}
           // eslint-disable-next-line jsx-a11y/no-autofocus -- The field opens when the user chooses Rename, so focus goes into it.
           autoFocus
@@ -351,7 +351,7 @@ function RenameSourceForm({
           <Button
             type="submit"
             size="sm"
-            className="h-9"
+
             disabled={isSubmitting}
           >
             Save
@@ -360,7 +360,7 @@ function RenameSourceForm({
             type="button"
             variant="ghost"
             size="sm"
-            className="h-9"
+
             onClick={() => {
               void onDone(false);
             }}

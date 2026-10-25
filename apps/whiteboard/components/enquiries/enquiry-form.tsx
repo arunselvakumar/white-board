@@ -245,7 +245,6 @@ function SelectField({
           >
             <SelectTrigger
               id={name}
-              size="lg"
               className="w-full min-w-0"
               aria-invalid={error != null}
             >

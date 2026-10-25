@@ -96,7 +96,7 @@ function FilterSelect({
           if (next != null) onChange(next);
         }}
       >
-        <SelectTrigger id={id} size="lg" className="w-full min-w-0">
+        <SelectTrigger id={id} className="w-full min-w-0">
           <SelectValue />
         </SelectTrigger>
         <SelectContent

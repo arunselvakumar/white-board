@@ -40,7 +40,7 @@ export function FilterSelect({
           onChange(next == null || next === ALL ? "" : next);
         }}
       >
-        <SelectTrigger id={id} size="sm" className="w-full min-w-0 sm:w-44">
+        <SelectTrigger id={id} className="w-full min-w-0 sm:w-44">
           <SelectValue />
         </SelectTrigger>
         <SelectContent align="start" alignItemWithTrigger={false}>

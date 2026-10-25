@@ -96,7 +96,7 @@ export function QuotationsPage() {
           meta="Quotation files from your Contractors and Suppliers. Add them on the Contractor's or Supplier's page."
         />
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-          <InputGroup className="h-9 sm:max-w-xs">
+          <InputGroup className="sm:max-w-xs">
             <InputGroupAddon>
               <Search aria-hidden="true" />
             </InputGroupAddon>

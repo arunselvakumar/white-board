@@ -227,7 +227,7 @@ function StatementLines({
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="text-destructive h-7"
+                        className="text-destructive"
                         onClick={() => {
                           setError(undefined);
                           setPending(line);

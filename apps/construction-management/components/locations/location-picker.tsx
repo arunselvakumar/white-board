@@ -210,7 +210,6 @@ function LocationFields({
               <SelectTrigger
                 id={firstId}
                 ref={ref}
-                size="lg"
                 className="w-full min-w-0"
                 aria-invalid={invalid}
                 aria-required={required}
@@ -351,7 +350,6 @@ function PlaceField({
         <SelectTrigger
           id={id}
           ref={placeRef}
-          size="lg"
           className="w-full min-w-0"
           aria-invalid={invalid}
           aria-required={required}
@@ -442,7 +440,6 @@ function WingFields({
           <SelectTrigger
             id={placeId}
             ref={placeRef}
-            size="lg"
             className="w-full min-w-0"
             aria-invalid={invalid}
             aria-required={required}

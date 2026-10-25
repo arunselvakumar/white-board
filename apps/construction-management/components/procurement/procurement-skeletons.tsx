@@ -51,7 +51,7 @@ export function FilterBarSkeleton({
       {labels.map((label) => (
         <div key={label} className="min-w-0 space-y-1">
           <p className="text-xs leading-none font-medium">{label}</p>
-          <Skeleton className="h-7 w-full rounded-lg sm:w-44" />
+          <Skeleton className="h-10 w-full rounded-lg sm:w-44" />
         </div>
       ))}
     </div>
@@ -738,7 +738,7 @@ export function TransferFormSkeleton({ title }: { title?: string }) {
             {["Transfer Date", "From", "To"].map((field) => (
               <div key={field} className="space-y-1.5">
                 <p className="text-sm leading-none font-medium">{field}</p>
-                <Skeleton className="h-8 w-full rounded-lg" />
+                <Skeleton className="h-10 w-full rounded-lg" />
               </div>
             ))}
           </div>
@@ -860,9 +860,9 @@ export function InventorySkeleton() {
         aria-hidden="true"
         className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center"
       >
-        <Skeleton className="h-8 w-full rounded-lg sm:max-w-xs" />
-        <Skeleton className="h-8 w-full rounded-lg sm:w-52" />
-        <Skeleton className="h-8 w-full rounded-lg sm:w-40" />
+        <Skeleton className="h-10 w-full rounded-lg sm:max-w-xs" />
+        <Skeleton className="h-10 w-full rounded-lg sm:w-52" />
+        <Skeleton className="h-10 w-full rounded-lg sm:w-40" />
       </div>
       <ResponsiveListSkeleton
         count={false}
@@ -1058,7 +1058,7 @@ export function StockRegisterSkeleton({ backHref }: { backHref: string }) {
         {["From", "To"].map((label) => (
           <div key={label} className="space-y-1">
             <p className="text-xs leading-none font-medium">{label}</p>
-            <Skeleton className="h-8 w-40 rounded-lg" />
+            <Skeleton className="h-10 w-40 rounded-lg" />
           </div>
         ))}
       </div>

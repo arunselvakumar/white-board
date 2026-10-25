@@ -185,7 +185,7 @@ export function StockRegisterPage({
           <Input
             id="register-from"
             type="date"
-            className="h-8 w-40"
+            className="w-40"
             value={range.from}
             max={range.to}
             onChange={(event) => {
@@ -200,7 +200,7 @@ export function StockRegisterPage({
           <Input
             id="register-to"
             type="date"
-            className="h-8 w-40"
+            className="w-40"
             value={range.to}
             min={range.from}
             onChange={(event) => {

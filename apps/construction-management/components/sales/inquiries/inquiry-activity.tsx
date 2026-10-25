@@ -77,7 +77,7 @@ function FollowUpEntry({
             type="button"
             size="sm"
             variant="ghost"
-            className="text-destructive h-7"
+            className="text-destructive"
             aria-label={`Remove the ${FOLLOW_UP_ACTIVITY_LABELS[followUp.activity].toLowerCase()} of ${when(followUp.doneOn)}`}
             disabled={remove.isPending}
             onClick={() => {

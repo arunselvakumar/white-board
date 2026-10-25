@@ -472,7 +472,6 @@ function PaymentForm({
                   >
                     <SelectTrigger
                       id="payment-party"
-                      size="lg"
                       className="w-full min-w-0"
                       aria-required
                       aria-invalid={errors.partyId != null}
@@ -736,7 +735,6 @@ function PaymentForm({
                 >
                   <SelectTrigger
                     id="payment-paid-by"
-                    size="lg"
                     className="w-full min-w-0"
                     aria-invalid={errors.paidByMemberId != null}
                   >

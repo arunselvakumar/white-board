@@ -173,11 +173,7 @@ export function StoreForm({ store }: { store?: Store }) {
                       if (value != null) field.onChange(value);
                     }}
                   >
-                    <SelectTrigger
-                      id="store-state"
-                      size="lg"
-                      className="w-full min-w-0"
-                    >
+                    <SelectTrigger id="store-state" className="w-full min-w-0">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent

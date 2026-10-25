@@ -153,7 +153,7 @@ export function BookingsList({ projectId }: { projectId: string }) {
             id="bookings-search"
             type="search"
             placeholder="Customer, mobile or Referred By"
-            className="h-8 w-full sm:w-64"
+            className="w-full sm:w-64"
             value={search}
             onChange={(event) => {
               setSearch(event.target.value);

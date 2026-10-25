@@ -44,7 +44,7 @@ export function VoucherRowsSkeleton() {
 export function PettyCashVouchersSkeleton() {
   return (
     <SkeletonGroup label="Loading vouchers" className="space-y-3">
-      <Skeleton className="h-8 w-56 rounded-md" />
+      <Skeleton className="h-10 w-56 rounded-md" />
       <FilterBarSkeleton
         size="sm"
         filters={["Date", "Type", "Status", "Category"]}

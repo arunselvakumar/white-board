@@ -115,14 +115,14 @@ function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
 }
 
 const selectTriggerVariants = cva(
-  "group/select-trigger border-input focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-placeholder:text-muted-foreground aria-invalid:ring-3 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 hover:bg-accent/60 data-popup-open:bg-accent/60 dark:hover:bg-accent/60 dark:data-popup-open:bg-accent/60 flex w-fit items-center justify-between gap-1.5 rounded-[6px] border bg-field pr-2 pl-2.5 font-[500] whitespace-nowrap outline-none select-none [transition:color_100ms_ease,background-color_100ms_ease,border-color_100ms_ease,box-shadow_100ms_ease,transform_160ms_var(--ease-glide)] focus-visible:ring-3 enabled:active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:enabled:active:scale-100 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/select-trigger border-input focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-placeholder:text-muted-foreground aria-invalid:ring-3 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 hover:bg-accent/60 data-popup-open:bg-accent/60 dark:hover:bg-accent/60 dark:data-popup-open:bg-accent/60 flex w-fit cursor-pointer items-center justify-between gap-1.5 rounded-[6px] border bg-field pr-2.5 pl-3 font-[500] whitespace-nowrap outline-none select-none [transition:color_100ms_ease,background-color_100ms_ease,border-color_100ms_ease,box-shadow_100ms_ease,transform_160ms_var(--ease-glide)] focus-visible:ring-3 enabled:active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:enabled:active:scale-100 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       size: {
-        default: "h-8 text-[13px]",
-        sm: "h-7 text-[12px]",
-        // 40 px, not Glide's 44, so it lines up with `h-10` Inputs in forms.
-        lg: "h-10 text-[14px]",
+        // 40 px, the height of Inputs and Buttons.
+        default: "h-10 text-[14px]",
+        sm: "h-9 text-[13px]",
+        lg: "h-12 text-[15px]",
       },
     },
     defaultVariants: {
@@ -308,7 +308,7 @@ function SelectContent({
           className={cn(
             "bg-popover text-popover-foreground ring-foreground/10 relative isolate z-50 flex max-h-(--available-height) w-44 min-w-(--anchor-width) flex-col overflow-hidden rounded-[10px] p-1 shadow-[0_4px_16px_rgb(0_0_0/22%)] ring-1 outline-none",
             // Row height and font per trigger size.
-            "[--select-font:13px] [--select-row:30px] data-[size=lg]:[--select-font:14px] data-[size=lg]:[--select-row:40px] data-[size=sm]:[--select-font:12px] data-[size=sm]:[--select-row:26px]",
+            "[--select-font:14px] [--select-row:36px] data-[size=lg]:[--select-font:15px] data-[size=lg]:[--select-row:40px] data-[size=sm]:[--select-font:13px] data-[size=sm]:[--select-row:32px]",
             // Pop out of the trigger's corner, flipping with the menu.
             "origin-(--transform-origin) data-[side=bottom]:data-[align=center]:origin-top data-[side=bottom]:data-[align=end]:origin-top-right data-[side=bottom]:data-[align=start]:origin-top-left data-[side=top]:data-[align=center]:origin-bottom data-[side=top]:data-[align=end]:origin-bottom-right data-[side=top]:data-[align=start]:origin-bottom-left",
             "data-open:animate-select-pop-in data-closed:animate-select-pop-out motion-reduce:data-open:animate-select-fade-in motion-reduce:data-closed:animate-select-fade-out data-instant-close:animate-none! data-[align-trigger=true]:animate-none!",

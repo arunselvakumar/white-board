@@ -502,10 +502,10 @@ export function HindrancesPageSkeleton() {
         {["Cause", "Responsible party", "From", "To"].map((label) => (
           <div key={label} className="space-y-1">
             <p className="text-xs leading-none font-medium">{label}</p>
-            <Skeleton className="h-8 w-full rounded-lg sm:w-36" />
+            <Skeleton className="h-10 w-full rounded-lg sm:w-36" />
           </div>
         ))}
-        <Skeleton className="h-8 w-full rounded-lg sm:w-52" />
+        <Skeleton className="h-10 w-full rounded-lg sm:w-52" />
       </div>
       <HindranceRowsSkeleton />
     </div>
@@ -654,7 +654,7 @@ export function ProgressReportRowsSkeleton() {
               </div>
               <SkeletonText width={width} />
             </div>
-            <Skeleton className="h-7 w-24 shrink-0 rounded-lg" />
+            <Skeleton className="h-10 w-24 shrink-0 rounded-lg" />
           </li>
         ))}
       </ul>
@@ -779,7 +779,7 @@ export function SiteDiaryPageSkeleton() {
         </div>
         <div aria-hidden="true" className="flex items-center gap-1">
           <Skeleton className="size-8 rounded-lg" />
-          <Skeleton className="h-8 w-40 rounded-lg" />
+          <Skeleton className="h-10 w-40 rounded-lg" />
           <Skeleton className="size-8 rounded-lg" />
         </div>
       </div>

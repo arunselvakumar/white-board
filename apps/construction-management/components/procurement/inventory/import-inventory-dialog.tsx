@@ -156,7 +156,7 @@ export function ImportInventoryDialog({
             <Input
               id="import-opening-date"
               type="date"
-              className="h-8 w-40"
+              className="w-40"
               max={localToday()}
               aria-required
               value={openingDate}

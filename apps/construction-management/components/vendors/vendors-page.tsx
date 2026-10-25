@@ -117,7 +117,7 @@ export function VendorsPage() {
           actions={addLink}
         />
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-          <InputGroup className="h-9 sm:max-w-xs">
+          <InputGroup className="sm:max-w-xs">
             <InputGroupAddon>
               <Search aria-hidden="true" />
             </InputGroupAddon>

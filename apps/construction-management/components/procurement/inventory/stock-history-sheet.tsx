@@ -140,7 +140,7 @@ function EntryItem({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="-mr-2 size-8"
+                    className="-mr-2"
                     aria-label={`Actions for ${entry.typeLabel} on ${formatDate(entry.entryDate)}`}
                   />
                 }

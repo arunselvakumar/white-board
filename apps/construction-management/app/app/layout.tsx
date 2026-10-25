@@ -36,7 +36,7 @@ export default async function AppLayout({
       canOpenDashboard={canOpenDashboard}
       canOpenUsersRoles={canOpenUsersRoles}
     >
-      <QuerySuspense>{children}</QuerySuspense>
+      <QuerySuspense serverFallback={null}>{children}</QuerySuspense>
     </AppShell>
   );
 }

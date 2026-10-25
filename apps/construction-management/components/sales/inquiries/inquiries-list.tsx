@@ -330,7 +330,7 @@ function FilterBar({
           id="inquiries-search"
           type="search"
           placeholder="Name, mobile or email"
-          className="h-8 w-full sm:w-56"
+          className="w-full sm:w-56"
           value={search}
           onChange={(event) => {
             setSearch(event.target.value);

@@ -164,7 +164,6 @@ function WingDetailsForm({
                       id="wing-phase"
                       ref={field.ref}
                       aria-required
-                      size="lg"
                       className="w-full min-w-0"
                     >
                       <SelectValue />
@@ -212,7 +211,6 @@ function WingDetailsForm({
                   <SelectTrigger
                     id="wing-type"
                     ref={field.ref}
-                    size="lg"
                     className="w-full min-w-0"
                     aria-required
                     aria-invalid={errors.type != null}

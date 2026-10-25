@@ -244,7 +244,6 @@ export function SequenceRuleDialog({
                 >
                   <SelectTrigger
                     id="sequence-project"
-                    size="lg"
                     className="w-full min-w-0"
                     aria-required
                   >
@@ -339,7 +338,6 @@ export function SequenceRuleDialog({
                   >
                     <SelectTrigger
                       id="sequence-separator"
-                      size="lg"
                       className="w-full min-w-0"
                       aria-required
                     >

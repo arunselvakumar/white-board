@@ -271,7 +271,6 @@ function StudyMaterialForm({
               >
                 <SelectTrigger
                   id="material-class-date"
-                  size="lg"
                   className="w-full min-w-0"
                   aria-invalid={errors.classDate != null}
                 >
