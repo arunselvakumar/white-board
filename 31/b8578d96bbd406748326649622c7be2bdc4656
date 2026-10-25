@@ -1,0 +1,147 @@
+apps/construction-management/components/attendance/labour/labour-attendance-page.tsx
+  s_43f32c25ef2007::t_0eeecfbaadf0f9 4-11,196-207
+apps/construction-management/components/attendance/vendor/vendor-attendance-page.tsx
+  s_43f32c25ef2007::t_18a96ce8ec66a1 4-11,194-205
+apps/construction-management/components/finance/central-payment/central-payment-page.tsx
+  s_43f32c25ef2007::t_90bf3959514fa5 12,255,257-258,260
+apps/construction-management/components/finance/central-payment/central-payment-skeletons.tsx
+  s_43f32c25ef2007::t_c0b807123d5ddf 3,16-28,91,93-94
+apps/construction-management/components/finance/parties/parties-skeletons.tsx
+  s_43f32c25ef2007::t_bfe5642e8b52c7 3,156-159,161,165
+apps/construction-management/components/finance/parties/party-money-page.tsx
+  s_43f32c25ef2007::t_ca30e99af655ce 4,119-130
+apps/construction-management/components/finance/parties/party-money-tab.tsx
+  s_43f32c25ef2007::t_3124aeef21fdf6 4,100-113
+apps/construction-management/components/finance/parties/settlement-list.stories.tsx
+  s_43f32c25ef2007::t_7bb4eab8c5e34b 169
+apps/construction-management/components/finance/parties/settlement-list.tsx
+  s_43f32c25ef2007::t_9fa074af83dc38 4-10,31,59-70,106,108-113,115
+apps/construction-management/components/finance/petty-cash/petty-cash-vouchers.tsx
+  s_43f32c25ef2007::t_e4747fba97ac43 4-10,23,80-84,461,463-466,468
+apps/construction-management/components/hrms/leave/leave-approvals-page.stories.tsx
+  s_43f32c25ef2007::t_73cafcf2ad61a4 61,64,143
+apps/construction-management/components/hrms/leave/leave-approvals-page.tsx
+  s_43f32c25ef2007::t_ed3e0299077e04 4-11,24,42-47,51,54-65,69,140-150
+apps/construction-management/components/hrms/leave/leave-configuration-page.tsx
+  s_43f32c25ef2007::t_24df081f6657d4 4-10,111-118
+apps/construction-management/components/hrms/leave/team-leaves-page.tsx
+  s_43f32c25ef2007::t_eb6b6cff9d9ea9 4-11,149-156,158-161
+apps/construction-management/components/hrms/shifts-page.tsx
+  s_43f32c25ef2007::t_002b075470cf8f 171-178
+apps/construction-management/components/hrms/team-attendance-page.stories.tsx
+  s_43f32c25ef2007::t_9d00256f2c79d8 59,65,70
+apps/construction-management/components/hrms/team-attendance-page.tsx
+  s_43f32c25ef2007::t_e5b68828df4129 4-13,16,44-51,108-117,174
+apps/construction-management/components/labours/labours-page.stories.tsx
+  s_43f32c25ef2007::t_1cd6bd18643634 175-177
+apps/construction-management/components/labours/labours-page.tsx
+  s_43f32c25ef2007::t_f124c9681ae8f2 6-7,10,51,94-97,237,239-242
+apps/construction-management/components/masters/material-master-lists.stories.tsx
+  s_43f32c25ef2007::t_4d5beffbf7ecb7 96
+apps/construction-management/components/masters/paged-master-list.tsx
+  s_43f32c25ef2007::t_a1c894020c0748 4-10,22,44-47,154,156-158,164
+apps/construction-management/components/parties/parties-page.stories.tsx
+  s_43f32c25ef2007::t_4d6064f2fec27c 78
+apps/construction-management/components/parties/parties-page.tsx
+  s_43f32c25ef2007::t_1ceb1cc27e774a 4-12,48,83-90,149,151-153,159
+apps/construction-management/components/parties/quotations-page.stories.tsx
+  s_43f32c25ef2007::t_d0f8b9edd56d11 130,153
+apps/construction-management/components/parties/quotations-page.tsx
+  s_43f32c25ef2007::t_111306998b64dd 4-12,23,52-60,116,118-120,126
+apps/construction-management/components/payments/payments-list.tsx
+  s_43f32c25ef2007::t_f96b7e5183b46a 4-12,32,57-61,63-67,88,90-93,95-96,98-101,103
+apps/construction-management/components/payments/payments-page.stories.tsx
+  s_43f32c25ef2007::t_e7a6b52e62409f 172
+apps/construction-management/components/payments/payments-page.tsx
+  s_43f32c25ef2007::t_ba48dabfab2ff6 3,52-63
+apps/construction-management/components/procurement/goods-receipts/goods-receipts-list.stories.tsx
+  s_43f32c25ef2007::t_98dc14cf48c2c6 67
+apps/construction-management/components/procurement/goods-receipts/goods-receipts-list.tsx
+  s_43f32c25ef2007::t_11a1e45be36e55 4-10,22,53-55,144,146-149,151
+apps/construction-management/components/procurement/procurement-skeletons.tsx
+  s_43f32c25ef2007::t_2fa28cd35099ab 1-8,904-908,923-930
+apps/construction-management/components/procurement/purchase-orders/purchase-orders-page.tsx
+  s_43f32c25ef2007::t_38ec6474276a8f 4-11,24,70-73,76,147,149-152,154
+apps/construction-management/components/procurement/purchase-orders/purchase-orders.stories.tsx
+  s_43f32c25ef2007::t_a46f8c7c59c0a3 86
+apps/construction-management/components/procurement/purchase-requests/purchase-requests-page.tsx
+  s_43f32c25ef2007::t_4c791b04faaf61 4-15,28,76-91,192,194-197,199
+apps/construction-management/components/procurement/purchase-requests/purchase-requests.stories.tsx
+  s_43f32c25ef2007::t_6e96f6ba379269 69,78
+apps/construction-management/components/procurement/stores/store-detail-page.tsx
+  s_43f32c25ef2007::t_20537039c2436b 4-12,123-144
+apps/construction-management/components/procurement/transfers/transfers-list.stories.tsx
+  s_43f32c25ef2007::t_b18240f27dc2da 85
+apps/construction-management/components/procurement/transfers/transfers-list.tsx
+  s_43f32c25ef2007::t_841a78b31b6386 8,22,57-59,259,261-264,266
+apps/construction-management/components/projects/documents/documents-skeletons.tsx
+  s_43f32c25ef2007::t_426a11fdd90e1e 8-11,21-28
+apps/construction-management/components/projects/documents/project-documents-page.stories.tsx
+  s_43f32c25ef2007::t_7d42b236919900 133-134,136-138,143,169
+apps/construction-management/components/projects/documents/project-documents-page.tsx
+  s_43f32c25ef2007::t_8787cc9b0f25bd 5,8-9,11-13,15,35,58-66,207,266-284
+apps/construction-management/components/projects/gallery/gallery-page.stories.tsx
+  s_43f32c25ef2007::t_98761eef71d152 194-195,203,210,381-382
+apps/construction-management/components/projects/gallery/gallery-page.tsx
+  s_43f32c25ef2007::t_ad119a25fcf704 24,65,452,454-457,459
+apps/construction-management/components/projects/gallery/gallery-skeletons.tsx
+  s_43f32c25ef2007::t_722b129d2fd799 1-2,5,7,9-16,37-41,49,51-60
+apps/construction-management/components/sales/bookings/bookings-list.stories.tsx
+  s_43f32c25ef2007::t_5113ba1e974a3d 64-65,68-69
+apps/construction-management/components/sales/bookings/bookings-list.tsx
+  s_43f32c25ef2007::t_a7301bc058ea51 5-13,25,63-86,93,124,126-129,131
+apps/construction-management/components/sales/inquiries/inquiries-list.stories.tsx
+  s_43f32c25ef2007::t_1576d056de660c 74,78-80,89-91,97-98,112-115,162
+apps/construction-management/components/sales/inquiries/inquiries-list.tsx
+  s_43f32c25ef2007::t_88823fa60452cc 29,70,72,119-120,202-203,205-208,210-211,213-216,218
+apps/construction-management/components/sales/inquiries/inquiries-skeletons.tsx
+  s_43f32c25ef2007::t_9535e74228360e 1-12,14,21,37-38,42,46-70,113-123,125-134,140,148-150
+apps/construction-management/components/site-work/hindrances/hindrances-list.stories.tsx
+  s_43f32c25ef2007::t_6e8279e26c1f6c 69
+apps/construction-management/components/site-work/hindrances/hindrances-list.tsx
+  s_43f32c25ef2007::t_079ff9b7012db7 16,54-57,252,254-257,259
+apps/construction-management/components/site-work/site-work-skeletons.tsx
+  s_43f32c25ef2007::t_48dc4b6e37fad0 1,4,13,432-438,469,472-482
+apps/construction-management/components/team-members/edit-team-member.tsx
+  s_43f32c25ef2007::t_408d3954d1e032 10-16,221-224,226-229,231-234
+apps/construction-management/components/team-members/team-members-page.stories.tsx
+  s_43f32c25ef2007::t_c2bac687f2dfb4 250
+apps/construction-management/components/team-members/team-members-page.tsx
+  s_43f32c25ef2007::t_27b37d435f593e 9-18,47,72-87,90,138,140-142,148
+apps/construction-management/components/team-members/team-members-skeletons.tsx
+  s_43f32c25ef2007::t_0deed1600d6948 1,125-128,130,134
+apps/construction-management/components/tracking/inspections/inspections-list.stories.tsx
+  s_43f32c25ef2007::t_c255330aaa6452 70,78-79,82,93,159,167
+apps/construction-management/components/tracking/inspections/inspections-list.tsx
+  s_43f32c25ef2007::t_17eafacea0dba3 4-11,24,80-85,138,414-415,417-427,430,436,479
+apps/construction-management/components/tracking/issues/issues-list.stories.tsx
+  s_43f32c25ef2007::t_0d86cb0852e378 81-82,85-86,90,94-97,99-103,161-162,168
+apps/construction-management/components/tracking/issues/issues-list.tsx
+  s_43f32c25ef2007::t_ce4e9d3de288c8 4-12,25,119-126,132-133,173,175-178,180
+apps/construction-management/components/tracking/tasks/tasks-page.tsx
+  s_43f32c25ef2007::t_82acc7041111a6 4,92-99
+apps/construction-management/components/tracking/tracking-skeletons.tsx
+  s_43f32c25ef2007::t_d2eb167b3e40c7 1,80,84-92,392,396
+apps/construction-management/components/vendors/vendors-page.stories.tsx
+  s_43f32c25ef2007::t_c3b0809f344672 77
+apps/construction-management/components/vendors/vendors-page.tsx
+  s_43f32c25ef2007::t_c74ba9867b6bc4 4-12,41,81-84,93,137,139-141,147
+apps/construction-management/e2e/pages/UsersPage.ts
+  s_43f32c25ef2007::t_adca8ee50fd5c9 22-23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "31b8578d96bbd406748326649622c7be2bdc4656",
+  "prompts": {},
+  "sessions": {
+    "s_43f32c25ef2007": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "925748d9-ee5c-4753-bfa8-47d07468a8e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
