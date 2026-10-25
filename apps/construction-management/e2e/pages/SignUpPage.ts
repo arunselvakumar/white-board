@@ -25,6 +25,18 @@ export class SignUpPage extends BasePage {
     return this.button("Create account");
   }
 
+  /** "We sent a code to … Use another email": the whole line, to match exactly. */
+  public get codeSentNotice() {
+    return this.page
+      .getByRole("paragraph")
+      .filter({ hasText: /^We sent a code to / });
+  }
+
+  /** A non-empty form alert (the route announcer is an empty alert). */
+  public get formAlert() {
+    return this.page.getByRole("alert").filter({ hasText: /\S/ });
+  }
+
   public get codeInput() {
     return this.page.getByRole("textbox", { name: "6-digit code" });
   }

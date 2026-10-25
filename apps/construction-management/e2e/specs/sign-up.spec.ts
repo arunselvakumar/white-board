@@ -22,7 +22,9 @@ signUpPageTest.describe("Sign up", () => {
         email,
         password: PASSWORD,
       });
-      await expect(page.getByText(`We sent a code to ${email}`)).toBeVisible();
+      await expect(signUpPage.codeSentNotice).toHaveText(
+        `We sent a code to ${email}. Use another email`,
+      );
       await signUpPage.enterCode(await emailCodeFor(email));
 
       const createCompanyPage = new CreateCompanyPage(page);
@@ -47,9 +49,10 @@ signUpPageTest.describe("Sign up", () => {
         password: "someone-elses-pass-1",
       });
       // The same next step as for a new email: nothing says the account exists.
-      await expect(
-        page.getByText(`We sent a code to ${account.email}`),
-      ).toBeVisible();
+      await expect(signUpPage.codeSentNotice).toHaveText(
+        `We sent a code to ${account.email}. Use another email`,
+      );
+      await expect(signUpPage.formAlert).toHaveCount(0);
 
       const signInPage = new SignInPage(page);
       await signInPage.goto();
