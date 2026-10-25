@@ -1,0 +1,23 @@
+apps/whiteboard/components/fees/fees-catalog.tsx
+  s_14667960bbe88c::t_23c9bf50ff3900 159,167
+packages/ui/src/components/tabs.tsx
+  s_14667960bbe88c::t_ee71a966e6f6d7 26-27,29,33-34,46,55-66,75-76,84-85,90-93
+packages/ui/src/styles/globals.css
+  s_14667960bbe88c::t_4e75005f8ee8a5 220-251
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "5b2b3d776895a03903cea4f05a4900e27d0832f6",
+  "prompts": {},
+  "sessions": {
+    "s_14667960bbe88c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "49253162-660f-4cb6-99fb-1fe41a0873fb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
