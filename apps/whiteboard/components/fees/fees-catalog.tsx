@@ -156,7 +156,7 @@ export function FeesCatalog({
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               <TabsList
                 aria-label="Dues filters"
-                className="grid h-auto! w-full grid-cols-3 sm:inline-flex sm:h-11! sm:w-fit"
+                className="grid w-full grid-cols-3 sm:inline-flex sm:w-fit"
               >
                 {FEE_DUES_FILTERS.map((item) => {
                   const count = dues.counts[item.count];
@@ -164,7 +164,7 @@ export function FeesCatalog({
                     <TabsTrigger
                       key={item.value}
                       value={item.value}
-                      className="h-auto min-h-9 px-2 leading-tight whitespace-normal sm:h-full sm:flex-none sm:px-3 sm:whitespace-nowrap"
+                      className="min-h-9 px-2 leading-tight whitespace-normal sm:flex-none sm:px-3 sm:whitespace-nowrap"
                     >
                       <span className="text-center text-balance">
                         {item.label}{" "}
