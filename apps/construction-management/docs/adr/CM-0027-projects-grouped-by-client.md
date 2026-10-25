@@ -21,7 +21,7 @@ The "Your Projects" section shows one group per client: the client's name, how m
 
 ### 2. Hovering a folder lifts the paper, not the folder
 
-On hover or keyboard focus, the sheet of paper behind the front slides up out of the folder (12 px, 300 ms, ease-out). The front panel, its shadow and the kebab stay still. Under `prefers-reduced-motion` nothing moves. The keyboard focus ring on the front is unchanged.
+On hover or keyboard focus, the sheet of paper behind the front slides up out of the folder (6 px, 300 ms, ease-out; halved from 12 px on 2026-10-25, which lifted it too far). The front panel, its shadow and the kebab stay still. Under `prefers-reduced-motion` nothing moves. The keyboard focus ring on the front is unchanged.
 
 ### 3. The status filter is underline tabs kept in the address (amended 2026-10-25)
 

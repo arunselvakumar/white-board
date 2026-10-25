@@ -31,7 +31,7 @@ function FolderBack({ back }: { back: string }) {
           back,
         )}
       />
-      <div className="bg-card absolute inset-x-4 top-4 bottom-4 rounded-lg border shadow-xs transition-transform duration-300 ease-out group-focus-within/folder:-translate-y-3 group-hover/folder:-translate-y-3 motion-reduce:transition-none motion-reduce:group-focus-within/folder:translate-y-0 motion-reduce:group-hover/folder:translate-y-0" />
+      <div className="bg-card absolute inset-x-4 top-4 bottom-4 rounded-lg border shadow-xs transition-transform duration-300 ease-out group-focus-within/folder:-translate-y-1.5 group-hover/folder:-translate-y-1.5 motion-reduce:transition-none motion-reduce:group-focus-within/folder:translate-y-0 motion-reduce:group-hover/folder:translate-y-0" />
     </div>
   );
 }

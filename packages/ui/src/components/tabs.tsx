@@ -95,7 +95,7 @@ function TabsList({
 }
 
 const tabsTriggerVariants = cva(
-  "group/tabs-trigger text-muted-foreground hover:text-foreground data-active:text-foreground focus-visible:ring-ring/50 relative inline-flex items-center text-sm font-medium whitespace-nowrap outline-none select-none group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/tabs-trigger text-muted-foreground hover:text-foreground data-active:text-foreground focus-visible:ring-ring/50 relative inline-flex cursor-pointer items-center text-sm font-medium whitespace-nowrap outline-none select-none group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
