@@ -360,7 +360,7 @@ export function TeamMemberDetailsFields<
           <legend className="text-sm font-semibold">Salary</legend>
           <p id="member-salary-hint" className="text-muted-foreground text-xs">
             {canSeeSalary
-              ? "Optional. You can add or change it later from Edit Staff."
+              ? "Optional. Only people with the Financial right on Staff see it."
               : "You cannot see salaries. Ask the Owner for the Financial right on Staff."}
           </p>
           {canSeeSalary && (
