@@ -36,6 +36,12 @@ Each spec has the same sections: Legacy behaviour · Entities & fields · Workfl
 | 12  | [Settings & Configuration](./modules/12-settings-configuration.md)                             | Numbering sequences, back-dated entry control, currency, form configuration, module visibility                                                             |
 | 13  | [Chat, Notifications & Support](./modules/13-chat-notifications-support.md)                    | Member/group/project chat, push notifications, support tickets, announcements                                                                              |
 
+### Testing
+
+| Doc                            | What it answers                                                                                    |
+| ------------------------------ | -------------------------------------------------------------------------------------------------- |
+| [e2e-tests.md](./e2e-tests.md) | Every Playwright end-to-end test, module by module, and which run on each PR (`@pr`) (ADR CM-0031) |
+
 ### Research
 
 | Doc                                                                      | What it answers                                                                                                                                                          |
