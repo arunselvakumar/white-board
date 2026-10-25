@@ -168,8 +168,14 @@ export function ShiftsPage({
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
           <TabsList aria-label="Shifts and rotations">
-            <TabsTrigger value="shifts">Shift templates</TabsTrigger>
-            <TabsTrigger value="rotations">Rotations</TabsTrigger>
+            <TabsTrigger value="shifts">
+              <Clock aria-hidden="true" />
+              Shift templates
+            </TabsTrigger>
+            <TabsTrigger value="rotations">
+              <Repeat aria-hidden="true" />
+              Rotations
+            </TabsTrigger>
           </TabsList>
           {tab === "shifts"
             ? shifts.items.length > 0

@@ -127,7 +127,7 @@ export const List: Story = {
 export const Filter: Story = {
   play: async ({ canvas, userEvent }) => {
     await canvas.findByRole("table", { name: "Quotations" });
-    await userEvent.click(canvas.getByRole("button", { name: "Suppliers" }));
+    await userEvent.click(canvas.getByRole("tab", { name: "Suppliers" }));
     await waitFor(() =>
       expect(
         listed().some((query) => query.get("partyKind") === "supplier"),
@@ -150,7 +150,7 @@ export const Filter: Story = {
     );
     await expect(await canvas.findByText("No quotations match")).toBeVisible();
 
-    await userEvent.click(canvas.getByRole("button", { name: "All" }));
+    await userEvent.click(canvas.getByRole("tab", { name: "All" }));
     await userEvent.clear(
       canvas.getByRole("searchbox", { name: "Search quotations" }),
     );

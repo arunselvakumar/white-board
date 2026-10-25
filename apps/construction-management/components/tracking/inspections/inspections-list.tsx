@@ -1,7 +1,14 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { ClipboardCheck, Plus } from "lucide-react";
+import {
+  CircleCheck,
+  CircleX,
+  ClipboardCheck,
+  Clock,
+  LayoutGrid,
+  Plus,
+} from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
@@ -14,6 +21,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
+import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import { Input } from "@repo/ui/components/input";
 import {
   Table,
@@ -23,7 +31,6 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
@@ -69,6 +76,12 @@ import {
 
 const MENU = "tracking.inspection_requests" as const;
 const ALL = "all";
+
+const STATUS_ICONS = {
+  pending: Clock,
+  approved: CircleCheck,
+  rejected: CircleX,
+} satisfies Record<InspectionStatus, typeof Clock>;
 
 type Filters = {
   status: InspectionStatus | null;
@@ -122,7 +135,7 @@ function outcomeText(
 }
 
 /**
- * A Project's Inspection Requests (CM-804): status chips with counts,
+ * A Project's Inspection Requests (CM-804): status tabs with counts,
  * filters (Department, Contractor, Inspector, location, date, search),
  * and for approvers a bulk mode that approves or rejects (one reason, and
  * **Also raise a snag**) the selected pending requests, skipping the rest.
@@ -398,32 +411,29 @@ function Rows({
     }
   };
 
-  const chips = (
-    <ToggleGroup
+  const tabs = (
+    <FilterTabs
       aria-label="Status"
-      className="flex-wrap"
-      value={[filters.status ?? ALL]}
-      onValueChange={(value: string[]) => {
-        const next = value[0];
-        if (next == null) return;
+      items={[
+        { value: ALL, label: "All", icon: LayoutGrid, count: allCount },
+        ...INSPECTION_STATUSES.map((status) => ({
+          value: status,
+          label: INSPECTION_STATUS_LABELS[status],
+          icon: STATUS_ICONS[status],
+          count: data.counts[status],
+        })),
+      ]}
+      value={filters.status ?? ALL}
+      onValueChange={(next) => {
         onStatus(isInspectionStatus(next) ? next : null);
       }}
-      variant="outline"
-      size="sm"
-    >
-      <ToggleGroupItem value={ALL}>All ({allCount})</ToggleGroupItem>
-      {INSPECTION_STATUSES.map((status) => (
-        <ToggleGroupItem key={status} value={status}>
-          {INSPECTION_STATUS_LABELS[status]} ({data.counts[status]})
-        </ToggleGroupItem>
-      ))}
-    </ToggleGroup>
+    />
   );
 
   if (data.items.length === 0)
     return (
       <div className="space-y-4">
-        {(filtered || allCount > 0) && chips}
+        {(filtered || allCount > 0) && tabs}
         <Empty className="border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
@@ -466,7 +476,7 @@ function Rows({
 
   return (
     <div className={cn("min-w-0 space-y-3", className)}>
-      {chips}
+      {tabs}
       <p className="text-muted-foreground text-sm">
         {data.total} {data.total === 1 ? "request" : "requests"}
       </p>

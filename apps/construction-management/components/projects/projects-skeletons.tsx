@@ -65,11 +65,19 @@ export function ProjectsHomeSkeleton() {
             />
           </div>
           <section className="bg-card @container rounded-2xl border shadow-xs">
-            <header className="flex flex-wrap items-center justify-between gap-3 px-5 pt-5 pb-3">
+            <header className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-5 pt-4 pb-3">
               <h2 className="text-base tracking-tight">Your Projects</h2>
-              <Skeleton className="h-8 w-72 max-w-full rounded-md" />
+              <div className="flex h-10 max-w-full items-center gap-4 overflow-hidden">
+                {[56, 96, 112, 96, 112].map((width, index) => (
+                  <Skeleton
+                    key={index}
+                    className="h-4 shrink-0 rounded-md"
+                    style={{ width }}
+                  />
+                ))}
+              </div>
             </header>
-            <div className="space-y-1 px-5 pt-1 pb-5">
+            <div className="space-y-4 px-5 pt-2 pb-5">
               <div className="flex items-center gap-2">
                 <Skeleton className="size-7 rounded-lg" />
                 <SkeletonText width="10rem" />

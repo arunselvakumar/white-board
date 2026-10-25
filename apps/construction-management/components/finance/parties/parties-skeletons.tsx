@@ -1,5 +1,6 @@
 "use client";
 
+import { FileText, ReceiptIndianRupee, ScrollText } from "lucide-react";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   SkeletonGroup,
@@ -152,11 +153,16 @@ export function PartyMoneyPageSkeleton({
       <OpeningCardSkeleton />
       <Tabs defaultValue="invoices" className="gap-4">
         <TabsList>
-          <TabsTrigger value="invoices">Invoices</TabsTrigger>
+          <TabsTrigger value="invoices">
+            <FileText aria-hidden="true" />
+            Invoices
+          </TabsTrigger>
           <TabsTrigger value="payments" disabled>
+            <ReceiptIndianRupee aria-hidden="true" />
             Payments
           </TabsTrigger>
           <TabsTrigger value="statement" disabled>
+            <ScrollText aria-hidden="true" />
             Statement
           </TabsTrigger>
         </TabsList>

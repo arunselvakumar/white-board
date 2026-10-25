@@ -7,7 +7,13 @@ import {
   useQueryClient,
   useSuspenseQueries,
 } from "@tanstack/react-query";
-import { KeyRound, Send } from "lucide-react";
+import {
+  FolderKanban,
+  KeyRound,
+  Send,
+  ShieldCheck,
+  UserRound,
+} from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@repo/ui/components/button";
@@ -212,11 +218,20 @@ export function EditTeamMember({ id }: { id: string }) {
         />
         <Tabs defaultValue="details" className="gap-6">
           <TabsList>
-            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="details">
+              <UserRound aria-hidden="true" />
+              Details
+            </TabsTrigger>
             {member.memberType === "normal" && (
-              <TabsTrigger value="projects">Projects</TabsTrigger>
+              <TabsTrigger value="projects">
+                <FolderKanban aria-hidden="true" />
+                Projects
+              </TabsTrigger>
             )}
-            <TabsTrigger value="role">Role</TabsTrigger>
+            <TabsTrigger value="role">
+              <ShieldCheck aria-hidden="true" />
+              Role
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="details">

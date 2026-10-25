@@ -1,7 +1,15 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { Pencil, Trash2 } from "lucide-react";
+import {
+  ArrowLeftRight,
+  ClipboardList,
+  FolderKanban,
+  Package,
+  Pencil,
+  Trash2,
+  Truck,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, useState } from "react";
@@ -112,15 +120,28 @@ export function StoreDetailPage({ storeId }: { storeId: string }) {
           }
         />
         <Tabs defaultValue="stock" className="gap-4">
-          <div className="-mx-1 overflow-x-auto px-1 pb-1">
-            <TabsList>
-              <TabsTrigger value="stock">Stock</TabsTrigger>
-              <TabsTrigger value="projects">Projects</TabsTrigger>
-              <TabsTrigger value="requests">Material Requests</TabsTrigger>
-              <TabsTrigger value="notes">Delivery Notes</TabsTrigger>
-              <TabsTrigger value="transfers">Transfers</TabsTrigger>
-            </TabsList>
-          </div>
+          <TabsList>
+            <TabsTrigger value="stock">
+              <Package aria-hidden="true" />
+              Stock
+            </TabsTrigger>
+            <TabsTrigger value="projects">
+              <FolderKanban aria-hidden="true" />
+              Projects
+            </TabsTrigger>
+            <TabsTrigger value="requests">
+              <ClipboardList aria-hidden="true" />
+              Material Requests
+            </TabsTrigger>
+            <TabsTrigger value="notes">
+              <Truck aria-hidden="true" />
+              Delivery Notes
+            </TabsTrigger>
+            <TabsTrigger value="transfers">
+              <ArrowLeftRight aria-hidden="true" />
+              Transfers
+            </TabsTrigger>
+          </TabsList>
           <TabsContent value="stock">
             <Suspense fallback={<InventorySkeleton />}>
               <InventoryPage

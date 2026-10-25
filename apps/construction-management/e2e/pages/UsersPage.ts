@@ -19,8 +19,8 @@ export class UsersPage extends AppShellPage {
 
   public statusFilter(name: string) {
     return this.page
-      .getByRole("group", { name: "Status" })
-      .getByRole("button", { name });
+      .getByRole("tablist", { name: "Status" })
+      .getByRole("tab", { name });
   }
 
   public get users() {

@@ -1,7 +1,14 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, Users } from "lucide-react";
+import {
+  CalendarDays,
+  ChartColumn,
+  ChevronLeft,
+  ChevronRight,
+  List,
+  Users,
+} from "lucide-react";
 import { Suspense, useState, useTransition } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
@@ -139,10 +146,19 @@ export function TeamLeavesPage({ today }: { today?: string }) {
         {options.permissions.viewTeam ? (
           <Tabs defaultValue="calendar" className="gap-4">
             <TabsList>
-              <TabsTrigger value="calendar">By day</TabsTrigger>
-              <TabsTrigger value="list">List</TabsTrigger>
+              <TabsTrigger value="calendar">
+                <CalendarDays aria-hidden="true" />
+                By day
+              </TabsTrigger>
+              <TabsTrigger value="list">
+                <List aria-hidden="true" />
+                List
+              </TabsTrigger>
               {options.permissions.report ? (
-                <TabsTrigger value="report">Report</TabsTrigger>
+                <TabsTrigger value="report">
+                  <ChartColumn aria-hidden="true" />
+                  Report
+                </TabsTrigger>
               ) : null}
             </TabsList>
             <div className={cn(updating && "opacity-60 transition-opacity")}>

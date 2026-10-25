@@ -5,6 +5,7 @@ import type {
   OpenApiOperation,
 } from "@/app/api/_lib/openapi";
 
+import { UpdateConstructionProjectsProjectColorRequestModel } from "./projects/[id]/color/update/update-project-color-request-model";
 import { UpdateConstructionProjectsProjectRequestModel } from "./projects/[id]/update/update-project-request-model";
 import { CreateConstructionProjectsProjectRequestModel } from "./projects/create-project-request-model";
 import { ListConstructionProjectsCustomFieldLabelsResponseModel } from "./projects/custom-field-labels/custom-field-labels-models";
@@ -37,6 +38,7 @@ export const projectsOpenApiComponents: OpenApiComponents = {
   ConstructionProjectsProjectResponseModel,
   CreateConstructionProjectsProjectRequestModel,
   UpdateConstructionProjectsProjectRequestModel,
+  UpdateConstructionProjectsProjectColorRequestModel,
   ListConstructionProjectsProjectOptionsResponseModel,
   ListConstructionProjectsCustomFieldLabelsResponseModel,
 };
@@ -134,6 +136,24 @@ export const projectsOpenApiOperations: OpenApiOperation[] = [
       StatusCodes.NOT_FOUND,
       StatusCodes.CONFLICT,
       StatusCodes.PAYMENT_REQUIRED,
+    ],
+  },
+  {
+    method: "post",
+    path: `${BASE}/{id}/color/update`,
+    summary:
+      "Change a Project's folder colour alone, from its menu on the Projects home (menu `projects.project`, update; 400 PROJECT_COLOR_INVALID)",
+    tags: PROJECTS,
+    params: ConstructionProjectsProjectParamsModel,
+    body: UpdateConstructionProjectsProjectColorRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The updated Project",
+    successSchema: ConstructionProjectsProjectResponseModel,
+    errors: [
+      StatusCodes.BAD_REQUEST,
+      ...SESSION_ERRORS,
+      StatusCodes.NOT_FOUND,
+      StatusCodes.CONFLICT,
     ],
   },
   {

@@ -247,7 +247,7 @@ export const FiltersByStatus: Story = {
   play: async ({ canvas, userEvent }) => {
     await canvas.findByText("1 User");
     await userEvent.click(
-      canvas.getByRole("button", { name: "Joining Pending" }),
+      canvas.getByRole("tab", { name: /^Joining Pending/ }),
     );
     await waitFor(() =>
       expect(fetchMock?.spy).toHaveBeenCalledWith(

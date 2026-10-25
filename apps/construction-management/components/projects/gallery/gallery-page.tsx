@@ -21,6 +21,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
+import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import { Input } from "@repo/ui/components/input";
 import {
   InputGroup,
@@ -42,7 +43,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@repo/ui/components/sheet";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 import { cn } from "@repo/ui/lib/utils";
 
 import { formatBytes } from "@/lib/project-documents";
@@ -62,16 +62,11 @@ import {
 
 import { FileThumbnail } from "../files/file-thumbnail";
 import { FileViewer } from "../files/file-viewer";
+import { GALLERY_TYPE_TABS } from "./gallery-skeletons";
 
 const SEARCH_DELAY_MS = 300;
 
 const ALL = "all";
-
-const TYPE_FILTERS: { value: GalleryFilter["type"]; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "image", label: "Images" },
-  { value: "pdf", label: "PDFs" },
-];
 
 const SOURCE_FILTERS = [
   { value: ALL, label: "All sources" },
@@ -454,22 +449,14 @@ export function GalleryPage({ projectId }: { projectId: string }) {
               }}
             />
           </InputGroup>
-          <ToggleGroup
+          <FilterTabs
             aria-label="Type"
-            value={[filter.type]}
-            onValueChange={(value: string[]) => {
-              const next = value[0] as GalleryFilter["type"] | undefined;
-              if (next != null) change({ type: next });
+            items={GALLERY_TYPE_TABS}
+            value={filter.type}
+            onValueChange={(next) => {
+              change({ type: next });
             }}
-            variant="outline"
-            size="sm"
-          >
-            {TYPE_FILTERS.map((type) => (
-              <ToggleGroupItem key={type.value} value={type.value}>
-                {type.label}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+          />
           <Button
             type="button"
             variant="outline"

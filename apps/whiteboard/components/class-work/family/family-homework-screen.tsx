@@ -2,6 +2,7 @@
 
 import { useAuth } from "@repo/auth/react";
 import { Card, CardContent } from "@repo/ui/components/card";
+import { BookOpen, ClipboardList } from "lucide-react";
 import {
   Empty,
   EmptyDescription,
@@ -10,6 +11,7 @@ import {
 import {
   Tabs,
   TabsContent,
+  TabsCount,
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components/tabs";
@@ -126,23 +128,25 @@ function StudentClassWork({
       ))}
       <Tabs defaultValue="homework" className="gap-4">
         <TabsList aria-label="Homework and Study Material">
-          <TabsTrigger value="homework" className="px-3 sm:px-4">
+          <TabsTrigger value="homework">
+            <ClipboardList aria-hidden="true" />
             Homework
             {groups.overdue.length > 0 && (
               <>
-                <span
+                <TabsCount
                   aria-hidden="true"
-                  className="bg-destructive/10 text-destructive rounded-full px-1.5 text-xs tabular-nums"
+                  className="bg-destructive/10 text-destructive group-data-active/tabs-trigger:bg-destructive/10 group-data-active/tabs-trigger:text-destructive"
                 >
                   {groups.overdue.length}
-                </span>
+                </TabsCount>
                 <span className="sr-only">
                   ({groups.overdue.length} overdue)
                 </span>
               </>
             )}
           </TabsTrigger>
-          <TabsTrigger value="materials" className="px-3 sm:px-4">
+          <TabsTrigger value="materials">
+            <BookOpen aria-hidden="true" />
             Study Material
           </TabsTrigger>
         </TabsList>

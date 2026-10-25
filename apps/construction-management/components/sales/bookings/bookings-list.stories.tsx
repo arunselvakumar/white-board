@@ -61,12 +61,12 @@ export const List: Story = {
   },
 };
 
-/** The chips filter by status, Hold expired included. */
-export const StatusChips: Story = {
+/** The tabs filter by status, Hold expired included. */
+export const StatusTabs: Story = {
   play: async ({ canvas, userEvent }) => {
     await canvas.findByRole("list", { name: "Bookings" });
-    const status = within(canvas.getByRole("group", { name: "Status" }));
-    await userEvent.click(status.getByRole("button", { name: "Hold expired" }));
+    const status = within(canvas.getByRole("tablist", { name: "Status" }));
+    await userEvent.click(status.getByRole("tab", { name: /^Hold expired/ }));
     await waitFor(async () => {
       await expect(
         api.calls.mock.calls.some(

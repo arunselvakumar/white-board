@@ -130,16 +130,17 @@ export const WithFiles: Story = {
     );
     await closeMenu(context);
 
-    const filter = within(canvas.getByRole("group", { name: "Paper" }));
+    const filter = within(canvas.getByRole("tablist", { name: "Paper" }));
+    // Each tab is its label, then its count.
     await expect(
-      filter.getAllByRole("button").map((button) => button.textContent),
-    ).toEqual(["All 5", "Quotation 1", "PO / WO 2", "Agreement 1", "Other 1"]);
-    await userEvent.click(filter.getByRole("button", { name: "PO / WO 2" }));
+      filter.getAllByRole("tab").map((tab) => tab.textContent),
+    ).toEqual(["All5", "Quotation1", "PO / WO2", "Agreement1", "Other1"]);
+    await userEvent.click(filter.getByRole("tab", { name: /^PO \/ WO/ }));
     await expect(canvas.getAllByRole("heading", { level: 3 })).toHaveLength(1);
     await expect(
       canvas.queryByText("Quotation_SBD_114.pdf"),
     ).not.toBeInTheDocument();
-    await userEvent.click(filter.getByRole("button", { name: "All 5" }));
+    await userEvent.click(filter.getByRole("tab", { name: /^All/ }));
     await expect(canvas.getAllByRole("heading", { level: 3 })).toHaveLength(4);
 
     await expect(
@@ -165,7 +166,7 @@ export const Empty: Story = {
     await expect(
       canvas.getAllByRole("button", { name: "Upload" }),
     ).toHaveLength(1);
-    await expect(canvas.queryByRole("group", { name: "Paper" })).toBeNull();
+    await expect(canvas.queryByRole("tablist", { name: "Paper" })).toBeNull();
   },
 };
 

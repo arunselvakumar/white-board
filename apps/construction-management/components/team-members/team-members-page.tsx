@@ -6,7 +6,16 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { MoreHorizontal, Plus, Search, Users } from "lucide-react";
+import {
+  CircleDot,
+  CircleX,
+  Clock,
+  LayoutGrid,
+  MoreHorizontal,
+  Plus,
+  Search,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { Suspense, useDeferredValue, useState, useTransition } from "react";
 import {
@@ -35,12 +44,12 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
+import { FilterTabs, type FilterTab } from "@repo/ui/components/filter-tabs";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@repo/ui/components/input-group";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
@@ -60,9 +69,25 @@ import { MemberStatusBadge, STATUS_FILTERS } from "./member-status-badge";
 import { ShareInviteDialog } from "./share-invite-dialog";
 import { TeamMemberRowsSkeleton } from "./team-members-skeletons";
 
+const STATUS_ICONS = {
+  all: LayoutGrid,
+  active: CircleDot,
+  joining_pending: Clock,
+  rejected: CircleX,
+} satisfies Record<
+  (typeof STATUS_FILTERS)[number]["value"],
+  FilterTab<string>["icon"]
+>;
+
+const STATUS_TABS: FilterTab<TeamMemberListFilter["status"]>[] =
+  STATUS_FILTERS.map((filter) => ({
+    ...filter,
+    icon: STATUS_ICONS[filter.value],
+  }));
+
 /**
  * Users & Roles → Users (CM-111, ADR CM-0030): the Company's Team Members,
- * with search, status chips, their Role and row actions.
+ * with search, status tabs, their Role and row actions.
  */
 export function TeamMembersPage({
   canAdd = true,
@@ -110,27 +135,17 @@ export function TeamMembersPage({
               }}
             />
           </InputGroup>
-          <ToggleGroup
+          <FilterTabs
             aria-label="Status"
-            value={[status]}
-            onValueChange={(value: string[]) => {
-              const next = value[0] as
-                TeamMemberListFilter["status"] | undefined;
-              if (next == null) return;
+            items={STATUS_TABS}
+            value={status}
+            onValueChange={(next) => {
               startTransition(() => {
                 setStatus(next);
                 setCursor(null);
               });
             }}
-            variant="outline"
-            size="sm"
-          >
-            {STATUS_FILTERS.map((filter) => (
-              <ToggleGroupItem key={filter.value} value={filter.value}>
-                {filter.label}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+          />
         </div>
         <Suspense fallback={<TeamMemberRowsSkeleton />}>
           <TeamMemberRows

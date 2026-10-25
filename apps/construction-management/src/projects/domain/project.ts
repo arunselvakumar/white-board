@@ -447,6 +447,17 @@ export class Project {
     return removed;
   }
 
+  /**
+   * The folder's colour alone, from the Projects home's menu (ADR CM-0026
+   * §5); false when it already had that colour.
+   */
+  setColor(raw: string, by: string, now: Date): boolean {
+    const color = cleanProjectColor(raw);
+    if (color === this.props.color) return false;
+    this.props = { ...this.props, color, updatedAt: now, updatedBy: by };
+    return true;
+  }
+
   delete(by: string, now: Date): void {
     if (this.props.deletedAt != null)
       throw notFound("PROJECT_NOT_FOUND", "This Project was deleted.");

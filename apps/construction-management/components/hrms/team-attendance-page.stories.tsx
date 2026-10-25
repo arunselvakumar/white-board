@@ -56,18 +56,18 @@ export const FiltersTheTeam: Story = {
     await expect(row).toHaveTextContent("Late");
     await expect(row).toHaveTextContent("Outside fence");
 
-    await userEvent.click(canvas.getByRole("button", { name: /Checked in 2/ }));
+    await userEvent.click(canvas.getByRole("tab", { name: /^Checked in\s*2/ }));
     await expect(names(canvas.getByRole("list"))).toEqual([
       "Prabhu Saravanan",
       "Meena Rajan",
     ]);
     await userEvent.click(
-      canvas.getByRole("button", { name: /Not checked in 1/ }),
+      canvas.getByRole("tab", { name: /^Not checked in\s*1/ }),
     );
     const missing = canvas.getByRole("list");
     await expect(names(missing)).toEqual(["Divya Lakshmi"]);
     await expect(missing).toHaveTextContent("Open from earlier");
-    await userEvent.click(canvas.getByRole("button", { name: /Day off 0/ }));
+    await userEvent.click(canvas.getByRole("tab", { name: /^Day off\s*0/ }));
     await expect(canvas.getByText("Nobody matches this filter.")).toBeVisible();
   },
 };

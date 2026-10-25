@@ -1,5 +1,6 @@
 "use client";
 
+import { Hammer, Truck, UserRoundPlus } from "lucide-react";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import { SkeletonGroup, SkeletonText } from "@repo/ui/components/skeleton-kit";
 import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/tabs";
@@ -12,9 +13,19 @@ import { PageHeader } from "@/components/app-shell/page-header";
  */
 
 export const PARTY_TABS = [
-  { value: "contractor", label: "Contractors", noun: "Contractor" },
-  { value: "supplier", label: "Suppliers", noun: "Supplier" },
-  { value: "other_party", label: "Other Parties", noun: "Other Party" },
+  {
+    value: "contractor",
+    label: "Contractors",
+    noun: "Contractor",
+    icon: Hammer,
+  },
+  { value: "supplier", label: "Suppliers", noun: "Supplier", icon: Truck },
+  {
+    value: "other_party",
+    label: "Other Parties",
+    noun: "Other Party",
+    icon: UserRoundPlus,
+  },
 ] as const;
 
 const WIDE = "hidden py-2 pl-2 text-right sm:table-cell";
@@ -77,14 +88,10 @@ export function CentralPaymentSkeleton() {
             </p>
           </div>
           <Tabs defaultValue="contractor">
-            <TabsList aria-label="Party type" className="w-full sm:w-fit">
+            <TabsList aria-label="Party type">
               {PARTY_TABS.map((item) => (
-                <TabsTrigger
-                  key={item.value}
-                  value={item.value}
-                  className="min-w-0 flex-1 sm:flex-none"
-                  disabled
-                >
+                <TabsTrigger key={item.value} value={item.value} disabled>
+                  <item.icon aria-hidden="true" />
                   {item.label}
                 </TabsTrigger>
               ))}

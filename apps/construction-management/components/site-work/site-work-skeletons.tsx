@@ -1,6 +1,7 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CircleCheck, CircleDot, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import type { FilterTab } from "@repo/ui/components/filter-tabs";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   FormSkeleton,
@@ -9,6 +10,7 @@ import {
   TableSkeleton,
   type SkeletonColumn,
 } from "@repo/ui/components/skeleton-kit";
+import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/tabs";
 import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeaderSkeleton } from "@/components/app-shell/page-header-skeleton";
@@ -427,6 +429,13 @@ export function EditEquipmentSkeleton() {
   );
 }
 
+/** The Hindrances list's Status tabs. */
+export const HINDRANCE_STATUS_TABS: FilterTab<"all" | "open" | "closed">[] = [
+  { value: "all", label: "All", icon: LayoutGrid },
+  { value: "open", label: "Open", icon: CircleDot },
+  { value: "closed", label: "Closed", icon: CircleCheck },
+];
+
 /** Hindrances: the count, then cards two to a row from `lg`. */
 export function HindranceRowsSkeleton() {
   return (
@@ -457,10 +466,20 @@ export function HindrancesPageSkeleton() {
     <div className="flex w-full max-w-6xl flex-col gap-4 p-6">
       <h2 className="font-semibold">Hindrances</h2>
       <div
-        aria-hidden="true"
+        inert
         className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end"
       >
-        <Skeleton className="h-7 w-44 rounded-lg" />
+        {/* The icons render here, not in `FilterTabs`, so a server page can show this. */}
+        <Tabs defaultValue="all" className="min-w-0">
+          <TabsList aria-label="Status">
+            {HINDRANCE_STATUS_TABS.map(({ value, label, icon: Icon }) => (
+              <TabsTrigger key={value} value={value}>
+                {Icon == null ? null : <Icon aria-hidden />}
+                {label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
         {["Cause", "Responsible party", "From", "To"].map((label) => (
           <div key={label} className="space-y-1">
             <p className="text-xs leading-none font-medium">{label}</p>

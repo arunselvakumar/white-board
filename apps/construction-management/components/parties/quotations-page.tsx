@@ -1,7 +1,15 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ExternalLink, FileText, Search } from "lucide-react";
+import {
+  ExternalLink,
+  FileText,
+  Hammer,
+  LayoutGrid,
+  type LucideIcon,
+  Search,
+  Truck,
+} from "lucide-react";
 import Link from "next/link";
 import { Suspense, useDeferredValue, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
@@ -12,6 +20,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
+import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import {
   InputGroup,
   InputGroupAddon,
@@ -25,7 +34,6 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
@@ -41,12 +49,15 @@ import { quotationOpenUrl } from "./party-quotations";
 import { PARTY_SCREENS, partyEditPath } from "./party-screens";
 import { QuotationRowsSkeleton } from "./parties-skeletons";
 
-const KIND_FILTERS: { value: QuotationsFilter["partyKind"]; label: string }[] =
-  [
-    { value: "all", label: "All" },
-    { value: "contractor", label: "Contractors" },
-    { value: "supplier", label: "Suppliers" },
-  ];
+const KIND_FILTERS: {
+  value: QuotationsFilter["partyKind"];
+  label: string;
+  icon: LucideIcon;
+}[] = [
+  { value: "all", label: "All", icon: LayoutGrid },
+  { value: "contractor", label: "Contractors", icon: Hammer },
+  { value: "supplier", label: "Suppliers", icon: Truck },
+];
 
 /** The day it was uploaded, in India: "4 Mar 2026". */
 const UPLOADED_ON = new Intl.DateTimeFormat("en-IN", {
@@ -102,27 +113,17 @@ export function QuotationsPage() {
               }}
             />
           </InputGroup>
-          <ToggleGroup
+          <FilterTabs
             aria-label="Party"
-            value={[partyKind]}
-            onValueChange={(value: string[]) => {
-              const next = value[0] as
-                QuotationsFilter["partyKind"] | undefined;
-              if (next == null) return;
+            items={KIND_FILTERS}
+            value={partyKind}
+            onValueChange={(next) => {
               startTransition(() => {
                 setPartyKind(next);
                 setCursor(null);
               });
             }}
-            variant="outline"
-            size="sm"
-          >
-            {KIND_FILTERS.map((filter) => (
-              <ToggleGroupItem key={filter.value} value={filter.value}>
-                {filter.label}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+          />
         </div>
         <Suspense fallback={<QuotationRowsSkeleton />}>
           <QuotationRows

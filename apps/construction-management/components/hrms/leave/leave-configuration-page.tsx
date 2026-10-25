@@ -1,7 +1,13 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Layers, MoreHorizontal, Plus, UserPlus } from "lucide-react";
+import {
+  CalendarOff,
+  Layers,
+  MoreHorizontal,
+  Plus,
+  UserPlus,
+} from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
@@ -102,8 +108,14 @@ export function LeaveConfigurationPage({ today }: { today?: string }) {
         </div>
         <Tabs defaultValue="types" className="gap-4">
           <TabsList>
-            <TabsTrigger value="types">Leave types</TabsTrigger>
-            <TabsTrigger value="structures">Structures</TabsTrigger>
+            <TabsTrigger value="types">
+              <CalendarOff aria-hidden="true" />
+              Leave types
+            </TabsTrigger>
+            <TabsTrigger value="structures">
+              <Layers aria-hidden="true" />
+              Structures
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="types">
             <LeaveTypesTab />

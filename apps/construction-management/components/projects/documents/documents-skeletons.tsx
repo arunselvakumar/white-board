@@ -5,7 +5,10 @@ import { SkeletonGroup, SkeletonText } from "@repo/ui/components/skeleton-kit";
 
 const WIDTHS = ["58%", "44%", "66%", "50%"];
 
-/** The real heading, the category chips, then a group of documents. */
+/** The paper tabs come from the files, so their labels are bars. */
+const TAB_WIDTHS = ["2rem", "4.5rem", "4rem", "4.5rem"];
+
+/** The real heading, the paper tabs, then a group of documents. */
 export function ProjectDocumentsSkeleton() {
   return (
     <div className="w-full max-w-5xl space-y-5 p-6">
@@ -15,7 +18,14 @@ export function ProjectDocumentsSkeleton() {
         </div>
       </div>
       <SkeletonGroup label="Loading documents" className="space-y-5">
-        <Skeleton className="h-8 w-72 max-w-full rounded-md" />
+        <div className="flex h-10 max-w-full items-center overflow-hidden">
+          {TAB_WIDTHS.map((width, tab) => (
+            <span key={tab} className="flex shrink-0 items-center gap-2 px-3">
+              <Skeleton className="size-4 rounded-sm" />
+              <Skeleton className="h-3 rounded-sm" style={{ width }} />
+            </span>
+          ))}
+        </div>
         <section className="space-y-2">
           <SkeletonText width="10rem" />
           <ul className="divide-border bg-card divide-y rounded-lg border">

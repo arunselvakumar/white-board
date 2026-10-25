@@ -242,6 +242,30 @@ export class ProjectHandlers {
   }
 
   /**
+   * Change colour from the folder's menu (ADR CM-0026 §5): the colour
+   * alone, so it needs no `expectedUpdatedAt` from the caller. The same
+   * colour again changes nothing.
+   */
+  async setColor(input: {
+    viewer: ProjectViewer;
+    id: string;
+    by: string;
+    color: string;
+  }): Promise<ProjectReadModel> {
+    const project = await this.load(input.viewer, input.id);
+    const loadedAt = project.updatedAt;
+    const before = projectSnapshot(project);
+    if (!project.setColor(input.color, input.by, this.clock()))
+      return toProjectReadModel(project);
+    await this.projects.update(
+      project,
+      loadedAt,
+      this.audit(project, input.by, "project.updated", before),
+    );
+    return toProjectReadModel(project);
+  }
+
+  /**
    * Tombstone; 409 `PROJECT_IN_USE` while site records, documents, Wings,
    * Locations, drawings or testing reports point at it.
    */

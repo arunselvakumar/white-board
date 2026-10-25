@@ -172,12 +172,9 @@ export const Filters: Story = {
     );
 
     await userEvent.click(
-      within(canvas.getByRole("group", { name: "Status" })).getByRole(
-        "button",
-        {
-          name: "Inactive",
-        },
-      ),
+      within(canvas.getByRole("tablist", { name: "Status" })).getByRole("tab", {
+        name: /^Inactive/,
+      }),
     );
     await waitFor(() =>
       expect(listUrls().some((url) => url.includes("active=false"))).toBe(true),

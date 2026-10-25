@@ -5,6 +5,7 @@ import {
   ArrowDownLeft,
   ArrowLeftRight,
   ArrowUpRight,
+  LayoutGrid,
   Plus,
 } from "lucide-react";
 import Link from "next/link";
@@ -18,6 +19,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
+import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import {
@@ -27,7 +29,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 import { cn } from "@repo/ui/lib/utils";
 
 import {
@@ -53,9 +54,9 @@ import { TransferStatusBadge, useTransferSideCan } from "./transfer-parts";
 import { TransferRowsSkeleton } from "@/components/procurement/procurement-skeletons";
 
 const DIRECTIONS = [
-  { value: "all", label: "All" },
-  { value: "out", label: "Sent" },
-  { value: "in", label: "Received" },
+  { value: "all", label: "All", icon: LayoutGrid },
+  { value: "out", label: "Sent", icon: ArrowUpRight },
+  { value: "in", label: "Received", icon: ArrowDownLeft },
 ] as const;
 
 const ALL = "all";
@@ -255,25 +256,14 @@ export function TransfersList({
         </Suspense>
       </div>
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
-        <ToggleGroup
+        <FilterTabs
           aria-label="Direction"
-          value={[filters.direction ?? ALL]}
-          onValueChange={(value: string[]) => {
-            const next = value[0];
-            if (next == null) return;
-            change({
-              direction: next === "in" || next === "out" ? next : null,
-            });
+          items={DIRECTIONS}
+          value={filters.direction ?? ALL}
+          onValueChange={(next) => {
+            change({ direction: next === ALL ? null : next });
           }}
-          variant="outline"
-          size="sm"
-        >
-          {DIRECTIONS.map((item) => (
-            <ToggleGroupItem key={item.value} value={item.value}>
-              {item.label}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
+        />
         <Select
           items={[
             { value: ALL, label: "Any status" },

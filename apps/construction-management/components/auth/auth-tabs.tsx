@@ -18,7 +18,7 @@ export function AuthTabs({
 }) {
   return (
     <Tabs defaultValue="mobile" className="gap-6">
-      <TabsList className="w-full">
+      <TabsList variant="pill" className="w-full">
         <TabsTrigger value="mobile">Mobile</TabsTrigger>
         <TabsTrigger value="email">Email</TabsTrigger>
       </TabsList>

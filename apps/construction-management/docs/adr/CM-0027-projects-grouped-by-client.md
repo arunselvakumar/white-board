@@ -23,6 +23,10 @@ The "Your Projects" section shows one group per client: the client's name, how m
 
 On hover or keyboard focus, the sheet of paper behind the front slides up out of the folder (12 px, 300 ms, ease-out). The front panel, its shadow and the kebab stay still. Under `prefers-reduced-motion` nothing moves. The keyboard focus ring on the front is unchanged.
 
+### 3. The status filter is underline tabs kept in the address (amended 2026-10-25)
+
+The status filter above the folders (All, Ongoing, Not started, On hold, Completed, each with its count) is a row of tabs with an icon left of the label. The picked one is underlined, and a faint underline shows on hover. The pick is kept in the query string (`?status=on_hold`, managed by `nuqs`), so a filtered list survives a reload and can be shared. "All" adds nothing to the address. The status totals above it set the same parameter. Each client group has 16 px between its heading and its folders, so the folder tabs don't touch the heading.
+
 ## Consequences
 
 - Two spellings of a client that differ by more than case or spacing ("Sri Balaji Developers" and "Sri Balaji Devs") are two groups until someone edits one. Clients are not a master record yet. If they become one, the group should key on its id.

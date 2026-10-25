@@ -58,10 +58,10 @@ export const ApprovesWithRemarks: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     await expect(
-      await canvas.findByRole("tab", { name: "Pending (2)" }),
+      await canvas.findByRole("tab", { name: /^Pending\s*2$/ }),
     ).toBeVisible();
     await expect(
-      canvas.getByRole("tab", { name: "Cancel Requests (1)" }),
+      canvas.getByRole("tab", { name: /^Cancel Requests\s*1$/ }),
     ).toBeVisible();
     // Your own request waits for someone else.
     await expect(
@@ -140,7 +140,7 @@ export const DecidesACancellation: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     await userEvent.click(
-      await canvas.findByRole("tab", { name: "Cancel Requests (1)" }),
+      await canvas.findByRole("tab", { name: /^Cancel Requests\s*1$/ }),
     );
     await userEvent.click(
       await canvas.findByRole("button", { name: "Approve cancellation" }),

@@ -1,7 +1,14 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { Plus, ShoppingCart } from "lucide-react";
+import {
+  CircleCheck,
+  CircleX,
+  Clock,
+  LayoutGrid,
+  Plus,
+  ShoppingCart,
+} from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
@@ -14,6 +21,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
+import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import {
   Table,
   TableBody,
@@ -22,7 +30,6 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
@@ -60,13 +67,13 @@ import {
 import { PurchaseOrderRowsSkeleton } from "@/components/procurement/procurement-skeletons";
 
 const APPROVAL_CHIPS = [
-  { key: "all", label: "All" },
-  { key: "pending", label: "Pending" },
-  { key: "approved", label: "Approved" },
-  { key: "rejected", label: "Rejected" },
+  { value: "all", label: "All", icon: LayoutGrid },
+  { value: "pending", label: "Pending", icon: Clock },
+  { value: "approved", label: "Approved", icon: CircleCheck },
+  { value: "rejected", label: "Rejected", icon: CircleX },
 ] as const;
 
-type Chip = (typeof APPROVAL_CHIPS)[number]["key"];
+type Chip = (typeof APPROVAL_CHIPS)[number]["value"];
 
 type Filters = {
   date: DateFilterValue;
@@ -137,23 +144,14 @@ export function PurchaseOrdersPage({
           )}
         </div>
       </div>
-      <ToggleGroup
+      <FilterTabs
         aria-label="Approval"
-        value={[filters.approval]}
-        onValueChange={(value: string[]) => {
-          const next = value[0] as Chip | undefined;
-          if (next != null) change({ approval: next });
+        items={APPROVAL_CHIPS}
+        value={filters.approval}
+        onValueChange={(next) => {
+          change({ approval: next });
         }}
-        variant="outline"
-        size="sm"
-        className="flex-wrap"
-      >
-        {APPROVAL_CHIPS.map((chip) => (
-          <ToggleGroupItem key={chip.key} value={chip.key}>
-            {chip.label}
-          </ToggleGroupItem>
-        ))}
-      </ToggleGroup>
+      />
       <Suspense fallback={<PurchaseOrderRowsSkeleton bulk={bulk} />}>
         <PurchaseOrderRows
           projectId={projectId}

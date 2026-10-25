@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
+import { Percent, Plus, Scale, Wallet } from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState, type ReactNode } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
@@ -97,9 +97,20 @@ export function PartyMoneyTab({
       </div>
       <Tabs defaultValue="balances" className="gap-4">
         <TabsList>
-          <TabsTrigger value="balances">Balances</TabsTrigger>
-          <TabsTrigger value="settlements">Settlements</TabsTrigger>
-          {screen.tds && <TabsTrigger value="tds">TDS</TabsTrigger>}
+          <TabsTrigger value="balances">
+            <Scale aria-hidden="true" />
+            Balances
+          </TabsTrigger>
+          <TabsTrigger value="settlements">
+            <Wallet aria-hidden="true" />
+            Settlements
+          </TabsTrigger>
+          {screen.tds && (
+            <TabsTrigger value="tds">
+              <Percent aria-hidden="true" />
+              TDS
+            </TabsTrigger>
+          )}
         </TabsList>
         <TabsContent value="balances">{balances}</TabsContent>
         <TabsContent value="settlements">

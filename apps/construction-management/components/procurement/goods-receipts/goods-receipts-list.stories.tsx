@@ -64,7 +64,7 @@ export const WithReceipts: Story = {
       `/app/projects/${PROJECT_ID}/materials/goods-received/new`,
     );
 
-    await userEvent.click(canvas.getByRole("button", { name: "Without PO" }));
+    await userEvent.click(canvas.getByRole("tab", { name: "Without PO" }));
     await waitFor(() =>
       expect(listCalls().at(-1)?.path).toContain("purchaseOrder=without"),
     );

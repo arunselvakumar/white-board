@@ -1,4 +1,11 @@
-import { ArrowLeft } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowLeftRight,
+  ClipboardList,
+  FolderKanban,
+  Package,
+  Truck,
+} from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Skeleton } from "@repo/ui/components/skeleton";
@@ -894,11 +901,11 @@ export function RequestRowsSkeleton({
 }
 
 const STORE_TABS = [
-  "Stock",
-  "Projects",
-  "Material Requests",
-  "Delivery Notes",
-  "Transfers",
+  { label: "Stock", icon: Package },
+  { label: "Projects", icon: FolderKanban },
+  { label: "Material Requests", icon: ClipboardList },
+  { label: "Delivery Notes", icon: Truck },
+  { label: "Transfers", icon: ArrowLeftRight },
 ];
 
 /** A Central Store's page while it loads: the real tabs over the Stock tab. */
@@ -913,15 +920,14 @@ export function StoreDetailSkeleton() {
           }}
         />
         <Tabs defaultValue="Stock" className="gap-4">
-          <div className="-mx-1 overflow-x-auto px-1 pb-1">
-            <TabsList>
-              {STORE_TABS.map((tab, index) => (
-                <TabsTrigger key={tab} value={tab} disabled={index > 0}>
-                  {tab}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </div>
+          <TabsList>
+            {STORE_TABS.map(({ label, icon: Icon }, index) => (
+              <TabsTrigger key={label} value={label} disabled={index > 0}>
+                <Icon aria-hidden="true" />
+                {label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
           <InventorySkeleton />
         </Tabs>
       </div>

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { Layers, LayoutDashboard, Users } from "lucide-react";
 import { expect, userEvent } from "storybook/test";
 import {
   Tabs,
@@ -13,9 +14,18 @@ const meta = {
   render: () => (
     <Tabs defaultValue="overview" className="min-w-80">
       <TabsList aria-label="Workspace views">
-        <TabsTrigger value="overview">Overview</TabsTrigger>
-        <TabsTrigger value="students">Students</TabsTrigger>
-        <TabsTrigger value="batches">Batches</TabsTrigger>
+        <TabsTrigger value="overview">
+          <LayoutDashboard aria-hidden="true" />
+          Overview
+        </TabsTrigger>
+        <TabsTrigger value="students">
+          <Users aria-hidden="true" />
+          Students
+        </TabsTrigger>
+        <TabsTrigger value="batches">
+          <Layers aria-hidden="true" />
+          Batches
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="overview" className="p-4">
         Workspace overview

@@ -1,3 +1,4 @@
+import { FolderKanban, ShieldCheck, UserRound } from "lucide-react";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   FormSkeleton,
@@ -121,11 +122,16 @@ export function EditTeamMemberSkeleton() {
         <PageHeaderSkeleton back={{ label: "Users", href: USERS_PATH }} />
         <Tabs defaultValue="details" className="gap-6">
           <TabsList>
-            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="details">
+              <UserRound aria-hidden="true" />
+              Details
+            </TabsTrigger>
             <TabsTrigger value="projects" disabled>
+              <FolderKanban aria-hidden="true" />
               Projects
             </TabsTrigger>
             <TabsTrigger value="role" disabled>
+              <ShieldCheck aria-hidden="true" />
               Role
             </TabsTrigger>
           </TabsList>

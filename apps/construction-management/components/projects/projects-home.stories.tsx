@@ -8,6 +8,8 @@ import {
   STORY_LOGO_URL,
   STORY_PROJECTS,
 } from "./project-fixtures";
+import type { ProjectColor } from "@/src/projects/domain/project-color";
+
 import { ProjectsHome } from "./projects-home";
 
 const BASE = "/api/construction/projects/projects";
@@ -25,6 +27,15 @@ const meta = {
     api = mockApi((call) => {
       if (call.method === "GET" && call.path === BASE)
         return Response.json(projectList(items, true, pinned));
+      const [, colored] =
+        /\/projects\/([^/]+)\/color\/update$/.exec(call.path) ?? [];
+      if (call.method === "POST" && colored != null) {
+        const { color } = call.body as { color: ProjectColor };
+        items = items.map((item) =>
+          item.id === colored ? { ...item, color } : item,
+        );
+        return Response.json(items.find((item) => item.id === colored));
+      }
       const [, id, verb] =
         /\/projects\/([^/]+)\/(pin|unpin)$/.exec(call.path) ?? [];
       if (call.method === "POST" && id != null) {
@@ -68,8 +79,8 @@ export const WithProjects: Story = {
     await expect(
       canvas.getByRole("link", { name: "New Project" }),
     ).toHaveAttribute("href", "/app/projects/new");
-    await expect(canvas.getByRole("button", { name: "All 5" })).toHaveAttribute(
-      "aria-pressed",
+    await expect(canvas.getByRole("tab", { name: "All 5" })).toHaveAttribute(
+      "aria-selected",
       "true",
     );
   },
@@ -103,19 +114,15 @@ export const ProgressOnTheCard: Story = {
 export const FiltersByStatus: Story = {
   play: async ({ canvas, userEvent }) => {
     await canvas.findByRole("group", { name: "Projects" });
-    await expect(
-      canvas.getByRole("button", { name: "Ongoing 2" }),
-    ).toBeVisible();
-    await expect(
-      canvas.getByRole("button", { name: "On hold 1" }),
-    ).toBeVisible();
+    await expect(canvas.getByRole("tab", { name: "Ongoing 2" })).toBeVisible();
+    await expect(canvas.getByRole("tab", { name: "On hold 1" })).toBeVisible();
 
-    await userEvent.click(canvas.getByRole("button", { name: "Completed 1" }));
+    await userEvent.click(canvas.getByRole("tab", { name: "Completed 1" }));
     const cards = within(canvas.getByRole("group", { name: "Projects" }));
     await expect(cards.getAllByRole("link")).toHaveLength(1);
     await expect(cards.getByRole("link")).toHaveTextContent("Zen Villas");
 
-    await userEvent.click(canvas.getByRole("button", { name: "Ongoing 2" }));
+    await userEvent.click(canvas.getByRole("tab", { name: "Ongoing 2" }));
     await expect(
       within(canvas.getByRole("group", { name: "Projects" }))
         .getAllByRole("link")
@@ -134,10 +141,29 @@ export const FilterWithNoMatch: Story = {
   },
   play: async ({ canvas, userEvent }) => {
     await canvas.findByRole("group", { name: "Projects" });
-    await userEvent.click(canvas.getByRole("button", { name: "On hold 0" }));
+    await userEvent.click(canvas.getByRole("tab", { name: "On hold 0" }));
     await expect(
       await canvas.findByText("No Projects are on hold."),
     ).toBeVisible();
+  },
+};
+
+/** The filter is read from the address: `?status=completed` opens on Completed. */
+export const FilterFromTheAddress: Story = {
+  parameters: { searchParams: "?status=completed" },
+  play: async ({ canvas }) => {
+    const cards = within(
+      await canvas.findByRole("group", { name: "Projects" }),
+    );
+    await expect(cards.getAllByRole("link")).toHaveLength(1);
+    await expect(cards.getByRole("link")).toHaveTextContent("Zen Villas");
+    await expect(
+      canvas.getByRole("tab", { name: "Completed 1" }),
+    ).toHaveAttribute("aria-selected", "true");
+    // The Completed status card above the list reads the same parameter.
+    await expect(
+      canvas.getByRole("button", { name: /^Completed 1 / }),
+    ).toHaveAttribute("aria-pressed", "true");
   },
 };
 
@@ -161,14 +187,14 @@ export const Empty: Story = {
       .closest("section");
     if (yourProjects == null) throw new Error("Your Projects has no section");
     const section = within(yourProjects);
-    for (const chip of [
+    for (const tab of [
       "All 0",
       "Ongoing 0",
       "Not started 0",
       "On hold 0",
       "Completed 0",
     ]) {
-      await expect(section.getByRole("button", { name: chip })).toBeVisible();
+      await expect(section.getByRole("tab", { name: tab })).toBeVisible();
     }
     await expect(section.getByText("No Projects yet")).toBeVisible();
     await expect(
@@ -180,8 +206,8 @@ export const Empty: Story = {
     ).toBeNull();
     await expect(canvas.queryByRole("group", { name: "Projects" })).toBeNull();
 
-    // A status chip keeps the empty state, not "No Projects are ongoing."
-    await userEvent.click(section.getByRole("button", { name: "Ongoing 0" }));
+    // A status tab keeps the empty state, not "No Projects are ongoing."
+    await userEvent.click(section.getByRole("tab", { name: "Ongoing 0" }));
     await expect(section.getByText("No Projects yet")).toBeVisible();
     await expect(canvas.queryByText("No Projects are ongoing.")).toBeNull();
   },
@@ -293,6 +319,56 @@ export const CardMenu: Story = {
     );
     await userEvent.click(await body.findByRole("menuitem", { name: "Unpin" }));
     await waitFor(() => expect(rowNames(canvas).at(-1)).toBe("Zen Villas"));
+  },
+};
+
+/**
+ * Change colour (ADR CM-0026 §5): the kebab's submenu lists the form's
+ * palette with the folder's colour ticked; picking one recolours the
+ * folder at once and saves only the colour.
+ */
+export const ChangeColour: Story = {
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const cards = await canvas.findByRole("group", { name: "Projects" });
+    const zen = () =>
+      within(cards)
+        .getByRole("link", { name: /Zen Villas/ })
+        .closest("li");
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Options for Zen Villas" }),
+    );
+    // Hovering opens the submenu; a click on top of that would toggle it shut.
+    await userEvent.hover(
+      await body.findByRole("menuitem", { name: "Change colour" }),
+    );
+    const colours = await body.findAllByRole("menuitemradio");
+    await expect(colours.map((item) => item.textContent)).toEqual([
+      "Lavender",
+      "Peach",
+      "Sky",
+      "Mint",
+      "Lemon",
+      "Rose",
+      "Sand",
+      "Slate",
+    ]);
+    const current = zen()?.dataset["color"];
+    await expect(
+      body.getByRole("menuitemradio", { checked: true }),
+    ).toHaveTextContent(new RegExp(current ?? "", "i"));
+
+    // Picked with the keyboard: the test pointer trips over Base UI's
+    // hover guard between a submenu's trigger and its rows.
+    body.getByRole("menuitemradio", { name: "Sky" }).focus();
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(zen()).toHaveAttribute("data-color", "sky"));
+    await expect(
+      api.calls.mock.calls.find(
+        ([call]) =>
+          call.method === "POST" && call.path === `${BASE}/${ZEN}/color/update`,
+      )?.[0].body,
+    ).toEqual({ color: "sky" });
   },
 };
 
@@ -442,7 +518,7 @@ export const GroupedByClient: Story = {
     );
     await expect(none.getAllByRole("link")).toHaveLength(2);
 
-    await userEvent.click(canvas.getByRole("button", { name: "On hold 1" }));
+    await userEvent.click(canvas.getByRole("tab", { name: "On hold 1" }));
     await expect(groupHeadings(canvas)).toEqual([
       "Sri Balaji Developers, 1 Project",
     ]);

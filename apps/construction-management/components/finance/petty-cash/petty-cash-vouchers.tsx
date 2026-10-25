@@ -1,7 +1,13 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { Paperclip, ReceiptText } from "lucide-react";
+import {
+  FolderKanban,
+  LayoutGrid,
+  type LucideIcon,
+  Paperclip,
+  ReceiptText,
+} from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
@@ -14,6 +20,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
+import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import {
   Table,
   TableBody,
@@ -22,7 +29,6 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
@@ -70,6 +76,11 @@ type Filters = {
   status: ApprovalStatus | "";
   paymentCategoryId: string;
 };
+
+const SCOPE_TABS: { value: Scope; label: string; icon: LucideIcon }[] = [
+  { value: "project", label: "This Project", icon: FolderKanban },
+  { value: "all", label: "All Projects", icon: LayoutGrid },
+];
 
 const NO_FILTERS: Filters = {
   scope: "project",
@@ -447,19 +458,14 @@ export function PettyCashVouchers({
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <ToggleGroup
+        <FilterTabs
           aria-label="Projects"
-          value={[filters.scope]}
-          onValueChange={(value: string[]) => {
-            const next = value[0];
-            if (next === "project" || next === "all") change({ scope: next });
+          items={SCOPE_TABS}
+          value={filters.scope}
+          onValueChange={(next) => {
+            change({ scope: next });
           }}
-          variant="outline"
-          size="sm"
-        >
-          <ToggleGroupItem value="project">This Project</ToggleGroupItem>
-          <ToggleGroupItem value="all">All Projects</ToggleGroupItem>
-        </ToggleGroup>
+        />
         {(may("approve") || may("reject")) && (
           <Button
             type="button"

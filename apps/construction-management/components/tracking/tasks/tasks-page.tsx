@@ -1,7 +1,7 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { FileSpreadsheet, Plus } from "lucide-react";
+import { FileSpreadsheet, GanttChart, ListTree, Plus } from "lucide-react";
 import Link from "next/link";
 import { Suspense, useDeferredValue, useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
@@ -89,8 +89,14 @@ export function TasksPage({
       </Suspense>
       <Tabs defaultValue={initialView} className="min-w-0 gap-4">
         <TabsList>
-          <TabsTrigger value="list">List</TabsTrigger>
-          <TabsTrigger value="gantt">Gantt</TabsTrigger>
+          <TabsTrigger value="list">
+            <ListTree aria-hidden="true" />
+            List
+          </TabsTrigger>
+          <TabsTrigger value="gantt">
+            <GanttChart aria-hidden="true" />
+            Gantt
+          </TabsTrigger>
         </TabsList>
         <TabsContent
           value="list"

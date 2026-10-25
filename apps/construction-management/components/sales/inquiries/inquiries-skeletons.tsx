@@ -1,11 +1,24 @@
-import { ArrowLeft, ListTodo } from "lucide-react";
+import {
+  AlarmClock,
+  ArrowLeft,
+  CalendarCheck,
+  CalendarClock,
+  CalendarOff,
+  CircleCheck,
+  CircleDot,
+  CircleX,
+  LayoutGrid,
+  ListTodo,
+} from "lucide-react";
 import Link from "next/link";
+import type { FilterTab } from "@repo/ui/components/filter-tabs";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   SkeletonGroup,
   SkeletonText,
   type SkeletonColumn,
 } from "@repo/ui/components/skeleton-kit";
+import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/tabs";
 
 import {
   FilterBarSkeleton,
@@ -20,15 +33,40 @@ import {
 import { inquiriesPath } from "@/src/queries/sales-inquiries";
 import {
   FOLLOW_UP_DUE_LABELS,
-  FOLLOW_UP_DUES,
   INQUIRY_STATUS_LABELS,
-  INQUIRY_STATUSES,
+  type FollowUpDue,
+  type InquiryStatus,
 } from "@/src/sales/domain/sales-terms";
 
 /*
- * Inquiries while they load (ADR-0047): the real heading, chips, filter
+ * Inquiries while they load (ADR-0047): the real heading, filter tabs, filter
  * labels, column headers and form labels; bars where the inquiries go.
  */
+
+/** The Status tabs: All, then one status at a time. */
+export const INQUIRY_STATUS_TABS: FilterTab<InquiryStatus | "all">[] = [
+  { value: "all", label: "All", icon: LayoutGrid },
+  { value: "open", label: INQUIRY_STATUS_LABELS.open, icon: CircleDot },
+  {
+    value: "converted",
+    label: INQUIRY_STATUS_LABELS.converted,
+    icon: CircleCheck,
+  },
+  { value: "lost", label: INQUIRY_STATUS_LABELS.lost, icon: CircleX },
+];
+
+/** The Follow-up due tabs: All, then one due at a time. */
+export const FOLLOW_UP_DUE_TABS: FilterTab<FollowUpDue | "all">[] = [
+  { value: "all", label: "All", icon: LayoutGrid },
+  { value: "overdue", label: FOLLOW_UP_DUE_LABELS.overdue, icon: AlarmClock },
+  { value: "today", label: FOLLOW_UP_DUE_LABELS.today, icon: CalendarCheck },
+  {
+    value: "upcoming",
+    label: FOLLOW_UP_DUE_LABELS.upcoming,
+    icon: CalendarClock,
+  },
+  { value: "none", label: FOLLOW_UP_DUE_LABELS.none, icon: CalendarOff },
+];
 
 const WIDTHS = ["62%", "48%", "70%", "55%", "66%"];
 
@@ -72,24 +110,34 @@ export function InquiryRowsSkeleton() {
   );
 }
 
-function Chips({ labels }: { labels: string[] }) {
+/**
+ * A filter's tabs with All picked. The icons render here, not in
+ * `FilterTabs`, so a server page can show this skeleton.
+ */
+function FilterTabsSkeleton<Value extends string>({
+  label,
+  items,
+}: {
+  label: string;
+  items: readonly FilterTab<Value>[];
+}) {
   return (
-    <div className="flex flex-wrap gap-0">
-      {labels.map((label, index) => (
-        <span
-          key={label}
-          className={`border-input text-muted-foreground inline-flex h-7 items-center border px-2.5 text-sm ${index === 0 ? "rounded-l-md" : "-ml-px"} ${index === labels.length - 1 ? "rounded-r-md" : ""}`}
-        >
-          {label}
-        </span>
-      ))}
-    </div>
+    <Tabs defaultValue="all" className="min-w-0">
+      <TabsList aria-label={label}>
+        {items.map(({ value, label: tab, icon: Icon }) => (
+          <TabsTrigger key={value} value={value}>
+            {Icon == null ? null : <Icon aria-hidden />}
+            {tab}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+    </Tabs>
   );
 }
 
 /**
  * The inquiries page before it can read `?due=`: the real heading, the
- * status and follow-up chips, the filters and the rows.
+ * status and follow-up tabs (inert), the filters and the rows.
  */
 export function InquiriesListSkeleton() {
   return (
@@ -97,9 +145,9 @@ export function InquiriesListSkeleton() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold">Inquiries</h2>
       </div>
-      <div aria-hidden="true" className="flex min-w-0 flex-wrap gap-2">
-        <Chips labels={INQUIRY_STATUSES.map((s) => INQUIRY_STATUS_LABELS[s])} />
-        <Chips labels={FOLLOW_UP_DUES.map((d) => FOLLOW_UP_DUE_LABELS[d])} />
+      <div inert className="flex min-w-0 flex-wrap gap-x-6 gap-y-2">
+        <FilterTabsSkeleton label="Status" items={INQUIRY_STATUS_TABS} />
+        <FilterTabsSkeleton label="Follow-up due" items={FOLLOW_UP_DUE_TABS} />
       </div>
       <InquiryFilterBarSkeleton />
       <InquiryRowsSkeleton />

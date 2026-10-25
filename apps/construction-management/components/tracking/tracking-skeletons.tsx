@@ -1,3 +1,4 @@
+import { GanttChart, ListTree } from "lucide-react";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   FormSkeleton,
@@ -76,13 +77,19 @@ export function InspectionFiltersSkeleton() {
   );
 }
 
-/** Inspection Requests: status chips with counts, the count, the rows. */
+/** Inspection Requests: status tabs with counts, the count, the rows. */
 export function InspectionRowsSkeleton({ bulk }: { bulk: boolean }) {
   return (
     <div className="min-w-0 space-y-3">
-      <div aria-hidden="true" className="flex flex-wrap gap-1">
-        {["4.5rem", "6rem", "6.5rem", "6rem", "5.5rem"].map((width) => (
-          <Skeleton key={width} className="h-7 rounded-lg" style={{ width }} />
+      <div
+        aria-hidden="true"
+        className="flex h-10 max-w-full items-center gap-6 overflow-hidden px-3"
+      >
+        {["3rem", "8.5rem", "5.5rem", "5.5rem"].map((width) => (
+          <div key={width} className="flex shrink-0 items-center gap-2">
+            <Skeleton className="size-4 rounded-sm" />
+            <Skeleton className="h-3.5 rounded-md" style={{ width }} />
+          </div>
         ))}
       </div>
       <ResponsiveListSkeleton
@@ -382,9 +389,11 @@ export function TasksPageSkeleton({
       <Tabs defaultValue={initialView} className="min-w-0 gap-4">
         <TabsList>
           <TabsTrigger value="list" disabled={initialView !== "list"}>
+            <ListTree aria-hidden="true" />
             List
           </TabsTrigger>
           <TabsTrigger value="gantt" disabled={initialView !== "gantt"}>
+            <GanttChart aria-hidden="true" />
             Gantt
           </TabsTrigger>
         </TabsList>

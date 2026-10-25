@@ -1,5 +1,6 @@
 import type { Preview } from "@storybook/nextjs-vite";
 import { Geist_Mono } from "next/font/google";
+import { NuqsTestingAdapter } from "nuqs/adapters/testing";
 import type { ReactNode } from "react";
 import { SatoshiStylesheet } from "@repo/ui/components/satoshi-stylesheet";
 import { ThemeProvider } from "@repo/ui/components/theme-provider";
@@ -26,9 +27,11 @@ const fontMono = Geist_Mono({
 function PreviewShell({
   children,
   theme,
+  searchParams,
 }: {
   children: ReactNode;
   theme: string;
+  searchParams?: string;
 }) {
   return (
     <ThemeProvider
@@ -39,12 +42,15 @@ function PreviewShell({
     >
       <TooltipProvider>
         <QueryProvider>
-          <div
-            className={`typeface-satoshi ${fontMono.variable} bg-background text-foreground font-sans antialiased`}
-          >
-            <SatoshiStylesheet />
-            {children}
-          </div>
+          {/* Query-string state (nuqs) starts from the story's `searchParams`. */}
+          <NuqsTestingAdapter hasMemory searchParams={searchParams}>
+            <div
+              className={`typeface-satoshi ${fontMono.variable} bg-background text-foreground font-sans antialiased`}
+            >
+              <SatoshiStylesheet />
+              {children}
+            </div>
+          </NuqsTestingAdapter>
         </QueryProvider>
       </TooltipProvider>
     </ThemeProvider>
@@ -101,7 +107,14 @@ const preview: Preview = {
   },
   decorators: [
     (Story, context) => (
-      <PreviewShell theme={String(context.globals["theme"] ?? "light")}>
+      <PreviewShell
+        theme={String(context.globals["theme"] ?? "light")}
+        searchParams={
+          typeof context.parameters["searchParams"] === "string"
+            ? context.parameters["searchParams"]
+            : undefined
+        }
+      >
         <Story />
       </PreviewShell>
     ),

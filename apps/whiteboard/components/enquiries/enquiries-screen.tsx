@@ -2,7 +2,15 @@
 
 import { useAuth } from "@repo/auth/react";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { CalendarClock, Plus, Search } from "lucide-react";
+import {
+  CalendarClock,
+  CircleCheck,
+  CircleDot,
+  LayoutGrid,
+  type LucideIcon,
+  Plus,
+  Search,
+} from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -25,6 +33,7 @@ import { Spinner } from "@repo/ui/components/spinner";
 import {
   Tabs,
   TabsContent,
+  TabsCount,
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components/tabs";
@@ -50,11 +59,11 @@ import { EnquiryStageBadge } from "./enquiry-stage-badge";
 
 const PAGE_SIZE = 20;
 
-const VIEWS: { value: EnquiryListView; label: string }[] = [
-  { value: "due", label: "Follow-ups due" },
-  { value: "open", label: "Open" },
-  { value: "closed", label: "Closed" },
-  { value: "all", label: "All" },
+const VIEWS: { value: EnquiryListView; label: string; icon: LucideIcon }[] = [
+  { value: "due", label: "Follow-ups due", icon: CalendarClock },
+  { value: "open", label: "Open", icon: CircleDot },
+  { value: "closed", label: "Closed", icon: CircleCheck },
+  { value: "all", label: "All", icon: LayoutGrid },
 ];
 
 function isView(value: unknown): value is EnquiryListView {
@@ -150,30 +159,29 @@ export function EnquiriesScreen() {
           className="gap-4"
         >
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div className="-mx-1 max-w-full overflow-x-auto px-1 pb-1">
-              <TabsList aria-label="Enquiry lists">
-                {VIEWS.map((item) => (
-                  <TabsTrigger
-                    key={item.value}
-                    value={item.value}
-                    className="flex-none px-3 sm:px-4"
-                  >
-                    {item.label}
-                    {item.value === "due" && dueCount != null ? (
-                      <>
-                        <span
-                          aria-hidden="true"
-                          className={`rounded-full px-1.5 text-xs tabular-nums ${dueCount > 0 ? "bg-amber-100 text-amber-900 dark:bg-amber-400/20 dark:text-amber-100" : "bg-muted text-muted-foreground"}`}
-                        >
-                          {dueCount}
-                        </span>
-                        <span className="sr-only">{dueCount} due</span>
-                      </>
-                    ) : null}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </div>
+            <TabsList aria-label="Enquiry lists">
+              {VIEWS.map((item) => (
+                <TabsTrigger key={item.value} value={item.value}>
+                  <item.icon aria-hidden="true" />
+                  {item.label}
+                  {item.value === "due" && dueCount != null ? (
+                    <>
+                      <TabsCount
+                        aria-hidden="true"
+                        className={
+                          dueCount > 0
+                            ? "bg-amber-100 text-amber-900 group-data-active/tabs-trigger:bg-amber-100 group-data-active/tabs-trigger:text-amber-900 dark:bg-amber-400/20 dark:text-amber-100 dark:group-data-active/tabs-trigger:bg-amber-400/20 dark:group-data-active/tabs-trigger:text-amber-100"
+                            : undefined
+                        }
+                      >
+                        {dueCount}
+                      </TabsCount>
+                      <span className="sr-only">{dueCount} due</span>
+                    </>
+                  ) : null}
+                </TabsTrigger>
+              ))}
+            </TabsList>
             <div className="relative w-full md:w-72">
               <Search
                 aria-hidden="true"

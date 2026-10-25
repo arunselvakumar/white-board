@@ -82,7 +82,7 @@ export const List: Story = {
 export const Filters: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     await canvas.findByRole("list", { name: "Material Transfers" });
-    await userEvent.click(canvas.getByRole("button", { name: "Received" }));
+    await userEvent.click(canvas.getByRole("tab", { name: "Received" }));
     await waitFor(async () => {
       await expect(listCalls().at(-1)?.path).toContain("direction=in");
     });
