@@ -1,0 +1,19 @@
+apps/construction-management/e2e/specs/sales.spec.ts
+  s_dc3d48bbd479da::t_d481de80091a01 114-118,129-130
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "109ca39071b55d9321b0734607f88fb0d79c391f",
+  "prompts": {},
+  "sessions": {
+    "s_dc3d48bbd479da": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "42aea6d8-890a-4303-99f6-66e2f8ab5369",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
