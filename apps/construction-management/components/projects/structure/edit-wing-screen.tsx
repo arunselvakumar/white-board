@@ -142,7 +142,6 @@ function EditWingForm({
                     id="edit-wing-phase"
                     ref={field.ref}
                     aria-required
-                    size="lg"
                     className="w-full min-w-0"
                   >
                     <SelectValue />

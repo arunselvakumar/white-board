@@ -141,7 +141,6 @@ export function EnrollmentForm({
                 <SelectTrigger
                   id="studentId"
                   aria-required
-                  size="lg"
                   className="w-full min-w-0"
                 >
                   <SelectValue placeholder="Select a Student" />
@@ -179,7 +178,6 @@ export function EnrollmentForm({
                 <SelectTrigger
                   id="batchId"
                   aria-required
-                  size="lg"
                   className="w-full min-w-0"
                 >
                   <SelectValue placeholder="Select a Batch" />
@@ -216,7 +214,6 @@ export function EnrollmentForm({
               <SelectTrigger
                 id="classModeOverride"
                 aria-required
-                size="lg"
                 className="w-full min-w-0"
               >
                 <SelectValue />
@@ -251,7 +248,6 @@ export function EnrollmentForm({
               <SelectTrigger
                 id="timingSource"
                 aria-required
-                size="lg"
                 className="w-full min-w-0"
               >
                 <SelectValue />

@@ -226,7 +226,7 @@ export function SiteDiaryPage({
           <Input
             type="date"
             aria-label="Date"
-            className="h-8 w-40"
+            className="w-40"
             max={today}
             value={date}
             onChange={(event) => {

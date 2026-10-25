@@ -198,7 +198,6 @@ export function SupervisorDialog({
                     >
                       <SelectTrigger
                         id="supervisor-team-member"
-                        size="lg"
                         className="w-full min-w-0"
                       >
                         <SelectValue />

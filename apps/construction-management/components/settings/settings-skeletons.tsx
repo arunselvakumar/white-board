@@ -120,7 +120,7 @@ export function BackdatedEntrySkeleton() {
                         <p className="text-sm font-medium">{item.label}</p>
                         <SkeletonText width="12rem" />
                       </div>
-                      <Skeleton className="h-7 w-14 rounded-lg" />
+                      <Skeleton className="h-9 w-14 rounded-lg" />
                     </li>
                   ))}
                 </ul>
@@ -227,8 +227,8 @@ export function SequenceIdsSkeleton() {
         label="Loading Sequence IDs"
         trailing={
           <div className="flex gap-2">
-            <Skeleton className="h-7 w-12 rounded-lg" />
-            <Skeleton className="h-7 w-16 rounded-lg" />
+            <Skeleton className="h-9 w-12 rounded-lg" />
+            <Skeleton className="h-9 w-16 rounded-lg" />
           </div>
         }
       />

@@ -35,7 +35,7 @@ export function CompanyProfileSkeleton() {
               <Skeleton className="size-20 rounded-lg" />
               <div className="min-w-0 flex-1 space-y-2">
                 <div className="flex gap-2">
-                  <Skeleton className="h-7 w-24 rounded-lg" />
+                  <Skeleton className="h-9 w-24 rounded-lg" />
                 </div>
                 <SkeletonText size="xs" width="16rem" />
               </div>

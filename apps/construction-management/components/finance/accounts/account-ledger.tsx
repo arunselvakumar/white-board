@@ -163,7 +163,7 @@ function LedgerBody({
           <Input
             id="ledger-from"
             type="date"
-            className="h-9 w-40"
+            className="w-40"
             value={period.from === "" ? data.from : period.from}
             min={addDays(data.to, -MAX_SPAN_DAYS)}
             max={data.to}
@@ -184,7 +184,7 @@ function LedgerBody({
           <Input
             id="ledger-to"
             type="date"
-            className="h-9 w-40"
+            className="w-40"
             value={period.to === "" ? data.to : period.to}
             min={data.from}
             max={addDays(data.from, MAX_SPAN_DAYS)}

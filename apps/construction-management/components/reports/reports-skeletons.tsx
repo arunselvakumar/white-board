@@ -37,7 +37,7 @@ function ReportCardSkeleton({ index }: { index: number }) {
           </div>
         </CardContent>
         <CardFooter>
-          <Skeleton className="h-8 w-full rounded-lg sm:w-24" />
+          <Skeleton className="h-10 w-full rounded-lg sm:w-24" />
         </CardFooter>
       </div>
     </Card>
@@ -93,8 +93,8 @@ export function RecentReportsSkeleton({
               <SkeletonText width="40%" />
             </div>
             <div className="flex gap-2">
-              <Skeleton className="h-7 w-16 rounded-lg" />
-              <Skeleton className="h-7 w-14 rounded-lg" />
+              <Skeleton className="h-9 w-16 rounded-lg" />
+              <Skeleton className="h-9 w-14 rounded-lg" />
             </div>
           </li>
         ))}

@@ -38,7 +38,7 @@ export function LedgerSkeleton({ back }: { back: PageHeaderBack }) {
               <span className="block text-xs leading-none font-medium">
                 {label}
               </span>
-              <Skeleton className="h-9 w-40 rounded-md" />
+              <Skeleton className="h-10 w-40 rounded-md" />
             </div>
           ))}
         </div>

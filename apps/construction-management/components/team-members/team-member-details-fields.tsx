@@ -237,7 +237,6 @@ export function TeamMemberDetailsFields<
               >
                 <SelectTrigger
                   id="member-designation"
-                  size="lg"
                   className="w-full min-w-0"
                   aria-required
                 >

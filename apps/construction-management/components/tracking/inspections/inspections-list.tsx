@@ -321,7 +321,7 @@ function FilterBar({
         type="search"
         aria-label="Search by Request No or work"
         placeholder="Request No or work"
-        className="col-span-2 h-8 w-full sm:w-56"
+        className="col-span-2 w-full sm:w-56"
         value={search}
         onChange={(event) => {
           setSearch(event.target.value);

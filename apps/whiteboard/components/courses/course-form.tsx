@@ -274,7 +274,6 @@ export function CourseForm({
                 <SelectTrigger
                   id="durationKind"
                   aria-required
-                  size="lg"
                   className="w-full"
                 >
                   <SelectValue />
@@ -324,7 +323,6 @@ export function CourseForm({
                     <SelectTrigger
                       id="durationUnit"
                       aria-required
-                      size="lg"
                       className="w-full"
                     >
                       <SelectValue />

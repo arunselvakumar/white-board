@@ -92,7 +92,7 @@ function FilterSelect({
           onChange(next);
         }}
       >
-        <SelectTrigger id={id} size="lg" className="w-full min-w-0">
+        <SelectTrigger id={id} className="w-full min-w-0">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent align="start" alignItemWithTrigger={false}>

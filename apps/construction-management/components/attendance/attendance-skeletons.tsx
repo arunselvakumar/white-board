@@ -76,7 +76,7 @@ export function LabourMarkingSheetSkeleton() {
     <SkeletonGroup label="Loading the day's sheet" className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <SkeletonText width="10rem" />
-        <Skeleton className="h-9 w-32 rounded-md" />
+        <Skeleton className="h-10 w-32 rounded-md" />
       </div>
       <ul className="space-y-2">
         {WIDTHS.slice(0, 3).map((width, row) => (

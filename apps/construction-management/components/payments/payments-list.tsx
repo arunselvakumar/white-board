@@ -109,7 +109,7 @@ export function PaymentsList({ projectId }: { projectId: string }) {
             <Input
               id="payments-from"
               type="date"
-              className="h-8 w-40"
+              className="w-40"
               value={filter.from}
               onChange={(event) => {
                 change({ from: event.target.value });
@@ -123,7 +123,7 @@ export function PaymentsList({ projectId }: { projectId: string }) {
             <Input
               id="payments-to"
               type="date"
-              className="h-8 w-40"
+              className="w-40"
               value={filter.to}
               onChange={(event) => {
                 change({ to: event.target.value });
@@ -318,7 +318,7 @@ function PaymentRows({
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="text-destructive h-7"
+                className="text-destructive"
                 aria-label={`Cancel payment to ${payment.partyName}`}
                 onClick={() => {
                   ask(payment);

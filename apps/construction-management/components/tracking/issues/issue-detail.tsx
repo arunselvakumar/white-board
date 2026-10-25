@@ -242,7 +242,7 @@ function ProgressItem({
             type="button"
             size="sm"
             variant="ghost"
-            className="text-destructive h-7"
+            className="text-destructive"
             disabled={remove.isPending}
             onClick={() => {
               setError(undefined);

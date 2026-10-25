@@ -47,7 +47,7 @@ export function GallerySkeleton() {
       </div>
       <div className="space-y-3">
         <div inert className="flex flex-wrap items-center gap-2">
-          <Skeleton className="h-9 w-full rounded-md sm:w-64" />
+          <Skeleton className="h-10 w-full rounded-md sm:w-64" />
           <Tabs defaultValue="all" className="min-w-0">
             <TabsList aria-label="Type">
               {GALLERY_TYPE_TABS.map(({ value, label, icon: Icon }) => (

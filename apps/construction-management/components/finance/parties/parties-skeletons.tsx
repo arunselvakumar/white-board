@@ -285,7 +285,7 @@ export function PartyBalancesWorkspaceSkeleton() {
                   <SkeletonText width="40%" />
                   <span className="flex items-center gap-3">
                     <SkeletonText width="5rem" />
-                    <Skeleton className="h-8 w-24 rounded-md" />
+                    <Skeleton className="h-10 w-24 rounded-md" />
                   </span>
                 </div>
               ))}

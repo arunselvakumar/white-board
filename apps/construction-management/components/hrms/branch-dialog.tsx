@@ -235,7 +235,6 @@ export function BranchDialog({
                       <SelectTrigger
                         id="branch-project"
                         aria-required
-                        size="lg"
                         className="w-full min-w-0"
                         aria-invalid={errors.projectId != null}
                       >

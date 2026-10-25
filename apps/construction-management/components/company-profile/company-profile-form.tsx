@@ -360,7 +360,6 @@ export function CompanyProfileForm({
                   >
                     <SelectTrigger
                       id="company-currency"
-                      size="lg"
                       className="w-full min-w-0"
                       aria-required
                     >
@@ -400,7 +399,6 @@ export function CompanyProfileForm({
                   >
                     <SelectTrigger
                       id="company-timezone"
-                      size="lg"
                       className="w-full min-w-0"
                       aria-required
                     >

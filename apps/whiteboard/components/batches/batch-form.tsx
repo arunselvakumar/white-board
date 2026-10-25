@@ -224,7 +224,6 @@ export function BatchForm({
                   <SelectTrigger
                     id="courseId"
                     aria-required
-                    size="lg"
                     className="w-full min-w-0"
                   >
                     <SelectValue placeholder="Select a Course" />
@@ -276,7 +275,6 @@ export function BatchForm({
                 <SelectTrigger
                   id="classMode"
                   aria-required
-                  size="lg"
                   className="w-full min-w-0"
                 >
                   <SelectValue placeholder="Select Class Mode" />
@@ -341,7 +339,6 @@ export function BatchForm({
                   <SelectTrigger
                     id="meetingOption"
                     aria-required
-                    size="lg"
                     className="w-full min-w-0"
                   >
                     <SelectValue />

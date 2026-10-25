@@ -118,7 +118,7 @@ export function TeamMembersPage({
           }
         />
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <InputGroup className="h-9 sm:max-w-xs">
+          <InputGroup className="sm:max-w-xs">
             <InputGroupAddon>
               <Search aria-hidden="true" />
             </InputGroupAddon>

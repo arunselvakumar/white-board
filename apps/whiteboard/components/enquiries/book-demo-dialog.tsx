@@ -323,7 +323,6 @@ function SelectField({
         <SelectTrigger
           id={id}
           aria-required={required}
-          size="lg"
           className="w-full min-w-0"
           aria-invalid={error != null}
         >

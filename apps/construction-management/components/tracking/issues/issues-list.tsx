@@ -342,7 +342,7 @@ function FilterBar({
           id="issues-search"
           type="search"
           placeholder="Number or details"
-          className="h-8 w-full sm:w-52"
+          className="w-full sm:w-52"
           value={search}
           onChange={(event) => {
             setSearch(event.target.value);

@@ -82,8 +82,8 @@ export function RecordHeaderSkeleton({
 export function FormActionsSkeleton() {
   return (
     <div className="flex flex-wrap justify-end gap-2">
-      <Skeleton className="h-8 w-20 rounded-lg" />
-      <Skeleton className="h-8 w-16 rounded-lg" />
+      <Skeleton className="h-10 w-20 rounded-lg" />
+      <Skeleton className="h-10 w-16 rounded-lg" />
     </div>
   );
 }

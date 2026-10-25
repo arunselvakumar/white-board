@@ -332,7 +332,7 @@ function DropdownField({
               field.onChange(value ?? "");
             }}
           >
-            <SelectTrigger id={id} size="lg" className="w-full">
+            <SelectTrigger id={id} className="w-full">
               <SelectValue placeholder={`Select ${label.toLowerCase()}`} />
             </SelectTrigger>
             <SelectContent align="start" alignItemWithTrigger={false}>
@@ -740,11 +740,7 @@ export function StudentForm({
                       batchField.onChange(value ?? "none");
                     }}
                   >
-                    <SelectTrigger
-                      id="student-batch"
-                      size="lg"
-                      className="w-full"
-                    >
+                    <SelectTrigger id="student-batch" className="w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent align="start" alignItemWithTrigger={false}>

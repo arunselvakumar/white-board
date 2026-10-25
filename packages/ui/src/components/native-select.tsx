@@ -8,9 +8,9 @@ const nativeSelectVariants = cva(
   {
     variants: {
       size: {
-        default: "h-8",
-        sm: "h-7 rounded-[min(var(--radius-md),10px)] py-0.5",
-        lg: "h-10",
+        default: "h-10",
+        sm: "h-9 rounded-[min(var(--radius-md),10px)] py-0.5",
+        lg: "h-12",
       },
     },
     defaultVariants: {

@@ -91,8 +91,8 @@ export function DrawingRevisionsSkeleton() {
             </div>
             <SkeletonText size="xs" width="70%" />
             <div className="flex flex-wrap gap-1">
-              <Skeleton className="h-8 w-16 rounded-md" />
-              <Skeleton className="h-8 w-24 rounded-md" />
+              <Skeleton className="h-10 w-16 rounded-md" />
+              <Skeleton className="h-10 w-24 rounded-md" />
             </div>
           </li>
         ))}

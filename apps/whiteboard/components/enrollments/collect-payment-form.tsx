@@ -119,7 +119,6 @@ export function CollectPaymentForm({
               <SelectTrigger
                 id="method"
                 aria-required
-                size="lg"
                 className="w-full min-w-0"
               >
                 <SelectValue />

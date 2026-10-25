@@ -163,7 +163,6 @@ function AddFloorDialog({
                     id="add-floor-position"
                     ref={field.ref}
                     aria-required
-                    size="lg"
                     className="w-full min-w-0"
                   >
                     <SelectValue />
@@ -344,7 +343,7 @@ export function WingEditor({
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="h-8 border-dashed"
+                    className="border-dashed"
                     aria-label={`Add a unit to ${floor.name}`}
                     onClick={() => {
                       onChange(addUnit(floors, floor.key));

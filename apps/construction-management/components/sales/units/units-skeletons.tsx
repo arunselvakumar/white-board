@@ -47,7 +47,7 @@ export function UnitsTabSkeleton() {
         <div className="flex flex-wrap items-end gap-3">
           <div className="w-full min-w-0 space-y-1 sm:w-64">
             <span className="block text-xs leading-none font-medium">Wing</span>
-            <Skeleton className="h-9 w-full rounded-md" />
+            <Skeleton className="h-10 w-full rounded-md" />
           </div>
           <CountsSkeleton />
         </div>
@@ -80,8 +80,8 @@ export function UnitPanelSkeleton() {
         <SkeletonText width="8rem" />
       </div>
       <div className="flex flex-wrap gap-2">
-        <Skeleton className="h-8 w-28 rounded-md" />
-        <Skeleton className="h-8 w-24 rounded-md" />
+        <Skeleton className="h-10 w-28 rounded-md" />
+        <Skeleton className="h-10 w-24 rounded-md" />
       </div>
       <div className="grid grid-cols-2 gap-4 rounded-lg border p-4">
         {Array.from({ length: 6 }, (_, index) => (

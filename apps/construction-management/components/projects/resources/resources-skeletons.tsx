@@ -11,7 +11,7 @@ const WIDTHS = ["58%", "44%", "66%", "50%"];
 export function ResourcePickerSkeleton({ label }: { label: string }) {
   return (
     <SkeletonGroup label={`Loading ${label}`} className="space-y-4">
-      <Skeleton className="h-9 w-full rounded-md" />
+      <Skeleton className="h-10 w-full rounded-md" />
       <ul className="-mx-1 divide-y rounded-lg border">
         {WIDTHS.map((width, row) => (
           <li key={row} className="flex items-center gap-3 px-3 py-2.5">

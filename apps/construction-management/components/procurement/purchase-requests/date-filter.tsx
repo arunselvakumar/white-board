@@ -65,7 +65,7 @@ export function DateFilter({
             <Input
               id={`${idPrefix}-from`}
               type="date"
-              className="h-8 w-36"
+              className="w-36"
               value={value.from}
               onChange={(event) => {
                 onChange({ ...value, from: event.target.value });
@@ -79,7 +79,7 @@ export function DateFilter({
             <Input
               id={`${idPrefix}-to`}
               type="date"
-              className="h-8 w-36"
+              className="w-36"
               value={value.to}
               onChange={(event) => {
                 onChange({ ...value, to: event.target.value });

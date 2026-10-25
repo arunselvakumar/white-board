@@ -226,7 +226,7 @@ function MoreFilters({
             onChange({ source: next ?? ALL });
           }}
         >
-          <SelectTrigger id={`${id}-source`} className="h-9 w-full sm:w-44">
+          <SelectTrigger id={`${id}-source`} className="w-full sm:w-44">
             <SelectValue />
           </SelectTrigger>
           <SelectContent align="start" alignItemWithTrigger={false}>
@@ -247,7 +247,7 @@ function MoreFilters({
             onChange({ uploadedBy: next ?? ALL });
           }}
         >
-          <SelectTrigger id={`${id}-uploader`} className="h-9 w-full sm:w-44">
+          <SelectTrigger id={`${id}-uploader`} className="w-full sm:w-44">
             <SelectValue />
           </SelectTrigger>
           <SelectContent align="start" alignItemWithTrigger={false}>
@@ -265,7 +265,7 @@ function MoreFilters({
           <Input
             id={`${id}-from`}
             type="date"
-            className="h-9 sm:w-40"
+            className="sm:w-40"
             value={filter.from ?? ""}
             max={filter.to ?? undefined}
             onChange={(event) => {
@@ -279,7 +279,7 @@ function MoreFilters({
           <Input
             id={`${id}-to`}
             type="date"
-            className="h-9 sm:w-40"
+            className="sm:w-40"
             value={filter.to ?? ""}
             min={filter.from ?? undefined}
             onChange={(event) => {
@@ -435,7 +435,7 @@ export function GalleryPage({ projectId }: { projectId: string }) {
 
       <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
-          <InputGroup className="h-9 w-full sm:w-64">
+          <InputGroup className="w-full sm:w-64">
             <InputGroupAddon>
               <Search aria-hidden="true" />
             </InputGroupAddon>

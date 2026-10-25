@@ -244,7 +244,6 @@ export function ReportSettingsContent({
                       <SelectTrigger
                         id="academicYearStartMonth"
                         aria-required
-                        size="lg"
                         className="w-full min-w-0"
                         aria-describedby="academicYearStartMonth-hint"
                       >

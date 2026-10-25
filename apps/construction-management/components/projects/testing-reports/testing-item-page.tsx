@@ -382,7 +382,7 @@ export function TestingItemPage({
         </Empty>
       ) : (
         <>
-          <InputGroup className="h-9 sm:max-w-xs">
+          <InputGroup className="sm:max-w-xs">
             <InputGroupAddon>
               <Search aria-hidden="true" />
             </InputGroupAddon>

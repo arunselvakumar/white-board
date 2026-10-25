@@ -29,7 +29,7 @@ export function PermissionMatrixSkeleton({
   return (
     <SkeletonGroup label={label} className="block min-w-0 space-y-3">
       <div className="flex flex-wrap items-center gap-3">
-        <Skeleton className="h-8 w-full rounded-lg sm:max-w-xs" />
+        <Skeleton className="h-10 w-full rounded-lg sm:max-w-xs" />
         <SkeletonText width="9rem" />
       </div>
       {byCategory(MENUS).map((category) => (

@@ -300,7 +300,7 @@ export function TransfersList({
             <Input
               id="transfers-from"
               type="date"
-              className="h-8 w-36"
+              className="w-36"
               value={filters.from ?? ""}
               onChange={(event) => {
                 change({ from: event.target.value });
@@ -314,7 +314,7 @@ export function TransfersList({
             <Input
               id="transfers-to"
               type="date"
-              className="h-8 w-36"
+              className="w-36"
               value={filters.to ?? ""}
               onChange={(event) => {
                 change({ to: event.target.value });

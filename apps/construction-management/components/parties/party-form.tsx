@@ -408,7 +408,6 @@ function PartyForm({
                       <SelectTrigger
                         id={id("state")}
                         ref={field.ref}
-                        size="lg"
                         className="w-full min-w-0"
                         aria-invalid={errors.stateCode != null}
                         aria-describedby={

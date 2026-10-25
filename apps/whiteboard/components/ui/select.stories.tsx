@@ -107,7 +107,7 @@ export const Open: Story = {
     await expect(pill().style.transform).toBe(
       `translateY(${selected.offsetTop}px)`,
     );
-    await expect(selected.offsetHeight).toBe(30);
+    await expect(selected.offsetHeight).toBe(36);
     await expect(listbox).toHaveAttribute("data-live");
 
     // Menu: 176 px wide, 6 px below the trigger, from its top-left corner.
@@ -195,7 +195,7 @@ export const WithTags: Story = {
     if (tag == null) throw new Error("No tag");
     await expect(tag).toHaveTextContent("4 months");
     // Tag text is 2 px smaller than the row.
-    await expect(getComputedStyle(tag).fontSize).toBe("11px");
+    await expect(getComputedStyle(tag).fontSize).toBe("12px");
     // The check shows on the selected row only.
     const checks = [...document.querySelectorAll("[data-slot=select-item]")]
       .map((row) => row.querySelector("svg"))
@@ -216,7 +216,7 @@ export const Sizes: Story = {
     const heights = canvas
       .getAllByRole("combobox")
       .map((trigger) => trigger.offsetHeight);
-    await expect(heights).toEqual([28, 32, 40]);
+    await expect(heights).toEqual([36, 40, 48]);
   },
 };
 

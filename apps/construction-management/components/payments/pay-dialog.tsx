@@ -352,7 +352,6 @@ function PayForm({
             >
               <SelectTrigger
                 id="pay-paid-by"
-                size="lg"
                 className="w-full min-w-0"
                 aria-invalid={errors.paidByMemberId != null}
               >

@@ -462,7 +462,6 @@ function ProjectForm({
                   <SelectTrigger
                     id="project-type"
                     ref={field.ref}
-                    size="lg"
                     className="w-full min-w-0"
                     aria-required={project == null}
                     aria-invalid={errors.projectType != null}
@@ -511,7 +510,6 @@ function ProjectForm({
                   <SelectTrigger
                     id="project-status"
                     ref={field.ref}
-                    size="lg"
                     className="w-full min-w-0"
                     aria-required
                     aria-invalid={errors.status != null}
@@ -599,7 +597,6 @@ function ProjectForm({
                   <SelectTrigger
                     id="project-state"
                     ref={field.ref}
-                    size="lg"
                     className="w-full min-w-0"
                     aria-invalid={errors.stateCode != null}
                     aria-describedby="project-state-hint"

@@ -123,7 +123,7 @@ export function RecentCentralReportsSkeleton() {
               </div>
               <SkeletonText width="40%" />
             </div>
-            <Skeleton className="h-8 w-28 rounded-md" />
+            <Skeleton className="h-10 w-28 rounded-md" />
           </li>
         ))}
       </ul>

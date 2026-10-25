@@ -61,7 +61,7 @@ export function PeriodSwitcher({
             <Input
               id="period-from"
               type="date"
-              className="h-8 w-40"
+              className="w-40"
               value={value.anchor}
               onChange={(event) => {
                 const from = event.target.value;
@@ -79,7 +79,7 @@ export function PeriodSwitcher({
             <Input
               id="period-to"
               type="date"
-              className="h-8 w-40"
+              className="w-40"
               min={value.anchor}
               value={value.to ?? value.anchor}
               onChange={(event) => {
@@ -96,7 +96,7 @@ export function PeriodSwitcher({
             type="button"
             variant="outline"
             size="icon"
-            className="size-8"
+
             aria-label={
               value.kind === "monthly" ? "Previous month" : "Previous week"
             }
@@ -116,7 +116,7 @@ export function PeriodSwitcher({
             type="button"
             variant="outline"
             size="icon"
-            className="size-8"
+
             aria-label={value.kind === "monthly" ? "Next month" : "Next week"}
             onClick={() => {
               onChange(shiftPeriod(value, 1));

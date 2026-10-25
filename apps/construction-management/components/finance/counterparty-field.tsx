@@ -85,7 +85,6 @@ function PartySelect({
     >
       <SelectTrigger
         id={id}
-        size="lg"
         className="w-full min-w-0"
         aria-invalid={invalid}
         aria-required={required}
@@ -163,7 +162,6 @@ export function CounterpartyField({
       >
         <SelectTrigger
           id={`${id}-kind`}
-          size="lg"
           className="w-full min-w-0"
           aria-label="Party kind"
         >

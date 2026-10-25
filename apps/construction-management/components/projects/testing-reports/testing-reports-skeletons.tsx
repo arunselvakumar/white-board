@@ -57,7 +57,7 @@ export function TestingItemSkeleton({ projectId }: { projectId: string }) {
           <SkeletonText size="base" width="12rem" />
           <SkeletonText width="5rem" />
         </div>
-        <Skeleton className="h-9 w-full rounded-md sm:max-w-xs" />
+        <Skeleton className="h-10 w-full rounded-md sm:max-w-xs" />
         <ul className="divide-border bg-card divide-y rounded-lg border">
           {WIDTHS.slice(0, 4).map((width, row) => (
             <li key={row} className="flex items-start gap-3 px-3 py-3 sm:px-4">

@@ -159,7 +159,6 @@ function AssignForm({
                 <SelectTrigger
                   id="leave-assign-structure"
                   aria-required
-                  size="lg"
                   className="w-full min-w-0"
                   aria-invalid={errors.structureId != null}
                 >

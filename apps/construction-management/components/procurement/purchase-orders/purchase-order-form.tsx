@@ -142,7 +142,6 @@ function SimpleSelect({
     >
       <SelectTrigger
         id={id}
-        size="lg"
         className="w-full min-w-0"
         aria-required={required}
         aria-invalid={invalid}

@@ -38,7 +38,7 @@ export function VendorRowsSkeleton() {
 export function ProjectFilterSkeleton() {
   return (
     <SkeletonGroup label="Loading Projects" className="w-full sm:w-56">
-      <Skeleton className="h-8 w-full rounded-lg" />
+      <Skeleton className="h-10 w-full rounded-lg" />
     </SkeletonGroup>
   );
 }

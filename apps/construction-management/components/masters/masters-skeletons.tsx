@@ -52,7 +52,7 @@ export function MasterRowsSkeleton({
   return (
     <SkeletonGroup label={label} className="block space-y-3">
       {search ? (
-        <Skeleton className="h-8 w-full rounded-lg sm:max-w-xs" />
+        <Skeleton className="h-10 w-full rounded-lg sm:max-w-xs" />
       ) : null}
       {count ? <SkeletonText width="5rem" /> : null}
       <ul className="bg-card divide-y rounded-xl border">

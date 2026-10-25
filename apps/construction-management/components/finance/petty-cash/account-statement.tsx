@@ -227,7 +227,7 @@ export function AccountStatementView({
           <Input
             id={`${id}-from`}
             type="date"
-            className="h-8 w-40"
+            className="w-40"
             value={range.from}
             onChange={(event) => {
               const from = event.target.value;
@@ -244,7 +244,7 @@ export function AccountStatementView({
           <Input
             id={`${id}-to`}
             type="date"
-            className="h-8 w-40"
+            className="w-40"
             value={range.to}
             onChange={(event) => {
               const to = event.target.value;

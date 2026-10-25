@@ -283,7 +283,6 @@ export function MaterialCategoryDialog({
               <SelectTrigger
                 id="category-parent"
                 ref={field.ref}
-                size="lg"
                 className="w-full min-w-0"
                 aria-invalid={errors.parentId != null}
               >

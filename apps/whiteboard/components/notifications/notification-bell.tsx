@@ -46,7 +46,7 @@ export function NotificationBell() {
           <Button
             variant="ghost"
             size="icon"
-            className="relative size-9 rounded-full"
+            className="relative rounded-full"
             aria-label={bellLabel(unreadCount)}
           />
         }

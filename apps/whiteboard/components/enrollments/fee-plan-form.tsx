@@ -163,7 +163,6 @@ export function FeePlanForm({
               <SelectTrigger
                 id="feePlanType"
                 aria-required
-                size="lg"
                 className="w-full min-w-0"
               >
                 <SelectValue />

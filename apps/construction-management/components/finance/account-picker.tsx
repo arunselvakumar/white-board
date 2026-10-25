@@ -114,7 +114,6 @@ export function AccountPicker({
     >
       <SelectTrigger
         id={id}
-        size="lg"
         className="w-full min-w-0"
         aria-invalid={invalid}
         aria-required={required}

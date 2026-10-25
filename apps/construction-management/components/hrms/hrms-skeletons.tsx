@@ -181,8 +181,8 @@ export function TeamLeavesSkeleton() {
           >
             <SkeletonText width="6rem" className="w-28 shrink-0" />
             <div className="flex min-w-0 flex-1 flex-wrap gap-2">
-              <Skeleton className="h-7 w-32 rounded-lg" />
-              <Skeleton className="h-7 w-24 rounded-lg" />
+              <Skeleton className="h-9 w-32 rounded-lg" />
+              <Skeleton className="h-9 w-24 rounded-lg" />
             </div>
           </li>
         ))}

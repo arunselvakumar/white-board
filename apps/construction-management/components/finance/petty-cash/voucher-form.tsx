@@ -363,7 +363,6 @@ export function VoucherForm({
               >
                 <SelectTrigger
                   id="voucher-account"
-                  size="lg"
                   className="w-full min-w-0"
                   aria-required
                   aria-invalid={errors.accountId != null}
@@ -429,7 +428,6 @@ export function VoucherForm({
                 >
                   <SelectTrigger
                     id="voucher-to"
-                    size="lg"
                     className="w-full min-w-0"
                     aria-required
                     aria-invalid={errors.toAccountId != null}
@@ -486,7 +484,6 @@ export function VoucherForm({
               >
                 <SelectTrigger
                   id="voucher-project"
-                  size="lg"
                   className="w-full min-w-0"
                   aria-invalid={errors.project != null}
                 >

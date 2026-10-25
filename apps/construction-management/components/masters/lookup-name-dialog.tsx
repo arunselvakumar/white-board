@@ -163,7 +163,6 @@ export function LookupNameDialog({
                   >
                     <SelectTrigger
                       id={`${fieldId}-skill`}
-                      size="lg"
                       className="w-full min-w-0"
                       aria-required
                     >

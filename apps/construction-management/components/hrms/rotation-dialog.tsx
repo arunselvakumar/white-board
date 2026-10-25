@@ -260,7 +260,6 @@ export function RotationDialog({
                     <SelectTrigger
                       id="rotation-type"
                       aria-required
-                      size="lg"
                       className="w-full min-w-0"
                     >
                       <SelectValue />
@@ -301,7 +300,6 @@ export function RotationDialog({
                       <SelectTrigger
                         id="rotation-days"
                         aria-required
-                        size="lg"
                         className="w-full min-w-0"
                       >
                         <SelectValue />
@@ -338,11 +336,7 @@ export function RotationDialog({
                   );
                 }}
               >
-                <SelectTrigger
-                  id="rotation-fill"
-                  size="lg"
-                  className="w-full min-w-0"
-                >
+                <SelectTrigger id="rotation-fill" className="w-full min-w-0">
                   <SelectValue placeholder="Choose" />
                 </SelectTrigger>
                 <SelectContent

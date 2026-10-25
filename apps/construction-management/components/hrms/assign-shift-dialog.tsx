@@ -189,7 +189,6 @@ export function AssignShiftDialog({
                   <SelectTrigger
                     id="assign-template"
                     aria-required
-                    size="lg"
                     className="w-full min-w-0"
                     aria-invalid={errors.templateId != null}
                   >
