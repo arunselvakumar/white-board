@@ -1,3 +1,5 @@
+import { expect } from "@playwright/test";
+
 import { AppShellPage } from "./AppShellPage";
 
 export class CheckoutPage extends AppShellPage {
@@ -27,8 +29,15 @@ export class CheckoutPage extends AppShellPage {
 
   /** Steps to Buyer details, fills them, and stops on the last step. */
   public async continueToPay(buyer: { name: string; address: string }) {
-    while (!(await this.step.textContent())?.includes("Buyer details"))
+    // Continue validates the step before moving on: wait for each move, and
+    // give up after the wizard's five steps.
+    for (let moves = 0; moves < 5; moves += 1) {
+      const current = (await this.step.textContent()) ?? "";
+      if (current.includes("Buyer details")) break;
       await this.continueButton.click();
+      await expect(this.step).not.toHaveText(current);
+    }
+    await expect(this.step).toContainText("Buyer details");
     await this.field("Billing name").fill(buyer.name);
     await this.field("Billing address").fill(buyer.address);
     await this.choose("State", "Tamil Nadu");

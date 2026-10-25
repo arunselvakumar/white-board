@@ -27,7 +27,7 @@ bun run --cwd apps/construction-management test:e2e:pr     # Playwright: the @pr
 bun run --cwd apps/construction-management test:e2e        # Playwright: every journey
 ```
 
-End-to-end tests (ADR [CM-0031](./docs/adr/CM-0031-end-to-end-tests.md)) run a production build on http://localhost:3102 against their own `construction_e2e` database and read emails from Mailpit; build again after changing the app. The catalogue is in [`docs/e2e-tests.md`](./docs/e2e-tests.md); `npx playwright show-report` (in this folder) opens the last run.
+End-to-end tests (ADR [CM-0031](./docs/adr/CM-0031-end-to-end-tests.md)) run a production build on http://localhost:3102 against their own `construction_e2e` database and read emails from Mailpit; build again after changing the app. `npx playwright show-report` (in this folder) opens the last run.
 
 Sign up at http://localhost:3002/sign-up with any email and a password; the verification code is in Mailpit (http://localhost:8025) or the server log, depending on `EMAIL_TRANSPORT`. Mobile OTP is off until SMS is switched on (`CONSTRUCTION_SMS=on`, ADR CM-0009); then any +91 mobile works locally with `OTP_TEST_CODE=000000`. Files go to Vercel Blob when `BLOB_READ_WRITE_TOKEN` is set, otherwise to `apps/construction-management/.blob-local`.
 

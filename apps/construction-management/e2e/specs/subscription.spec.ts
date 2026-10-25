@@ -27,9 +27,9 @@ checkoutPageTest.describe("Subscription checkout", () => {
       await subscriptionPage.goto();
       await expect(subscriptionPage.pageHeading).toBeVisible();
       await expect(subscriptionPage.main).toContainText("Basic");
-      await expect(subscriptionPage.invoices).not.toContainText(
-        "No invoices yet",
-      );
+      await expect(
+        subscriptionPage.invoices.getByLabel(/^Download invoice /),
+      ).toBeVisible();
     },
   );
 });

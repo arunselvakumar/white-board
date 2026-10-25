@@ -31,6 +31,9 @@ rolesPageTest.describe("Role Management", () => {
       await expect(projectsPage.menuLink("Users & Roles")).toHaveCount(0);
 
       await page.goto("/app/roles/new");
+      await expect(
+        page.getByText("You don't have access to adding Roles"),
+      ).toBeVisible();
       await expect(new RoleFormPage(page).saveButton).toHaveCount(0);
     },
   );

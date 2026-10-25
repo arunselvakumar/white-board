@@ -5,6 +5,7 @@ import { PASSWORD, newEmail, signUpByEmail, unique } from "../api/session";
 import { signUpPageTest } from "../helpers/signUpPageTest";
 import { CreateCompanyPage } from "../pages/CreateCompanyPage";
 import { ProjectsPage } from "../pages/ProjectsPage";
+import { SignInPage } from "../pages/SignInPage";
 
 signUpPageTest.describe("Sign up", () => {
   signUpPageTest(
@@ -37,16 +38,25 @@ signUpPageTest.describe("Sign up", () => {
   );
 
   signUpPageTest(
-    "should say the email is taken, when someone signs up with an email that already has an account",
+    "should neither reveal nor replace the account, when someone signs up with an email that already has one",
     async ({ signUpPage, account, page }) => {
       await signUpPage.goto();
       await signUpPage.fillDetails({
         name: "Someone Else",
         email: account.email,
-        password: PASSWORD,
+        password: "someone-elses-pass-1",
       });
-      await expect(page.getByText(/already/i)).toBeVisible();
-      await expect(signUpPage.codeInput).toHaveCount(0);
+      // The same next step as for a new email: nothing says the account exists.
+      await expect(
+        page.getByText(`We sent a code to ${account.email}`),
+      ).toBeVisible();
+
+      const signInPage = new SignInPage(page);
+      await signInPage.goto();
+      await signInPage.signInByEmail(account.email, "someone-elses-pass-1");
+      await expect(signInPage.formAlert).toBeVisible();
+      await signInPage.signInByEmail(account.email, account.password);
+      await expect(page).toHaveURL(new ProjectsPage(page).url);
     },
   );
 

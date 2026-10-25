@@ -12,7 +12,7 @@ export const FAKE_GATEWAY_KEY_ID = "rzp_test_fake";
  * Razorpay from `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET`, or null when
  * they are not set: checkout then shows "Payments are not configured".
  * The key id `rzp_test_fake` selects the fake gateway for end-to-end tests
- * (ADR CM-0031); live production refuses it.
+ * (ADR CM-0031); Vercel (previews included) and live production refuse it.
  */
 export function paymentGatewayFromEnv(): PaymentGateway | null {
   const keyId = process.env["RAZORPAY_KEY_ID"] ?? "";
@@ -20,10 +20,13 @@ export function paymentGatewayFromEnv(): PaymentGateway | null {
   if (keyId === "" || keySecret === "") return null;
   if (keyId === FAKE_GATEWAY_KEY_ID) {
     if (
-      process.env.NODE_ENV === "production" &&
-      process.env["VERCEL_ENV"] !== "preview"
+      process.env["VERCEL"] === "1" ||
+      (process.env.NODE_ENV === "production" &&
+        process.env["VERCEL_ENV"] !== "preview")
     )
-      throw new Error("The fake payment gateway must not run in production.");
+      throw new Error(
+        "The fake payment gateway must not run on Vercel or in live production.",
+      );
     return new FakePaymentGateway(keySecret);
   }
   return new RazorpayGateway(keyId, keySecret);
