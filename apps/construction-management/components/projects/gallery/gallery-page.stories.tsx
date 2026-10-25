@@ -191,8 +191,8 @@ export const WithFiles: Story = {
 export const FilterByType: Story = {
   play: async (context) => {
     const { canvas, userEvent } = context;
-    const type = within(await canvas.findByRole("group", { name: "Type" }));
-    await userEvent.click(type.getByRole("button", { name: "PDFs" }));
+    const type = within(await canvas.findByRole("tablist", { name: "Type" }));
+    await userEvent.click(type.getByRole("tab", { name: /^PDFs/ }));
     await waitForTotal(context, "3 files");
     await expect(lastFilters()).toEqual({ type: "pdf" });
     await expect(tiles(context)).toHaveLength(3);
@@ -200,14 +200,14 @@ export const FilterByType: Story = {
       canvas.getByRole("button", { name: CUBE_TEST.fileName }),
     ).toBeVisible();
 
-    await userEvent.click(type.getByRole("button", { name: "Images" }));
+    await userEvent.click(type.getByRole("tab", { name: /^Images/ }));
     await waitForTotal(context, "57 files");
     await expect(lastFilters()).toEqual({ type: "image" });
     await expect(
       canvas.queryByRole("button", { name: CUBE_TEST.fileName }),
     ).toBeNull();
 
-    await userEvent.click(type.getByRole("button", { name: "All" }));
+    await userEvent.click(type.getByRole("tab", { name: /^All/ }));
     await waitForTotal(context, "60 files");
   },
 };
@@ -378,8 +378,8 @@ export const Paging: Story = {
     await waitFor(async () => {
       await expect(tiles(context)).toHaveLength(12);
     });
-    const type = within(canvas.getByRole("group", { name: "Type" }));
-    await userEvent.click(type.getByRole("button", { name: "Images" }));
+    const type = within(canvas.getByRole("tablist", { name: "Type" }));
+    await userEvent.click(type.getByRole("tab", { name: /^Images/ }));
     await waitForTotal(context, "57 files");
     await expect(lastFilters()).toEqual({ type: "image" });
     await expect(tileNames(context)[0]).toBe(SLAB_PHOTO.fileName);

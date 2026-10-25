@@ -2,7 +2,15 @@
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { formatMobile } from "@repo/auth/construction/mobile";
-import { Plus, Receipt } from "lucide-react";
+import {
+  Ban,
+  CircleCheck,
+  LayoutGrid,
+  PauseCircle,
+  Plus,
+  Receipt,
+  TimerOff,
+} from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
@@ -14,6 +22,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
+import { FilterTabs, type FilterTab } from "@repo/ui/components/filter-tabs";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import {
@@ -24,7 +33,6 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 import { cn } from "@repo/ui/lib/utils";
 
 import { formatDate } from "@/components/payments/payment-format";
@@ -40,7 +48,6 @@ import {
 import { unitChartQuery } from "@/src/queries/sales-units";
 import {
   BOOKING_DISPLAY_STATUS_LABELS,
-  BOOKING_DISPLAY_STATUSES,
   type BookingDisplayStatus,
 } from "@/src/sales/domain/booking";
 import { BOOKING_COLUMNS, BookingRowsSkeleton } from "./bookings-skeletons";
@@ -53,13 +60,37 @@ type Filters = {
 
 const NO_FILTERS: Filters = { statuses: [], wingId: "", search: "" };
 
+const STATUS_TABS: FilterTab<BookingDisplayStatus | "all">[] = [
+  { value: "all", label: "All", icon: LayoutGrid },
+  {
+    value: "on_hold",
+    label: BOOKING_DISPLAY_STATUS_LABELS.on_hold,
+    icon: PauseCircle,
+  },
+  {
+    value: "hold_expired",
+    label: BOOKING_DISPLAY_STATUS_LABELS.hold_expired,
+    icon: TimerOff,
+  },
+  {
+    value: "booked",
+    label: BOOKING_DISPLAY_STATUS_LABELS.booked,
+    icon: CircleCheck,
+  },
+  {
+    value: "cancelled",
+    label: BOOKING_DISPLAY_STATUS_LABELS.cancelled,
+    icon: Ban,
+  },
+];
+
 function plural(n: number, word: string): string {
   return `${String(n)} ${n === 1 ? word : `${word}s`}`;
 }
 
 /**
  * Bookings → **Bookings** (CM-1006): the Project's bookings, newest
- * first, with status chips (On Hold, Hold expired, Booked, Cancelled), a
+ * first, with status tabs (All, On Hold, Hold expired, Booked, Cancelled), a
  * Wing filter and a search on the customer or Referred By; cards at phone
  * width, a table above. Booking Create holders add one.
  */
@@ -90,27 +121,14 @@ export function BookingsList({ projectId }: { projectId: string }) {
           </Link>
         )}
       </div>
-      <ToggleGroup
-        multiple
+      <FilterTabs
         aria-label="Status"
-        variant="outline"
-        size="sm"
-        className="flex-wrap"
-        value={filters.statuses}
-        onValueChange={(value: string[]) => {
-          change({
-            statuses: BOOKING_DISPLAY_STATUSES.filter((status) =>
-              value.includes(status),
-            ),
-          });
+        items={STATUS_TABS}
+        value={filters.statuses[0] ?? "all"}
+        onValueChange={(next) => {
+          change({ statuses: next === "all" ? [] : [next] });
         }}
-      >
-        {BOOKING_DISPLAY_STATUSES.map((status) => (
-          <ToggleGroupItem key={status} value={status}>
-            {BOOKING_DISPLAY_STATUS_LABELS[status]}
-          </ToggleGroupItem>
-        ))}
-      </ToggleGroup>
+      />
       <div className="grid min-w-0 grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-end">
         {wings.length > 1 && (
           <FilterSelect

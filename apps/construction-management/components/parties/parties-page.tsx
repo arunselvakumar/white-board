@@ -1,7 +1,15 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { MoreHorizontal, Plus, Search } from "lucide-react";
+import {
+  CircleDot,
+  CircleOff,
+  LayoutGrid,
+  type LucideIcon,
+  MoreHorizontal,
+  Plus,
+  Search,
+} from "lucide-react";
 import Link from "next/link";
 import {
   type ReactNode,
@@ -37,6 +45,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
+import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import {
   InputGroup,
   InputGroupAddon,
@@ -50,7 +59,6 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
@@ -72,10 +80,14 @@ import {
 } from "./party-screens";
 import { PartyRowsSkeleton } from "./parties-skeletons";
 
-const STATUS_FILTERS: { value: PartyListFilter["status"]; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "active", label: "Active" },
-  { value: "inactive", label: "Inactive" },
+const STATUS_FILTERS: {
+  value: PartyListFilter["status"];
+  label: string;
+  icon: LucideIcon;
+}[] = [
+  { value: "all", label: "All", icon: LayoutGrid },
+  { value: "active", label: "Active", icon: CircleDot },
+  { value: "inactive", label: "Inactive", icon: CircleOff },
 ];
 
 /** "Tower A +1": the first name and how many more. */
@@ -134,26 +146,17 @@ export function PartiesPage({ list }: { list: PartyList }) {
               }}
             />
           </InputGroup>
-          <ToggleGroup
+          <FilterTabs
             aria-label="Status"
-            value={[status]}
-            onValueChange={(value: string[]) => {
-              const next = value[0] as PartyListFilter["status"] | undefined;
-              if (next == null) return;
+            items={STATUS_FILTERS}
+            value={status}
+            onValueChange={(next) => {
               startTransition(() => {
                 setStatus(next);
                 setCursor(null);
               });
             }}
-            variant="outline"
-            size="sm"
-          >
-            {STATUS_FILTERS.map((filter) => (
-              <ToggleGroupItem key={filter.value} value={filter.value}>
-                {filter.label}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+          />
         </div>
         <Suspense fallback={<PartyRowsSkeleton screen={screen} />}>
           <PartyRows

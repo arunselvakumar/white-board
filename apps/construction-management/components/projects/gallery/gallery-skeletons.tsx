@@ -1,9 +1,19 @@
+import { FileText, ImageIcon, LayoutGrid } from "lucide-react";
+import type { FilterTab } from "@repo/ui/components/filter-tabs";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import { SkeletonGroup, SkeletonText } from "@repo/ui/components/skeleton-kit";
+import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/tabs";
 
-/* The Gallery while it loads (ADR-0047): real heading and type chips. */
+import type { GalleryFilter } from "@/src/queries/project-gallery";
 
-const TYPES = ["All", "Images", "PDFs"];
+/* The Gallery while it loads (ADR-0047): real heading and type tabs. */
+
+/** The Gallery's Type tabs. */
+export const GALLERY_TYPE_TABS: FilterTab<GalleryFilter["type"]>[] = [
+  { value: "all", label: "All", icon: LayoutGrid },
+  { value: "image", label: "Images", icon: ImageIcon },
+  { value: "pdf", label: "PDFs", icon: FileText },
+];
 
 /** A grid of square file tiles, each with a name and two meta lines. */
 export function GalleryTilesSkeleton() {
@@ -24,7 +34,11 @@ export function GalleryTilesSkeleton() {
   );
 }
 
-/** The whole Gallery page: heading, search, type chips, then the tiles. */
+/**
+ * The whole Gallery page: heading, search, type tabs (inert), then the
+ * tiles. The tab icons render here, not in `FilterTabs`, so a server page
+ * can show this.
+ */
 export function GallerySkeleton() {
   return (
     <div className="w-full max-w-5xl space-y-5 p-6">
@@ -32,18 +46,18 @@ export function GallerySkeleton() {
         <h2 className="font-semibold">Gallery</h2>
       </div>
       <div className="space-y-3">
-        <div aria-hidden="true" className="flex flex-wrap items-center gap-2">
+        <div inert className="flex flex-wrap items-center gap-2">
           <Skeleton className="h-9 w-full rounded-md sm:w-64" />
-          <div className="flex">
-            {TYPES.map((label, index) => (
-              <span
-                key={label}
-                className={`border-input text-muted-foreground inline-flex h-7 items-center border px-2.5 text-sm ${index === 0 ? "rounded-l-md" : "-ml-px"} ${index === TYPES.length - 1 ? "rounded-r-md" : ""}`}
-              >
-                {label}
-              </span>
-            ))}
-          </div>
+          <Tabs defaultValue="all" className="min-w-0">
+            <TabsList aria-label="Type">
+              {GALLERY_TYPE_TABS.map(({ value, label, icon: Icon }) => (
+                <TabsTrigger key={value} value={value}>
+                  {Icon == null ? null : <Icon aria-hidden />}
+                  {label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
         </div>
       </div>
       <GalleryTilesSkeleton />

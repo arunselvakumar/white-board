@@ -9,6 +9,7 @@ import { Button } from "@repo/ui/components/button";
 import {
   Tabs,
   TabsContent,
+  TabsCount,
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components/tabs";
@@ -251,17 +252,12 @@ function PartyDues({ summary }: { summary: CentralPaymentSummary }) {
           setTab(next as PartyTab);
         }}
       >
-        <TabsList aria-label="Party type" className="w-full sm:w-fit">
+        <TabsList aria-label="Party type">
           {PARTY_TABS.map((item) => (
-            <TabsTrigger
-              key={item.value}
-              value={item.value}
-              className="min-w-0 flex-1 sm:flex-none"
-            >
+            <TabsTrigger key={item.value} value={item.value}>
+              <item.icon aria-hidden="true" />
               {item.label}
-              <span className="text-muted-foreground ml-1 hidden text-xs tabular-nums sm:inline">
-                {summary.parties[item.value].length}
-              </span>
+              <TabsCount>{summary.parties[item.value].length}</TabsCount>
             </TabsTrigger>
           ))}
         </TabsList>

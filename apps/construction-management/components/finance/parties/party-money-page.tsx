@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
+import { FileText, Plus, ReceiptIndianRupee, ScrollText } from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
@@ -116,9 +116,18 @@ export function PartyMoneyPage({
       </Suspense>
       <Tabs defaultValue="invoices" className="gap-4">
         <TabsList>
-          <TabsTrigger value="invoices">Invoices</TabsTrigger>
-          <TabsTrigger value="payments">Payments</TabsTrigger>
-          <TabsTrigger value="statement">Statement</TabsTrigger>
+          <TabsTrigger value="invoices">
+            <FileText aria-hidden="true" />
+            Invoices
+          </TabsTrigger>
+          <TabsTrigger value="payments">
+            <ReceiptIndianRupee aria-hidden="true" />
+            Payments
+          </TabsTrigger>
+          <TabsTrigger value="statement">
+            <ScrollText aria-hidden="true" />
+            Statement
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="invoices">
           <Suspense fallback={<PartyCardsSkeleton label="Loading invoices" />}>

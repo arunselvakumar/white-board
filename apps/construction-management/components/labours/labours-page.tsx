@@ -3,8 +3,11 @@
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import {
   ArrowRightLeft,
+  CircleDot,
+  CircleOff,
   Download,
   HardHat,
+  LayoutGrid,
   MoreHorizontal,
   Plus,
   Search,
@@ -45,6 +48,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
+import { FilterTabs, type FilterTab } from "@repo/ui/components/filter-tabs";
 import {
   InputGroup,
   InputGroupAddon,
@@ -65,7 +69,6 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
@@ -88,10 +91,10 @@ import { TransferDialog, type TransferTarget } from "./transfer-dialog";
 import { TransferHistorySheet } from "./transfer-history-sheet";
 import { LabourRowsSkeleton } from "./labours-skeletons";
 
-const STATUS_FILTERS: { value: LabourListFilter["status"]; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "active", label: "Active" },
-  { value: "inactive", label: "Inactive" },
+const STATUS_FILTERS: FilterTab<LabourListFilter["status"]>[] = [
+  { value: "all", label: "All", icon: LayoutGrid },
+  { value: "active", label: "Active", icon: CircleDot },
+  { value: "inactive", label: "Inactive", icon: CircleOff },
 ];
 
 const ALL = "all";
@@ -231,22 +234,12 @@ export function LaboursPage() {
               }}
             />
           </InputGroup>
-          <ToggleGroup
+          <FilterTabs
             aria-label="Status"
-            value={[status]}
-            onValueChange={(value: string[]) => {
-              const next = value[0] as LabourListFilter["status"] | undefined;
-              if (next != null) set(setStatus)(next);
-            }}
-            variant="outline"
-            size="sm"
-          >
-            {STATUS_FILTERS.map((item) => (
-              <ToggleGroupItem key={item.value} value={item.value}>
-                {item.label}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+            items={STATUS_FILTERS}
+            value={status}
+            onValueChange={set(setStatus)}
+          />
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <FilterSelect

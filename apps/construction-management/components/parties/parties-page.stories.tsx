@@ -75,7 +75,7 @@ export const Contractors: Story = {
       canvas.getByRole("searchbox", { name: "Search Contractors" }),
       "balaji",
     );
-    await userEvent.click(canvas.getByRole("button", { name: "Inactive" }));
+    await userEvent.click(canvas.getByRole("tab", { name: "Inactive" }));
     await waitFor(() =>
       expect(
         listedQueries(CONTRACTORS).some(

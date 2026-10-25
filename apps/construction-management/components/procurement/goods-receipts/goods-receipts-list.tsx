@@ -1,7 +1,13 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { PackageCheck, Plus } from "lucide-react";
+import {
+  FileMinus,
+  LayoutGrid,
+  PackageCheck,
+  Plus,
+  ShoppingCart,
+} from "lucide-react";
 import Link from "next/link";
 import { Suspense, useDeferredValue, useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
@@ -13,6 +19,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
+import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import {
@@ -23,7 +30,6 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 import { cn } from "@repo/ui/lib/utils";
 
 import {
@@ -44,9 +50,9 @@ import {
 import { GoodsReceiptRowsSkeleton } from "@/components/procurement/procurement-skeletons";
 
 const PO_FILTERS = [
-  { value: "all", label: "All" },
-  { value: "with", label: "Against PO" },
-  { value: "without", label: "Without PO" },
+  { value: "all", label: "All", icon: LayoutGrid },
+  { value: "with", label: "Against PO", icon: ShoppingCart },
+  { value: "without", label: "Without PO", icon: FileMinus },
 ] as const;
 
 const ALL_SUPPLIERS = "all";
@@ -135,26 +141,14 @@ export function GoodsReceiptsList({ projectId }: { projectId: string }) {
             />
           </div>
         </div>
-        <ToggleGroup
+        <FilterTabs
           aria-label="Purchase Order"
-          value={[filter.purchaseOrder ?? "all"]}
-          onValueChange={(value: string[]) => {
-            const next = value[0];
-            if (next == null) return;
-            change({
-              purchaseOrder:
-                next === "with" || next === "without" ? next : null,
-            });
+          items={PO_FILTERS}
+          value={filter.purchaseOrder ?? "all"}
+          onValueChange={(next) => {
+            change({ purchaseOrder: next === "all" ? null : next });
           }}
-          variant="outline"
-          size="sm"
-        >
-          {PO_FILTERS.map((item) => (
-            <ToggleGroupItem key={item.value} value={item.value}>
-              {item.label}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
+        />
       </div>
       <Suspense fallback={<GoodsReceiptRowsSkeleton />}>
         <ReceiptRows

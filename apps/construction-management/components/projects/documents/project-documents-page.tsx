@@ -2,10 +2,17 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
+  ClipboardList,
   Download,
   Eye,
+  FileIcon,
+  FileSignature,
   FolderOpen,
+  Gavel,
+  Handshake,
+  LayoutGrid,
   MoreHorizontal,
+  ReceiptText,
   Trash2,
   Upload,
 } from "lucide-react";
@@ -25,7 +32,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { FilterTabs, type FilterTab } from "@repo/ui/components/filter-tabs";
 
 import {
   PROJECT_DOCUMENT_KIND_LABELS,
@@ -47,6 +54,15 @@ import { UploadDocumentsDialog } from "./upload-documents-dialog";
 import { useDocumentUploads } from "./use-document-uploads";
 
 type Filter = "all" | ProjectDocumentKind;
+
+const KIND_ICONS = {
+  tender: Gavel,
+  quotation: ReceiptText,
+  loa: FileSignature,
+  client_order: ClipboardList,
+  agreement: Handshake,
+  other: FileIcon,
+} satisfies Record<ProjectDocumentKind, FilterTab<Filter>["icon"]>;
 
 function downloadUrl(document: ProjectDocument): string {
   return `${document.url}?download=1`;
@@ -188,7 +204,7 @@ export function ProjectDocumentsPage({
   const [filter, setFilter] = useState<Filter>("all");
 
   const groups = groupDocumentsByKind(data.items);
-  // A paper whose last file was deleted drops out of the chips.
+  // A paper whose last file was deleted drops out of the tabs.
   const current =
     filter !== "all" && groups.some((group) => group.kind === filter)
       ? filter
@@ -247,37 +263,25 @@ export function ProjectDocumentsPage({
         </Empty>
       ) : (
         <>
-          <div className="-mx-6 overflow-x-auto px-6 pb-1">
-            <ToggleGroup
-              aria-label="Paper"
-              value={[current]}
-              onValueChange={(value: string[]) => {
-                const next = value[0] as Filter | undefined;
-                if (next != null) setFilter(next);
-              }}
-              variant="outline"
-              size="sm"
-            >
-              <ToggleGroupItem value="all" className="whitespace-nowrap">
-                All{" "}
-                <span className="text-muted-foreground tabular-nums">
-                  {data.items.length}
-                </span>
-              </ToggleGroupItem>
-              {groups.map((group) => (
-                <ToggleGroupItem
-                  key={group.kind}
-                  value={group.kind}
-                  className="whitespace-nowrap"
-                >
-                  {PROJECT_DOCUMENT_KIND_LABELS[group.kind]}{" "}
-                  <span className="text-muted-foreground tabular-nums">
-                    {group.items.length}
-                  </span>
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
-          </div>
+          <FilterTabs
+            aria-label="Paper"
+            items={[
+              {
+                value: "all",
+                label: "All",
+                icon: LayoutGrid,
+                count: data.items.length,
+              },
+              ...groups.map((group) => ({
+                value: group.kind,
+                label: PROJECT_DOCUMENT_KIND_LABELS[group.kind],
+                icon: KIND_ICONS[group.kind],
+                count: group.items.length,
+              })),
+            ]}
+            value={current}
+            onValueChange={setFilter}
+          />
 
           <div className="space-y-6">
             {shown.map((group) => {

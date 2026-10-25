@@ -1,7 +1,13 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Plus, type LucideIcon } from "lucide-react";
+import {
+  CircleCheck,
+  CircleOff,
+  LayoutGrid,
+  Plus,
+  type LucideIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -13,7 +19,7 @@ import {
   type ReactNode,
 } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { FilterTabs, type FilterTab } from "@repo/ui/components/filter-tabs";
 import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
@@ -35,13 +41,10 @@ import {
 } from "./master-list-parts";
 import { MasterRowsSkeleton } from "./masters-skeletons";
 
-const STATUS_FILTERS: {
-  value: MaterialMasterFilter["status"];
-  label: string;
-}[] = [
-  { value: "all", label: "All" },
-  { value: "enabled", label: "Enabled" },
-  { value: "disabled", label: "Disabled" },
+const STATUS_FILTERS: FilterTab<MaterialMasterFilter["status"]>[] = [
+  { value: "all", label: "All", icon: LayoutGrid },
+  { value: "enabled", label: "Enabled", icon: CircleCheck },
+  { value: "disabled", label: "Disabled", icon: CircleOff },
 ];
 
 type Item = { id: string; disabled: boolean; updatedAt: string };
@@ -148,27 +151,17 @@ export function PagedMasterListScreen<L extends MaterialMasterList>({
               setCursor(null);
             }}
           />
-          <ToggleGroup
+          <FilterTabs
             aria-label="Status"
-            value={[status]}
-            onValueChange={(value: string[]) => {
-              const next = value[0] as
-                MaterialMasterFilter["status"] | undefined;
-              if (next == null) return;
+            items={STATUS_FILTERS}
+            value={status}
+            onValueChange={(next) => {
               startTransition(() => {
                 setStatus(next);
                 setCursor(null);
               });
             }}
-            variant="outline"
-            size="sm"
-          >
-            {STATUS_FILTERS.map((filter) => (
-              <ToggleGroupItem key={filter.value} value={filter.value}>
-                {filter.label}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+          />
           {filters}
         </div>
         <Suspense

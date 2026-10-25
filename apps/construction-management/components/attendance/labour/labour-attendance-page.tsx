@@ -1,7 +1,14 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, Users } from "lucide-react";
+import {
+  CalendarRange,
+  ChevronLeft,
+  ChevronRight,
+  ClipboardCheck,
+  ListChecks,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { Suspense, useDeferredValue, useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
@@ -186,9 +193,18 @@ export function LabourAttendancePage({
   return (
     <Tabs defaultValue={initialView} className="gap-4">
       <TabsList>
-        <TabsTrigger value="mark">Mark</TabsTrigger>
-        <TabsTrigger value="recorded">Recorded</TabsTrigger>
-        <TabsTrigger value="month">Month</TabsTrigger>
+        <TabsTrigger value="mark">
+          <ClipboardCheck aria-hidden="true" />
+          Mark
+        </TabsTrigger>
+        <TabsTrigger value="recorded">
+          <ListChecks aria-hidden="true" />
+          Recorded
+        </TabsTrigger>
+        <TabsTrigger value="month">
+          <CalendarRange aria-hidden="true" />
+          Month
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="mark">
         <MarkTab projectId={projectId} initialDate={start} />

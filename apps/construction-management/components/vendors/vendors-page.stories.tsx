@@ -74,7 +74,7 @@ export const WithVendors: Story = {
     await expect(rows.getByText("Inactive")).toBeVisible();
     await expect(canvas.getByText("2 Vendors")).toBeVisible();
 
-    await userEvent.click(canvas.getByRole("button", { name: "Active" }));
+    await userEvent.click(canvas.getByRole("tab", { name: /^Active/ }));
     await waitFor(() =>
       expect(
         listedQueries().some((query) => query.get("active") === "true"),

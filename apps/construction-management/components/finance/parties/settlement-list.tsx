@@ -1,7 +1,13 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { HandCoins } from "lucide-react";
+import {
+  CircleCheck,
+  CircleX,
+  Clock,
+  HandCoins,
+  type LucideIcon,
+} from "lucide-react";
 import { Suspense, useState, useTransition } from "react";
 import {
   AlertDialog,
@@ -22,9 +28,9 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
+import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import { Label } from "@repo/ui/components/label";
 import { Textarea } from "@repo/ui/components/textarea";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 import { cn } from "@repo/ui/lib/utils";
 
 import { FieldError } from "@/components/auth/field-error";
@@ -49,6 +55,18 @@ const STATUS_LABELS: Record<Status, string> = {
   approved: "Approved",
   rejected: "Rejected",
 };
+
+const STATUS_ICONS: Record<Status, LucideIcon> = {
+  pending: Clock,
+  approved: CircleCheck,
+  rejected: CircleX,
+};
+
+const STATUS_TABS = (Object.keys(STATUS_LABELS) as Status[]).map((value) => ({
+  value,
+  label: STATUS_LABELS[value],
+  icon: STATUS_ICONS[value],
+}));
 
 /** A refusal's message, with each refused settlement for a bulk one. */
 function problemOf(error: unknown): string {
@@ -85,24 +103,16 @@ export function SettlementList({
   const [updating, startTransition] = useTransition();
   return (
     <div className="space-y-4">
-      <ToggleGroup
+      <FilterTabs
         aria-label="Settlement status"
-        value={[status]}
-        onValueChange={(value: string[]) => {
-          const next = value[0];
-          if (next === "pending" || next === "approved" || next === "rejected")
-            startTransition(() => {
-              setStatus(next);
-            });
+        items={STATUS_TABS}
+        value={status}
+        onValueChange={(next) => {
+          startTransition(() => {
+            setStatus(next);
+          });
         }}
-        variant="outline"
-      >
-        {(Object.keys(STATUS_LABELS) as Status[]).map((item) => (
-          <ToggleGroupItem key={item} value={item}>
-            {STATUS_LABELS[item]}
-          </ToggleGroupItem>
-        ))}
-      </ToggleGroup>
+      />
       <div className={cn(updating && "opacity-60 transition-opacity")}>
         <Suspense fallback={<SettlementsSkeleton />}>
           <Settlements

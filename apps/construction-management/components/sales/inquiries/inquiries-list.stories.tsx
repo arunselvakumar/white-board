@@ -71,11 +71,13 @@ export const List: Story = {
   },
 };
 
-/** Status and Due filters go to the server; Due is one at a time. */
+/** Status and Due filters go to the server, one tab of each at a time. */
 export const Filters: Story = {
   play: async ({ canvas, userEvent }) => {
     await canvas.findByRole("list", { name: "Inquiries" });
-    await userEvent.click(canvas.getByRole("button", { name: "Lost" }));
+    const status = within(canvas.getByRole("tablist", { name: "Status" }));
+    const due = within(canvas.getByRole("tablist", { name: "Follow-up due" }));
+    await userEvent.click(status.getByRole("tab", { name: /^Lost/ }));
     await waitFor(() =>
       expect(
         calls("GET", `${INQUIRIES_API}?`).some((call) =>
@@ -84,16 +86,16 @@ export const Filters: Story = {
       ).toBe(true),
     );
     await waitFor(() => expect(canvas.getByText("1 inquiry")).toBeVisible());
-    await userEvent.click(canvas.getByRole("button", { name: "Lost" }));
-    await userEvent.click(canvas.getByRole("button", { name: "Today" }));
-    await userEvent.click(canvas.getByRole("button", { name: "Overdue" }));
+    await userEvent.click(status.getByRole("tab", { name: /^All/ }));
+    await userEvent.click(due.getByRole("tab", { name: /^Today/ }));
+    await userEvent.click(due.getByRole("tab", { name: /^Overdue/ }));
     await waitFor(() =>
       expect(calls("GET", `${INQUIRIES_API}?`).at(-1)?.path).toContain(
         "due=overdue",
       ),
     );
-    await expect(canvas.getByRole("button", { name: "Today" })).toHaveAttribute(
-      "aria-pressed",
+    await expect(due.getByRole("tab", { name: /^Today/ })).toHaveAttribute(
+      "aria-selected",
       "false",
     );
   },
@@ -107,9 +109,10 @@ export const OverdueFromLink: Story = {
   play: async ({ canvas }) => {
     const list = within(await canvas.findByRole("list", { name: "Inquiries" }));
     await expect(list.getAllByRole("listitem")).toHaveLength(1);
-    await expect(
-      canvas.getByRole("button", { name: "Overdue" }),
-    ).toHaveAttribute("aria-pressed", "true");
+    await expect(canvas.getByRole("tab", { name: /^Overdue/ })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
   },
 };
 
@@ -156,7 +159,7 @@ export const Empty: Story = {
 export const NothingMatches: Story = {
   play: async ({ canvas, userEvent }) => {
     await canvas.findByRole("list", { name: "Inquiries" });
-    await userEvent.click(canvas.getByRole("button", { name: "Converted" }));
+    await userEvent.click(canvas.getByRole("tab", { name: /^Converted/ }));
     await expect(await canvas.findByText("No inquiries match")).toBeVisible();
   },
 };

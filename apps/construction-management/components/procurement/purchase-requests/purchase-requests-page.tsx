@@ -1,7 +1,18 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { ClipboardList, Plus } from "lucide-react";
+import {
+  CircleCheck,
+  CircleDashed,
+  CirclePlus,
+  CircleX,
+  ClipboardList,
+  Clock,
+  LayoutGrid,
+  type LucideIcon,
+  Plus,
+  ShoppingCart,
+} from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
@@ -14,6 +25,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
+import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import {
   Table,
   TableBody,
@@ -22,7 +34,6 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
@@ -61,6 +72,22 @@ import {
 } from "./purchase-request-format";
 import { ReasonDialog } from "./reason-dialog";
 import { PurchaseRequestRowsSkeleton } from "@/components/procurement/procurement-skeletons";
+
+const STATUS_ICONS: Record<StatusChip, LucideIcon> = {
+  all: LayoutGrid,
+  pending: Clock,
+  approved: CircleCheck,
+  rejected: CircleX,
+  ordered: ShoppingCart,
+  partially_ordered: CircleDashed,
+  excess_ordered: CirclePlus,
+};
+
+const STATUS_TABS = STATUS_CHIPS.map((chip) => ({
+  value: chip.key,
+  label: chip.label,
+  icon: STATUS_ICONS[chip.key],
+}));
 
 type Filters = {
   date: DateFilterValue;
@@ -162,23 +189,14 @@ export function PurchaseRequestsPage({
           )}
         </div>
       </div>
-      <ToggleGroup
+      <FilterTabs
         aria-label="Status"
-        value={[filters.chip]}
-        onValueChange={(value: string[]) => {
-          const next = value[0] as StatusChip | undefined;
-          if (next != null) change({ chip: next });
+        items={STATUS_TABS}
+        value={filters.chip}
+        onValueChange={(next) => {
+          change({ chip: next });
         }}
-        variant="outline"
-        size="sm"
-        className="flex-wrap"
-      >
-        {STATUS_CHIPS.map((chip) => (
-          <ToggleGroupItem key={chip.key} value={chip.key}>
-            {chip.label}
-          </ToggleGroupItem>
-        ))}
-      </ToggleGroup>
+      />
       <Suspense fallback={<PurchaseRequestRowsSkeleton bulk={bulk} />}>
         <PurchaseRequestRows
           projectId={projectId}

@@ -13,6 +13,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
+import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import {
@@ -22,7 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 import { cn } from "@repo/ui/lib/utils";
 
 import {
@@ -51,15 +51,12 @@ import {
   lostSummary,
   partyLabel,
 } from "./hindrance-parts";
-import { HindranceRowsSkeleton } from "@/components/site-work/site-work-skeletons";
+import {
+  HINDRANCE_STATUS_TABS,
+  HindranceRowsSkeleton,
+} from "@/components/site-work/site-work-skeletons";
 
 const ALL = "all";
-
-const STATUSES = [
-  { value: ALL, label: "All" },
-  { value: "open", label: "Open" },
-  { value: "closed", label: "Closed" },
-] as const;
 
 function HindranceItem({
   hindrance,
@@ -252,25 +249,14 @@ export function HindrancesList({ projectId }: { projectId: string }) {
         )}
       </div>
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
-        <ToggleGroup
+        <FilterTabs
           aria-label="Status"
-          value={[filters.status ?? ALL]}
-          onValueChange={(value: string[]) => {
-            const next = value[0];
-            if (next == null) return;
-            change({
-              status: next === "open" || next === "closed" ? next : null,
-            });
+          items={HINDRANCE_STATUS_TABS}
+          value={filters.status ?? ALL}
+          onValueChange={(next) => {
+            change({ status: next === ALL ? null : next });
           }}
-          variant="outline"
-          size="sm"
-        >
-          {STATUSES.map((item) => (
-            <ToggleGroupItem key={item.value} value={item.value}>
-              {item.label}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
+        />
         <FilterSelect<HindranceCause>
           label="Cause"
           anyLabel="Any cause"

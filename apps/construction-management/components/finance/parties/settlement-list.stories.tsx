@@ -166,7 +166,7 @@ export const ReadOnlyAndDecided: Story = {
     await expect(
       canvas.queryByRole("button", { name: /^Approve / }),
     ).toBeNull();
-    await userEvent.click(canvas.getByRole("button", { name: "Rejected" }));
+    await userEvent.click(canvas.getByRole("tab", { name: "Rejected" }));
     await expect(
       await canvas.findByText("Rejected: Collect the balance"),
     ).toBeVisible();

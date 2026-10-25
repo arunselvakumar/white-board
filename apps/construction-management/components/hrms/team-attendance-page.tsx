@@ -1,10 +1,19 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Users } from "lucide-react";
+import {
+  AlarmClock,
+  CalendarOff,
+  CircleDashed,
+  LayoutGrid,
+  LogIn,
+  LogOut,
+  Plane,
+  Users,
+} from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { FilterTabs, type FilterTab } from "@repo/ui/components/filter-tabs";
 
 import type { LiveState } from "@/src/hrms/domain/attendance";
 import {
@@ -32,14 +41,14 @@ type Filter =
 
 type Item = HrmsTeamToday["items"][number];
 
-const FILTERS: readonly { value: Filter; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "checked_in", label: "Checked in" },
-  { value: "checked_out", label: "Checked out" },
-  { value: "not_checked_in", label: "Not checked in" },
-  { value: "late", label: "Late" },
-  { value: "on_leave", label: "On Leave" },
-  { value: "off", label: "Day off" },
+const FILTERS: readonly FilterTab<Filter>[] = [
+  { value: "all", label: "All", icon: LayoutGrid },
+  { value: "checked_in", label: "Checked in", icon: LogIn },
+  { value: "checked_out", label: "Checked out", icon: LogOut },
+  { value: "not_checked_in", label: "Not checked in", icon: CircleDashed },
+  { value: "late", label: "Late", icon: AlarmClock },
+  { value: "on_leave", label: "On Leave", icon: Plane },
+  { value: "off", label: "Day off", icon: CalendarOff },
 ];
 
 const OFF: readonly LiveState[] = ["holiday", "week_off"];
@@ -96,31 +105,16 @@ function TeamToday() {
           {data.counts.all} checked in today
         </p>
       </div>
-      <div className="-mx-6 overflow-x-auto px-6 pb-1 [contain:inline-size]">
-        <ToggleGroup
-          aria-label="Show"
-          value={[filter]}
-          onValueChange={(value: string[]) => {
-            const next = value[0] as Filter | undefined;
-            if (next != null) setFilter(next);
-          }}
-          variant="outline"
-          size="sm"
-        >
-          {FILTERS.map((item) => (
-            <ToggleGroupItem
-              key={item.value}
-              value={item.value}
-              className="whitespace-nowrap"
-            >
-              {item.label}{" "}
-              <span className="text-muted-foreground tabular-nums">
-                {count(data, item.value)}
-              </span>
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
-      </div>
+      <FilterTabs
+        aria-label="Show"
+        className="[contain:inline-size]"
+        items={FILTERS.map((item) => ({
+          ...item,
+          count: count(data, item.value),
+        }))}
+        value={filter}
+        onValueChange={setFilter}
+      />
       {items.length === 0 ? (
         <p className="text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
           Nobody matches this filter.
@@ -177,7 +171,7 @@ function TeamToday() {
 /**
  * Team Attendance (CM-309): where each Team Member stands today (checked
  * in, checked out, not checked in, on leave, day off), with late and
- * out-of-fence flags and filter chips. Menu `hrms.attendance` View All.
+ * out-of-fence flags and filter tabs. Menu `hrms.attendance` View All.
  */
 export function TeamAttendancePage() {
   return (

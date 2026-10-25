@@ -1,7 +1,15 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { FileText, Wallet } from "lucide-react";
+import {
+  Banknote,
+  FileText,
+  HandCoins,
+  Handshake,
+  LayoutGrid,
+  Shovel,
+  Wallet,
+} from "lucide-react";
 import { Suspense, useState, useTransition } from "react";
 import {
   AlertDialog,
@@ -21,6 +29,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
+import { FilterTabs, type FilterTab } from "@repo/ui/components/filter-tabs";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import {
@@ -31,7 +40,6 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
@@ -46,17 +54,17 @@ import {
 import { formatDate, money } from "./payment-format";
 import { PAYMENT_COLUMNS, PaymentRowsSkeleton } from "./payments-skeletons";
 
-const TYPES = [
-  { value: "all", label: "All" },
-  { value: "labour", label: "Labour" },
-  { value: "vendor", label: "Vendor" },
-] as const;
+const TYPES: FilterTab<"all" | "labour" | "vendor">[] = [
+  { value: "all", label: "All", icon: LayoutGrid },
+  { value: "labour", label: "Labour", icon: Shovel },
+  { value: "vendor", label: "Vendor", icon: Handshake },
+];
 
-const KINDS = [
-  { value: "all", label: "All" },
-  { value: "payment", label: "Payments" },
-  { value: "advance", label: "Advances" },
-] as const;
+const KINDS: FilterTab<"all" | "payment" | "advance">[] = [
+  { value: "all", label: "All", icon: LayoutGrid },
+  { value: "payment", label: "Payments", icon: Banknote },
+  { value: "advance", label: "Advances", icon: HandCoins },
+];
 
 /** Recorded payments of a Project with filters and cancel (CM-216). */
 export function PaymentsList({ projectId }: { projectId: string }) {
@@ -77,44 +85,22 @@ export function PaymentsList({ projectId }: { projectId: string }) {
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
-        <ToggleGroup
+        <FilterTabs
           aria-label="Party type"
-          value={[filter.partyType ?? "all"]}
-          onValueChange={(value: string[]) => {
-            const next = value[0];
-            if (next == null) return;
-            change({
-              partyType: next === "labour" || next === "vendor" ? next : null,
-            });
+          items={TYPES}
+          value={filter.partyType ?? "all"}
+          onValueChange={(next) => {
+            change({ partyType: next === "all" ? null : next });
           }}
-          variant="outline"
-          size="sm"
-        >
-          {TYPES.map((item) => (
-            <ToggleGroupItem key={item.value} value={item.value}>
-              {item.label}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
-        <ToggleGroup
+        />
+        <FilterTabs
           aria-label="Kind"
-          value={[filter.kind ?? "all"]}
-          onValueChange={(value: string[]) => {
-            const next = value[0];
-            if (next == null) return;
-            change({
-              kind: next === "payment" || next === "advance" ? next : null,
-            });
+          items={KINDS}
+          value={filter.kind ?? "all"}
+          onValueChange={(next) => {
+            change({ kind: next === "all" ? null : next });
           }}
-          variant="outline"
-          size="sm"
-        >
-          {KINDS.map((item) => (
-            <ToggleGroupItem key={item.value} value={item.value}>
-              {item.label}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
+        />
         <div className="flex items-end gap-2">
           <div className="space-y-1">
             <Label htmlFor="payments-from" className="text-xs">

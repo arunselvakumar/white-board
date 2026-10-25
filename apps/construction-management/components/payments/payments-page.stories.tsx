@@ -169,7 +169,7 @@ export const PaymentsTab: Story = {
     await expect(
       canvas.getAllByText("HDFC Current A/c").length,
     ).toBeGreaterThan(0);
-    await userEvent.click(canvas.getByRole("button", { name: "Advances" }));
+    await userEvent.click(canvas.getByRole("tab", { name: /^Advances/ }));
     await expect(
       await canvas.findByText("1 payment · ₹5,000.00"),
     ).toBeVisible();

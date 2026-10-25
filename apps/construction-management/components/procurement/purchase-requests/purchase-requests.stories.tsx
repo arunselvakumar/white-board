@@ -66,7 +66,7 @@ export const List: Story = {
     await expect(
       canvas.getAllByText("Partially Ordered").length,
     ).toBeGreaterThan(0);
-    await userEvent.click(canvas.getByRole("button", { name: "Rejected" }));
+    await userEvent.click(canvas.getByRole("tab", { name: "Rejected" }));
     await waitFor(async () => {
       await expect(calls("GET", "approvalStatus=rejected")).toHaveLength(1);
     });
@@ -75,7 +75,7 @@ export const List: Story = {
       canvas.getAllByText(REJECTED_PR.number).length,
     ).toBeGreaterThan(0);
     await userEvent.click(
-      canvas.getByRole("button", { name: "Partially Ordered" }),
+      canvas.getByRole("tab", { name: "Partially Ordered" }),
     );
     await waitFor(async () => {
       await expect(calls("GET", "orderStatus=partially_ordered")).toHaveLength(

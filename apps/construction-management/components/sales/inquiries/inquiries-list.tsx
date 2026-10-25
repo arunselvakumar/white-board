@@ -26,6 +26,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
+import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import {
@@ -36,7 +37,6 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 import { cn } from "@repo/ui/lib/utils";
 
 import { localToday } from "@/components/payments/payment-format";
@@ -50,10 +50,7 @@ import {
   type InquiryFilters,
 } from "@/src/queries/sales-inquiries";
 import {
-  FOLLOW_UP_DUE_LABELS,
   FOLLOW_UP_DUES,
-  INQUIRY_STATUS_LABELS,
-  INQUIRY_STATUSES,
   INTEREST_TYPE_LABELS,
   INTEREST_TYPES,
   type FollowUpDue,
@@ -70,7 +67,9 @@ import {
 import { ImportInquiriesDialog } from "./import-inquiries-dialog";
 import { InquiryQuickAddDialog } from "./inquiry-quick-add-dialog";
 import {
+  FOLLOW_UP_DUE_TABS,
   INQUIRY_COLUMNS,
+  INQUIRY_STATUS_TABS,
   InquiryFilterBarSkeleton,
   InquiryRowsSkeleton,
 } from "./inquiries-skeletons";
@@ -117,8 +116,8 @@ function inquiries(n: number): string {
 }
 
 /**
- * A Project's inquiries (CM-1003): status chips Open / Converted / Lost,
- * the Due filter Overdue / Today / Upcoming / No follow-up (open with
+ * A Project's inquiries (CM-1003): status tabs All / Open / Converted /
+ * Lost, the Due tabs All / Overdue / Today / Upcoming / No follow-up (open with
  * `?due=overdue` from a notification), filters by Funnel Stage, Interest
  * Type, Lead Source and Assignee, and a search on the name, mobile or
  * email; newest first in pages. **Add Inquiry** opens the full form,
@@ -200,45 +199,23 @@ export function InquiriesList({
           </div>
         )}
       </div>
-      <div className="flex min-w-0 flex-wrap gap-2">
-        <ToggleGroup
-          multiple
+      <div className="flex min-w-0 flex-wrap gap-x-6 gap-y-2">
+        <FilterTabs
           aria-label="Status"
-          variant="outline"
-          size="sm"
-          className="flex-wrap"
-          value={filters.statuses}
-          onValueChange={(value: string[]) => {
-            change({
-              statuses: INQUIRY_STATUSES.filter((status) =>
-                value.includes(status),
-              ),
-            });
+          items={INQUIRY_STATUS_TABS}
+          value={filters.statuses[0] ?? "all"}
+          onValueChange={(next) => {
+            change({ statuses: next === "all" ? [] : [next] });
           }}
-        >
-          {INQUIRY_STATUSES.map((status) => (
-            <ToggleGroupItem key={status} value={status}>
-              {INQUIRY_STATUS_LABELS[status]}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
-        <ToggleGroup
+        />
+        <FilterTabs
           aria-label="Follow-up due"
-          variant="outline"
-          size="sm"
-          className="flex-wrap"
-          value={filters.due === "" ? [] : [filters.due]}
-          onValueChange={(value: string[]) => {
-            const picked = value.at(-1) ?? "";
-            change({ due: isDue(picked) ? picked : "" });
+          items={FOLLOW_UP_DUE_TABS}
+          value={filters.due === "" ? "all" : filters.due}
+          onValueChange={(next) => {
+            change({ due: next === "all" ? "" : next });
           }}
-        >
-          {FOLLOW_UP_DUES.map((due) => (
-            <ToggleGroupItem key={due} value={due}>
-              {FOLLOW_UP_DUE_LABELS[due]}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
+        />
       </div>
       <Suspense fallback={<InquiryFilterBarSkeleton />}>
         <FilterBar projectId={projectId} filters={filters} onChange={change} />

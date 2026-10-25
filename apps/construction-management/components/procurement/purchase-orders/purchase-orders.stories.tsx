@@ -83,7 +83,7 @@ export const List: Story = {
       canvas.getAllByText("Partially received").length,
     ).toBeGreaterThan(0);
     await expect(canvas.getAllByText("₹49,280.00").length).toBeGreaterThan(0);
-    await userEvent.click(canvas.getByRole("button", { name: "Pending" }));
+    await userEvent.click(canvas.getByRole("tab", { name: "Pending" }));
     await waitFor(async () => {
       await expect(calls("GET", "approvalStatus=pending")).toHaveLength(1);
     });

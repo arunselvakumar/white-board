@@ -66,7 +66,7 @@ export const Register: Story = {
 export const Filters: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     await canvas.findByRole("list", { name: "Hindrances" });
-    await userEvent.click(canvas.getByRole("button", { name: "Closed" }));
+    await userEvent.click(canvas.getByRole("tab", { name: /^Closed/ }));
     await waitFor(async () => {
       await expect(
         within(canvas.getByRole("list", { name: "Hindrances" })).getAllByRole(

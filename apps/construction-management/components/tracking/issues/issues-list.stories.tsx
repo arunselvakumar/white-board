@@ -78,26 +78,29 @@ export const List: Story = {
   },
 };
 
-/** The status chips filter on Pending, Delayed, Solved and Closed together. */
-export const StatusChips: Story = {
+/** The status tabs filter on one of Pending, Delayed, Solved or Closed. */
+export const StatusTabs: Story = {
   play: async ({ canvas, userEvent }) => {
     await canvas.findByRole("list", { name: "Issues & Snags" });
-    const status = within(canvas.getByRole("group", { name: "Status" }));
-    await userEvent.click(status.getByRole("button", { name: "Pending" }));
-    await userEvent.click(status.getByRole("button", { name: "Delayed" }));
+    const status = within(canvas.getByRole("tablist", { name: "Status" }));
+    await userEvent.click(status.getByRole("tab", { name: /^Delayed/ }));
     await waitFor(async () => {
       await expect(
         calls("GET", `${ISSUES_API}?`).some((call) =>
-          call.path.includes("status=pending%2Cdelayed"),
+          call.path.includes("status=delayed"),
         ),
       ).toBe(true);
     });
+    const rows = () =>
+      within(canvas.getByRole("list", { name: "Issues & Snags" })).getAllByRole(
+        "listitem",
+      );
     await waitFor(async () => {
-      await expect(
-        within(
-          canvas.getByRole("list", { name: "Issues & Snags" }),
-        ).getAllByRole("listitem"),
-      ).toHaveLength(2);
+      await expect(rows()).toHaveLength(1);
+    });
+    await userEvent.click(status.getByRole("tab", { name: /^All/ }));
+    await waitFor(async () => {
+      await expect(rows()).toHaveLength(4);
     });
   },
 };
@@ -155,14 +158,14 @@ export const FilterClearsSelection: Story = {
       );
     await userEvent.click(pick());
     await expect(canvas.getByText("1 selected")).toBeVisible();
-    const status = within(canvas.getByRole("group", { name: "Status" }));
-    await userEvent.click(status.getByRole("button", { name: "Pending" }));
+    const status = within(canvas.getByRole("tablist", { name: "Status" }));
+    await userEvent.click(status.getByRole("tab", { name: /^Pending/ }));
     await waitFor(async () => {
       await expect(rows()).toHaveLength(1);
     });
     await expect(canvas.queryByText("1 selected")).toBeNull();
     await expect(pick()).not.toBeChecked();
-    await userEvent.click(status.getByRole("button", { name: "Pending" }));
+    await userEvent.click(status.getByRole("tab", { name: /^All/ }));
     await waitFor(async () => {
       await expect(rows()).toHaveLength(4);
     });

@@ -1,7 +1,15 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { HardHat, MoreHorizontal, Plus, Search } from "lucide-react";
+import {
+  CircleDot,
+  CircleOff,
+  HardHat,
+  LayoutGrid,
+  MoreHorizontal,
+  Plus,
+  Search,
+} from "lucide-react";
 import Link from "next/link";
 import { Suspense, useDeferredValue, useState, useTransition } from "react";
 import {
@@ -30,6 +38,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
+import { FilterTabs, type FilterTab } from "@repo/ui/components/filter-tabs";
 import {
   InputGroup,
   InputGroupAddon,
@@ -50,7 +59,6 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
@@ -70,10 +78,10 @@ import { ProjectFilterSkeleton, VendorRowsSkeleton } from "./vendors-skeletons";
 
 export const VENDORS_PATH = "/app/masters/vendors";
 
-const STATUS_FILTERS: { value: VendorListFilter["status"]; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "active", label: "Active" },
-  { value: "inactive", label: "Inactive" },
+const STATUS_FILTERS: FilterTab<VendorListFilter["status"]>[] = [
+  { value: "all", label: "All", icon: LayoutGrid },
+  { value: "active", label: "Active", icon: CircleDot },
+  { value: "inactive", label: "Inactive", icon: CircleOff },
 ];
 
 const ALL_PROJECTS = "all";
@@ -82,7 +90,7 @@ function editPath(id: string): string {
   return `${VENDORS_PATH}/${encodeURIComponent(id)}`;
 }
 
-/** Masters → Vendors (CM-209): search, status chips, Project filter, row actions. */
+/** Masters → Vendors (CM-209): search, status tabs, Project filter, row actions. */
 export function VendorsPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<VendorListFilter["status"]>("all");
@@ -126,26 +134,17 @@ export function VendorsPage() {
               }}
             />
           </InputGroup>
-          <ToggleGroup
+          <FilterTabs
             aria-label="Status"
-            value={[status]}
-            onValueChange={(value: string[]) => {
-              const next = value[0] as VendorListFilter["status"] | undefined;
-              if (next == null) return;
+            items={STATUS_FILTERS}
+            value={status}
+            onValueChange={(next) => {
               startTransition(() => {
                 setStatus(next);
                 setCursor(null);
               });
             }}
-            variant="outline"
-            size="sm"
-          >
-            {STATUS_FILTERS.map((filter) => (
-              <ToggleGroupItem key={filter.value} value={filter.value}>
-                {filter.label}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+          />
           <Suspense fallback={<ProjectFilterSkeleton />}>
             <ProjectFilter
               value={projectId}

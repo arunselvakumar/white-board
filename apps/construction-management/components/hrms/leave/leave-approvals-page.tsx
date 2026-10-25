@@ -1,7 +1,14 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ListChecks } from "lucide-react";
+import {
+  Ban,
+  CircleCheck,
+  CircleX,
+  Clock,
+  ListChecks,
+  type LucideIcon,
+} from "lucide-react";
 import { useState } from "react";
 import { Button } from "@repo/ui/components/button";
 import {
@@ -14,6 +21,7 @@ import {
 import {
   Tabs,
   TabsContent,
+  TabsCount,
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components/tabs";
@@ -31,17 +39,34 @@ import {
   type Decision,
 } from "./leave-request-parts";
 
-const TABS: { value: LeaveApprovalTab; label: string; empty: string }[] = [
+const TABS: {
+  value: LeaveApprovalTab;
+  label: string;
+  icon: LucideIcon;
+  empty: string;
+}[] = [
   {
     value: "pending",
     label: "Pending",
+    icon: Clock,
     empty: "No leave is waiting for a decision.",
   },
-  { value: "approved", label: "Approved", empty: "No approved leave yet." },
-  { value: "rejected", label: "Rejected", empty: "No rejected leave." },
+  {
+    value: "approved",
+    label: "Approved",
+    icon: CircleCheck,
+    empty: "No approved leave yet.",
+  },
+  {
+    value: "rejected",
+    label: "Rejected",
+    icon: CircleX,
+    empty: "No rejected leave.",
+  },
   {
     value: "cancel_requests",
     label: "Cancel Requests",
+    icon: Ban,
     empty: "Nobody has asked to cancel approved leave.",
   },
 ];
@@ -112,18 +137,17 @@ function ApprovalTabs({ initialTab }: { initialTab: LeaveApprovalTab }) {
       }}
       className="gap-4"
     >
-      <div className="-mx-6 overflow-x-auto px-6 [contain:inline-size]">
-        <TabsList>
-          {TABS.map((item) => (
-            <TabsTrigger key={item.value} value={item.value}>
-              {item.label}
-              {item.value !== "approved" && item.value !== "rejected"
-                ? ` (${String(pending.counts[item.value])})`
-                : ""}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </div>
+      <TabsList>
+        {TABS.map((item) => (
+          <TabsTrigger key={item.value} value={item.value}>
+            <item.icon aria-hidden="true" />
+            {item.label}
+            {item.value !== "approved" && item.value !== "rejected" ? (
+              <TabsCount>{pending.counts[item.value]}</TabsCount>
+            ) : null}
+          </TabsTrigger>
+        ))}
+      </TabsList>
       {TABS.map((item) => (
         <TabsContent key={item.value} value={item.value}>
           {tab === item.value ? (

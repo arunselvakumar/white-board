@@ -1,7 +1,14 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, HardHat } from "lucide-react";
+import {
+  CalendarDays,
+  CalendarRange,
+  ChevronLeft,
+  ChevronRight,
+  HardHat,
+  Timer,
+} from "lucide-react";
 import Link from "next/link";
 import { Suspense, useDeferredValue, useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
@@ -184,9 +191,18 @@ export function VendorAttendancePage({
   return (
     <Tabs defaultValue={initialView} className="gap-4">
       <TabsList>
-        <TabsTrigger value="day">Day</TabsTrigger>
-        <TabsTrigger value="month">Month</TabsTrigger>
-        <TabsTrigger value="overtime">Overtime</TabsTrigger>
+        <TabsTrigger value="day">
+          <CalendarDays aria-hidden="true" />
+          Day
+        </TabsTrigger>
+        <TabsTrigger value="month">
+          <CalendarRange aria-hidden="true" />
+          Month
+        </TabsTrigger>
+        <TabsTrigger value="overtime">
+          <Timer aria-hidden="true" />
+          Overtime
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="day">
         <DayTab projectId={projectId} initialDate={start} />

@@ -1,5 +1,6 @@
 "use client";
 
+import { Handshake, ReceiptIndianRupee, Shovel } from "lucide-react";
 import { Suspense, useState, useTransition } from "react";
 import {
   Tabs,
@@ -48,9 +49,18 @@ export function PaymentsPage({
   return (
     <Tabs defaultValue={initialTab} className="gap-4">
       <TabsList>
-        <TabsTrigger value="labour">Labour</TabsTrigger>
-        <TabsTrigger value="vendor">Vendor</TabsTrigger>
-        <TabsTrigger value="payments">Payments</TabsTrigger>
+        <TabsTrigger value="labour">
+          <Shovel aria-hidden="true" />
+          Labour
+        </TabsTrigger>
+        <TabsTrigger value="vendor">
+          <Handshake aria-hidden="true" />
+          Vendor
+        </TabsTrigger>
+        <TabsTrigger value="payments">
+          <ReceiptIndianRupee aria-hidden="true" />
+          Payments
+        </TabsTrigger>
       </TabsList>
       {(["labour", "vendor"] as const).map((partyType) => (
         <TabsContent key={partyType} value={partyType} className="space-y-4">

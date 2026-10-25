@@ -67,7 +67,7 @@ export const Requests: Story = {
     await expect(t.getByText("Rejected")).toBeVisible();
     await expect(t.getAllByText(/Velan Constructions/)).toHaveLength(3);
     await expect(
-      canvas.getByRole("button", { name: "Pending for approval (1)" }),
+      canvas.getByRole("tab", { name: /^Pending for approval\s*1/ }),
     ).toBeVisible();
     await expect(
       canvas.getByRole("link", { name: "Add Inspection Request" }),
@@ -75,11 +75,11 @@ export const Requests: Story = {
   },
 };
 
-/** The status chips filter the list and keep their counts. */
-export const StatusChips: Story = {
+/** The status tabs filter the list and keep their counts. */
+export const StatusTabs: Story = {
   play: async ({ canvas, userEvent }) => {
     await canvas.findByRole("list", { name: "Inspection Requests" });
-    await userEvent.click(canvas.getByRole("button", { name: "Rejected (1)" }));
+    await userEvent.click(canvas.getByRole("tab", { name: /^Rejected\s*1/ }));
     await waitFor(async () => {
       await expect(
         within(
@@ -90,7 +90,7 @@ export const StatusChips: Story = {
     await expect(
       canvas.getByRole("link", { name: "IR/26-27/00002" }),
     ).toBeVisible();
-    await expect(canvas.getByRole("button", { name: "All (3)" })).toBeVisible();
+    await expect(canvas.getByRole("tab", { name: /^All\s*3/ })).toBeVisible();
   },
 };
 
@@ -156,7 +156,7 @@ export const SelectionStartsOver: Story = {
       canvas.getByRole("button", { name: "Approve (0)" }),
     ).toBeDisabled();
     await userEvent.click(box());
-    await userEvent.click(canvas.getByRole("button", { name: "Rejected (1)" }));
+    await userEvent.click(canvas.getByRole("tab", { name: /^Rejected\s*1/ }));
     await waitFor(async () => {
       await expect(
         within(
@@ -164,7 +164,7 @@ export const SelectionStartsOver: Story = {
         ).getAllByRole("listitem"),
       ).toHaveLength(1);
     });
-    await userEvent.click(canvas.getByRole("button", { name: "All (3)" }));
+    await userEvent.click(canvas.getByRole("tab", { name: /^All\s*3/ }));
     await waitFor(async () => {
       await expect(
         within(

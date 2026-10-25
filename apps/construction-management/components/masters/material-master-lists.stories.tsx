@@ -93,7 +93,7 @@ export const Units: Story = {
       ).toEqual(["kg"]),
     );
     await userEvent.clear(canvas.getByLabelText("Search Measurement Units"));
-    await userEvent.click(canvas.getByRole("button", { name: "Disabled" }));
+    await userEvent.click(canvas.getByRole("tab", { name: /^Disabled/ }));
     await waitFor(() =>
       expect(calledWith(api.spy, UNITS, { status: "disabled" })).toBe(true),
     );

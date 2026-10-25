@@ -1,7 +1,15 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { ListChecks, Plus } from "lucide-react";
+import {
+  AlarmClock,
+  BadgeCheck,
+  CircleCheck,
+  Clock,
+  LayoutGrid,
+  ListChecks,
+  Plus,
+} from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
@@ -14,6 +22,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
+import { FilterTabs, type FilterTab } from "@repo/ui/components/filter-tabs";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import {
@@ -24,7 +33,6 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
@@ -52,7 +60,6 @@ import {
 import type { LocationType } from "@/src/shared-kernel/location-ref";
 import {
   ISSUE_STATUS_LABELS,
-  ISSUE_STATUSES,
   type IssueStatus,
 } from "@/src/tracking/domain/issue";
 import {
@@ -109,13 +116,21 @@ function toQuery(filters: Filters): IssueFilters {
   };
 }
 
+const STATUS_TABS: FilterTab<IssueStatus | "all">[] = [
+  { value: "all", label: "All", icon: LayoutGrid },
+  { value: "pending", label: ISSUE_STATUS_LABELS.pending, icon: Clock },
+  { value: "delayed", label: ISSUE_STATUS_LABELS.delayed, icon: AlarmClock },
+  { value: "solved", label: ISSUE_STATUS_LABELS.solved, icon: CircleCheck },
+  { value: "closed", label: ISSUE_STATUS_LABELS.closed, icon: BadgeCheck },
+];
+
 function plural(n: number, word: string): string {
   return `${String(n)} ${n === 1 ? word : `${word}s`}`;
 }
 
 /**
- * A Project's Issues & Snags (CM-803): status chips Pending / Delayed /
- * Solved / Closed (Delayed is open past the Due Date), filters by
+ * A Project's Issues & Snags (CM-803): status tabs All / Pending /
+ * Delayed / Solved / Closed (Delayed is open past the Due Date), filters by
  * priority, category, assignee, Department, Contractor, location, Issue
  * Date and a search; select issues to **Mark As Solved** (Update) or
  * **Verify** (Approve) them together, the rest skipped and counted.
@@ -155,25 +170,14 @@ export function IssuesList({
           </Link>
         )}
       </div>
-      <ToggleGroup
-        multiple
+      <FilterTabs
         aria-label="Status"
-        variant="outline"
-        size="sm"
-        className="flex-wrap"
-        value={filters.statuses}
-        onValueChange={(value: string[]) => {
-          change({
-            statuses: ISSUE_STATUSES.filter((status) => value.includes(status)),
-          });
+        items={STATUS_TABS}
+        value={filters.statuses[0] ?? "all"}
+        onValueChange={(next) => {
+          change({ statuses: next === "all" ? [] : [next] });
         }}
-      >
-        {ISSUE_STATUSES.map((status) => (
-          <ToggleGroupItem key={status} value={status}>
-            {ISSUE_STATUS_LABELS[status]}
-          </ToggleGroupItem>
-        ))}
-      </ToggleGroup>
+      />
       <Suspense fallback={<IssueFiltersSkeleton />}>
         <FilterBar
           projectId={projectId}
