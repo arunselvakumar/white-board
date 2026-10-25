@@ -2,6 +2,7 @@ import { getCompanyAuthSnapshot } from "@repo/auth/construction/server";
 import { CompanyAuthProvider } from "@repo/auth/construction/react";
 import type { Metadata } from "next";
 import { Geist_Mono } from "next/font/google";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type { ReactNode } from "react";
 import { SatoshiStylesheet } from "@repo/ui/components/satoshi-stylesheet";
 import { ThemeProvider } from "@repo/ui/components/theme-provider";
@@ -48,7 +49,9 @@ export default async function RootLayout({
           >
             <TooltipProvider>
               <ImpersonationBanner />
-              <QueryProvider>{children}</QueryProvider>
+              <NuqsAdapter>
+                <QueryProvider>{children}</QueryProvider>
+              </NuqsAdapter>
             </TooltipProvider>
           </ThemeProvider>
         </CompanyAuthProvider>

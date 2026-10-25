@@ -49,6 +49,10 @@ Order, the status totals and chips, and both empty states stay as they were.
 
 The project shell header, the Project switcher and reports do not use the colour for now.
 
+### 5. Change colour from the folder's menu (amended 2026-10-25)
+
+The kebab on each folder has **Change colour**. It opens a submenu with the same eight colours as the Project form, each with its swatch, and the current colour ticked. Picking one recolours the folder at once and saves only the colour (`POST /projects/{id}/color/update`). It needs the same permission as Edit (`projects.project` update) and is audited as `project.updated`. Because nothing else changes, it doesn't send the `expectedUpdatedAt` an Edit does. If the server refuses, the folder goes back to its old colour.
+
 ## Consequences
 
 - Every Project from before this change is Lavender until someone edits it. The home starts out all one colour for a Company with many Projects. Owners can recolour them, and the default does not rotate.

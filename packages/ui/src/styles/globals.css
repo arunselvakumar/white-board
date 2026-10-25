@@ -217,10 +217,11 @@
   --animate-select-fade-out: select-fade-out 120ms ease forwards;
   --animate-select-value-swap: select-value-swap 160ms ease;
 
-  /* Tabs (Aceternity's Animated Tabs): the active pill springs to the
-     picked tab. `linear()` samples a damping-ratio-0.7 spring (motion's
-     `bounce: 0.3`) that settles at the end of the duration, so plain CSS
-     transitions can overshoot by ~5% without a motion library. */
+  /* Tabs: the picked tab's underline (or, on the sign-in forms, its pill)
+     springs to the newly picked tab. `linear()` samples a damping-ratio-0.7
+     spring (motion's `bounce: 0.3`) that settles at the end of the
+     duration, so plain CSS transitions can overshoot by ~5% without a
+     motion library. */
   --ease-spring: linear(
     0,
     0.069,

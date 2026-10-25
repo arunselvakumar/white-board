@@ -6,8 +6,15 @@ import {
 
 import type { ConstructionProjectsProjectHomeResponseModel } from "@/app/api/construction/projects/projects/[id]/home/home-models";
 
+import type { ProjectColor } from "@/src/projects/domain/project-color";
+
 import { apiJson } from "./http";
-import { PROJECTS_API, PROJECTS_KEY, projectsQuery } from "./projects";
+import {
+  PROJECTS_API,
+  PROJECTS_KEY,
+  projectsQuery,
+  type ProjectResponse,
+} from "./projects";
 
 export type ProjectHome = ConstructionProjectsProjectHomeResponseModel;
 export type ProjectHomeModule = ProjectHome["modules"][number];
@@ -67,5 +74,39 @@ export function usePinProject() {
           queryKey: projectHomeQuery(input.id).queryKey,
         }),
       ]),
+  });
+}
+
+/**
+ * Change colour from the folder's menu (ADR CM-0026 §5). The folder takes
+ * the new colour at once and goes back if the server refuses it.
+ */
+export function useSetProjectColor() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { id: string; color: ProjectColor }) =>
+      postJson<ProjectResponse>(projectUrl(input.id, "color/update"), {
+        color: input.color,
+      }),
+    onMutate: async (input) => {
+      await queryClient.cancelQueries({ queryKey: projectsQuery.queryKey });
+      const before = queryClient.getQueryData(projectsQuery.queryKey);
+      queryClient.setQueryData(projectsQuery.queryKey, (list) =>
+        list == null
+          ? list
+          : {
+              ...list,
+              items: list.items.map((item) =>
+                item.id === input.id ? { ...item, color: input.color } : item,
+              ),
+            },
+      );
+      return { before };
+    },
+    onError: (_error, _input, context) => {
+      if (context?.before != null)
+        queryClient.setQueryData(projectsQuery.queryKey, context.before);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: PROJECTS_KEY }),
   });
 }
