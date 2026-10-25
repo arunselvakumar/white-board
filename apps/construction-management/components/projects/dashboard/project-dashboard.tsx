@@ -251,7 +251,7 @@ function StubSection({ section }: { section: DashboardSection }) {
         </span>
       }
     >
-      <p className="text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
+      <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
         {STUB_TEXT[section.key] ?? section.label}
       </p>
     </Section>
@@ -477,7 +477,7 @@ function DashboardSections({
   const shown = shownSections(layout);
   if (shown.length === 0)
     return (
-      <p className="text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
+      <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
         Every section is hidden. Use Manage dashboard to show some.
       </p>
     );

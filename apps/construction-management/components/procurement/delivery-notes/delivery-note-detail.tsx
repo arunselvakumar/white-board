@@ -226,7 +226,7 @@ export function DeliveryNoteDetail({ noteId }: { noteId: string }) {
         }
       />
 
-      <dl className="grid grid-cols-2 gap-3 rounded-xl border p-4 sm:grid-cols-3">
+      <dl className="bg-card grid grid-cols-2 gap-3 rounded-xl border p-4 sm:grid-cols-3">
         <Fact label="Material Request">
           <Link
             href={centralStoreHref.request(note.materialRequestId)}

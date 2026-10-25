@@ -66,7 +66,7 @@ export function OnboardingSplitShell({
   children: ReactNode;
 }) {
   return (
-    <div className="bg-background flex min-h-svh">
+    <div className="bg-card flex min-h-svh">
       <AuthBrandPanel photo={photo} />
       <div className="flex min-h-svh w-full shrink-0 flex-col lg:w-[min(46%,560px)]">
         <header className="flex items-center justify-between px-8 py-4">

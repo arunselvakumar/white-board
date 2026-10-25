@@ -213,7 +213,7 @@ export function InvoiceDetail({
           </h3>
           <ul className="space-y-2 text-sm">
             {invoice.settlements.map((settlement) => (
-              <li key={settlement.id} className="rounded-lg border p-2">
+              <li key={settlement.id} className="bg-card rounded-lg border p-2">
                 <p>
                   <span className="font-medium capitalize">
                     {settlement.status}

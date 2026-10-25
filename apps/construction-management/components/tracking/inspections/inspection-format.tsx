@@ -186,7 +186,7 @@ export function InspectionRejectDialog({
             <FieldError message={problem} />
           </div>
           {canRaiseSnag && (
-            <div className="flex items-start gap-3 rounded-lg border p-3">
+            <div className="bg-card flex items-start gap-3 rounded-lg border p-3">
               <Checkbox
                 id="inspection-raise-snag"
                 checked={raiseSnag}

@@ -914,7 +914,7 @@ export function LabourMarkingSheet({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 rounded-lg border px-3 py-2">
+      <div className="bg-card flex flex-wrap items-center gap-3 rounded-lg border px-3 py-2">
         <label className="flex items-center gap-2 text-sm">
           <Checkbox
             aria-label="Select all shown"
@@ -1010,7 +1010,7 @@ export function LabourMarkingSheet({
       </div>
 
       {visible.length === 0 ? (
-        <p className="text-muted-foreground rounded-lg border p-6 text-center text-sm">
+        <p className="bg-card text-muted-foreground rounded-lg border p-6 text-center text-sm">
           No Labour matches the filter.
         </p>
       ) : (

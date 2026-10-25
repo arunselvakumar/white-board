@@ -112,34 +112,36 @@ function RoleForm({
         void submit(event);
       }}
     >
-      <div className="grid max-w-2xl gap-4">
-        <div className="space-y-1.5">
-          <Label htmlFor="role-name" required>
-            Role name
-          </Label>
-          <Input
-            id="role-name"
-            className="h-10"
-            autoComplete="off"
-            placeholder="Site Engineer"
-            readOnly={readOnly}
-            aria-required
-            aria-invalid={errors.name != null}
-            {...form.register("name")}
-          />
-          <FieldError message={errors.name?.message} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="role-description">Description</Label>
-          <Textarea
-            id="role-description"
-            rows={2}
-            placeholder="What people on this Role do"
-            readOnly={readOnly}
-            aria-invalid={errors.description != null}
-            {...form.register("description")}
-          />
-          <FieldError message={errors.description?.message} />
+      <div className="bg-card rounded-xl border p-4 sm:p-5">
+        <div className="grid max-w-2xl gap-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="role-name" required>
+              Role name
+            </Label>
+            <Input
+              id="role-name"
+              className="h-10"
+              autoComplete="off"
+              placeholder="Site Engineer"
+              readOnly={readOnly}
+              aria-required
+              aria-invalid={errors.name != null}
+              {...form.register("name")}
+            />
+            <FieldError message={errors.name?.message} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="role-description">Description</Label>
+            <Textarea
+              id="role-description"
+              rows={2}
+              placeholder="What people on this Role do"
+              readOnly={readOnly}
+              aria-invalid={errors.description != null}
+              {...form.register("description")}
+            />
+            <FieldError message={errors.description?.message} />
+          </div>
         </div>
       </div>
       <section aria-labelledby="role-permissions" className="space-y-2">

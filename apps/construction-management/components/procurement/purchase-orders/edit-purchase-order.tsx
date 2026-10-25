@@ -25,7 +25,7 @@ export function EditPurchaseOrder({
   const { data } = useSuspenseQuery(purchaseOrderQuery(id));
   if (!data.actions.edit)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyTitle>{data.number} cannot be edited</EmptyTitle>
           <EmptyDescription>

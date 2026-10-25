@@ -125,7 +125,7 @@ function Lines({ receipt }: { receipt: GoodsReceipt }) {
       role="region"
       aria-label="Materials received, scrolls sideways"
       tabIndex={0}
-      className="focus-visible:ring-ring/50 overflow-x-auto rounded-lg border outline-none focus-visible:ring-3 [&>[data-slot=table-container]]:overflow-visible"
+      className="bg-card focus-visible:ring-ring/50 overflow-x-auto rounded-lg border outline-none focus-visible:ring-3 [&>[data-slot=table-container]]:overflow-visible"
     >
       <Table aria-label="Materials received">
         <TableHeader>

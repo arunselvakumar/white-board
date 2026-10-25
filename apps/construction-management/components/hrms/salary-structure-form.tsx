@@ -330,7 +330,10 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <section aria-labelledby={id} className="space-y-6 rounded-xl border p-6">
+    <section
+      aria-labelledby={id}
+      className="bg-card space-y-6 rounded-xl border p-6"
+    >
       <div className="space-y-1">
         <h3 id={id} className="text-lg font-semibold">
           {title}
@@ -707,7 +710,7 @@ function ComponentRow({
   const label =
     name.trim().length > 0 ? name.trim() : `Component ${String(index + 1)}`;
   return (
-    <li className="space-y-3 rounded-lg border p-4">
+    <li className="bg-card space-y-3 rounded-lg border p-4">
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor={`${prefix}-name`} required>

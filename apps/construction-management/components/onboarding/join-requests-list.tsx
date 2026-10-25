@@ -60,7 +60,12 @@ export function JoinRequestsList({ after }: { after?: ReactNode }) {
         </h2>
         <ItemGroup className="gap-2">
           {data.items.map((request) => (
-            <Item key={request.id} variant="outline" role="listitem">
+            <Item
+              key={request.id}
+              variant="outline"
+              className="bg-card"
+              role="listitem"
+            >
               <ItemMedia variant="icon">
                 <MailOpen />
               </ItemMedia>

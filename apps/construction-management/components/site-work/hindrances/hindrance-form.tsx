@@ -410,7 +410,7 @@ export function HindranceForm({
         </p>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="bg-card grid gap-4 rounded-xl border p-4 sm:grid-cols-3 sm:p-5">
         <div className="space-y-1.5">
           <Label htmlFor="hindrance-start" required>
             Start date
@@ -568,7 +568,7 @@ export function HindranceForm({
         </div>
       </div>
 
-      <fieldset className="space-y-3 rounded-lg border p-4">
+      <fieldset className="bg-card space-y-3 rounded-lg border p-4">
         <legend className="px-1 text-sm font-semibold">Joint sign-off</legend>
         <p className="text-muted-foreground text-sm">
           Record who signed the hindrance on site. It is not an approval.
@@ -635,18 +635,20 @@ export function HindranceForm({
       </fieldset>
 
       {hindrance == null && (
-        <Controller
-          control={form.control}
-          name="files"
-          render={({ field }) => (
-            <PendingFilesField
-              documentType="hindrance"
-              value={field.value}
-              onChange={field.onChange}
-              disabled={busy}
-            />
-          )}
-        />
+        <div className="bg-card rounded-xl border p-4 sm:p-5">
+          <Controller
+            control={form.control}
+            name="files"
+            render={({ field }) => (
+              <PendingFilesField
+                documentType="hindrance"
+                value={field.value}
+                onChange={field.onChange}
+                disabled={busy}
+              />
+            )}
+          />
+        </div>
       )}
 
       <FormAlert message={error ?? undefined} />

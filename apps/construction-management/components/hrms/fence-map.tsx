@@ -125,7 +125,7 @@ export default function FenceMap({
       ref={container}
       role="region"
       aria-label="Map. Tap to place the fence centre."
-      className="isolate h-64 w-full overflow-hidden rounded-lg border sm:h-72"
+      className="bg-card isolate h-64 w-full overflow-hidden rounded-lg border sm:h-72"
     />
   );
 }

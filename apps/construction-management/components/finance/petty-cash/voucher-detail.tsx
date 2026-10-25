@@ -154,7 +154,7 @@ export function VoucherDetail({
         }
       />
       <FormAlert message={error} />
-      <section className="space-y-4 rounded-xl border p-4">
+      <section className="bg-card space-y-4 rounded-xl border p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Amount
             paise={voucherSign(voucher.voucherType) * voucher.amount}

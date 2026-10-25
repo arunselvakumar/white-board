@@ -52,7 +52,7 @@ export function shiftDate(date: string, days: number): string {
 
 function NoLabourers() {
   return (
-    <Empty className="border">
+    <Empty className="bg-card border">
       <EmptyHeader>
         <EmptyMedia variant="icon">
           <Users />

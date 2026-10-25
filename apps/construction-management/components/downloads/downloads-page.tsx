@@ -73,7 +73,7 @@ export function DownloadsPage() {
           </Alert>
         )}
         {items.length === 0 ? (
-          <Empty className="border">
+          <Empty className="bg-card border">
             <EmptyHeader>
               <EmptyMedia variant="icon">
                 <Download />
@@ -86,7 +86,10 @@ export function DownloadsPage() {
             </EmptyHeader>
           </Empty>
         ) : (
-          <ul aria-label="Downloads" className="divide-y rounded-xl border">
+          <ul
+            aria-label="Downloads"
+            className="bg-card divide-y rounded-xl border"
+          >
             {items.map((item) => (
               <DownloadRow
                 key={`${item.source}:${item.id}`}

@@ -86,7 +86,7 @@ function Section({
       <h3 className="text-sm font-medium">{title}</h3>
       <dl
         className={cn(
-          "rounded-lg border py-1 text-sm",
+          "bg-card rounded-lg border py-1 text-sm",
           columns === 2 && "grid grid-cols-2",
         )}
       >

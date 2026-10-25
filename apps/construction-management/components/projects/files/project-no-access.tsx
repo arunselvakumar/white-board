@@ -14,7 +14,7 @@ import {
 export function ProjectNoAccess({ what }: { what: string }) {
   return (
     <div className="w-full max-w-5xl p-6">
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <Lock />

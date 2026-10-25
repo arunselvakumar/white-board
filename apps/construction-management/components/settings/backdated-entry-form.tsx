@@ -140,7 +140,7 @@ export function BackdatedEntryForm() {
         >
           <section
             aria-labelledby="backdated-defaults"
-            className="space-y-4 rounded-xl border p-6"
+            className="bg-card space-y-4 rounded-xl border p-6"
           >
             <div className="space-y-1">
               <h2 id="backdated-defaults" className="text-lg font-semibold">
@@ -163,7 +163,7 @@ export function BackdatedEntryForm() {
 
           <section
             aria-labelledby="backdated-modules"
-            className="space-y-4 rounded-xl border p-6"
+            className="bg-card space-y-4 rounded-xl border p-6"
           >
             <div className="space-y-1">
               <h2 id="backdated-modules" className="text-lg font-semibold">
@@ -180,7 +180,7 @@ export function BackdatedEntryForm() {
                   <h3 className="text-muted-foreground text-xs font-semibold tracking-[0.12em] uppercase">
                     {group.label}
                   </h3>
-                  <ul className="divide-y rounded-lg border">
+                  <ul className="bg-card divide-y rounded-lg border">
                     {BACKDATED_MODULES.filter(
                       (item) => item.group === group.key,
                     ).map((item) => {
@@ -220,7 +220,7 @@ export function BackdatedEntryForm() {
 
           <section
             aria-labelledby="backdated-closing"
-            className="space-y-4 rounded-xl border p-6"
+            className="bg-card space-y-4 rounded-xl border p-6"
           >
             <div className="space-y-1">
               <h2 id="backdated-closing" className="text-lg font-semibold">

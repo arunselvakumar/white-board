@@ -275,7 +275,7 @@ function ProjectCards({ data }: { data: Dashboard }) {
           <Link
             href={projectDashboardPath(row.id)}
             aria-label={row.name}
-            className="hover:bg-secondary/60 focus-visible:ring-ring/50 block min-w-0 space-y-3 rounded-xl border p-4 transition-colors outline-none focus-visible:ring-3"
+            className="bg-card hover:bg-secondary/60 focus-visible:ring-ring/50 block min-w-0 space-y-3 rounded-xl border p-4 transition-colors outline-none focus-visible:ring-3"
           >
             <div className="flex min-w-0 items-center justify-between gap-3">
               <span className="min-w-0 truncate font-semibold">{row.name}</span>
@@ -305,7 +305,7 @@ function ProjectCards({ data }: { data: Dashboard }) {
 
 function NoProjects() {
   return (
-    <Empty className="border">
+    <Empty className="bg-card border">
       <EmptyHeader>
         <EmptyMedia variant="icon">
           <Building2 />

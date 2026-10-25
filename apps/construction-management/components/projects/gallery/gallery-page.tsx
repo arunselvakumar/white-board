@@ -407,7 +407,7 @@ export function GalleryPage({ projectId }: { projectId: string }) {
     return (
       <div className="w-full max-w-5xl space-y-5 p-6">
         <h2 className="font-semibold">Gallery</h2>
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <Images />
@@ -492,7 +492,7 @@ export function GalleryPage({ projectId }: { projectId: string }) {
       </div>
 
       {items.length === 0 ? (
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <SearchX />

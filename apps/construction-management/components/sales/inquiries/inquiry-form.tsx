@@ -304,7 +304,7 @@ export function InquiryForm({
         void save(false)(event);
       }}
     >
-      <div className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="bg-card grid min-w-0 gap-4 rounded-xl border p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-3">
         {field(
           "inquiryDate",
           "Inquiry Date",
@@ -531,7 +531,7 @@ export function InquiryForm({
       </div>
 
       {inquiry == null ? (
-        <div className="grid min-w-0 gap-4 lg:grid-cols-2">
+        <div className="bg-card grid min-w-0 gap-4 rounded-xl border p-4 sm:p-5 lg:grid-cols-2">
           <Controller
             control={form.control}
             name="visitingCard"

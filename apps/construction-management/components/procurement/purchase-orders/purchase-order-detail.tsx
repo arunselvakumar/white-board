@@ -121,7 +121,7 @@ export function PurchaseOrderDetailPage({
         <FormAlert message={error} />
       </div>
 
-      <dl className="grid grid-cols-2 gap-4 rounded-lg border p-4 sm:grid-cols-3">
+      <dl className="bg-card grid grid-cols-2 gap-4 rounded-lg border p-4 sm:grid-cols-3">
         <Fact label="Purchase Order Date">{formatDate(po.orderDate)}</Fact>
         <Fact label="Expected Delivery Date">
           {formatDate(po.expectedDeliveryDate)}
@@ -377,7 +377,7 @@ export function PurchaseOrderDetailPage({
             Nothing received against it yet.
           </p>
         ) : (
-          <ul className="divide-y rounded-lg border">
+          <ul className="bg-card divide-y rounded-lg border">
             {po.goodsReceipts.map((grn) => (
               <li
                 key={grn.id}

@@ -56,7 +56,7 @@ function SettingsCard({
   children: ReactNode;
 }) {
   return (
-    <section className="space-y-4 rounded-xl border p-6">
+    <section className="bg-card space-y-4 rounded-xl border p-6">
       <div className="space-y-1">
         <h2 className="text-lg font-semibold">{title}</h2>
         <p className="text-muted-foreground text-sm">{description}</p>
@@ -108,7 +108,7 @@ export function BackdatedEntrySkeleton() {
                 <h3 className="text-muted-foreground text-xs font-semibold tracking-[0.12em] uppercase">
                   {group.label}
                 </h3>
-                <ul className="divide-y rounded-lg border">
+                <ul className="bg-card divide-y rounded-lg border">
                   {BACKDATED_MODULES.filter(
                     (item) => item.group === group.key,
                   ).map((item) => (
@@ -147,7 +147,7 @@ export function GrnFieldsSkeleton() {
             <h2 className="text-base font-semibold">
               {GRN_FIELD_GROUP_LABELS[group]}
             </h2>
-            <ul className="divide-y rounded-xl border">
+            <ul className="bg-card divide-y rounded-xl border">
               {fields
                 .filter((field) => field.group === group)
                 .map((field) => (
@@ -180,7 +180,7 @@ function SettingsRowsSkeleton({
 }) {
   return (
     <SkeletonGroup label={label} className="block">
-      <ul className="divide-y rounded-xl border">
+      <ul className="bg-card divide-y rounded-xl border">
         {["40%", "28%", "48%"].map((width) => (
           <li
             key={width}

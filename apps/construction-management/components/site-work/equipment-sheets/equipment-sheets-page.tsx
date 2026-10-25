@@ -364,7 +364,7 @@ function SheetRows({
     return (
       <div className={cn("space-y-4", className)}>
         {(filtered || data.total > 0) && filterBar}
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <Truck />
@@ -460,7 +460,7 @@ function SheetRows({
           </div>
         </div>
       )}
-      <div className="hidden overflow-x-auto rounded-lg border md:block">
+      <div className="bg-card hidden overflow-x-auto rounded-lg border md:block">
         <Table aria-label="Equipment Usage sheets">
           <TableHeader>
             <TableRow>
@@ -546,7 +546,7 @@ function SheetRows({
       </div>
       <ul aria-label="Equipment Usage sheets" className="space-y-2 md:hidden">
         {data.items.map((sheet) => (
-          <li key={sheet.id} className="rounded-lg border p-3">
+          <li key={sheet.id} className="bg-card rounded-lg border p-3">
             <div className="flex items-start gap-3">
               {check(sheet)}
               <div className="min-w-0 flex-1">

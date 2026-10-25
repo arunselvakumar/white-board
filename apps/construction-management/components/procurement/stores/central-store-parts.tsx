@@ -228,7 +228,7 @@ export function ScrollRegion({
       role="region"
       aria-label={label}
       tabIndex={0}
-      className={`focus-visible:ring-ring overflow-x-auto outline-none focus-visible:ring-2 [&>[data-slot=table-container]]:overflow-visible ${bordered ? "rounded-xl border" : ""}`}
+      className={`focus-visible:ring-ring overflow-x-auto outline-none focus-visible:ring-2 [&>[data-slot=table-container]]:overflow-visible ${bordered ? "bg-card rounded-xl border" : ""}`}
     >
       {children}
     </div>

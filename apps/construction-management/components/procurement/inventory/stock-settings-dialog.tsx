@@ -156,7 +156,7 @@ function SettingsForm({
             control={form.control}
             name="minAlertEnabled"
             render={({ field }) => (
-              <div className="flex items-start justify-between gap-4 rounded-lg border p-3">
+              <div className="bg-card flex items-start justify-between gap-4 rounded-lg border p-3">
                 <div className="space-y-0.5">
                   <Label htmlFor="settings-alert">Minimum stock alert</Label>
                   <p className="text-muted-foreground text-xs">

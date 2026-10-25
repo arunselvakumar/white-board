@@ -27,7 +27,7 @@ import {
  * it); the table's own container does not scroll.
  */
 const SCROLL =
-  "focus-visible:ring-ring/50 overflow-x-auto rounded-lg border outline-none focus-visible:ring-3 [&>[data-slot=table-container]]:overflow-visible";
+  "bg-card focus-visible:ring-ring/50 overflow-x-auto rounded-lg border outline-none focus-visible:ring-3 [&>[data-slot=table-container]]:overflow-visible";
 
 function money(paise: number | null): string {
   return paise == null ? "—" : formatPaise(paise);
@@ -47,7 +47,7 @@ function OvertimeTable({
   );
   if (data.items.length === 0)
     return (
-      <p className="text-muted-foreground rounded-lg border p-6 text-center text-sm">
+      <p className="bg-card text-muted-foreground rounded-lg border p-6 text-center text-sm">
         No vendor overtime between these dates.
       </p>
     );

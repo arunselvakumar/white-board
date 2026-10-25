@@ -420,7 +420,7 @@ function TransactionRows({
     return (
       <div className="space-y-4">
         {(filtered || data.total > 0) && filterBar}
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <Receipt />
@@ -559,7 +559,7 @@ function TransactionRows({
           </div>
         </div>
       )}
-      <div className="hidden overflow-x-auto rounded-lg border md:block">
+      <div className="bg-card hidden overflow-x-auto rounded-lg border md:block">
         <Table aria-label="Transactions">
           <TableHeader>
             <TableRow>
@@ -622,7 +622,7 @@ function TransactionRows({
       </div>
       <ul aria-label="Transactions" className="space-y-2 md:hidden">
         {data.items.map((item) => (
-          <li key={item.id} className="rounded-lg border p-3">
+          <li key={item.id} className="bg-card rounded-lg border p-3">
             <div className="flex items-start gap-3">
               {check(item)}
               <div className="min-w-0 flex-1">

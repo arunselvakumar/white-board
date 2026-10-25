@@ -59,7 +59,7 @@ function ProjectsChecklist({
   const { data } = useSuspenseQuery(projectOptionsQuery);
   if (data.items.length === 0)
     return (
-      <p className="text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
+      <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
         No Projects yet. Add a Project first, then choose it here.
       </p>
     );
@@ -125,12 +125,15 @@ export function OtherPartyForm({
   return (
     <form
       noValidate
-      className="space-y-8"
+      className="space-y-6"
       onSubmit={(event) => {
         void submit(event);
       }}
     >
-      <section aria-labelledby="other-party-details" className="space-y-4">
+      <section
+        aria-labelledby="other-party-details"
+        className="bg-card space-y-4 rounded-xl border p-4 sm:p-5"
+      >
         <h2 id="other-party-details" className="font-semibold">
           Details
         </h2>
@@ -265,7 +268,10 @@ export function OtherPartyForm({
         </div>
       </section>
 
-      <section aria-labelledby="other-party-projects" className="space-y-3">
+      <section
+        aria-labelledby="other-party-projects"
+        className="bg-card space-y-3 rounded-xl border p-4 sm:p-5"
+      >
         <div className="space-y-1">
           <h2 id="other-party-projects" className="font-semibold">
             Projects

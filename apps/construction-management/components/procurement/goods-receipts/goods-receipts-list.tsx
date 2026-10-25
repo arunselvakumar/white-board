@@ -211,7 +211,7 @@ function ReceiptRows({
     return (
       <div className={cn("space-y-3", className)}>
         {supplierFilter}
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <PackageCheck />
@@ -237,7 +237,7 @@ function ReceiptRows({
           ? "1 Goods Receipt"
           : `${String(data.total)} Goods Receipts`}
       </p>
-      <div className="overflow-x-auto rounded-lg border">
+      <div className="bg-card overflow-x-auto rounded-lg border">
         <Table>
           <TableHeader>
             <TableRow>

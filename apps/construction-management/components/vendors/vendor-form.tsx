@@ -82,7 +82,7 @@ function ProjectsChecklist({
   const { data } = useSuspenseQuery(projectOptionsQuery);
   if (data.items.length === 0)
     return (
-      <p className="text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
+      <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
         No Projects yet. Add a Project first, then assign the Vendor to it.
       </p>
     );
@@ -92,7 +92,7 @@ function ProjectsChecklist({
         const checked = value.includes(project.id);
         return (
           <li key={project.id}>
-            <Label className="hover:bg-muted/50 flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 font-normal">
+            <Label className="bg-card hover:bg-muted/50 flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 font-normal">
               <Checkbox
                 checked={checked}
                 onCheckedChange={(next) => {
@@ -147,12 +147,15 @@ function VendorForm({
   return (
     <form
       noValidate
-      className="space-y-8"
+      className="space-y-6"
       onSubmit={(event) => {
         void submit(event);
       }}
     >
-      <section aria-labelledby="vendor-details" className="space-y-4">
+      <section
+        aria-labelledby="vendor-details"
+        className="bg-card space-y-4 rounded-xl border p-4 sm:p-5"
+      >
         <h2 id="vendor-details" className="font-semibold">
           Details
         </h2>
@@ -228,7 +231,10 @@ function VendorForm({
         </div>
       </section>
 
-      <section aria-labelledby="vendor-projects" className="space-y-3">
+      <section
+        aria-labelledby="vendor-projects"
+        className="bg-card space-y-3 rounded-xl border p-4 sm:p-5"
+      >
         <div className="space-y-1">
           <h2 id="vendor-projects" className="font-semibold">
             Projects

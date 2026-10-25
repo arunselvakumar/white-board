@@ -91,7 +91,7 @@ export function BulkSelectDialog({
       {options.length === 0 ? (
         <p className="text-muted-foreground text-sm">{empty}</p>
       ) : (
-        <ul className="divide-y rounded-lg border">
+        <ul className="bg-card divide-y rounded-lg border">
           {options.map((option) => {
             const id = `bulk-material-${option.id}`;
             return (

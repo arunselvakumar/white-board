@@ -306,7 +306,7 @@ export function DrawingAlbumPage({
       </div>
 
       {drawings.length === 0 ? (
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <FileStack />

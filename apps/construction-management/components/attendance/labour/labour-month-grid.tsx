@@ -32,7 +32,7 @@ const MONTH_LEGEND =
   "P Present · H Half Day · A Absent · L Leave · PL Paid Leave · HO Holiday · a number under the code is overtime hours.";
 
 const SCROLL =
-  "focus-visible:ring-ring/50 overflow-x-auto rounded-lg border outline-none focus-visible:ring-3 [&>[data-slot=table-container]]:overflow-visible";
+  "bg-card focus-visible:ring-ring/50 overflow-x-auto rounded-lg border outline-none focus-visible:ring-3 [&>[data-slot=table-container]]:overflow-visible";
 
 const CODE_STYLE: Record<string, string> = {
   P: "text-emerald-700 dark:text-emerald-400",
@@ -78,7 +78,7 @@ function Grid({ projectId, month }: { projectId: string; month: string }) {
   );
   if (data.labourers.length === 0)
     return (
-      <p className="text-muted-foreground rounded-lg border p-6 text-center text-sm">
+      <p className="bg-card text-muted-foreground rounded-lg border p-6 text-center text-sm">
         No Labours on this Project in this month.
       </p>
     );
@@ -95,7 +95,7 @@ function Grid({ projectId, month }: { projectId: string; month: string }) {
         <Table aria-label="Labour attendance by day">
           <TableHeader>
             <TableRow>
-              <TableHead className="bg-background sticky left-0 min-w-36">
+              <TableHead className="bg-card sticky left-0 min-w-36">
                 Labour
               </TableHead>
               {data.dates.map((date) => (
@@ -117,7 +117,7 @@ function Grid({ projectId, month }: { projectId: string; month: string }) {
                 <TableRow key={row.labourId} aria-label={row.name}>
                   <TableHead
                     scope="row"
-                    className="bg-background sticky left-0 font-medium"
+                    className="bg-card sticky left-0 font-medium"
                   >
                     {row.name}
                   </TableHead>

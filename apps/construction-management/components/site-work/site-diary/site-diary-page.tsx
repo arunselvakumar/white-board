@@ -62,7 +62,7 @@ function DiaryForDate({
   const { data } = useSuspenseQuery(siteDiaryOnDateQuery(projectId, date));
   if (data.diary == null)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <BookOpen />

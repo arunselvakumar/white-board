@@ -149,7 +149,10 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <section aria-labelledby={id} className="space-y-4">
+    <section
+      aria-labelledby={id}
+      className="bg-card space-y-4 rounded-xl border p-4 sm:p-5"
+    >
       <div className="space-y-1">
         <h2 id={id} className="font-semibold">
           {title}
@@ -215,7 +218,7 @@ export function LabourForm({
   return (
     <form
       noValidate
-      className="space-y-8"
+      className="space-y-6"
       onSubmit={(event) => {
         void submit(event);
       }}

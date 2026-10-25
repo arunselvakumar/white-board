@@ -372,7 +372,7 @@ function MyAttendance() {
           </p>
         </div>
         {data.entries.length === 0 ? (
-          <p className="text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
+          <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
             No check-ins today yet.
           </p>
         ) : (
@@ -412,7 +412,7 @@ function MyAttendance() {
         <section
           aria-labelledby="hrms-missed-day"
           className={cn(
-            "flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4",
+            "bg-card flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4",
           )}
         >
           <div className="space-y-0.5">

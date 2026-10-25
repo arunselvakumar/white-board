@@ -184,7 +184,7 @@ export function ImportInventoryDialog({
                 ? `Imported: ${String(preview.imported)} opening ${preview.imported === 1 ? "entry" : "entries"}, ${String(preview.estimatesSet)} estimated ${preview.estimatesSet === 1 ? "quantity" : "quantities"}.`
                 : `${String(ready)} ready · ${String(preview.errorCount)} with errors`}
             </p>
-            <div className="max-h-80 overflow-auto rounded-lg border">
+            <div className="bg-card max-h-80 overflow-auto rounded-lg border">
               <Table aria-label="Import preview">
                 <TableHeader>
                   <TableRow>

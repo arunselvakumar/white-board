@@ -88,7 +88,7 @@ export function PartyQuotationListSkeleton() {
 export function PartyFormSkeleton({ screen }: { screen: PartyScreen }) {
   return (
     <FormPageSkeleton back={{ label: screen.plural, href: screen.path }}>
-      <div className="space-y-8">
+      <div className="space-y-6">
         <FormSectionSkeleton title="Details">
           <FormSkeleton
             columns={2}

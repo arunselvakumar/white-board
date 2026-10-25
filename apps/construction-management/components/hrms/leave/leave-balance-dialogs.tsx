@@ -237,11 +237,11 @@ function InitialiseForm({
             }}
             className="grid gap-2 sm:grid-cols-2"
           >
-            <div className="flex items-center gap-3 rounded-lg border p-3">
+            <div className="bg-card flex items-center gap-3 rounded-lg border p-3">
               <RadioGroupItem id="leave-init-members" value="members" />
               <Label htmlFor="leave-init-members">Chosen Team Members</Label>
             </div>
-            <div className="flex items-center gap-3 rounded-lg border p-3">
+            <div className="bg-card flex items-center gap-3 rounded-lg border p-3">
               <RadioGroupItem
                 id="leave-init-structure"
                 value="structure"
@@ -585,13 +585,13 @@ function CreditList({
   );
   if (data.items.length === 0)
     return (
-      <p className="text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
+      <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
         No credits in {data.leaveYear} yet. Balances are opened by initialising
         them.
       </p>
     );
   return (
-    <ul aria-label="Credits" className="divide-y rounded-xl border">
+    <ul aria-label="Credits" className="bg-card divide-y rounded-xl border">
       {data.items.map((entry) => (
         <li key={entry.id} className="flex items-start gap-3 px-3 py-2.5">
           <div className="min-w-0 flex-1">

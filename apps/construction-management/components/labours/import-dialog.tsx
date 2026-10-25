@@ -173,7 +173,7 @@ export function ImportDialog({
                 ? `Imported ${String(preview.imported)} ${preview.imported === 1 ? "Labour" : "Labours"}.`
                 : `${String(preview.valid)} ready · ${String(preview.invalid)} with errors`}
             </p>
-            <div className="max-h-80 overflow-auto rounded-lg border">
+            <div className="bg-card max-h-80 overflow-auto rounded-lg border">
               <Table aria-label="Import preview">
                 <TableHeader>
                   <TableRow>

@@ -143,7 +143,7 @@ export function ChoiceSelect({
 
 export function GoodsReceiptNoAccess({ what }: { what: string }) {
   return (
-    <Empty className="border">
+    <Empty className="bg-card border">
       <EmptyHeader>
         <EmptyTitle>No access to {what}</EmptyTitle>
         <EmptyDescription>

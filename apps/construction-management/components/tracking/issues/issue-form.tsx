@@ -301,205 +301,207 @@ export function IssueForm({
         void save(false)(event);
       }}
     >
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="space-y-1.5">
-          <Label htmlFor="issue-date" required>
-            Issue Date
-          </Label>
-          <Input
-            id="issue-date"
-            type="date"
-            max={localToday()}
-            aria-required
-            aria-invalid={errors.issueDate != null}
-            {...form.register("issueDate")}
-          />
-          <FieldError message={errors.issueDate?.message} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="issue-priority">Priority</Label>
-          <Controller
-            control={form.control}
-            name="priority"
-            render={({ field }) => (
-              <OptionSelect
-                id="issue-priority"
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="No priority"
-                noneLabel="No priority"
-                invalid={errors.priority != null}
-                items={TRACKING_PRIORITIES.map((item) => ({
-                  value: item.key,
-                  label: item.label,
-                  content: <PriorityChip priority={item.key} />,
-                }))}
-              />
-            )}
-          />
-          <FieldError message={errors.priority?.message} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="issue-due">Due Date</Label>
-          <Input
-            id="issue-due"
-            type="date"
-            aria-invalid={errors.dueDate != null}
-            aria-describedby="issue-due-hint"
-            {...form.register("dueDate")}
-          />
-          <p id="issue-due-hint" className="text-muted-foreground text-xs">
-            Past it, an open issue shows Delayed.
-          </p>
-          <FieldError message={errors.dueDate?.message} />
-        </div>
-        <div className="space-y-1.5 sm:col-span-2 lg:col-span-3">
-          <Label htmlFor="issue-details" required>
-            Details
-          </Label>
-          <Textarea
-            id="issue-details"
-            rows={3}
-            aria-required
-            aria-invalid={errors.details != null}
-            {...form.register("details")}
-          />
-          <FieldError message={errors.details?.message} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="issue-category">Category</Label>
-          <Controller
-            control={form.control}
-            name="categoryId"
-            render={({ field }) => (
-              <OptionSelect
-                id="issue-category"
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="No category"
-                noneLabel="No category"
-                invalid={errors.categoryId != null}
-                items={categories}
-              />
-            )}
-          />
-          <FieldError message={errors.categoryId?.message} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="issue-department">Department</Label>
-          <Controller
-            control={form.control}
-            name="departmentId"
-            render={({ field }) => (
-              <OptionSelect
-                id="issue-department"
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="No department"
-                noneLabel="No department"
-                invalid={errors.departmentId != null}
-                items={departments}
-              />
-            )}
-          />
-          <FieldError message={errors.departmentId?.message} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="issue-contractor">Contractor</Label>
-          <Controller
-            control={form.control}
-            name="contractorId"
-            render={({ field }) => (
-              <OptionSelect
-                id="issue-contractor"
-                value={field.value}
-                onChange={field.onChange}
-                placeholder={
-                  contractors.length === 0
-                    ? "No Contractors on this Project"
-                    : "No Contractor"
-                }
-                noneLabel="No Contractor"
-                invalid={errors.contractorId != null}
-                items={contractors}
-              />
-            )}
-          />
-          <FieldError message={errors.contractorId?.message} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="issue-assignee">Assign To</Label>
-          <Controller
-            control={form.control}
-            name="assigneeMemberId"
-            render={({ field }) => (
-              <OptionSelect
-                id="issue-assignee"
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="No one"
-                noneLabel="No one"
-                invalid={errors.assigneeMemberId != null}
-                items={members}
-              />
-            )}
-          />
-          <FieldError message={errors.assigneeMemberId?.message} />
-        </div>
-        <div className="space-y-1.5 sm:col-span-2 lg:col-span-3">
-          <Suspense fallback={<LocationPickerSkeleton />}>
+      <div className="bg-card space-y-6 rounded-xl border p-4 sm:p-5">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="issue-date" required>
+              Issue Date
+            </Label>
+            <Input
+              id="issue-date"
+              type="date"
+              max={localToday()}
+              aria-required
+              aria-invalid={errors.issueDate != null}
+              {...form.register("issueDate")}
+            />
+            <FieldError message={errors.issueDate?.message} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="issue-priority">Priority</Label>
             <Controller
               control={form.control}
-              name="siteLocation"
+              name="priority"
               render={({ field }) => (
-                <LocationPicker
-                  projectId={projectId}
+                <OptionSelect
+                  id="issue-priority"
                   value={field.value}
                   onChange={field.onChange}
-                  invalid={errors.siteLocation != null}
+                  placeholder="No priority"
+                  noneLabel="No priority"
+                  invalid={errors.priority != null}
+                  items={TRACKING_PRIORITIES.map((item) => ({
+                    value: item.key,
+                    label: item.label,
+                    content: <PriorityChip priority={item.key} />,
+                  }))}
                 />
               )}
             />
-          </Suspense>
-          <FieldError message={errors.siteLocation?.message} />
+            <FieldError message={errors.priority?.message} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="issue-due">Due Date</Label>
+            <Input
+              id="issue-due"
+              type="date"
+              aria-invalid={errors.dueDate != null}
+              aria-describedby="issue-due-hint"
+              {...form.register("dueDate")}
+            />
+            <p id="issue-due-hint" className="text-muted-foreground text-xs">
+              Past it, an open issue shows Delayed.
+            </p>
+            <FieldError message={errors.dueDate?.message} />
+          </div>
+          <div className="space-y-1.5 sm:col-span-2 lg:col-span-3">
+            <Label htmlFor="issue-details" required>
+              Details
+            </Label>
+            <Textarea
+              id="issue-details"
+              rows={3}
+              aria-required
+              aria-invalid={errors.details != null}
+              {...form.register("details")}
+            />
+            <FieldError message={errors.details?.message} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="issue-category">Category</Label>
+            <Controller
+              control={form.control}
+              name="categoryId"
+              render={({ field }) => (
+                <OptionSelect
+                  id="issue-category"
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="No category"
+                  noneLabel="No category"
+                  invalid={errors.categoryId != null}
+                  items={categories}
+                />
+              )}
+            />
+            <FieldError message={errors.categoryId?.message} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="issue-department">Department</Label>
+            <Controller
+              control={form.control}
+              name="departmentId"
+              render={({ field }) => (
+                <OptionSelect
+                  id="issue-department"
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="No department"
+                  noneLabel="No department"
+                  invalid={errors.departmentId != null}
+                  items={departments}
+                />
+              )}
+            />
+            <FieldError message={errors.departmentId?.message} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="issue-contractor">Contractor</Label>
+            <Controller
+              control={form.control}
+              name="contractorId"
+              render={({ field }) => (
+                <OptionSelect
+                  id="issue-contractor"
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder={
+                    contractors.length === 0
+                      ? "No Contractors on this Project"
+                      : "No Contractor"
+                  }
+                  noneLabel="No Contractor"
+                  invalid={errors.contractorId != null}
+                  items={contractors}
+                />
+              )}
+            />
+            <FieldError message={errors.contractorId?.message} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="issue-assignee">Assign To</Label>
+            <Controller
+              control={form.control}
+              name="assigneeMemberId"
+              render={({ field }) => (
+                <OptionSelect
+                  id="issue-assignee"
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="No one"
+                  noneLabel="No one"
+                  invalid={errors.assigneeMemberId != null}
+                  items={members}
+                />
+              )}
+            />
+            <FieldError message={errors.assigneeMemberId?.message} />
+          </div>
+          <div className="space-y-1.5 sm:col-span-2 lg:col-span-3">
+            <Suspense fallback={<LocationPickerSkeleton />}>
+              <Controller
+                control={form.control}
+                name="siteLocation"
+                render={({ field }) => (
+                  <LocationPicker
+                    projectId={projectId}
+                    value={field.value}
+                    onChange={field.onChange}
+                    invalid={errors.siteLocation != null}
+                  />
+                )}
+              />
+            </Suspense>
+            <FieldError message={errors.siteLocation?.message} />
+          </div>
         </div>
-      </div>
 
-      {issue == null ? (
-        <div className="grid min-w-0 gap-4 lg:grid-cols-2">
-          <Controller
-            control={form.control}
-            name="images"
-            render={({ field }) => (
-              <TrackingPendingFilesField
-                documentType="issue"
-                photosOnly
-                label="Images"
-                value={field.value}
-                onChange={field.onChange}
-                disabled={busy}
-              />
-            )}
-          />
-          <Controller
-            control={form.control}
-            name="attachments"
-            render={({ field }) => (
-              <TrackingPendingFilesField
-                documentType="issue"
-                label="Attachments"
-                value={field.value}
-                onChange={field.onChange}
-                disabled={busy}
-              />
-            )}
-          />
-        </div>
-      ) : (
-        <p className="text-muted-foreground text-sm">
-          Add or remove images and attachments on the issue&apos;s page.
-        </p>
-      )}
+        {issue == null ? (
+          <div className="grid min-w-0 gap-4 lg:grid-cols-2">
+            <Controller
+              control={form.control}
+              name="images"
+              render={({ field }) => (
+                <TrackingPendingFilesField
+                  documentType="issue"
+                  photosOnly
+                  label="Images"
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={busy}
+                />
+              )}
+            />
+            <Controller
+              control={form.control}
+              name="attachments"
+              render={({ field }) => (
+                <TrackingPendingFilesField
+                  documentType="issue"
+                  label="Attachments"
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={busy}
+                />
+              )}
+            />
+          </div>
+        ) : (
+          <p className="text-muted-foreground text-sm">
+            Add or remove images and attachments on the issue&apos;s page.
+          </p>
+        )}
+      </div>
 
       <FormAlert message={error ?? undefined} />
       {uploads.uploading && (

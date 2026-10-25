@@ -51,7 +51,7 @@ export function UnitsTabSkeleton() {
           </div>
           <CountsSkeleton />
         </div>
-        <div className="space-y-2 rounded-lg border p-3">
+        <div className="bg-card space-y-2 rounded-lg border p-3">
           {[0, 1, 2, 3].map((floor) => (
             <div key={floor} className="flex items-center gap-2">
               <SkeletonText width="3rem" className="shrink-0" />
@@ -83,7 +83,7 @@ export function UnitPanelSkeleton() {
         <Skeleton className="h-8 w-28 rounded-md" />
         <Skeleton className="h-8 w-24 rounded-md" />
       </div>
-      <div className="grid grid-cols-2 gap-4 rounded-lg border p-4">
+      <div className="bg-card grid grid-cols-2 gap-4 rounded-lg border p-4">
         {Array.from({ length: 6 }, (_, index) => (
           <div key={index} className="min-w-0">
             <SkeletonText size="xs" width="45%" />

@@ -350,7 +350,7 @@ function PurchaseRequestRows({
     return (
       <div className={cn("space-y-4", className)}>
         {filterBar}
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <ClipboardList />
@@ -446,7 +446,7 @@ function PurchaseRequestRows({
           </div>
         </div>
       )}
-      <div className="hidden overflow-x-auto rounded-lg border md:block">
+      <div className="bg-card hidden overflow-x-auto rounded-lg border md:block">
         <Table aria-label="Purchase Requests">
           <TableHeader>
             <TableRow>
@@ -510,7 +510,7 @@ function PurchaseRequestRows({
       </div>
       <ul aria-label="Purchase Requests" className="space-y-2 md:hidden">
         {data.items.map((pr) => (
-          <li key={pr.id} className="rounded-lg border p-3">
+          <li key={pr.id} className="bg-card rounded-lg border p-3">
             <div className="flex items-start gap-3">
               {check(pr)}
               <div className="min-w-0 flex-1">

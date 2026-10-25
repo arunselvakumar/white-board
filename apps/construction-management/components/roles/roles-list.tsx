@@ -230,7 +230,7 @@ function RolesListContent({ actions }: { actions: RoleActions }) {
           actions={addLink}
         />
         {data.length === 0 ? (
-          <Empty className="border">
+          <Empty className="bg-card border">
             <EmptyHeader>
               <EmptyMedia variant="icon">
                 <ShieldCheck />
@@ -261,7 +261,7 @@ function RolesListContent({ actions }: { actions: RoleActions }) {
             </InputGroup>
             <FormAlert message={listError} />
             {items.length === 0 ? (
-              <p className="text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
+              <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
                 No Role matches “{query.trim()}”.
               </p>
             ) : (

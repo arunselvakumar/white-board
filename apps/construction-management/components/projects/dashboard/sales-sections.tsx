@@ -137,7 +137,7 @@ export function BookingSectionBody({
           ) : (
             <ul
               aria-label="Latest bookings"
-              className="divide-y rounded-lg border"
+              className="bg-card divide-y rounded-lg border"
             >
               {booking.latest.map((item) => (
                 <li
@@ -321,7 +321,7 @@ export function InquirySectionBody({
           ) : (
             <ul
               aria-label="Lead source performance"
-              className="divide-y rounded-lg border text-sm"
+              className="bg-card divide-y rounded-lg border text-sm"
             >
               {inquiry.leadSources.map((source) => (
                 <li
@@ -349,7 +349,7 @@ export function InquirySectionBody({
           ) : (
             <ul
               aria-label="Sales team performance"
-              className="divide-y rounded-lg border text-sm"
+              className="bg-card divide-y rounded-lg border text-sm"
             >
               {inquiry.team.map((member) => (
                 <li

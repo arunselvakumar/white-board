@@ -74,7 +74,7 @@ function Nothing({
   description: string;
 }) {
   return (
-    <Empty className="border">
+    <Empty className="bg-card border">
       <EmptyHeader>
         <EmptyMedia variant="icon">
           <Users />
@@ -225,7 +225,7 @@ function ByDay({ month }: { month: string }) {
             {(byDate.get(date) ?? []).map(({ leave, session }) => (
               <li
                 key={leave.id}
-                className="flex items-center gap-1.5 rounded-lg border px-2 py-1 text-sm"
+                className="bg-card flex items-center gap-1.5 rounded-lg border px-2 py-1 text-sm"
               >
                 <span className="font-medium">{leave.memberName}</span>
                 <span className="text-muted-foreground">

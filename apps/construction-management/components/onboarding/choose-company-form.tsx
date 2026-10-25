@@ -54,7 +54,12 @@ export function ChooseCompanyForm({
           </h2>
           <ItemGroup className="gap-2">
             {companies.map((company) => (
-              <Item key={company.id} variant="outline" role="listitem">
+              <Item
+                key={company.id}
+                variant="outline"
+                className="bg-card"
+                role="listitem"
+              >
                 <ItemMedia variant="icon">
                   <Building />
                 </ItemMedia>

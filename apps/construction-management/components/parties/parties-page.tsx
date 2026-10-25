@@ -235,7 +235,7 @@ function PartyRows({
   const filtered = filter.search.trim().length > 0 || filter.status !== "all";
   if (data.items.length === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <Icon />
@@ -261,7 +261,7 @@ function PartyRows({
       <p className="text-muted-foreground text-sm">
         {data.total} {data.total === 1 ? screen.label : screen.plural}
       </p>
-      <div className="rounded-lg border">
+      <div className="bg-card rounded-lg border">
         <Table aria-label={screen.plural}>
           <TableHeader>
             <TableRow>

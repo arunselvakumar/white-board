@@ -304,164 +304,167 @@ export function TransferForm({
         void form.handleSubmit((input) => submit(input, false))(event);
       }}
     >
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="space-y-1.5">
-          <Label htmlFor="transfer-date" required>
-            Transfer Date
-          </Label>
-          <Input
-            id="transfer-date"
-            type="date"
-            max={localToday()}
-            aria-required
-            aria-invalid={errors.transferDate != null}
-            {...form.register("transferDate")}
-          />
-          <FieldError message={errors.transferDate?.message} />
+      <div className="bg-card space-y-6 rounded-xl border p-4 sm:p-5">
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="transfer-date" required>
+              Transfer Date
+            </Label>
+            <Input
+              id="transfer-date"
+              type="date"
+              max={localToday()}
+              aria-required
+              aria-invalid={errors.transferDate != null}
+              {...form.register("transferDate")}
+            />
+            <FieldError message={errors.transferDate?.message} />
+          </div>
+          {locationSelect("from", "From", null)}
+          {locationSelect("to", "To", values.from)}
         </div>
-        {locationSelect("from", "From", null)}
-        {locationSelect("to", "To", values.from)}
-      </div>
 
-      <section aria-labelledby="transfer-lines" className="space-y-3">
-        <h3 id="transfer-lines" className="text-sm font-semibold">
-          Transferred material
-        </h3>
-        <ol className="space-y-3">
-          {lines.fields.map((field, index) => {
-            const line = values.lines[index];
-            const lineErrors = errors.lines?.[index];
-            const id = (name: string) => `transfer-${String(index)}-${name}`;
-            const stock =
-              line == null || line.materialId === ""
-                ? null
-                : (available?.get(line.materialId) ?? null);
-            const unit = line == null ? undefined : uomOf.get(line.materialId);
-            const short =
-              stock != null &&
-              line != null &&
-              QUANTITY_PATTERN.test(line.quantity.trim()) &&
-              Number(line.quantity) > Number(stock);
-            return (
-              <li
-                key={field.id}
-                aria-label={`Material ${String(index + 1)}`}
-                className="grid gap-3 rounded-lg border p-3 sm:grid-cols-[1fr_9rem_1fr_auto] sm:items-start"
-              >
-                <div className="min-w-0 space-y-1.5">
-                  <Label htmlFor={id("material")} required>
-                    Material
-                  </Label>
-                  <Controller
-                    control={form.control}
-                    name={`lines.${index}.materialId`}
-                    render={({ field: control }) => (
-                      <MaterialPicker
-                        required
-                        id={id("material")}
-                        value={control.value === "" ? null : control.value}
-                        excludeIds={chosen.filter(
-                          (value) => value !== control.value,
-                        )}
-                        invalid={lineErrors?.materialId != null}
-                        onChange={(material) => {
-                          control.onChange(material?.id ?? "");
-                        }}
-                      />
+        <section aria-labelledby="transfer-lines" className="space-y-3">
+          <h3 id="transfer-lines" className="text-sm font-semibold">
+            Transferred material
+          </h3>
+          <ol className="space-y-3">
+            {lines.fields.map((field, index) => {
+              const line = values.lines[index];
+              const lineErrors = errors.lines?.[index];
+              const id = (name: string) => `transfer-${String(index)}-${name}`;
+              const stock =
+                line == null || line.materialId === ""
+                  ? null
+                  : (available?.get(line.materialId) ?? null);
+              const unit =
+                line == null ? undefined : uomOf.get(line.materialId);
+              const short =
+                stock != null &&
+                line != null &&
+                QUANTITY_PATTERN.test(line.quantity.trim()) &&
+                Number(line.quantity) > Number(stock);
+              return (
+                <li
+                  key={field.id}
+                  aria-label={`Material ${String(index + 1)}`}
+                  className="bg-card grid gap-3 rounded-lg border p-3 sm:grid-cols-[1fr_9rem_1fr_auto] sm:items-start"
+                >
+                  <div className="min-w-0 space-y-1.5">
+                    <Label htmlFor={id("material")} required>
+                      Material
+                    </Label>
+                    <Controller
+                      control={form.control}
+                      name={`lines.${index}.materialId`}
+                      render={({ field: control }) => (
+                        <MaterialPicker
+                          required
+                          id={id("material")}
+                          value={control.value === "" ? null : control.value}
+                          excludeIds={chosen.filter(
+                            (value) => value !== control.value,
+                          )}
+                          invalid={lineErrors?.materialId != null}
+                          onChange={(material) => {
+                            control.onChange(material?.id ?? "");
+                          }}
+                        />
+                      )}
+                    />
+                    <FieldError message={lineErrors?.materialId?.message} />
+                    {stock != null && (
+                      <p
+                        className={
+                          short
+                            ? "text-destructive text-xs"
+                            : "text-muted-foreground text-xs"
+                        }
+                      >
+                        Available: {formatQuantity(stock)}
+                        {unit == null ? "" : ` ${unit}`}
+                        {short && " — not enough to approve"}
+                      </p>
                     )}
-                  />
-                  <FieldError message={lineErrors?.materialId?.message} />
-                  {stock != null && (
-                    <p
-                      className={
-                        short
-                          ? "text-destructive text-xs"
-                          : "text-muted-foreground text-xs"
-                      }
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor={id("quantity")} required>
+                      Quantity{unit == null ? "" : ` (${unit})`}
+                    </Label>
+                    <Input
+                      id={id("quantity")}
+                      inputMode="decimal"
+                      autoComplete="off"
+                      aria-required
+                      aria-invalid={lineErrors?.quantity != null}
+                      {...form.register(`lines.${index}.quantity`)}
+                    />
+                    <FieldError message={lineErrors?.quantity?.message} />
+                  </div>
+                  <div className="min-w-0 space-y-1.5">
+                    <Label htmlFor={id("remark")}>Remarks</Label>
+                    <Input
+                      id={id("remark")}
+                      autoComplete="off"
+                      aria-invalid={lineErrors?.remark != null}
+                      {...form.register(`lines.${index}.remark`)}
+                    />
+                    <FieldError message={lineErrors?.remark?.message} />
+                  </div>
+                  {lines.fields.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="sm:mt-6"
+                      aria-label={`Remove material ${String(index + 1)}`}
+                      onClick={() => {
+                        lines.remove(index);
+                      }}
                     >
-                      Available: {formatQuantity(stock)}
-                      {unit == null ? "" : ` ${unit}`}
-                      {short && " — not enough to approve"}
-                    </p>
+                      <Trash2 aria-hidden="true" />
+                    </Button>
                   )}
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor={id("quantity")} required>
-                    Quantity{unit == null ? "" : ` (${unit})`}
-                  </Label>
-                  <Input
-                    id={id("quantity")}
-                    inputMode="decimal"
-                    autoComplete="off"
-                    aria-required
-                    aria-invalid={lineErrors?.quantity != null}
-                    {...form.register(`lines.${index}.quantity`)}
-                  />
-                  <FieldError message={lineErrors?.quantity?.message} />
-                </div>
-                <div className="min-w-0 space-y-1.5">
-                  <Label htmlFor={id("remark")}>Remarks</Label>
-                  <Input
-                    id={id("remark")}
-                    autoComplete="off"
-                    aria-invalid={lineErrors?.remark != null}
-                    {...form.register(`lines.${index}.remark`)}
-                  />
-                  <FieldError message={lineErrors?.remark?.message} />
-                </div>
-                {lines.fields.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="sm:mt-6"
-                    aria-label={`Remove material ${String(index + 1)}`}
-                    onClick={() => {
-                      lines.remove(index);
-                    }}
-                  >
-                    <Trash2 aria-hidden="true" />
-                  </Button>
-                )}
-              </li>
-            );
-          })}
-        </ol>
-        {lines.fields.length < 100 && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              lines.append(blankLine());
-            }}
-          >
-            <Plus aria-hidden="true" />
-            Add material
-          </Button>
-        )}
-      </section>
+                </li>
+              );
+            })}
+          </ol>
+          {lines.fields.length < 100 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                lines.append(blankLine());
+              }}
+            >
+              <Plus aria-hidden="true" />
+              Add material
+            </Button>
+          )}
+        </section>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-1.5">
-          <Label htmlFor="transfer-receiver">Receiver Name</Label>
-          <Input
-            id="transfer-receiver"
-            autoComplete="off"
-            aria-invalid={errors.receiverName != null}
-            {...form.register("receiverName")}
-          />
-          <FieldError message={errors.receiverName?.message} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="transfer-remark">Remark</Label>
-          <Textarea
-            id="transfer-remark"
-            rows={2}
-            aria-invalid={errors.remark != null}
-            {...form.register("remark")}
-          />
-          <FieldError message={errors.remark?.message} />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="transfer-receiver">Receiver Name</Label>
+            <Input
+              id="transfer-receiver"
+              autoComplete="off"
+              aria-invalid={errors.receiverName != null}
+              {...form.register("receiverName")}
+            />
+            <FieldError message={errors.receiverName?.message} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="transfer-remark">Remark</Label>
+            <Textarea
+              id="transfer-remark"
+              rows={2}
+              aria-invalid={errors.remark != null}
+              {...form.register("remark")}
+            />
+            <FieldError message={errors.remark?.message} />
+          </div>
         </div>
       </div>
 

@@ -121,7 +121,7 @@ export function PartyStatementSkeleton() {
 /** The Opening balance card: its real heading, the amount line a bar. */
 export function OpeningCardSkeleton() {
   return (
-    <section className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3">
+    <section className="bg-card flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3">
       <div className="min-w-0 flex-1">
         <h2 className="text-sm font-semibold">Opening balance</h2>
         <SkeletonGroup label="Loading the opening balance">
@@ -193,7 +193,7 @@ export function PartyPaymentDetailSkeleton({
         }}
       />
       <SkeletonGroup label="Loading the payment" className="space-y-6">
-        <div className="grid gap-x-6 gap-y-3 rounded-lg border p-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="bg-card grid gap-x-6 gap-y-3 rounded-lg border p-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }, (_, index) => (
             <div key={index} className="min-w-0">
               <SkeletonText size="xs" width="40%" />
@@ -203,7 +203,7 @@ export function PartyPaymentDetailSkeleton({
         </div>
         <section className="space-y-2">
           <h2 className="font-semibold">Invoices it settles</h2>
-          <ul className="divide-y rounded-lg border">
+          <ul className="bg-card divide-y rounded-lg border">
             {WIDTHS.slice(0, 2).map((width, row) => (
               <li key={row} className="flex justify-between gap-3 p-3">
                 <SkeletonText width={width} />
@@ -271,12 +271,12 @@ export function PartyBalancesWorkspaceSkeleton() {
       />
       <ul className="space-y-3">
         {WIDTHS.slice(0, 3).map((width, row) => (
-          <li key={row} className="rounded-lg border p-3">
+          <li key={row} className="bg-card rounded-lg border p-3">
             <div className="flex flex-wrap items-start justify-between gap-2">
               <SkeletonText size="base" width={width} />
               <SkeletonText width="9rem" />
             </div>
-            <div className="mt-2 divide-y rounded-md border">
+            <div className="bg-card mt-2 divide-y rounded-md border">
               {[0, 1].map((line) => (
                 <div
                   key={line}
@@ -301,7 +301,7 @@ export function PartyBalancesWorkspaceSkeleton() {
 export function AllocationSkeleton() {
   return (
     <SkeletonGroup label="Loading open invoices">
-      <ul className="divide-y rounded-lg border">
+      <ul className="bg-card divide-y rounded-lg border">
         {WIDTHS.slice(0, 3).map((width, row) => (
           <li
             key={row}

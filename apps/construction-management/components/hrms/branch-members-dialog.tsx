@@ -99,7 +99,7 @@ export function BranchMembersDialog({
             const checked = chosen.includes(employee.memberId);
             return (
               <li key={employee.memberId}>
-                <Label className="hover:bg-muted/50 flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 font-normal">
+                <Label className="bg-card hover:bg-muted/50 flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 font-normal">
                   <Checkbox
                     checked={checked}
                     onCheckedChange={(next) => {

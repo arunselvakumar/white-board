@@ -111,7 +111,7 @@ export function SiteDiaryView({
 
       {error != null && <FormAlert message={error} />}
 
-      <dl className="grid gap-4 rounded-lg border p-4 sm:grid-cols-3">
+      <dl className="bg-card grid gap-4 rounded-lg border p-4 sm:grid-cols-3">
         <Fact label="Rainfall">{formatRainfall(diary.rainfallMm)}</Fact>
         <Fact label="Site condition" className="sm:col-span-2">
           {diary.siteCondition ?? "—"}

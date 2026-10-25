@@ -271,7 +271,7 @@ export function WingsPage({
               ) : null}
             </div>
             {phase.items.length === 0 ? (
-              <p className="text-muted-foreground rounded-xl border border-dashed p-4 text-center text-sm">
+              <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-4 text-center text-sm">
                 No Wings in {phase.name} yet.
               </p>
             ) : (

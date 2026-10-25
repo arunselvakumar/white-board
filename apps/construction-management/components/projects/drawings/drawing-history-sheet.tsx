@@ -39,7 +39,7 @@ function Revisions({
         <li
           key={revision.id}
           aria-label={revision.label}
-          className="space-y-2 rounded-lg border px-3 py-2.5"
+          className="bg-card space-y-2 rounded-lg border px-3 py-2.5"
         >
           <div className="flex min-w-0 items-center gap-2">
             <Badge variant={index === 0 ? "default" : "secondary"}>

@@ -305,7 +305,7 @@ export function BookingForm({
       <FormAlert message={error ?? undefined} />
       <section
         aria-label="Unit and dates"
-        className="space-y-4 rounded-lg border p-4"
+        className="bg-card space-y-4 rounded-lg border p-4"
       >
         {editing ? (
           <p className="text-sm">
@@ -469,7 +469,7 @@ export function BookingForm({
 
       <section
         aria-label="Customer details"
-        className="grid gap-4 rounded-lg border p-4 sm:grid-cols-2"
+        className="bg-card grid gap-4 rounded-lg border p-4 sm:grid-cols-2"
       >
         <Field
           id="booking-customer"
@@ -555,7 +555,7 @@ export function BookingForm({
       {!editing && (
         <section
           aria-label="Files"
-          className="grid min-w-0 gap-4 rounded-lg border p-4 lg:grid-cols-2"
+          className="bg-card grid min-w-0 gap-4 rounded-lg border p-4 lg:grid-cols-2"
         >
           <Controller
             control={form.control}

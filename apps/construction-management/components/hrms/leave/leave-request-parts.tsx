@@ -152,7 +152,7 @@ export function LeaveDetailSheet({
             </div>
             <section aria-label="Days" className="space-y-1">
               <h3 className="text-sm font-medium">Days</h3>
-              <ul className="divide-y rounded-lg border text-sm">
+              <ul className="bg-card divide-y rounded-lg border text-sm">
                 {leave.days.map((day) => (
                   <li key={day.date} className="flex justify-between px-3 py-2">
                     <span>{formatDay(day.date)}</span>
@@ -285,7 +285,7 @@ function LeaveOwnActions({
   return (
     <form
       noValidate
-      className="space-y-2 rounded-lg border p-3"
+      className="bg-card space-y-2 rounded-lg border p-3"
       onSubmit={(event) => {
         void submit(event);
       }}

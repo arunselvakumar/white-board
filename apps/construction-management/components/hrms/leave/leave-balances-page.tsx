@@ -53,7 +53,7 @@ export function LeaveBalancesPage() {
           <h2 className="text-xl font-semibold tracking-tight">
             Leave Balances
           </h2>
-          <Empty className="border">
+          <Empty className="bg-card border">
             <EmptyHeader>
               <EmptyMedia variant="icon">
                 <Scale />

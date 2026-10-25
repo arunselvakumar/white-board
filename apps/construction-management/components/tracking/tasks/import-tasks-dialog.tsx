@@ -136,7 +136,7 @@ export function ImportTasksDialog({
         {errors != null && errors.length > 0 ? (
           <ul
             aria-label="Problems in the sheet"
-            className="max-h-72 divide-y overflow-y-auto rounded-lg border text-sm"
+            className="bg-card max-h-72 divide-y overflow-y-auto rounded-lg border text-sm"
           >
             {errors.map((row) => (
               <li

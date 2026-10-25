@@ -47,7 +47,7 @@ export function ProjectFilterSkeleton() {
 export function VendorFormSkeleton() {
   return (
     <FormPageSkeleton back={{ label: "Vendors", href: "/app/masters/vendors" }}>
-      <div className="space-y-8">
+      <div className="space-y-6">
         <FormSectionSkeleton title="Details">
           <FormSkeleton
             columns={2}
@@ -71,7 +71,7 @@ export function VendorFormSkeleton() {
         <FormSectionSkeleton title="Rate card">
           <FormSkeleton
             columns={2}
-            actions={2}
+            actions={1}
             fields={[
               { label: "Shift name", wide: true },
               { label: "Start time" },

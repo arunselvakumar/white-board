@@ -241,7 +241,7 @@ export function ProjectDocumentsPage({
       </div>
 
       {data.items.length === 0 ? (
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <FolderOpen />

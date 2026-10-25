@@ -310,7 +310,7 @@ export function PermissionMatrix({
         )}
       </div>
       {categories.length === 0 ? (
-        <p className="text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
+        <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
           No menu matches “{query.trim()}”.
         </p>
       ) : (

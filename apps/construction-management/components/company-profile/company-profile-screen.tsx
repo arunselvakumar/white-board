@@ -28,7 +28,7 @@ export function CompanyProfileScreen() {
           meta="How your Company appears on documents and to your team."
         />
         {profile == null ? (
-          <Empty className="border">
+          <Empty className="bg-card border">
             <EmptyHeader>
               <EmptyMedia variant="icon">
                 <Lock />

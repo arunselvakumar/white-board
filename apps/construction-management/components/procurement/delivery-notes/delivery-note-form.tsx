@@ -211,7 +211,7 @@ export function DeliveryNoteForm({
           void form.handleSubmit(save)(event);
         }}
       >
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="bg-card grid gap-4 rounded-xl border p-4 sm:grid-cols-2 sm:p-5">
           <div className="space-y-1.5">
             <Label htmlFor="dn-date" required>
               Delivery Date
@@ -243,7 +243,7 @@ export function DeliveryNoteForm({
           </div>
         </div>
 
-        <section className="space-y-3">
+        <section className="bg-card space-y-3 rounded-xl border p-4 sm:p-5">
           <h2 className="font-semibold">Materials</h2>
           <ul aria-label="Materials to deliver" className="space-y-3">
             {lines.map((line) => {
@@ -251,7 +251,7 @@ export function DeliveryNoteForm({
               return (
                 <li
                   key={line.id}
-                  className="grid gap-3 rounded-xl border p-3 sm:grid-cols-[minmax(0,2fr)_repeat(2,minmax(0,1fr))_minmax(0,1.2fr)] sm:items-center"
+                  className="bg-card grid gap-3 rounded-xl border p-3 sm:grid-cols-[minmax(0,2fr)_repeat(2,minmax(0,1fr))_minmax(0,1.2fr)] sm:items-center"
                 >
                   <div className="min-w-0">
                     <span className="block truncate text-sm font-medium">

@@ -51,7 +51,7 @@ export function TransferHistorySkeleton() {
   return (
     <SkeletonGroup label="Loading transfers" className="block space-y-3">
       {["62%", "48%", "70%"].map((width) => (
-        <div key={width} className="rounded-lg border px-3 py-2.5">
+        <div key={width} className="bg-card rounded-lg border px-3 py-2.5">
           <SkeletonText size="xs" width="5.5rem" />
           <SkeletonText width={width} />
         </div>
@@ -64,7 +64,7 @@ export function TransferHistorySkeleton() {
 export function LabourFilesSkeleton() {
   return (
     <SkeletonGroup label="Loading documents" className="block">
-      <ul className="divide-border divide-y rounded-lg border">
+      <ul className="bg-card divide-border divide-y rounded-lg border">
         {["54%", "38%"].map((width) => (
           <li key={width} className="flex items-center gap-3 px-4 py-2.5">
             <Skeleton className="size-4 shrink-0 rounded-sm" />
@@ -85,7 +85,7 @@ export function LabourFormSkeleton() {
       back={{ label: "Labours", href: "/app/masters/labours" }}
       meta
     >
-      <div className="space-y-8">
+      <div className="space-y-6">
         <FormSectionSkeleton title="Basic">
           <FormSkeleton
             columns={2}
@@ -125,6 +125,7 @@ export function LabourFormSkeleton() {
         <FormSectionSkeleton title="Category & contact">
           <FormSkeleton
             columns={2}
+            actions={0}
             fields={[
               { label: "Labour Category", control: "select" },
               { label: "Supervisor", control: "select" },

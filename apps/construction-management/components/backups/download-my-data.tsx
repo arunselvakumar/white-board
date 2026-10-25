@@ -96,7 +96,7 @@ export function DownloadMyDataAction() {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Item variant="outline" role="listitem" className="flex-wrap">
+      <Item variant="outline" role="listitem" className="bg-card flex-wrap">
         <ItemMedia variant="icon">
           <Download />
         </ItemMedia>

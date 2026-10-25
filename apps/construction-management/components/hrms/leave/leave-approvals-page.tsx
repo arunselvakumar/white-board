@@ -79,7 +79,7 @@ function Nothing({
   description: string;
 }) {
   return (
-    <Empty className="border">
+    <Empty className="bg-card border">
       <EmptyHeader>
         <EmptyMedia variant="icon">
           <ListChecks />

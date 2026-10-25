@@ -405,310 +405,315 @@ export function TaskForm({
           Sub-task of {parent.label} {parent.name}
         </p>
       )}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="space-y-1.5 sm:col-span-2 lg:col-span-3">
-          <Label htmlFor="task-name" required>
-            Task name
-          </Label>
-          <Input
-            id="task-name"
-            autoComplete="off"
-            aria-required
-            aria-invalid={errors.name != null}
-            {...form.register("name")}
-          />
-          <FieldError message={errors.name?.message} />
+      <div className="bg-card space-y-6 rounded-xl border p-4 sm:p-5">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="space-y-1.5 sm:col-span-2 lg:col-span-3">
+            <Label htmlFor="task-name" required>
+              Task name
+            </Label>
+            <Input
+              id="task-name"
+              autoComplete="off"
+              aria-required
+              aria-invalid={errors.name != null}
+              {...form.register("name")}
+            />
+            <FieldError message={errors.name?.message} />
+          </div>
+          <div className="space-y-1.5 sm:col-span-2 lg:col-span-3">
+            <Label htmlFor="task-description">Description</Label>
+            <Textarea
+              id="task-description"
+              rows={3}
+              aria-invalid={errors.description != null}
+              {...form.register("description")}
+            />
+            <FieldError message={errors.description?.message} />
+          </div>
+          <div className="space-y-1.5 sm:col-span-2">
+            <Label htmlFor="task-assignees">Assign to</Label>
+            <Controller
+              control={form.control}
+              name="assigneeIds"
+              render={({ field }) => (
+                <ChipsSelect
+                  id="task-assignees"
+                  label="Team Members"
+                  options={members}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="Choose Team Members"
+                  emptyText="No Team Members found."
+                  invalid={errors.assigneeIds != null}
+                />
+              )}
+            />
+            <FieldError message={errors.assigneeIds?.message} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="task-priority">Priority</Label>
+            <Controller
+              control={form.control}
+              name="priority"
+              render={({ field }) => (
+                <OptionSelect
+                  id="task-priority"
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="None"
+                  items={TRACKING_PRIORITIES.map((item) => ({
+                    value: item.key,
+                    label: item.label,
+                  }))}
+                />
+              )}
+            />
+          </div>
+          {summary ? (
+            <p className="text-muted-foreground text-sm sm:col-span-2 lg:col-span-3">
+              This task has sub-tasks: its dates, work, price and progress roll
+              up from them.
+            </p>
+          ) : (
+            <>
+              <div className="space-y-1.5">
+                <Label htmlFor="task-start">Start Date</Label>
+                <Input
+                  id="task-start"
+                  type="date"
+                  aria-invalid={errors.startDate != null}
+                  {...form.register("startDate")}
+                />
+                <FieldError message={errors.startDate?.message} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="task-due">Due Date</Label>
+                <Input
+                  id="task-due"
+                  type="date"
+                  aria-invalid={errors.dueDate != null}
+                  {...form.register("dueDate")}
+                />
+                <FieldError message={errors.dueDate?.message} />
+              </div>
+            </>
+          )}
+          <div className="space-y-1.5">
+            <Label htmlFor="task-department">Department</Label>
+            <Controller
+              control={form.control}
+              name="departmentId"
+              render={({ field }) => (
+                <OptionSelect
+                  id="task-department"
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="None"
+                  items={departments}
+                  invalid={errors.departmentId != null}
+                />
+              )}
+            />
+            <FieldError message={errors.departmentId?.message} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="task-contractor">Contractor</Label>
+            <Controller
+              control={form.control}
+              name="contractorId"
+              render={({ field }) => (
+                <OptionSelect
+                  id="task-contractor"
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder={
+                    contractors.length === 0
+                      ? "No Contractors on this Project"
+                      : "None"
+                  }
+                  items={contractors}
+                  invalid={errors.contractorId != null}
+                />
+              )}
+            />
+            <FieldError message={errors.contractorId?.message} />
+          </div>
+          <div className="space-y-1.5 sm:col-span-2">
+            <Label htmlFor="task-tags">Tags</Label>
+            <Controller
+              control={form.control}
+              name="tagIds"
+              render={({ field }) => (
+                <ChipsSelect
+                  id="task-tags"
+                  label="Tags"
+                  options={tags}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder={
+                    canCreateTags ? "Choose or type a new tag" : "Choose tags"
+                  }
+                  emptyText="No tags found."
+                  invalid={errors.tagIds != null}
+                  {...(canCreateTags
+                    ? {
+                        onCreate: async (name: string) => {
+                          try {
+                            return await ensureTag.mutateAsync(name);
+                          } catch (caught) {
+                            form.setError("tagIds", {
+                              message:
+                                caught instanceof QueryHttpError
+                                  ? caught.message
+                                  : "The tag could not be created.",
+                            });
+                            return null;
+                          }
+                        },
+                      }
+                    : {})}
+                />
+              )}
+            />
+            <FieldError message={errors.tagIds?.message} />
+          </div>
         </div>
-        <div className="space-y-1.5 sm:col-span-2 lg:col-span-3">
-          <Label htmlFor="task-description">Description</Label>
-          <Textarea
-            id="task-description"
-            rows={3}
-            aria-invalid={errors.description != null}
-            {...form.register("description")}
-          />
-          <FieldError message={errors.description?.message} />
-        </div>
-        <div className="space-y-1.5 sm:col-span-2">
-          <Label htmlFor="task-assignees">Assign to</Label>
-          <Controller
-            control={form.control}
-            name="assigneeIds"
-            render={({ field }) => (
-              <ChipsSelect
-                id="task-assignees"
-                label="Team Members"
-                options={members}
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="Choose Team Members"
-                emptyText="No Team Members found."
-                invalid={errors.assigneeIds != null}
-              />
-            )}
-          />
-          <FieldError message={errors.assigneeIds?.message} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="task-priority">Priority</Label>
-          <Controller
-            control={form.control}
-            name="priority"
-            render={({ field }) => (
-              <OptionSelect
-                id="task-priority"
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="None"
-                items={TRACKING_PRIORITIES.map((item) => ({
-                  value: item.key,
-                  label: item.label,
-                }))}
-              />
-            )}
-          />
-        </div>
-        {summary ? (
-          <p className="text-muted-foreground text-sm sm:col-span-2 lg:col-span-3">
-            This task has sub-tasks: its dates, work, price and progress roll up
-            from them.
-          </p>
-        ) : (
-          <>
-            <div className="space-y-1.5">
-              <Label htmlFor="task-start">Start Date</Label>
-              <Input
-                id="task-start"
-                type="date"
-                aria-invalid={errors.startDate != null}
-                {...form.register("startDate")}
-              />
-              <FieldError message={errors.startDate?.message} />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="task-due">Due Date</Label>
-              <Input
-                id="task-due"
-                type="date"
-                aria-invalid={errors.dueDate != null}
-                {...form.register("dueDate")}
-              />
-              <FieldError message={errors.dueDate?.message} />
-            </div>
-          </>
-        )}
-        <div className="space-y-1.5">
-          <Label htmlFor="task-department">Department</Label>
-          <Controller
-            control={form.control}
-            name="departmentId"
-            render={({ field }) => (
-              <OptionSelect
-                id="task-department"
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="None"
-                items={departments}
-                invalid={errors.departmentId != null}
-              />
-            )}
-          />
-          <FieldError message={errors.departmentId?.message} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="task-contractor">Contractor</Label>
-          <Controller
-            control={form.control}
-            name="contractorId"
-            render={({ field }) => (
-              <OptionSelect
-                id="task-contractor"
-                value={field.value}
-                onChange={field.onChange}
-                placeholder={
-                  contractors.length === 0
-                    ? "No Contractors on this Project"
-                    : "None"
-                }
-                items={contractors}
-                invalid={errors.contractorId != null}
-              />
-            )}
-          />
-          <FieldError message={errors.contractorId?.message} />
-        </div>
-        <div className="space-y-1.5 sm:col-span-2">
-          <Label htmlFor="task-tags">Tags</Label>
-          <Controller
-            control={form.control}
-            name="tagIds"
-            render={({ field }) => (
-              <ChipsSelect
-                id="task-tags"
-                label="Tags"
-                options={tags}
-                value={field.value}
-                onChange={field.onChange}
-                placeholder={
-                  canCreateTags ? "Choose or type a new tag" : "Choose tags"
-                }
-                emptyText="No tags found."
-                invalid={errors.tagIds != null}
-                {...(canCreateTags
-                  ? {
-                      onCreate: async (name: string) => {
-                        try {
-                          return await ensureTag.mutateAsync(name);
-                        } catch (caught) {
-                          form.setError("tagIds", {
-                            message:
-                              caught instanceof QueryHttpError
-                                ? caught.message
-                                : "The tag could not be created.",
-                          });
-                          return null;
-                        }
-                      },
-                    }
-                  : {})}
-              />
-            )}
-          />
-          <FieldError message={errors.tagIds?.message} />
-        </div>
-      </div>
 
-      <fieldset className="min-w-0 space-y-3">
-        <legend className="text-sm font-semibold">Location</legend>
-        <Suspense fallback={<LocationPickerSkeleton />}>
-          <Controller
-            control={form.control}
-            name="siteLocation"
-            render={({ field }) => (
-              <LocationPicker
-                projectId={projectId}
-                value={field.value}
-                onChange={field.onChange}
-                invalid={errors.siteLocation != null}
-              />
-            )}
-          />
-          <FieldError message={errors.siteLocation?.message} />
-          {extras.fields.map((item, index) => (
-            <div key={item.id} className="flex min-w-0 items-start gap-2">
-              <div className="min-w-0 flex-1">
+        <fieldset className="min-w-0 space-y-3">
+          <legend className="text-sm font-semibold">Location</legend>
+          <Suspense fallback={<LocationPickerSkeleton />}>
+            <Controller
+              control={form.control}
+              name="siteLocation"
+              render={({ field }) => (
+                <LocationPicker
+                  projectId={projectId}
+                  value={field.value}
+                  onChange={field.onChange}
+                  invalid={errors.siteLocation != null}
+                />
+              )}
+            />
+            <FieldError message={errors.siteLocation?.message} />
+            {extras.fields.map((item, index) => (
+              <div key={item.id} className="flex min-w-0 items-start gap-2">
+                <div className="min-w-0 flex-1">
+                  <Controller
+                    control={form.control}
+                    name={`extraLocations.${index}.ref`}
+                    render={({ field }) => (
+                      <LocationPicker
+                        projectId={projectId}
+                        label={`Other location ${String(index + 1)}`}
+                        required
+                        value={field.value}
+                        onChange={field.onChange}
+                        invalid={errors.extraLocations?.[index]?.ref != null}
+                      />
+                    )}
+                  />
+                  <FieldError
+                    message={errors.extraLocations?.[index]?.ref?.message}
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={`Remove other location ${String(index + 1)}`}
+                  onClick={() => {
+                    extras.remove(index);
+                  }}
+                >
+                  <X aria-hidden="true" />
+                </Button>
+              </div>
+            ))}
+          </Suspense>
+          <FieldError message={errors.extraLocations?.message} />
+          {(mainLocation != null || extras.fields.length > 0) && (
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={extras.fields.length >= TASK_LIMITS.extraLocations}
+                onClick={() => {
+                  extras.append({ ref: null });
+                }}
+              >
+                <Plus aria-hidden="true" />
+                Add another location
+              </Button>
+              <p className="text-muted-foreground text-xs">
+                Other locations are of the same Location Type as the main one,
+                and in the same Wing.
+              </p>
+            </>
+          )}
+        </fieldset>
+
+        {!summary && (
+          <fieldset className="min-w-0 space-y-3">
+            <legend className="text-sm font-semibold">Work and price</legend>
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="task-work" required={workRequired}>
+                  Total work
+                </Label>
+                <Input
+                  id="task-work"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  aria-required={workRequired}
+                  aria-invalid={errors.totalWorkQty != null}
+                  aria-describedby="task-work-hint"
+                  {...form.register("totalWorkQty")}
+                />
+                <p
+                  id="task-work-hint"
+                  className="text-muted-foreground text-xs"
+                >
+                  Leave empty to record progress as a percentage.
+                </p>
+                <FieldError message={errors.totalWorkQty?.message} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="task-unit" required={unitRequired}>
+                  Unit
+                </Label>
                 <Controller
                   control={form.control}
-                  name={`extraLocations.${index}.ref`}
+                  name="totalWorkUnitId"
                   render={({ field }) => (
-                    <LocationPicker
-                      projectId={projectId}
-                      label={`Other location ${String(index + 1)}`}
-                      required
+                    <OptionSelect
+                      required={unitRequired}
+                      id="task-unit"
                       value={field.value}
                       onChange={field.onChange}
-                      invalid={errors.extraLocations?.[index]?.ref != null}
+                      placeholder="None"
+                      items={units}
+                      invalid={errors.totalWorkUnitId != null}
                     />
                   )}
                 />
-                <FieldError
-                  message={errors.extraLocations?.[index]?.ref?.message}
-                />
+                <FieldError message={errors.totalWorkUnitId?.message} />
               </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-sm"
-                aria-label={`Remove other location ${String(index + 1)}`}
-                onClick={() => {
-                  extras.remove(index);
-                }}
-              >
-                <X aria-hidden="true" />
-              </Button>
-            </div>
-          ))}
-        </Suspense>
-        <FieldError message={errors.extraLocations?.message} />
-        {(mainLocation != null || extras.fields.length > 0) && (
-          <>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={extras.fields.length >= TASK_LIMITS.extraLocations}
-              onClick={() => {
-                extras.append({ ref: null });
-              }}
-            >
-              <Plus aria-hidden="true" />
-              Add another location
-            </Button>
-            <p className="text-muted-foreground text-xs">
-              Other locations are of the same Location Type as the main one, and
-              in the same Wing.
-            </p>
-          </>
-        )}
-      </fieldset>
-
-      {!summary && (
-        <fieldset className="min-w-0 space-y-3">
-          <legend className="text-sm font-semibold">Work and price</legend>
-          <div className="grid gap-4 sm:grid-cols-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="task-work" required={workRequired}>
-                Total work
-              </Label>
-              <Input
-                id="task-work"
-                inputMode="decimal"
-                autoComplete="off"
-                aria-required={workRequired}
-                aria-invalid={errors.totalWorkQty != null}
-                aria-describedby="task-work-hint"
-                {...form.register("totalWorkQty")}
-              />
-              <p id="task-work-hint" className="text-muted-foreground text-xs">
-                Leave empty to record progress as a percentage.
-              </p>
-              <FieldError message={errors.totalWorkQty?.message} />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="task-unit" required={unitRequired}>
-                Unit
-              </Label>
-              <Controller
-                control={form.control}
-                name="totalWorkUnitId"
-                render={({ field }) => (
-                  <OptionSelect
-                    required={unitRequired}
-                    id="task-unit"
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="None"
-                    items={units}
-                    invalid={errors.totalWorkUnitId != null}
+              {financial && (
+                <div className="space-y-1.5">
+                  <Label htmlFor="task-price">Total Price</Label>
+                  <MoneyInput
+                    id="task-price"
+                    aria-invalid={errors.totalPrice != null}
+                    {...form.register("totalPrice")}
                   />
-                )}
-              />
-              <FieldError message={errors.totalWorkUnitId?.message} />
+                  <FieldError message={errors.totalPrice?.message} />
+                </div>
+              )}
             </div>
-            {financial && (
-              <div className="space-y-1.5">
-                <Label htmlFor="task-price">Total Price</Label>
-                <MoneyInput
-                  id="task-price"
-                  aria-invalid={errors.totalPrice != null}
-                  {...form.register("totalPrice")}
-                />
-                <FieldError message={errors.totalPrice?.message} />
-              </div>
-            )}
-          </div>
-        </fieldset>
-      )}
+          </fieldset>
+        )}
+      </div>
 
       <FormAlert message={error ?? undefined} />
       <div className="flex flex-wrap justify-end gap-2">

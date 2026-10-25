@@ -366,7 +366,7 @@ export function TestingItemPage({
       </div>
 
       {item.reportCount === 0 ? (
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <FlaskConical />
@@ -399,7 +399,7 @@ export function TestingItemPage({
           </InputGroup>
 
           {data.items.length === 0 ? (
-            <Empty className="border">
+            <Empty className="bg-card border">
               <EmptyHeader>
                 <EmptyMedia variant="icon">
                   <FileSearch />

@@ -154,7 +154,7 @@ export function AssignShiftDialog({
                 {(["shift", "rotation"] as const).map((option) => (
                   <div
                     key={option}
-                    className="flex items-center gap-3 rounded-lg border p-3"
+                    className="bg-card flex items-center gap-3 rounded-lg border p-3"
                   >
                     <RadioGroupItem
                       id={`assign-${option}`}

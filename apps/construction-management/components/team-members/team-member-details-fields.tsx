@@ -163,216 +163,223 @@ export function TeamMemberDetailsFields<
   }));
   return (
     <div className="space-y-6">
-      <fieldset className="space-y-2">
-        <legend className="text-sm font-semibold">
-          Member type
-          <RequiredIndicator />
-        </legend>
-        <Controller
-          name="memberType"
-          control={form.control}
-          render={({ field }) => (
-            <RadioGroup
-              value={field.value}
-              onValueChange={(value) => {
-                field.onChange(value);
-              }}
-              className="grid gap-3 sm:grid-cols-2"
-              aria-required
-            >
-              <Label className="has-data-checked:border-primary flex cursor-pointer items-start gap-3 rounded-lg border p-3 font-normal">
-                <RadioGroupItem
-                  value="normal"
-                  aria-label="Normal Team Member"
-                />
-                <span className="space-y-0.5">
-                  <span className="block font-semibold">Normal</span>
-                  <span className="text-muted-foreground block text-xs">
-                    Works on Projects. Their Role decides what they may do.
-                  </span>
-                </span>
-              </Label>
-              <Label className="has-data-checked:border-primary flex cursor-pointer items-start gap-3 rounded-lg border p-3 font-normal">
-                <RadioGroupItem value="hrms" aria-label="HRMS Team Member" />
-                <span className="space-y-0.5">
-                  <span className="block font-semibold">HRMS only</span>
-                  <span className="text-muted-foreground block text-xs">
-                    Attendance, leave and salary. No Projects.
-                  </span>
-                </span>
-              </Label>
-            </RadioGroup>
-          )}
-        />
-      </fieldset>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-1.5">
-          <Label htmlFor="member-name" required>
-            Name
-          </Label>
-          <Input
-            id="member-name"
-            placeholder="Prabhu Saravanan"
-            className="h-10"
-            aria-required
-            {...form.register("name")}
-          />
-          <FieldError message={errors.name?.message} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="member-designation" required>
-            Designation
-          </Label>
+      <div className="bg-card space-y-6 rounded-xl border p-4 sm:p-5">
+        <fieldset className="space-y-2">
+          <legend className="text-sm font-semibold">
+            Member type
+            <RequiredIndicator />
+          </legend>
           <Controller
-            name="designationId"
+            name="memberType"
             control={form.control}
             render={({ field }) => (
-              <Select
-                items={items}
-                value={field.value === "" ? null : field.value}
+              <RadioGroup
+                value={field.value}
                 onValueChange={(value) => {
-                  if (value != null) field.onChange(value);
+                  field.onChange(value);
                 }}
+                className="grid gap-3 sm:grid-cols-2"
+                aria-required
               >
-                <SelectTrigger
-                  id="member-designation"
-                  size="lg"
-                  className="w-full min-w-0"
-                  aria-required
-                >
-                  <SelectValue placeholder="Choose a Designation" />
-                </SelectTrigger>
-                <SelectContent
-                  align="start"
-                  alignItemWithTrigger={false}
-                  aria-label="Designations"
-                >
-                  {items.map((item) => (
-                    <SelectItem key={item.value} value={item.value}>
-                      {item.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <Label className="bg-card has-data-checked:border-primary flex cursor-pointer items-start gap-3 rounded-lg border p-3 font-normal">
+                  <RadioGroupItem
+                    value="normal"
+                    aria-label="Normal Team Member"
+                  />
+                  <span className="space-y-0.5">
+                    <span className="block font-semibold">Normal</span>
+                    <span className="text-muted-foreground block text-xs">
+                      Works on Projects. Their Role decides what they may do.
+                    </span>
+                  </span>
+                </Label>
+                <Label className="bg-card has-data-checked:border-primary flex cursor-pointer items-start gap-3 rounded-lg border p-3 font-normal">
+                  <RadioGroupItem value="hrms" aria-label="HRMS Team Member" />
+                  <span className="space-y-0.5">
+                    <span className="block font-semibold">HRMS only</span>
+                    <span className="text-muted-foreground block text-xs">
+                      Attendance, leave and salary. No Projects.
+                    </span>
+                  </span>
+                </Label>
+              </RadioGroup>
             )}
           />
-          {designations.length === 0 && (
-            <p className="text-muted-foreground text-xs">
-              No Designations yet.{" "}
-              <Link
-                href="/app/masters/designations/new"
-                className="text-primary underline underline-offset-4"
-              >
-                Add a Designation
-              </Link>{" "}
-              first.
-            </p>
-          )}
-          <FieldError message={errors.designationId?.message} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="member-aadhaar">Aadhaar</Label>
-          <Input
-            id="member-aadhaar"
-            inputMode="numeric"
-            placeholder={masked?.aadhaar ?? "1234 5678 9012"}
-            className="h-10"
-            {...form.register("aadhaar")}
-          />
-          {masked?.aadhaar != null && (
-            <p className="text-muted-foreground text-xs">
-              Leave blank to keep {masked.aadhaar}.
-            </p>
-          )}
-          <FieldError message={errors.aadhaar?.message} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="member-pan">PAN</Label>
-          <Input
-            id="member-pan"
-            autoCapitalize="characters"
-            placeholder={masked?.pan ?? "ABCPE1234F"}
-            className="h-10 uppercase placeholder:normal-case"
-            {...form.register("pan")}
-          />
-          {masked?.pan != null && (
-            <p className="text-muted-foreground text-xs">
-              Leave blank to keep {masked.pan}.
-            </p>
-          )}
-          <FieldError message={errors.pan?.message} />
-        </div>
-        <div className="space-y-1.5 sm:col-span-2">
-          <Label htmlFor="member-address">Address</Label>
-          <Input
-            id="member-address"
-            placeholder="Flat 4, Anna Nagar, Chennai"
-            className="h-10"
-            {...form.register("address")}
-          />
-          <FieldError message={errors.address?.message} />
-        </div>
-        <div className="space-y-1.5 sm:col-span-2">
-          <Label htmlFor="member-emergency">Emergency contact</Label>
-          <Input
-            id="member-emergency"
-            placeholder="Name and phone"
-            className="h-10"
-            {...form.register("emergencyContact")}
-          />
-          <FieldError message={errors.emergencyContact?.message} />
+        </fieldset>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="member-name" required>
+              Name
+            </Label>
+            <Input
+              id="member-name"
+              placeholder="Prabhu Saravanan"
+              className="h-10"
+              aria-required
+              {...form.register("name")}
+            />
+            <FieldError message={errors.name?.message} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="member-designation" required>
+              Designation
+            </Label>
+            <Controller
+              name="designationId"
+              control={form.control}
+              render={({ field }) => (
+                <Select
+                  items={items}
+                  value={field.value === "" ? null : field.value}
+                  onValueChange={(value) => {
+                    if (value != null) field.onChange(value);
+                  }}
+                >
+                  <SelectTrigger
+                    id="member-designation"
+                    size="lg"
+                    className="w-full min-w-0"
+                    aria-required
+                  >
+                    <SelectValue placeholder="Choose a Designation" />
+                  </SelectTrigger>
+                  <SelectContent
+                    align="start"
+                    alignItemWithTrigger={false}
+                    aria-label="Designations"
+                  >
+                    {items.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {designations.length === 0 && (
+              <p className="text-muted-foreground text-xs">
+                No Designations yet.{" "}
+                <Link
+                  href="/app/masters/designations/new"
+                  className="text-primary underline underline-offset-4"
+                >
+                  Add a Designation
+                </Link>{" "}
+                first.
+              </p>
+            )}
+            <FieldError message={errors.designationId?.message} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="member-aadhaar">Aadhaar</Label>
+            <Input
+              id="member-aadhaar"
+              inputMode="numeric"
+              placeholder={masked?.aadhaar ?? "1234 5678 9012"}
+              className="h-10"
+              {...form.register("aadhaar")}
+            />
+            {masked?.aadhaar != null && (
+              <p className="text-muted-foreground text-xs">
+                Leave blank to keep {masked.aadhaar}.
+              </p>
+            )}
+            <FieldError message={errors.aadhaar?.message} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="member-pan">PAN</Label>
+            <Input
+              id="member-pan"
+              autoCapitalize="characters"
+              placeholder={masked?.pan ?? "ABCPE1234F"}
+              className="h-10 uppercase placeholder:normal-case"
+              {...form.register("pan")}
+            />
+            {masked?.pan != null && (
+              <p className="text-muted-foreground text-xs">
+                Leave blank to keep {masked.pan}.
+              </p>
+            )}
+            <FieldError message={errors.pan?.message} />
+          </div>
+          <div className="space-y-1.5 sm:col-span-2">
+            <Label htmlFor="member-address">Address</Label>
+            <Input
+              id="member-address"
+              placeholder="Flat 4, Anna Nagar, Chennai"
+              className="h-10"
+              {...form.register("address")}
+            />
+            <FieldError message={errors.address?.message} />
+          </div>
+          <div className="space-y-1.5 sm:col-span-2">
+            <Label htmlFor="member-emergency">Emergency contact</Label>
+            <Input
+              id="member-emergency"
+              placeholder="Name and phone"
+              className="h-10"
+              {...form.register("emergencyContact")}
+            />
+            <FieldError message={errors.emergencyContact?.message} />
+          </div>
         </div>
       </div>
 
-      <fieldset className="space-y-2" aria-describedby="member-sign-in-hint">
-        <legend className="text-sm font-semibold">
-          Sign-in
-          <RequiredIndicator />
-        </legend>
-        <p id="member-sign-in-hint" className="text-muted-foreground text-xs">
-          A mobile number or an email. Either one is enough.
-        </p>
-        <div className="grid gap-4 pt-2 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="member-mobile" required={mobileRequired}>
-              Mobile
-            </Label>
-            <MobileField
-              id="member-mobile"
-              readOnly={mobileLocked}
-              aria-required={mobileRequired}
-              aria-describedby="member-mobile-hint"
-              {...form.register("mobile")}
-            />
-            <p
-              id="member-mobile-hint"
-              className="text-muted-foreground text-xs"
-            >
-              {mobileLocked
-                ? "They sign in with this number; they change it in My Profile."
-                : "They can sign in with it and a password."}
-            </p>
-            <FieldError message={errors.mobile?.message} />
+      <div className="bg-card rounded-xl border p-4 sm:p-5">
+        <fieldset className="space-y-2" aria-describedby="member-sign-in-hint">
+          <legend className="text-sm font-semibold">
+            Sign-in
+            <RequiredIndicator />
+          </legend>
+          <p id="member-sign-in-hint" className="text-muted-foreground text-xs">
+            A mobile number or an email. Either one is enough.
+          </p>
+          <div className="grid gap-4 pt-2 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="member-mobile" required={mobileRequired}>
+                Mobile
+              </Label>
+              <MobileField
+                id="member-mobile"
+                readOnly={mobileLocked}
+                aria-required={mobileRequired}
+                aria-describedby="member-mobile-hint"
+                {...form.register("mobile")}
+              />
+              <p
+                id="member-mobile-hint"
+                className="text-muted-foreground text-xs"
+              >
+                {mobileLocked
+                  ? "They sign in with this number; they change it in My Profile."
+                  : "They can sign in with it and a password."}
+              </p>
+              <FieldError message={errors.mobile?.message} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="member-email">Email</Label>
+              <Input
+                id="member-email"
+                type="email"
+                placeholder="example@example.com"
+                className="h-10"
+                aria-describedby="member-email-hint"
+                {...form.register("email")}
+              />
+              <p
+                id="member-email-hint"
+                className="text-muted-foreground text-xs"
+              >
+                Where the invitation goes. They can sign in with it too.
+              </p>
+              <FieldError message={errors.email?.message} />
+            </div>
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="member-email">Email</Label>
-            <Input
-              id="member-email"
-              type="email"
-              placeholder="example@example.com"
-              className="h-10"
-              aria-describedby="member-email-hint"
-              {...form.register("email")}
-            />
-            <p id="member-email-hint" className="text-muted-foreground text-xs">
-              Where the invitation goes. They can sign in with it too.
-            </p>
-            <FieldError message={errors.email?.message} />
-          </div>
-        </div>
-        {signIn == null ? null : <div className="pt-2">{signIn}</div>}
-      </fieldset>
+          {signIn == null ? null : <div className="pt-2">{signIn}</div>}
+        </fieldset>
+      </div>
     </div>
   );
 }

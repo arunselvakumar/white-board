@@ -119,7 +119,7 @@ export function DevicesSection() {
               variant="outline"
               role="listitem"
               aria-label={deviceName(device)}
-              className="flex-wrap"
+              className="bg-card flex-wrap"
             >
               <ItemMedia variant="icon">
                 <Icon />

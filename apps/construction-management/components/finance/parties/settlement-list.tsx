@@ -154,7 +154,7 @@ function Settlements({
 
   if (data.items.length === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <HandCoins />
@@ -201,7 +201,7 @@ function Settlements({
   return (
     <div className="space-y-3">
       {status === "pending" && decidable.length > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border p-2">
+        <div className="bg-card flex flex-wrap items-center justify-between gap-2 rounded-lg border p-2">
           <Label className="flex items-center gap-2 font-normal">
             <Checkbox
               checked={chosen.length > 0 && chosen.length === decidable.length}
@@ -303,7 +303,7 @@ function SettlementItem({
   const invoice = settlement.invoice;
   const label = `${invoice.invoiceNumber} · ${invoice.party.name ?? "A removed party"}`;
   return (
-    <li className="rounded-lg border p-3">
+    <li className="bg-card rounded-lg border p-3">
       <div className="flex items-start gap-3">
         {selectable && (
           <Checkbox

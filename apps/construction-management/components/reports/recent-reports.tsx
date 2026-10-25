@@ -68,7 +68,7 @@ export function RecentReports({
       : data.items.filter((job) => kinds.includes(job.kind));
   if (items.length === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <FileSpreadsheet />
@@ -82,7 +82,10 @@ export function RecentReports({
       </Empty>
     );
   return (
-    <ul className="divide-y rounded-xl border" aria-label="Recent reports">
+    <ul
+      className="bg-card divide-y rounded-xl border"
+      aria-label="Recent reports"
+    >
       {items.map((job) => (
         <li
           key={job.id}

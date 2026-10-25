@@ -304,7 +304,7 @@ export function SiteDiaryForm({
         void form.handleSubmit(submit)(event);
       }}
     >
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="bg-card grid gap-4 rounded-xl border p-4 sm:grid-cols-3 sm:p-5">
         <div className="space-y-1.5">
           <Label htmlFor="diary-date" required>
             Date
@@ -370,7 +370,10 @@ export function SiteDiaryForm({
         </div>
       </div>
 
-      <section aria-labelledby="diary-form-visitors" className="space-y-3">
+      <section
+        aria-labelledby="diary-form-visitors"
+        className="bg-card space-y-3 rounded-xl border p-4 sm:p-5"
+      >
         <h3 id="diary-form-visitors" className="text-sm font-semibold">
           Visitors
         </h3>
@@ -385,7 +388,7 @@ export function SiteDiaryForm({
               <li
                 key={row.id}
                 aria-label={`Visitor ${String(index + 1)}`}
-                className="grid gap-3 rounded-lg border p-3 sm:grid-cols-[1fr_1fr_1fr_7rem_7rem_auto] sm:items-start"
+                className="bg-card grid gap-3 rounded-lg border p-3 sm:grid-cols-[1fr_1fr_1fr_7rem_7rem_auto] sm:items-start"
               >
                 <div className="min-w-0 space-y-1.5">
                   <Label htmlFor={id("name")} required>
@@ -471,7 +474,10 @@ export function SiteDiaryForm({
         )}
       </section>
 
-      <section aria-labelledby="diary-form-instructions" className="space-y-3">
+      <section
+        aria-labelledby="diary-form-instructions"
+        className="bg-card space-y-3 rounded-xl border p-4 sm:p-5"
+      >
         <h3 id="diary-form-instructions" className="text-sm font-semibold">
           Instructions
         </h3>
@@ -488,7 +494,7 @@ export function SiteDiaryForm({
               <li
                 key={row.id}
                 aria-label={`Instruction ${String(index + 1)}`}
-                className="grid gap-3 rounded-lg border p-3 sm:grid-cols-[1fr_1fr_auto] sm:items-start"
+                className="bg-card grid gap-3 rounded-lg border p-3 sm:grid-cols-[1fr_1fr_auto] sm:items-start"
               >
                 <div className="min-w-0 space-y-1.5">
                   <Label htmlFor={id("by")} required>
@@ -567,31 +573,33 @@ export function SiteDiaryForm({
         )}
       </section>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="diary-notes">Notes</Label>
-        <Textarea
-          id="diary-notes"
-          rows={4}
-          aria-invalid={errors.notes != null}
-          {...form.register("notes")}
-        />
-        <FieldError message={errors.notes?.message} />
-      </div>
+      <div className="bg-card space-y-6 rounded-xl border p-4 sm:p-5">
+        <div className="space-y-1.5">
+          <Label htmlFor="diary-notes">Notes</Label>
+          <Textarea
+            id="diary-notes"
+            rows={4}
+            aria-invalid={errors.notes != null}
+            {...form.register("notes")}
+          />
+          <FieldError message={errors.notes?.message} />
+        </div>
 
-      {diary == null && (
-        <Controller
-          control={form.control}
-          name="photos"
-          render={({ field }) => (
-            <PendingFilesField
-              documentType="site_diary"
-              value={field.value}
-              onChange={field.onChange}
-              disabled={busy}
-            />
-          )}
-        />
-      )}
+        {diary == null && (
+          <Controller
+            control={form.control}
+            name="photos"
+            render={({ field }) => (
+              <PendingFilesField
+                documentType="site_diary"
+                value={field.value}
+                onChange={field.onChange}
+                disabled={busy}
+              />
+            )}
+          />
+        )}
+      </div>
 
       <FormAlert message={error ?? undefined} />
       <div className="flex flex-wrap justify-end gap-2">

@@ -313,7 +313,7 @@ export function CompanyBackupScreen() {
             <HrmsBackupForm />
           </>
         ) : (
-          <Empty className="border">
+          <Empty className="bg-card border">
             <EmptyHeader>
               <EmptyMedia variant="icon">
                 <Lock />

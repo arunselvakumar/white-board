@@ -20,7 +20,7 @@ export function HrmsComingSoon({ href }: { href: string }) {
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-4">
         <h2 className="text-xl font-semibold tracking-tight">{page.title}</h2>
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <Icon />

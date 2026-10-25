@@ -28,7 +28,7 @@ export function MemberChecklist({
     members.length > 0 && members.every((m) => chosen.has(m.memberId));
   return (
     <div
-      className="max-h-64 overflow-y-auto rounded-lg border"
+      className="bg-card max-h-64 overflow-y-auto rounded-lg border"
       aria-invalid={invalid === true ? true : undefined}
     >
       <div className="bg-muted/40 flex items-center gap-3 border-b px-3 py-2.5">
