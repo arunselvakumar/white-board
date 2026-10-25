@@ -1,0 +1,29 @@
+apps/marketing/app/fonts/Urbanist-OFL.txt
+  s_f75948b77f95f2::t_43bf2ca5b929be 1-93
+apps/marketing/app/layout.tsx
+  s_bfacd6219e31fa::t_0882a1d8073f0c 2-3,9-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "5cbb25535753c98a1896d5bd72a003e513b3e679",
+  "prompts": {},
+  "sessions": {
+    "s_bfacd6219e31fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "db90b3af-250e-4584-a829-2c9ecb094a76",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_f75948b77f95f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5ebba896-1f11-4031-b8e8-5ce29fc19410",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
