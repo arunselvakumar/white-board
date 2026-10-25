@@ -1,13 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono, Urbanist } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import type { ReactNode } from "react";
 import { ThemeProvider } from "@repo/ui/components/theme-provider";
 
 import "./marketing.css";
 
-const fontSans = Urbanist({
-  subsets: ["latin"],
-  weight: ["300", "400", "600"],
+// Urbanist is self-hosted (the upstream variable font, OFL). Google Fonts sometimes
+// answers with extensionless /l/font?kit= URLs for Urbanist, and next build then
+// fails (vercel/next.js#99114).
+const fontSans = localFont({
+  src: "./fonts/Urbanist-wght.woff2",
+  weight: "300 600",
   variable: "--font-sans",
 });
 
