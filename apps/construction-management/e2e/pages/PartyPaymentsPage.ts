@@ -39,9 +39,12 @@ export class PartyPaymentsPage extends ProjectPage {
   /** Record payment: the party, an amount spread over open invoices by Fill. */
   public async pay(input: { party: string; label: string; amount: string }) {
     await this.link("Record payment").click();
+    // Wait for the form's page: a picker opened while the page is still
+    // arriving is carried off with the page's scroll to the top.
+    await this.heading(`Pay ${input.label.toLowerCase()}`).waitFor();
     await this.choose(input.label, input.party);
     await this.field("Amount").fill(input.amount);
     await this.button("Fill").click();
-    await this.button(/^Record ₹/).click();
+    await this.clickAndWaitFor(this.button(/^Record ₹/), /\/party-payments$/);
   }
 }
