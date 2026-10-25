@@ -1,0 +1,19 @@
+apps/construction-management/components/app-shell/company-switcher.tsx
+  s_43f32c25ef2007::t_5bbb8f777dee4b 42-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "380ec49b41a67d74c94f04fdfaae1c52261ee1b2",
+  "prompts": {},
+  "sessions": {
+    "s_43f32c25ef2007": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "925748d9-ee5c-4753-bfa8-47d07468a8e5",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
