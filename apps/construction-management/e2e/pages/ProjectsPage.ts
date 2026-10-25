@@ -19,8 +19,8 @@ export class ProjectsPage extends AppShellPage {
 
   public statusFilter(name: string) {
     return this.page
-      .getByRole("group", { name: "Status" })
-      .getByRole("button", { name: new RegExp(`^${name} \\d+`) });
+      .getByRole("tablist", { name: "Status" })
+      .getByRole("tab", { name: new RegExp(`^${name} \\d+`) });
   }
 
   /** The folder of one client's Projects (ADR CM-0027). */
