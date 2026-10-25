@@ -1,0 +1,19 @@
+apps/construction-management/components/projects/projects-home.stories.tsx
+  s_43f32c25ef2007::t_1f81be23458059 163
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "33b13d71efb93e2f4ff1a8fa16f6892de0f0b33b",
+  "prompts": {},
+  "sessions": {
+    "s_43f32c25ef2007": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "925748d9-ee5c-4753-bfa8-47d07468a8e5",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
