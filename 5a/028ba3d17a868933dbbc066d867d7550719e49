@@ -1,0 +1,23 @@
+apps/construction-management/components/projects/project-folder-card.tsx
+  s_43f32c25ef2007::t_22876e2535d8e2 34
+apps/construction-management/docs/adr/CM-0027-projects-grouped-by-client.md
+  s_43f32c25ef2007::t_97366b9f429d06 24
+packages/ui/src/components/tabs.tsx
+  s_43f32c25ef2007::t_f4d806c14ba011 98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "5a028ba3d17a868933dbbc066d867d7550719e49",
+  "prompts": {},
+  "sessions": {
+    "s_43f32c25ef2007": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "925748d9-ee5c-4753-bfa8-47d07468a8e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
