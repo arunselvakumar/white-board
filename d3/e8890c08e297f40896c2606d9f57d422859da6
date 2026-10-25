@@ -1,0 +1,33 @@
+apps/construction-management/README.md
+  s_dc3d48bbd479da::t_4a35846486ea2e 30
+apps/construction-management/docs/adr/CM-0031-end-to-end-tests.md
+  s_dc3d48bbd479da::t_6977faa546132c 22
+apps/construction-management/e2e/pages/CheckoutPage.ts
+  s_dc3d48bbd479da::t_0f6da52cec920a 1-2,32-36,38-40
+apps/construction-management/e2e/specs/roles.spec.ts
+  s_dc3d48bbd479da::t_07fbad87ee1bab 34-36
+apps/construction-management/e2e/specs/sign-up.spec.ts
+  s_dc3d48bbd479da::t_4b6c23061ad4bf 8,41,47,49-59
+apps/construction-management/e2e/specs/subscription.spec.ts
+  s_dc3d48bbd479da::t_02199ecb9b0750 30-32
+apps/construction-management/src/organization/infrastructure/payment-gateway-from-env.test.ts
+  s_dc3d48bbd479da::t_a083ce7ca79d78 24,29,34-40,43
+apps/construction-management/src/organization/infrastructure/payment-gateway-from-env.ts
+  s_dc3d48bbd479da::t_24eec3e733a65b 15,23-25,27-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "d3e8890c08e297f40896c2606d9f57d422859da6",
+  "prompts": {},
+  "sessions": {
+    "s_dc3d48bbd479da": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "42aea6d8-890a-4303-99f6-66e2f8ab5369",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
