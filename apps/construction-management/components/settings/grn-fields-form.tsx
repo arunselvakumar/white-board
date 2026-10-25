@@ -98,7 +98,7 @@ export function GrnFieldsForm() {
                 <h2 id={headingId} className="text-base font-semibold">
                   {GRN_FIELD_GROUP_LABELS[group]}
                 </h2>
-                <ul className="divide-y rounded-xl border">
+                <ul className="bg-card divide-y rounded-xl border">
                   {fields.map((field) => {
                     const id = `grn-field-${field.key}`;
                     return (

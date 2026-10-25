@@ -12,12 +12,14 @@ export function RoleFormSkeleton() {
       meta
     >
       <div className="space-y-6">
-        <FormSkeleton
-          className="max-w-2xl"
-          actions={0}
-          label="Loading Role"
-          fields={[{ label: "Role name" }, { label: "Description" }]}
-        />
+        <div className="bg-card rounded-xl border p-4 sm:p-5">
+          <FormSkeleton
+            className="max-w-2xl"
+            actions={0}
+            label="Loading Role"
+            fields={[{ label: "Role name" }, { label: "Description" }]}
+          />
+        </div>
         <section className="space-y-2">
           <h2 className="font-semibold">Permission Matrix</h2>
           <PermissionMatrixSkeleton label="Loading the Role's permissions" />

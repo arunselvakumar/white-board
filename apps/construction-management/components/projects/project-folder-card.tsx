@@ -59,7 +59,7 @@ export function ProjectFolderCard({
       <Link
         href={href}
         className={cn(
-          "focus-visible:ring-ring/50 relative flex h-full min-h-44 flex-col gap-3 rounded-2xl border p-4 pr-14 shadow-xs outline-none focus-visible:ring-3",
+          "bg-card focus-visible:ring-ring/50 relative flex h-full min-h-44 flex-col gap-3 rounded-2xl border p-4 pr-14 shadow-xs outline-none focus-visible:ring-3",
           tint.body,
         )}
       >

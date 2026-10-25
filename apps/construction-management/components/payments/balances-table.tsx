@@ -59,7 +59,7 @@ export function BalancesTable({
 
   if (data.items.length === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             {partyType === "labour" ? <Users /> : <HardHat />}
@@ -80,7 +80,7 @@ export function BalancesTable({
         {data.items.length} {data.items.length === 1 ? nouns.one : nouns.many}
         {!data.financial && " · amounts need the Financial permission"}
       </p>
-      <div className="hidden rounded-lg border md:block">
+      <div className="bg-card hidden rounded-lg border md:block">
         <Table aria-label={`${nouns.title} balances`}>
           <TableHeader>
             <TableRow>
@@ -166,7 +166,7 @@ export function BalancesTable({
         className="space-y-2 md:hidden"
       >
         {data.items.map((row) => (
-          <li key={row.partyId} className="rounded-lg border p-3">
+          <li key={row.partyId} className="bg-card rounded-lg border p-3">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="truncate font-medium">{row.name}</p>

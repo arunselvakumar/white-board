@@ -443,7 +443,7 @@ export function InventoryPage({
       </div>
 
       {data.items.length === 0 ? (
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <PackageOpen />
@@ -584,7 +584,7 @@ export function InventoryPage({
           )}
 
           {rows.length === 0 ? (
-            <Empty className="border">
+            <Empty className="bg-card border">
               <EmptyHeader>
                 <EmptyMedia variant="icon">
                   <PackageSearch />
@@ -601,7 +601,7 @@ export function InventoryPage({
                 role="region"
                 aria-label="Stock table, scrolls sideways"
                 tabIndex={0}
-                className="focus-visible:ring-ring/50 hidden overflow-x-auto rounded-lg border outline-none focus-visible:ring-3 md:block [&>[data-slot=table-container]]:overflow-visible"
+                className="bg-card focus-visible:ring-ring/50 hidden overflow-x-auto rounded-lg border outline-none focus-visible:ring-3 md:block [&>[data-slot=table-container]]:overflow-visible"
               >
                 <Table aria-label="Stock">
                   <TableHeader>
@@ -681,7 +681,7 @@ export function InventoryPage({
                 {rows.map((row) => (
                   <li
                     key={row.materialId}
-                    className="flex items-start gap-3 rounded-lg border p-3"
+                    className="bg-card flex items-start gap-3 rounded-lg border p-3"
                   >
                     <Checkbox
                       className="mt-1"

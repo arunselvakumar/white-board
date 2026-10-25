@@ -267,7 +267,7 @@ function VendorRows({
     filter.projectId != null;
   if (data.items.length === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <HardHat />
@@ -293,7 +293,7 @@ function VendorRows({
       <p className="text-muted-foreground text-sm">
         {data.total} {data.total === 1 ? "Vendor" : "Vendors"}
       </p>
-      <div className="rounded-lg border">
+      <div className="bg-card rounded-lg border">
         <Table aria-label="Vendors">
           <TableHeader>
             <TableRow>

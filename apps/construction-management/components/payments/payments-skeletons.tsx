@@ -71,7 +71,7 @@ export function PaymentRowsSkeleton() {
 export function StatementLinesSkeleton() {
   return (
     <SkeletonGroup label="Loading the statement" className="space-y-3">
-      <dl className="grid grid-cols-2 gap-2 rounded-lg border p-3 text-sm">
+      <dl className="bg-card grid grid-cols-2 gap-2 rounded-lg border p-3 text-sm">
         <div>
           <dt className="text-muted-foreground">Previous Balance</dt>
           <dd>
@@ -87,7 +87,7 @@ export function StatementLinesSkeleton() {
       </dl>
       <ol className="space-y-2">
         {["62%", "48%", "70%"].map((width, row) => (
-          <li key={row} className="rounded-lg border p-3">
+          <li key={row} className="bg-card rounded-lg border p-3">
             <div className="flex items-start justify-between gap-3">
               <SkeletonText width={width} />
               <SkeletonText width="4.5rem" />

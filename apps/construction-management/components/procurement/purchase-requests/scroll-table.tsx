@@ -23,7 +23,7 @@ export function ScrollTable({
       aria-label={label}
       tabIndex={0}
       className={cn(
-        "focus-visible:ring-ring/50 overflow-x-auto rounded-lg border outline-none focus-visible:ring-3",
+        "bg-card focus-visible:ring-ring/50 overflow-x-auto rounded-lg border outline-none focus-visible:ring-3",
         className,
       )}
     >

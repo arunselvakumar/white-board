@@ -464,7 +464,10 @@ function Section({
   aside?: ReactNode;
 }) {
   return (
-    <section aria-labelledby={id} className="space-y-3">
+    <section
+      aria-labelledby={id}
+      className="bg-card space-y-3 rounded-xl border p-4 sm:p-5"
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 id={id} className="text-sm font-semibold">
           {title}
@@ -1480,7 +1483,7 @@ export function EquipmentSheetForm({
                 <li
                   key={field.id}
                   aria-label={`Material ${String(index + 1)}`}
-                  className="grid gap-3 rounded-lg border p-3 sm:grid-cols-[1fr_10rem_auto] sm:items-start"
+                  className="bg-card grid gap-3 rounded-lg border p-3 sm:grid-cols-[1fr_10rem_auto] sm:items-start"
                 >
                   <div className="min-w-0 space-y-1.5">
                     <Label htmlFor={lineId("material")} required>
@@ -1629,7 +1632,7 @@ export function EquipmentSheetForm({
           {notice}
         </p>
       )}
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="bg-card grid gap-4 rounded-xl border p-4 sm:grid-cols-2 sm:p-5">
         <div className="space-y-1.5">
           <Label htmlFor={id("date")} required>
             Sheet Date
@@ -1694,7 +1697,7 @@ export function EquipmentSheetForm({
 
       {picker}
       {editing && machine != null && (
-        <div className="flex flex-wrap items-center gap-2 rounded-lg border p-3">
+        <div className="bg-card flex flex-wrap items-center gap-2 rounded-lg border p-3">
           <span className="font-medium">
             {machine.name} · {machine.equipmentNumber}
           </span>

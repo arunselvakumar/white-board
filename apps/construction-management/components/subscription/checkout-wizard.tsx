@@ -181,7 +181,7 @@ export function CheckoutWizard({ kind: requested }: { kind?: string | null }) {
     return (
       <Centered>
         <PageHeader back={BACK} title="Choose a plan" />
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyTitle>Only the Owner can buy or change the plan</EmptyTitle>
             <EmptyDescription>
@@ -196,7 +196,7 @@ export function CheckoutWizard({ kind: requested }: { kind?: string | null }) {
     return (
       <Centered>
         <PageHeader back={BACK} title="Choose a plan" />
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <CreditCard aria-hidden="true" />
@@ -534,7 +534,7 @@ function ChoiceCard({
   return (
     <Label
       htmlFor={id}
-      className="has-data-checked:border-primary has-data-checked:bg-primary/5 hover:border-primary/60 flex cursor-pointer items-start gap-3 rounded-xl border p-4 font-normal"
+      className="bg-card has-data-checked:border-primary has-data-checked:bg-primary/5 hover:border-primary/60 flex cursor-pointer items-start gap-3 rounded-xl border p-4 font-normal"
     >
       <RadioGroupItem id={id} value={value} className="mt-0.5" />
       <span className="min-w-0 space-y-1">
@@ -651,7 +651,7 @@ function AddOnsStep({
           ? `Charged per unit per month, for the ${daysLeftText(daysLeft)} on your plan.`
           : "Optional. Charged per unit per month for every month of the plan."}
       </p>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="bg-card grid gap-4 rounded-xl border p-4 sm:grid-cols-2 sm:p-5">
         {catalogue.addOns.map((addOn) => {
           const id = `add-on-${addOn.grant}`;
           return (
@@ -689,7 +689,7 @@ function BuyerStep({ form }: StepProps) {
       <p className="text-muted-foreground text-sm">
         Printed on your tax invoice. Add your GSTIN to claim input tax credit.
       </p>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="bg-card grid gap-4 rounded-xl border p-4 sm:grid-cols-2 sm:p-5">
         <div className="space-y-1.5 sm:col-span-2">
           <Label htmlFor="billing-name" required>
             Billing name
@@ -788,57 +788,59 @@ function ReviewStep({ quote }: { quote: QuoteView }) {
         {quote.planName} plan from {longDate.format(new Date(quote.startsAt))}{" "}
         to {longDate.format(new Date(quote.endsAt))}.
       </p>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Item</TableHead>
-            <TableHead className="text-right">Rate</TableHead>
-            <TableHead className="text-right">Qty</TableHead>
-            <TableHead className="text-right">Amount</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {quote.lines.map((line) => (
-            <TableRow key={line.item}>
-              <TableCell className="whitespace-normal">
-                {line.description}
-                <span className="text-muted-foreground block text-xs">
-                  {line.months == null
-                    ? `${String(line.days ?? 0)} days`
-                    : `${String(line.months)} months`}
-                </span>
+      <div className="bg-card rounded-lg border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Item</TableHead>
+              <TableHead className="text-right">Rate</TableHead>
+              <TableHead className="text-right">Qty</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {quote.lines.map((line) => (
+              <TableRow key={line.item}>
+                <TableCell className="whitespace-normal">
+                  {line.description}
+                  <span className="text-muted-foreground block text-xs">
+                    {line.months == null
+                      ? `${String(line.days ?? 0)} days`
+                      : `${String(line.months)} months`}
+                  </span>
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {money(line.ratePaise, quote.currency)}
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {line.quantity}
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {money(line.amountPaise, quote.currency)}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+          <TableFooter>
+            {rows.map(([label, amount]) => (
+              <TableRow key={label}>
+                <TableCell colSpan={3}>{label}</TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {money(amount, quote.currency)}
+                </TableCell>
+              </TableRow>
+            ))}
+            <TableRow>
+              <TableCell colSpan={3} className="font-semibold">
+                Total
               </TableCell>
-              <TableCell className="text-right tabular-nums">
-                {money(line.ratePaise, quote.currency)}
-              </TableCell>
-              <TableCell className="text-right tabular-nums">
-                {line.quantity}
-              </TableCell>
-              <TableCell className="text-right tabular-nums">
-                {money(line.amountPaise, quote.currency)}
+              <TableCell className="text-right font-semibold tabular-nums">
+                {money(quote.totalPaise, quote.currency)}
               </TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-        <TableFooter>
-          {rows.map(([label, amount]) => (
-            <TableRow key={label}>
-              <TableCell colSpan={3}>{label}</TableCell>
-              <TableCell className="text-right tabular-nums">
-                {money(amount, quote.currency)}
-              </TableCell>
-            </TableRow>
-          ))}
-          <TableRow>
-            <TableCell colSpan={3} className="font-semibold">
-              Total
-            </TableCell>
-            <TableCell className="text-right font-semibold tabular-nums">
-              {money(quote.totalPaise, quote.currency)}
-            </TableCell>
-          </TableRow>
-        </TableFooter>
-      </Table>
+          </TableFooter>
+        </Table>
+      </div>
     </section>
   );
 }

@@ -655,7 +655,7 @@ export function TaskDetail({
               {task.baselines.map((row) => (
                 <li
                   key={row.id}
-                  className="min-w-0 rounded-lg border p-3 text-sm"
+                  className="bg-card min-w-0 rounded-lg border p-3 text-sm"
                 >
                   <p className="font-medium">
                     v{row.version}: {dateRange(row.startDate, row.endDate)} ·{" "}

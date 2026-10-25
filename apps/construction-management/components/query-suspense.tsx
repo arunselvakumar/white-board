@@ -131,7 +131,7 @@ class QueryErrorBoundary extends Component<
   override render() {
     if (this.state.error != null) {
       return (
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyTitle>Couldn&apos;t load this page</EmptyTitle>
             <EmptyDescription>Please try again.</EmptyDescription>

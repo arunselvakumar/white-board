@@ -86,7 +86,7 @@ export function InspectionEdit({
         {data.actions.edit ? (
           <InspectionForm projectId={projectId} inspection={data} />
         ) : (
-          <div className="space-y-3 rounded-xl border p-4">
+          <div className="bg-card space-y-3 rounded-xl border p-4">
             <p className="text-sm">
               {data.status === "pending"
                 ? "You cannot edit Inspection Requests on this Project."

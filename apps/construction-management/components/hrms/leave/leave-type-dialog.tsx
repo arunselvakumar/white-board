@@ -425,7 +425,7 @@ function LeaveTypeForm({
               {ACCRUAL_MODES.map((mode) => (
                 <div
                   key={mode}
-                  className="flex items-start gap-3 rounded-lg border p-3"
+                  className="bg-card flex items-start gap-3 rounded-lg border p-3"
                 >
                   <RadioGroupItem
                     id={`leave-type-accrual-${mode}`}

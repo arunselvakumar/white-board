@@ -181,8 +181,8 @@ export function TeamLeavesSkeleton() {
           >
             <SkeletonText width="6rem" className="w-28 shrink-0" />
             <div className="flex min-w-0 flex-1 flex-wrap gap-2">
-              <Skeleton className="h-9 w-32 rounded-lg" />
-              <Skeleton className="h-9 w-24 rounded-lg" />
+              <Skeleton className="h-10 w-32 rounded-lg" />
+              <Skeleton className="h-10 w-24 rounded-lg" />
             </div>
           </li>
         ))}
@@ -195,7 +195,7 @@ export function TeamLeavesSkeleton() {
 export function CreditListSkeleton() {
   return (
     <SkeletonGroup label="Loading credits">
-      <ul className="divide-y rounded-xl border">
+      <ul className="bg-card divide-y rounded-xl border">
         {WIDTHS.slice(0, 3).map((width, row) => (
           <li key={row} className="flex items-start gap-3 px-3 py-2.5">
             <div className="min-w-0 flex-1">

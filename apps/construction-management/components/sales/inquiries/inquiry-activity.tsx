@@ -63,7 +63,7 @@ function FollowUpEntry({
   const [error, setError] = useState<string | undefined>();
   const Icon = ACTIVITY_ICONS[followUp.activity];
   return (
-    <li className="min-w-0 space-y-1.5 rounded-lg border p-3">
+    <li className="bg-card min-w-0 space-y-1.5 rounded-lg border p-3">
       <div className="flex min-w-0 flex-wrap items-start justify-between gap-2">
         <p className="flex min-w-0 items-center gap-2 text-sm font-medium">
           <Icon aria-hidden="true" className="text-muted-foreground size-4" />

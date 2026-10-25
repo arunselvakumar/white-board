@@ -160,7 +160,7 @@ export function SequenceIdsManager({
         <FormAlert message={error} />
 
         {rules.length === 0 ? (
-          <Empty className="border">
+          <Empty className="bg-card border">
             <EmptyHeader>
               <EmptyMedia variant="icon">
                 <Hash />
@@ -185,7 +185,7 @@ export function SequenceIdsManager({
         ) : (
           <ul
             aria-label={`${sequenceModule(module).label} rules`}
-            className="divide-y rounded-xl border"
+            className="bg-card divide-y rounded-xl border"
           >
             {rules.map((rule) => (
               <li

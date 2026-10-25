@@ -34,7 +34,7 @@ function NotShared({
   description: string;
 }) {
   return (
-    <Empty className="border">
+    <Empty className="bg-card border">
       <EmptyHeader>
         <EmptyMedia variant="icon">
           <CalendarOff />
@@ -171,7 +171,7 @@ function MyLeaves({
             ))}
           </ul>
         ) : (
-          <p className="text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
+          <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
             Your leave balances for {balances.leaveYear} are not open yet. Your
             manager opens them from Leave Balances.
           </p>
@@ -183,7 +183,7 @@ function MyLeaves({
           Requests
         </h3>
         {requests.items.length === 0 ? (
-          <Empty className="border">
+          <Empty className="bg-card border">
             <EmptyHeader>
               <EmptyMedia variant="icon">
                 <CalendarOff />

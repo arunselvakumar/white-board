@@ -157,7 +157,7 @@ export function AttendancePanelSkeleton({ title }: { title: string }) {
 export function SettingsListSkeleton({ rows = 4 }: { rows?: number }) {
   return (
     <SkeletonGroup label="Loading settings" className="block">
-      <ul className="divide-y rounded-lg border">
+      <ul className="bg-card divide-y rounded-lg border">
         {Array.from({ length: rows }, (_, row) => (
           <li
             key={row}
@@ -176,7 +176,7 @@ export function SettingsListSkeleton({ rows = 4 }: { rows?: number }) {
 export function MaterialChecklistSkeleton() {
   return (
     <SkeletonGroup label="Loading materials" className="block">
-      <ul className="divide-y rounded-lg border">
+      <ul className="bg-card divide-y rounded-lg border">
         {WIDTHS.slice(0, 3).map((width) => (
           <li key={width} className="flex items-start gap-3 px-3 py-2">
             <Skeleton className="size-4 shrink-0 rounded-[4px]" />
@@ -277,38 +277,50 @@ export function TitledFormSkeleton({
 /** The Daily Worksheet form while its options load. */
 export function WorksheetFormSkeleton() {
   return (
-    <FormSkeleton
-      className="w-full max-w-4xl"
-      columns={2}
-      label="Loading worksheet form"
-      fields={[
-        { label: "Location", control: "select", wide: true },
-        { label: "Contractor", control: "select" },
-        { label: "Department", control: "select" },
-        { label: "Work Type", control: "select" },
-        { label: "Work Shift", control: "select" },
-        { label: "Skilled Labours" },
-        { label: "Unskilled Labours" },
-      ]}
-    />
+    <div className="w-full max-w-4xl space-y-6">
+      <FormSkeleton
+        className="bg-card rounded-xl border p-4 sm:p-5"
+        actions={0}
+        columns={2}
+        label="Loading worksheet form"
+        fields={[
+          { label: "Location", control: "select", wide: true },
+          { label: "Contractor", control: "select" },
+          { label: "Department", control: "select" },
+          { label: "Work Type", control: "select" },
+          { label: "Work Shift", control: "select" },
+          { label: "Skilled Labours" },
+          { label: "Unskilled Labours" },
+        ]}
+      />
+      <div className="flex justify-end gap-2">
+        <Skeleton className="h-9 w-24" />
+      </div>
+    </div>
   );
 }
 
 /** The Equipment Usage form while its options load. */
 export function EquipmentSheetFormSkeleton() {
   return (
-    <FormSkeleton
-      className="w-full max-w-4xl"
-      columns={2}
-      label="Loading usage sheet form"
-      fields={[
-        { label: "Equipment", control: "select", wide: true },
-        { label: "Opening reading" },
-        { label: "Closing reading" },
-        { label: "Idle hours" },
-        { label: "Breakdown hours" },
-      ]}
-    />
+    <div className="w-full max-w-4xl space-y-6">
+      <FormSkeleton
+        className="bg-card rounded-xl border p-4 sm:p-5"
+        actions={0}
+        columns={2}
+        label="Loading usage sheet form"
+        fields={[
+          { label: "Equipment", control: "select", wide: true },
+          { label: "Opening reading" },
+          { label: "Closing reading" },
+          { label: "Idle hours" },
+          { label: "Breakdown hours" },
+        ]}
+      />
+      <div className="flex justify-end gap-2">
+        <Skeleton className="h-9 w-24" />
+      </div>
+    </div>
   );
 }
 
@@ -317,7 +329,7 @@ export function EquipmentRowsSkeleton() {
   return (
     <SkeletonGroup label="Loading equipment" className="block space-y-3">
       <SkeletonText width="6rem" />
-      <ul className="divide-y rounded-lg border">
+      <ul className="bg-card divide-y rounded-lg border">
         {WIDTHS.map((width) => (
           <li key={width} className="flex items-center gap-3 px-4 py-3">
             <div className="min-w-0 flex-1 space-y-1">
@@ -398,19 +410,26 @@ export function EquipmentDetailSkeleton({
 /** The equipment form while its options (Projects, types) load. */
 export function EquipmentFormSkeleton() {
   return (
-    <FormSkeleton
-      columns={2}
-      label="Loading equipment form"
-      fields={[
-        { label: "Equipment type", control: "select", wide: true },
-        { label: "Equipment Name" },
-        { label: "Equipment Number" },
-        { label: "Purchase Year" },
-        { label: "Contact Person" },
-        { label: "Contact Number" },
-        { label: "Company Name" },
-      ]}
-    />
+    <div className="space-y-6">
+      <FormSkeleton
+        className="bg-card rounded-xl border p-4 sm:p-5"
+        actions={0}
+        columns={2}
+        label="Loading equipment form"
+        fields={[
+          { label: "Equipment type", control: "select", wide: true },
+          { label: "Equipment Name" },
+          { label: "Equipment Number" },
+          { label: "Purchase Year" },
+          { label: "Contact Person" },
+          { label: "Contact Number" },
+          { label: "Company Name" },
+        ]}
+      />
+      <div className="flex justify-end gap-2">
+        <Skeleton className="h-9 w-24" />
+      </div>
+    </div>
   );
 }
 
@@ -546,7 +565,7 @@ export function HindranceDetailSkeleton({ projectId }: { projectId: string }) {
         label="Loading hindrance"
         className="block w-full max-w-4xl space-y-6"
       >
-        <dl className="grid gap-4 rounded-lg border p-4 sm:grid-cols-3">
+        <dl className="bg-card grid gap-4 rounded-lg border p-4 sm:grid-cols-3">
           {[
             "Affected activity",
             "Time lost",
@@ -595,20 +614,26 @@ export function HindranceFormSkeleton({
 /** The hindrance form's fields while its options load. */
 export function HindranceFormFieldsSkeleton() {
   return (
-    <FormSkeleton
-      className="w-full max-w-4xl"
-      columns={2}
-      label="Loading hindrance form"
-      fields={[
-        { label: "Start date" },
-        { label: "End date" },
-        { label: "Hours lost" },
-        { label: "Cause", control: "select" },
-        { label: "Affected activity", wide: true },
-        { label: "Responsible party", control: "select" },
-        { label: "Description", control: "textarea", wide: true },
-      ]}
-    />
+    <div className="w-full max-w-4xl space-y-6">
+      <FormSkeleton
+        className="bg-card rounded-xl border p-4 sm:p-5"
+        actions={0}
+        columns={2}
+        label="Loading hindrance form"
+        fields={[
+          { label: "Start date" },
+          { label: "End date" },
+          { label: "Hours lost" },
+          { label: "Cause", control: "select" },
+          { label: "Affected activity", wide: true },
+          { label: "Responsible party", control: "select" },
+          { label: "Description", control: "textarea", wide: true },
+        ]}
+      />
+      <div className="flex justify-end gap-2">
+        <Skeleton className="h-9 w-24" />
+      </div>
+    </div>
   );
 }
 
@@ -616,7 +641,7 @@ export function HindranceFormFieldsSkeleton() {
 export function ProgressReportRowsSkeleton() {
   return (
     <SkeletonGroup label="Loading reports" className="block">
-      <ul className="divide-y rounded-xl border">
+      <ul className="bg-card divide-y rounded-xl border">
         {WIDTHS.slice(0, 3).map((width) => (
           <li
             key={width}
@@ -629,7 +654,7 @@ export function ProgressReportRowsSkeleton() {
               </div>
               <SkeletonText width={width} />
             </div>
-            <Skeleton className="h-9 w-24 shrink-0 rounded-lg" />
+            <Skeleton className="h-10 w-24 shrink-0 rounded-lg" />
           </li>
         ))}
       </ul>
@@ -680,7 +705,7 @@ export function DiaryDaySkeleton() {
         <Skeleton className="h-7 w-32 rounded-full" />
         <Skeleton className="h-7 w-36 rounded-full" />
       </div>
-      <dl className="grid gap-4 rounded-lg border p-4 sm:grid-cols-3">
+      <dl className="bg-card grid gap-4 rounded-lg border p-4 sm:grid-cols-3">
         {["Rainfall", "Site condition", "Written by"].map((fact, index) => (
           <div
             key={fact}
@@ -787,18 +812,24 @@ export function SiteDiaryFormSkeleton({ projectId }: { projectId: string }) {
         }}
         title="Edit Site Diary"
       />
-      <FormSkeleton
-        className="w-full max-w-4xl"
-        columns={2}
-        label="Loading Site Diary"
-        fields={[
-          { label: "Date" },
-          { label: "Weather (morning)", control: "select" },
-          { label: "Weather (afternoon)", control: "select" },
-          { label: "Rainfall (mm)" },
-          { label: "Site condition", control: "textarea", wide: true },
-        ]}
-      />
+      <div className="w-full max-w-4xl space-y-6">
+        <FormSkeleton
+          className="bg-card rounded-xl border p-4 sm:p-5"
+          actions={0}
+          columns={2}
+          label="Loading Site Diary"
+          fields={[
+            { label: "Date" },
+            { label: "Weather (morning)", control: "select" },
+            { label: "Weather (afternoon)", control: "select" },
+            { label: "Rainfall (mm)" },
+            { label: "Site condition", control: "textarea", wide: true },
+          ]}
+        />
+        <div className="flex justify-end gap-2">
+          <Skeleton className="h-9 w-24" />
+        </div>
+      </div>
     </div>
   );
 }

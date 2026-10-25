@@ -65,7 +65,7 @@ function OwnerActions({ companyName }: { companyName: string }) {
           id="transfer-ownership"
           variant="outline"
           role="listitem"
-          className="flex-wrap"
+          className="bg-card flex-wrap"
         >
           <ItemMedia variant="icon">
             <UserRoundCog />
@@ -93,7 +93,7 @@ function OwnerActions({ companyName }: { companyName: string }) {
           id="delete-company"
           variant="outline"
           role="listitem"
-          className="flex-wrap"
+          className="bg-card flex-wrap"
         >
           <ItemMedia variant="icon">
             <Trash2 />
@@ -181,7 +181,7 @@ export function CompanyOwnershipScreen() {
             <OwnerActions companyName={companyName} />
           </Suspense>
         ) : (
-          <Empty className="border">
+          <Empty className="bg-card border">
             <EmptyHeader>
               <EmptyMedia variant="icon">
                 <Lock />

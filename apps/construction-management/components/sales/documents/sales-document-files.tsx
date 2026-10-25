@@ -180,7 +180,7 @@ function RoleGroup({
         {label}
       </h3>
       {files.length === 0 && pending.length === 0 ? (
-        <p className="text-muted-foreground rounded-lg border border-dashed p-4 text-center text-sm">
+        <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-center text-sm">
           {`No ${label.toLowerCase()} yet.`}
         </p>
       ) : (

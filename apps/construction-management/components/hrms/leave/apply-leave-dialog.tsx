@@ -368,7 +368,7 @@ function ApplyForm({
 
       <section
         aria-label="Day breakdown"
-        className="space-y-2 rounded-lg border p-3"
+        className="bg-card space-y-2 rounded-lg border p-3"
       >
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h3 className="text-sm font-medium">Day breakdown</h3>

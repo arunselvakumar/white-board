@@ -145,7 +145,7 @@ export function StoreForm({ store }: { store?: Store }) {
             void form.handleSubmit(submit)(event);
           }}
         >
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="bg-card grid gap-4 rounded-xl border p-4 sm:grid-cols-2 sm:p-5">
             <div className="space-y-1.5">
               <Label htmlFor="store-name" required>
                 Store name
@@ -206,7 +206,7 @@ export function StoreForm({ store }: { store?: Store }) {
             </div>
           </div>
 
-          <section className="space-y-4">
+          <section className="bg-card space-y-4 rounded-xl border p-4 sm:p-5">
             <h2 className="font-semibold">Assignments</h2>
             <div className="space-y-1.5">
               <Label htmlFor="store-projects" required>

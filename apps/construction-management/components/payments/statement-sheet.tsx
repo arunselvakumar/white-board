@@ -121,7 +121,7 @@ function StatementLines({
 
   return (
     <div className="space-y-3">
-      <dl className="grid grid-cols-2 gap-2 rounded-lg border p-3 text-sm">
+      <dl className="bg-card grid grid-cols-2 gap-2 rounded-lg border p-3 text-sm">
         <div>
           <dt className="text-muted-foreground">Previous Balance</dt>
           <dd className="font-medium tabular-nums">
@@ -148,7 +148,7 @@ function StatementLines({
               <li
                 key={line.id}
                 className={cn(
-                  "rounded-lg border px-3 py-2.5",
+                  "bg-card rounded-lg border px-3 py-2.5",
                   muted && "bg-muted/40",
                 )}
               >

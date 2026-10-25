@@ -271,7 +271,7 @@ export function MaterialRequestForm({
             void form.handleSubmit(submit)(event);
           }}
         >
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="bg-card grid gap-4 rounded-xl border p-4 sm:grid-cols-2 sm:p-5">
             <div className="space-y-1.5">
               <Label htmlFor="mr-date" required>
                 Request Date
@@ -382,7 +382,7 @@ export function MaterialRequestForm({
             </div>
           </div>
 
-          <section className="space-y-3">
+          <section className="bg-card space-y-3 rounded-xl border p-4 sm:p-5">
             <h2 className="font-semibold">Materials</h2>
             <ul aria-label="Materials" className="space-y-3">
               {lines.fields.map((line, index) => {
@@ -390,7 +390,7 @@ export function MaterialRequestForm({
                 return (
                   <li
                     key={line.id}
-                    className="grid gap-3 rounded-xl border p-3 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.5fr)_auto] sm:items-start"
+                    className="bg-card grid gap-3 rounded-xl border p-3 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.5fr)_auto] sm:items-start"
                   >
                     <div className="min-w-0 space-y-1.5">
                       <Label htmlFor={`mr-material-${String(index)}`} required>

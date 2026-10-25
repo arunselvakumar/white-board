@@ -156,7 +156,7 @@ function QuotationRows({
 
   if (data.items.length === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <FileText />
@@ -178,7 +178,7 @@ function QuotationRows({
       <p className="text-muted-foreground text-sm">
         {data.total} {data.total === 1 ? "quotation" : "quotations"}
       </p>
-      <div className="rounded-lg border">
+      <div className="bg-card rounded-lg border">
         <Table aria-label="Quotations">
           <TableHeader>
             <TableRow>

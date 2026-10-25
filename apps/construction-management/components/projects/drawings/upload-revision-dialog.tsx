@@ -68,7 +68,7 @@ export function UploadRevisionDialog({
               : `${shown.name} is at ${shown.latest.label}. The new file becomes ${revisionLabel(shown.latest.revision + 1)}; ${shown.latest.label} stays in the history.`}
           </DialogDescription>
         </DialogHeader>
-        <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed px-4 py-6 text-center">
+        <div className="bg-card flex flex-col items-center gap-2 rounded-xl border border-dashed px-4 py-6 text-center">
           <p className="text-muted-foreground text-sm">{DRAWING_FILES_HINT}</p>
           <Input
             ref={input}

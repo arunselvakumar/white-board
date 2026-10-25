@@ -356,7 +356,7 @@ function LabourRows({
     filter.supervisorId != null;
   if (data.items.length === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <HardHat />
@@ -429,7 +429,7 @@ function LabourRows({
           </div>
         )}
       </div>
-      <div className="rounded-lg border">
+      <div className="bg-card rounded-lg border">
         <Table aria-label="Labours">
           <TableHeader>
             <TableRow>

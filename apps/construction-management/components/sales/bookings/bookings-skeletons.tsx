@@ -71,7 +71,7 @@ export function BookingDetailSkeleton({ projectId }: { projectId: string }) {
         </div>
       </div>
       <div className="w-full max-w-4xl min-w-0 space-y-6">
-        <dl className="grid gap-4 rounded-lg border p-4 sm:grid-cols-3">
+        <dl className="bg-card grid gap-4 rounded-lg border p-4 sm:grid-cols-3">
           {FACTS.map((label, index) => (
             <div key={label} className="min-w-0">
               <dt className="text-muted-foreground text-xs">{label}</dt>
@@ -122,7 +122,7 @@ export function BookingEditSkeleton({
         label="Loading the booking"
         className="w-full max-w-4xl space-y-6"
       >
-        <section className="space-y-4 rounded-lg border p-4">
+        <section className="bg-card space-y-4 rounded-lg border p-4">
           <SkeletonText width="12rem" />
           <FieldGridSkeleton
             className="grid gap-4 sm:grid-cols-2"
@@ -130,7 +130,7 @@ export function BookingEditSkeleton({
           />
         </section>
         <FieldGridSkeleton
-          className="grid gap-4 rounded-lg border p-4 sm:grid-cols-2"
+          className="bg-card grid gap-4 rounded-lg border p-4 sm:grid-cols-2"
           fields={[
             { label: "Customer name" },
             { label: "Mobile" },

@@ -171,7 +171,7 @@ export function InquiryDetail({
 
       <div className="grid w-full min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="min-w-0 space-y-6">
-          <dl className="grid min-w-0 gap-4 rounded-lg border p-4 sm:grid-cols-3">
+          <dl className="bg-card grid min-w-0 gap-4 rounded-lg border p-4 sm:grid-cols-3">
             {inquiry.status === "converted" && (
               <Fact label="Converted to" className="sm:col-span-3">
                 {inquiry.convertedUnit?.name ?? "A removed unit"}

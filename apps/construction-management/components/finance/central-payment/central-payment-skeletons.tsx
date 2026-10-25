@@ -110,7 +110,7 @@ export function CentralPaymentSkeleton() {
 export function RecentCentralReportsSkeleton() {
   return (
     <SkeletonGroup label="Loading recent reports">
-      <ul className="divide-y rounded-xl border">
+      <ul className="bg-card divide-y rounded-xl border">
         {WIDTHS.slice(0, 3).map((width, row) => (
           <li
             key={row}

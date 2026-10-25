@@ -97,7 +97,7 @@ export function SelectControlSkeleton({
   );
 }
 
-/** A phone's list of row cards (`rounded-lg border p-3`). */
+/** A phone's list of row cards (`bg-card rounded-lg border p-3`). */
 export function RowCardsSkeleton({
   rows = 3,
   lines = 2,
@@ -113,7 +113,7 @@ export function RowCardsSkeleton({
   return (
     <ul className={className}>
       {Array.from({ length: rows }, (_, row) => (
-        <li key={row} className="rounded-lg border p-3">
+        <li key={row} className="bg-card rounded-lg border p-3">
           <div className="flex items-start justify-between gap-3">
             <SkeletonText width={WIDTHS[row % WIDTHS.length]} />
             {trailing ? <SkeletonText width="4.5rem" /> : null}

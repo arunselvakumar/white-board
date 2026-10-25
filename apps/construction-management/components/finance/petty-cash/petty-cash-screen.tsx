@@ -94,7 +94,7 @@ function AccountPanel({
   return (
     <section
       aria-labelledby="petty-cash-account-name"
-      className="space-y-4 rounded-xl border p-4"
+      className="bg-card space-y-4 rounded-xl border p-4"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 space-y-1">
@@ -218,7 +218,7 @@ export function PettyCashScreen({ projectId }: { projectId: string }) {
         {openButton}
       </div>
       {data.items.length === 0 ? (
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <Wallet />

@@ -185,7 +185,7 @@ function Results({
   const { data } = useSuspenseQuery(labourAttendanceListQuery(filter));
   if (data.items.length === 0)
     return (
-      <p className="text-muted-foreground rounded-lg border p-6 text-center text-sm">
+      <p className="bg-card text-muted-foreground rounded-lg border p-6 text-center text-sm">
         No attendance matches these filters.
       </p>
     );
@@ -194,7 +194,7 @@ function Results({
       <p className="text-muted-foreground text-sm">{data.total} days</p>
       <ul className="space-y-2 lg:hidden">
         {data.items.map((day) => (
-          <li key={day.id} className="space-y-2 rounded-xl border p-3">
+          <li key={day.id} className="bg-card space-y-2 rounded-xl border p-3">
             <div className="flex justify-between gap-2">
               <span className="font-medium">{day.labourName}</span>
               <span className="text-muted-foreground text-sm">{day.date}</span>
@@ -216,7 +216,7 @@ function Results({
           </li>
         ))}
       </ul>
-      <div className="hidden rounded-lg border lg:block">
+      <div className="bg-card hidden rounded-lg border lg:block">
         <Table aria-label="Recorded labour attendance">
           <TableHeader>
             <TableRow>

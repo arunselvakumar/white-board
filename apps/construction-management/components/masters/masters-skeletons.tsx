@@ -158,7 +158,7 @@ export function FormSectionSkeleton({
   children: ReactNode;
 }) {
   return (
-    <section className="space-y-4">
+    <section className="bg-card space-y-4 rounded-xl border p-4 sm:p-5">
       <div className="space-y-1">
         <h2 className="font-semibold">{title}</h2>
         {description == null ? null : (
@@ -183,7 +183,7 @@ export function ChecklistSkeleton({
       {Array.from({ length: rows }, (_, row) => (
         <div
           key={row}
-          className="flex items-center gap-3 rounded-lg border px-3 py-2.5"
+          className="bg-card flex items-center gap-3 rounded-lg border px-3 py-2.5"
         >
           <Skeleton className="size-4 shrink-0 rounded-[4px]" />
           <SkeletonText width={NAME_WIDTHS[row % NAME_WIDTHS.length]} />
@@ -200,10 +200,11 @@ export function MaterialFormSkeleton({ title }: { title?: string }) {
       back={{ label: "Materials", href: "/app/masters/materials" }}
       title={title}
     >
-      <div className="space-y-8">
+      <div className="space-y-6">
         <FormSectionSkeleton title="Details">
           <FormSkeleton
             columns={2}
+            actions={0}
             label="Loading Material"
             fields={[
               { label: "Material name" },
@@ -211,11 +212,19 @@ export function MaterialFormSkeleton({ title }: { title?: string }) {
               { label: "Measurement Unit", control: "select" },
               { label: "Material Category", control: "select" },
               { label: "Specification", control: "textarea", wide: true },
-              { label: "Minimum Stock", control: "checkbox", wide: true },
-              { label: "Rate Details", control: "checkbox", wide: true },
             ]}
           />
         </FormSectionSkeleton>
+        <FormSkeleton
+          className="bg-card rounded-xl border p-4 sm:p-5"
+          actions={0}
+          fields={[{ label: "Minimum Stock", control: "checkbox" }]}
+        />
+        <FormSkeleton
+          className="bg-card rounded-xl border p-4 sm:p-5"
+          actions={0}
+          fields={[{ label: "Rate Details", control: "checkbox" }]}
+        />
       </div>
     </FormPageSkeleton>
   );

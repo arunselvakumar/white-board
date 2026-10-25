@@ -165,7 +165,10 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <section aria-labelledby={id} className="space-y-4">
+    <section
+      aria-labelledby={id}
+      className="bg-card space-y-4 rounded-xl border p-4 sm:p-5"
+    >
       <div className="space-y-1">
         <h2 id={id} className="font-semibold">
           {title}
@@ -196,7 +199,7 @@ function OrderLines({
   const errors = form.formState.errors.orderLines;
   return (
     <div className="space-y-2">
-      <div className="overflow-x-auto rounded-lg border">
+      <div className="bg-card overflow-x-auto rounded-lg border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -317,7 +320,7 @@ function ManualLines({
           return (
             <li
               key={field.id}
-              className="grid gap-3 rounded-lg border p-3 sm:grid-cols-12 sm:items-start"
+              className="bg-card grid gap-3 rounded-lg border p-3 sm:grid-cols-12 sm:items-start"
             >
               <div className="space-y-1.5 sm:col-span-4">
                 <Label htmlFor={`grn-line-${n}-material`} required>
@@ -656,7 +659,7 @@ function GoodsReceiptForm({
               Supplier
             </Label>
             {options.suppliers.length === 0 ? (
-              <p className="text-muted-foreground rounded-lg border border-dashed p-3 text-sm">
+              <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-3 text-sm">
                 No Suppliers on this Project. Add one under the Project&apos;s
                 Resources first.
               </p>
@@ -831,7 +834,7 @@ function GoodsReceiptForm({
       )}
 
       {!hidden.has("remark") && (
-        <div className="space-y-1.5">
+        <div className="bg-card space-y-1.5 rounded-xl border p-4 sm:p-5">
           <Label htmlFor="grn-remark">Remark</Label>
           <Textarea
             id="grn-remark"
@@ -1000,7 +1003,7 @@ export function EditGoodsReceiptScreen({
       }}
     >
       {receipt.paid ? (
-        <p className="text-muted-foreground rounded-lg border p-4 text-sm">
+        <p className="bg-card text-muted-foreground rounded-lg border p-4 text-sm">
           A supplier payment points at this Goods Receipt, so it cannot be
           changed.
         </p>

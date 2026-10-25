@@ -172,7 +172,7 @@ export function PartyPaymentDetail({
           </div>
         }
       />
-      <dl className="grid gap-x-6 gap-y-3 rounded-lg border p-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
+      <dl className="bg-card grid gap-x-6 gap-y-3 rounded-lg border p-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
         {facts.map(([label, value]) => (
           <div key={label} className="min-w-0">
             <dt className="text-muted-foreground text-xs">{label}</dt>
@@ -200,7 +200,7 @@ export function PartyPaymentDetail({
             None yet: the whole payment is an advance.
           </p>
         ) : (
-          <ul className="divide-y rounded-lg border text-sm">
+          <ul className="bg-card divide-y rounded-lg border text-sm">
             {payment.allocations.map((allocation) => (
               <li
                 key={allocation.id}

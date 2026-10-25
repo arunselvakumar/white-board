@@ -271,7 +271,7 @@ function EmptyLocations({
 }) {
   const wings = structure === "wings";
   return (
-    <Empty className="border p-6" aria-label={label}>
+    <Empty className="bg-card border p-6" aria-label={label}>
       <EmptyHeader>
         <EmptyMedia variant="icon">
           <MapPin />

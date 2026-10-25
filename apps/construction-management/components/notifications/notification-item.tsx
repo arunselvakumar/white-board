@@ -181,7 +181,7 @@ export function NotificationRow({
     <div
       data-unread={unread ? "" : undefined}
       className={cn(
-        "flex gap-3 rounded-xl border p-3 text-sm",
+        "bg-card flex gap-3 rounded-xl border p-3 text-sm",
         unread && "bg-primary/5",
       )}
     >

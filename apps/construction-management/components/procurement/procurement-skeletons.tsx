@@ -51,7 +51,7 @@ export function FilterBarSkeleton({
       {labels.map((label) => (
         <div key={label} className="min-w-0 space-y-1">
           <p className="text-xs leading-none font-medium">{label}</p>
-          <Skeleton className="h-9 w-full rounded-lg sm:w-44" />
+          <Skeleton className="h-10 w-full rounded-lg sm:w-44" />
         </div>
       ))}
     </div>
@@ -72,7 +72,7 @@ function CardRows({
     <SkeletonGroup label={label} className="block md:hidden">
       <ul className="space-y-2">
         {Array.from({ length: rows }, (_, row) => (
-          <li key={row} className="rounded-lg border p-3">
+          <li key={row} className="bg-card rounded-lg border p-3">
             <div className="flex items-start gap-3">
               <div className="min-w-0 flex-1">
                 <SkeletonText size="base" width="7rem" />
@@ -158,7 +158,7 @@ export function DocumentDetailSkeleton({
   header = "link",
   label,
   facts,
-  factsClassName = "grid grid-cols-2 gap-4 rounded-lg border p-4 sm:grid-cols-3",
+  factsClassName = "bg-card grid grid-cols-2 gap-4 rounded-lg border p-4 sm:grid-cols-3",
   sections = [],
   className = "w-full max-w-4xl space-y-6",
   children,
@@ -271,9 +271,15 @@ export function ProcurementFormSkeleton({
         columns={columns}
         fields={fields}
         label={label}
-        actions={children == null ? 1 : 0}
+        className="bg-card rounded-xl border p-4 sm:p-5"
+        actions={0}
       />
       {children}
+      {children == null ? (
+        <div className="flex justify-end gap-2">
+          <Skeleton className="h-9 w-24" />
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -372,7 +378,7 @@ function FormCardSkeleton({
   fields: SkeletonField[];
 }) {
   return (
-    <section className="space-y-4 rounded-lg border p-4">
+    <section className="bg-card space-y-4 rounded-lg border p-4">
       <h3 className="font-semibold">{title}</h3>
       <FormSkeleton columns={2} actions={0} fields={fields} />
     </section>
@@ -433,7 +439,7 @@ export function PurchaseRequestWizardSkeleton() {
           <li
             key={label}
             className={cn(
-              "flex flex-1 items-center gap-2 rounded-lg border px-3 py-2 text-sm",
+              "bg-card flex flex-1 items-center gap-2 rounded-lg border px-3 py-2 text-sm",
               index === 0
                 ? "border-primary bg-primary/5 font-medium"
                 : "text-muted-foreground",
@@ -453,9 +459,13 @@ export function PurchaseRequestWizardSkeleton() {
       </ol>
       <FormSkeleton
         label="Loading Purchase Request"
+        className="bg-card rounded-xl border p-4 sm:p-5"
         fields={[{ label: "Add a material", control: "select" }]}
-        actions={1}
+        actions={0}
       />
+      <div className="flex justify-end gap-2">
+        <Skeleton className="h-9 w-24" />
+      </div>
     </div>
   );
 }
@@ -615,7 +625,7 @@ export function GoodsReceiptFormSkeleton({
       ) : (
         <PageHeader back={back} title={title} />
       )}
-      <section className="space-y-4">
+      <section className="bg-card space-y-4 rounded-xl border p-4 sm:p-5">
         <h2 className="font-semibold">Details</h2>
         <FormSkeleton
           columns={2}
@@ -679,7 +689,7 @@ export function TransferDetailSkeleton({ backHref }: { backHref: string }) {
         </div>
       </div>
       <SkeletonGroup label="Loading transfer" className="block space-y-6">
-        <dl className="grid gap-4 rounded-lg border p-4 sm:grid-cols-3">
+        <dl className="bg-card grid gap-4 rounded-lg border p-4 sm:grid-cols-3">
           {["From", "To", "Receiver Name", "Sent by"].map((fact, index) => (
             <div key={fact} className="min-w-0">
               <dt className="text-muted-foreground text-xs">{fact}</dt>
@@ -691,7 +701,7 @@ export function TransferDetailSkeleton({ backHref }: { backHref: string }) {
         </dl>
         <section className="space-y-2">
           <h3 className="text-sm font-semibold">Materials</h3>
-          <ul className="divide-y rounded-lg border">
+          <ul className="bg-card divide-y rounded-lg border">
             {WIDTHS.slice(0, 3).map((width) => (
               <li
                 key={width}
@@ -723,24 +733,30 @@ export function TransferFormSkeleton({ title }: { title?: string }) {
         label="Loading transfer"
         className="block w-full max-w-4xl space-y-6"
       >
-        <div className="grid gap-4 sm:grid-cols-3">
-          {["Transfer Date", "From", "To"].map((field) => (
-            <div key={field} className="space-y-1.5">
-              <p className="text-sm leading-none font-medium">{field}</p>
-              <Skeleton className="h-10 w-full rounded-lg" />
-            </div>
-          ))}
+        <div className="bg-card space-y-6 rounded-xl border p-4 sm:p-5">
+          <div className="grid gap-4 sm:grid-cols-3">
+            {["Transfer Date", "From", "To"].map((field) => (
+              <div key={field} className="space-y-1.5">
+                <p className="text-sm leading-none font-medium">{field}</p>
+                <Skeleton className="h-10 w-full rounded-lg" />
+              </div>
+            ))}
+          </div>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold">Transferred material</h3>
+            <FormSkeleton
+              columns={2}
+              actions={0}
+              fields={[
+                { label: "Material", control: "select" },
+                { label: "Quantity" },
+              ]}
+            />
+          </section>
         </div>
-        <section className="space-y-3">
-          <h3 className="text-sm font-semibold">Transferred material</h3>
-          <FormSkeleton
-            columns={2}
-            fields={[
-              { label: "Material", control: "select" },
-              { label: "Quantity" },
-            ]}
-          />
-        </section>
+        <div className="flex justify-end gap-2">
+          <Skeleton className="h-9 w-24" />
+        </div>
       </SkeletonGroup>
     </div>
   );
@@ -945,7 +961,7 @@ export function MaterialRequestDetailSkeleton({
     <DocumentDetailSkeleton
       header="page"
       className="w-full max-w-5xl space-y-6"
-      factsClassName="grid grid-cols-2 gap-3 rounded-xl border p-4 sm:grid-cols-3"
+      factsClassName="bg-card grid grid-cols-2 gap-3 rounded-xl border p-4 sm:grid-cols-3"
       back={back}
       label="Loading Material Request"
       facts={[
@@ -978,7 +994,7 @@ export function DeliveryNoteDetailSkeleton() {
     <DocumentDetailSkeleton
       header="page"
       className="w-full max-w-5xl space-y-6"
-      factsClassName="grid grid-cols-2 gap-3 rounded-xl border p-4 sm:grid-cols-3"
+      factsClassName="bg-card grid grid-cols-2 gap-3 rounded-xl border p-4 sm:grid-cols-3"
       back={{ label: "Central Store", href: "/app/workspace/central-store" }}
       label="Loading Delivery Note"
       facts={[
@@ -1058,7 +1074,10 @@ export function StockHistorySkeleton() {
       <SkeletonText width="12rem" />
       <ol className="space-y-2">
         {WIDTHS.slice(0, 4).map((width) => (
-          <li key={width} className="space-y-1 rounded-lg border px-3 py-2.5">
+          <li
+            key={width}
+            className="bg-card space-y-1 rounded-lg border px-3 py-2.5"
+          >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1 space-y-0.5">
                 <SkeletonText width="7rem" />

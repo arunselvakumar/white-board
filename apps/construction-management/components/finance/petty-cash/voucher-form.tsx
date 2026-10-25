@@ -322,120 +322,56 @@ export function VoucherForm({
         </p>
       ) : null}
 
-      <Controller
-        control={form.control}
-        name="voucherType"
-        render={({ field }) => (
-          <ToggleGroup
-            aria-label="Voucher type"
-            value={[field.value]}
-            onValueChange={(value: string[]) => {
-              const next = value[0];
-              if (next != null) field.onChange(next);
-            }}
-            variant="outline"
-          >
-            {VOUCHER_TYPES.map((item) => (
-              <ToggleGroupItem key={item} value={item}>
-                {VOUCHER_TYPE_LABELS[item]}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
-        )}
-      />
+      <div className="bg-card space-y-6 rounded-xl border p-4 sm:p-5">
+        <Controller
+          control={form.control}
+          name="voucherType"
+          render={({ field }) => (
+            <ToggleGroup
+              aria-label="Voucher type"
+              value={[field.value]}
+              onValueChange={(value: string[]) => {
+                const next = value[0];
+                if (next != null) field.onChange(next);
+              }}
+              variant="outline"
+            >
+              {VOUCHER_TYPES.map((item) => (
+                <ToggleGroupItem key={item} value={item}>
+                  {VOUCHER_TYPE_LABELS[item]}
+                </ToggleGroupItem>
+              ))}
+            </ToggleGroup>
+          )}
+        />
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="space-y-1.5 sm:col-span-2">
-          <Label htmlFor="voucher-account" required>
-            Petty-cash account
-          </Label>
-          <Controller
-            control={form.control}
-            name="accountId"
-            render={({ field }) => (
-              <Select
-                items={accountItems}
-                value={field.value === "" ? null : field.value}
-                onValueChange={(next) => {
-                  if (typeof next === "string") field.onChange(next);
-                }}
-                disabled={voucher != null}
-              >
-                <SelectTrigger
-                  id="voucher-account"
-                  className="w-full min-w-0"
-                  aria-required
-                  aria-invalid={errors.accountId != null}
-                >
-                  <SelectValue placeholder="Choose an account" />
-                </SelectTrigger>
-                <SelectContent align="start" alignItemWithTrigger={false}>
-                  {accountItems.map((item) => (
-                    <SelectItem key={item.value} value={item.value}>
-                      {item.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-          <FieldError message={errors.accountId?.message} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="voucher-date" required>
-            Date
-          </Label>
-          <Input
-            id="voucher-date"
-            type="date"
-            aria-required
-            aria-invalid={errors.voucherDate != null}
-            {...form.register("voucherDate")}
-          />
-          <FieldError message={errors.voucherDate?.message} />
-        </div>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="space-y-1.5">
-          <Label htmlFor="voucher-amount" required>
-            Amount
-          </Label>
-          <MoneyInput
-            id="voucher-amount"
-            placeholder="0"
-            aria-required
-            aria-invalid={errors.amount != null}
-            {...form.register("amount")}
-          />
-          <FieldError message={errors.amount?.message} />
-        </div>
-        {transfer ? (
+        <div className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="voucher-to" required>
-              To account
+            <Label htmlFor="voucher-account" required>
+              Petty-cash account
             </Label>
             <Controller
               control={form.control}
-              name="toAccountId"
+              name="accountId"
               render={({ field }) => (
                 <Select
-                  items={toItems}
+                  items={accountItems}
                   value={field.value === "" ? null : field.value}
                   onValueChange={(next) => {
                     if (typeof next === "string") field.onChange(next);
                   }}
+                  disabled={voucher != null}
                 >
                   <SelectTrigger
-                    id="voucher-to"
+                    id="voucher-account"
                     className="w-full min-w-0"
                     aria-required
-                    aria-invalid={errors.toAccountId != null}
+                    aria-invalid={errors.accountId != null}
                   >
                     <SelectValue placeholder="Choose an account" />
                   </SelectTrigger>
                   <SelectContent align="start" alignItemWithTrigger={false}>
-                    {toItems.map((item) => (
+                    {accountItems.map((item) => (
                       <SelectItem key={item.value} value={item.value}>
                         {item.label}
                       </SelectItem>
@@ -444,139 +380,208 @@ export function VoucherForm({
                 </Select>
               )}
             />
-            <FieldError message={errors.toAccountId?.message} />
+            <FieldError message={errors.accountId?.message} />
           </div>
-        ) : (
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="voucher-category" required>
-              Payment Category
+          <div className="space-y-1.5">
+            <Label htmlFor="voucher-date" required>
+              Date
             </Label>
+            <Input
+              id="voucher-date"
+              type="date"
+              aria-required
+              aria-invalid={errors.voucherDate != null}
+              {...form.register("voucherDate")}
+            />
+            <FieldError message={errors.voucherDate?.message} />
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="voucher-amount" required>
+              Amount
+            </Label>
+            <MoneyInput
+              id="voucher-amount"
+              placeholder="0"
+              aria-required
+              aria-invalid={errors.amount != null}
+              {...form.register("amount")}
+            />
+            <FieldError message={errors.amount?.message} />
+          </div>
+          {transfer ? (
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="voucher-to" required>
+                To account
+              </Label>
+              <Controller
+                control={form.control}
+                name="toAccountId"
+                render={({ field }) => (
+                  <Select
+                    items={toItems}
+                    value={field.value === "" ? null : field.value}
+                    onValueChange={(next) => {
+                      if (typeof next === "string") field.onChange(next);
+                    }}
+                  >
+                    <SelectTrigger
+                      id="voucher-to"
+                      className="w-full min-w-0"
+                      aria-required
+                      aria-invalid={errors.toAccountId != null}
+                    >
+                      <SelectValue placeholder="Choose an account" />
+                    </SelectTrigger>
+                    <SelectContent align="start" alignItemWithTrigger={false}>
+                      {toItems.map((item) => (
+                        <SelectItem key={item.value} value={item.value}>
+                          {item.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              <FieldError message={errors.toAccountId?.message} />
+            </div>
+          ) : (
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="voucher-category" required>
+                Payment Category
+              </Label>
+              <Controller
+                control={form.control}
+                name="paymentCategoryId"
+                render={({ field }) => (
+                  <PaymentCategoryPicker
+                    id="voucher-category"
+                    value={field.value}
+                    onChange={field.onChange}
+                    invalid={errors.paymentCategoryId != null}
+                  />
+                )}
+              />
+              <FieldError message={errors.paymentCategoryId?.message} />
+            </div>
+          )}
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="voucher-project">Project</Label>
             <Controller
               control={form.control}
-              name="paymentCategoryId"
+              name="project"
               render={({ field }) => (
-                <PaymentCategoryPicker
-                  id="voucher-category"
+                <Select
+                  items={projectItems}
                   value={field.value}
-                  onChange={field.onChange}
-                  invalid={errors.paymentCategoryId != null}
-                />
+                  onValueChange={(next) => {
+                    if (typeof next === "string") field.onChange(next);
+                  }}
+                >
+                  <SelectTrigger
+                    id="voucher-project"
+                    className="w-full min-w-0"
+                    aria-invalid={errors.project != null}
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent align="start" alignItemWithTrigger={false}>
+                    {projectItems.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               )}
             />
-            <FieldError message={errors.paymentCategoryId?.message} />
+            <FieldError message={errors.project?.message} />
           </div>
-        )}
-      </div>
+          {transfer ? null : (
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label
+                htmlFor="voucher-party"
+                required={counterpartyKind != null}
+              >
+                {voucherType === "receipt" ? "Received from" : "Paid to"}
+              </Label>
+              <Controller
+                control={form.control}
+                name="counterparty"
+                render={({ field }) => (
+                  <CounterpartyField
+                    required={counterpartyKind != null}
+                    id="voucher-party"
+                    value={field.value as CounterpartyValue}
+                    onChange={field.onChange}
+                    projectId={projectIdOf(project)}
+                    invalid={errors.counterparty != null}
+                  />
+                )}
+              />
+              <FieldError message={errors.counterparty?.message} />
+            </div>
+          )}
+        </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="voucher-paid-for">
+              {voucherType === "receipt" ? "Received for" : "Paid for"}
+            </Label>
+            <Input
+              id="voucher-paid-for"
+              autoComplete="off"
+              placeholder="Diesel for the mixer"
+              aria-invalid={errors.paidFor != null}
+              {...form.register("paidFor")}
+            />
+            <FieldError message={errors.paidFor?.message} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="voucher-reference">Reference</Label>
+            <Input
+              id="voucher-reference"
+              autoComplete="off"
+              placeholder="Bill number"
+              aria-invalid={errors.reference != null}
+              {...form.register("reference")}
+            />
+            <FieldError message={errors.reference?.message} />
+          </div>
+        </div>
+
         <div className="space-y-1.5">
-          <Label htmlFor="voucher-project">Project</Label>
+          <Label htmlFor="voucher-description">Description</Label>
+          <Textarea
+            id="voucher-description"
+            rows={3}
+            aria-invalid={errors.description != null}
+            {...form.register("description")}
+          />
+          <FieldError message={errors.description?.message} />
+        </div>
+
+        {voucher == null ? (
           <Controller
             control={form.control}
-            name="project"
+            name="files"
             render={({ field }) => (
-              <Select
-                items={projectItems}
+              <FinancePendingFilesField
+                documentType="petty_cash_voucher"
                 value={field.value}
-                onValueChange={(next) => {
-                  if (typeof next === "string") field.onChange(next);
-                }}
-              >
-                <SelectTrigger
-                  id="voucher-project"
-                  className="w-full min-w-0"
-                  aria-invalid={errors.project != null}
-                >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent align="start" alignItemWithTrigger={false}>
-                  {projectItems.map((item) => (
-                    <SelectItem key={item.value} value={item.value}>
-                      {item.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                onChange={field.onChange}
+                disabled={busy}
+              />
             )}
           />
-          <FieldError message={errors.project?.message} />
-        </div>
-        {transfer ? null : (
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="voucher-party" required={counterpartyKind != null}>
-              {voucherType === "receipt" ? "Received from" : "Paid to"}
-            </Label>
-            <Controller
-              control={form.control}
-              name="counterparty"
-              render={({ field }) => (
-                <CounterpartyField
-                  required={counterpartyKind != null}
-                  id="voucher-party"
-                  value={field.value as CounterpartyValue}
-                  onChange={field.onChange}
-                  projectId={projectIdOf(project)}
-                  invalid={errors.counterparty != null}
-                />
-              )}
-            />
-            <FieldError message={errors.counterparty?.message} />
-          </div>
-        )}
+        ) : null}
       </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-1.5">
-          <Label htmlFor="voucher-paid-for">
-            {voucherType === "receipt" ? "Received for" : "Paid for"}
-          </Label>
-          <Input
-            id="voucher-paid-for"
-            autoComplete="off"
-            placeholder="Diesel for the mixer"
-            aria-invalid={errors.paidFor != null}
-            {...form.register("paidFor")}
-          />
-          <FieldError message={errors.paidFor?.message} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="voucher-reference">Reference</Label>
-          <Input
-            id="voucher-reference"
-            autoComplete="off"
-            placeholder="Bill number"
-            aria-invalid={errors.reference != null}
-            {...form.register("reference")}
-          />
-          <FieldError message={errors.reference?.message} />
-        </div>
-      </div>
-
-      <div className="space-y-1.5">
-        <Label htmlFor="voucher-description">Description</Label>
-        <Textarea
-          id="voucher-description"
-          rows={3}
-          aria-invalid={errors.description != null}
-          {...form.register("description")}
-        />
-        <FieldError message={errors.description?.message} />
-      </div>
-
-      {voucher == null ? (
-        <Controller
-          control={form.control}
-          name="files"
-          render={({ field }) => (
-            <FinancePendingFilesField
-              documentType="petty_cash_voucher"
-              value={field.value}
-              onChange={field.onChange}
-              disabled={busy}
-            />
-          )}
-        />
-      ) : null}
 
       <FormAlert message={error ?? undefined} />
       {uploads.uploading ? (

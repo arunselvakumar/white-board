@@ -206,7 +206,7 @@ function BookingRows({
 
   if (data.items.length === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <Receipt />
@@ -235,7 +235,7 @@ function BookingRows({
       <p className="text-muted-foreground text-sm">
         {plural(data.total, "booking")}
       </p>
-      <div className="hidden overflow-x-auto rounded-lg border md:block">
+      <div className="bg-card hidden overflow-x-auto rounded-lg border md:block">
         <Table aria-label="Bookings">
           <TableHeader>
             <TableRow>
@@ -284,7 +284,7 @@ function BookingRows({
       </div>
       <ul aria-label="Bookings" className="space-y-2 md:hidden">
         {data.items.map((booking) => (
-          <li key={booking.id} className="rounded-lg border p-3">
+          <li key={booking.id} className="bg-card rounded-lg border p-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <Link
                 href={href(booking)}

@@ -58,7 +58,7 @@ export function HrmsWorkspaceTile() {
   return (
     <Item
       variant="outline"
-      className="w-full"
+      className="bg-card w-full"
       render={<Link href={HRMS_PATH} />}
     >
       <ItemMedia variant="icon">

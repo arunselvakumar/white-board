@@ -275,7 +275,7 @@ export function MaterialRequestDetail({
         }
       />
 
-      <dl className="grid grid-cols-2 gap-3 rounded-xl border p-4 sm:grid-cols-3">
+      <dl className="bg-card grid grid-cols-2 gap-3 rounded-xl border p-4 sm:grid-cols-3">
         <Fact label="Request Date">{formatDate(request.requestDate)}</Fact>
         <Fact label="Request To">{request.storeName ?? "—"}</Fact>
         <Fact label="Project">{request.projectName ?? "—"}</Fact>

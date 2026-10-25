@@ -46,59 +46,61 @@ export function RoleField({
   const chosen = roles.find((role) => role.id === value) ?? null;
   return (
     <div className="space-y-6">
-      <div className="max-w-md space-y-1.5">
-        <Label htmlFor={id} required>
-          Role
-        </Label>
-        <Select
-          items={items}
-          value={value}
-          onValueChange={(next) => {
-            if (next != null) onChange(next);
-          }}
-        >
-          <SelectTrigger
-            id={id}
-            className="w-full min-w-0"
-            aria-required
-            aria-describedby={`${id}-hint`}
+      <div className="bg-card rounded-xl border p-4 sm:p-5">
+        <div className="max-w-md space-y-1.5">
+          <Label htmlFor={id} required>
+            Role
+          </Label>
+          <Select
+            items={items}
+            value={value}
+            onValueChange={(next) => {
+              if (next != null) onChange(next);
+            }}
           >
-            <SelectValue placeholder="Choose a Role" />
-          </SelectTrigger>
-          <SelectContent
-            align="start"
-            alignItemWithTrigger={false}
-            aria-label="Roles"
-          >
-            {roles.map((role) => (
-              <SelectItem
-                key={role.id}
-                value={role.id}
-                tag={role.isSeed ? "Default" : undefined}
-              >
-                {role.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <p id={`${id}-hint`} className="text-muted-foreground text-xs">
-          {chosen?.description != null && chosen.description !== ""
-            ? chosen.description
-            : "What they may do comes from their Role."}
-        </p>
-        <FieldError message={error} />
-        {roles.length === 0 && (
-          <p className="text-muted-foreground text-xs">
-            No Roles yet.{" "}
-            <Link
-              href={`${ROLES_PATH}/new`}
-              className="text-primary underline underline-offset-4"
+            <SelectTrigger
+              id={id}
+              className="w-full min-w-0"
+              aria-required
+              aria-describedby={`${id}-hint`}
             >
-              Add a Role
-            </Link>{" "}
-            first.
+              <SelectValue placeholder="Choose a Role" />
+            </SelectTrigger>
+            <SelectContent
+              align="start"
+              alignItemWithTrigger={false}
+              aria-label="Roles"
+            >
+              {roles.map((role) => (
+                <SelectItem
+                  key={role.id}
+                  value={role.id}
+                  tag={role.isSeed ? "Default" : undefined}
+                >
+                  {role.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p id={`${id}-hint`} className="text-muted-foreground text-xs">
+            {chosen?.description != null && chosen.description !== ""
+              ? chosen.description
+              : "What they may do comes from their Role."}
           </p>
-        )}
+          <FieldError message={error} />
+          {roles.length === 0 && (
+            <p className="text-muted-foreground text-xs">
+              No Roles yet.{" "}
+              <Link
+                href={`${ROLES_PATH}/new`}
+                className="text-primary underline underline-offset-4"
+              >
+                Add a Role
+              </Link>{" "}
+              first.
+            </p>
+          )}
+        </div>
       </div>
       {chosen != null && (
         <section aria-labelledby={`${id}-preview`} className="space-y-2">

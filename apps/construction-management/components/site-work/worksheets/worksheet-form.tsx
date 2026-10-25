@@ -588,7 +588,7 @@ export function WorksheetForm({
       <section
         key="location"
         aria-labelledby={id("location-heading")}
-        className="space-y-3"
+        className="bg-card space-y-3 rounded-xl border p-4 sm:p-5"
       >
         <h3 id={id("location-heading")} className="text-sm font-semibold">
           {WORKSHEET_SECTION_LABELS.location}
@@ -623,7 +623,7 @@ export function WorksheetForm({
       <section
         key="basic"
         aria-labelledby={id("basic-heading")}
-        className="space-y-3"
+        className="bg-card space-y-3 rounded-xl border p-4 sm:p-5"
       >
         <h3 id={id("basic-heading")} className="text-sm font-semibold">
           {WORKSHEET_SECTION_LABELS.basic}
@@ -826,7 +826,7 @@ export function WorksheetForm({
       <section
         key="materials"
         aria-labelledby={id("materials-heading")}
-        className="space-y-3"
+        className="bg-card space-y-3 rounded-xl border p-4 sm:p-5"
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 id={id("materials-heading")} className="text-sm font-semibold">
@@ -871,7 +871,7 @@ export function WorksheetForm({
                 <li
                   key={field.id}
                   aria-label={`Material ${String(index + 1)}`}
-                  className="grid gap-3 rounded-lg border p-3 sm:grid-cols-[1fr_10rem_auto] sm:items-start"
+                  className="bg-card grid gap-3 rounded-lg border p-3 sm:grid-cols-[1fr_10rem_auto] sm:items-start"
                 >
                   <div className="min-w-0 space-y-1.5">
                     <Label htmlFor={lineId("material")} required>
@@ -986,7 +986,7 @@ export function WorksheetForm({
         <section
           key="other"
           aria-labelledby={id("other-heading")}
-          className="space-y-3"
+          className="bg-card space-y-3 rounded-xl border p-4 sm:p-5"
         >
           <h3 id={id("other-heading")} className="text-sm font-semibold">
             {WORKSHEET_SECTION_LABELS.other}
@@ -1052,50 +1052,52 @@ export function WorksheetForm({
           {notice}
         </p>
       )}
-      <div className="max-w-sm space-y-1.5">
-        <Label htmlFor={id("date")} required>
-          Sheet Date
-        </Label>
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            aria-label="Previous day"
-            disabled={values.sheetDate === ""}
-            onClick={() => {
-              form.setValue("sheetDate", addDays(values.sheetDate, -1), {
-                shouldValidate: true,
-              });
-            }}
-          >
-            <ChevronLeft aria-hidden="true" />
-          </Button>
-          <Input
-            id={id("date")}
-            type="date"
-            max={today}
-            className="min-w-0 flex-1"
-            aria-required
-            aria-invalid={errors.sheetDate != null}
-            {...form.register("sheetDate")}
-          />
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            aria-label="Next day"
-            disabled={values.sheetDate === "" || values.sheetDate >= today}
-            onClick={() => {
-              form.setValue("sheetDate", addDays(values.sheetDate, 1), {
-                shouldValidate: true,
-              });
-            }}
-          >
-            <ChevronRight aria-hidden="true" />
-          </Button>
+      <div className="bg-card rounded-xl border p-4 sm:p-5">
+        <div className="max-w-sm space-y-1.5">
+          <Label htmlFor={id("date")} required>
+            Sheet Date
+          </Label>
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              aria-label="Previous day"
+              disabled={values.sheetDate === ""}
+              onClick={() => {
+                form.setValue("sheetDate", addDays(values.sheetDate, -1), {
+                  shouldValidate: true,
+                });
+              }}
+            >
+              <ChevronLeft aria-hidden="true" />
+            </Button>
+            <Input
+              id={id("date")}
+              type="date"
+              max={today}
+              className="min-w-0 flex-1"
+              aria-required
+              aria-invalid={errors.sheetDate != null}
+              {...form.register("sheetDate")}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              aria-label="Next day"
+              disabled={values.sheetDate === "" || values.sheetDate >= today}
+              onClick={() => {
+                form.setValue("sheetDate", addDays(values.sheetDate, 1), {
+                  shouldValidate: true,
+                });
+              }}
+            >
+              <ChevronRight aria-hidden="true" />
+            </Button>
+          </div>
+          <FieldError message={errors.sheetDate?.message} />
         </div>
-        <FieldError message={errors.sheetDate?.message} />
       </div>
 
       {settings.sectionOrder.map((section) => sections[section])}

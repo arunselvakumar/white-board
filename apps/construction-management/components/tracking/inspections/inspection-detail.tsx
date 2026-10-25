@@ -88,7 +88,7 @@ function DecisionPanel({
     return (
       <section
         aria-label="Decision"
-        className="flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4"
+        className="bg-card flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4"
       >
         <div className="min-w-0 space-y-1">
           <p className="font-medium">{INSPECTION_STATUS_LABELS.pending}</p>
@@ -126,7 +126,7 @@ function DecisionPanel({
     <section
       aria-label="Decision"
       className={cn(
-        "space-y-1 rounded-xl border p-4",
+        "bg-card space-y-1 rounded-xl border p-4",
         approved
           ? "border-emerald-300 bg-emerald-50 dark:border-emerald-900 dark:bg-emerald-950/40"
           : "border-red-300 bg-red-50 dark:border-red-900 dark:bg-red-950/40",
@@ -169,7 +169,7 @@ function Links({
   return (
     <section
       aria-label="Linked records"
-      className="space-y-2 rounded-xl border p-4"
+      className="bg-card space-y-2 rounded-xl border p-4"
     >
       {reinspectionOf != null && (
         <p className="flex flex-wrap items-center gap-2 text-sm">
@@ -230,7 +230,10 @@ function Drawings({
       ) : (
         <ul className="grid gap-2 sm:grid-cols-2">
           {inspection.drawings.map((drawing) => (
-            <li key={drawing.id} className="min-w-0 rounded-lg border p-3">
+            <li
+              key={drawing.id}
+              className="bg-card min-w-0 rounded-lg border p-3"
+            >
               <div className="flex items-start gap-2">
                 <FileImage
                   aria-hidden="true"
@@ -369,7 +372,7 @@ export function InspectionDetail({
         />
         <Links inspection={inspection} projectId={projectId} />
 
-        <dl className="grid gap-4 rounded-xl border p-4 sm:grid-cols-3">
+        <dl className="bg-card grid gap-4 rounded-xl border p-4 sm:grid-cols-3">
           <Fact label="Description of work" className="sm:col-span-3">
             {inspection.workDescription}
           </Fact>

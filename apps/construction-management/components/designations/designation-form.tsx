@@ -78,24 +78,29 @@ function DesignationForm({
         void submit(event);
       }}
     >
-      <div className="max-w-md space-y-1.5">
-        <Label htmlFor="designation-name" required>
-          Designation name
-        </Label>
-        <Input
-          id="designation-name"
-          className="h-10"
-          autoComplete="off"
-          aria-required
-          aria-invalid={errors.name != null}
-          aria-describedby="designation-name-hint"
-          {...form.register("name")}
-        />
-        <p id="designation-name-hint" className="text-muted-foreground text-xs">
-          A job title, like Site Engineer or Store Keeper. What a person may do
-          comes from their Role.
-        </p>
-        <FieldError message={errors.name?.message} />
+      <div className="bg-card rounded-xl border p-4 sm:p-5">
+        <div className="max-w-md space-y-1.5">
+          <Label htmlFor="designation-name" required>
+            Designation name
+          </Label>
+          <Input
+            id="designation-name"
+            className="h-10"
+            autoComplete="off"
+            aria-required
+            aria-invalid={errors.name != null}
+            aria-describedby="designation-name-hint"
+            {...form.register("name")}
+          />
+          <p
+            id="designation-name-hint"
+            className="text-muted-foreground text-xs"
+          >
+            A job title, like Site Engineer or Store Keeper. What a person may
+            do comes from their Role.
+          </p>
+          <FieldError message={errors.name?.message} />
+        </div>
       </div>
       <FormAlert message={errors.root?.message} />
       <div className="flex flex-wrap gap-2">

@@ -11,7 +11,7 @@ import {
 export function RolesNoAccess({ what }: { what: string }) {
   return (
     <div className="w-full max-w-4xl p-6">
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <Lock />

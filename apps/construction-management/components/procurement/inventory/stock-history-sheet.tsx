@@ -94,7 +94,7 @@ function EntryItem({
   return (
     <li
       className={cn(
-        "space-y-1 rounded-lg border px-3 py-2.5",
+        "bg-card space-y-1 rounded-lg border px-3 py-2.5",
         (reversal || entry.reversed) && "bg-muted/40",
       )}
     >
@@ -214,7 +214,7 @@ function Entries({
 
   if (data.items.length === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <History />

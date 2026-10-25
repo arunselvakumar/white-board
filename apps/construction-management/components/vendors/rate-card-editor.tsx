@@ -206,7 +206,10 @@ export function RateCardEditor(props: EditorProps) {
   const shifts = useFieldArray({ control, name: "shifts" });
 
   return (
-    <section aria-labelledby="vendor-rate-card" className="space-y-3">
+    <section
+      aria-labelledby="vendor-rate-card"
+      className="bg-card space-y-3 rounded-xl border p-4 sm:p-5"
+    >
       <div className="space-y-1">
         <h2 id="vendor-rate-card" className="font-semibold">
           Rate card
@@ -222,7 +225,7 @@ export function RateCardEditor(props: EditorProps) {
       {shifts.fields.length === 0 && (
         <p
           role="status"
-          className="text-muted-foreground flex items-center gap-2 rounded-lg border border-dashed p-4 text-sm"
+          className="bg-card text-muted-foreground flex items-center gap-2 rounded-lg border border-dashed p-4 text-sm"
         >
           <TriangleAlert aria-hidden="true" className="size-4 shrink-0" />
           No rate card. Attendance cannot be recorded for this Vendor until you

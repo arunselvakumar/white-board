@@ -434,7 +434,7 @@ function Rows({
     return (
       <div className="space-y-4">
         {(filtered || allCount > 0) && tabs}
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <ClipboardCheck />
@@ -527,7 +527,7 @@ function Rows({
           </div>
         </div>
       )}
-      <div className="hidden overflow-x-auto rounded-lg border md:block">
+      <div className="bg-card hidden overflow-x-auto rounded-lg border md:block">
         <Table aria-label="Inspection Requests">
           <TableHeader>
             <TableRow>
@@ -580,7 +580,7 @@ function Rows({
       </div>
       <ul aria-label="Inspection Requests" className="space-y-2 md:hidden">
         {data.items.map((row) => (
-          <li key={row.id} className="rounded-lg border p-3">
+          <li key={row.id} className="bg-card rounded-lg border p-3">
             <div className="flex items-start gap-3">
               {check(row)}
               <div className="min-w-0 flex-1 space-y-1">

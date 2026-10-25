@@ -74,7 +74,7 @@ function Checklist({
         const checked = value.includes(choice.id);
         return (
           <li key={choice.id}>
-            <Label className="hover:bg-muted/50 flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 font-normal">
+            <Label className="bg-card hover:bg-muted/50 flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 font-normal">
               <Checkbox
                 checked={checked}
                 onCheckedChange={(next) => {
@@ -106,7 +106,7 @@ function ProjectsChecklist({
   const { data } = useSuspenseQuery(projectOptionsQuery);
   if (data.items.length === 0)
     return (
-      <p className="text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
+      <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
         No Projects yet. Add a Project first, then assign the {screen.label} to
         it.
       </p>
@@ -144,7 +144,7 @@ function DepartmentsChecklist({
     }));
   if (choices.length === 0)
     return (
-      <p className="text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
+      <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
         No Departments yet. Add them under Masters → Departments.
       </p>
     );
@@ -175,7 +175,10 @@ function TdsSettings({
   const applicable = useWatch({ control: form.control, name: "tdsApplicable" });
   const kind = tdsPayeeKind(pan.trim() === "" ? null : pan.trim());
   return (
-    <section aria-labelledby={id("tds")} className="space-y-4">
+    <section
+      aria-labelledby={id("tds")}
+      className="bg-card space-y-4 rounded-xl border p-4 sm:p-5"
+    >
       <div className="space-y-1">
         <h2 id={id("tds")} className="font-semibold">
           TDS
@@ -285,12 +288,15 @@ function PartyForm({
   return (
     <form
       noValidate
-      className="space-y-8"
+      className="space-y-6"
       onSubmit={(event) => {
         void submit(event);
       }}
     >
-      <section aria-labelledby={id("details")} className="space-y-4">
+      <section
+        aria-labelledby={id("details")}
+        className="bg-card space-y-4 rounded-xl border p-4 sm:p-5"
+      >
         <h2 id={id("details")} className="font-semibold">
           Details
         </h2>
@@ -471,7 +477,10 @@ function PartyForm({
       {screen.departments && <TdsSettings id={id} form={form} />}
 
       {screen.departments && (
-        <section aria-labelledby={id("departments")} className="space-y-3">
+        <section
+          aria-labelledby={id("departments")}
+          className="bg-card space-y-3 rounded-xl border p-4 sm:p-5"
+        >
           <div className="space-y-1">
             <h2 id={id("departments")} className="font-semibold">
               Departments
@@ -499,7 +508,10 @@ function PartyForm({
         </section>
       )}
 
-      <section aria-labelledby={id("projects")} className="space-y-3">
+      <section
+        aria-labelledby={id("projects")}
+        className="bg-card space-y-3 rounded-xl border p-4 sm:p-5"
+      >
         <div className="space-y-1">
           <h2 id={id("projects")} className="font-semibold">
             Projects

@@ -236,7 +236,7 @@ export function TaskGanttChart({
   }, [start, today, scale]);
   if (range == null)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <ChartGantt />

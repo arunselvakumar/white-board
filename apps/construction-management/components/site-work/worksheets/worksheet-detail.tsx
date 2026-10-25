@@ -114,7 +114,7 @@ export function WorksheetDetailPage({
         <FormAlert message={error} />
       </div>
 
-      <dl className="grid grid-cols-2 gap-4 rounded-lg border p-4 sm:grid-cols-3">
+      <dl className="bg-card grid grid-cols-2 gap-4 rounded-lg border p-4 sm:grid-cols-3">
         <Fact label="Location">
           {sheet.siteLocation == null ? (
             "—"

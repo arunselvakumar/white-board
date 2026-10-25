@@ -75,7 +75,7 @@ export function RecentReportsSkeleton({
 }) {
   return (
     <SkeletonGroup label={label} className={cn("block", className)}>
-      <ul className="divide-y rounded-xl border">
+      <ul className="bg-card divide-y rounded-xl border">
         {Array.from({ length: rows }, (_, row) => (
           <li
             key={row}
@@ -93,8 +93,8 @@ export function RecentReportsSkeleton({
               <SkeletonText width="40%" />
             </div>
             <div className="flex gap-2">
-              <Skeleton className="h-9 w-16 rounded-lg" />
-              <Skeleton className="h-9 w-14 rounded-lg" />
+              <Skeleton className="h-10 w-16 rounded-lg" />
+              <Skeleton className="h-10 w-14 rounded-lg" />
             </div>
           </li>
         ))}

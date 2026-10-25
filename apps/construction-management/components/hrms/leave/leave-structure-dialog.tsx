@@ -218,7 +218,7 @@ function StructureForm({
           Leave types
           <RequiredIndicator />
         </legend>
-        <ul className="divide-y rounded-lg border">
+        <ul className="bg-card divide-y rounded-lg border">
           {types.map((type, index) => {
             const included = lines[index]?.included === true;
             return (

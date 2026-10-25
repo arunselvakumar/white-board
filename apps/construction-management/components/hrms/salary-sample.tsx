@@ -163,7 +163,7 @@ export function SalarySample({
   return (
     <section
       aria-labelledby="salary-sample-title"
-      className="space-y-4 rounded-xl border p-6"
+      className="bg-card space-y-4 rounded-xl border p-6"
     >
       <div className="space-y-1">
         <h3 id="salary-sample-title" className="text-lg font-semibold">

@@ -260,7 +260,7 @@ export function WingEditor({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="bg-card space-y-4 rounded-xl border p-4 sm:p-6">
       <p className="text-sm font-medium tabular-nums" aria-live="polite">
         {editorTotals(type, floors)}
       </p>

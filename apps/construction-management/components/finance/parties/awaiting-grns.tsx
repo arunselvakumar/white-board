@@ -35,7 +35,7 @@ export function AwaitingGrns({
   return (
     <section
       aria-labelledby="awaiting-grns"
-      className="space-y-3 rounded-lg border p-4"
+      className="bg-card space-y-3 rounded-lg border p-4"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 space-y-1">
@@ -65,7 +65,7 @@ export function AwaitingGrns({
       )}
       <ul
         aria-label="GRNs awaiting invoice"
-        className="divide-y rounded-lg border"
+        className="bg-card divide-y rounded-lg border"
       >
         {data.items.map((grn) => (
           <li key={grn.id} className="flex items-center gap-3 p-3 text-sm">

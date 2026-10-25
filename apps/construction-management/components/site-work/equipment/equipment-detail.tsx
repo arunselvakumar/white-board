@@ -101,7 +101,7 @@ function MovementHistory({ equipment }: { equipment: EquipmentDetail }) {
         role="region"
         aria-label="Movement history, scrolls sideways"
         tabIndex={0}
-        className="focus-visible:ring-ring/50 overflow-x-auto rounded-lg border outline-none focus-visible:ring-3"
+        className="bg-card focus-visible:ring-ring/50 overflow-x-auto rounded-lg border outline-none focus-visible:ring-3"
       >
         <table className="w-full min-w-[40rem] text-sm">
           <thead className="bg-muted/50 text-muted-foreground text-left text-xs">
@@ -171,11 +171,14 @@ function MaintenanceLog({
         Maintenance log
       </h2>
       {equipment.maintenance.length === 0 ? (
-        <p className="text-muted-foreground rounded-lg border p-4 text-sm">
+        <p className="bg-card text-muted-foreground rounded-lg border p-4 text-sm">
           No maintenance logged yet.
         </p>
       ) : (
-        <ul className="divide-y rounded-lg border" aria-label="Maintenance log">
+        <ul
+          className="bg-card divide-y rounded-lg border"
+          aria-label="Maintenance log"
+        >
           {equipment.maintenance.map((entry) => {
             const open = entry.endDate == null;
             return (
@@ -391,7 +394,7 @@ export function EquipmentDetailView({
               <img
                 src={equipment.photo.thumbnailUrl}
                 alt=""
-                className="size-14 shrink-0 rounded-lg border object-cover"
+                className="bg-card size-14 shrink-0 rounded-lg border object-cover"
               />
             )
           }

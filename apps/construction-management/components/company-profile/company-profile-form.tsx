@@ -17,7 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { Separator } from "@repo/ui/components/separator";
 import { Textarea } from "@repo/ui/components/textarea";
 
 import { FieldError } from "@/components/auth/field-error";
@@ -201,8 +200,11 @@ export function CompanyProfileForm({
   };
 
   return (
-    <div className="space-y-8">
-      <section aria-labelledby="company-logo-heading" className="space-y-3">
+    <div className="space-y-6">
+      <section
+        aria-labelledby="company-logo-heading"
+        className="bg-card space-y-3 rounded-xl border p-4 sm:p-5"
+      >
         <div>
           <h2 id="company-logo-heading" className="text-base font-semibold">
             Logo
@@ -234,8 +236,6 @@ export function CompanyProfileForm({
         />
       </section>
 
-      <Separator />
-
       <form
         onSubmit={(event) => {
           void form.handleSubmit(submit)(event);
@@ -244,181 +244,186 @@ export function CompanyProfileForm({
         aria-label="Company profile"
       >
         <fieldset disabled={readOnly} className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-1.5 md:col-span-2">
-              <Label htmlFor="company-name" required>
-                Company name
-              </Label>
-              <Input
-                id="company-name"
-                className="h-10"
-                aria-required
-                {...form.register("name")}
-              />
-              <FieldError message={errors.name?.message} />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="company-mobile">Company mobile</Label>
-              {profile.isIndian ? (
-                <MobileField id="company-mobile" {...form.register("mobile")} />
-              ) : (
-                <Input
-                  id="company-mobile"
-                  type="tel"
-                  inputMode="tel"
-                  placeholder="+91 77081 65767"
-                  className="h-10"
-                  {...form.register("mobile")}
-                />
-              )}
-              <FieldError message={errors.mobile?.message} />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="company-email">Company email</Label>
-              <Input
-                id="company-email"
-                type="email"
-                placeholder="example@example.com"
-                className="h-10"
-                {...form.register("email")}
-              />
-              <FieldError message={errors.email?.message} />
-            </div>
-          </div>
-
-          {profile.isIndian && (
+          <div className="bg-card space-y-6 rounded-xl border p-4 sm:p-5">
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-1.5">
-                <Label htmlFor="company-gstin">GSTIN</Label>
+              <div className="space-y-1.5 md:col-span-2">
+                <Label htmlFor="company-name" required>
+                  Company name
+                </Label>
                 <Input
-                  id="company-gstin"
-                  placeholder="33AAPFA0939F1ZM"
-                  autoCapitalize="characters"
-                  className="h-10 uppercase placeholder:normal-case"
-                  {...form.register("gstin")}
+                  id="company-name"
+                  className="h-10"
+                  aria-required
+                  {...form.register("name")}
                 />
-                <FieldError message={errors.gstin?.message} />
+                <FieldError message={errors.name?.message} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="company-pan">Company PAN</Label>
+                <Label htmlFor="company-mobile">Company mobile</Label>
+                {profile.isIndian ? (
+                  <MobileField
+                    id="company-mobile"
+                    {...form.register("mobile")}
+                  />
+                ) : (
+                  <Input
+                    id="company-mobile"
+                    type="tel"
+                    inputMode="tel"
+                    placeholder="+91 77081 65767"
+                    className="h-10"
+                    {...form.register("mobile")}
+                  />
+                )}
+                <FieldError message={errors.mobile?.message} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="company-email">Company email</Label>
                 <Input
-                  id="company-pan"
-                  placeholder="AAPFA0939F"
-                  autoCapitalize="characters"
-                  className="h-10 uppercase placeholder:normal-case"
-                  {...form.register("pan")}
+                  id="company-email"
+                  type="email"
+                  placeholder="example@example.com"
+                  className="h-10"
+                  {...form.register("email")}
                 />
-                <FieldError message={errors.pan?.message} />
+                <FieldError message={errors.email?.message} />
               </div>
             </div>
-          )}
 
-          <div className="space-y-1.5">
-            <Label htmlFor="company-address">Address</Label>
-            <Textarea
-              id="company-address"
-              rows={3}
-              placeholder="Office address, as it should print on documents"
-              {...form.register("address")}
-            />
-            <FieldError message={errors.address?.message} />
-          </div>
+            {profile.isIndian && (
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-1.5">
+                  <Label htmlFor="company-gstin">GSTIN</Label>
+                  <Input
+                    id="company-gstin"
+                    placeholder="33AAPFA0939F1ZM"
+                    autoCapitalize="characters"
+                    className="h-10 uppercase placeholder:normal-case"
+                    {...form.register("gstin")}
+                  />
+                  <FieldError message={errors.gstin?.message} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="company-pan">Company PAN</Label>
+                  <Input
+                    id="company-pan"
+                    placeholder="AAPFA0939F"
+                    autoCapitalize="characters"
+                    className="h-10 uppercase placeholder:normal-case"
+                    {...form.register("pan")}
+                  />
+                  <FieldError message={errors.pan?.message} />
+                </div>
+              </div>
+            )}
 
-          <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-1.5">
-              <Label htmlFor="company-country">Country</Label>
-              <Input
-                id="company-country"
-                readOnly
-                disabled
-                value={country?.name ?? profile.country}
-                aria-describedby="company-country-note"
-                className="h-10"
+              <Label htmlFor="company-address">Address</Label>
+              <Textarea
+                id="company-address"
+                rows={3}
+                placeholder="Office address, as it should print on documents"
+                {...form.register("address")}
               />
-              <p
-                id="company-country-note"
-                className="text-muted-foreground text-xs"
-              >
-                Set when the Company was created; it decides GST and plans.
-              </p>
+              <FieldError message={errors.address?.message} />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="company-currency" required>
-                Currency
-              </Label>
-              <Controller
-                name="currency"
-                control={form.control}
-                render={({ field }) => (
-                  <Select
-                    items={CURRENCY_ITEMS}
-                    value={field.value}
-                    disabled={readOnly}
-                    onValueChange={(value) => {
-                      if (value != null) field.onChange(value);
-                    }}
-                  >
-                    <SelectTrigger
-                      id="company-currency"
-                      className="w-full min-w-0"
-                      aria-required
+
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="company-country">Country</Label>
+                <Input
+                  id="company-country"
+                  readOnly
+                  disabled
+                  value={country?.name ?? profile.country}
+                  aria-describedby="company-country-note"
+                  className="h-10"
+                />
+                <p
+                  id="company-country-note"
+                  className="text-muted-foreground text-xs"
+                >
+                  Set when the Company was created; it decides GST and plans.
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="company-currency" required>
+                  Currency
+                </Label>
+                <Controller
+                  name="currency"
+                  control={form.control}
+                  render={({ field }) => (
+                    <Select
+                      items={CURRENCY_ITEMS}
+                      value={field.value}
+                      disabled={readOnly}
+                      onValueChange={(value) => {
+                        if (value != null) field.onChange(value);
+                      }}
                     >
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent
-                      align="start"
-                      alignItemWithTrigger={false}
-                      aria-label="Currencies"
+                      <SelectTrigger
+                        id="company-currency"
+                        className="w-full min-w-0"
+                        aria-required
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent
+                        align="start"
+                        alignItemWithTrigger={false}
+                        aria-label="Currencies"
+                      >
+                        {CURRENCY_ITEMS.map((item) => (
+                          <SelectItem key={item.value} value={item.value}>
+                            {item.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                <FieldError message={errors.currency?.message} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="company-timezone" required>
+                  Time zone
+                </Label>
+                <Controller
+                  name="timezone"
+                  control={form.control}
+                  render={({ field }) => (
+                    <Select
+                      items={TIMEZONE_ITEMS}
+                      value={field.value}
+                      disabled={readOnly}
+                      onValueChange={(value) => {
+                        if (value != null) field.onChange(value);
+                      }}
                     >
-                      {CURRENCY_ITEMS.map((item) => (
-                        <SelectItem key={item.value} value={item.value}>
-                          {item.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              <FieldError message={errors.currency?.message} />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="company-timezone" required>
-                Time zone
-              </Label>
-              <Controller
-                name="timezone"
-                control={form.control}
-                render={({ field }) => (
-                  <Select
-                    items={TIMEZONE_ITEMS}
-                    value={field.value}
-                    disabled={readOnly}
-                    onValueChange={(value) => {
-                      if (value != null) field.onChange(value);
-                    }}
-                  >
-                    <SelectTrigger
-                      id="company-timezone"
-                      className="w-full min-w-0"
-                      aria-required
-                    >
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent
-                      align="start"
-                      alignItemWithTrigger={false}
-                      aria-label="Time zones"
-                    >
-                      {TIMEZONE_ITEMS.map((item) => (
-                        <SelectItem key={item.value} value={item.value}>
-                          {item.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              <FieldError message={errors.timezone?.message} />
+                      <SelectTrigger
+                        id="company-timezone"
+                        className="w-full min-w-0"
+                        aria-required
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent
+                        align="start"
+                        alignItemWithTrigger={false}
+                        aria-label="Time zones"
+                      >
+                        {TIMEZONE_ITEMS.map((item) => (
+                          <SelectItem key={item.value} value={item.value}>
+                            {item.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                <FieldError message={errors.timezone?.message} />
+              </div>
             </div>
           </div>
 

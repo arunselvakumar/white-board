@@ -199,7 +199,7 @@ function VoucherRows({
 
   if (data.items.length === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <ReceiptText />
@@ -304,7 +304,7 @@ function VoucherRows({
           </div>
         </div>
       )}
-      <div className="hidden overflow-x-auto rounded-lg border md:block">
+      <div className="bg-card hidden overflow-x-auto rounded-lg border md:block">
         <Table aria-label="Vouchers">
           <TableHeader>
             <TableRow>
@@ -363,7 +363,7 @@ function VoucherRows({
       </div>
       <ul aria-label="Vouchers" className="space-y-2 md:hidden">
         {data.items.map((voucher) => (
-          <li key={voucher.id} className="rounded-lg border p-3">
+          <li key={voucher.id} className="bg-card rounded-lg border p-3">
             <div className="flex items-start gap-3">
               {check(voucher)}
               <div className="min-w-0 flex-1">

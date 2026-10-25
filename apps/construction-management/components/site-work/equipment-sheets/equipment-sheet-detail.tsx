@@ -166,7 +166,7 @@ export function EquipmentSheetDetailPage({
         <FormAlert message={error} />
       </div>
 
-      <dl className="grid grid-cols-2 gap-4 rounded-lg border p-4 sm:grid-cols-3">
+      <dl className="bg-card grid grid-cols-2 gap-4 rounded-lg border p-4 sm:grid-cols-3">
         <Fact label="Equipment">
           {sheet.equipment.name} · {sheet.equipment.equipmentNumber}
         </Fact>
@@ -302,7 +302,7 @@ export function EquipmentSheetDetailPage({
           <h3 id="equipment-sheet-hire" className="font-semibold">
             Hire
           </h3>
-          <dl className="grid grid-cols-2 gap-4 rounded-lg border p-4 sm:grid-cols-4">
+          <dl className="bg-card grid grid-cols-2 gap-4 rounded-lg border p-4 sm:grid-cols-4">
             <Fact label="Hire party">
               {sheet.equipment.hireParty?.name ?? "—"}
             </Fact>

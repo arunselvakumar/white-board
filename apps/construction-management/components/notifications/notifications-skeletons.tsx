@@ -33,7 +33,10 @@ export function NotificationsScreenSkeleton() {
         <SkeletonGroup label="Loading notifications" className="block">
           <ul className="space-y-2">
             {WIDTHS.map((width) => (
-              <li key={width} className="flex gap-3 rounded-xl border p-3">
+              <li
+                key={width}
+                className="bg-card flex gap-3 rounded-xl border p-3"
+              >
                 <Skeleton className="mt-1.5 size-2 shrink-0 rounded-full" />
                 <div className="min-w-0 flex-1 space-y-3">
                   <div className="space-y-1">
@@ -41,8 +44,8 @@ export function NotificationsScreenSkeleton() {
                     <SkeletonText size="xs" width="25%" />
                   </div>
                   <div className="flex gap-2">
-                    <Skeleton className="h-9 w-20 rounded-lg" />
-                    <Skeleton className="h-9 w-16 rounded-lg" />
+                    <Skeleton className="h-10 w-20 rounded-lg" />
+                    <Skeleton className="h-10 w-16 rounded-lg" />
                   </div>
                 </div>
               </li>

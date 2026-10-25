@@ -358,7 +358,7 @@ export function ProjectsHome() {
             />
           </header>
           {data.counts.all === 0 ? (
-            <Empty className="mx-5 mb-5 w-auto border">
+            <Empty className="bg-card mx-5 mb-5 w-auto border">
               <EmptyHeader>
                 <EmptyMedia variant="icon">
                   <Building2 />
@@ -374,7 +374,7 @@ export function ProjectsHome() {
               </EmptyContent>
             </Empty>
           ) : items.length === 0 ? (
-            <p className="text-muted-foreground mx-5 mb-5 rounded-xl border border-dashed p-6 text-center text-sm">
+            <p className="bg-card text-muted-foreground mx-5 mb-5 rounded-xl border border-dashed p-6 text-center text-sm">
               No Projects are{" "}
               {PROJECT_STATUS_LABELS[filter as ProjectStatus].toLowerCase()}.
             </p>

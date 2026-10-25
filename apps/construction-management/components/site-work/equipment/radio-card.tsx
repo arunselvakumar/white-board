@@ -34,7 +34,7 @@ export function RadioCard({
     <label
       data-disabled={disabled ? "" : undefined}
       className={cn(
-        "hover:bg-muted/50 has-data-checked:border-primary has-data-checked:bg-primary/5 has-focus-visible:ring-ring/50 flex cursor-pointer items-start gap-2 rounded-lg border p-3 transition-colors has-focus-visible:ring-3 data-disabled:cursor-not-allowed data-disabled:opacity-60 data-disabled:hover:bg-transparent",
+        "bg-card hover:bg-muted/50 has-data-checked:border-primary has-data-checked:bg-primary/5 has-focus-visible:ring-ring/50 flex cursor-pointer items-start gap-2 rounded-lg border p-3 transition-colors has-focus-visible:ring-3 data-disabled:cursor-not-allowed data-disabled:opacity-60 data-disabled:hover:bg-transparent",
         className,
       )}
       onClick={(event) => {

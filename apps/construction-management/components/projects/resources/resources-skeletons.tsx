@@ -12,7 +12,7 @@ export function ResourcePickerSkeleton({ label }: { label: string }) {
   return (
     <SkeletonGroup label={`Loading ${label}`} className="space-y-4">
       <Skeleton className="h-10 w-full rounded-md" />
-      <ul className="-mx-1 divide-y rounded-lg border">
+      <ul className="bg-card -mx-1 divide-y rounded-lg border">
         {WIDTHS.map((width, row) => (
           <li key={row} className="flex items-center gap-3 px-3 py-2.5">
             <Skeleton className="size-4 shrink-0 rounded-[4px]" />
@@ -44,7 +44,7 @@ export function ProjectResourcesSkeleton() {
               </p>
             </div>
             <SkeletonGroup label={`Loading ${section.title}`}>
-              <ul className="divide-y rounded-lg border">
+              <ul className="bg-card divide-y rounded-lg border">
                 {WIDTHS.slice(0, 2).map((width, row) => (
                   <li key={row} className="flex items-center gap-3 px-3 py-2.5">
                     <span className="min-w-0 flex-1">

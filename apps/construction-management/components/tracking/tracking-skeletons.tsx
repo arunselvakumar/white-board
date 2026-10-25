@@ -121,7 +121,10 @@ export function UpdatesSkeleton({
     <SkeletonGroup label={label} className="block">
       <ul className="space-y-2">
         {WIDTHS.slice(0, rows).map((width) => (
-          <li key={width} className="min-w-0 space-y-2 rounded-lg border p-3">
+          <li
+            key={width}
+            className="bg-card min-w-0 space-y-2 rounded-lg border p-3"
+          >
             <div className="flex items-center gap-2">
               <SkeletonText width="7rem" />
               <SkeletonText size="xs" width="5rem" />
@@ -157,7 +160,7 @@ export function FeedSkeleton({
 /** The facts grid of a tracking record; the first fact spans the row. */
 function FactsSkeleton({
   facts,
-  className = "grid gap-4 rounded-lg border p-4 sm:grid-cols-3",
+  className = "bg-card grid gap-4 rounded-lg border p-4 sm:grid-cols-3",
   wideFirst = true,
 }: {
   facts: string[];
@@ -472,10 +475,15 @@ export function TrackingFormSkeleton({
           title={title}
         />
         <FormSkeleton
+          className="bg-card rounded-xl border p-4 sm:p-5"
           columns={2}
+          actions={0}
           label={`Loading ${kind} form`}
           fields={[...FORM_FIELDS[kind]]}
         />
+        <div className="flex justify-end gap-2">
+          <Skeleton className="h-9 w-24" />
+        </div>
       </div>
     </div>
   );
@@ -488,11 +496,17 @@ export function TrackingFormFieldsSkeleton({
   kind: keyof typeof FORM_FIELDS;
 }) {
   return (
-    <FormSkeleton
-      className="w-full max-w-4xl"
-      columns={2}
-      label={`Loading ${kind} form`}
-      fields={[...FORM_FIELDS[kind]]}
-    />
+    <div className="w-full max-w-4xl space-y-6">
+      <FormSkeleton
+        className="bg-card rounded-xl border p-4 sm:p-5"
+        columns={2}
+        actions={0}
+        label={`Loading ${kind} form`}
+        fields={[...FORM_FIELDS[kind]]}
+      />
+      <div className="flex justify-end gap-2">
+        <Skeleton className="h-9 w-24" />
+      </div>
+    </div>
   );
 }

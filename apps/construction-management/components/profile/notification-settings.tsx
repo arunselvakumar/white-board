@@ -147,7 +147,7 @@ function DeviceSwitch({ device }: { device: PushDevice }) {
 
   return (
     <div className="space-y-2">
-      <div className="flex items-start justify-between gap-4 rounded-xl border p-4">
+      <div className="bg-card flex items-start justify-between gap-4 rounded-xl border p-4">
         <div className="min-w-0 space-y-1">
           <Label htmlFor={DEVICE_SWITCH_ID}>
             Turn on notifications on this device
@@ -200,7 +200,10 @@ function MutedGroups() {
           Couldn’t load your notification settings. Please try again.
         </p>
       ) : (
-        <ul className="divide-y rounded-xl border" aria-label="Push by menu">
+        <ul
+          className="bg-card divide-y rounded-xl border"
+          aria-label="Push by menu"
+        >
           {preferences.data.groups.map((group) => {
             const id = `push-group-${group.key}`;
             return (

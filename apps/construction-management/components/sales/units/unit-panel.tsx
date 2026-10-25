@@ -148,7 +148,7 @@ export function UnitPanel({
         </div>
       )}
 
-      <dl className="grid grid-cols-2 gap-4 rounded-lg border p-4">
+      <dl className="bg-card grid grid-cols-2 gap-4 rounded-lg border p-4">
         <Fact label="Unit type">{profile.unitType ?? "—"}</Fact>
         {areas.map(([label, value]) => (
           <Fact key={label} label={label}>
@@ -170,7 +170,7 @@ export function UnitPanel({
       {unit.booking != null && (
         <section
           aria-label="Booking"
-          className="space-y-2 rounded-lg border p-4"
+          className="bg-card space-y-2 rounded-lg border p-4"
         >
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="text-sm font-semibold">
@@ -206,7 +206,7 @@ export function UnitPanel({
           <h3 id="unit-past-bookings" className="text-sm font-semibold">
             Earlier bookings
           </h3>
-          <ul className="divide-y rounded-lg border text-sm">
+          <ul className="bg-card divide-y rounded-lg border text-sm">
             {past.map((item) => (
               <li
                 key={item.id}

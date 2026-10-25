@@ -128,7 +128,7 @@ export function OtherExpenseForm({
           the account&apos;s ledger and sends it for approval again.
         </p>
       )}
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="bg-card grid gap-4 rounded-xl border p-4 sm:grid-cols-2 sm:p-5">
         <div className="min-w-0 space-y-1.5">
           <Label htmlFor="expense-date" required>
             Date

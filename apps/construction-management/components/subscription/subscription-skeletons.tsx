@@ -84,7 +84,7 @@ export function CheckoutSkeleton() {
               {["7rem", "5.5rem", "8rem", "6rem"].map((width) => (
                 <div
                   key={width}
-                  className="flex items-start gap-3 rounded-xl border p-4"
+                  className="bg-card flex items-start gap-3 rounded-xl border p-4"
                 >
                   <Skeleton className="mt-0.5 size-4 shrink-0 rounded-full" />
                   <div className="min-w-0 flex-1 space-y-1">

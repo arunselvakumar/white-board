@@ -173,7 +173,7 @@ function ProgressComposer({ issue }: { issue: Issue }) {
     <form
       noValidate
       aria-label="Add Update"
-      className="min-w-0 space-y-3 rounded-lg border p-4"
+      className="bg-card min-w-0 space-y-3 rounded-lg border p-4"
       onSubmit={(event) => {
         void submit(event);
       }}
@@ -227,7 +227,7 @@ function ProgressItem({
   const remove = useDeleteIssueProgress(issueId);
   const [error, setError] = useState<string | undefined>();
   return (
-    <li className="min-w-0 space-y-2 rounded-lg border p-3">
+    <li className="bg-card min-w-0 space-y-2 rounded-lg border p-3">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <p className="text-sm">
           <span className="font-medium">
@@ -449,7 +449,7 @@ export function IssueDetail({
             </Link>
           </p>
         )}
-        <dl className="grid gap-4 rounded-lg border p-4 sm:grid-cols-3">
+        <dl className="bg-card grid gap-4 rounded-lg border p-4 sm:grid-cols-3">
           <Fact label="Details" className="sm:col-span-3">
             {issue.details}
           </Fact>

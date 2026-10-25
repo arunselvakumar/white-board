@@ -256,13 +256,13 @@ export function WorkTypeDialog({
                 }}
               />
               {materials.fields.length === 0 ? (
-                <p className="text-muted-foreground rounded-lg border border-dashed p-4 text-center text-sm">
+                <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-center text-sm">
                   No Materials assigned.
                 </p>
               ) : (
                 <ul
                   aria-label="Assigned Materials"
-                  className="divide-y rounded-lg border"
+                  className="bg-card divide-y rounded-lg border"
                 >
                   {materials.fields.map((field, index) => (
                     <li

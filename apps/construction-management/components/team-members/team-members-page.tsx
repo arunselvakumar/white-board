@@ -207,7 +207,7 @@ function TeamMemberRows({
   const filtered = filter.search.trim().length > 0 || filter.status !== "all";
   if (data.items.length === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <Users />
@@ -237,7 +237,7 @@ function TeamMemberRows({
       <p className="text-muted-foreground text-sm">
         {data.total} {data.total === 1 ? "User" : "Users"}
       </p>
-      <div className="rounded-lg border">
+      <div className="bg-card rounded-lg border">
         <div
           aria-hidden="true"
           className="text-muted-foreground bg-muted/40 hidden items-center gap-4 rounded-t-lg border-b px-4 py-2 text-xs font-medium sm:flex"

@@ -72,7 +72,7 @@ function Lines({
           ["Money out", -data.totalOut],
           ["Closing", data.closing],
         ].map(([label, value]) => (
-          <div key={label} className="rounded-lg border p-3">
+          <div key={label} className="bg-card rounded-lg border p-3">
             <dt className="text-muted-foreground text-xs">{label}</dt>
             <dd className="font-semibold">
               <Amount paise={Number(value)} />
@@ -81,13 +81,13 @@ function Lines({
         ))}
       </dl>
       {data.entries.length === 0 ? (
-        <p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
+        <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
           No entries between {formatDate(from)} and {formatDate(to)}. Pending
           vouchers show once approved.
         </p>
       ) : (
         <>
-          <div className="hidden overflow-x-auto rounded-lg border md:block">
+          <div className="bg-card hidden overflow-x-auto rounded-lg border md:block">
             <Table aria-label="Statement">
               <TableHeader>
                 <TableRow>
@@ -155,7 +155,7 @@ function Lines({
           </div>
           <ul aria-label="Statement" className="space-y-2 md:hidden">
             {data.entries.map((entry) => (
-              <li key={entry.id} className="rounded-lg border p-3">
+              <li key={entry.id} className="bg-card rounded-lg border p-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <p className="font-medium">

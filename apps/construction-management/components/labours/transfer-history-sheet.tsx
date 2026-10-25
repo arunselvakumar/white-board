@@ -53,7 +53,10 @@ export function TransferHistorySheet({
           )}
           <ol aria-label="Transfers" className="space-y-3">
             {items.map((item) => (
-              <li key={item.id} className="rounded-lg border px-3 py-2.5">
+              <li
+                key={item.id}
+                className="bg-card rounded-lg border px-3 py-2.5"
+              >
                 <p className="text-muted-foreground text-xs">
                   {formatDate(item.transferDate)}
                 </p>

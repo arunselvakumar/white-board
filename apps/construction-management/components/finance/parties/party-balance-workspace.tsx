@@ -80,7 +80,7 @@ function Balances({ partyType }: { partyType: PartyType }) {
 
   if (data.items.length === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <Scale />
@@ -97,19 +97,19 @@ function Balances({ partyType }: { partyType: PartyType }) {
   return (
     <div className="space-y-4">
       <dl className="grid gap-3 sm:grid-cols-3">
-        <div className="rounded-lg border p-3">
+        <div className="bg-card rounded-lg border p-3">
           <dt className="text-muted-foreground text-xs">Owed by the Company</dt>
           <dd className="font-semibold tabular-nums">
             {money(data.totals.owedByCompany)}
           </dd>
         </div>
-        <div className="rounded-lg border p-3">
+        <div className="bg-card rounded-lg border p-3">
           <dt className="text-muted-foreground text-xs">Owed to the Company</dt>
           <dd className="font-semibold tabular-nums">
             {money(data.totals.owedToCompany)}
           </dd>
         </div>
-        <div className="rounded-lg border p-3">
+        <div className="bg-card rounded-lg border p-3">
           <dt className="text-muted-foreground text-xs">Net</dt>
           <dd className="font-semibold tabular-nums">
             {balanceWords(data.totals.net)}
@@ -118,7 +118,7 @@ function Balances({ partyType }: { partyType: PartyType }) {
       </dl>
       <ul aria-label="Party balances" className="space-y-3">
         {data.items.map((item) => (
-          <li key={item.party.id} className="rounded-lg border p-3">
+          <li key={item.party.id} className="bg-card rounded-lg border p-3">
             <div className="flex flex-wrap items-start justify-between gap-2">
               <p className="min-w-0 font-medium break-words">
                 {item.party.name ?? "A removed party"}
@@ -139,7 +139,7 @@ function Balances({ partyType }: { partyType: PartyType }) {
             ) : (
               <ul
                 aria-label={`${item.party.name ?? "Party"} by Project`}
-                className="mt-2 divide-y rounded-md border"
+                className="bg-card mt-2 divide-y rounded-md border"
               >
                 {item.projects.map((project) => (
                   <li

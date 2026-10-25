@@ -51,7 +51,7 @@ export function shiftDate(date: string, days: number): string {
 
 function NoVendors() {
   return (
-    <Empty className="border">
+    <Empty className="bg-card border">
       <EmptyHeader>
         <EmptyMedia variant="icon">
           <HardHat />

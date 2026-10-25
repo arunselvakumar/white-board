@@ -34,7 +34,7 @@ import { MonthlyAttendanceSkeleton } from "@/components/hrms/hrms-skeletons";
 
 /** One focusable scroll area around the wide grid. */
 const SCROLL =
-  "focus-visible:ring-ring/50 overflow-x-auto rounded-lg border outline-none focus-visible:ring-3 [contain:inline-size] [&>[data-slot=table-container]]:overflow-visible";
+  "bg-card focus-visible:ring-ring/50 overflow-x-auto rounded-lg border outline-none focus-visible:ring-3 [contain:inline-size] [&>[data-slot=table-container]]:overflow-visible";
 
 function code(day: HrmsAttendanceDay): string {
   return day.status === "on_leave" && day.leave?.half === true
@@ -71,7 +71,7 @@ function Grid({ month }: { month: string }) {
         <Table aria-label="Attendance by day">
           <TableHeader>
             <TableRow>
-              <TableHead className="bg-background sticky left-0 min-w-36">
+              <TableHead className="bg-card sticky left-0 min-w-36">
                 Team Member
               </TableHead>
               {dates.map((date) => (
@@ -100,7 +100,7 @@ function Grid({ month }: { month: string }) {
                 >
                   <TableHead
                     scope="row"
-                    className="bg-background sticky left-0 font-medium"
+                    className="bg-card sticky left-0 font-medium"
                   >
                     {row.member.name}
                   </TableHead>

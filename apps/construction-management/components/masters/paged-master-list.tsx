@@ -232,7 +232,7 @@ function PagedRows<L extends MaterialMasterList>({
     Object.values(filter.extra ?? {}).some((value) => value != null);
   if (items.length === 0)
     return filtered ? (
-      <p className="text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
+      <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
         No {screen.singular} matches these filters.
       </p>
     ) : (

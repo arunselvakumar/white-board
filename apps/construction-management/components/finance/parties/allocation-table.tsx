@@ -67,7 +67,7 @@ export function AllocationTable({
 }) {
   if (invoices.length === 0)
     return (
-      <p className="text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
+      <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
         No open invoices. The whole payment is an advance; apply it to a later
         invoice from the payment.
       </p>
@@ -103,7 +103,10 @@ export function AllocationTable({
           </div>
         </div>
       )}
-      <ul aria-label="Open invoices" className="divide-y rounded-lg border">
+      <ul
+        aria-label="Open invoices"
+        className="bg-card divide-y rounded-lg border"
+      >
         {invoices.map((invoice) => {
           const text = values[invoice.id] ?? "";
           const paise = isRupees(text) ? (rupeesToPaise(text) ?? 0) : 0;

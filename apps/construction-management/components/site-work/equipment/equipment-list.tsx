@@ -123,7 +123,7 @@ function Rows({
   const { data } = useSuspenseQuery(equipmentListQuery(filters));
   if (data.items.length === 0)
     return filtered ? (
-      <p className="text-muted-foreground rounded-lg border p-6 text-center text-sm">
+      <p className="bg-card text-muted-foreground rounded-lg border p-6 text-center text-sm">
         No equipment matches these filters.
       </p>
     ) : (
@@ -139,7 +139,7 @@ function Rows({
       <p className="text-muted-foreground text-sm">
         {data.total === 1 ? "1 machine" : `${String(data.total)} machines`}
       </p>
-      <ul className="divide-y rounded-lg border" aria-label="Equipment">
+      <ul className="bg-card divide-y rounded-lg border" aria-label="Equipment">
         {data.items.map((item) => (
           <li key={item.id}>
             <Link

@@ -68,7 +68,7 @@ export function OpeningCard({
   return (
     <section
       aria-labelledby="opening-balance"
-      className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3"
+      className="bg-card flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3"
     >
       <div className="min-w-0">
         <h2 id="opening-balance" className="text-sm font-semibold">

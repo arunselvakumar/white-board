@@ -113,7 +113,7 @@ function Hindrances({
     (filters.search ?? "").trim() !== "";
   if (data.items.length === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <OctagonPause />

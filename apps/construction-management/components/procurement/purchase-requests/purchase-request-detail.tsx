@@ -111,7 +111,7 @@ export function PurchaseRequestDetailPage({
         <FormAlert message={error} />
       </div>
 
-      <dl className="grid grid-cols-2 gap-4 rounded-lg border p-4 sm:grid-cols-3">
+      <dl className="bg-card grid grid-cols-2 gap-4 rounded-lg border p-4 sm:grid-cols-3">
         <Fact label="Purchase Request Date">{formatDate(pr.requestDate)}</Fact>
         <Fact label="Required Date">
           {pr.requiredDate == null ? "—" : formatDate(pr.requiredDate)}
@@ -222,7 +222,7 @@ export function PurchaseRequestDetailPage({
             No Purchase Order raised against it yet.
           </p>
         ) : (
-          <ul className="divide-y rounded-lg border">
+          <ul className="bg-card divide-y rounded-lg border">
             {pr.purchaseOrders.map((po) => (
               <li
                 key={po.id}

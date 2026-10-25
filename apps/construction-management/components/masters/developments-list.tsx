@@ -140,7 +140,7 @@ function DevelopmentListContent({
             />
             <FormAlert message={listError} />
             {items.length === 0 ? (
-              <p className="text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
+              <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
                 No {config.singular} matches “{query.trim()}”.
               </p>
             ) : (

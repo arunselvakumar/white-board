@@ -84,7 +84,10 @@ export function DrawingRevisionsSkeleton() {
     <SkeletonGroup label="Loading revisions">
       <ol className="space-y-2">
         {["64%", "52%"].map((width, index) => (
-          <li key={index} className="space-y-2 rounded-lg border px-3 py-2.5">
+          <li
+            key={index}
+            className="bg-card space-y-2 rounded-lg border px-3 py-2.5"
+          >
             <div className="flex min-w-0 items-center gap-2">
               <Skeleton className="h-5 w-10 rounded-full" />
               <SkeletonText width={width} className="flex-1" />

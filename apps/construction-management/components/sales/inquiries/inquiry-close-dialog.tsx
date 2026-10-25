@@ -111,7 +111,7 @@ function UnitPicker({
   );
   if (items.length === 0)
     return (
-      <p className="text-muted-foreground rounded-lg border border-dashed p-3 text-sm">
+      <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-3 text-sm">
         No unit can be booked now: every unit is booked, on hold or unavailable.
       </p>
     );
@@ -275,7 +275,7 @@ export function InquiryCloseDialog({
                 ).map(([value, label, disabled]) => (
                   <div
                     key={value}
-                    className="flex items-center gap-2 rounded-lg border px-3 py-2"
+                    className="bg-card flex items-center gap-2 rounded-lg border px-3 py-2"
                   >
                     <RadioGroupItem
                       id={`close-${value}`}

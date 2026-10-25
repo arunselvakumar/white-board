@@ -105,7 +105,7 @@ export function UnitsTab({ projectId }: { projectId: string }) {
       </div>
 
       {wing == null ? (
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <Building2 />

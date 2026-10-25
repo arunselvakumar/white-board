@@ -134,7 +134,7 @@ export function TdsLedgerView({
         </div>
       </div>
       {contractorId === "" ? (
-        <p className="text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
+        <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
           Choose a Contractor to see the TDS deducted from their payments.
         </p>
       ) : (
@@ -172,7 +172,7 @@ function Ledger({
           className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4"
         >
           {data.quarters.map((quarter) => (
-            <li key={quarter.quarter} className="rounded-lg border p-3">
+            <li key={quarter.quarter} className="bg-card rounded-lg border p-3">
               <p className="text-muted-foreground text-xs">{quarter.label}</p>
               <p className="font-semibold tabular-nums">{money(quarter.tds)}</p>
               <p className="text-muted-foreground text-xs tabular-nums">
@@ -191,7 +191,7 @@ function Ledger({
         </p>
       </section>
       {data.rows.length === 0 ? (
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <Receipt />
@@ -205,7 +205,7 @@ function Ledger({
         </Empty>
       ) : (
         <>
-          <div className="hidden overflow-x-auto rounded-lg border md:block">
+          <div className="bg-card hidden overflow-x-auto rounded-lg border md:block">
             <Table aria-label="TDS ledger">
               <TableHeader>
                 <TableRow>
@@ -248,7 +248,10 @@ function Ledger({
           </div>
           <ul aria-label="TDS ledger" className="space-y-2 md:hidden">
             {data.rows.map((row) => (
-              <li key={row.paymentId} className="rounded-lg border p-3 text-sm">
+              <li
+                key={row.paymentId}
+                className="bg-card rounded-lg border p-3 text-sm"
+              >
                 <div className="flex justify-between gap-3">
                   <span className="min-w-0 truncate font-medium">
                     {row.number}
