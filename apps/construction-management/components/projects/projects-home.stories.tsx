@@ -160,6 +160,7 @@ export const FilterFromTheAddress: Story = {
     await expect(
       canvas.getByRole("tab", { name: "Completed 1" }),
     ).toHaveAttribute("aria-selected", "true");
+    // The Completed status card above the list reads the same parameter.
     await expect(
       canvas.getByRole("button", { name: /^Completed 1 / }),
     ).toHaveAttribute("aria-pressed", "true");
