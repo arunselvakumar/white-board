@@ -39,6 +39,7 @@ import {
 import {
   Tabs,
   TabsContent,
+  TabsCount,
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components/tabs";
@@ -164,13 +165,15 @@ export function BatchClassWorkContent({
         >
           <div className="flex flex-wrap items-center justify-between gap-3">
             <TabsList aria-label="Homework and Study Material">
-              <TabsTrigger value="homework" className="flex-none px-3 sm:px-4">
+              <TabsTrigger value="homework">
+                <ClipboardList aria-hidden="true" />
                 Homework
-                <Count value={view.homework.length} />
+                <TabsCount>{view.homework.length}</TabsCount>
               </TabsTrigger>
-              <TabsTrigger value="materials" className="flex-none px-3 sm:px-4">
+              <TabsTrigger value="materials">
+                <BookOpen aria-hidden="true" />
                 Study Material
-                <Count value={view.materials.length} />
+                <TabsCount>{view.materials.length}</TabsCount>
               </TabsTrigger>
             </TabsList>
             {view.canEdit ? (
@@ -320,14 +323,6 @@ export function BatchClassWorkContent({
         </AlertDialogContent>
       </AlertDialog>
     </div>
-  );
-}
-
-function Count({ value }: { value: number }) {
-  return (
-    <span className="bg-muted text-muted-foreground rounded-full px-1.5 text-xs tabular-nums">
-      {value}
-    </span>
   );
 }
 

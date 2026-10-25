@@ -5,6 +5,8 @@ import {
   CalendarClock,
   ClipboardList,
   IndianRupee,
+  LayoutGrid,
+  type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@repo/ui/components/badge";
@@ -28,6 +30,7 @@ import { Spinner } from "@repo/ui/components/spinner";
 import {
   Tabs,
   TabsContent,
+  TabsCount,
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components/tabs";
@@ -50,11 +53,17 @@ import { feeDateLabel, followUpDueLabel } from "./fees-format";
 export const FEE_DUES_FILTERS: {
   value: FeeDuesFilter;
   label: string;
+  icon: LucideIcon;
   count: keyof FeeDuesResponse["counts"];
 }[] = [
-  { value: "overdue", label: "Overdue", count: "overdue" },
-  { value: "due_soon", label: "Due soon", count: "dueSoon" },
-  { value: "all", label: "All with a balance", count: "all" },
+  { value: "overdue", label: "Overdue", icon: AlarmClock, count: "overdue" },
+  {
+    value: "due_soon",
+    label: "Due soon",
+    icon: CalendarClock,
+    count: "dueSoon",
+  },
+  { value: "all", label: "All with a balance", icon: LayoutGrid, count: "all" },
 ];
 
 export const FEE_DUES_SORTS: { value: FeeDuesSort; label: string }[] = [
@@ -154,26 +163,22 @@ export function FeesCatalog({
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-              <TabsList
-                aria-label="Dues filters"
-                className="grid w-full grid-cols-3 sm:inline-flex sm:w-fit"
-              >
+              <TabsList aria-label="Dues filters">
                 {FEE_DUES_FILTERS.map((item) => {
                   const count = dues.counts[item.count];
                   return (
-                    <TabsTrigger
-                      key={item.value}
-                      value={item.value}
-                      className="min-h-9 px-2 leading-tight whitespace-normal sm:flex-none sm:px-3 sm:whitespace-nowrap"
-                    >
-                      <span className="text-center text-balance">
-                        {item.label}{" "}
-                        <span
-                          className={`inline-block rounded-full px-1.5 text-xs tabular-nums ${item.value === "overdue" && count > 0 ? "bg-destructive/10 text-destructive dark:bg-destructive/20" : "bg-muted text-muted-foreground"}`}
-                        >
-                          {count}
-                        </span>
-                      </span>
+                    <TabsTrigger key={item.value} value={item.value}>
+                      <item.icon aria-hidden="true" />
+                      {item.label}
+                      <TabsCount
+                        className={
+                          item.value === "overdue" && count > 0
+                            ? "bg-destructive/10 text-destructive dark:bg-destructive/20 group-data-active/tabs-trigger:bg-destructive/10 group-data-active/tabs-trigger:text-destructive"
+                            : undefined
+                        }
+                      >
+                        {count}
+                      </TabsCount>
                     </TabsTrigger>
                   );
                 })}
