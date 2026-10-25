@@ -187,7 +187,7 @@ function SettingsForm({
           <h3 id="worksheet-settings-shown" className="text-sm font-semibold">
             Shown on the form
           </h3>
-          <ul className="divide-y rounded-lg border">
+          <ul className="bg-card divide-y rounded-lg border">
             {TOGGLES.map((item) => toggle(item.key, item.label))}
           </ul>
         </section>
@@ -199,7 +199,10 @@ function SettingsForm({
           <h3 id="worksheet-settings-order" className="text-sm font-semibold">
             Section order
           </h3>
-          <ol aria-label="Section order" className="divide-y rounded-lg border">
+          <ol
+            aria-label="Section order"
+            className="bg-card divide-y rounded-lg border"
+          >
             {sections.fields.map((field, index) => {
               const label = WORKSHEET_SECTION_LABELS[field.key];
               return (
@@ -255,7 +258,7 @@ function SettingsForm({
           >
             Approval
           </h3>
-          <ul className="rounded-lg border">
+          <ul className="bg-card rounded-lg border">
             {toggle("approvalEnabled", "Worksheets need approval")}
           </ul>
           <p className="text-muted-foreground text-xs">

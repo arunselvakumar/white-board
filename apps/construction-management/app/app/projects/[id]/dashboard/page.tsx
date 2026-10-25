@@ -26,7 +26,7 @@ export default async function ProjectDashboardRoute({
   if (!canRead)
     return (
       <div className="w-full p-6">
-        <Empty className="max-w-4xl border">
+        <Empty className="bg-card max-w-4xl border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <LayoutDashboard />

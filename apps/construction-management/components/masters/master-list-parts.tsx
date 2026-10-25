@@ -81,7 +81,7 @@ export function MasterEmpty({
   action: ReactNode;
 }) {
   return (
-    <Empty className="border">
+    <Empty className="bg-card border">
       <EmptyHeader>
         <EmptyMedia variant="icon">
           <Icon />

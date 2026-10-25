@@ -425,12 +425,15 @@ function PaymentForm({
   return (
     <form
       noValidate
-      className="space-y-8"
+      className="space-y-6"
       onSubmit={(event) => {
         void submit(event);
       }}
     >
-      <section aria-labelledby="payment-details" className="space-y-4">
+      <section
+        aria-labelledby="payment-details"
+        className="bg-card space-y-4 rounded-xl border p-4 sm:p-5"
+      >
         <h2 id="payment-details" className="font-semibold">
           Payment
         </h2>
@@ -659,7 +662,10 @@ function PaymentForm({
         />
       )}
 
-      <section aria-labelledby="payment-allocation" className="space-y-3">
+      <section
+        aria-labelledby="payment-allocation"
+        className="bg-card space-y-3 rounded-xl border p-4 sm:p-5"
+      >
         <div className="space-y-1">
           <h2 id="payment-allocation" className="font-semibold">
             Invoices it settles
@@ -687,7 +693,10 @@ function PaymentForm({
         )}
       </section>
 
-      <section aria-labelledby="payment-more" className="space-y-4">
+      <section
+        aria-labelledby="payment-more"
+        className="bg-card space-y-4 rounded-xl border p-4 sm:p-5"
+      >
         <h2 id="payment-more" className="font-semibold">
           More
         </h2>
@@ -831,7 +840,10 @@ function TdsBlock({
 }) {
   const { errors } = form.formState;
   return (
-    <section aria-labelledby="payment-tds" className="space-y-4">
+    <section
+      aria-labelledby="payment-tds"
+      className="bg-card space-y-4 rounded-xl border p-4 sm:p-5"
+    >
       <div className="space-y-1">
         <h2 id="payment-tds" className="font-semibold">
           TDS {suggestion?.label ?? "194C"}
@@ -846,7 +858,7 @@ function TdsBlock({
               : `${REASON_LABELS[suggestion.reason]}. Suggested ${money(suggestion.amount)} at ${suggestion.rate}% on ${money(suggestion.base)}${suggestion.catchUpBase > 0 ? `, including ${money(suggestion.catchUpBase)} caught up` : ""}.`}
         </p>
       </div>
-      <dl className="grid grid-cols-3 gap-3 rounded-lg border p-3 text-sm">
+      <dl className="bg-card grid grid-cols-3 gap-3 rounded-lg border p-3 text-sm">
         <div className="min-w-0">
           <dt className="text-muted-foreground text-xs">Settled</dt>
           <dd className="tabular-nums">{money(settled)}</dd>

@@ -32,7 +32,7 @@ type Counts = VendorAttendanceMonth["totals"];
  * it); the table's own container does not scroll.
  */
 const SCROLL =
-  "focus-visible:ring-ring/50 overflow-x-auto rounded-lg border outline-none focus-visible:ring-3 [&>[data-slot=table-container]]:overflow-visible";
+  "bg-card focus-visible:ring-ring/50 overflow-x-auto rounded-lg border outline-none focus-visible:ring-3 [&>[data-slot=table-container]]:overflow-visible";
 
 function money(paise: number | null): string {
   return paise == null ? "—" : formatPaise(paise);
@@ -80,7 +80,7 @@ function MonthTable({
   );
   if (data.vendors.length === 0)
     return (
-      <p className="text-muted-foreground rounded-lg border p-6 text-center text-sm">
+      <p className="bg-card text-muted-foreground rounded-lg border p-6 text-center text-sm">
         No vendor attendance recorded in this month.
       </p>
     );
@@ -96,7 +96,7 @@ function MonthTable({
         <Table aria-label="Vendor attendance by day">
           <TableHeader>
             <TableRow>
-              <TableHead className="bg-background sticky left-0 min-w-36">
+              <TableHead className="bg-card sticky left-0 min-w-36">
                 Vendor
               </TableHead>
               {data.dates.map((date) => (
@@ -117,7 +117,7 @@ function MonthTable({
                 <TableRow key={row.vendorId}>
                   <TableHead
                     scope="row"
-                    className="bg-background sticky left-0 font-medium"
+                    className="bg-card sticky left-0 font-medium"
                   >
                     {row.vendorName}
                   </TableHead>

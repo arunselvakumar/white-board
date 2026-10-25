@@ -95,7 +95,7 @@ function KindSection({
         <p className="text-muted-foreground text-sm">{kind.hint}</p>
       </div>
       {rows.length === 0 ? (
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <kind.icon />

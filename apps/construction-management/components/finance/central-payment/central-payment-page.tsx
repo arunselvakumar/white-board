@@ -101,7 +101,7 @@ function PartyDuesTable({
 }) {
   if (rows.length === 0)
     return (
-      <p className="text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
+      <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
         No {noun} has invoices, payments or a balance on these Projects.
       </p>
     );
@@ -298,7 +298,7 @@ function Accounts({
         </Link>
       </div>
       {accounts.length === 0 ? (
-        <p className="text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
+        <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
           There are no company accounts yet.
         </p>
       ) : (
@@ -376,12 +376,12 @@ function PettyCash({
         Petty cash
       </h2>
       {accounts.length === 0 ? (
-        <p className="text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
+        <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
           There is no petty-cash account you can see.
         </p>
       ) : (
         <ul
-          className="divide-y rounded-xl border"
+          className="bg-card divide-y rounded-xl border"
           aria-label="Petty-cash accounts"
         >
           {accounts.map((account) => (

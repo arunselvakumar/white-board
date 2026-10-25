@@ -57,7 +57,7 @@ function Register({
   const { data } = useSuspenseQuery(stockRegisterQuery(location, range));
   if (data.items.length === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <ClipboardList />
@@ -75,12 +75,12 @@ function Register({
       role="region"
       aria-label="Stock Register, scrolls sideways"
       tabIndex={0}
-      className="focus-visible:ring-ring/50 overflow-x-auto rounded-lg border outline-none focus-visible:ring-3 [&>[data-slot=table-container]]:overflow-visible"
+      className="bg-card focus-visible:ring-ring/50 overflow-x-auto rounded-lg border outline-none focus-visible:ring-3 [&>[data-slot=table-container]]:overflow-visible"
     >
       <Table aria-label="Stock Register">
         <TableHeader>
           <TableRow>
-            <TableHead className="bg-background sticky left-0 min-w-44">
+            <TableHead className="bg-card sticky left-0 min-w-44">
               Material
             </TableHead>
             {STOCK_REGISTER_COLUMNS.map((column) => (
@@ -93,7 +93,7 @@ function Register({
         <TableBody>
           {data.items.map((row) => (
             <TableRow key={row.materialId}>
-              <TableCell className="bg-background sticky left-0 max-w-56">
+              <TableCell className="bg-card sticky left-0 max-w-56">
                 <span
                   className="block truncate font-medium"
                   title={row.materialName}

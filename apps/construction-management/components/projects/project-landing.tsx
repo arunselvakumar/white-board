@@ -33,7 +33,7 @@ export function ProjectLanding({ id }: { id: string }) {
   if (target != null) return <PageFallback />;
   return (
     <div className="w-full p-6">
-      <Empty className="max-w-4xl border">
+      <Empty className="bg-card max-w-4xl border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <LayoutGrid />

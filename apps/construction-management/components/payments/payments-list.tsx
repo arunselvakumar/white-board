@@ -189,7 +189,7 @@ function PaymentRows({
     filter.to !== "";
   if (data.items.length === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <Wallet />
@@ -219,7 +219,7 @@ function PaymentRows({
         {data.totalAmount != null && ` · ${money(data.totalAmount)}`}
       </p>
       <FormAlert message={error} />
-      <div className="hidden rounded-lg border md:block">
+      <div className="bg-card hidden rounded-lg border md:block">
         <Table aria-label="Payments">
           <TableHeader>
             <TableRow>
@@ -288,7 +288,7 @@ function PaymentRows({
       </div>
       <ul aria-label="Payments" className="space-y-2 md:hidden">
         {data.items.map((payment) => (
-          <li key={payment.id} className="rounded-lg border p-3">
+          <li key={payment.id} className="bg-card rounded-lg border p-3">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="truncate font-medium">{payment.partyName}</p>

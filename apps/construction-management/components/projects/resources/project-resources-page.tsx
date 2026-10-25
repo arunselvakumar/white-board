@@ -135,7 +135,7 @@ function ResourceCard({
         )}
       </div>
       {lines.length === 0 ? (
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <Icon />
@@ -159,7 +159,10 @@ function ResourceCard({
           )}
         </Empty>
       ) : (
-        <ul aria-label={section.title} className="divide-y rounded-lg border">
+        <ul
+          aria-label={section.title}
+          className="bg-card divide-y rounded-lg border"
+        >
           {lines.map((line) => (
             <ResourceLine key={line.id} line={line} />
           ))}

@@ -35,7 +35,7 @@ export function WorksheetAttendancePanel({
   if (isPending) return <AttendancePanelSkeleton title={title} />;
   if (isError)
     return (
-      <p className="text-muted-foreground rounded-lg border p-3 text-sm">
+      <p className="bg-card text-muted-foreground rounded-lg border p-3 text-sm">
         Attendance could not be loaded.
       </p>
     );

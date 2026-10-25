@@ -367,7 +367,7 @@ export function TransferDetail({
 
       <StockErrorAlert error={error} />
 
-      <dl className="grid gap-4 rounded-lg border p-4 sm:grid-cols-3">
+      <dl className="bg-card grid gap-4 rounded-lg border p-4 sm:grid-cols-3">
         <Fact label="From">{transfer.from.name}</Fact>
         <Fact label="To">{transfer.to.name}</Fact>
         <Fact label="Receiver Name">{transfer.receiverName ?? "—"}</Fact>
@@ -401,7 +401,10 @@ export function TransferDetail({
         <h3 id="transfer-materials" className="text-sm font-semibold">
           Materials
         </h3>
-        <ul aria-label="Materials" className="divide-y rounded-lg border">
+        <ul
+          aria-label="Materials"
+          className="bg-card divide-y rounded-lg border"
+        >
           {transfer.lines.map((line) => (
             <li
               key={line.id}

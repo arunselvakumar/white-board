@@ -171,7 +171,7 @@ export function BranchesPage({ showMap = true }: { showMap?: boolean }) {
               <Badge variant="secondary">{offices.length}</Badge>
             </div>
             {offices.length === 0 ? (
-              <p className="text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
+              <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
                 No office branch yet. Members not on a Project need one to check
                 in when GPS is required.
               </p>
@@ -212,7 +212,7 @@ export function BranchesPage({ showMap = true }: { showMap?: boolean }) {
               <Badge variant="secondary">{sites.length}</Badge>
             </div>
             {sites.length === 0 ? (
-              <p className="text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
+              <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
                 No site fence yet. Team Members on a Project can check in at its
                 site once it has one.
               </p>

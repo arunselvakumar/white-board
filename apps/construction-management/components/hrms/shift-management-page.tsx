@@ -64,7 +64,10 @@ function HistoryDialog({
             No shift assigned yet; the HRMS Settings day applies.
           </p>
         ) : (
-          <ol aria-label="Shift history" className="divide-y rounded-lg border">
+          <ol
+            aria-label="Shift history"
+            className="bg-card divide-y rounded-lg border"
+          >
             {item.history.map((entry) => (
               <li key={entry.id} className="space-y-0.5 px-3 py-2.5">
                 <p className="font-medium">
@@ -186,7 +189,7 @@ export function ShiftManagementPage() {
         {notice}
       </p>
       {shown.length === 0 ? (
-        <p className="text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
+        <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
           No Team Member matches “{query.trim()}”.
         </p>
       ) : (

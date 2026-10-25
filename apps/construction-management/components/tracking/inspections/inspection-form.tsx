@@ -426,148 +426,150 @@ export function InspectionForm({
         </p>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="space-y-1.5">
-          <Label htmlFor="inspection-date" required>
-            Inspection Date
-          </Label>
-          <Input
-            id="inspection-date"
-            type="date"
-            aria-required
-            aria-invalid={errors.inspectionDate != null}
-            {...form.register("inspectionDate")}
-          />
-          <FieldError message={errors.inspectionDate?.message} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="inspection-time">Inspection Time</Label>
-          <Input
-            id="inspection-time"
-            type="time"
-            aria-invalid={errors.inspectionTime != null}
-            {...form.register("inspectionTime")}
-          />
-          <FieldError message={errors.inspectionTime?.message} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="inspection-inspector">Inspector</Label>
-          <Controller
-            control={form.control}
-            name="inspectorMemberId"
-            render={({ field }) => (
-              <OptionSelect
-                id="inspection-inspector"
-                value={field.value === "" ? NONE : field.value}
-                onChange={field.onChange}
-                placeholder="No one yet"
-                invalid={errors.inspectorMemberId != null}
-                items={lists.members}
-              />
-            )}
-          />
-          <FieldError message={errors.inspectorMemberId?.message} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="inspection-department">Department</Label>
-          <Controller
-            control={form.control}
-            name="departmentId"
-            render={({ field }) => (
-              <OptionSelect
-                id="inspection-department"
-                value={field.value === "" ? NONE : field.value}
-                onChange={field.onChange}
-                placeholder="None"
-                invalid={errors.departmentId != null}
-                items={lists.departments}
-              />
-            )}
-          />
-          <FieldError message={errors.departmentId?.message} />
-        </div>
-        <div className="space-y-1.5 lg:col-span-2">
-          <Label htmlFor="inspection-contractor">Contractor</Label>
-          <Controller
-            control={form.control}
-            name="contractorId"
-            render={({ field }) => (
-              <OptionSelect
-                id="inspection-contractor"
-                value={field.value === "" ? NONE : field.value}
-                onChange={field.onChange}
-                placeholder="None"
-                invalid={errors.contractorId != null}
-                items={lists.contractors}
-              />
-            )}
-          />
-          <FieldError message={errors.contractorId?.message} />
-        </div>
-        <div className="space-y-1.5 sm:col-span-2 lg:col-span-3">
-          <Label htmlFor="inspection-work" required>
-            Description of work
-          </Label>
-          <Textarea
-            id="inspection-work"
-            rows={3}
-            aria-required
-            aria-invalid={errors.workDescription != null}
-            {...form.register("workDescription")}
-          />
-          <FieldError message={errors.workDescription?.message} />
-        </div>
-        <div className="min-w-0 space-y-1.5 sm:col-span-2 lg:col-span-3">
-          <Suspense fallback={<LocationPickerSkeleton />}>
+      <div className="bg-card space-y-6 rounded-xl border p-4 sm:p-5">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="inspection-date" required>
+              Inspection Date
+            </Label>
+            <Input
+              id="inspection-date"
+              type="date"
+              aria-required
+              aria-invalid={errors.inspectionDate != null}
+              {...form.register("inspectionDate")}
+            />
+            <FieldError message={errors.inspectionDate?.message} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="inspection-time">Inspection Time</Label>
+            <Input
+              id="inspection-time"
+              type="time"
+              aria-invalid={errors.inspectionTime != null}
+              {...form.register("inspectionTime")}
+            />
+            <FieldError message={errors.inspectionTime?.message} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="inspection-inspector">Inspector</Label>
             <Controller
               control={form.control}
-              name="siteLocation"
+              name="inspectorMemberId"
               render={({ field }) => (
-                <LocationPicker
-                  projectId={projectId}
-                  value={field.value}
+                <OptionSelect
+                  id="inspection-inspector"
+                  value={field.value === "" ? NONE : field.value}
                   onChange={field.onChange}
-                  invalid={errors.siteLocation != null}
+                  placeholder="No one yet"
+                  invalid={errors.inspectorMemberId != null}
+                  items={lists.members}
                 />
               )}
             />
-          </Suspense>
-          <FieldError message={errors.siteLocation?.message} />
+            <FieldError message={errors.inspectorMemberId?.message} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="inspection-department">Department</Label>
+            <Controller
+              control={form.control}
+              name="departmentId"
+              render={({ field }) => (
+                <OptionSelect
+                  id="inspection-department"
+                  value={field.value === "" ? NONE : field.value}
+                  onChange={field.onChange}
+                  placeholder="None"
+                  invalid={errors.departmentId != null}
+                  items={lists.departments}
+                />
+              )}
+            />
+            <FieldError message={errors.departmentId?.message} />
+          </div>
+          <div className="space-y-1.5 lg:col-span-2">
+            <Label htmlFor="inspection-contractor">Contractor</Label>
+            <Controller
+              control={form.control}
+              name="contractorId"
+              render={({ field }) => (
+                <OptionSelect
+                  id="inspection-contractor"
+                  value={field.value === "" ? NONE : field.value}
+                  onChange={field.onChange}
+                  placeholder="None"
+                  invalid={errors.contractorId != null}
+                  items={lists.contractors}
+                />
+              )}
+            />
+            <FieldError message={errors.contractorId?.message} />
+          </div>
+          <div className="space-y-1.5 sm:col-span-2 lg:col-span-3">
+            <Label htmlFor="inspection-work" required>
+              Description of work
+            </Label>
+            <Textarea
+              id="inspection-work"
+              rows={3}
+              aria-required
+              aria-invalid={errors.workDescription != null}
+              {...form.register("workDescription")}
+            />
+            <FieldError message={errors.workDescription?.message} />
+          </div>
+          <div className="min-w-0 space-y-1.5 sm:col-span-2 lg:col-span-3">
+            <Suspense fallback={<LocationPickerSkeleton />}>
+              <Controller
+                control={form.control}
+                name="siteLocation"
+                render={({ field }) => (
+                  <LocationPicker
+                    projectId={projectId}
+                    value={field.value}
+                    onChange={field.onChange}
+                    invalid={errors.siteLocation != null}
+                  />
+                )}
+              />
+            </Suspense>
+            <FieldError message={errors.siteLocation?.message} />
+          </div>
+          <div className="min-w-0 space-y-1.5 sm:col-span-2 lg:col-span-3">
+            <Label htmlFor="inspection-drawings">Linked drawings</Label>
+            <Controller
+              control={form.control}
+              name="drawingIds"
+              render={({ field }) => (
+                <DrawingsPicker
+                  id="inspection-drawings"
+                  options={lists.drawings}
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={busy}
+                />
+              )}
+            />
+            <FieldError message={errors.drawingIds?.message} />
+          </div>
         </div>
-        <div className="min-w-0 space-y-1.5 sm:col-span-2 lg:col-span-3">
-          <Label htmlFor="inspection-drawings">Linked drawings</Label>
+
+        {inspection == null && (
           <Controller
             control={form.control}
-            name="drawingIds"
+            name="files"
             render={({ field }) => (
-              <DrawingsPicker
-                id="inspection-drawings"
-                options={lists.drawings}
+              <TrackingPendingFilesField
+                documentType="inspection"
+                label="Drawings and site photographs"
                 value={field.value}
                 onChange={field.onChange}
                 disabled={busy}
               />
             )}
           />
-          <FieldError message={errors.drawingIds?.message} />
-        </div>
+        )}
       </div>
-
-      {inspection == null && (
-        <Controller
-          control={form.control}
-          name="files"
-          render={({ field }) => (
-            <TrackingPendingFilesField
-              documentType="inspection"
-              label="Drawings and site photographs"
-              value={field.value}
-              onChange={field.onChange}
-              disabled={busy}
-            />
-          )}
-        />
-      )}
 
       <FormAlert message={error ?? undefined} />
       <div className="flex flex-wrap justify-end gap-2">

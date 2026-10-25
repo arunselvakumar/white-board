@@ -90,7 +90,7 @@ function PickerBody({
   if (choices.length === 0)
     return (
       <>
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <section.icon />
@@ -132,7 +132,7 @@ function PickerBody({
       </InputGroup>
       <ul
         aria-label={section.title}
-        className="-mx-1 max-h-72 divide-y overflow-y-auto rounded-lg border"
+        className="bg-card -mx-1 max-h-72 divide-y overflow-y-auto rounded-lg border"
       >
         {visible.map((item) => {
           const id = `resource-${section.key}-${item.id}`;

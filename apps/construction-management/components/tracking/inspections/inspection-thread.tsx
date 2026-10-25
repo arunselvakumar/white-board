@@ -86,7 +86,7 @@ function ObservationsBody({
           {data.items.map((item) => (
             <li
               key={item.id}
-              className="min-w-0 space-y-2 rounded-lg border p-3"
+              className="bg-card min-w-0 space-y-2 rounded-lg border p-3"
             >
               <div className="flex items-start justify-between gap-2">
                 <Byline name={item.createdBy.name} at={item.createdAt} />

@@ -204,7 +204,10 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <section aria-labelledby={id} className="space-y-6 rounded-xl border p-6">
+    <section
+      aria-labelledby={id}
+      className="bg-card space-y-6 rounded-xl border p-6"
+    >
       <div className="space-y-1">
         <h3 id={id} className="text-lg font-semibold">
           {title}
@@ -356,7 +359,7 @@ export function HrmsSettingsForm() {
                     {GPS_REQUIREMENTS.map((mode) => (
                       <div
                         key={mode}
-                        className="flex items-start gap-3 rounded-lg border p-3"
+                        className="bg-card flex items-start gap-3 rounded-lg border p-3"
                       >
                         <RadioGroupItem
                           id={`hrms-gps-${mode}`}

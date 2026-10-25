@@ -38,7 +38,7 @@ export function DeliveryNotesList({
   );
   if (data.total === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <Truck />

@@ -205,7 +205,7 @@ export function UploadDocumentsDialog({
         </div>
         <div
           data-dragging={dragging ? "" : undefined}
-          className="border-input data-dragging:border-ring data-dragging:bg-muted/60 flex flex-col items-center gap-2 rounded-xl border border-dashed px-4 py-6 text-center transition-colors"
+          className="bg-card border-input data-dragging:border-ring data-dragging:bg-muted/60 flex flex-col items-center gap-2 rounded-xl border border-dashed px-4 py-6 text-center transition-colors"
           onDragEnter={(event) => {
             if (accept(event)) setDragging(true);
           }}

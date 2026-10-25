@@ -24,7 +24,7 @@ export function TeamMemberRowsSkeleton() {
   return (
     <SkeletonGroup label="Loading Users" className="block space-y-3">
       <SkeletonText width="7rem" />
-      <div className="rounded-lg border">
+      <div className="bg-card rounded-lg border">
         <div className="text-muted-foreground bg-muted/40 hidden items-center gap-4 rounded-t-lg border-b px-4 py-2 text-xs font-medium sm:flex">
           <span className="flex-1">User</span>
           <span className="w-40">Role</span>
@@ -81,6 +81,18 @@ const DETAIL_FIELDS = [
   { label: "Email" },
 ] as const;
 
+const SIGN_IN_FIELDS = DETAIL_FIELDS.slice(-2);
+const PERSON_FIELDS = DETAIL_FIELDS.slice(0, -2);
+
+function SignInSkeleton() {
+  return (
+    <div className="bg-card space-y-2 rounded-xl border p-4 sm:p-5">
+      <p className="text-sm font-semibold">Sign-in</p>
+      <FormSkeleton columns={2} actions={0} fields={[...SIGN_IN_FIELDS]} />
+    </div>
+  );
+}
+
 /** Add User while the Designations and Roles load: step 1, the details form. */
 export function AddTeamMemberSkeleton() {
   return (
@@ -97,18 +109,22 @@ export function AddTeamMemberSkeleton() {
           <li className="bg-border h-1 flex-1 rounded-full" />
         </ol>
         <div className="space-y-6">
-          <div className="space-y-2">
-            <p className="text-sm font-semibold">Member type</p>
-            <div className="grid gap-3 sm:grid-cols-2" aria-hidden="true">
-              <Skeleton className="h-[4.25rem] rounded-lg" />
-              <Skeleton className="h-[4.25rem] rounded-lg" />
+          <div className="bg-card space-y-6 rounded-xl border p-4 sm:p-5">
+            <div className="space-y-2">
+              <p className="text-sm font-semibold">Member type</p>
+              <div className="grid gap-3 sm:grid-cols-2" aria-hidden="true">
+                <Skeleton className="h-[4.25rem] rounded-lg" />
+                <Skeleton className="h-[4.25rem] rounded-lg" />
+              </div>
             </div>
+            <FormSkeleton
+              columns={2}
+              actions={0}
+              label="Loading Designations"
+              fields={[...PERSON_FIELDS]}
+            />
           </div>
-          <FormSkeleton
-            columns={2}
-            label="Loading Designations"
-            fields={[...DETAIL_FIELDS]}
-          />
+          <SignInSkeleton />
         </div>
       </div>
     </div>
@@ -135,11 +151,16 @@ export function EditTeamMemberSkeleton() {
               Role
             </TabsTrigger>
           </TabsList>
-          <FormSkeleton
-            columns={2}
-            label="Loading User"
-            fields={[...DETAIL_FIELDS]}
-          />
+          <div className="space-y-6">
+            <FormSkeleton
+              className="bg-card rounded-xl border p-4 sm:p-5"
+              columns={2}
+              actions={0}
+              label="Loading User"
+              fields={[...PERSON_FIELDS]}
+            />
+            <SignInSkeleton />
+          </div>
         </Tabs>
       </div>
     </div>

@@ -21,7 +21,7 @@ export default async function CompanyDashboardPage() {
   if (!(await viewerCan("reporting.project_dashboard", "read")))
     return (
       <div className="w-full p-6">
-        <Empty className="max-w-4xl border">
+        <Empty className="bg-card max-w-4xl border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <LayoutDashboard />

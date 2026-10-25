@@ -91,7 +91,7 @@ export function PartyBalances({
 
   if (data.items.length === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <HardHat />
@@ -113,7 +113,7 @@ export function PartyBalances({
         {data.items.length === 1 ? screen.label : screen.plural} · a positive
         balance is owed to the party
       </p>
-      <div className="hidden overflow-x-auto rounded-lg border md:block">
+      <div className="bg-card hidden overflow-x-auto rounded-lg border md:block">
         <Table aria-label={`${screen.label} balances`}>
           <TableHeader>
             <TableRow>
@@ -195,7 +195,7 @@ export function PartyBalances({
         className="space-y-2 md:hidden"
       >
         {data.items.map((row) => (
-          <li key={row.party.id} className="rounded-lg border p-3">
+          <li key={row.party.id} className="bg-card rounded-lg border p-3">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <Link

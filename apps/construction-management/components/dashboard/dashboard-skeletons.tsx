@@ -67,7 +67,7 @@ export function CompanyDashboardSkeleton() {
             {NAME_WIDTHS.map((width, row) => (
               <li
                 key={row}
-                className="block min-w-0 space-y-3 rounded-xl border p-4"
+                className="bg-card block min-w-0 space-y-3 rounded-xl border p-4"
               >
                 <div className="flex min-w-0 items-center justify-between gap-3">
                   <SkeletonText size="base" width={width} />

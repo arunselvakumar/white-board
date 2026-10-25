@@ -288,7 +288,7 @@ function PurchaseOrderRows({
     return (
       <div className={cn("space-y-4", className)}>
         {filterBar}
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <ShoppingCart />
@@ -386,7 +386,7 @@ function PurchaseOrderRows({
           </div>
         </div>
       )}
-      <div className="hidden rounded-lg border md:block">
+      <div className="bg-card hidden rounded-lg border md:block">
         <Table aria-label="Purchase Orders">
           <TableHeader>
             <TableRow>
@@ -454,7 +454,7 @@ function PurchaseOrderRows({
       </div>
       <ul aria-label="Purchase Orders" className="space-y-2 md:hidden">
         {data.items.map((po) => (
-          <li key={po.id} className="rounded-lg border p-3">
+          <li key={po.id} className="bg-card rounded-lg border p-3">
             <div className="flex items-start gap-3">
               {check(po)}
               <div className="min-w-0 flex-1">

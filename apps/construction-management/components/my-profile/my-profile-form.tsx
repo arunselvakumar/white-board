@@ -10,7 +10,6 @@ import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { Separator } from "@repo/ui/components/separator";
 import { Textarea } from "@repo/ui/components/textarea";
 
 import {
@@ -199,8 +198,11 @@ export function MyProfileForm({ profile }: { profile: MyProfileModel }) {
     profile.aadhaarMasked != null || profile.panMasked != null;
 
   return (
-    <div className="space-y-8">
-      <section aria-labelledby="my-photo-heading" className="space-y-3">
+    <div className="space-y-6">
+      <section
+        aria-labelledby="my-photo-heading"
+        className="bg-card space-y-3 rounded-xl border p-4 sm:p-5"
+      >
         <div>
           <h2 id="my-photo-heading" className="text-base font-semibold">
             Photo
@@ -225,17 +227,18 @@ export function MyProfileForm({ profile }: { profile: MyProfileModel }) {
         />
       </section>
 
-      <Separator />
-
       <form
         onSubmit={(event) => {
           void form.handleSubmit(submit)(event);
         }}
         noValidate
         aria-label="My Profile"
-        className="space-y-8"
+        className="space-y-6"
       >
-        <section aria-labelledby="my-contact-heading" className="space-y-4">
+        <section
+          aria-labelledby="my-contact-heading"
+          className="bg-card space-y-4 rounded-xl border p-4 sm:p-5"
+        >
           <h2 id="my-contact-heading" className="text-base font-semibold">
             Contact
           </h2>
@@ -315,7 +318,10 @@ export function MyProfileForm({ profile }: { profile: MyProfileModel }) {
           </div>
         </section>
 
-        <section aria-labelledby="my-ids-heading" className="space-y-4">
+        <section
+          aria-labelledby="my-ids-heading"
+          className="bg-card space-y-4 rounded-xl border p-4 sm:p-5"
+        >
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <h2 id="my-ids-heading" className="text-base font-semibold">

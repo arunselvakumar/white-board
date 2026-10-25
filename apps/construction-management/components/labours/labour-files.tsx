@@ -126,14 +126,14 @@ export function LabourFiles({ labour }: { labour: LabourResponse }) {
         {documents.isPending ? (
           <LabourFilesSkeleton />
         ) : (documents.data?.items.length ?? 0) === 0 ? (
-          <p className="text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
+          <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
             No documents yet. Add an ID card, bank passbook or licence (PDF,
             PNG, JPEG or WebP, up to 10 MB).
           </p>
         ) : (
           <ul
             aria-label="Documents"
-            className="divide-border divide-y rounded-lg border"
+            className="bg-card divide-border divide-y rounded-lg border"
           >
             {documents.data?.items.map((document) => (
               <li

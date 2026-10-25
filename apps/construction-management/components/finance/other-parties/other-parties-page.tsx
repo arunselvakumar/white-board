@@ -149,7 +149,7 @@ function OtherPartyRows({
   const filtered = filter.search.trim().length > 0;
   if (data.items.length === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <Handshake />
@@ -179,7 +179,7 @@ function OtherPartyRows({
         {data.total} {data.total === 1 ? "Other Party" : "Other Parties"}
       </p>
       <FormAlert message={confirming ? undefined : error} />
-      <div className="hidden rounded-lg border md:block">
+      <div className="bg-card hidden rounded-lg border md:block">
         <Table aria-label="Other Parties">
           <TableHeader>
             <TableRow>
@@ -246,7 +246,7 @@ function OtherPartyRows({
       </div>
       <ul aria-label="Other Parties" className="space-y-2 md:hidden">
         {data.items.map((party) => (
-          <li key={party.id} className="rounded-lg border p-3">
+          <li key={party.id} className="bg-card rounded-lg border p-3">
             <div className="min-w-0">
               <Link
                 href={otherPartyEditPath(party.id)}

@@ -105,7 +105,7 @@ function ModeRadios({
       {(["cash", "bank"] as const).map((mode) => (
         <div
           key={mode}
-          className="flex items-center gap-3 rounded-lg border p-3"
+          className="bg-card flex items-center gap-3 rounded-lg border p-3"
         >
           <RadioGroupItem id={`${idPrefix}-${mode}`} value={mode} />
           <Label htmlFor={`${idPrefix}-${mode}`}>

@@ -171,7 +171,7 @@ function SettingsForm({
           >
             Shown on the form
           </h3>
-          <ul className="divide-y rounded-lg border">
+          <ul className="bg-card divide-y rounded-lg border">
             {EQUIPMENT_SHEET_FIELD_TOGGLES.map((key) =>
               toggle(key, EQUIPMENT_SHEET_TOGGLE_LABELS[key]),
             )}
@@ -191,7 +191,7 @@ function SettingsForm({
           >
             Approval
           </h3>
-          <ul className="rounded-lg border">
+          <ul className="bg-card rounded-lg border">
             {toggle("approvalEnabled", "Usage sheets need approval")}
           </ul>
           <p className="text-muted-foreground text-xs">

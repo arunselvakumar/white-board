@@ -96,7 +96,7 @@ export function PartyInvoices({
   );
   if (data.items.length === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <FileText />
@@ -173,7 +173,7 @@ export function PartyPayments({
   const paths = partyPaths(projectId, partyType);
   if (data.items.length === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <Wallet />
@@ -247,7 +247,7 @@ export function PartyStatementTable({
   );
   if (data.lines.length === 0)
     return (
-      <p className="text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
+      <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
         Nothing on the statement yet.
       </p>
     );
@@ -256,7 +256,7 @@ export function PartyStatementTable({
       <p className="text-muted-foreground text-sm">
         + is owed to the party; − is an advance or owed to the Company.
       </p>
-      <div className="hidden rounded-lg border md:block">
+      <div className="bg-card hidden rounded-lg border md:block">
         <Table aria-label="Statement">
           <TableHeader>
             <TableRow>
@@ -301,7 +301,7 @@ export function PartyStatementTable({
       </div>
       <ul aria-label="Statement" className="space-y-2 md:hidden">
         {data.lines.map((line) => (
-          <li key={line.id} className="rounded-lg border p-3 text-sm">
+          <li key={line.id} className="bg-card rounded-lg border p-3 text-sm">
             <div className="flex justify-between gap-3">
               <span className="min-w-0">
                 {ENTRY_KIND_LABELS[line.kind]}

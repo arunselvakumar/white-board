@@ -8,12 +8,14 @@ export function DesignationFormSkeleton() {
     <FormPageSkeleton
       back={{ label: "Designations", href: "/app/masters/designations" }}
     >
-      <FormSkeleton
-        className="max-w-md"
-        actions={0}
-        label="Loading Designation"
-        fields={[{ label: "Designation name" }]}
-      />
+      <div className="bg-card rounded-xl border p-4 sm:p-5">
+        <FormSkeleton
+          className="max-w-md"
+          actions={0}
+          label="Loading Designation"
+          fields={[{ label: "Designation name" }]}
+        />
+      </div>
     </FormPageSkeleton>
   );
 }

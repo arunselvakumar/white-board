@@ -104,7 +104,10 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <section aria-label={title} className="space-y-4 rounded-lg border p-4">
+    <section
+      aria-label={title}
+      className="bg-card space-y-4 rounded-lg border p-4"
+    >
       <h3 className="font-semibold">
         {title}
         {required && <RequiredIndicator />}
@@ -504,7 +507,10 @@ function PurchaseOrderFields({
               : "No materials yet."}
           </p>
         ) : (
-          <ul aria-label="Order lines" className="divide-y rounded-lg border">
+          <ul
+            aria-label="Order lines"
+            className="bg-card divide-y rounded-lg border"
+          >
             {fields.map((field, index) => {
               const line = lines[index] ?? field;
               const amounts = lineAmountsOf(line, supplyType);

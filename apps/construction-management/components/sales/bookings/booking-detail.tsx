@@ -209,7 +209,7 @@ export function BookingDetail({
             </Link>
           </p>
         )}
-        <dl className="grid gap-4 rounded-lg border p-4 sm:grid-cols-3">
+        <dl className="bg-card grid gap-4 rounded-lg border p-4 sm:grid-cols-3">
           <Fact label="Unit">
             {booking.unit.name} · {booking.unit.floorName}
           </Fact>

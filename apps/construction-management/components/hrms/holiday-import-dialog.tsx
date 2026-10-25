@@ -164,7 +164,7 @@ export function HolidayImportDialog({
                 ? `Imported ${String(preview.imported)} ${plural(preview.imported)}.`
                 : `${String(preview.valid)} ready · ${String(preview.invalid)} with errors`}
             </p>
-            <div className="max-h-80 overflow-auto rounded-lg border">
+            <div className="bg-card max-h-80 overflow-auto rounded-lg border">
               <Table aria-label="Import preview">
                 <TableHeader>
                   <TableRow>

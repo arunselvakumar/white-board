@@ -364,7 +364,7 @@ export function EmployeeSalaryGrid() {
         </div>
 
         {data.structures.length === 0 ? (
-          <Empty className="border">
+          <Empty className="bg-card border">
             <EmptyHeader>
               <EmptyMedia variant="icon">
                 <IdCard />
@@ -446,7 +446,7 @@ export function EmployeeSalaryGrid() {
               </div>
             )}
             {visible.length === 0 ? (
-              <p className="text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
+              <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
                 No member matches “{query.trim()}”.
               </p>
             ) : (

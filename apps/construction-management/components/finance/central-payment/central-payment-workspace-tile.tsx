@@ -14,7 +14,7 @@ export function CentralPaymentWorkspaceTile() {
   return (
     <Item
       variant="outline"
-      className="w-full"
+      className="bg-card w-full"
       render={<Link href="/app/workspace/central-payment" />}
     >
       <ItemMedia variant="icon">

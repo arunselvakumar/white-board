@@ -148,7 +148,7 @@ function Invoices() {
         Invoices
       </h2>
       {data.items.length === 0 ? (
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyTitle>No invoices yet</EmptyTitle>
             <EmptyDescription>
@@ -157,50 +157,55 @@ function Invoices() {
           </EmptyHeader>
         </Empty>
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Invoice</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>For</TableHead>
-              <TableHead className="text-right">Total</TableHead>
-              <TableHead>
-                <span className="sr-only">Download</span>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.items.map((invoice) => (
-              <TableRow key={invoice.id}>
-                <TableCell className="font-medium">
-                  {invoice.invoiceNumber}
-                </TableCell>
-                <TableCell>
-                  {longDate.format(new Date(invoice.paidAt))}
-                </TableCell>
-                <TableCell>
-                  {KIND_LABELS[invoice.kind]} · {invoice.planName}
-                  {invoice.months == null
-                    ? ""
-                    : `, ${String(invoice.months)} months`}
-                </TableCell>
-                <TableCell className="text-right tabular-nums">
-                  {formatMinor(invoice.totalPaise, invoice.currency)}
-                </TableCell>
-                <TableCell className="text-right">
-                  <a
-                    href={invoice.pdfPath}
-                    className={buttonVariants({ variant: "ghost", size: "sm" })}
-                    aria-label={`Download invoice ${invoice.invoiceNumber}`}
-                  >
-                    <FileText aria-hidden="true" />
-                    PDF
-                  </a>
-                </TableCell>
+        <div className="bg-card rounded-lg border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Invoice</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>For</TableHead>
+                <TableHead className="text-right">Total</TableHead>
+                <TableHead>
+                  <span className="sr-only">Download</span>
+                </TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {data.items.map((invoice) => (
+                <TableRow key={invoice.id}>
+                  <TableCell className="font-medium">
+                    {invoice.invoiceNumber}
+                  </TableCell>
+                  <TableCell>
+                    {longDate.format(new Date(invoice.paidAt))}
+                  </TableCell>
+                  <TableCell>
+                    {KIND_LABELS[invoice.kind]} · {invoice.planName}
+                    {invoice.months == null
+                      ? ""
+                      : `, ${String(invoice.months)} months`}
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {formatMinor(invoice.totalPaise, invoice.currency)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <a
+                      href={invoice.pdfPath}
+                      className={buttonVariants({
+                        variant: "ghost",
+                        size: "sm",
+                      })}
+                      aria-label={`Download invoice ${invoice.invoiceNumber}`}
+                    >
+                      <FileText aria-hidden="true" />
+                      PDF
+                    </a>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       )}
     </section>
   );

@@ -240,7 +240,7 @@ export function TaskTree({
   const filtered = tasksFiltered(filters);
   if (data.items.length === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <ListTree />
@@ -306,7 +306,7 @@ export function TaskTree({
       {problem?.inUse != null && (
         <ul
           aria-label="Tasks named by Daily Worksheets"
-          className="space-y-1 rounded-lg border p-3 text-sm"
+          className="bg-card space-y-1 rounded-lg border p-3 text-sm"
         >
           {problem.inUse.tasks.map((item) => (
             <li key={item.id}>

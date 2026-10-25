@@ -76,7 +76,7 @@ export function NotificationsScreen() {
           </p>
         ) : null}
         {items.length === 0 ? (
-          <Empty className="rounded-2xl border">
+          <Empty className="bg-card rounded-2xl border">
             <EmptyHeader>
               <EmptyMedia variant="icon">
                 <Bell aria-hidden="true" />

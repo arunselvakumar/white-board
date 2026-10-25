@@ -14,7 +14,7 @@ import { PageHeader } from "@/components/app-shell/page-header";
 export function PushMenuListSkeleton() {
   return (
     <SkeletonGroup label="Loading notification settings" className="block">
-      <ul className="divide-y rounded-xl border">
+      <ul className="bg-card divide-y rounded-xl border">
         {["40%", "55%", "32%", "48%"].map((width) => (
           <li
             key={width}
@@ -35,8 +35,8 @@ export function MyProfileSkeleton() {
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-8">
         <PageHeader title="My Profile" meta={<SkeletonText width="10rem" />} />
-        <SkeletonGroup label="Loading your profile" className="block space-y-8">
-          <section className="space-y-3">
+        <SkeletonGroup label="Loading your profile" className="block space-y-6">
+          <section className="bg-card space-y-3 rounded-xl border p-4 sm:p-5">
             <div>
               <h2 className="text-base font-semibold">Photo</h2>
               <p className="text-muted-foreground text-sm">
@@ -51,7 +51,7 @@ export function MyProfileSkeleton() {
               </div>
             </div>
           </section>
-          <section className="space-y-4">
+          <section className="bg-card space-y-4 rounded-xl border p-4 sm:p-5">
             <h2 className="text-base font-semibold">Contact</h2>
             <FormSkeleton
               columns={2}

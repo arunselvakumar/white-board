@@ -153,7 +153,7 @@ export function OtherExpenseDetail({
           Pending approval: it moves no money until it is approved.
         </p>
       )}
-      <dl className="grid gap-4 rounded-lg border p-4 sm:grid-cols-2 lg:grid-cols-3">
+      <dl className="bg-card grid gap-4 rounded-lg border p-4 sm:grid-cols-2 lg:grid-cols-3">
         <Fact label="Amount">{money(expense.amount)}</Fact>
         <Fact label="Payment Category">{expense.paymentCategory.name}</Fact>
         <Fact label="Paid to">{expense.payeeName ?? "—"}</Fact>

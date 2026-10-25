@@ -351,12 +351,15 @@ export function MaterialForm({
   return (
     <form
       noValidate
-      className="space-y-8"
+      className="space-y-6"
       onSubmit={(event) => {
         void submit(event);
       }}
     >
-      <section aria-labelledby="material-details" className="space-y-4">
+      <section
+        aria-labelledby="material-details"
+        className="bg-card space-y-4 rounded-xl border p-4 sm:p-5"
+      >
         <h2 id="material-details" className="font-semibold">
           Details
         </h2>
@@ -458,7 +461,10 @@ export function MaterialForm({
         </div>
       </section>
 
-      <section aria-labelledby="material-min-stock" className="space-y-4">
+      <section
+        aria-labelledby="material-min-stock"
+        className="bg-card space-y-4 rounded-xl border p-4 sm:p-5"
+      >
         <Controller
           name="hasMinStock"
           control={form.control}
@@ -498,7 +504,10 @@ export function MaterialForm({
       </section>
 
       {financial ? (
-        <section aria-labelledby="material-rate" className="space-y-4">
+        <section
+          aria-labelledby="material-rate"
+          className="bg-card space-y-4 rounded-xl border p-4 sm:p-5"
+        >
           <Controller
             name="hasRate"
             control={form.control}

@@ -330,7 +330,7 @@ export function PurchaseRequestWizard({
             key={label}
             aria-current={index === step ? "step" : undefined}
             className={cn(
-              "flex flex-1 items-center gap-2 rounded-lg border px-3 py-2 text-sm",
+              "bg-card flex flex-1 items-center gap-2 rounded-lg border px-3 py-2 text-sm",
               index === step
                 ? "border-primary bg-primary/5 font-medium"
                 : "text-muted-foreground",
@@ -353,7 +353,10 @@ export function PurchaseRequestWizard({
       <FormAlert message={error} />
 
       {step === 0 && (
-        <section aria-label="Materials" className="space-y-4">
+        <section
+          aria-label="Materials"
+          className="bg-card space-y-4 rounded-xl border p-4 sm:p-5"
+        >
           <div className="space-y-1.5">
             {/* At least one material: required until the first is added. */}
             <Label htmlFor="pr-material-picker" required={fields.length === 0}>
@@ -397,7 +400,7 @@ export function PurchaseRequestWizard({
           {viewSelected && fields.length > 0 && (
             <ul
               aria-label="Selected materials"
-              className="divide-y rounded-lg border"
+              className="bg-card divide-y rounded-lg border"
             >
               {fields.map((field, index) => (
                 <li
@@ -429,13 +432,19 @@ export function PurchaseRequestWizard({
       )}
 
       {step === 1 && (
-        <section aria-label="Quantity" className="space-y-4">
+        <section
+          aria-label="Quantity"
+          className="bg-card space-y-4 rounded-xl border p-4 sm:p-5"
+        >
           <ul className="space-y-3">
             {fields.map((field, index) => {
               const row = info.get(field.materialId);
               const quantityError = errors.items?.[index]?.quantity?.message;
               return (
-                <li key={field.id} className="space-y-2 rounded-lg border p-3">
+                <li
+                  key={field.id}
+                  className="bg-card space-y-2 rounded-lg border p-3"
+                >
                   <div className="grid gap-3 sm:grid-cols-[1fr_12rem] sm:items-start">
                     <div className="min-w-0">
                       <p className="font-medium">{field.materialName}</p>
@@ -503,7 +512,7 @@ export function PurchaseRequestWizard({
               );
             })}
           </ul>
-          <div className="flex items-center gap-3 rounded-lg border p-3">
+          <div className="bg-card flex items-center gap-3 rounded-lg border p-3">
             <Controller
               name="separateRemarks"
               control={form.control}
@@ -535,7 +544,10 @@ export function PurchaseRequestWizard({
       )}
 
       {step === 2 && (
-        <section aria-label="Details" className="grid gap-4 sm:grid-cols-2">
+        <section
+          aria-label="Details"
+          className="bg-card grid gap-4 rounded-xl border p-4 sm:grid-cols-2 sm:p-5"
+        >
           <div className="space-y-1.5">
             <Label htmlFor="pr-request-date" required>
               Purchase Request Date

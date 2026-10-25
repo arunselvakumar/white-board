@@ -223,13 +223,13 @@ function LedgerBody({
         </dl>
       </section>
       {data.entries.length === 0 ? (
-        <p className="text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
+        <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
           Nothing moved through this account between {formatDate(data.from)} and{" "}
           {formatDate(data.to)}.
         </p>
       ) : (
         <>
-          <div className="hidden overflow-x-auto rounded-lg border md:block">
+          <div className="bg-card hidden overflow-x-auto rounded-lg border md:block">
             <Table aria-label="Ledger">
               <TableHeader>
                 <TableRow>
@@ -307,7 +307,7 @@ function LedgerBody({
           </div>
           <ul aria-label="Ledger entries" className="space-y-2 md:hidden">
             {data.entries.map((line) => (
-              <li key={line.id} className="rounded-lg border p-3">
+              <li key={line.id} className="bg-card rounded-lg border p-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium">

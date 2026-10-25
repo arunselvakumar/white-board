@@ -157,7 +157,7 @@ function MovementForm({
             <li
               key={field.id}
               aria-label={`Line ${String(index + 1)}`}
-              className="space-y-3 rounded-lg border p-3"
+              className="bg-card space-y-3 rounded-lg border p-3"
             >
               <div className="grid gap-3 sm:grid-cols-[1fr_10rem_9rem]">
                 <div className="min-w-0 space-y-1.5">

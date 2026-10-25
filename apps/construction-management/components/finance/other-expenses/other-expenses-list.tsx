@@ -307,7 +307,7 @@ function ExpenseRows({
 
   if (data.items.length === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <ReceiptText />
@@ -407,7 +407,7 @@ function ExpenseRows({
           </div>
         </div>
       )}
-      <div className="hidden rounded-lg border md:block">
+      <div className="bg-card hidden rounded-lg border md:block">
         <Table aria-label="Other Expenses">
           <TableHeader>
             <TableRow>

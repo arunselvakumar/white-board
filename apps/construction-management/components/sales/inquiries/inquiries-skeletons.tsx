@@ -241,7 +241,7 @@ export function InquiryDetailSkeleton({ projectId }: { projectId: string }) {
       </div>
       <div className="grid w-full min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="min-w-0 space-y-6">
-          <dl className="grid min-w-0 gap-4 rounded-lg border p-4 sm:grid-cols-3">
+          <dl className="bg-card grid min-w-0 gap-4 rounded-lg border p-4 sm:grid-cols-3">
             {FACTS.map((label, index) => (
               <div key={label} className="min-w-0">
                 <dt className="text-muted-foreground text-xs">{label}</dt>
@@ -290,7 +290,7 @@ export function InquiryFormSkeleton() {
     >
       <FieldGridSkeleton
         fields={INQUIRY_FIELDS}
-        className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        className="bg-card grid min-w-0 gap-4 rounded-xl border p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-3"
       />
       <FormActionsSkeleton />
     </SkeletonGroup>

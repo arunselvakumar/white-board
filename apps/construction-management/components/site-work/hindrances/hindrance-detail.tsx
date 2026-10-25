@@ -212,7 +212,7 @@ function SignOff({ hindrance }: { hindrance: Hindrance }) {
           {hindrance.actions.edit && " Edit the hindrance to record it."}
         </p>
       ) : (
-        <dl className="grid gap-4 rounded-lg border p-4 sm:grid-cols-3">
+        <dl className="bg-card grid gap-4 rounded-lg border p-4 sm:grid-cols-3">
           <Fact label="For the Company">
             {signOff.teamMember == null
               ? "—"
@@ -304,7 +304,7 @@ export function HindranceDetail({
       <FormAlert message={error ?? undefined} />
 
       <div className="w-full max-w-4xl space-y-6">
-        <dl className="grid gap-4 rounded-lg border p-4 sm:grid-cols-3">
+        <dl className="bg-card grid gap-4 rounded-lg border p-4 sm:grid-cols-3">
           <Fact label="Affected activity" className="sm:col-span-2">
             {hindrance.affectedActivity}
           </Fact>

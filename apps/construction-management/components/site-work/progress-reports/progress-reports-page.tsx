@@ -201,7 +201,7 @@ function ReportList({
 
   if (data.items.length === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <NotebookText />
@@ -226,7 +226,10 @@ function ReportList({
 
   return (
     <>
-      <ul aria-label="Progress Reports" className="divide-y rounded-xl border">
+      <ul
+        aria-label="Progress Reports"
+        className="bg-card divide-y rounded-xl border"
+      >
         {data.items.map((report) => (
           <ReportItem
             key={report.id}

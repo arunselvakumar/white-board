@@ -94,7 +94,7 @@ export function BillingAddressesManager() {
         <FormAlert message={error} />
 
         {data.items.length === 0 ? (
-          <Empty className="border">
+          <Empty className="bg-card border">
             <EmptyHeader>
               <EmptyMedia variant="icon">
                 <MapPinned />
@@ -110,7 +110,7 @@ export function BillingAddressesManager() {
         ) : (
           <ul
             aria-label="Billing addresses"
-            className="divide-y rounded-xl border"
+            className="bg-card divide-y rounded-xl border"
           >
             {data.items.map((item) => (
               <li

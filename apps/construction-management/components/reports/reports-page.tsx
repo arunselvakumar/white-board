@@ -208,7 +208,7 @@ export function ReportsPage({
   return (
     <div className="space-y-8">
       {offered.length === 0 ? (
-        <Empty className="border">
+        <Empty className="bg-card border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <FileSpreadsheet />

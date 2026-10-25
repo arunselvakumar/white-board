@@ -86,7 +86,7 @@ export function FileViewer({
               <iframe
                 title={shown.name}
                 src={shown.url}
-                className="h-[70dvh] w-full rounded-md border"
+                className="bg-card h-[70dvh] w-full rounded-md border"
               />
             ) : (
               <div className="bg-muted/50 flex flex-col items-center gap-3 rounded-lg border px-4 py-10 text-center">

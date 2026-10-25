@@ -90,7 +90,7 @@ export function MaterialRequestsList({
     );
   if (data.total === 0)
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <ClipboardList />
