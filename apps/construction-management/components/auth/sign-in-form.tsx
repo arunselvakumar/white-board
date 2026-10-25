@@ -36,7 +36,7 @@ export function SignInForm({
         description="With your email, or your mobile number, and password."
       />
       <Tabs defaultValue={mobileOtp ? "mobile" : "email"} className="gap-6">
-        <TabsList className="w-full">
+        <TabsList variant="pill" className="w-full">
           <TabsTrigger value="email">Email</TabsTrigger>
           <TabsTrigger value="mobile">Mobile</TabsTrigger>
         </TabsList>
