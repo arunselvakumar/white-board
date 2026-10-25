@@ -1,0 +1,19 @@
+apps/construction-management/e2e/pages/PartyPaymentsPage.ts
+  s_43f32c25ef2007::t_a40ad09e4b0140 42-44,48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "8907c4d189f4584c2206e001120d48257e945170",
+  "prompts": {},
+  "sessions": {
+    "s_43f32c25ef2007": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "925748d9-ee5c-4753-bfa8-47d07468a8e5",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
