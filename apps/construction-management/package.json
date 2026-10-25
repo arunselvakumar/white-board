@@ -13,7 +13,11 @@
     "test:http": "vitest --project=http --run",
     "storybook": "storybook dev -p 6007",
     "build-storybook": "storybook build",
-    "test-storybook": "vitest --project=storybook --run"
+    "test-storybook": "vitest --project=storybook --run",
+    "test:e2e:build": "bun e2e/build.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:pr": "playwright test --grep @pr",
+    "test:e2e:budget": "bun e2e/check-pr-budget.ts"
   },
   "dependencies": {
     "@expo-google-fonts/noto-sans-bengali": "0.4.4",
@@ -51,6 +55,7 @@
     "zod": "^4.5.4"
   },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
     "@prisma/nextjs-monorepo-workaround-plugin": "6.16.3",
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",

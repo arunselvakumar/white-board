@@ -41,3 +41,9 @@ next-env.d.ts
 storybook-static
 .blob-local
 .next-verify
+
+# End-to-end tests (Playwright)
+.next-e2e/
+.blob-e2e/
+test-results/
+playwright-report/

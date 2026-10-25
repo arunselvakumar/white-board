@@ -13,14 +13,19 @@ function env(name: string): string | null {
  * Vercel Blob when `BLOB_READ_WRITE_TOKEN` (a static token) or
  * `BLOB_STORE_ID` (OIDC, set by connecting the store to the Vercel
  * project) is present; otherwise files on disk under `BLOB_LOCAL_DIR`
- * (default `.blob-local` in the app). Files on disk are refused in
- * production, where a deployment's disk does not last.
+ * (default `.blob-local` in the app). Files on disk are refused on Vercel
+ * and in live production, where a deployment's disk does not last; a
+ * production build run as a preview off Vercel (the end-to-end tests,
+ * ADR CM-0031) keeps them on disk.
  */
 export function storageFromEnv(): ObjectStorage {
   const token = env("BLOB_READ_WRITE_TOKEN");
   if (token != null) return new VercelBlobStorage(token);
   if (env("BLOB_STORE_ID") != null) return new VercelBlobStorage(null);
-  if (process.env.NODE_ENV === "production")
+  if (
+    process.env.NODE_ENV === "production" &&
+    (process.env["VERCEL"] === "1" || process.env["VERCEL_ENV"] !== "preview")
+  )
     throw new Error(
       "Connect a Vercel Blob store (BLOB_STORE_ID) or set BLOB_READ_WRITE_TOKEN to store files in production (CM-115).",
     );

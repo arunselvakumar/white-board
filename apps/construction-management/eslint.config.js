@@ -147,7 +147,24 @@ export default [
   prismaErrorGuard,
   ...storybook.configs["flat/recommended"],
   {
+    // Playwright fixtures hand their value to `use`, which is not React's.
+    // Page objects expose every URL as a getter, literal or not, so a
+    // subclass can always override the base class's abstract `url`.
+    files: ["e2e/**/*.ts"],
+    rules: {
+      "react-hooks/rules-of-hooks": "off",
+      "@typescript-eslint/class-literal-property-style": "off",
+    },
+  },
+  {
     // public/ holds static files served as-is (sw.js is plain browser JS).
-    ignores: ["storybook-static/**", ".next-verify/**", "public/**"],
+    ignores: [
+      "storybook-static/**",
+      ".next-verify/**",
+      ".next-e2e/**",
+      "playwright-report/**",
+      "test-results/**",
+      "public/**",
+    ],
   },
 ];
