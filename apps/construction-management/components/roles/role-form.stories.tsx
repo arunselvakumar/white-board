@@ -24,7 +24,7 @@ function bodyOf(path: string): unknown {
 }
 
 const meta = {
-  title: "Users & Roles/Role Management/Form",
+  title: "Staff & Roles/Role Management/Form",
   component: EditRoleScreen,
   args: { id: SITE_ENGINEER_ROLE.id, canUpdate: true },
   render: (args) => (
@@ -117,7 +117,7 @@ export const EditRole: Story = {
       await canvas.findByRole("heading", { name: "Edit Site Engineer" }),
     ).toBeVisible();
     await expect(
-      canvas.getByText("Changes apply to the 3 Users on this Role."),
+      canvas.getByText("Changes apply to the 3 Staff on this Role."),
     ).toBeVisible();
     await expect(canvas.getByLabelText("Role name")).toHaveValue(
       "Site Engineer",
@@ -244,7 +244,7 @@ export const ReadOnly: Story = {
     await expect(
       await canvas.findByRole("heading", { name: "Site Engineer" }),
     ).toBeVisible();
-    await expect(canvas.getByText("3 Users on this Role.")).toBeVisible();
+    await expect(canvas.getByText("3 Staff on this Role.")).toBeVisible();
     await expect(canvas.getByLabelText("Role name")).toHaveAttribute(
       "readonly",
     );

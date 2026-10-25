@@ -70,14 +70,15 @@ function createdAs(overrides: Parameters<typeof teamMember>[0] = {}) {
 }
 
 const meta = {
-  title: "Users & Roles/Users/AddUser",
+  title: "Staff & Roles/Staff/AddStaff",
   component: AddTeamMemberWizard,
+  args: { canSeeSalary: true },
   beforeEach() {
     signInAs("owner", { name: "Anugraha Engineers" });
   },
-  render: () => (
+  render: (args) => (
     <QuerySuspense>
-      <AddTeamMemberWizard />
+      <AddTeamMemberWizard {...args} />
     </QuerySuspense>
   ),
 } satisfies Meta<typeof AddTeamMemberWizard>;
@@ -136,6 +137,16 @@ export const InviteByEmail: Story = {
     ).toBeVisible();
     await userEvent.type(canvas.getByLabelText("Mobile"), "77081 65767");
     await userEvent.type(canvas.getByLabelText("Aadhaar"), "2341 2341 2346");
+    // The salary is optional, in rupees, like a Labour's wage (ADR CM-0032).
+    await userEvent.type(canvas.getByLabelText("Salary per month"), "25k");
+    await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
+    await expect(
+      await canvas.findByText(
+        "Enter an amount in rupees, like 25000 or 25000.50",
+      ),
+    ).toBeVisible();
+    await userEvent.clear(canvas.getByLabelText("Salary per month"));
+    await userEvent.type(canvas.getByLabelText("Salary per month"), "25,000");
     await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
 
     await userEvent.click(
@@ -179,6 +190,7 @@ export const InviteByEmail: Story = {
       roleId: SITE_ENGINEER_ROLE.id,
       invite: true,
       password: null,
+      monthlySalary: 2_500_000,
     });
     await expect("permissions" in sentBody()).toBe(false);
     await userEvent.click(
@@ -188,6 +200,36 @@ export const InviteByEmail: Story = {
     await waitFor(() =>
       expect(dialog.getByLabelText("Invite link")).toBeVisible(),
     );
+  },
+};
+
+/**
+ * Without Financial on Staff the salary is neither shown nor sent, as a
+ * Labour's wage (ADR CM-0032).
+ */
+export const WithoutSalaryRight: Story = {
+  args: { canSeeSalary: false },
+  beforeEach: serve(createdAs({ email: null })),
+  play: async (context) => {
+    const { canvas, userEvent } = context;
+    await fillBasics(context);
+    await expect(
+      canvas.getByText(
+        "You cannot see salaries. Ask the Owner for the Financial right on Staff.",
+      ),
+    ).toBeVisible();
+    await expect(
+      canvas.queryByLabelText("Salary per month"),
+    ).not.toBeInTheDocument();
+    await userEvent.type(canvas.getByLabelText("Mobile"), "77081 65767");
+    await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Continue" }),
+    );
+    await choose(context, "Role", /^Site Engineer/);
+    await userEvent.click(canvas.getByRole("button", { name: "Add Staff" }));
+    await waitFor(() => expect(sentBody()).toMatchObject({ invite: false }));
+    await expect("monthlySalary" in sentBody()).toBe(false);
   },
 };
 
@@ -232,7 +274,7 @@ export const SetAPassword: Story = {
       await canvas.findByRole("button", { name: "Continue" }),
     );
     await choose(context, "Role", /^Site Engineer/);
-    await userEvent.click(canvas.getByRole("button", { name: "Add User" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Add Staff" }));
 
     await expect(
       await canvas.findByRole("heading", {
@@ -276,7 +318,7 @@ export const ExistingAccount: Story = {
       await canvas.findByRole("button", { name: "Continue" }),
     );
     await choose(context, "Role", /^Site Engineer/);
-    await userEvent.click(canvas.getByRole("button", { name: "Add User" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Add Staff" }));
     await expect(
       await canvas.findByRole("heading", {
         name: "Prabhu Saravanan already has an account",
@@ -297,7 +339,7 @@ export const RecordOnly: Story = {
     await userEvent.type(canvas.getByLabelText("Mobile"), "77081 65767");
     await expect(
       canvas.getByText(
-        "They are a record until you invite them or set a password. You can do either later from Edit User.",
+        "They are a record until you invite them or set a password. You can do either later from Edit Staff.",
       ),
     ).toBeVisible();
     await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
@@ -305,7 +347,7 @@ export const RecordOnly: Story = {
       await canvas.findByRole("button", { name: "Continue" }),
     );
     await choose(context, "Role", /^Site Engineer/);
-    await userEvent.click(canvas.getByRole("button", { name: "Add User" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Add Staff" }));
     await expect(
       await canvas.findByRole("heading", { name: "Prabhu Saravanan is added" }),
     ).toBeVisible();
@@ -328,7 +370,7 @@ export const EmailWithoutInvite: Story = {
       await canvas.findByRole("button", { name: "Continue" }),
     );
     await choose(context, "Role", /^Accountant/);
-    await userEvent.click(canvas.getByRole("button", { name: "Add User" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Add Staff" }));
     await expect(
       await canvas.findByRole("heading", { name: "Prabhu Saravanan is added" }),
     ).toBeVisible();
@@ -385,7 +427,7 @@ export const MobileAlreadyInUse: Story = {
       await canvas.findByRole("button", { name: "Continue" }),
     );
     await choose(context, "Role", /^Site Engineer/);
-    await userEvent.click(canvas.getByRole("button", { name: "Add User" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Add Staff" }));
     await expect(
       await canvas.findByText(
         "Another Team Member in this Company has this mobile number.",
@@ -418,10 +460,10 @@ export const NoDesignationsYet: Story = {
 export const Phone: Story = {
   globals: { viewport: { value: "mobile1" } },
   beforeEach: serve(createdAs()),
-  render: () => (
+  render: (args) => (
     <div data-testid="phone" style={{ width: 375 }}>
       <QuerySuspense>
-        <AddTeamMemberWizard />
+        <AddTeamMemberWizard {...args} />
       </QuerySuspense>
     </div>
   ),

@@ -16,7 +16,7 @@ import { Button, buttonVariants } from "@repo/ui/components/button";
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";
-import { USERS_PATH } from "@/lib/users-roles-nav";
+import { STAFF_PATH } from "@/lib/staff-roles-nav";
 import { QueryHttpError } from "@/src/queries/http";
 import { ROLES_KEY, rolesQuery } from "@/src/queries/roles";
 import {
@@ -32,10 +32,10 @@ import { RoleField, hrmsStaffRoleId } from "./role-field";
 import { ShareInviteDialog } from "./share-invite-dialog";
 import {
   SignInOptions,
-  addUserSchema,
+  addStaffSchema,
   inviteAvailable,
   signInWays,
-  type AddUserValues,
+  type AddStaffValues,
 } from "./sign-in-options";
 import {
   DETAIL_ERROR_FIELDS,
@@ -52,10 +52,10 @@ const STEP_LABELS: Record<Step, string> = {
   role: "Role",
 };
 
-const EMPTY: AddUserValues = { ...EMPTY_DETAILS, invite: true, password: "" };
+const EMPTY: AddStaffValues = { ...EMPTY_DETAILS, invite: true, password: "" };
 
 /** Server codes the Sign-in section owns, beyond the detail fields'. */
-const ERROR_FIELDS: Record<string, keyof AddUserValues> = {
+const ERROR_FIELDS: Record<string, keyof AddStaffValues> = {
   ...DETAIL_ERROR_FIELDS,
   MEMBER_EMAIL_REQUIRED: "email",
   PASSWORD_TOO_SHORT: "password",
@@ -69,18 +69,23 @@ type Created = TeamMember &
   PasswordOutcome & { passwordSet: boolean; invited: boolean };
 
 /**
- * Add User (CM-111, ADR CM-0030 §6): details with how they sign in →
+ * Add Staff (CM-111, ADR CM-0030 §6): details with how they sign in →
  * Projects → Role. HRMS members skip Projects and start on HRMS Staff.
  */
-export function AddTeamMemberWizard() {
+export function AddTeamMemberWizard({
+  canSeeSalary,
+}: {
+  /** Financial on Staff (ADR CM-0032). */
+  canSeeSalary: boolean;
+}) {
   const [{ data: designations }, { data: roles }] = useSuspenseQueries({
     queries: [designationOptionsQuery, rolesQuery],
   });
   const { company } = useActiveCompany();
   const companyName = company?.name ?? "your Company";
   const queryClient = useQueryClient();
-  const form = useForm<AddUserValues>({
-    resolver: zodResolver(addUserSchema),
+  const form = useForm<AddStaffValues>({
+    resolver: zodResolver(addStaffSchema),
     defaultValues: EMPTY,
   });
   const [memberType, email, password, invite] = useWatch({
@@ -109,7 +114,7 @@ export function AddTeamMemberWizard() {
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: TEAM_MEMBERS_KEY }),
-        // The Role's Users count changed.
+        // The Role's staff count changed.
         queryClient.invalidateQueries({ queryKey: ROLES_KEY }),
       ]);
     },
@@ -131,7 +136,10 @@ export function AddTeamMemberWizard() {
     const sendInvite = inviteAvailable(values) && values.invite;
     try {
       const member = await mutation.mutateAsync({
-        ...detailsInput(values, { keepIdentifiersWhenBlank: false }),
+        ...detailsInput(values, {
+          keepIdentifiersWhenBlank: false,
+          canSeeSalary,
+        }),
         projectIds: memberType === "hrms" ? [] : projectIds,
         roleId,
         invite: sendInvite,
@@ -166,8 +174,8 @@ export function AddTeamMemberWizard() {
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
-          back={{ label: "Users", href: USERS_PATH }}
-          title="Add User"
+          back={{ label: "Staff", href: STAFF_PATH }}
+          title="Add Staff"
           meta={`Step ${String(index + 1)} of ${String(steps.length)}: ${STEP_LABELS[step]}`}
         />
         <ol className="flex gap-1.5" aria-label="Steps">
@@ -195,6 +203,7 @@ export function AddTeamMemberWizard() {
             <TeamMemberDetailsFields
               form={form}
               designations={designations}
+              canSeeSalary={canSeeSalary}
               signIn={<SignInOptions form={form} companyName={companyName} />}
             />
           )}
@@ -238,7 +247,7 @@ export function AddTeamMemberWizard() {
                   ? "Adding…"
                   : inviting
                     ? "Add and invite"
-                    : "Add User"}
+                    : "Add Staff"}
             </Button>
           </div>
         </form>
@@ -280,7 +289,7 @@ function AddedUser({
   } else {
     title = `${created.name} is added`;
     text =
-      "They are a record until you invite them or set a password. You can do either from Edit User.";
+      "They are a record until you invite them or set a password. You can do either from Edit Staff.";
   }
   const Icon = icon;
 
@@ -304,10 +313,10 @@ function AddedUser({
               </Button>
             )}
             <Link
-              href={USERS_PATH}
+              href={STAFF_PATH}
               className={buttonVariants({ variant: "outline" })}
             >
-              Back to Users
+              Back to Staff
             </Link>
           </div>
         </div>

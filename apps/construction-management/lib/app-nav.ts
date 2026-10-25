@@ -35,12 +35,12 @@ export const APP_NAV = [
       "Your Company's lists: Designations, Contractors, Suppliers, Materials, Measurement Units, Terms & Conditions, Vendors, Labours and Departments.",
   },
   {
-    // The area opens on Users; Role Management sits beside it in the submenu.
-    href: "/app/users",
-    label: "Users & Roles",
-    title: "Users & Roles",
+    // The area opens on Staff; Role Management sits beside it in the submenu.
+    href: "/app/staff",
+    label: "Staff & Roles",
+    title: "Staff & Roles",
     description:
-      "Your team and how they sign in, and the Roles that decide what each one may do.",
+      "Your staff and how they sign in, and the Roles that decide what each one may do.",
   },
   {
     href: "/app/settings",

@@ -41,7 +41,7 @@ import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MasterListPageSkeleton } from "@/components/masters/masters-skeletons";
 import { fieldForCode } from "@/lib/server-errors";
-import { ROLES_PATH, rolePath } from "@/lib/users-roles-nav";
+import { ROLES_PATH, rolePath, staffCount } from "@/lib/staff-roles-nav";
 import { QueryHttpError } from "@/src/queries/http";
 import {
   rolesQuery,
@@ -53,18 +53,14 @@ import {
 import type { RoleActions } from "./role-actions";
 
 export const ROLES_META =
-  "A Role is what its Users may do. Editing a Role changes access for everyone on it.";
+  "A Role is what its staff may do. Editing a Role changes access for everyone on it.";
 
 const byName = new Intl.Collator("en", { sensitivity: "base", numeric: true });
-
-export function usersCount(count: number): string {
-  return count === 1 ? "1 User" : `${String(count)} Users`;
-}
 
 /** Why a Role cannot be deleted yet, or null when it can. */
 function deleteBlockedReason(role: Role): string | null {
   if (role.userCount === 0) return null;
-  return `${usersCount(role.userCount)} on it. Move them to another Role first.`;
+  return `${staffCount(role.userCount)} on it. Move them to another Role first.`;
 }
 
 /** The user count a ROLE_IN_USE refusal carries, when it does. */
@@ -125,11 +121,11 @@ function RoleRow({
         ) : null}
         {/* On a phone the count sits under the name. */}
         <p className="text-muted-foreground text-xs sm:hidden">
-          {usersCount(role.userCount)}
+          {staffCount(role.userCount)}
         </p>
       </div>
       <p className="text-muted-foreground hidden w-24 shrink-0 text-right text-sm tabular-nums sm:block">
-        {usersCount(role.userCount)}
+        {staffCount(role.userCount)}
       </p>
       <DropdownMenu>
         <DropdownMenuTrigger
@@ -180,7 +176,7 @@ function RoleRow({
   );
 }
 
-/** Users & Roles → Role Management (ADR CM-0030): the Company's Roles. */
+/** Staff & Roles → Role Management (ADR CM-0030): the Company's Roles. */
 export function RolesList({ actions }: { actions: RoleActions }) {
   return (
     <Suspense
@@ -308,7 +304,7 @@ function RolesListContent({ actions }: { actions: RoleActions }) {
               Delete {pendingDelete?.name ?? "this Role"}?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              It will no longer be offered on Add User. This cannot be undone.
+              It will no longer be offered on Add Staff. This cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <FormAlert message={deleteError} />
@@ -330,7 +326,7 @@ function RolesListContent({ actions }: { actions: RoleActions }) {
                     setDeleteError(
                       count == null
                         ? fieldForCode(error, {}).message
-                        : `${usersCount(count)} on this Role now. Move them to another Role first.`,
+                        : `${staffCount(count)} on this Role now. Move them to another Role first.`,
                     );
                   },
                 });

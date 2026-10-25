@@ -4,8 +4,11 @@ import { z } from "zod";
 import {
   FLAGS,
   MENUS,
+  financialValue,
+  type MemberAccess,
   type PermissionGrants,
 } from "@/src/shared-kernel/access";
+import { MAX_MONTHLY_SALARY } from "@/src/organization/domain/team-member";
 import {
   PASSWORD_MAX,
   PASSWORD_MIN,
@@ -32,6 +35,15 @@ export const teamMemberDetailFields = {
   aadhaar: z.string().trim().max(14).nullish(),
   pan: z.string().trim().max(10).nullish(),
   emergencyContact: z.string().trim().max(120).nullish(),
+  monthlySalary: z
+    .number()
+    .int()
+    .min(0)
+    .max(MAX_MONTHLY_SALARY)
+    .nullish()
+    .describe(
+      "Paise a month; optional (ADR CM-0032). Ignored without Financial on Staff; on edit, leave it out to keep it and send null to clear it",
+    ),
   memberType: z.enum(["normal", "hrms"]),
 };
 
@@ -52,6 +64,13 @@ export const ConstructionOrganizationTeamMemberResponseModel = z.object({
   aadhaarMasked: z.string().nullable(),
   panMasked: z.string().nullable(),
   emergencyContact: z.string().nullable(),
+  monthlySalary: z
+    .number()
+    .int()
+    .nullable()
+    .describe(
+      "Paise a month (ADR CM-0032); null when none, or without Financial on Staff",
+    ),
   memberType: z.enum(["normal", "hrms"]),
   isOwner: z.boolean(),
   status: z.enum(["joining_pending", "active", "rejected", "left"]),
@@ -67,7 +86,7 @@ export const ConstructionOrganizationTeamMemberResponseModel = z.object({
   canSetPassword: z
     .boolean()
     .describe(
-      "Edit User may set a new password: not the Owner, and no User yet or a User in no other Company (ADR CM-0030 §7)",
+      "Edit Staff may set a new password: not the Owner, and no User yet or a User in no other Company (ADR CM-0030 §7)",
     ),
   invitePath: z.string().nullable(),
   invitedAt: z.iso.datetime().nullable(),
@@ -80,11 +99,18 @@ export type ConstructionOrganizationTeamMemberResponseModel = z.infer<
   typeof ConstructionOrganizationTeamMemberResponseModel
 >;
 
+/** The salary only with Financial on Staff (ADR CM-0032). */
 export function toTeamMemberResponse(
   member: TeamMemberReadModel,
+  access: MemberAccess,
 ): ConstructionOrganizationTeamMemberResponseModel {
   return {
     ...member,
+    monthlySalary: financialValue(
+      access,
+      "organization.team_members",
+      member.monthlySalary,
+    ),
     mobileLocked:
       isConstructionSmsEnabled() &&
       // Same rule as TeamMember.updateDetails: locked once past Joining Pending.
@@ -105,7 +131,7 @@ export const TeamMemberPasswordModel = z
   .max(PASSWORD_MAX);
 
 /**
- * Add User and Set a new password answer with the Team Member and whether
+ * Add Staff and Set a new password answer with the Team Member and whether
  * the password was ignored because someone already signs in with that
  * mobile or email (ADR CM-0030 §3).
  */
@@ -124,9 +150,10 @@ export type ConstructionOrganizationTeamMemberWithPasswordResponseModel =
 
 export function toTeamMemberWithPasswordResponse(
   member: TeamMemberWithPassword,
+  access: MemberAccess,
 ): ConstructionOrganizationTeamMemberWithPasswordResponseModel {
   return {
-    ...toTeamMemberResponse(member),
+    ...toTeamMemberResponse(member, access),
     passwordIgnored: member.passwordIgnored,
   };
 }

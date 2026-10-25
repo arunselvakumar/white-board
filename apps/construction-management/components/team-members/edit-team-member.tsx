@@ -25,9 +25,10 @@ import {
 } from "@repo/ui/components/tabs";
 
 import { PageHeader } from "@/components/app-shell/page-header";
+import { paiseToRupees } from "@/components/money/money-input";
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";
-import { USERS_PATH } from "@/lib/users-roles-nav";
+import { STAFF_PATH } from "@/lib/staff-roles-nav";
 import { ROLES_KEY, rolesQuery } from "@/src/queries/roles";
 import {
   TEAM_MEMBERS_KEY,
@@ -65,6 +66,7 @@ function valuesOf(member: TeamMember): TeamMemberDetailsValues {
     aadhaar: "",
     pan: "",
     emergencyContact: member.emergencyContact ?? "",
+    monthlySalary: paiseToRupees(member.monthlySalary),
   };
 }
 
@@ -84,10 +86,17 @@ function passwordNotice(outcome: TeamMember & PasswordOutcome): Notice {
 }
 
 /**
- * Edit User (CM-111, ADR CM-0030): Details, Projects and Role tabs, and
+ * Edit Staff (CM-111, ADR CM-0030): Details, Projects and Role tabs, and
  * from the header Set a new password and the invitation.
  */
-export function EditTeamMember({ id }: { id: string }) {
+export function EditTeamMember({
+  id,
+  canSeeSalary,
+}: {
+  id: string;
+  /** Financial on Staff (ADR CM-0032). */
+  canSeeSalary: boolean;
+}) {
   const [{ data: member }, { data: designations }, { data: roles }] =
     useSuspenseQueries({
       queries: [teamMemberQuery(id), designationOptionsQuery, rolesQuery],
@@ -107,7 +116,7 @@ export function EditTeamMember({ id }: { id: string }) {
     mutationFn: (values: TeamMemberDetailsValues) =>
       updateTeamMember(
         id,
-        detailsInput(values, { keepIdentifiersWhenBlank: true }),
+        detailsInput(values, { keepIdentifiersWhenBlank: true, canSeeSalary }),
       ),
     onSuccess: async (updated) => {
       await saved(updated);
@@ -120,7 +129,7 @@ export function EditTeamMember({ id }: { id: string }) {
     mutationFn: (next: string) => setTeamMemberRole(id, next),
     onSuccess: async (updated) => {
       await saved(updated);
-      // Both Roles' Users counts changed.
+      // Both Roles' staff counts changed.
       await queryClient.invalidateQueries({ queryKey: ROLES_KEY });
     },
   });
@@ -145,7 +154,7 @@ export function EditTeamMember({ id }: { id: string }) {
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
-          back={{ label: "Users", href: USERS_PATH }}
+          back={{ label: "Staff", href: STAFF_PATH }}
           title={member.name}
           meta={
             <span className="inline-flex flex-wrap items-center gap-2">
@@ -261,6 +270,7 @@ export function EditTeamMember({ id }: { id: string }) {
                   pan: member.panMasked,
                 }}
                 mobileLocked={member.mobileLocked}
+                canSeeSalary={canSeeSalary}
               />
               <FormAlert message={form.formState.errors.root?.message} />
               {details.isSuccess && !form.formState.isDirty && (

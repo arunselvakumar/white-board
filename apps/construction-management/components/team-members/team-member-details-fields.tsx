@@ -23,10 +23,18 @@ import {
 
 import { FieldError } from "@/components/auth/field-error";
 import { MobileField } from "@/components/auth/mobile-field";
+import {
+  MoneyInput,
+  isRupees,
+  rupeesToPaise,
+} from "@/components/money/money-input";
 import type { DesignationOption } from "@/src/queries/team-members";
 import { isValidAadhaar, isValidPan } from "@/src/shared-kernel/tax-ids";
 
-/** The detail fields Add User (step 1) and Edit User share (CM-111). */
+/** The API's cap (ADR CM-0032), as a Labour's wage. */
+const MAX_SALARY_PAISE = 2_000_000_000;
+
+/** The detail fields Add Staff (step 1) and Edit Staff share (CM-111). */
 export const teamMemberDetailsObject = z.object({
   memberType: z.enum(["normal", "hrms"]),
   name: z.string().trim().min(1, "Enter the name").max(100, "Name is too long"),
@@ -58,6 +66,16 @@ export const teamMemberDetailsObject = z.object({
       message: "Enter a valid 10-character PAN",
     }),
   emergencyContact: z.string().trim().max(120, "Too long"),
+  /** Rupees; optional (ADR CM-0032). */
+  monthlySalary: z
+    .string()
+    .trim()
+    .refine((value) => value === "" || isRupees(value), {
+      message: "Enter an amount in rupees, like 25000 or 25000.50",
+    })
+    .refine((value) => (rupeesToPaise(value) ?? 0) <= MAX_SALARY_PAISE, {
+      message: "Enter at most ₹2 crore a month",
+    }),
 });
 
 /** A mobile or an email; either one is enough (ADR CM-0030 §6). */
@@ -87,6 +105,7 @@ export const EMPTY_DETAILS: TeamMemberDetailsValues = {
   aadhaar: "",
   pan: "",
   emergencyContact: "",
+  monthlySalary: "",
 };
 
 /** Server error codes → the field they belong to. */
@@ -107,12 +126,16 @@ export const DETAIL_ERROR_FIELDS: Record<
   AADHAAR_INVALID: "aadhaar",
   PAN_INVALID: "pan",
   ADDRESS_TOO_LONG: "address",
+  SALARY_INVALID: "monthlySalary",
 };
 
-/** The request body for the details, from form values. */
+/**
+ * The request body for the details, from form values. Without
+ * `canSeeSalary` the salary is left out, so an edit keeps it.
+ */
 export function detailsInput(
   values: TeamMemberDetailsValues,
-  options: { keepIdentifiersWhenBlank: boolean },
+  options: { keepIdentifiersWhenBlank: boolean; canSeeSalary: boolean },
 ) {
   const identifier = (value: string) =>
     value === ""
@@ -131,6 +154,9 @@ export function detailsInput(
     pan: identifier(values.pan),
     emergencyContact:
       values.emergencyContact === "" ? null : values.emergencyContact,
+    monthlySalary: options.canSeeSalary
+      ? rupeesToPaise(values.monthlySalary)
+      : undefined,
   };
 }
 
@@ -141,17 +167,20 @@ export function TeamMemberDetailsFields<
   designations,
   masked,
   mobileLocked = false,
+  canSeeSalary,
   signIn,
 }: {
   form: UseFormReturn<Values>;
   designations: DesignationOption[];
+  /** Financial on Staff: without it the salary is neither shown nor sent. */
+  canSeeSalary: boolean;
   /** Stored identifiers, shown as placeholders when editing. */
   masked?: { aadhaar: string | null; pan: string | null };
   mobileLocked?: boolean;
-  /** Add User's Invite them and Set a password, under mobile and email. */
+  /** Add Staff's Invite them and Set a password, under mobile and email. */
   signIn?: ReactNode;
 }) {
-  // Only the detail fields are read here; Add User's form has more.
+  // Only the detail fields are read here; Add Staff's form has more.
   const form = wide as unknown as UseFormReturn<TeamMemberDetailsValues>;
   const errors = form.formState.errors;
   // A mobile or an email is needed: Mobile is marked while Email is blank.
@@ -184,7 +213,7 @@ export function TeamMemberDetailsFields<
                 <Label className="bg-card has-data-checked:border-primary flex cursor-pointer items-start gap-3 rounded-lg border p-3 font-normal">
                   <RadioGroupItem
                     value="normal"
-                    aria-label="Normal Team Member"
+                    aria-label="Normal staff member"
                   />
                   <span className="space-y-0.5">
                     <span className="block font-semibold">Normal</span>
@@ -194,7 +223,7 @@ export function TeamMemberDetailsFields<
                   </span>
                 </Label>
                 <Label className="bg-card has-data-checked:border-primary flex cursor-pointer items-start gap-3 rounded-lg border p-3 font-normal">
-                  <RadioGroupItem value="hrms" aria-label="HRMS Team Member" />
+                  <RadioGroupItem value="hrms" aria-label="HRMS staff member" />
                   <span className="space-y-0.5">
                     <span className="block font-semibold">HRMS only</span>
                     <span className="text-muted-foreground block text-xs">
@@ -324,6 +353,32 @@ export function TeamMemberDetailsFields<
             <FieldError message={errors.emergencyContact?.message} />
           </div>
         </div>
+      </div>
+
+      <div className="bg-card rounded-xl border p-4 sm:p-5">
+        <fieldset className="space-y-2" aria-describedby="member-salary-hint">
+          <legend className="text-sm font-semibold">Salary</legend>
+          <p id="member-salary-hint" className="text-muted-foreground text-xs">
+            {canSeeSalary
+              ? "Optional. Only people with the Financial right on Staff see it."
+              : "You cannot see salaries. Ask the Owner for the Financial right on Staff."}
+          </p>
+          {canSeeSalary && (
+            <div className="grid gap-4 pt-2 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="member-salary">Salary per month</Label>
+                <MoneyInput
+                  id="member-salary"
+                  className="h-10"
+                  placeholder="25000"
+                  aria-invalid={errors.monthlySalary != null}
+                  {...form.register("monthlySalary")}
+                />
+                <FieldError message={errors.monthlySalary?.message} />
+              </div>
+            </div>
+          )}
+        </fieldset>
       </div>
 
       <div className="bg-card rounded-xl border p-4 sm:p-5">

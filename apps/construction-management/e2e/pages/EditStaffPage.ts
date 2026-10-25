@@ -2,7 +2,7 @@ import type { Page } from "@playwright/test";
 
 import { AppShellPage } from "./AppShellPage";
 
-export class EditUserPage extends AppShellPage {
+export class EditStaffPage extends AppShellPage {
   constructor(
     page: Page,
     private readonly memberId = "",
@@ -11,11 +11,15 @@ export class EditUserPage extends AppShellPage {
   }
 
   public get url() {
-    return `/app/users/${this.memberId}`;
+    return `/app/staff/${this.memberId}`;
   }
 
   public tab(name: "Details" | "Projects" | "Role") {
     return this.page.getByRole("tab", { name });
+  }
+
+  public get salaryField() {
+    return this.page.getByRole("textbox", { name: "Salary per month" });
   }
 
   public get saveDetailsButton() {

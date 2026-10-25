@@ -6,7 +6,8 @@ import {
 } from "./team-member-models";
 
 /**
- * Add User (ADR CM-0030 §6): details, Member Type, Projects and the Role.
+ * Add Staff (ADR CM-0030 §6): details, salary, Member Type, Projects and
+ * the Role.
  * `password` makes the sign-in account at once (`invite` is then ignored);
  * otherwise `invite` sends the invitation (needs an email) or, false,
  * keeps a record to invite later.

@@ -25,7 +25,10 @@ export async function GET(
       TeamMemberIdParamsModel.safeParse(await context.params),
     );
     return Response.json(
-      toTeamMemberResponse(await handlers.get(session.workspaceId, id)),
+      toTeamMemberResponse(
+        await handlers.get(session.workspaceId, id),
+        session.access,
+      ),
     );
   } catch (error) {
     return mapError(error);

@@ -5,16 +5,19 @@ import { AddTeamMemberSkeleton } from "@/components/team-members/team-members-sk
 import { QuerySuspense } from "@/components/query-suspense";
 import { RolesNoAccess } from "@/components/roles/roles-no-access";
 
-import { viewerCan } from "../../_lib/viewer-can";
+import { viewerFlags } from "../../_lib/viewer-can";
 
-export const metadata: Metadata = { title: "Add User" };
+export const metadata: Metadata = { title: "Add Staff" };
 
 export default async function Page() {
-  if (!(await viewerCan("organization.team_members", "create")))
-    return <RolesNoAccess what="adding Users" />;
+  const can = await viewerFlags("organization.team_members", [
+    "create",
+    "financial",
+  ]);
+  if (!can.create) return <RolesNoAccess what="adding Staff" />;
   return (
     <QuerySuspense fallback={<AddTeamMemberSkeleton />}>
-      <AddTeamMemberWizard />
+      <AddTeamMemberWizard canSeeSalary={can.financial} />
     </QuerySuspense>
   );
 }

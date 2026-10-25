@@ -1,12 +1,12 @@
 import { AppShellPage } from "./AppShellPage";
 
-export class AddUserPage extends AppShellPage {
+export class AddStaffPage extends AppShellPage {
   public get url() {
-    return "/app/users/new";
+    return "/app/staff/new";
   }
 
   public get pageHeading() {
-    return this.heading("Add User", { level: 1 });
+    return this.heading("Add Staff", { level: 1 });
   }
 
   public get nameField() {
@@ -19,6 +19,10 @@ export class AddUserPage extends AppShellPage {
 
   public get emailField() {
     return this.page.getByRole("textbox", { name: "Email" });
+  }
+
+  public get salaryField() {
+    return this.page.getByRole("textbox", { name: "Salary per month" });
   }
 
   public get inviteCheckbox() {
@@ -43,11 +47,13 @@ export class AddUserPage extends AppShellPage {
     email?: string;
     mobile?: string;
     password?: string;
+    salary?: string;
   }) {
     await this.nameField.fill(input.name);
     await this.choose("Designation", input.designation ?? "Site Engineer");
     if (input.mobile != null) await this.mobileField.fill(input.mobile);
     if (input.email != null) await this.emailField.fill(input.email);
+    if (input.salary != null) await this.salaryField.fill(input.salary);
     if (input.password != null) await this.passwordField.fill(input.password);
   }
 

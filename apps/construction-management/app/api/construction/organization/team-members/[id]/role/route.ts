@@ -38,7 +38,7 @@ export async function PUT(
       grantor: session.access,
       roleId,
     });
-    return Response.json(toTeamMemberResponse(member));
+    return Response.json(toTeamMemberResponse(member, session.access));
   } catch (error) {
     return mapError(error);
   }

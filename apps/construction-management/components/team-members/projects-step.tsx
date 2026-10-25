@@ -51,8 +51,8 @@ function ProjectChecklist({ value, onChange }: Selection) {
           </EmptyMedia>
           <EmptyTitle>No Projects yet</EmptyTitle>
           <EmptyDescription>
-            Once you add Projects, choose here which ones this Team Member works
-            on. You can assign them later from Edit.
+            Once you add Projects, choose here which ones this staff member
+            works on. You can assign them later from Edit.
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
@@ -77,7 +77,7 @@ function ProjectChecklist({ value, onChange }: Selection) {
   return (
     <fieldset className="space-y-3">
       <legend className="text-muted-foreground mb-3 text-sm">
-        The Team Member works only on the Projects you tick. Leave all empty to
+        The staff member works only on the Projects you tick. Leave all empty to
         assign them later.
       </legend>
       <ul className="bg-card divide-y rounded-xl border">

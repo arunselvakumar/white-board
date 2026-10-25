@@ -24,7 +24,7 @@ import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { PermissionMatrix } from "@/components/permissions/permission-matrix";
 import { fieldForCode } from "@/lib/server-errors";
-import { ROLES_PATH } from "@/lib/users-roles-nav";
+import { ROLES_PATH, staffCount } from "@/lib/staff-roles-nav";
 import { QueryHttpError } from "@/src/queries/http";
 import {
   roleQuery,
@@ -34,8 +34,6 @@ import {
   type RoleInput,
 } from "@/src/queries/roles";
 import type { PermissionGrants } from "@/src/shared-kernel/access";
-
-import { usersCount } from "./roles-list";
 
 const schema = z.object({
   name: z
@@ -151,8 +149,8 @@ function RoleForm({
           </h2>
           <p className="text-muted-foreground text-sm">
             {readOnly
-              ? "What Users on this Role may do."
-              : "Tick what Users on this Role may do. You can only give what you can do yourself."}
+              ? "What staff on this Role may do."
+              : "Tick what staff on this Role may do. You can only give what you can do yourself."}
           </p>
         </div>
         <Controller
@@ -219,7 +217,7 @@ export function NewRoleScreen() {
   return (
     <FormPage
       title="Add Role"
-      meta="Give it to Users on Add User or Edit User."
+      meta="Give it to staff on Add Staff or Edit Staff."
     >
       <RoleForm
         form={form}
@@ -265,10 +263,10 @@ export function EditRoleScreen({
         <span className="inline-flex items-center gap-1.5">
           <Users aria-hidden="true" className="size-4" />
           {data.userCount === 0
-            ? "No Users are on this Role yet."
+            ? "No staff are on this Role yet."
             : canUpdate
-              ? `Changes apply to the ${usersCount(data.userCount)} on this Role.`
-              : `${usersCount(data.userCount)} on this Role.`}
+              ? `Changes apply to the ${staffCount(data.userCount)} on this Role.`
+              : `${staffCount(data.userCount)} on this Role.`}
         </span>
       }
     >

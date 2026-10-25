@@ -85,8 +85,8 @@ export type TeamMemberInvited = {
 };
 
 /**
- * Team Member commands and queries (CM-108); screens call them Users (ADR
- * CM-0030). Routes check the Permission Matrix (`organization.team_members`)
+ * Team Member commands and queries (CM-108); screens call them Staff (ADR
+ * CM-0032). Routes check the Permission Matrix (`organization.team_members`)
  * before calling these.
  */
 export class TeamMemberHandlers {
@@ -184,6 +184,7 @@ export class TeamMemberHandlers {
         status: member.status,
         projectIds: member.projectIds,
         roleId: member.roleId,
+        monthlySalary: member.monthlySalary,
       },
     };
   }
@@ -228,7 +229,7 @@ export class TeamMemberHandlers {
   }
 
   /**
-   * Add User (ADR CM-0030 §6). Joining Pending with an invite link; then
+   * Add Staff (ADR CM-0030 §6). Joining Pending with an invite link; then
    * one of three outcomes:
    *
    * - `password`: the sign-in account is made and the member is Active at
@@ -250,6 +251,8 @@ export class TeamMemberHandlers {
     /** Who is giving the Role; the Owner when omitted (tests, seeds). */
     grantor?: MemberAccess;
     details: TeamMemberDetailsInput;
+    /** Paise a month; the route drops it without Financial (ADR CM-0032). */
+    monthlySalary?: number | null;
     memberType: MemberType;
     projectIds?: readonly string[];
     roleId?: string | null;
@@ -278,6 +281,7 @@ export class TeamMemberHandlers {
       id: newId(now.getTime()),
       workspaceId: input.workspaceId,
       details,
+      monthlySalary: input.monthlySalary,
       memberType: input.memberType,
       projectIds: input.memberType === "hrms" ? [] : (input.projectIds ?? []),
       roleId: role?.id ?? null,
@@ -361,12 +365,17 @@ export class TeamMemberHandlers {
     return { ...(await this.view(member)), passwordIgnored: null };
   }
 
-  /** Edit details and Member Type; the Role stays (ADR CM-0030). */
+  /**
+   * Edit details, salary and Member Type; the Role stays (ADR CM-0030).
+   * `monthlySalary` left out keeps the stored one (a member without
+   * Financial never sees it); null clears it (ADR CM-0032).
+   */
   async update(input: {
     workspaceId: string;
     id: string;
     by: string;
     details: TeamMemberDetailsInput;
+    monthlySalary?: number | null;
     memberType: MemberType;
   }): Promise<TeamMemberReadModel> {
     const now = this.clock();
@@ -389,6 +398,8 @@ export class TeamMemberHandlers {
     member.updateDetails(details, input.by, now, {
       mobileIsSignIn: this.mobileSignIn(),
     });
+    if (input.monthlySalary !== undefined)
+      member.setMonthlySalary(input.monthlySalary, input.by, now);
     if (input.memberType !== member.memberType) {
       if (input.memberType === "hrms")
         await this.plan.assertCanAdd(input.workspaceId, "hrms_member");

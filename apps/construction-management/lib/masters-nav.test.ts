@@ -24,7 +24,7 @@ describe("MASTERS_GROUPS", () => {
       "Designations",
     );
     expect(activeMastersSection("/app/settings")).toBeUndefined();
-    // Team Members moved to Users & Roles → Users (ADR CM-0030).
+    // Team Members moved to Staff & Roles → Staff (ADR CM-0030).
     expect(activeMastersSection("/app/masters/team-members")).toBeUndefined();
     expect(MASTERS_GROUPS[0]?.sections.map((section) => section.label)).toEqual(
       ["Designations"],

@@ -63,6 +63,8 @@ export type TeamMemberDetailsInput = {
   aadhaar?: string | null;
   pan?: string | null;
   emergencyContact: string | null;
+  /** Paise a month; left out keeps it, null clears it (ADR CM-0032). */
+  monthlySalary?: number | null;
   memberType: "normal" | "hrms";
 };
 
@@ -75,7 +77,7 @@ function post<T>(path: string, body?: unknown): Promise<T> {
 }
 
 /**
- * Add User (ADR CM-0030 §6): `password` set signs them up at once (`invite`
+ * Add Staff (ADR CM-0030 §6): `password` set signs them up at once (`invite`
  * is ignored then); otherwise `invite` emails them the Join Request.
  */
 export function createTeamMember(

@@ -54,7 +54,7 @@ import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
-import { USERS_PATH, userPath } from "@/lib/users-roles-nav";
+import { STAFF_PATH, staffCount, staffPath } from "@/lib/staff-roles-nav";
 import { QueryHttpError } from "@/src/queries/http";
 import {
   TEAM_MEMBERS_KEY,
@@ -86,13 +86,13 @@ const STATUS_TABS: FilterTab<TeamMemberListFilter["status"]>[] =
   }));
 
 /**
- * Users & Roles → Users (CM-111, ADR CM-0030): the Company's Team Members,
+ * Staff & Roles → Staff (CM-111, ADR CM-0030): the Company's Team Members,
  * with search, status tabs, their Role and row actions.
  */
 export function TeamMembersPage({
   canAdd = true,
 }: {
-  /** Team Members Create; without it there is no Add User. */
+  /** Team Members Create; without it there is no Add Staff. */
   canAdd?: boolean;
 }) {
   const [search, setSearch] = useState("");
@@ -106,13 +106,13 @@ export function TeamMembersPage({
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
-          title="Users"
+          title="Staff"
           meta="Your team, how they sign in, and the Role that decides what each one may do."
           actions={
             canAdd ? (
-              <Link href={`${USERS_PATH}/new`} className={buttonVariants()}>
+              <Link href={`${STAFF_PATH}/new`} className={buttonVariants()}>
                 <Plus />
-                Add User
+                Add Staff
               </Link>
             ) : undefined
           }
@@ -124,7 +124,7 @@ export function TeamMembersPage({
             </InputGroupAddon>
             <InputGroupInput
               type="search"
-              aria-label="Search Users"
+              aria-label="Search Staff"
               placeholder="Search name, mobile or email"
               value={search}
               onChange={(event) => {
@@ -213,7 +213,7 @@ function TeamMemberRows({
             <Users />
           </EmptyMedia>
           <EmptyTitle>
-            {filtered ? "No Users match" : "No Users yet"}
+            {filtered ? "No Staff match" : "No Staff yet"}
           </EmptyTitle>
           <EmptyDescription>
             {filtered
@@ -223,9 +223,9 @@ function TeamMemberRows({
         </EmptyHeader>
         {!filtered && (
           <EmptyContent>
-            <Link href={`${USERS_PATH}/new`} className={buttonVariants()}>
+            <Link href={`${STAFF_PATH}/new`} className={buttonVariants()}>
               <Plus />
-              Add User
+              Add Staff
             </Link>
           </EmptyContent>
         )}
@@ -234,25 +234,23 @@ function TeamMemberRows({
 
   return (
     <div className={cn("space-y-3", className)}>
-      <p className="text-muted-foreground text-sm">
-        {data.total} {data.total === 1 ? "User" : "Users"}
-      </p>
+      <p className="text-muted-foreground text-sm">{staffCount(data.total)}</p>
       <div className="bg-card rounded-lg border">
         <div
           aria-hidden="true"
           className="text-muted-foreground bg-muted/40 hidden items-center gap-4 rounded-t-lg border-b px-4 py-2 text-xs font-medium sm:flex"
         >
-          <span className="flex-1">User</span>
+          <span className="flex-1">Staff</span>
           <span className="w-40">Role</span>
           <span className="w-8" />
         </div>
-        <ul aria-label="Users" className="divide-border divide-y">
+        <ul aria-label="Staff" className="divide-border divide-y">
           {data.items.map((member) => (
             <li key={member.id} className="flex items-center gap-4 px-4 py-3">
               <div className="min-w-0 flex-1 space-y-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <Link
-                    href={userPath(member.id)}
+                    href={staffPath(member.id)}
                     className="truncate font-semibold hover:underline"
                   >
                     {member.name}
@@ -314,7 +312,7 @@ function TeamMemberRows({
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem
-                      render={<Link href={userPath(member.id)} />}
+                      render={<Link href={staffPath(member.id)} />}
                     >
                       Edit
                     </DropdownMenuItem>

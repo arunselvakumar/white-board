@@ -28,10 +28,10 @@ export type AreaNavGroup = {
 
 /**
  * A top-level area in the sidebar with a submenu of its screens, grouped
- * (Masters, Workspace, Users & Roles). The submenu opens by itself on any
+ * (Masters, Workspace, Staff & Roles). The submenu opens by itself on any
  * page of the area and can be folded away elsewhere. A page of the area is
- * one under its link or one a submenu entry owns (`currentHref`): Users &
- * Roles links to Users, and Role Management sits beside it.
+ * one under its link or one a submenu entry owns (`currentHref`): Staff &
+ * Roles links to Staff, and Role Management sits beside it.
  */
 export function AreaNavMenu({
   href,

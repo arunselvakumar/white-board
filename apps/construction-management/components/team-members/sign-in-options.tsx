@@ -24,8 +24,8 @@ export const temporaryPassword = z
   .min(PASSWORD_MIN, `Use at least ${String(PASSWORD_MIN)} characters`)
   .max(PASSWORD_MAX, `Use at most ${String(PASSWORD_MAX)} characters`);
 
-/** Add User's details step: the details plus how they will sign in. */
-export const addUserSchema = teamMemberDetailsObject
+/** Add Staff's details step: the details plus how they will sign in. */
+export const addStaffSchema = teamMemberDetailsObject
   .extend({
     invite: z.boolean(),
     // Blank means no password; otherwise a Temporary Password.
@@ -36,7 +36,7 @@ export const addUserSchema = teamMemberDetailsObject
     message: MOBILE_OR_EMAIL_MESSAGE,
   });
 
-export type AddUserValues = z.infer<typeof addUserSchema>;
+export type AddStaffValues = z.infer<typeof addStaffSchema>;
 
 /**
  * What they can sign in with, in words: "their mobile or email" when they
@@ -62,7 +62,7 @@ export function inviteAvailable(values: {
 }
 
 /**
- * Add User's three outcomes (ADR CM-0030 §6): Invite them (needs an email;
+ * Add Staff's three outcomes (ADR CM-0030 §6): Invite them (needs an email;
  * ticked by default once one is typed), Set a password (they sign in at
  * once and change it the first time), or neither (a record until invited).
  */
@@ -70,7 +70,7 @@ export function SignInOptions({
   form,
   companyName,
 }: {
-  form: UseFormReturn<AddUserValues>;
+  form: UseFormReturn<AddStaffValues>;
   companyName: string;
 }) {
   const [email, mobile, password, invite] = useWatch({
@@ -151,7 +151,7 @@ export function SignInOptions({
       {!inviting && !hasPassword ? (
         <p className="text-muted-foreground border-t pt-3 text-sm">
           They are a record until you invite them or set a password. You can do
-          either later from Edit User.
+          either later from Edit Staff.
         </p>
       ) : null}
     </div>
