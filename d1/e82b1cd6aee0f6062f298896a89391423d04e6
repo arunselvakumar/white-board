@@ -1,0 +1,51 @@
+apps/construction-management/.storybook/preview.tsx
+  s_43f32c25ef2007::t_c04ac7b56095e5 3,30,34,45-53,110-117
+apps/construction-management/app/api/construction/projects/projects/[id]/color/update/route.ts
+  s_43f32c25ef2007::t_4d8886cc555843 1-50
+apps/construction-management/app/api/construction/projects/projects/[id]/color/update/update-project-color-request-model.ts
+  s_43f32c25ef2007::t_8f29f80a4b3362 1-16
+apps/construction-management/app/layout.tsx
+  s_43f32c25ef2007::t_56bc206cf6ca60 5,52-54
+apps/construction-management/components/projects/projects-home.stories.tsx
+  s_43f32c25ef2007::t_4644b98b3f0345 11-12,30-38,82-83,117-118,120,125,144,151-168,189,196,208-209,324-373,520
+apps/construction-management/components/projects/projects-home.tsx
+  s_43f32c25ef2007::t_a0d6dd97c88419 7,9,12,14-16,23,26,32-37,53-57,66,74-81,90-98,142-143,155,173,180-184,192,195-223,229,264,302,309,331,337,344,346-358,385
+apps/construction-management/components/projects/projects-skeletons.tsx
+  s_43f32c25ef2007::t_2fe283e2886e3d 68,70-78,80
+apps/construction-management/docs/adr/CM-0026-project-colour-folder-cards.md
+  s_43f32c25ef2007::t_16e8ed2bb42b34 52-55
+apps/construction-management/docs/adr/CM-0027-projects-grouped-by-client.md
+  s_43f32c25ef2007::t_ebcbe40ec1965a 26-29
+apps/construction-management/package.json
+  s_43f32c25ef2007::t_96e3a8346886d0 48
+apps/construction-management/src/queries/project-home.ts
+  s_43f32c25ef2007::t_7d74a3642a0bc1 9-10,12-17,79-112
+bun.lock
+  s_43f32c25ef2007::t_8162a2f9457d2a 45,1930-1931
+packages/ui/src/styles/globals.css
+  s_43f32c25ef2007::t_093fe0f7145a68 220-224
+apps/construction-management/app/api/construction/projects/openapi.ts
+  s_43f32c25ef2007::t_ca58a1db7babb6 8,41,141-158
+apps/construction-management/app/api/construction/projects/projects/project-color.http.test.ts
+  s_43f32c25ef2007::t_ec5b1d1b31147d 1-138
+apps/construction-management/src/projects/application/project-handlers.ts
+  s_43f32c25ef2007::t_1262b5b979e943 244-267
+apps/construction-management/src/projects/domain/project.ts
+  s_43f32c25ef2007::t_6515d3f6679573 450-460
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "d1e82b1cd6aee0f6062f298896a89391423d04e6",
+  "prompts": {},
+  "sessions": {
+    "s_43f32c25ef2007": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "925748d9-ee5c-4753-bfa8-47d07468a8e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
