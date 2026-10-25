@@ -94,7 +94,7 @@ export function HrmsShell({ children }: { children: ReactNode }) {
           </nav>
         )}
       </div>
-      <HrmsAccessBoundary key={pathname} what={page?.title ?? "this page"}>
+      <HrmsAccessBoundary resetKey={pathname} what={page?.title ?? "this page"}>
         <Suspense fallback={<HrmsPageFallback title={page?.title} />}>
           {children}
         </Suspense>

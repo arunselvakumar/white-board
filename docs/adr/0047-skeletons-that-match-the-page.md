@@ -35,6 +35,21 @@ Construction Management adds `PageHeaderSkeleton` and a better root `PageFallbac
 
 **A guard against drift.** Lint forbids importing `Skeleton` from `@repo/ui/components/skeleton` in Construction Management outside `*-skeletons.tsx` files and the kit, so a new generic box has to be a named skeleton in the area's file. `QuerySuspense`'s fallback is still optional, because the root layout needs a default.
 
+## Amendment (2026-10-25): no generic skeleton before the page's own
+
+Opening a page used to show the root `PageFallback` (a header and a table) first, and only then the page's own skeleton.
+
+There were two reasons:
+
+- `QuerySuspense` was keyed by the path, so every link click remounted the root boundary, which then fell back.
+- The server sent `PageFallback` in the first HTML.
+
+Now:
+
+- The boundary stays mounted, and a navigation is a transition. The current page stays until the next one shows its own skeleton, and an error is cleared when the path changes. The HRMS shell's access boundary and Whiteboard's `QuerySuspense` do the same.
+- The root layout's server fallback is empty (`serverFallback={null}`), so a full page load shows the app shell, then the page's own skeleton.
+- Opening a Project (`/app/projects/[id]`) draws nothing while it forwards to the first module, so that module's skeleton is the only one.
+
 ## Considered options
 
 - **A hand-drawn skeleton per page.** This is the most exact, but it means about 150 components that drift as soon as a page changes.

@@ -12,14 +12,14 @@ import {
   EmptyTitle,
 } from "@repo/ui/components/empty";
 
-import { PageFallback } from "@/components/query-suspense";
 import { firstProjectModulePath, projectNavGroups } from "@/lib/project-nav";
 import { projectHomeQuery } from "@/src/queries/project-home";
 
 /**
  * `/app/projects/[id]`: opening a Project goes to the first module in the
  * member's menu (Dashboard for most), not a page of its own. With none
- * they can open, it says so.
+ * they can open, it says so. While it forwards it draws nothing, so the
+ * next thing under the Project header is that module's own skeleton.
  */
 export function ProjectLanding({ id }: { id: string }) {
   const router = useRouter();
@@ -30,7 +30,7 @@ export function ProjectLanding({ id }: { id: string }) {
     if (target != null) router.replace(target);
   }, [router, target]);
 
-  if (target != null) return <PageFallback />;
+  if (target != null) return null;
   return (
     <div className="w-full p-6">
       <Empty className="max-w-4xl border">

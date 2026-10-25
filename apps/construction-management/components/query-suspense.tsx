@@ -64,24 +64,35 @@ function useIsClient(): boolean {
  * Page reads run in the browser only (ADR-0026): query functions fetch
  * relative `/api/...` URLs with the browser's Session cookie, which the
  * server render has neither of. The shell around this renders on the server.
+ *
+ * The boundary is not remounted on navigation: a link click is a transition,
+ * so the current page stays until the next one can show its own skeleton,
+ * instead of flashing this fallback first. An error is cleared when the
+ * path changes.
  */
 export function QuerySuspense({
   children,
   fallback = <PageFallback />,
+  serverFallback = fallback,
 }: {
   children: ReactNode;
   /** What shows while loading; `null` for a section that may stay empty. */
   fallback?: ReactNode;
+  /**
+   * What the server sends in its place (the page has not run yet). The
+   * root layout sends nothing, so a page's first skeleton is its own.
+   */
+  serverFallback?: ReactNode;
 }) {
   const pathname = usePathname();
   const isClient = useIsClient();
 
-  if (!isClient) return fallback;
+  if (!isClient) return serverFallback;
 
   return (
-    <QueryErrorResetBoundary key={pathname}>
+    <QueryErrorResetBoundary>
       {({ reset }) => (
-        <QueryErrorBoundary onReset={reset}>
+        <QueryErrorBoundary onReset={reset} resetKey={pathname}>
           <Suspense fallback={fallback}>{children}</Suspense>
         </QueryErrorBoundary>
       )}
@@ -92,6 +103,8 @@ export function QuerySuspense({
 type QueryErrorBoundaryProps = {
   children: ReactNode;
   onReset: () => void;
+  /** The page's path: when it changes, a shown error is cleared. */
+  resetKey: string;
 };
 
 type QueryErrorBoundaryState = {
@@ -106,6 +119,13 @@ class QueryErrorBoundary extends Component<
 
   static getDerivedStateFromError(error: Error): QueryErrorBoundaryState {
     return { error };
+  }
+
+  override componentDidUpdate(previous: QueryErrorBoundaryProps) {
+    if (this.state.error != null && previous.resetKey !== this.props.resetKey) {
+      this.props.onReset();
+      this.setState({ error: null });
+    }
   }
 
   override render() {

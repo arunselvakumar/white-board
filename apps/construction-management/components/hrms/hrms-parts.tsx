@@ -110,16 +110,22 @@ export function HrmsNoAccess({ what }: { what: string }) {
 /**
  * Shows "You don't have access to …" for a 403 from a page read (a member
  * whose Permission Matrix lacks the menu); any other error goes on to the
- * app's boundary (`QuerySuspense`).
+ * app's boundary (`QuerySuspense`). A `resetKey` change (the page's path)
+ * clears it, so the boundary need not be remounted on navigation.
  */
 export class HrmsAccessBoundary extends Component<
-  { children: ReactNode; what: string },
+  { children: ReactNode; what: string; resetKey?: string },
   { error: Error | null }
 > {
   override state: { error: Error | null } = { error: null };
 
   static getDerivedStateFromError(error: unknown) {
     return { error: error instanceof Error ? error : new Error(String(error)) };
+  }
+
+  override componentDidUpdate(previous: { resetKey?: string }) {
+    if (this.state.error != null && previous.resetKey !== this.props.resetKey)
+      this.setState({ error: null });
   }
 
   override render() {
