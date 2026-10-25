@@ -1,0 +1,559 @@
+apps/construction-management/app/app/dashboard/page.tsx
+  s_78c924a349522f::t_4af7e0c10daf0a 24
+apps/construction-management/app/app/projects/[id]/dashboard/page.tsx
+  s_78c924a349522f::t_ff173a0a6840ae 29
+apps/construction-management/components/account/company-ownership-screen.tsx
+  s_78c924a349522f::t_a49c0666155585 68,96,184
+apps/construction-management/components/app-shell/page-placeholder.tsx
+  s_78c924a349522f::t_6476f5c602b4ec 24
+apps/construction-management/components/attendance/labour/labour-attendance-page.tsx
+  s_78c924a349522f::t_e6a072096cd7c3 55
+apps/construction-management/components/attendance/labour/labour-marking-sheet.tsx
+  s_78c924a349522f::t_41e5b0575dd4c9 917,1013
+apps/construction-management/components/attendance/labour/labour-month-grid.tsx
+  s_78c924a349522f::t_a999d196a2d2ff 35,81,98,120
+apps/construction-management/components/attendance/labour/labour-recorded-list.tsx
+  s_78c924a349522f::t_99d5130ccbec36 188,197,219
+apps/construction-management/components/attendance/vendor/vendor-attendance-page.tsx
+  s_78c924a349522f::t_067a4f9e6040a1 54
+apps/construction-management/components/attendance/vendor/vendor-month-view.tsx
+  s_78c924a349522f::t_1114dd91c8f739 35,83,99,120
+apps/construction-management/components/attendance/vendor/vendor-overtime-view.tsx
+  s_78c924a349522f::t_56569c690bf349 30,50
+apps/construction-management/components/auth/public-shell.tsx
+  s_78c924a349522f::t_31f41f8641332c 89
+apps/construction-management/components/backups/company-backup-screen.tsx
+  s_78c924a349522f::t_2285473f973328 316
+apps/construction-management/components/backups/download-my-data.tsx
+  s_78c924a349522f::t_3ba5c7761a5849 99
+apps/construction-management/components/company-profile/company-profile-form.tsx
+  s_78c924a349522f::t_af1cd2d9cf1b08 203-207,247-252,254,256-257,259-260,262-278,281,283-287,289,293-318,321-326,328,330-363,365-403,405-428
+apps/construction-management/components/company-profile/company-profile-screen.tsx
+  s_78c924a349522f::t_9257ff2ec48fb3 31
+apps/construction-management/components/company-profile/company-profile-skeletons.tsx
+  s_78c924a349522f::t_73d393946f9d8f 25,27,45-46,60
+apps/construction-management/components/dashboard/company-dashboard.tsx
+  s_78c924a349522f::t_8bacc8bc9c3cc5 278,308
+apps/construction-management/components/dashboard/dashboard-skeletons.tsx
+  s_78c924a349522f::t_0bd0d24afc343b 70
+apps/construction-management/components/designations/designation-form.tsx
+  s_78c924a349522f::t_bc6ab6f303df6d 81-103
+apps/construction-management/components/designations/designations-list.tsx
+  s_78c924a349522f::t_024e0168ebda66 181,212
+apps/construction-management/components/designations/designations-skeletons.tsx
+  s_78c924a349522f::t_d7c1a0dc163175 11-18
+apps/construction-management/components/downloads/downloads-page.tsx
+  s_78c924a349522f::t_80e196b3127e41 76,89-92
+apps/construction-management/components/finance/accounts/account-ledger.tsx
+  s_78c924a349522f::t_a8981ddef5ea93 226,232,310
+apps/construction-management/components/finance/central-payment/central-payment-page.tsx
+  s_78c924a349522f::t_966ff05926a3d0 104,301,379,384
+apps/construction-management/components/finance/central-payment/central-payment-skeletons.tsx
+  s_78c924a349522f::t_71266ec36aac8b 113
+apps/construction-management/components/finance/central-payment/central-payment-workspace-tile.tsx
+  s_78c924a349522f::t_4044c1bbdec5ec 17
+apps/construction-management/components/finance/documents/finance-document-files.tsx
+  s_78c924a349522f::t_7ed103b6f0253f 106
+apps/construction-management/components/finance/finance-skeletons.tsx
+  s_78c924a349522f::t_2335e7e17bdff7 100,116
+apps/construction-management/components/finance/other-expenses/other-expense-detail.tsx
+  s_78c924a349522f::t_0a5e47df144cde 156
+apps/construction-management/components/finance/other-expenses/other-expense-form.tsx
+  s_78c924a349522f::t_49e7f8321d3d1b 131
+apps/construction-management/components/finance/other-expenses/other-expenses-list.tsx
+  s_78c924a349522f::t_50bd4798c110e4 310,410
+apps/construction-management/components/finance/other-parties/other-parties-page.tsx
+  s_78c924a349522f::t_3032fe7d4edf3f 152,182,249
+apps/construction-management/components/finance/other-parties/other-party-form.tsx
+  s_78c924a349522f::t_b0b3000ff13d67 62,128,133-136,271-274
+apps/construction-management/components/finance/parties/allocation-table.tsx
+  s_78c924a349522f::t_060e61f08860a8 70,106-109
+apps/construction-management/components/finance/parties/awaiting-grns.tsx
+  s_78c924a349522f::t_4ebea39bb72797 38,68
+apps/construction-management/components/finance/parties/invoice-sheet.tsx
+  s_78c924a349522f::t_0f15b73c818b54 216
+apps/construction-management/components/finance/parties/opening-card.tsx
+  s_78c924a349522f::t_d523bda0169b93 71
+apps/construction-management/components/finance/parties/parties-skeletons.tsx
+  s_78c924a349522f::t_f9f38d1ec108c6 124,196,206,274,279,304
+apps/construction-management/components/finance/parties/party-balance-workspace.tsx
+  s_78c924a349522f::t_17803dd9d962e5 83,100,106,112,121,142
+apps/construction-management/components/finance/parties/party-balances.tsx
+  s_78c924a349522f::t_ea980d48d24626 94,116,198
+apps/construction-management/components/finance/parties/party-lists.tsx
+  s_78c924a349522f::t_11d6081baa48a4 99,176,250,259,304
+apps/construction-management/components/finance/parties/party-payment-detail.tsx
+  s_78c924a349522f::t_d11a82ca16b02c 175,203
+apps/construction-management/components/finance/parties/party-payment-form.tsx
+  s_78c924a349522f::t_4a2f69d5b249c8 428,433-436,665-668,696-699,843-846,861
+apps/construction-management/components/finance/parties/settlement-list.tsx
+  s_78c924a349522f::t_d9491c9f6a7a9b 157,204,306
+apps/construction-management/components/finance/parties/tds-ledger.tsx
+  s_78c924a349522f::t_d1b7d51531dec0 141,179,198,212,255-258
+apps/construction-management/components/finance/payment-categories/payment-categories-list.tsx
+  s_78c924a349522f::t_b1b4aabae3cbb0 99
+apps/construction-management/components/finance/petty-cash/account-statement.tsx
+  s_78c924a349522f::t_25170e706aa942 75,84,90,158
+apps/construction-management/components/finance/petty-cash/petty-cash-screen.tsx
+  s_78c924a349522f::t_ec1b6651b613aa 97,221
+apps/construction-management/components/finance/petty-cash/petty-cash-vouchers.tsx
+  s_78c924a349522f::t_865877dc6748dc 202,307,366
+apps/construction-management/components/finance/petty-cash/voucher-detail.tsx
+  s_78c924a349522f::t_05814da51091bb 157
+apps/construction-management/components/finance/petty-cash/voucher-form.tsx
+  s_78c924a349522f::t_2baa1becd9dc9e 325-346,348,350-351,355,358,363,366,370,375,384,386-388,390-476,479,481-482,484-503,506,508-512,514-532,534-538,540-545,547-558,561,563-568,570,573-586
+apps/construction-management/components/finance/transactions/import-transactions-dialog.tsx
+  s_78c924a349522f::t_18b5b89583de07 138
+apps/construction-management/components/finance/transactions/transactions-page.tsx
+  s_78c924a349522f::t_1cb7716b656b5e 423,562,625
+apps/construction-management/components/hrms/assign-shift-dialog.tsx
+  s_78c924a349522f::t_48bbf4d8fd92c7 157
+apps/construction-management/components/hrms/branch-members-dialog.tsx
+  s_78c924a349522f::t_343c3ff7ed3463 102
+apps/construction-management/components/hrms/branches-page.tsx
+  s_78c924a349522f::t_d9c44ef52dbebe 174,215
+apps/construction-management/components/hrms/employee-salary-grid.tsx
+  s_78c924a349522f::t_1a6d3a20dcb74d 367,449
+apps/construction-management/components/hrms/fence-map.tsx
+  s_78c924a349522f::t_04db32a7714626 128
+apps/construction-management/components/hrms/holiday-import-dialog.tsx
+  s_78c924a349522f::t_4825d506735b32 167
+apps/construction-management/components/hrms/hrms-coming-soon.tsx
+  s_78c924a349522f::t_067b5b080abe58 23
+apps/construction-management/components/hrms/hrms-parts.tsx
+  s_78c924a349522f::t_305d5c34123d79 86
+apps/construction-management/components/hrms/hrms-settings-form.tsx
+  s_78c924a349522f::t_4185d7eb203737 207-210,362
+apps/construction-management/components/hrms/hrms-skeletons.tsx
+  s_78c924a349522f::t_99b1235e7246d8 198
+apps/construction-management/components/hrms/hrms-workspace-tile.tsx
+  s_78c924a349522f::t_47210a568c3fb2 61
+apps/construction-management/components/hrms/leave/apply-leave-dialog.tsx
+  s_78c924a349522f::t_afaaded892a9eb 372
+apps/construction-management/components/hrms/leave/leave-approvals-page.tsx
+  s_78c924a349522f::t_ded127f4d07b8b 82
+apps/construction-management/components/hrms/leave/leave-balance-dialogs.tsx
+  s_78c924a349522f::t_17f12d127c1d43 240,244,588,594
+apps/construction-management/components/hrms/leave/leave-balances-page.tsx
+  s_78c924a349522f::t_d32da0b722022d 56
+apps/construction-management/components/hrms/leave/leave-request-parts.tsx
+  s_78c924a349522f::t_4e853d6aa7e93a 155,288
+apps/construction-management/components/hrms/leave/leave-structure-dialog.tsx
+  s_78c924a349522f::t_8f911a543df9af 221
+apps/construction-management/components/hrms/leave/leave-type-dialog.tsx
+  s_78c924a349522f::t_eecf67c642925a 429
+apps/construction-management/components/hrms/leave/member-checklist.tsx
+  s_78c924a349522f::t_5cf4fff3b82fc6 31
+apps/construction-management/components/hrms/leave/my-leaves-page.tsx
+  s_78c924a349522f::t_5e75f7d011116e 37,174,186
+apps/construction-management/components/hrms/leave/team-leaves-page.tsx
+  s_78c924a349522f::t_9df973de297d14 77,228
+apps/construction-management/components/hrms/monthly-attendance-page.tsx
+  s_78c924a349522f::t_cb1904e206471d 37,74,103
+apps/construction-management/components/hrms/my-attendance-page.tsx
+  s_78c924a349522f::t_f8e72503578fc2 375,415
+apps/construction-management/components/hrms/salary-sample.tsx
+  s_78c924a349522f::t_467b47458a5c5c 166
+apps/construction-management/components/hrms/salary-structure-form.tsx
+  s_78c924a349522f::t_31ced9ddd50d0b 333-336,713
+apps/construction-management/components/hrms/salary-structures-list.tsx
+  s_78c924a349522f::t_899a4acd82a1c1 169
+apps/construction-management/components/hrms/salary/salary-dialogs.tsx
+  s_78c924a349522f::t_21da53744f8f5f 108
+apps/construction-management/components/hrms/salary/salary-slip-sheet.tsx
+  s_78c924a349522f::t_5d8d79e65a4c1f 89
+apps/construction-management/components/hrms/shift-management-page.tsx
+  s_78c924a349522f::t_4c2dbdf1f0267b 67-70,192
+apps/construction-management/components/hrms/team-attendance-page.tsx
+  s_78c924a349522f::t_0a709b6a0d1f34 119
+apps/construction-management/components/labours/import-dialog.tsx
+  s_78c924a349522f::t_3f06a32c409fc0 176
+apps/construction-management/components/labours/labour-files.tsx
+  s_78c924a349522f::t_ec442a7c6002da 129,136
+apps/construction-management/components/labours/labour-form.tsx
+  s_78c924a349522f::t_1ee1bc2270e685 152-155,221
+apps/construction-management/components/labours/labours-page.tsx
+  s_78c924a349522f::t_e242b5d128baa2 359,432
+apps/construction-management/components/labours/labours-skeletons.tsx
+  s_78c924a349522f::t_87b5c1efcfd774 54,67,88,128
+apps/construction-management/components/labours/transfer-history-sheet.tsx
+  s_78c924a349522f::t_0b3e86551e3297 56-59
+apps/construction-management/components/locations/location-picker.tsx
+  s_78c924a349522f::t_f35032d20fb4da 275
+apps/construction-management/components/masters/developments-list.tsx
+  s_78c924a349522f::t_2d03d471aa315a 143
+apps/construction-management/components/masters/lookup-list.tsx
+  s_78c924a349522f::t_2ebb4acc4e55b9 116
+apps/construction-management/components/masters/master-list-parts.tsx
+  s_78c924a349522f::t_b59fbd2e540094 84
+apps/construction-management/components/masters/masters-skeletons.tsx
+  s_78c924a349522f::t_08432a69a2dc29 161,186,203,207,218-227
+apps/construction-management/components/masters/material-form.tsx
+  s_78c924a349522f::t_8e3a47d2b182f0 354,359-362,464-467,507-510
+apps/construction-management/components/masters/paged-master-list.tsx
+  s_78c924a349522f::t_6b73825e7e7bdf 235
+apps/construction-management/components/masters/supervisors-list.tsx
+  s_78c924a349522f::t_b15885ae3566a4 128
+apps/construction-management/components/masters/tracking-master-lists.tsx
+  s_78c924a349522f::t_7c8855b38608bc 159
+apps/construction-management/components/masters/work-type-dialog.tsx
+  s_78c924a349522f::t_ba2439eeec8087 260,266
+apps/construction-management/components/masters/work-types-list.tsx
+  s_78c924a349522f::t_48a92c8dec7c67 128
+apps/construction-management/components/my-profile/my-profile-form.tsx
+  s_78c924a349522f::t_3dd987024ac071 201-205,236,238-241,321-324
+apps/construction-management/components/notifications/notification-item.tsx
+  s_78c924a349522f::t_fbdf5180d4ba8e 184
+apps/construction-management/components/notifications/notifications-screen.tsx
+  s_78c924a349522f::t_cb000c8c797cb2 79
+apps/construction-management/components/notifications/notifications-skeletons.tsx
+  s_78c924a349522f::t_99d531dd180c64 36-39
+apps/construction-management/components/onboarding/choose-company-form.tsx
+  s_78c924a349522f::t_104bbdccf7f8fe 57-62
+apps/construction-management/components/onboarding/join-requests-list.tsx
+  s_78c924a349522f::t_376dced65a19be 63-68
+apps/construction-management/components/onboarding/onboarding-shell.tsx
+  s_78c924a349522f::t_76b71011b94ed9 69
+apps/construction-management/components/parties/parties-page.tsx
+  s_78c924a349522f::t_a94460a3c74a13 238,264
+apps/construction-management/components/parties/parties-skeletons.tsx
+  s_78c924a349522f::t_ff066a876048a1 91
+apps/construction-management/components/parties/party-form.tsx
+  s_78c924a349522f::t_c08d2c38a1999c 77,109,147,178-181,291,296-299,481-484,512-515
+apps/construction-management/components/parties/party-quotations.tsx
+  s_78c924a349522f::t_bbe282ac96966c 197,318
+apps/construction-management/components/parties/quotations-page.tsx
+  s_78c924a349522f::t_aafefcbd25a53a 159,181
+apps/construction-management/components/payments/balances-table.tsx
+  s_78c924a349522f::t_c8202d4064e953 62,83,169
+apps/construction-management/components/payments/payments-list.tsx
+  s_78c924a349522f::t_a471a7cef93540 192,222,291
+apps/construction-management/components/payments/payments-skeletons.tsx
+  s_78c924a349522f::t_3e16ee8f84dec2 74,90
+apps/construction-management/components/payments/statement-sheet.tsx
+  s_78c924a349522f::t_63d1767ec579ee 124,151
+apps/construction-management/components/permissions/permission-matrix.tsx
+  s_78c924a349522f::t_9a228b0a7cdd74 313
+apps/construction-management/components/procurement/central-inventory/central-inventory-page.tsx
+  s_78c924a349522f::t_c40370b1d6295b 121
+apps/construction-management/components/procurement/delivery-notes/delivery-note-detail.tsx
+  s_78c924a349522f::t_e8882f0695c860 229
+apps/construction-management/components/procurement/delivery-notes/delivery-note-form.tsx
+  s_78c924a349522f::t_ad15ae471ff491 214,246,254
+apps/construction-management/components/procurement/delivery-notes/delivery-notes-list.tsx
+  s_78c924a349522f::t_82cea539fbe9e4 41
+apps/construction-management/components/procurement/documents/document-files-view.tsx
+  s_78c924a349522f::t_70a40261325f57 83
+apps/construction-management/components/procurement/goods-receipts/goods-receipt-detail.tsx
+  s_78c924a349522f::t_282c89aa6f9f45 128
+apps/construction-management/components/procurement/goods-receipts/goods-receipt-form.tsx
+  s_78c924a349522f::t_d0bc214dc880ce 168-171,202,323,662,837,1006
+apps/construction-management/components/procurement/goods-receipts/goods-receipt-parts.tsx
+  s_78c924a349522f::t_da441c74bf615f 146
+apps/construction-management/components/procurement/goods-receipts/goods-receipts-list.tsx
+  s_78c924a349522f::t_3b1b85f0d65c09 214,240
+apps/construction-management/components/procurement/inventory/import-inventory-dialog.tsx
+  s_78c924a349522f::t_6ed658eccb2467 187
+apps/construction-management/components/procurement/inventory/inventory-page.tsx
+  s_78c924a349522f::t_7327adafe6fa9d 446,587,604,684
+apps/construction-management/components/procurement/inventory/stock-history-sheet.tsx
+  s_78c924a349522f::t_27523e58dedc06 97,217
+apps/construction-management/components/procurement/inventory/stock-movement-dialog.tsx
+  s_78c924a349522f::t_d7285c4b04e4a9 160
+apps/construction-management/components/procurement/inventory/stock-register-page.tsx
+  s_78c924a349522f::t_6781aee88de899 60,78,83,96
+apps/construction-management/components/procurement/inventory/stock-settings-dialog.tsx
+  s_78c924a349522f::t_da7aac2620257b 159
+apps/construction-management/components/procurement/material-requests/material-request-detail.tsx
+  s_78c924a349522f::t_0a244e104e22f2 278
+apps/construction-management/components/procurement/material-requests/material-request-form.tsx
+  s_78c924a349522f::t_a05f440f4bdf0c 275,386,394
+apps/construction-management/components/procurement/material-requests/material-requests-list.tsx
+  s_78c924a349522f::t_771f23ed9f97eb 93
+apps/construction-management/components/procurement/procurement-skeletons.tsx
+  s_78c924a349522f::t_1bdbba6ad31a15 75,161,274-275,278-282,381,442,462,464,466-468,628,692,704,736-758,964,997,1077-1080
+apps/construction-management/components/procurement/purchase-orders/edit-purchase-order.tsx
+  s_78c924a349522f::t_1e138da8c5c4cc 28
+apps/construction-management/components/procurement/purchase-orders/purchase-order-detail.tsx
+  s_78c924a349522f::t_3c5f1ee68d48c0 124,380
+apps/construction-management/components/procurement/purchase-orders/purchase-order-form.tsx
+  s_78c924a349522f::t_11b8c805f8a799 107-110,510-513
+apps/construction-management/components/procurement/purchase-orders/purchase-orders-page.tsx
+  s_78c924a349522f::t_bf0132df792331 291,389,457
+apps/construction-management/components/procurement/purchase-requests/edit-purchase-request.tsx
+  s_78c924a349522f::t_e9e19708947ce5 28
+apps/construction-management/components/procurement/purchase-requests/purchase-request-detail.tsx
+  s_78c924a349522f::t_e7ba6cdbe6faef 114,225
+apps/construction-management/components/procurement/purchase-requests/purchase-request-wizard.tsx
+  s_78c924a349522f::t_98757614e874d7 333,356-359,403,435-438,444-447,515,547-550
+apps/construction-management/components/procurement/purchase-requests/purchase-requests-page.tsx
+  s_78c924a349522f::t_f5f86a84f11aa5 353,449,513
+apps/construction-management/components/procurement/purchase-requests/scroll-table.tsx
+  s_78c924a349522f::t_184c8925d224d2 26
+apps/construction-management/components/procurement/stores/central-store-parts.tsx
+  s_78c924a349522f::t_f88aae05b0e9da 231
+apps/construction-management/components/procurement/stores/central-store-workspace-tiles.tsx
+  s_78c924a349522f::t_1bbd303747d688 22,47
+apps/construction-management/components/procurement/stores/store-form.tsx
+  s_43f32c25ef2007::t_a6a9d5e8718941 148,213
+apps/construction-management/components/procurement/stores/stores-page.tsx
+  s_78c924a349522f::t_05f2bbf5ef2db1 104
+apps/construction-management/components/procurement/transfers/transfer-detail.tsx
+  s_78c924a349522f::t_e167a49810a36b 370,404-407
+apps/construction-management/components/procurement/transfers/transfer-form.tsx
+  s_78c924a349522f::t_d4affe863f0cb9 307-324,327-387,389-423,425-426,428-445,447-467
+apps/construction-management/components/procurement/transfers/transfers-list.tsx
+  s_78c924a349522f::t_70625a131823a4 140
+apps/construction-management/components/profile/devices-section.tsx
+  s_78c924a349522f::t_faa54323ab2dc2 122
+apps/construction-management/components/profile/notification-settings.tsx
+  s_78c924a349522f::t_5981b26a5b5152 150,203-206
+apps/construction-management/components/profile/privacy-section.tsx
+  s_78c924a349522f::t_e92d4206186aac 34
+apps/construction-management/components/profile/profile-skeletons.tsx
+  s_78c924a349522f::t_efe1dc79293564 17,38-39,54
+apps/construction-management/components/projects/dashboard/project-dashboard.tsx
+  s_78c924a349522f::t_36b68fc83d0643 254,480
+apps/construction-management/components/projects/dashboard/sales-sections.tsx
+  s_78c924a349522f::t_405ff1b1bafd15 140,324,352
+apps/construction-management/components/projects/documents/project-documents-page.tsx
+  s_78c924a349522f::t_51101cca54d685 244
+apps/construction-management/components/projects/documents/upload-documents-dialog.tsx
+  s_78c924a349522f::t_86f012ba179881 208
+apps/construction-management/components/projects/drawings/drawing-album-page.tsx
+  s_78c924a349522f::t_409a8a5fc5ba70 309
+apps/construction-management/components/projects/drawings/drawing-history-sheet.tsx
+  s_78c924a349522f::t_b425b551abbb1c 42
+apps/construction-management/components/projects/drawings/drawings-page.tsx
+  s_78c924a349522f::t_54e0e911ced44a 179
+apps/construction-management/components/projects/drawings/drawings-skeletons.tsx
+  s_78c924a349522f::t_34f8eddba3e723 87-90
+apps/construction-management/components/projects/drawings/upload-drawings-dialog.tsx
+  s_78c924a349522f::t_92d0eae40cb400 129
+apps/construction-management/components/projects/drawings/upload-revision-dialog.tsx
+  s_78c924a349522f::t_6c7c6e8e8c4ff2 71
+apps/construction-management/components/projects/files/file-viewer.tsx
+  s_78c924a349522f::t_3a8a47017856c0 89
+apps/construction-management/components/projects/files/project-no-access.tsx
+  s_78c924a349522f::t_257ca12927b632 17
+apps/construction-management/components/projects/gallery/gallery-page.tsx
+  s_78c924a349522f::t_494e5a33282bbb 410,495
+apps/construction-management/components/projects/project-amenities.tsx
+  s_78c924a349522f::t_7c6367b9781e45 98
+apps/construction-management/components/projects/project-folder-card.tsx
+  s_78c924a349522f::t_04675717de4944 62
+apps/construction-management/components/projects/project-form.tsx
+  s_78c924a349522f::t_48370e6846188e 394,865
+apps/construction-management/components/projects/project-landing.tsx
+  s_78c924a349522f::t_b58617a0e72806 36
+apps/construction-management/components/projects/projects-home.tsx
+  s_78c924a349522f::t_ff64826bdc8c76 361,377
+apps/construction-management/components/projects/resources/project-resources-page.tsx
+  s_78c924a349522f::t_609db3bf712ed6 138,162-165
+apps/construction-management/components/projects/resources/resource-picker-dialog.tsx
+  s_78c924a349522f::t_ecf0635693f8c8 93,135
+apps/construction-management/components/projects/resources/resources-skeletons.tsx
+  s_78c924a349522f::t_1dbdbbf05d20ea 15,47
+apps/construction-management/components/projects/structure/structure-parts.tsx
+  s_78c924a349522f::t_d1b192f6b452e3 86
+apps/construction-management/components/projects/structure/wing-editor.tsx
+  s_78c924a349522f::t_2cb1de2db9ef04 264
+apps/construction-management/components/projects/structure/wings-page.tsx
+  s_78c924a349522f::t_1716aa9edec172 274
+apps/construction-management/components/projects/testing-reports/testing-item-page.tsx
+  s_78c924a349522f::t_b804f133da3f31 369,402
+apps/construction-management/components/projects/testing-reports/testing-report-sheet.tsx
+  s_78c924a349522f::t_7cecbfcc623ceb 266
+apps/construction-management/components/projects/testing-reports/testing-reports-page.tsx
+  s_78c924a349522f::t_c83e2f0c95f7b1 261
+apps/construction-management/components/query-suspense.tsx
+  s_78c924a349522f::t_e8a96dfdaeff9a 114
+apps/construction-management/components/reports/central-reports-page.tsx
+  s_78c924a349522f::t_11c88764ee0ee0 70
+apps/construction-management/components/reports/central-reports-workspace-tile.tsx
+  s_78c924a349522f::t_bac445836d0bd6 17
+apps/construction-management/components/reports/recent-reports.tsx
+  s_78c924a349522f::t_b64259fd1a2f28 71,85-88
+apps/construction-management/components/reports/reports-page.tsx
+  s_78c924a349522f::t_c29961e0e05fd2 211
+apps/construction-management/components/reports/reports-skeletons.tsx
+  s_78c924a349522f::t_e0027b06dd1507 78
+apps/construction-management/components/roles/role-form.tsx
+  s_78c924a349522f::t_7ac9df00b3fe10 115-144
+apps/construction-management/components/roles/roles-list.tsx
+  s_78c924a349522f::t_dcad57df7d1ba7 233,264
+apps/construction-management/components/roles/roles-no-access.tsx
+  s_78c924a349522f::t_9437eb98668979 14
+apps/construction-management/components/roles/roles-skeletons.tsx
+  s_78c924a349522f::t_fecec594892582 15-22
+apps/construction-management/components/sales/bookings/booking-detail.tsx
+  s_78c924a349522f::t_03fc7a8eba3104 212
+apps/construction-management/components/sales/bookings/booking-form.tsx
+  s_78c924a349522f::t_0f621a830b7fa6 308,472,558
+apps/construction-management/components/sales/bookings/bookings-list.tsx
+  s_78c924a349522f::t_5bf393470356e5 209,238,287
+apps/construction-management/components/sales/bookings/bookings-skeletons.tsx
+  s_78c924a349522f::t_a3928cfad00352 74,125,133
+apps/construction-management/components/sales/documents/sales-document-files.tsx
+  s_78c924a349522f::t_87fb23ef31f88b 183
+apps/construction-management/components/sales/inquiries/import-inquiries-dialog.tsx
+  s_78c924a349522f::t_c8eed46217f4eb 159
+apps/construction-management/components/sales/inquiries/inquiries-list.tsx
+  s_78c924a349522f::t_241c861e4d193a 372,399,456
+apps/construction-management/components/sales/inquiries/inquiries-skeletons.tsx
+  s_78c924a349522f::t_0186699266fb41 244,293
+apps/construction-management/components/sales/inquiries/inquiry-activity.tsx
+  s_78c924a349522f::t_ccb52169552a30 66
+apps/construction-management/components/sales/inquiries/inquiry-close-dialog.tsx
+  s_78c924a349522f::t_2c77c04f00ff48 114,278
+apps/construction-management/components/sales/inquiries/inquiry-detail.tsx
+  s_78c924a349522f::t_9ba33f142d1a8a 174
+apps/construction-management/components/sales/inquiries/inquiry-duplicate-prompt.tsx
+  s_78c924a349522f::t_ee84528aa3e4b6 63
+apps/construction-management/components/sales/inquiries/inquiry-form.tsx
+  s_78c924a349522f::t_e2a8789db478ff 307,534
+apps/construction-management/components/sales/units/import-units-dialog.tsx
+  s_78c924a349522f::t_7add9bab217eae 140
+apps/construction-management/components/sales/units/unit-panel.tsx
+  s_78c924a349522f::t_7be08f0cffa0b1 151,173,209
+apps/construction-management/components/sales/units/units-skeletons.tsx
+  s_78c924a349522f::t_20d9a86647c343 54,86
+apps/construction-management/components/sales/units/units-tab.tsx
+  s_78c924a349522f::t_2a62c037823379 108
+apps/construction-management/components/settings/advanced-settings.tsx
+  s_78c924a349522f::t_0ca7f6ef607e51 32
+apps/construction-management/components/settings/backdated-entry-form.tsx
+  s_78c924a349522f::t_a911407eef4f1b 143,166,183,223
+apps/construction-management/components/settings/billing-addresses-manager.tsx
+  s_78c924a349522f::t_c2c4843096da4a 97,113
+apps/construction-management/components/settings/grn-fields-form.tsx
+  s_78c924a349522f::t_0cb46ba73f3b2e 101
+apps/construction-management/components/settings/sequence-ids-manager.tsx
+  s_78c924a349522f::t_2f9f58b9382716 167,192
+apps/construction-management/components/settings/settings-skeletons.tsx
+  s_78c924a349522f::t_770f811970cf13 59,111,150,183
+apps/construction-management/components/site-work/documents/site-work-document-files.tsx
+  s_78c924a349522f::t_5829f9f55e4db6 109
+apps/construction-management/components/site-work/equipment-sheets/equipment-sheet-detail.tsx
+  s_78c924a349522f::t_ac64b2365325af 169,305
+apps/construction-management/components/site-work/equipment-sheets/equipment-sheet-form.tsx
+  s_78c924a349522f::t_c8aee849c54871 467-470,1486,1635,1700
+apps/construction-management/components/site-work/equipment-sheets/equipment-sheet-settings-dialog.tsx
+  s_78c924a349522f::t_c1e486e35c9e26 174,194
+apps/construction-management/components/site-work/equipment-sheets/equipment-sheets-page.tsx
+  s_78c924a349522f::t_fd22b0366873dd 367,463,549
+apps/construction-management/components/site-work/equipment/equipment-detail.tsx
+  s_78c924a349522f::t_9252164571237e 104,174,178-181,397
+apps/construction-management/components/site-work/equipment/equipment-list.tsx
+  s_78c924a349522f::t_bcf2702be0188b 126,142
+apps/construction-management/components/site-work/equipment/radio-card.tsx
+  s_78c924a349522f::t_6a4b30c1ea1815 37
+apps/construction-management/components/site-work/hindrances/hindrance-detail.tsx
+  s_78c924a349522f::t_959c2040c9ec1a 215,307
+apps/construction-management/components/site-work/hindrances/hindrance-form.tsx
+  s_78c924a349522f::t_998cb649742eac 413,571,638-651
+apps/construction-management/components/site-work/hindrances/hindrances-list.tsx
+  s_78c924a349522f::t_0db344b1f83b98 116
+apps/construction-management/components/site-work/progress-reports/progress-reports-page.tsx
+  s_78c924a349522f::t_bcf68f4d9c90eb 204,229-232
+apps/construction-management/components/site-work/site-diary/site-diary-form.tsx
+  s_78c924a349522f::t_005513bcf23f30 307,373-376,391,477-480,497,576-586,588-602
+apps/construction-management/components/site-work/site-diary/site-diary-page.tsx
+  s_78c924a349522f::t_390a77c9120e19 65
+apps/construction-management/components/site-work/site-diary/site-diary-view.tsx
+  s_78c924a349522f::t_767b0f2709375e 114
+apps/construction-management/components/site-work/site-work-skeletons.tsx
+  s_78c924a349522f::t_10e23abc3bcf9f 160,179,280-299,306-323,332,413-432,568,617-636,644,708,815-832
+apps/construction-management/components/site-work/worksheets/bulk-select-dialog.tsx
+  s_78c924a349522f::t_b30c84bb7dd041 94
+apps/construction-management/components/site-work/worksheets/worksheet-attendance-panel.tsx
+  s_78c924a349522f::t_c75ce975af79e8 38
+apps/construction-management/components/site-work/worksheets/worksheet-detail.tsx
+  s_78c924a349522f::t_189fd141066f80 117
+apps/construction-management/components/site-work/worksheets/worksheet-form.tsx
+  s_78c924a349522f::t_ac5bbfaaa3ff4c 591,626,829,874,989,1055-1099
+apps/construction-management/components/site-work/worksheets/worksheet-settings-dialog.tsx
+  s_78c924a349522f::t_a768566c9d5e03 190,202-205,261
+apps/construction-management/components/site-work/worksheets/worksheets-page.tsx
+  s_78c924a349522f::t_34824ab2e8ad44 345,438,522
+apps/construction-management/components/subscription/checkout-wizard.tsx
+  s_78c924a349522f::t_9411d30c705552 184,199,537,654,692,792-799,801-839,842-844
+apps/construction-management/components/subscription/subscription-overview.tsx
+  s_78c924a349522f::t_a888be96d4fb83 151,160-170,172-208
+apps/construction-management/components/subscription/subscription-skeletons.tsx
+  s_78c924a349522f::t_5a8c6d64a3b2fc 87
+apps/construction-management/components/team-members/projects-step.tsx
+  s_78c924a349522f::t_97c0b86a947b3a 47
+apps/construction-management/components/team-members/role-field.tsx
+  s_78c924a349522f::t_cbeb9324e57d99 49-59,61-66,68-89,91-104
+apps/construction-management/components/team-members/team-member-details-fields.tsx
+  s_78c924a349522f::t_2dad91cb27e310 166-171,173,176-177,179,181-182,184-205,208,210-223,225-226,228-259,261-273,276,278-280,282-298,300-325,328-382
+apps/construction-management/components/team-members/team-members-page.tsx
+  s_78c924a349522f::t_9f17e9e74f4d59 210,240
+apps/construction-management/components/team-members/team-members-skeletons.tsx
+  s_78c924a349522f::t_3c79be1873e49e 27,84-95,112-118,120-125,127,154-163
+apps/construction-management/components/tracking/documents/tracking-document-files.tsx
+  s_78c924a349522f::t_723ffceb3e459d 112
+apps/construction-management/components/tracking/inspections/inspection-detail.tsx
+  s_78c924a349522f::t_f6d749fcab3e13 91,129,172,233-236,375
+apps/construction-management/components/tracking/inspections/inspection-form.tsx
+  s_78c924a349522f::t_46eda59d20e849 429-533,535-539,542,544-546,549,553-554,556-557,560,562-564,571
+apps/construction-management/components/tracking/inspections/inspection-format.tsx
+  s_78c924a349522f::t_63f7c8768f8c3f 189
+apps/construction-management/components/tracking/inspections/inspection-pages.tsx
+  s_78c924a349522f::t_ed6f8b27954e4f 89
+apps/construction-management/components/tracking/inspections/inspection-thread.tsx
+  s_78c924a349522f::t_058e62e67bc776 89
+apps/construction-management/components/tracking/inspections/inspections-list.tsx
+  s_78c924a349522f::t_8d4c7553be7b1f 437,530,583
+apps/construction-management/components/tracking/issues/issue-detail.tsx
+  s_78c924a349522f::t_e4f0ab1795e0f8 176,230,452
+apps/construction-management/components/tracking/issues/issue-form.tsx
+  s_78c924a349522f::t_81d828dd38ccb2 304-462,464-466,468-470,473,475-478,481,485-503
+apps/construction-management/components/tracking/issues/issues-list.tsx
+  s_78c924a349522f::t_d3e164909a327a 433,516,577
+apps/construction-management/components/tracking/tasks/import-tasks-dialog.tsx
+  s_78c924a349522f::t_31a41712816b47 139
+apps/construction-management/components/tracking/tasks/task-detail.tsx
+  s_78c924a349522f::t_f8a2fc97205a8b 658
+apps/construction-management/components/tracking/tasks/task-form.tsx
+  s_78c924a349522f::t_5560a1cf667e85 408-579,582-593,595-629,631-635,638-640,642,645-646,648-650,652-659,661-671,673-679,681-716
+apps/construction-management/components/tracking/tasks/task-gantt.tsx
+  s_78c924a349522f::t_f1582e22226d9e 239
+apps/construction-management/components/tracking/tasks/task-tree.tsx
+  s_78c924a349522f::t_738ca1ec0df88f 243,309
+apps/construction-management/components/tracking/tracking-skeletons.tsx
+  s_78c924a349522f::t_78774521fd9cce 124-127,163,478,480,484-486,499-510
+apps/construction-management/components/vendors/rate-card-editor.tsx
+  s_78c924a349522f::t_706cb8855f0d67 209-212,228
+apps/construction-management/components/vendors/vendor-form.tsx
+  s_78c924a349522f::t_6eeef4e865cbf0 85,95,150,155-158,234-237
+apps/construction-management/components/vendors/vendors-page.tsx
+  s_78c924a349522f::t_d54cfa09d50ae6 270,296
+apps/construction-management/components/vendors/vendors-skeletons.tsx
+  s_78c924a349522f::t_a945abc24b6754 50,74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "82611038b0d354f801f67e6838ff20b7195bf79b",
+  "prompts": {},
+  "sessions": {
+    "s_43f32c25ef2007": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "925748d9-ee5c-4753-bfa8-47d07468a8e5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    },
+    "s_78c924a349522f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5f054878-66ec-4e38-832e-04a66e5fc0ca",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
