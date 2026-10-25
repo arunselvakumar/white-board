@@ -1,0 +1,19 @@
+apps/construction-management/components/team-members/team-member-details-fields.tsx
+  s_bfacd6219e31fa::t_7f6eed75cf5980 363
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "b1818d2e18af3d83f538a82b84c0bbf3784ae07f",
+  "prompts": {},
+  "sessions": {
+    "s_bfacd6219e31fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "db90b3af-250e-4584-a829-2c9ecb094a76",
+        "model": "unknown"
+      },
+      "human_author": "Arun Selva Kumar <arun@joinassembly.com>"
+    }
+  }
+}
