@@ -111,6 +111,11 @@ projectTest.describe("Sales CRM", () => {
     "should list the new Funnel Stage, when the Owner adds one in Inquiry settings",
     async ({ project, page }) => {
       await page.goto(`/app/projects/${project.id}/inquiries/settings`);
+      const list = page.getByRole("list", { name: "Funnel Stages" });
+      const stages = list.getByRole("listitem");
+      await expect(stages.first()).toBeVisible();
+      const before = await stages.count();
+
       await page.getByRole("button", { name: "Add Funnel Stage" }).click();
       await page
         .getByRole("dialog")
@@ -121,12 +126,8 @@ projectTest.describe("Sales CRM", () => {
         .getByRole("dialog")
         .getByRole("button", { name: /^(Add|Save)/ })
         .click();
-      await expect(
-        page.getByRole("list", { name: "Funnel Stages" }).getByRole("listitem"),
-      ).toHaveCount(5);
-      await expect(
-        page.getByRole("list", { name: "Funnel Stages" }),
-      ).toContainText("Loan sanctioned");
+      await expect(stages).toHaveCount(before + 1);
+      await expect(list).toContainText("Loan sanctioned");
     },
   );
 });
