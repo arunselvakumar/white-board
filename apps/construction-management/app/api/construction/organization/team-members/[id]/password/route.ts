@@ -42,7 +42,9 @@ export async function POST(
       grantor: session.access,
       password,
     });
-    return Response.json(toTeamMemberWithPasswordResponse(member));
+    return Response.json(
+      toTeamMemberWithPasswordResponse(member, session.access),
+    );
   } catch (error) {
     return mapError(error);
   }

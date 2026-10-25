@@ -2,7 +2,7 @@ import { FormSkeleton } from "@repo/ui/components/skeleton-kit";
 
 import { FormPageSkeleton } from "@/components/masters/masters-skeletons";
 import { PermissionMatrixSkeleton } from "@/components/permissions/permissions-skeletons";
-import { ROLES_PATH } from "@/lib/users-roles-nav";
+import { ROLES_PATH } from "@/lib/staff-roles-nav";
 
 /** Edit Role while it loads: name and description, then its matrix. */
 export function RoleFormSkeleton() {

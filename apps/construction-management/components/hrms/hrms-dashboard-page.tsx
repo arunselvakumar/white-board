@@ -51,7 +51,7 @@ const LEAVE_APPROVALS = `${HRMS_PATH}/leave/approvals`;
 const TEAM_LEAVES = `${HRMS_PATH}/leave/team`;
 const HOLIDAYS = `${HRMS_PATH}/configuration/holidays`;
 const CONFIGURATION = `${HRMS_PATH}/configuration`;
-const USERS = "/app/users";
+const USERS = "/app/staff";
 
 /**
  * The breakdown's rows and the trend's series, in stacking order (bottom

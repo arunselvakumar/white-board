@@ -2,11 +2,11 @@ import { expect } from "@playwright/test";
 
 import { unique } from "../api/session";
 import { designationsPageTest } from "../helpers/designationsPageTest";
-import { AddUserPage } from "../pages/AddUserPage";
+import { AddStaffPage } from "../pages/AddStaffPage";
 
 designationsPageTest.describe("Designations", () => {
   designationsPageTest(
-    "should offer the new Designation when adding a User, when the Owner adds one",
+    "should offer the new Designation when adding staff, when the Owner adds one",
     async ({ designationsPage, page }) => {
       const name = unique("Safety Officer");
 
@@ -17,9 +17,9 @@ designationsPageTest.describe("Designations", () => {
       await expect(page).toHaveURL(designationsPage.url);
       await expect(designationsPage.designation(name)).toBeVisible();
 
-      const addUserPage = new AddUserPage(page);
-      await addUserPage.goto();
-      await addUserPage.choose("Designation", name);
+      const addStaffPage = new AddStaffPage(page);
+      await addStaffPage.goto();
+      await addStaffPage.choose("Designation", name);
       await expect(
         page.getByRole("combobox", { name: "Designation" }),
       ).toContainText(name);

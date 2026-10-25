@@ -18,7 +18,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * Every live Role of the Active Company, by name (ADR CM-0030). Role
- * Management reads it, and so does Add User to offer the Roles.
+ * Management reads it, and so does Add Staff to offer the Roles.
  */
 export async function GET(request: Request): Promise<Response> {
   try {

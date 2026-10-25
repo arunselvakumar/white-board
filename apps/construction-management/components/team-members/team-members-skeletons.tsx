@@ -9,9 +9,9 @@ import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/tabs";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { PageHeaderSkeleton } from "@/components/app-shell/page-header-skeleton";
-import { USERS_PATH } from "@/lib/users-roles-nav";
+import { STAFF_PATH } from "@/lib/staff-roles-nav";
 
-/** Users & Roles → Users while it loads (ADR-0047). */
+/** Staff & Roles → Staff while it loads (ADR-0047). */
 
 const NAME_WIDTHS = ["9rem", "12rem", "7.5rem", "10.5rem", "8rem"];
 const LINE_WIDTHS = ["55%", "40%", "62%", "48%", "36%"];
@@ -22,11 +22,11 @@ const LINE_WIDTHS = ["55%", "40%", "62%", "48%", "36%"];
  */
 export function TeamMemberRowsSkeleton() {
   return (
-    <SkeletonGroup label="Loading Users" className="block space-y-3">
+    <SkeletonGroup label="Loading Staff" className="block space-y-3">
       <SkeletonText width="7rem" />
       <div className="bg-card rounded-lg border">
         <div className="text-muted-foreground bg-muted/40 hidden items-center gap-4 rounded-t-lg border-b px-4 py-2 text-xs font-medium sm:flex">
-          <span className="flex-1">User</span>
+          <span className="flex-1">Staff</span>
           <span className="w-40">Role</span>
           <span className="w-8" />
         </div>
@@ -69,7 +69,7 @@ export function ProjectChecklistSkeleton() {
   );
 }
 
-/** Edit User while the member loads: header, the tabs, the details form. */
+/** Edit Staff while the member loads: header, the tabs, the details form. */
 const DETAIL_FIELDS = [
   { label: "Name" },
   { label: "Designation", control: "select" },
@@ -93,14 +93,14 @@ function SignInSkeleton() {
   );
 }
 
-/** Add User while the Designations and Roles load: step 1, the details form. */
+/** Add Staff while the Designations and Roles load: step 1, the details form. */
 export function AddTeamMemberSkeleton() {
   return (
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
-          back={{ label: "Users", href: USERS_PATH }}
-          title="Add User"
+          back={{ label: "Staff", href: STAFF_PATH }}
+          title="Add Staff"
           meta="Step 1 of 3: Details"
         />
         <ol className="flex gap-1.5" aria-hidden="true">
@@ -135,7 +135,7 @@ export function EditTeamMemberSkeleton() {
   return (
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
-        <PageHeaderSkeleton back={{ label: "Users", href: USERS_PATH }} />
+        <PageHeaderSkeleton back={{ label: "Staff", href: STAFF_PATH }} />
         <Tabs defaultValue="details" className="gap-6">
           <TabsList>
             <TabsTrigger value="details">
@@ -156,7 +156,7 @@ export function EditTeamMemberSkeleton() {
               className="bg-card rounded-xl border p-4 sm:p-5"
               columns={2}
               actions={0}
-              label="Loading User"
+              label="Loading staff member"
               fields={[...PERSON_FIELDS]}
             />
             <SignInSkeleton />

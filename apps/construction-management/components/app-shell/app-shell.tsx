@@ -36,7 +36,7 @@ import { CompanyDeletionBanner } from "./company-deletion-banner";
 import { PlanBanner } from "./plan-banner";
 import { ProjectNavMenu } from "./project-nav-menu";
 import { UserMenu } from "./user-menu";
-import { UsersRolesNavMenu } from "./users-roles-nav-menu";
+import { StaffRolesNavMenu } from "./staff-roles-nav-menu";
 import { WorkspaceNavMenu } from "./workspace-nav-menu";
 
 const NAV_BUTTON_CLASS =
@@ -49,21 +49,21 @@ const FOOTER_LINKS = [
 ] as const;
 
 /**
- * Authenticated chrome: the Company Dashboard, the three areas, Users &
+ * Authenticated chrome: the Company Dashboard, the three areas, Staff &
  * Roles and Settings, the Active Company, the account menu. Inside a
  * Project the areas give way to the Project's own menu (ADR CM-0020).
  * `canOpenDashboard` is the Dashboard menu's Read flag (CM-902): without it
- * the Dashboard is not in the menu. `canOpenUsersRoles` is Team Members or
- * Role Management Read (ADR CM-0030): without either, Users & Roles is not.
+ * the Dashboard is not in the menu. `canOpenStaffRoles` is Team Members or
+ * Role Management Read (ADR CM-0030): without either, Staff & Roles is not.
  */
 export function AppShell({
   children,
   canOpenDashboard = false,
-  canOpenUsersRoles = true,
+  canOpenStaffRoles = true,
 }: {
   children: ReactNode;
   canOpenDashboard?: boolean;
-  canOpenUsersRoles?: boolean;
+  canOpenStaffRoles?: boolean;
 }) {
   const pathname = usePathname() || "/app";
   const projectId = projectIdFromPath(pathname);
@@ -96,7 +96,7 @@ export function AppShell({
             <MainMenu
               pathname={pathname}
               canOpenDashboard={canOpenDashboard}
-              canOpenUsersRoles={canOpenUsersRoles}
+              canOpenStaffRoles={canOpenStaffRoles}
             />
           ) : (
             <ProjectNavMenu
@@ -159,17 +159,17 @@ export function AppShell({
 
 /**
  * The Company Dashboard (with Dashboard Read), the three areas: Projects,
- * Workspace and Masters (each with its submenu), Users & Roles, then
+ * Workspace and Masters (each with its submenu), Staff & Roles, then
  * Settings.
  */
 function MainMenu({
   pathname,
   canOpenDashboard,
-  canOpenUsersRoles,
+  canOpenStaffRoles,
 }: {
   pathname: string;
   canOpenDashboard: boolean;
-  canOpenUsersRoles: boolean;
+  canOpenStaffRoles: boolean;
 }) {
   return (
     <SidebarGroup className="px-3 pt-4">
@@ -190,10 +190,10 @@ function MainMenu({
                     buttonClassName={NAV_BUTTON_CLASS}
                   />
                 );
-              if (item.href === "/app/users" && !canOpenUsersRoles) return null;
-              if (item.href === "/app/users")
+              if (item.href === "/app/staff" && !canOpenStaffRoles) return null;
+              if (item.href === "/app/staff")
                 return (
-                  <UsersRolesNavMenu
+                  <StaffRolesNavMenu
                     key={item.href}
                     pathname={pathname}
                     buttonClassName={NAV_BUTTON_CLASS}

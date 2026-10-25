@@ -34,7 +34,7 @@ const schema = z.object({ password: temporaryPassword });
 type Values = z.infer<typeof schema>;
 
 /**
- * Set a new password on Edit User (ADR CM-0030 §7): a Temporary Password
+ * Set a new password on Edit Staff (ADR CM-0030 §7): a Temporary Password
  * they replace the next time they sign in. Allowed only while the account
  * belongs to this Company alone (`canSetPassword`).
  */

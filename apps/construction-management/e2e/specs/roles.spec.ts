@@ -28,7 +28,7 @@ rolesPageTest.describe("Role Management", () => {
       await expect(projectsPage.addProjectLink).toHaveCount(0);
       await expect(projectsPage.menuLink("Projects")).toBeVisible();
       await expect(projectsPage.menuLink("Dashboard")).toHaveCount(0);
-      await expect(projectsPage.menuLink("Users & Roles")).toHaveCount(0);
+      await expect(projectsPage.menuLink("Staff & Roles")).toHaveCount(0);
 
       await page.goto("/app/roles/new");
       await expect(
@@ -50,7 +50,7 @@ rolesPageTest.describe("Role Management", () => {
       const memberPage = await member.page();
       const memberProjects = new ProjectsPage(memberPage);
       await memberProjects.goto();
-      await expect(memberProjects.menuLink("Users & Roles")).toHaveCount(0);
+      await expect(memberProjects.menuLink("Staff & Roles")).toHaveCount(0);
 
       const roleForm = new RoleFormPage(ownerPage, member.roleId);
       await roleForm.goto();
@@ -59,7 +59,7 @@ rolesPageTest.describe("Role Management", () => {
       await expect(ownerPage).toHaveURL("/app/roles");
 
       await memberPage.reload();
-      await expect(memberProjects.menuLink("Users & Roles")).toBeVisible();
+      await expect(memberProjects.menuLink("Staff & Roles")).toBeVisible();
     },
   );
 

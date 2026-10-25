@@ -25,6 +25,8 @@ export type TeamMemberReadModel = {
   aadhaarMasked: string | null;
   panMasked: string | null;
   emergencyContact: string | null;
+  /** Paise a month (ADR CM-0032); Response models null it without Financial. */
+  monthlySalary: number | null;
   memberType: MemberType;
   isOwner: boolean;
   status: TeamMemberStatus;
@@ -79,6 +81,7 @@ export function toTeamMemberReadModel(
       details.aadhaar == null ? null : maskIdentifier(details.aadhaar),
     panMasked: details.pan == null ? null : maskIdentifier(details.pan),
     emergencyContact: details.emergencyContact,
+    monthlySalary: member.monthlySalary,
     memberType: member.memberType,
     isOwner: member.isOwner,
     status: member.status,

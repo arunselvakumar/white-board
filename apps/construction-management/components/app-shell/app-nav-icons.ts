@@ -17,6 +17,6 @@ export const APP_NAV_ICONS: Record<AppNavHref, LucideIcon> = {
   "/app/projects": Building2,
   "/app/workspace": Briefcase,
   "/app/masters": Library,
-  "/app/users": UsersRound,
+  "/app/staff": UsersRound,
   "/app/settings": Settings,
 };

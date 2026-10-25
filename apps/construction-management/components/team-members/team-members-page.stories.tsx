@@ -24,6 +24,7 @@ function member(overrides: Partial<TeamMember>): TeamMember {
     aadhaarMasked: null,
     panMasked: null,
     emergencyContact: null,
+    monthlySalary: null,
     memberType: "normal",
     isOwner: false,
     status: "joining_pending",
@@ -104,7 +105,7 @@ function page(items: TeamMember[]) {
 }
 
 const meta = {
-  title: "Users & Roles/Users/List",
+  title: "Staff & Roles/Staff/List",
   component: TeamMembersPage,
   beforeEach() {
     signInAs("owner", { name: "Anugraha Engineers" });
@@ -135,9 +136,9 @@ export const WithMembers: Story = {
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
-    await expect(await canvas.findByText("3 Users")).toBeVisible();
-    await expect(canvas.getByRole("heading", { name: "Users" })).toBeVisible();
-    const rows = within(canvas.getByRole("list", { name: "Users" }));
+    await expect(await canvas.findByText("3 Staff")).toBeVisible();
+    await expect(canvas.getByRole("heading", { name: "Staff" })).toBeVisible();
+    const rows = within(canvas.getByRole("list", { name: "Staff" }));
     await expect(rows.getByText("Joining Pending")).toBeVisible();
     await expect(rows.getByText("HRMS")).toBeVisible();
     // Each row names its Role; the Owner has none.
@@ -194,7 +195,7 @@ export const InviteNeedsAnEmail: Story = {
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
-    await expect(await canvas.findByText("3 Users")).toBeVisible();
+    await expect(await canvas.findByText("3 Staff")).toBeVisible();
     // Menus animate in; their items are there before they are fully opaque.
 
     await userEvent.click(
@@ -245,7 +246,7 @@ export const FiltersByStatus: Story = {
     return fetchMock.restore;
   },
   play: async ({ canvas, userEvent }) => {
-    await canvas.findByText("1 User");
+    await canvas.findByText("1 Staff member");
     await userEvent.click(
       canvas.getByRole("tab", { name: /^Joining Pending/ }),
     );
@@ -255,7 +256,7 @@ export const FiltersByStatus: Story = {
         expect.anything(),
       ),
     );
-    await userEvent.type(canvas.getByLabelText("Search Users"), "sur");
+    await userEvent.type(canvas.getByLabelText("Search Staff"), "sur");
     await waitFor(() =>
       expect(fetchMock?.spy).toHaveBeenCalledWith(
         `${LIST}?limit=25&search=sur&status=joining_pending`,
@@ -271,9 +272,9 @@ export const Empty: Story = {
     return fetchMock.restore;
   },
   play: async ({ canvas }) => {
-    await expect(await canvas.findByText("No Users yet")).toBeVisible();
-    const add = canvas.getAllByRole("link", { name: "Add User" });
-    await expect(add.at(-1)).toHaveAttribute("href", "/app/users/new");
+    await expect(await canvas.findByText("No Staff yet")).toBeVisible();
+    const add = canvas.getAllByRole("link", { name: "Add Staff" });
+    await expect(add.at(-1)).toHaveAttribute("href", "/app/staff/new");
   },
 };
 
@@ -292,7 +293,7 @@ export const Phone: Story = {
     </div>
   ),
   play: async ({ canvas }) => {
-    await canvas.findByText("3 Users");
+    await canvas.findByText("3 Staff");
     await expect(canvas.getAllByText("Role:")[0]).toBeVisible();
     const phone = canvas.getByTestId("phone");
     await expect(phone.scrollWidth).toBeLessThanOrEqual(375);

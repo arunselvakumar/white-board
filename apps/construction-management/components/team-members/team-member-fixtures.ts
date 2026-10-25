@@ -1,7 +1,7 @@
 import { SITE_ENGINEER_ROLE } from "@/components/roles/role-fixtures";
 import type { DesignationOption, TeamMember } from "@/src/queries/team-members";
 
-/** Story fixtures for the User screens (Team Members in code). */
+/** Story fixtures for the Staff screens (Team Members in code). */
 export const DESIGNATIONS: DesignationOption[] = [
   { id: "0199c3a0-0000-7000-8000-000000000201", name: "Site Engineer" },
   { id: "0199c3a0-0000-7000-8000-000000000202", name: "Accountant" },
@@ -29,6 +29,7 @@ export function teamMember(overrides: Partial<TeamMember> = {}): TeamMember {
     aadhaarMasked: "XXXXXXXX2346",
     panMasked: null,
     emergencyContact: null,
+    monthlySalary: null,
     memberType: "normal",
     isOwner: false,
     status: "joining_pending",

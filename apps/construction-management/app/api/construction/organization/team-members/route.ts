@@ -4,6 +4,7 @@ import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
 import { assertKnownProjects } from "@/src/organization/application/project-directory";
+import { can } from "@/src/shared-kernel/access";
 import {
   decodeListCursor,
   encodeListCursor,
@@ -50,7 +51,9 @@ export async function GET(request: Request): Promise<Response> {
     const moreAfter = backwards || page.hasMore;
     const moreBefore = backwards ? page.hasMore : model.after != null;
     const body: ListConstructionOrganizationTeamMembersResponseModel = {
-      items: page.items.map(toTeamMemberResponse),
+      items: page.items.map((member) =>
+        toTeamMemberResponse(member, session.access),
+      ),
       nextCursor: moreAfter && last != null ? encodeListCursor(last) : null,
       prevCursor: moreBefore && first != null ? encodeListCursor(first) : null,
       total: page.total,
@@ -62,7 +65,7 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * Add User (CM-110, ADR CM-0030 §6): invited, given a password (Active at
+ * Add Staff (CM-110, ADR CM-0030 §6): invited, given a password (Active at
  * once), or a record only.
  */
 export async function POST(request: Request): Promise<Response> {
@@ -78,8 +81,15 @@ export async function POST(request: Request): Promise<Response> {
         await request.json(),
       ),
     );
-    const { memberType, projectIds, roleId, invite, password, ...details } =
-      model;
+    const {
+      memberType,
+      projectIds,
+      roleId,
+      invite,
+      password,
+      monthlySalary,
+      ...details
+    } = model;
     if (memberType === "normal")
       await assertKnownProjects(
         projectDirectory,
@@ -92,14 +102,25 @@ export async function POST(request: Request): Promise<Response> {
       grantor: session.access,
       memberType,
       details,
+      // Only someone who may see salaries may set one (ADR CM-0032).
+      monthlySalary: can(
+        session.access,
+        "organization.team_members",
+        "financial",
+      )
+        ? monthlySalary
+        : null,
       projectIds,
       roleId,
       invite,
       password,
     });
-    return Response.json(toTeamMemberWithPasswordResponse(member), {
-      status: StatusCodes.CREATED,
-    });
+    return Response.json(
+      toTeamMemberWithPasswordResponse(member, session.access),
+      {
+        status: StatusCodes.CREATED,
+      },
+    );
   } catch (error) {
     return mapError(error);
   }

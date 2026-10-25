@@ -38,6 +38,7 @@ type Member = {
   canSetPassword: boolean;
   passwordIgnored?: string | null;
   aadhaarMasked: string | null;
+  monthlySalary: number | null;
   invitePath: string | null;
   designation: { name: string | null };
 };
@@ -237,6 +238,94 @@ describe("Team Members HTTP (CM-110)", () => {
     );
     expect(refused.status).toBe(StatusCodes.FORBIDDEN);
     expect(await json(refused)).toMatchObject({ code: "PERMISSION_DENIED" });
+  });
+
+  it("keeps the salary behind Financial on Staff (ADR CM-0032)", async () => {
+    const owner = await ownerWithCompany();
+    const body = (overrides: Record<string, unknown> = {}) => ({
+      name: "Prabhu Saravanan",
+      designationId: owner.designationId("Site Engineer"),
+      mobile: newMobile(),
+      memberType: "normal",
+      roleId: owner.roleId("Accountant"),
+      invite: false,
+      ...overrides,
+    });
+    const created = await create(
+      jsonRequest(BASE, owner.cookie, body({ monthlySalary: 2_500_000 })),
+    );
+    expect(created.status).toBe(StatusCodes.CREATED);
+    const prabhu = await json<Member>(created);
+    expect(prabhu.monthlySalary).toBe(2_500_000);
+    const ownerSees = async (id: string) =>
+      (
+        await json<Member>(
+          await getOne(jsonRequest(`${BASE}/${id}`, owner.cookie), params(id)),
+        )
+      ).monthlySalary;
+
+    // A clerk without Financial sees none, and cannot set or change one.
+    const clerk = await memberWith(owner, {
+      "organization.team_members": ["create", "read", "update"],
+    });
+    const clerkRole = await roleWith(owner.workspaceId, owner.userId, {
+      "organization.team_members": ["read"],
+    });
+    const seen = await json<Member>(
+      await getOne(
+        jsonRequest(`${BASE}/${prabhu.id}`, clerk.cookie),
+        params(prabhu.id),
+      ),
+    );
+    expect(seen.monthlySalary).toBeNull();
+    const edited = await update(
+      jsonRequest(`${BASE}/${prabhu.id}/update`, clerk.cookie, {
+        ...body({ mobile: seen.mobile }),
+        name: "Prabhu K.",
+        monthlySalary: 100,
+      }),
+      params(prabhu.id),
+    );
+    expect(edited.status).toBe(StatusCodes.OK);
+    expect(await ownerSees(prabhu.id)).toBe(2_500_000);
+    const byClerk = await json<Member>(
+      await create(
+        jsonRequest(
+          BASE,
+          clerk.cookie,
+          body({ roleId: clerkRole, monthlySalary: 100 }),
+        ),
+      ),
+    );
+    expect(await ownerSees(byClerk.id)).toBeNull();
+
+    // With Financial: null clears it, leaving it out keeps it.
+    const accountant = await memberWith(owner, {
+      "organization.team_members": ["read", "update", "financial"],
+    });
+    const kept = await update(
+      jsonRequest(`${BASE}/${prabhu.id}/update`, accountant.cookie, {
+        ...body({ mobile: seen.mobile }),
+        name: "Prabhu S.",
+      }),
+      params(prabhu.id),
+    );
+    expect((await json<Member>(kept)).monthlySalary).toBe(2_500_000);
+    const cleared = await update(
+      jsonRequest(`${BASE}/${prabhu.id}/update`, accountant.cookie, {
+        ...body({ mobile: seen.mobile }),
+        monthlySalary: null,
+      }),
+      params(prabhu.id),
+    );
+    expect((await json<Member>(cleared)).monthlySalary).toBeNull();
+
+    for (const monthlySalary of [-1, 2_000_000_001, 12.5]) {
+      const refused = await create(
+        jsonRequest(BASE, owner.cookie, body({ monthlySalary })),
+      );
+      expect(refused.status).toBe(StatusCodes.BAD_REQUEST);
+    }
   });
 
   it("lets a Member give only a Role they hold every cell of, never to themselves", async () => {

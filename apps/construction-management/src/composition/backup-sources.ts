@@ -1574,6 +1574,7 @@ const SPECS: Record<string, EntitySpec> = {
       "CASE WHEN t.pan_last4 IS NULL THEN NULL ELSE 'XXXXXX' || t.pan_last4 END",
     ),
     col("emergencyContact", "Emergency Contact", "t.emergency_contact"),
+    money("monthlySalary", "Monthly Salary (₹)", "t.monthly_salary"),
     col("memberType", "Member Type", "t.member_type::text", "enum"),
     col("isOwner", "Owner", "t.is_owner", "bool"),
     col("status", "Status", "t.status::text", "enum"),

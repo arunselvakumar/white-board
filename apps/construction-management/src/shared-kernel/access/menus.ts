@@ -179,13 +179,7 @@ const DEFINITIONS = [
   ],
   // Master records.
   ["masters.master_records", "Master Records", "master_records", "R", false],
-  [
-    "organization.team_members",
-    "Team Members",
-    "master_records",
-    "CRUD",
-    false,
-  ],
+  ["organization.team_members", "Staff", "master_records", "CRUDF", false],
   ["masters.departments", "Departments", "master_records", "CRUD", false],
   ["masters.contractors", "Contractors", "master_records", "CRUD", false],
   ["masters.suppliers", "Supplier", "master_records", "CRUD", false],

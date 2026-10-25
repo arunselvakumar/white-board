@@ -30,7 +30,7 @@ export async function POST(
       id,
       by: session.userId,
     });
-    return Response.json(toTeamMemberResponse(member));
+    return Response.json(toTeamMemberResponse(member, session.access));
   } catch (error) {
     return mapError(error);
   }

@@ -5,9 +5,9 @@ import { EditTeamMemberSkeleton } from "@/components/team-members/team-members-s
 import { QuerySuspense } from "@/components/query-suspense";
 import { RolesNoAccess } from "@/components/roles/roles-no-access";
 
-import { viewerCan } from "../../_lib/viewer-can";
+import { viewerFlags } from "../../_lib/viewer-can";
 
-export const metadata: Metadata = { title: "Edit User" };
+export const metadata: Metadata = { title: "Edit Staff" };
 
 export default async function Page({
   params,
@@ -15,11 +15,14 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  if (!(await viewerCan("organization.team_members", "read")))
-    return <RolesNoAccess what="Users" />;
+  const can = await viewerFlags("organization.team_members", [
+    "read",
+    "financial",
+  ]);
+  if (!can.read) return <RolesNoAccess what="Staff" />;
   return (
     <QuerySuspense fallback={<EditTeamMemberSkeleton />}>
-      <EditTeamMember id={id} />
+      <EditTeamMember id={id} canSeeSalary={can.financial} />
     </QuerySuspense>
   );
 }

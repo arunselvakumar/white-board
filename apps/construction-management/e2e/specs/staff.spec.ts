@@ -11,37 +11,37 @@ import {
   signUpByEmail,
   unique,
 } from "../api/session";
-import { usersPageTest } from "../helpers/usersPageTest";
-import { AddUserPage } from "../pages/AddUserPage";
-import { EditUserPage } from "../pages/EditUserPage";
+import { staffPageTest } from "../helpers/staffPageTest";
+import { AddStaffPage } from "../pages/AddStaffPage";
+import { EditStaffPage } from "../pages/EditStaffPage";
 import { JoinPage } from "../pages/JoinPage";
 import { ProjectsPage } from "../pages/ProjectsPage";
 import { SignUpPage } from "../pages/SignUpPage";
-import { UsersPage } from "../pages/UsersPage";
+import { StaffPage } from "../pages/StaffPage";
 import { signInByMobile } from "../api/session";
 
 const GUEST = { storageState: { cookies: [], origins: [] } };
 
-usersPageTest.describe("Users", () => {
-  usersPageTest(
+staffPageTest.describe("Staff", () => {
+  staffPageTest(
     "should show the invitee as Active, when the Owner invites by email and they join from the emailed link",
     { tag: ["@pr"] },
-    async ({ usersPage, owner, page, browser }) => {
+    async ({ staffPage, owner, page, browser }) => {
       const name = unique("Prabhu Saravanan");
       const email = newEmail("invitee");
 
-      await usersPage.goto();
-      await usersPage.addUserLink.click();
-      const addUserPage = new AddUserPage(page);
-      await addUserPage.fillDetails({ name, email });
-      await expect(addUserPage.inviteCheckbox).toBeChecked();
-      await addUserPage.continueButton.click();
-      await addUserPage.continueButton.click();
-      await addUserPage.chooseRole("Site Engineer");
-      await addUserPage.button("Add and invite").click();
-      await expect(addUserPage.heading(`${name} is invited`)).toBeVisible();
-      await usersPage.goto();
-      await expect(usersPage.user(name)).toContainText("Joining Pending");
+      await staffPage.goto();
+      await staffPage.addUserLink.click();
+      const addStaffPage = new AddStaffPage(page);
+      await addStaffPage.fillDetails({ name, email });
+      await expect(addStaffPage.inviteCheckbox).toBeChecked();
+      await addStaffPage.continueButton.click();
+      await addStaffPage.continueButton.click();
+      await addStaffPage.chooseRole("Site Engineer");
+      await addStaffPage.button("Add and invite").click();
+      await expect(addStaffPage.heading(`${name} is invited`)).toBeVisible();
+      await staffPage.goto();
+      await expect(staffPage.user(name)).toContainText("Joining Pending");
 
       const invitee = await (await browser.newContext(GUEST)).newPage();
       const joinPath = await emailLinkFor(email, "/join/", /^Join /);
@@ -60,68 +60,70 @@ usersPageTest.describe("Users", () => {
       await invitee.context().close();
 
       await page.reload();
-      await expect(usersPage.user(name)).toContainText("Active");
+      await expect(staffPage.user(name)).toContainText("Active");
     },
   );
 
-  usersPageTest(
-    "should add an Active User on the chosen Project and Role, when the Owner adds staff with a mobile and a password",
-    async ({ usersPage, owner, page }) => {
+  staffPageTest(
+    "should add an Active staff member with their salary on the chosen Project and Role, when the Owner adds staff with a mobile and a password",
+    async ({ staffPage, owner, page }) => {
       const project = await createProject(owner.api);
       const name = unique("Murugan K");
 
-      const addUserPage = new AddUserPage(page);
-      await addUserPage.goto();
-      await addUserPage.fillDetails({
+      const addStaffPage = new AddStaffPage(page);
+      await addStaffPage.goto();
+      await addStaffPage.fillDetails({
         name,
         mobile: newMobile().slice(3),
         password: PASSWORD,
+        salary: "18,000",
       });
-      await addUserPage.continueButton.click();
-      await addUserPage.projectCheckbox(project.name).check();
-      await addUserPage.continueButton.click();
-      await addUserPage.chooseRole("Site Supervisor");
-      await addUserPage.button("Add User").click();
+      await addStaffPage.continueButton.click();
+      await addStaffPage.projectCheckbox(project.name).check();
+      await addStaffPage.continueButton.click();
+      await addStaffPage.chooseRole("Site Supervisor");
+      await addStaffPage.button("Add Staff").click();
       await expect(
-        addUserPage.heading(`${name} can sign in now`),
+        addStaffPage.heading(`${name} can sign in now`),
       ).toBeVisible();
 
-      await usersPage.goto();
-      const row = usersPage.user(name);
+      await staffPage.goto();
+      const row = staffPage.user(name);
       await expect(row).toContainText("Active");
       await expect(row).toContainText("Site Supervisor");
 
       await row.getByRole("link", { name }).click();
-      const editUserPage = new EditUserPage(page);
-      await editUserPage.tab("Projects").click();
+      const editStaffPage = new EditStaffPage(page);
+      await expect(editStaffPage.salaryField).toHaveValue("18000");
+      await editStaffPage.tab("Projects").click();
       await expect(
         page.getByRole("checkbox", { name: project.name }),
       ).toBeChecked();
     },
   );
 
-  usersPageTest(
+  staffPageTest(
     "should list the invitee under Joining Pending with a shareable link, when the invitation is not accepted yet",
-    async ({ usersPage, owner }) => {
+    async ({ staffPage, owner }) => {
       const invitee = await inviteMember(owner.api, {
         roleId: await roleId(owner.api, "Site Engineer"),
       });
 
-      await usersPage.goto();
-      await usersPage.statusFilter("Joining Pending").click();
-      await expect(usersPage.user(invitee.name)).toBeVisible();
-      await expect(usersPage.user(owner.name)).toHaveCount(0);
+      await staffPage.goto();
+      await staffPage.statusFilter("Joining Pending").click();
+      await expect(staffPage.user(invitee.name)).toBeVisible();
+      await expect(staffPage.user(owner.name)).toHaveCount(0);
 
-      await usersPage.rowAction(invitee.name, "Share invite link");
-      await expect(usersPage.dialog.getByLabel("Invite link")).toHaveValue(
+      await staffPage.rowAction(invitee.name, "Share invite link");
+      await expect(staffPage.dialog.getByLabel("Invite link")).toHaveValue(
         /\/join\//,
       );
     },
   );
 
-  usersPageTest(
+  staffPageTest(
     "should show the invitation as Declined, when the invitee declines it",
-    async ({ usersPage, owner, browser, playwright, baseURL }) => {
+    async ({ staffPage, owner, browser, playwright, baseURL }) => {
       const invitee = await inviteMember(owner.api, {
         roleId: await roleId(owner.api, "Site Engineer"),
       });
@@ -143,15 +145,15 @@ usersPageTest.describe("Users", () => {
       await context.close();
       await request.dispose();
 
-      await usersPage.goto();
-      await usersPage.statusFilter("Declined").click();
-      await expect(usersPage.user(invitee.name)).toBeVisible();
+      await staffPage.goto();
+      await staffPage.statusFilter("Declined").click();
+      await expect(staffPage.user(invitee.name)).toBeVisible();
     },
   );
 
-  usersPageTest(
+  staffPageTest(
     "should take away the Company's Projects, when the Owner deletes a member",
-    async ({ usersPage, owner, newMember }) => {
+    async ({ staffPage, owner, newMember }) => {
       const project = await createProject(owner.api);
       const member = await newMember({
         roleName: "Site Engineer",
@@ -162,26 +164,26 @@ usersPageTest.describe("Users", () => {
       await memberProjects.goto();
       await expect(memberProjects.projectCard(project.name)).toBeVisible();
 
-      await usersPage.goto();
-      await usersPage.rowAction(member.name, "Delete");
-      await usersPage.alertDialog
+      await staffPage.goto();
+      await staffPage.rowAction(member.name, "Delete");
+      await staffPage.alertDialog
         .getByRole("button", { name: /Delete/ })
         .click();
-      await expect(usersPage.user(member.name)).toHaveCount(0);
+      await expect(staffPage.user(member.name)).toHaveCount(0);
 
       await memberProjects.goto();
       await expect(memberProjects.projectCard(project.name)).toHaveCount(0);
     },
   );
 
-  usersPageTest(
-    "should find a User by name, when the Owner searches Users",
+  staffPageTest(
+    "should find a staff member by name, when the Owner searches Staff",
     async ({ newMember, owner, page }) => {
       const member = await newMember({
         roleName: "Site Engineer",
         name: unique("Karthik R"),
       });
-      const users = new UsersPage(page);
+      const users = new StaffPage(page);
       await users.goto();
       await users.searchBox.fill(member.name);
       await expect(users.user(member.name)).toBeVisible();
@@ -189,17 +191,17 @@ usersPageTest.describe("Users", () => {
     },
   );
 
-  usersPageTest(
+  staffPageTest(
     "should make the member choose a new password, when the Owner sets one for them",
     async ({ newMember, page, playwright, baseURL }) => {
       const member = await newMember({ roleName: "Site Engineer" });
-      const users = new UsersPage(page);
+      const users = new StaffPage(page);
       await users.goto();
       await users
         .user(member.name)
         .getByRole("link", { name: member.name })
         .click();
-      const editUser = new EditUserPage(page);
+      const editUser = new EditStaffPage(page);
       await editUser.setPasswordButton.click();
       const dialog = page.getByRole("dialog", { name: "Set a new password" });
       await dialog.getByLabel("New password").fill("owner-set-pass-77");

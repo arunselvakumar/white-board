@@ -107,6 +107,23 @@ export function teamMemberDetails(input: {
   };
 }
 
+/** The largest monthly salary in paise (₹2 crore), as a Labour's wage. */
+export const MAX_MONTHLY_SALARY = 2_000_000_000;
+
+/**
+ * An optional monthly salary in paise (ADR CM-0032): null or 0 is none.
+ * Separate from the HRMS salary set-up the salary run reads.
+ */
+export function monthlySalary(value: number | null | undefined): number | null {
+  if (value == null || value === 0) return null;
+  if (!Number.isSafeInteger(value) || value < 0 || value > MAX_MONTHLY_SALARY)
+    throw new DomainError(
+      "SALARY_INVALID",
+      "The salary must be a positive amount in paise, at most ₹2 crore a month.",
+    );
+  return value;
+}
+
 /** An unguessable token for the invite link (`/join/<token>`). */
 export function newInviteToken(): string {
   return randomBytes(24).toString("base64url");
@@ -118,6 +135,8 @@ export type TeamMemberProps = {
   /** Set when the invitee accepts (or for the Owner from the start). */
   userId: string | null;
   details: TeamMemberDetails;
+  /** Paise a month, or null (ADR CM-0032). */
+  monthlySalary: number | null;
   memberType: MemberType;
   isOwner: boolean;
   status: TeamMemberStatus;
@@ -151,6 +170,7 @@ export class TeamMember {
     id: string;
     workspaceId: string;
     details: TeamMemberDetails;
+    monthlySalary?: number | null;
     memberType: MemberType;
     projectIds?: readonly string[];
     roleId: string | null;
@@ -162,6 +182,7 @@ export class TeamMember {
       workspaceId: input.workspaceId,
       userId: null,
       details: input.details,
+      monthlySalary: monthlySalary(input.monthlySalary),
       memberType: input.memberType,
       isOwner: false,
       status: "joining_pending",
@@ -193,6 +214,7 @@ export class TeamMember {
       workspaceId: input.workspaceId,
       userId: input.userId,
       details: input.details,
+      monthlySalary: null,
       memberType: "normal",
       isOwner: true,
       status: "active",
@@ -224,6 +246,9 @@ export class TeamMember {
   }
   get details(): TeamMemberDetails {
     return this.props.details;
+  }
+  get monthlySalary(): number | null {
+    return this.props.monthlySalary;
   }
   get memberType(): MemberType {
     return this.props.memberType;
@@ -294,6 +319,14 @@ export class TeamMember {
       );
     }
     this.props = { ...this.props, details };
+    this.touch(by, now);
+  }
+
+  /** Sets or clears the monthly salary (ADR CM-0032). */
+  setMonthlySalary(paise: number | null, by: string, now: Date): void {
+    const salary = monthlySalary(paise);
+    if (salary === this.props.monthlySalary) return;
+    this.props = { ...this.props, monthlySalary: salary };
     this.touch(by, now);
   }
 

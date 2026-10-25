@@ -2,7 +2,7 @@ import { expect } from "@playwright/test";
 
 import { FIXTURES } from "../fixtures";
 import { profilePageTest } from "../helpers/profilePageTest";
-import { UsersPage } from "../pages/UsersPage";
+import { StaffPage } from "../pages/StaffPage";
 import { emailCodeFor } from "../api/mailpit";
 import { ProfilePage } from "../pages/ProfilePage";
 
@@ -26,9 +26,9 @@ profilePageTest.describe("My Profile", () => {
       );
       await expect(profilePage.photoRegion.getByRole("img")).toBeVisible();
 
-      const usersPage = new UsersPage(page);
-      await usersPage.goto();
-      await expect(usersPage.user("Kavya Raman")).toBeVisible();
+      const staffPage = new StaffPage(page);
+      await staffPage.goto();
+      await expect(staffPage.user("Kavya Raman")).toBeVisible();
     },
   );
 

@@ -49,7 +49,7 @@ export async function POST(
       by: session.userId,
       projectIds,
     });
-    return Response.json(toTeamMemberResponse(member));
+    return Response.json(toTeamMemberResponse(member, session.access));
   } catch (error) {
     return mapError(error);
   }

@@ -192,7 +192,7 @@ export class RoleHandlers {
     if (userCount > 0)
       throw conflict(
         "ROLE_IN_USE",
-        "Users are on this Role. Give them another Role first.",
+        "Staff are on this Role. Give them another Role first.",
         { userCount },
       );
     const before = snapshot(role);

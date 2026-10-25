@@ -2,7 +2,7 @@ import { expect } from "@playwright/test";
 
 import { emailCodeFor } from "../api/mailpit";
 import { companyTest } from "../helpers/companyTest";
-import { UsersPage } from "../pages/UsersPage";
+import { StaffPage } from "../pages/StaffPage";
 import { latestEmailTo } from "../api/mailpit";
 
 companyTest.describe("Company ownership and deletion", () => {
@@ -48,7 +48,7 @@ companyTest.describe("Company ownership and deletion", () => {
       await dialog.getByRole("button", { name: "Transfer ownership" }).click();
       await expect(dialog).toHaveCount(0);
 
-      const users = new UsersPage(page);
+      const users = new StaffPage(page);
       await users.goto();
       await expect(users.user(member.name)).toContainText("Owner");
       await expect(users.user(owner.name)).not.toContainText(

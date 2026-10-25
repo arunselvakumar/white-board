@@ -18,7 +18,7 @@ let api: ReturnType<typeof mockApi> | null = null;
 
 /**
  * An in-memory Roles API over `initial`. `inUseLater` names a Role that
- * gains a User after the list loaded, so its delete answers ROLE_IN_USE.
+ * gains a staff member after the list loaded, so its delete answers ROLE_IN_USE.
  */
 function serve(initial: Role[], inUseLater?: string) {
   return () => {
@@ -51,7 +51,7 @@ function serve(initial: Role[], inUseLater?: string) {
           return Response.json(
             {
               code: "ROLE_IN_USE",
-              message: "Users are on this Role.",
+              message: "Staff are on this Role.",
               details: { userCount: 1 },
             },
             { status: 409 },
@@ -67,7 +67,7 @@ function serve(initial: Role[], inUseLater?: string) {
 }
 
 const meta = {
-  title: "Users & Roles/Role Management/List",
+  title: "Staff & Roles/Role Management/List",
   component: RolesList,
   args: { actions: ALL_ROLE_ACTIONS },
   render: (args) => (
@@ -108,7 +108,7 @@ export const WithRoles: Story = {
     ]);
     const engineer = await rowOf(canvas, "Site Engineer");
     await expect(engineer.getByText("Default")).toBeVisible();
-    await expect(engineer.getAllByText("3 Users")[0]).toBeInTheDocument();
+    await expect(engineer.getAllByText("3 Staff")[0]).toBeInTheDocument();
     await expect(engineer.getByText(/Runs the site day to day/)).toBeVisible();
     const helper = await rowOf(canvas, "Store helper");
     await expect(helper.queryByText("Default")).not.toBeInTheDocument();
@@ -127,7 +127,7 @@ export const WithRoles: Story = {
   },
 };
 
-/** A Role with Users on it cannot be deleted; the menu says why. */
+/** A Role with staff on it cannot be deleted; the menu says why. */
 export const DeleteBlockedWhileInUse: Story = {
   beforeEach: serve(ROLES),
   play: async ({ canvas, canvasElement, userEvent }) => {
@@ -139,7 +139,7 @@ export const DeleteBlockedWhileInUse: Story = {
     await expect(remove).toHaveAttribute("aria-disabled", "true");
     await expect(
       within(remove).getByText(
-        "3 Users on it. Move them to another Role first.",
+        "3 Staff on it. Move them to another Role first.",
       ),
     ).toBeVisible();
   },
@@ -168,7 +168,7 @@ export const DuplicateAndDelete: Story = {
     const confirm = within(await body.findByRole("alertdialog"));
     await waitFor(() =>
       expect(
-        confirm.getByText(/no longer be offered on Add User/),
+        confirm.getByText(/no longer be offered on Add Staff/),
       ).toBeVisible(),
     );
     await userEvent.click(confirm.getByRole("button", { name: "Delete" }));
@@ -203,7 +203,7 @@ export const DeleteRefusedInUse: Story = {
     await userEvent.click(confirm.getByRole("button", { name: "Delete" }));
     await expect(
       await confirm.findByText(
-        "1 User on this Role now. Move them to another Role first.",
+        "1 Staff member on this Role now. Move them to another Role first.",
       ),
     ).toBeVisible();
     await expect(
@@ -213,7 +213,7 @@ export const DeleteRefusedInUse: Story = {
     await userEvent.click(confirm.getByRole("button", { name: "Cancel" }));
     const accountant = await rowOf(canvas, "Accountant");
     await waitFor(() =>
-      expect(accountant.getAllByText("1 User")[0]).toBeInTheDocument(),
+      expect(accountant.getAllByText("1 Staff member")[0]).toBeInTheDocument(),
     );
   },
 };

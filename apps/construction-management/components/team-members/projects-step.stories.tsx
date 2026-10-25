@@ -28,7 +28,7 @@ function Controlled() {
 }
 
 const meta = {
-  title: "Users & Roles/Users/ProjectsStep",
+  title: "Staff & Roles/Staff/ProjectsStep",
   component: ProjectsStep,
   beforeEach() {
     options = [

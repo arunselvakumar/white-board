@@ -46,9 +46,9 @@ function serve(member: TeamMember, extra: MockRoute[] = []) {
 }
 
 const meta = {
-  title: "Users & Roles/Users/EditUser",
+  title: "Staff & Roles/Staff/EditStaff",
   component: EditTeamMember,
-  args: { id: MEMBER.id },
+  args: { id: MEMBER.id, canSeeSalary: true },
   beforeEach() {
     signInAs("owner", { name: "Anugraha Engineers" });
   },
@@ -90,6 +90,60 @@ export const EditDetailsKeepsAadhaar: Story = {
     );
     // Blank Aadhaar is left out, so the stored one stays.
     await expect("aadhaar" in bodyOf(`${ONE}/update`)).toBe(false);
+  },
+};
+
+/** The salary shows in rupees; clearing it sends null (ADR CM-0032). */
+export const EditSalary: Story = {
+  beforeEach: serve({ ...MEMBER, monthlySalary: 2_500_050 }, [
+    {
+      method: "POST",
+      path: `${ONE}/update`,
+      respond: () => Response.json({ ...MEMBER, monthlySalary: 3_000_000 }),
+    },
+  ]),
+  play: async ({ canvas, userEvent }) => {
+    const salary = await canvas.findByLabelText("Salary per month");
+    await expect(salary).toHaveValue("25000.50");
+    await userEvent.clear(salary);
+    await userEvent.type(salary, "30000");
+    await userEvent.click(canvas.getByRole("button", { name: "Save details" }));
+    await waitFor(() =>
+      expect(bodyOf(`${ONE}/update`)).toMatchObject({
+        monthlySalary: 3_000_000,
+      }),
+    );
+  },
+};
+
+/** Without Financial on Staff the salary is not shown, and an edit keeps it. */
+export const SalaryHiddenWithoutRight: Story = {
+  args: { canSeeSalary: false },
+  beforeEach: serve(MEMBER, [
+    {
+      method: "POST",
+      path: `${ONE}/update`,
+      respond: () => Response.json(MEMBER),
+    },
+  ]),
+  play: async ({ canvas, userEvent }) => {
+    await expect(
+      await canvas.findByText(
+        "You cannot see salaries. Ask the Owner for the Financial right on Staff.",
+      ),
+    ).toBeVisible();
+    await expect(
+      canvas.queryByLabelText("Salary per month"),
+    ).not.toBeInTheDocument();
+    const name = canvas.getByLabelText("Name");
+    await userEvent.type(name, " K.");
+    await userEvent.click(canvas.getByRole("button", { name: "Save details" }));
+    await waitFor(() =>
+      expect(bodyOf(`${ONE}/update`)).toMatchObject({
+        name: "Prabhu Saravanan K.",
+      }),
+    );
+    await expect("monthlySalary" in bodyOf(`${ONE}/update`)).toBe(false);
   },
 };
 

@@ -181,6 +181,9 @@ model ConstructionOrganizationTeamMember {
   panEncrypted     String?                                  @map("pan_encrypted")
   panLast4         String?                                  @map("pan_last4") @db.Char(4)
   emergencyContact String?                                  @map("emergency_contact")
+  /// Paise a month; optional (ADR CM-0032). Seen and set with Financial on
+  /// Staff (`organization.team_members`). Separate from HRMS salary set-up.
+  monthlySalary    Int?                                     @map("monthly_salary")
   /// Storage key of the photo set in My Profile (CM-115); a `stored_files` row.
   photoKey         String?                                  @map("photo_key")
   memberType       ConstructionOrganizationMemberType       @default(normal) @map("member_type")

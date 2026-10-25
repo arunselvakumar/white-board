@@ -15,12 +15,12 @@ The Company the current Session is working in. Every API call is scoped to it; i
 _Avoid_: current org, selected tenant
 
 **User**:
-A person who can sign in: by email and password, by mobile and password, and by mobile OTP once SMS is on (ADR CM-0009, CM-0030). A User exists once, across all their Companies. The **Users** page (Users & Roles → Users) lists the Company's Team Members, including records that cannot sign in yet.
+A person who can sign in: by email and password, by mobile and password, and by mobile OTP once SMS is on (ADR CM-0009, CM-0030). A User exists once, across all their Companies. The **Staff** page (Staff & Roles → Staff) lists the Company's Team Members, including records that cannot sign in yet.
 _Avoid_: account, login, customer
 
 **Team Member**:
-A User's membership and employee record inside one Company: name, Designation, mobile, email, ids, Member Type, projects, and their Role. Screens call it a **User** (Add User, Edit User); code, APIs and audit events say Team Member (ADR CM-0030).
-_Avoid_: employee, staff (in UI copy)
+A User's membership and employee record inside one Company: name, Designation, mobile, email, ids, an optional monthly salary, Member Type, projects, and their Role. The Staff & Roles screens call them **Staff** (Add Staff, Edit Staff, "1 Staff member"); code, APIs, audit events and other modules say Team Member (ADR CM-0030, CM-0032).
+_Avoid_: employee; User (in UI copy for this record)
 
 **Owner**:
 The Team Member who created the Company. Buys and renews the plan, can do everything, cannot be removed. Role `owner` in `@repo/auth`.
@@ -44,7 +44,7 @@ _Avoid_: invite request
 ### Access
 
 **Role**:
-A named Permission Matrix in a Company (Admin, Site Engineer, HRMS Staff…), given to Team Members on Users & Roles → Role Management. Every Team Member but the Owner has exactly one. Editing a Role changes access for everyone on it (ADR CM-0030).
+A named Permission Matrix in a Company (Admin, Site Engineer, HRMS Staff…), given to Team Members on Staff & Roles → Role Management. Every Team Member but the Owner has exactly one. Editing a Role changes access for everyone on it (ADR CM-0030).
 _Avoid_: designation, permission template, group
 
 **Permission Matrix**:
