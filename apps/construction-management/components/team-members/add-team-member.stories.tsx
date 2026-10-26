@@ -88,7 +88,7 @@ async function choose(
   name: string | RegExp,
 ) {
   const body = within(canvasElement.ownerDocument.body);
-  await userEvent.click(canvas.getByLabelText(label));
+  await userEvent.click(canvas.getByRole("combobox", { name: label }));
   await userEvent.click(await body.findByRole("option", { name }));
 }
 
@@ -263,7 +263,7 @@ export const WithoutSalaryRight: Story = {
     await expect(
       canvas.queryByLabelText("Salary per month"),
     ).not.toBeInTheDocument();
-    await expect(canvas.queryByText("Salary type")).not.toBeInTheDocument();
+    await expect(canvas.getByText("Salary type")).not.toBeVisible();
     await expect(canvas.getByLabelText("Working hours per day")).toBeVisible();
     await userEvent.type(canvas.getByLabelText("Mobile"), "77081 65767");
     await choose(context, "Role", /^Site Engineer/);
@@ -426,7 +426,7 @@ export const HrmsMemberStartsOnHrmsStaff: Story = {
     ).not.toBeInTheDocument();
     await userEvent.type(canvas.getByLabelText("Name"), "Anitha");
     await userEvent.type(canvas.getByLabelText("Email"), "anitha@anugraha.in");
-    await expect(canvas.getByLabelText("Role")).toHaveTextContent("HRMS Staff");
+    await expect(canvas.getByRole("combobox", { name: "Role" })).toHaveTextContent("HRMS Staff");
     await userEvent.click(
       canvas.getByRole("button", { name: "Add and invite" }),
     );
