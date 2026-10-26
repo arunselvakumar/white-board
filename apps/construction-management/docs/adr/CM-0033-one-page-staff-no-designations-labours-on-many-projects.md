@@ -40,13 +40,13 @@ The issue listed five questions. The owner accepted the recommended answer to ea
 
 - Add Staff and Edit Staff have a **Salary** card with the same fields and words as the Labour **Wage** card, from one shared component:
 
-  | Field                  | Rule                                                               |
-  | ---------------------- | ------------------------------------------------------------------ |
-  | Salary type            | Daily or Monthly, Monthly by default                               |
-  | Salary per day / month | Rupees, optional (blank is no salary), at most ₹2 crore            |
-  | Overtime per hour      | Rupees, 0 if none; shown only when a salary is set                 |
-  | Working hours per day  | Decimal hours, more than 0 and at most 24, 8 by default (CM-0011)  |
-  | Weekly holidays        | Sunday to Saturday, Sunday by default                              |
+  | Field                  | Rule                                                              |
+  | ---------------------- | ----------------------------------------------------------------- |
+  | Salary type            | Daily or Monthly, Monthly by default                              |
+  | Salary per day / month | Rupees, optional (blank is no salary), at most ₹2 crore           |
+  | Overtime per hour      | Rupees, 0 if none; shown only when a salary is set                |
+  | Working hours per day  | Decimal hours, more than 0 and at most 24, 8 by default (CM-0011) |
+  | Weekly holidays        | Sunday to Saturday, Sunday by default                             |
 
 - **A staff salary stays optional; a Labour's wage stays required**, because attendance prices every Labour day from it.
 - **Staff have no opening balance.** Labours have a ledger (CM-0004); Staff do not.

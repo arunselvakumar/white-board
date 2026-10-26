@@ -24,6 +24,7 @@ import {
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FieldError } from "@/components/auth/field-error";
+import { FormSection } from "@/components/forms/form-section";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MobileField } from "@/components/auth/mobile-field";
 import { MoneyInput } from "@/components/money/money-input";
@@ -140,35 +141,6 @@ function ChoiceField({
   );
 }
 
-function Section({
-  id,
-  title,
-  hint,
-  children,
-}: {
-  id: string;
-  title: string;
-  hint?: string;
-  children: ReactNode;
-}) {
-  return (
-    <section
-      aria-labelledby={id}
-      className="bg-card space-y-4 rounded-xl border p-4 sm:p-5"
-    >
-      <div className="space-y-1">
-        <h2 id={id} className="font-semibold">
-          {title}
-        </h2>
-        {hint != null && (
-          <p className="text-muted-foreground text-sm">{hint}</p>
-        )}
-      </div>
-      {children}
-    </section>
-  );
-}
-
 /**
  * Add and Edit Labour (CM-207): Basic, Wage, Statutory, Category & contact,
  * and Projects (none, one or many, ADR CM-0033). Amounts are typed in
@@ -230,7 +202,7 @@ export function LabourForm({
         void submit(event);
       }}
     >
-      <Section id="labour-basic" title="Basic">
+      <FormSection title="Basic">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="labour-name" required>
@@ -292,10 +264,9 @@ export function LabourForm({
             <FieldError message={errors.joiningDate?.message} />
           </div>
         </div>
-      </Section>
+      </FormSection>
 
-      <Section
-        id="labour-wage"
+      <FormSection
         title="Wage"
         hint={
           showAmounts
@@ -332,9 +303,9 @@ export function LabourForm({
             </div>
           )}
         </WageFields>
-      </Section>
+      </FormSection>
 
-      <Section id="labour-statutory" title="Statutory">
+      <FormSection title="Statutory">
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-1.5">
             <Label htmlFor="labour-uan">UAN</Label>
@@ -378,9 +349,9 @@ export function LabourForm({
             <FieldError message={errors.aadhaar?.message} />
           </div>
         </div>
-      </Section>
+      </FormSection>
 
-      <Section id="labour-contact" title="Category & contact">
+      <FormSection title="Category & contact">
         <div className="grid gap-4 sm:grid-cols-2">
           <ChoiceField
             id="labour-category"
@@ -424,10 +395,9 @@ export function LabourForm({
             error={errors.gender?.message}
           />
         </div>
-      </Section>
+      </FormSection>
 
-      <Section
-        id="labour-projects"
+      <FormSection
         title="Projects"
         hint={
           isNew
@@ -469,7 +439,7 @@ export function LabourForm({
             to choose it here.
           </p>
         )}
-      </Section>
+      </FormSection>
 
       <FormAlert message={errors.root?.message} />
       <div className="flex flex-wrap gap-2">

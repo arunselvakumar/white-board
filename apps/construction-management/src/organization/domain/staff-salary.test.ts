@@ -99,8 +99,9 @@ describe("keepLeftOut", () => {
     expect(
       staffSalary(keepLeftOut({ workingHoursPerDay: "9" }, stored)),
     ).toEqual({ ...stored, workingHoursPerDay: "9" });
-    expect(staffSalary(keepLeftOut({ perMonth: null }, stored))).toMatchObject(
-      { perMonth: null, overtimePerHour: 0 },
-    );
+    expect(staffSalary(keepLeftOut({ perMonth: null }, stored))).toMatchObject({
+      perMonth: null,
+      overtimePerHour: 0,
+    });
   });
 });

@@ -251,7 +251,8 @@ export function EditTeamMember({
                       detailErrorFields(values),
                     );
                     if (field == null) form.setError("root", { message });
-                    else form.setError(field, { message }, { shouldFocus: true });
+                    else
+                      form.setError(field, { message }, { shouldFocus: true });
                   }
                 })(event);
               }}

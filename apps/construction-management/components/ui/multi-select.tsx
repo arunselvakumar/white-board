@@ -19,7 +19,7 @@ export type MultiSelectOption = { id: string; name: string };
 /**
  * Pick any number of records from a searchable list: a tick per chosen
  * row in the list and a chip per chosen record in the field (`Combobox
- * multiple`). Stores ids; ids missing from `options` are dropped on the
+ * multiple`). Escape never clears it; chips are removed one by one. Stores ids; ids missing from `options` are dropped on the
  * next change, so pass a saved record that is no longer live in `options`
  * to keep it.
  */
@@ -68,7 +68,13 @@ export function MultiSelect({
       isItemEqualToValue={(item: MultiSelectOption, other: MultiSelectOption) =>
         item.id === other.id
       }
-      onValueChange={(next: MultiSelectOption[]) => {
+      onValueChange={(
+        next: MultiSelectOption[],
+        details: { reason: string },
+      ) => {
+        // Escape on a closed list would clear every choice; it only
+        // dismisses here, so a stray key never loses the selection.
+        if (details.reason === "escape-key") return;
         onChange(next.map((item) => item.id));
       }}
     >

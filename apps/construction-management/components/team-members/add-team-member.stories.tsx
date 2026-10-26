@@ -112,9 +112,10 @@ export const InviteByEmail: Story = {
         await canvas.findByRole("heading", { name: new RegExp(`^${card}`) }),
       ).toBeVisible();
     await expect(canvas.queryByText(/Step \d of/)).not.toBeInTheDocument();
-    await expect(
-      canvas.getByRole("link", { name: "Cancel" }),
-    ).toHaveAttribute("href", "/app/staff");
+    await expect(canvas.getByRole("link", { name: "Cancel" })).toHaveAttribute(
+      "href",
+      "/app/staff",
+    );
     await userEvent.click(canvas.getByRole("button", { name: "Add Staff" }));
     await expect(await canvas.findByText("Enter the name")).toBeVisible();
     await expect(
@@ -161,7 +162,9 @@ export const InviteByEmail: Story = {
     await userEvent.type(canvas.getByLabelText("Working hours per day"), "9");
     await userEvent.click(canvas.getByRole("button", { name: "Sat" }));
 
-    await userEvent.click(canvas.getByRole("checkbox", { name: /Sri Heights/ }));
+    await userEvent.click(
+      canvas.getByRole("checkbox", { name: /Sri Heights/ }),
+    );
 
     // No Role yet: the Role card says so.
     await userEvent.click(
@@ -426,7 +429,9 @@ export const HrmsMemberStartsOnHrmsStaff: Story = {
     ).not.toBeInTheDocument();
     await userEvent.type(canvas.getByLabelText("Name"), "Anitha");
     await userEvent.type(canvas.getByLabelText("Email"), "anitha@anugraha.in");
-    await expect(canvas.getByRole("combobox", { name: "Role" })).toHaveTextContent("HRMS Staff");
+    await expect(
+      canvas.getByRole("combobox", { name: "Role" }),
+    ).toHaveTextContent("HRMS Staff");
     await userEvent.click(
       canvas.getByRole("button", { name: "Add and invite" }),
     );

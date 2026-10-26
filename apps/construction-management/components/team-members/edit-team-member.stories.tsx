@@ -141,16 +141,13 @@ export const EditSalary: Story = {
  */
 export const SalaryHiddenWithoutRight: Story = {
   args: { canSeeSalary: false },
-  beforeEach: serve(
-    { ...MEMBER, overtimeWagePerHour: null },
-    [
-      {
-        method: "POST",
-        path: `${ONE}/update`,
-        respond: () => Response.json(MEMBER),
-      },
-    ],
-  ),
+  beforeEach: serve({ ...MEMBER, overtimeWagePerHour: null }, [
+    {
+      method: "POST",
+      path: `${ONE}/update`,
+      respond: () => Response.json(MEMBER),
+    },
+  ]),
   play: async ({ canvas, userEvent }) => {
     await expect(
       await canvas.findByText(

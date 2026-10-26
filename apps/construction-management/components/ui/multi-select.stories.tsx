@@ -72,9 +72,14 @@ export const TickSearchAndRemove: Story = {
     ).toBeNull();
     await userEvent.click(body.getByRole("option", { name: "Mall Block C" }));
     await expect(args.onChange).toHaveBeenLastCalledWith(["p1", "p3"]);
-    // Tab leaves the field; Escape on a closed list would clear it.
-    await userEvent.tab();
+    // Escape closes the list, and pressed again keeps every choice.
+    await userEvent.keyboard("{Escape}");
+    await userEvent.keyboard("{Escape}");
     await expect(args.onChange).toHaveBeenLastCalledWith(["p1", "p3"]);
+    await expect(
+      canvas.getByRole("button", { name: "Remove Tower A" }),
+    ).toBeVisible();
+    await userEvent.tab();
     await expect(input).toHaveValue("");
 
     await userEvent.click(

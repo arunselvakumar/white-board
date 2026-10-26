@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-query";
 import { CheckCircle2, Info, type LucideIcon } from "lucide-react";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useForm, useWatch, type FieldPath } from "react-hook-form";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 
@@ -53,6 +53,8 @@ const SIGN_IN_ERROR_FIELDS: Record<string, FieldPath<AddStaffValues>> = {
   PASSWORD_TOO_LONG: "password",
 };
 
+const ROLE_FIELD_ID = "member-role";
+
 /** Server codes about the Role, shown on the Role card. */
 const ROLE_ERRORS = new Set(["ROLE_NOT_FOUND", "ROLE_REQUIRED"]);
 
@@ -84,7 +86,6 @@ export function AddTeamMember({
   });
   const [chosenRoleId, setChosenRoleId] = useState<string | null>(null);
   const [roleError, setRoleError] = useState<string | undefined>();
-  const roleCard = useRef<HTMLDivElement>(null);
   const [created, setCreated] = useState<Created | null>(null);
   const [projectIds, setProjectIds] = useState<string[]>([]);
 
@@ -106,10 +107,9 @@ export function AddTeamMember({
 
   const showRoleError = (message: string) => {
     setRoleError(message);
-    roleCard.current?.scrollIntoView({ block: "center" });
-    roleCard.current?.querySelector<HTMLElement>("button")?.focus({
-      preventScroll: true,
-    });
+    const trigger = document.getElementById(ROLE_FIELD_ID);
+    trigger?.scrollIntoView({ block: "center" });
+    trigger?.focus({ preventScroll: true });
   };
 
   // Client checks focus (and so scroll to) the first field in error.
@@ -183,19 +183,17 @@ export function AddTeamMember({
                 <ProjectsField value={projectIds} onChange={setProjectIds} />
               </FormSection>
             )}
-            <div ref={roleCard}>
-              <RoleField
-                id="member-role"
-                roles={roles}
-                value={roleId}
-                onChange={(value) => {
-                  setChosenRoleId(value);
-                  setRoleError(undefined);
-                }}
-                error={roleError}
-                previewOpen={false}
-              />
-            </div>
+            <RoleField
+              id={ROLE_FIELD_ID}
+              roles={roles}
+              value={roleId}
+              onChange={(value) => {
+                setChosenRoleId(value);
+                setRoleError(undefined);
+              }}
+              error={roleError}
+              previewOpen={false}
+            />
           </TeamMemberDetailsFields>
 
           <FormAlert message={form.formState.errors.root?.message} />
