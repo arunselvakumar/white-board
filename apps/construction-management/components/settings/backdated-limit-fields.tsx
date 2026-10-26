@@ -13,10 +13,9 @@ import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 
 import { FieldError } from "@/components/auth/field-error";
+import { MultiSelect } from "@/components/ui/multi-select";
 import type { RoleOption } from "@/src/queries/settings";
 import { MAX_BACKDATED_DAYS } from "@/src/shared-kernel/backdated-policy";
-
-import { RoleMultiSelect } from "./role-multi-select";
 
 export const limitSchema = z.object({
   days: z
@@ -93,11 +92,14 @@ export function BackdatedLimitFields<Values extends WithLimits>({
                 name={`${action.key}.overrideRoleIds` as Path<Values>}
                 control={control}
                 render={({ field }) => (
-                  <RoleMultiSelect
+                  <MultiSelect
                     id={overrideId}
-                    roles={roles}
+                    options={roles}
                     value={field.value as string[]}
                     onChange={field.onChange}
+                    placeholder="No override"
+                    empty="No Roles found."
+                    listLabel="Roles"
                   />
                 )}
               />

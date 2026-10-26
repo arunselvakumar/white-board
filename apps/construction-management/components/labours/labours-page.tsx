@@ -192,7 +192,7 @@ export function LaboursPage() {
         <PageHeader
           back={{ label: "Masters", href: "/app/masters" }}
           title="Labours"
-          meta="Your own Labours: wages, Project and transfers."
+          meta="Your own Labours: wages, Projects and transfers."
           actions={
             <div className="flex flex-wrap gap-2">
               <Button
