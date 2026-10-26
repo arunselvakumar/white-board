@@ -358,7 +358,7 @@ All master tables carry `id`, `companyId` (nullable where global seeds exist), `
 | gender              | enum{Male, Female, Other}           | no             | Values inferred.             |
 | photo               | file                                | no             |                              |
 | otherDocuments      | file[]                              | no             |                              |
-| currentProjectId    | FK → Project                        | no             | Changes only by transfer.    |
+| projectIds          | FK → Project[]                      | no             | None, one or many (CM-0033). |
 | isActive            | bool                                | yes            | Active/Inactive (08).        |
 | isHidden            | bool                                | no             | `labour/hide`.               |
 
@@ -621,7 +621,7 @@ stateDiagram-v2
 - Global seeds (`companyId = null`) are read-only for companies; they can be disabled, not edited or deleted (inferred from Disable endpoints and Designation Duplicate).
 - A master record referenced by transactions should be disabled or hidden rather than deleted (inferred; legacy offers `hide` for labour and `Disable` for lookups).
 - Parties are offered in a project only if assigned to that project (Contractors, Suppliers, Vendors, Labours, Other Parties; also via Project → Resources, 03).
-- A Labour has exactly one current project; changing it is a transfer with history, not an edit.
+- A Labour is on none, one or many Projects (ADR CM-0033). Ticking or unticking one on Edit, and a transfer, each write a history row.
 - A Contractor may cover many Departments; the Department picker on worksheets is filtered by the chosen contractor (inferred).
 - Material **Rate Details** and **Minimum Stock** sections are only stored when their checkbox is on.
 - Discount type is ₹ (amount) or %; GST Rate is a percentage; HSN Code is free text in legacy.

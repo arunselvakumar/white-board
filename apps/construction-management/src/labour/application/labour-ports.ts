@@ -2,11 +2,7 @@ import type { AuditEvent } from "@/src/shared-kernel/audit";
 import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 import type { ListCursor } from "@/src/shared-kernel/list-cursor";
 
-import type {
-  Labour,
-  LabourDetails,
-  ProjectChanges,
-} from "../domain/labour";
+import type { Labour, LabourDetails, ProjectChanges } from "../domain/labour";
 
 /**
  * A row of a labourer's transfer history (CM-206, ADR CM-0033): onto a

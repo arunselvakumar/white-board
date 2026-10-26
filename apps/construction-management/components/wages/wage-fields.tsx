@@ -113,7 +113,7 @@ export function WageFields<Values extends FieldValues>({
           control={form.control}
           render={({ field }) => (
             <ToggleGroup
-              value={[field.value as string]}
+              value={[field.value]}
               onValueChange={(value: string[]) => {
                 const next = value[0];
                 if (next === "daily" || next === "monthly")
@@ -129,7 +129,10 @@ export function WageFields<Values extends FieldValues>({
       </fieldset>
       {showAmounts && (
         <div key={key} className="space-y-1.5">
-          <Label htmlFor={`${id}-${key === "perDay" ? "day" : "month"}`} required={options.required}>
+          <Label
+            htmlFor={`${id}-${key === "perDay" ? "day" : "month"}`}
+            required={options.required}
+          >
             {key === "perDay" ? words.perDay : words.perMonth}
           </Label>
           <MoneyInput

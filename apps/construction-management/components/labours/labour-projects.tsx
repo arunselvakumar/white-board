@@ -33,11 +33,7 @@ export function ProjectChips({
   return (
     <span className="flex flex-wrap gap-1">
       {projects.map((project) => (
-        <Badge
-          key={project.id}
-          variant="outline"
-          className="max-w-40 truncate"
-        >
+        <Badge key={project.id} variant="outline" className="max-w-40 truncate">
           {project.name}
         </Badge>
       ))}
