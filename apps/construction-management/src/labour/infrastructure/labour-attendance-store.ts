@@ -28,7 +28,7 @@ import type {
 } from "../application/labour-attendance-handlers";
 import { dayLedgerEntries, type PricedDay } from "../domain/labour-attendance";
 import { workingHours, type Weekday } from "../domain/wages";
-import { projectsOn } from "./labour-project-on";
+import { onProjectOn } from "./labour-project-on";
 import { lockLiveParties } from "./party-locks";
 import { companyToday, PrismaLabourQueries } from "./prisma-labour-queries";
 import { prismaLedger } from "./prisma-ledger";
@@ -155,8 +155,9 @@ function rowData(day: PricedDay) {
 
 /**
  * Labour attendance in `construction_labour` (CM-210): one live row per
- * labourer per date (partial unique index), overtime lines in id order, and
- * the labour ledger in the same transaction (ADR CM-0004).
+ * labourer per Project per date (partial unique index, ADR CM-0033),
+ * overtime lines in id order, and the labour ledger in the same
+ * transaction (ADR CM-0004).
  */
 export class PrismaLabourAttendanceStore implements LabourAttendanceStore {
   private readonly queries: PrismaLabourQueries;
@@ -183,13 +184,14 @@ export class PrismaLabourAttendanceStore implements LabourAttendanceStore {
     return new Map(rows.map((row) => [row.id, toLabourer(row)]));
   }
 
-  projectsOn(
+  onProject(
     _workspaceId: string,
     ids: readonly string[],
+    projectId: string,
     date: CalendarDate,
-  ): Promise<Map<string, string>> {
+  ): Promise<Set<string>> {
     // Ids come from `labourers`, already scoped to the Company.
-    return projectsOn(this.db, ids, date);
+    return onProjectOn(this.db, ids, projectId, date);
   }
 
   async labourersOn(
@@ -204,12 +206,14 @@ export class PrismaLabourAttendanceStore implements LabourAttendanceStore {
   async daysOf(
     workspaceId: string,
     labourIds: readonly string[],
+    projectId: string,
     date: CalendarDate,
   ): Promise<StoredLabourDay[]> {
     if (labourIds.length === 0) return [];
     const rows = await this.db.constructionLabourAttendance.findMany({
       where: {
         workspaceId,
+        projectId,
         labourId: { in: [...new Set(labourIds)] },
         attendanceDate: calendarDateToDb(date),
         deletedAt: null,

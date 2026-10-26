@@ -192,11 +192,19 @@ export class PrismaWagePaymentStore implements WagePaymentStore {
     if (partyType === "labour") {
       const row = await this.db.constructionLabourLabour.findFirst({
         where,
-        select: { id: true, name: true, currentProjectId: true },
+        select: {
+          id: true,
+          name: true,
+          projects: { select: { projectId: true } },
+        },
       });
       return row == null
         ? null
-        : { id: row.id, name: row.name, projectIds: [row.currentProjectId] };
+        : {
+            id: row.id,
+            name: row.name,
+            projectIds: row.projects.map((project) => project.projectId),
+          };
     }
     const row = await this.db.constructionLabourVendor.findFirst({
       where,

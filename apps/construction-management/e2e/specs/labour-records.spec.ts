@@ -60,7 +60,7 @@ laboursPageTest.describe("Labour records", () => {
         row.getCell(column("Wage Type*")).value = "Daily";
         row.getCell(column("Wage per Day (₹)")).value = 750;
         row.getCell(column("Overtime Wage per Hour (₹)*")).value = 90;
-        row.getCell(column("Project*")).value = project.name;
+        row.getCell(column("Projects")).value = project.name;
         row.commit();
       }
       const filled = Buffer.from(await book.xlsx.writeBuffer());

@@ -52,7 +52,7 @@ type Labour = {
   balance: number | null;
   aadhaarMasked: string | null;
   contactNumber: string | null;
-  currentProject: { id: string; name: string };
+  projects: { id: string; name: string }[];
   labourCategory: { id: string; name: string } | null;
   supervisor: { id: string; name: string } | null;
   isActive: boolean;
@@ -133,7 +133,7 @@ function labourBody(projectId: string, extra: Record<string, unknown> = {}) {
     wagePerDay: 70_000,
     overtimeWagePerHour: 10_000,
     weeklyHolidays: [0],
-    currentProjectId: projectId,
+    projectIds: [projectId],
     ...extra,
   };
 }
@@ -274,7 +274,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
       balance: 150_000,
       aadhaarMasked: "XXXXXXXX2346",
       contactNumber: "+917708165767",
-      currentProject: { id: tower },
+      projects: [{ id: tower }],
       labourCategory: { id: mason },
       supervisor: { id: supervisor },
       isActive: true,
@@ -449,7 +449,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
       [{ contactNumber: "12345" }, "MOBILE_INVALID"],
       [{ weeklyHolidays: [1, 1] }, "WEEKLY_HOLIDAYS_INVALID"],
       [{ joiningDate: "2026-13-01" }, "JOINING_DATE_INVALID"],
-      [{ currentProjectId: newId() }, "PROJECT_NOT_FOUND"],
+      [{ projectIds: [newId()] }, "PROJECT_NOT_FOUND"],
       [{ labourCategoryId: welder }, "LABOUR_CATEGORY_NOT_FOUND"],
       [{ supervisorId: newId() }, "SUPERVISOR_NOT_FOUND"],
     ];
@@ -590,7 +590,9 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect(early.status).toBe(StatusCodes.CONFLICT);
     expect(await codeOf(early)).toBe("TRANSFER_BEFORE_ATTENDANCE");
     // All or none: Shyam did not move either.
-    expect((await get(company.cookie, shyam.id)).currentProject.id).toBe(tower);
+    expect((await get(company.cookie, shyam.id)).projects).toMatchObject([
+      { id: tower },
+    ]);
 
     const moved = await transfer(company.cookie, {
       labourIds: [dhuresh.id, shyam.id],
@@ -600,9 +602,9 @@ describe("Labour register (CM-205 – CM-207)", () => {
     });
     expect(moved.status).toBe(StatusCodes.OK);
     const body = await json<{ items: Labour[] }>(moved);
-    expect(body.items.map((item) => item.currentProject.id)).toEqual([
-      villa,
-      villa,
+    expect(body.items.map((item) => item.projects.map((p) => p.id))).toEqual([
+      [villa],
+      [villa],
     ]);
 
     const back = await transfer(company.cookie, {
@@ -650,6 +652,119 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect(await options(villa, "2026-10-03")).toEqual([]);
     expect(await options(villa, "2026-10-04")).toEqual([dhuresh.id, shyam.id]);
     expect(await options(tower, "2026-08-01")).toEqual([]);
+  });
+
+  it("puts a Labour on none, one or many Projects, with history (ADR CM-0033)", async () => {
+    const company = await ownerWithCompany();
+    const { tower, villa, suffix } = await fixtures(company);
+    const mall = await seedProject(company.workspaceId, `Mall ${suffix}`);
+    type History = {
+      items: {
+        fromProject: { id: string } | null;
+        toProject: { id: string } | null;
+        transferDate: string;
+      }[];
+    };
+    const history = async (id: string) =>
+      json<History>(
+        await listTransfers(
+          jsonRequest(`${BASE}/${id}/transfers`, company.cookie),
+          params(id),
+        ),
+      );
+    const options = async (projectId: string, date: string) =>
+      (
+        await json<{ items: { id: string }[] }>(
+          await labourOptions(
+            jsonRequest(
+              `${BASE}/options?projectId=${projectId}&date=${date}`,
+              company.cookie,
+            ),
+          ),
+        )
+      ).items.map((item) => item.id);
+
+    // None: Projects can be ticked later.
+    const ravi = await created(
+      company.cookie,
+      labourBody(tower, { name: "Ravi", projectIds: [] }),
+    );
+    expect(ravi.projects).toEqual([]);
+    expect((await history(ravi.id)).items).toEqual([]);
+    expect(await options(tower, "2026-09-02")).not.toContain(ravi.id);
+
+    // Many: on the sheet of each, and in each Project's list.
+    const meena = await created(
+      company.cookie,
+      labourBody(tower, { name: "Meena", projectIds: [tower, villa] }),
+    );
+    expect(meena.projects.map((project) => project.id).sort()).toEqual(
+      [tower, villa].sort(),
+    );
+    expect(await options(tower, "2026-09-02")).toEqual([meena.id]);
+    expect(await options(villa, "2026-09-02")).toEqual([meena.id]);
+    const inVilla = await json<{ items: Labour[] }>(
+      await listLabours(
+        jsonRequest(`${BASE}?projectId=${villa}`, company.cookie),
+      ),
+    );
+    expect(inVilla.items.map((item) => item.id)).toEqual([meena.id]);
+
+    // Transfer names the Project they leave; the other stays.
+    const transfer = (body: Record<string, unknown>) =>
+      transferLabours(jsonRequest(`${BASE}/transfer`, company.cookie, body));
+    const unnamed = await transfer({
+      labourIds: [meena.id],
+      toProjectId: mall,
+      transferDate: "2026-10-01",
+    });
+    expect(await codeOf(unnamed)).toBe("TRANSFER_FROM_PROJECT_REQUIRED");
+    const moved = await transfer({
+      labourIds: [meena.id],
+      fromProjectId: villa,
+      toProjectId: mall,
+      transferDate: "2026-10-01",
+    });
+    expect(moved.status).toBe(StatusCodes.OK);
+    expect(await options(villa, "2026-09-30")).toEqual([meena.id]);
+    expect(await options(villa, "2026-10-01")).toEqual([]);
+    expect(await options(mall, "2026-10-01")).toEqual([meena.id]);
+    expect(await options(tower, "2026-10-01")).toEqual([meena.id]);
+
+    // Edit ticks and unticks, each with a history row from today.
+    const edited = await update(
+      company.cookie,
+      await get(company.cookie, meena.id),
+      { projectIds: [mall, villa] },
+    );
+    expect(edited.status).toBe(StatusCodes.OK);
+    expect(
+      (await json<Labour>(edited)).projects.map((project) => project.id).sort(),
+    ).toEqual([mall, villa].sort());
+    const rows = (await history(meena.id)).items;
+    const [left, joined] = rows.slice(-2);
+    expect(left).toMatchObject({ fromProject: { id: tower }, toProject: null });
+    expect(joined).toMatchObject({ fromProject: null, toProject: { id: villa } });
+    const today = left?.transferDate ?? "";
+    expect(joined?.transferDate).toBe(today);
+    expect(await options(tower, today)).toEqual([]);
+    expect(await options(villa, today)).toEqual([meena.id]);
+    // Before today the history still puts them on Tower A.
+    expect(await options(tower, "2026-10-02")).toEqual([meena.id]);
+
+    // Leaving them out on Edit keeps them; a deleted Project cannot be ticked.
+    const kept = await update(
+      company.cookie,
+      await get(company.cookie, meena.id),
+      { name: "Meena S" },
+    );
+    expect((await json<Labour>(kept)).projects).toHaveLength(2);
+    const missing = await update(
+      company.cookie,
+      await get(company.cookie, meena.id),
+      { projectIds: [newId()] },
+    );
+    expect(await codeOf(missing)).toBe("PROJECT_NOT_FOUND");
   });
 
   it("needs Labour transfer on the destination and every source Project", async () => {
@@ -788,7 +903,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
 
   it("imports from the sample sheet: preview with errors, then all or nothing", async () => {
     const company = await ownerWithCompany();
-    const { tower, mason, suffix } = await fixtures(company);
+    const { tower, villa, mason, suffix } = await fixtures(company);
     await created(company.cookie, labourBody(tower, { labourCode: "DB-1" }));
 
     const templateResponse = await importTemplate(
@@ -825,7 +940,8 @@ describe("Labour register (CM-205 – CM-207)", () => {
       "Overtime Wage per Hour (₹)*": 80.5,
       "Weekly Holidays": "Sun, Sat",
       "Opening Balance (₹)": -1500,
-      "Project*": `tower a ${suffix}`,
+      // Many Projects, separated by ";" (ADR CM-0033).
+      Projects: `tower a ${suffix}; Villa ${suffix}`,
       "Labour Category": `Mason ${suffix}`,
       "Labour Id": "IMP-1",
       "Working Hours per Day": 9,
@@ -836,7 +952,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
       "Joining Date*": "31/02/2026",
       "Wage Type*": "Daily",
       "Overtime Wage per Hour (₹)*": 50,
-      "Project*": "Nowhere",
+      Projects: "Nowhere",
       "Labour Id": "DB-1",
     });
     fill(4, { ...good, "Labour Name*": "Manikandan", "Labour Id": "imp-1" });
@@ -914,8 +1030,10 @@ describe("Labour register (CM-205 – CM-207)", () => {
       weeklyHolidays: [0, 6],
       openingBalance: -150_000,
       labourCategory: { id: mason },
-      currentProject: { id: tower },
     });
+    expect(list.items[0]?.projects.map((project) => project.id).sort()).toEqual(
+      [tower, villa].sort(),
+    );
 
     const garbage = await importLabours(
       upload(`${BASE}/import`, company.cookie, pngBytes(), XLSX),

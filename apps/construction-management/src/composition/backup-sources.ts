@@ -1641,9 +1641,9 @@ const SPECS: Record<string, EntitySpec> = {
       nameIn(`${MS}.labour_categories`, "t.labour_category_id"),
     ),
     col(
-      "currentProject",
-      "Current Project",
-      nameIn(`${PJ}.projects`, "t.current_project_id"),
+      "projects",
+      "Projects",
+      `(SELECT string_agg(x.name, '; ' ORDER BY x.name) FROM ${LB}.labour_projects a JOIN ${PJ}.projects x ON x.id = a.project_id WHERE a.labour_id = t.id AND x.deleted_at IS NULL)`,
     ),
     col("wageType", "Wage Type", "t.wage_type::text", "enum"),
     money("wagePerDay", "Wage / Day (₹)", "t.wage_per_day"),

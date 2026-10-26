@@ -4,7 +4,7 @@ import type { AuditEvent } from "@/src/shared-kernel/audit";
 import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 import { conflict } from "@/src/shared-kernel/domain-error";
 
-import { Labour } from "../domain/labour";
+import { Labour, type ProjectChanges } from "../domain/labour";
 import type { LabourDirectories } from "./labour-handlers";
 import type {
   LabourMove,
@@ -30,7 +30,7 @@ export class FakeLabourRepository implements LabourRepository {
       id: labour.id,
       workspaceId: labour.workspaceId,
       details: { ...labour.details },
-      currentProjectId: labour.currentProjectId,
+      projectIds: [...labour.projectIds],
       isActive: labour.isActive,
       createdAt: labour.createdAt,
       updatedAt: labour.updatedAt,
@@ -93,17 +93,18 @@ export class FakeLabourRepository implements LabourRepository {
     for (const { labour, openingBalance } of items) {
       this.labours.set(labour.id, this.copy(labour));
       this.ledger.set(labour.id, openingBalance === 0 ? [] : [openingBalance]);
-      this.history.set(labour.id, [
-        {
-          id: `${labour.id}-0`,
+      this.history.set(
+        labour.id,
+        labour.projectIds.map((projectId, index) => ({
+          id: `${labour.id}-${String(index)}`,
           fromProjectId: null,
-          toProjectId: labour.currentProjectId,
+          toProjectId: projectId,
           transferDate: labour.details.joiningDate,
           remark: null,
           createdAt: labour.createdAt,
           createdBy: labour.createdBy,
-        },
-      ]);
+        })),
+      );
     }
     this.audits.push(...audits);
     return Promise.resolve();
@@ -114,6 +115,7 @@ export class FakeLabourRepository implements LabourRepository {
     expectedUpdatedAt: Date | null;
     opening: number | null;
     joiningDateChanged: boolean;
+    projects?: (ProjectChanges & { date: CalendarDate }) | null;
     audit: AuditEvent;
   }): Promise<void> {
     const stored = this.labours.get(input.labour.id);
@@ -123,6 +125,23 @@ export class FakeLabourRepository implements LabourRepository {
     )
       return Promise.reject(conflict("LABOUR_CHANGED", "Changed."));
     this.labours.set(input.labour.id, this.copy(input.labour));
+    const history = this.history.get(input.labour.id) ?? [];
+    const row = (from: string | null, to: string | null, date: CalendarDate) =>
+      history.push({
+        id: `${input.labour.id}-${String(history.length)}`,
+        fromProjectId: from,
+        toProjectId: to,
+        transferDate: date,
+        remark: null,
+        createdAt: input.labour.updatedAt,
+        createdBy: input.labour.updatedBy,
+      });
+    if (input.projects != null) {
+      const { date } = input.projects;
+      for (const id of input.projects.removed) row(id, null, date);
+      for (const id of input.projects.added) row(null, id, date);
+    }
+    this.history.set(input.labour.id, history);
     if (input.opening != null) {
       const entries = this.ledger.get(input.labour.id) ?? [];
       const live = entries.reduce((sum, amount) => sum + amount, 0);
@@ -158,7 +177,7 @@ export class FakeLabourRepository implements LabourRepository {
       this.history.get(move.labour.id)?.push({
         id: `${move.labour.id}-${String(this.history.get(move.labour.id)?.length ?? 0)}`,
         fromProjectId: move.fromProjectId,
-        toProjectId: move.labour.currentProjectId,
+        toProjectId: move.toProjectId,
         transferDate: move.transferDate,
         remark: move.remark,
         createdAt: move.labour.updatedAt,
@@ -169,6 +188,14 @@ export class FakeLabourRepository implements LabourRepository {
     return Promise.resolve();
   }
 
+  /** Today, as the handler tests see it. */
+  todayIs: CalendarDate = "2026-10-08";
+
+  today(): Promise<CalendarDate> {
+    return Promise.resolve(this.todayIs);
+  }
+
+  /** Attendance here is on any Project. */
   latestAttendance(
     _workspaceId: string,
     ids: readonly string[],
@@ -210,10 +237,10 @@ export function fakeQueries(repository: FakeLabourRepository): LabourQueries {
       id: labour.id,
       details,
       aadhaarMasked: aadhaar == null ? null : `XXXXXXXX${aadhaar.slice(-4)}`,
-      currentProject: {
-        id: labour.currentProjectId,
-        name: labour.currentProjectId,
-      },
+      projects: labour.projectIds.map((projectId) => ({
+        id: projectId,
+        name: projectId,
+      })),
       labourCategory: null,
       supervisor: null,
       isActive: labour.isActive,

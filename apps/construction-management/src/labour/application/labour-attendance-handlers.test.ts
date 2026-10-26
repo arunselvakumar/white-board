@@ -61,7 +61,7 @@ function setup() {
   store.add(labourer("kavitha", { monthly: true }), "p1", "2026-09-01");
   store.add(labourer("old", { isActive: false }), "p1", "2026-09-01");
   store.add(labourer("moved"), "p1", "2026-09-01");
-  store.transfer("moved", "p2", "2026-10-05");
+  store.transfer("moved", "p1", "p2", "2026-10-05");
   store.categories = [{ id: "mason", name: "Mason" }];
   const guard = new FakeLabourBackdatedGuard();
   // Each command a millisecond later, so updatedAt changes on every write.
@@ -130,6 +130,21 @@ describe("LabourAttendanceHandlers.markDay", () => {
     expect(guard.checks).toEqual([{ action: "create", date: TODAY }]);
   });
 
+  it("marks a Labour on two Projects on each of them the same day", async () => {
+    const { store, handlers } = setup();
+    store.alsoOn("dhuresh", "p2", "2026-10-01");
+    const marks = [{ labourId: "dhuresh", status: "present" as const }];
+    await handlers.markDay(mark({ marks }));
+    const [onVilla] = await handlers.markDay(mark({ projectId: "p2", marks }));
+    expect(onVilla).toMatchObject({ labourId: "dhuresh", earned: 70_000 });
+    expect(store.balance("dhuresh")).toBe(140_000);
+    const sheet = await handlers.sheet("w1", "p2", TODAY);
+    expect(sheet.labourers.map((row) => row.labourId)).toEqual([
+      "dhuresh",
+      "moved",
+    ]);
+  });
+
   it("refuses inactive, off-project and unknown Labours with details.labourId", async () => {
     const { handlers } = setup();
     const inactive = await failure(
@@ -146,7 +161,7 @@ describe("LabourAttendanceHandlers.markDay", () => {
       ),
     );
     expect(moved.code).toBe("LABOUR_NOT_ON_PROJECT");
-    expect(moved.details).toMatchObject({ labourId: "moved", projectId: "p2" });
+    expect(moved.details).toMatchObject({ labourId: "moved" });
     // Before the transfer the day belongs to p1.
     await handlers.markDay(
       mark({

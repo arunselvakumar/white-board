@@ -23,7 +23,7 @@ labourAttendancePageTest.describe("Labour", () => {
       await addLabourPage.fill({
         name,
         wagePerDay: "850",
-        project: project.name,
+        projects: [project.name],
         joiningDate: todayInIndia(-10),
       });
       await addLabourPage.saveButton.click();

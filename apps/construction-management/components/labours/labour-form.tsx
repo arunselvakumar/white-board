@@ -8,13 +8,12 @@ import type { ReactNode } from "react";
 import {
   Controller,
   useForm,
-  useWatch,
   type Control,
   type FieldPath,
 } from "react-hook-form";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
-import { Label, RequiredIndicator } from "@repo/ui/components/label";
+import { Label } from "@repo/ui/components/label";
 import {
   Select,
   SelectContent,
@@ -22,13 +21,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MobileField } from "@/components/auth/mobile-field";
 import { MoneyInput } from "@/components/money/money-input";
+import {
+  MultiSelect,
+  type MultiSelectOption,
+} from "@/components/ui/multi-select";
+import { WageFields } from "@/components/wages/wage-fields";
+import { LABOUR_WAGE } from "@/components/wages/wage-schema";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   labourQuery,
@@ -41,7 +45,6 @@ import { projectOptionsQuery } from "@/src/queries/projects";
 
 import { LabourFiles } from "./labour-files";
 import {
-  WEEKDAYS,
   createLabourPayload,
   labourErrorFields,
   labourFormDefaults,
@@ -49,6 +52,7 @@ import {
   updateLabourPayload,
   type LabourFormValues,
 } from "./labour-form-schema";
+import { projectsLabel } from "./labour-projects";
 
 export const LABOURS_PATH = "/app/masters/labours";
 
@@ -167,7 +171,8 @@ function Section({
 
 /**
  * Add and Edit Labour (CM-207): Basic, Wage, Statutory, Category & contact,
- * and the Project on Add. Amounts are typed in rupees and sent as paise.
+ * and Projects (none, one or many, ADR CM-0033). Amounts are typed in
+ * rupees and sent as paise.
  */
 export function LabourForm({
   labour,
@@ -183,15 +188,14 @@ export function LabourForm({
   // Amounts come back null without the Financial flag; Add assumes it.
   const showAmounts = isNew || labour.overtimeWagePerHour != null;
   const form = useForm<LabourFormValues>({
-    resolver: zodResolver(labourFormSchema({ showAmounts, isNew })),
+    resolver: zodResolver(labourFormSchema({ showAmounts })),
     defaultValues: labourFormDefaults(labour),
   });
   const errors = form.formState.errors;
-  const wageType = useWatch({ control: form.control, name: "wageType" });
 
   const categories = useQuery(lookupListQuery("labour-categories"));
   const supervisors = useQuery(supervisorsQuery);
-  const projects = useQuery({ ...projectOptionsQuery, enabled: isNew });
+  const projects = useQuery(projectOptionsQuery);
   const categoryChoices = useChoices(
     categories.data?.items,
     labour?.labourCategory,
@@ -200,9 +204,13 @@ export function LabourForm({
     supervisors.data?.items,
     labour?.supervisor,
   );
-  const projectChoices: Choice[] = (projects.data?.items ?? []).map(
-    (project) => ({ value: project.id, label: project.name }),
-  );
+  // Live Projects, plus any saved one no longer live, so it stays ticked.
+  const projectChoices: MultiSelectOption[] = [
+    ...(projects.data?.items ?? []).map(({ id, name }) => ({ id, name })),
+    ...(labour?.projects ?? []).filter(
+      (saved) => !projects.data?.items.some((item) => item.id === saved.id),
+    ),
+  ];
 
   const submit = form.handleSubmit(async (values) => {
     try {
@@ -295,103 +303,13 @@ export function LabourForm({
             : "You cannot see wages. Ask the Owner for the Financial right on Labours."
         }
       >
-        <div className="grid gap-4 sm:grid-cols-2">
-          <fieldset className="space-y-1.5">
-            <legend className="text-sm font-medium">
-              Wage type
-              <RequiredIndicator />
-            </legend>
-            <Controller
-              name="wageType"
-              control={form.control}
-              render={({ field }) => (
-                <ToggleGroup
-                  value={[field.value]}
-                  onValueChange={(value: string[]) => {
-                    const next = value[0];
-                    if (next === "daily" || next === "monthly")
-                      field.onChange(next);
-                  }}
-                  variant="outline"
-                >
-                  <ToggleGroupItem value="daily">Daily wages</ToggleGroupItem>
-                  <ToggleGroupItem value="monthly">
-                    Monthly wages
-                  </ToggleGroupItem>
-                </ToggleGroup>
-              )}
-            />
-          </fieldset>
-          {showAmounts &&
-            (wageType === "daily" ? (
-              <div className="space-y-1.5">
-                <Label htmlFor="labour-wage-day" required>
-                  Wage per day
-                </Label>
-                <MoneyInput
-                  id="labour-wage-day"
-                  className="h-10"
-                  placeholder="700"
-                  aria-required
-                  aria-invalid={errors.wagePerDay != null}
-                  {...form.register("wagePerDay")}
-                />
-                <FieldError message={errors.wagePerDay?.message} />
-              </div>
-            ) : (
-              <div className="space-y-1.5">
-                <Label htmlFor="labour-wage-month" required>
-                  Wage per month
-                </Label>
-                <MoneyInput
-                  id="labour-wage-month"
-                  className="h-10"
-                  placeholder="18000"
-                  aria-required
-                  aria-invalid={errors.wagePerMonth != null}
-                  {...form.register("wagePerMonth")}
-                />
-                <FieldError message={errors.wagePerMonth?.message} />
-              </div>
-            ))}
-          {showAmounts && (
-            <div className="space-y-1.5">
-              <Label htmlFor="labour-overtime" required>
-                Overtime wage per hour
-              </Label>
-              <MoneyInput
-                id="labour-overtime"
-                className="h-10"
-                placeholder="100"
-                aria-required
-                aria-invalid={errors.overtimeWagePerHour != null}
-                {...form.register("overtimeWagePerHour")}
-              />
-              <FieldError message={errors.overtimeWagePerHour?.message} />
-            </div>
-          )}
-          <div className="space-y-1.5">
-            <Label htmlFor="labour-working-hours" required>
-              Working hours per day
-            </Label>
-            <Input
-              id="labour-working-hours"
-              inputMode="decimal"
-              className="h-10"
-              placeholder="8"
-              aria-describedby="labour-working-hours-hint"
-              aria-required
-              aria-invalid={errors.workingHoursPerDay != null}
-              {...form.register("workingHoursPerDay")}
-            />
-            <p
-              id="labour-working-hours-hint"
-              className="text-muted-foreground text-xs"
-            >
-              Time worked beyond this is overtime.
-            </p>
-            <FieldError message={errors.workingHoursPerDay?.message} />
-          </div>
+        <WageFields
+          form={form}
+          name="wage"
+          idPrefix="labour"
+          options={LABOUR_WAGE}
+          showAmounts={showAmounts}
+        >
           {showAmounts && (
             <div className="space-y-1.5">
               <Label htmlFor="labour-opening">Opening balance</Label>
@@ -413,35 +331,7 @@ export function LabourForm({
               <FieldError message={errors.openingBalance?.message} />
             </div>
           )}
-          <fieldset className="space-y-1.5 sm:col-span-2">
-            <legend className="text-sm font-medium">Weekly holidays</legend>
-            <Controller
-              name="weeklyHolidays"
-              control={form.control}
-              render={({ field }) => (
-                <ToggleGroup
-                  multiple
-                  value={field.value.map(String)}
-                  onValueChange={(value: string[]) => {
-                    field.onChange(value.map(Number));
-                  }}
-                  variant="outline"
-                  size="sm"
-                  className="flex-wrap"
-                >
-                  {WEEKDAYS.map((day) => (
-                    <ToggleGroupItem key={day.value} value={String(day.value)}>
-                      {day.label}
-                    </ToggleGroupItem>
-                  ))}
-                </ToggleGroup>
-              )}
-            />
-            <p className="text-muted-foreground text-xs">
-              Attendance marks these days Holiday by default.
-            </p>
-          </fieldset>
-        </div>
+        </WageFields>
       </Section>
 
       <Section id="labour-statutory" title="Statutory">
@@ -536,40 +426,50 @@ export function LabourForm({
         </div>
       </Section>
 
-      {isNew && (
-        <Section
-          id="labour-project"
-          title="Project"
-          hint="Where they work from the joining date. Move them later with Transfer."
-        >
-          <div className="grid gap-4 sm:grid-cols-2">
-            <ChoiceField
-              id="labour-project-select"
-              label="Project"
-              name="currentProjectId"
-              control={form.control}
-              choices={projectChoices}
-              placeholder={
-                projects.isPending ? "Loading Projects…" : "Select a Project"
-              }
-              error={errors.currentProjectId?.message}
-              required
-            />
-          </div>
-          {projects.data?.items.length === 0 && (
-            <p className="text-muted-foreground text-sm">
-              No Projects yet.{" "}
-              <Link
-                href="/app/projects"
-                className="text-primary underline underline-offset-4"
-              >
-                Add a Project
-              </Link>{" "}
-              first.
-            </p>
-          )}
-        </Section>
-      )}
+      <Section
+        id="labour-projects"
+        title="Projects"
+        hint={
+          isNew
+            ? "Where they work from the joining date. Leave empty to choose later."
+            : "A Project ticked or removed here counts from today. To move them from one Project to another on a date, use Transfer."
+        }
+      >
+        <div className="space-y-1.5">
+          <Label htmlFor="labour-projects-select">Projects</Label>
+          <Controller
+            name="projectIds"
+            control={form.control}
+            render={({ field }) => (
+              <MultiSelect
+                id="labour-projects-select"
+                options={projectChoices}
+                value={field.value}
+                onChange={field.onChange}
+                placeholder={
+                  projects.isPending ? "Loading Projects…" : "Search Projects"
+                }
+                empty="No Projects found."
+                listLabel="Projects"
+                invalid={errors.projectIds != null}
+              />
+            )}
+          />
+          <FieldError message={errors.projectIds?.message} />
+        </div>
+        {projects.data?.items.length === 0 && (
+          <p className="text-muted-foreground text-sm">
+            No Projects yet.{" "}
+            <Link
+              href="/app/projects"
+              className="text-primary underline underline-offset-4"
+            >
+              Add a Project
+            </Link>{" "}
+            to choose it here.
+          </p>
+        )}
+      </Section>
 
       <FormAlert message={errors.root?.message} />
       <div className="flex flex-wrap gap-2">
@@ -629,7 +529,7 @@ export function EditLabourScreen({ id }: { id: string }) {
   return (
     <FormPage
       title={`Edit ${data.name}`}
-      meta={`${data.currentProject.name}${data.isActive ? "" : " · Inactive"}`}
+      meta={`${projectsLabel(data.projects)}${data.isActive ? "" : " · Inactive"}`}
     >
       <div className="space-y-10">
         <LabourForm

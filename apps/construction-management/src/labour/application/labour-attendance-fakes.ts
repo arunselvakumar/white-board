@@ -21,10 +21,10 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
   readonly ledger: FakeEntry[] = [];
   readonly audits: string[] = [];
   readonly people = new Map<string, AttendanceLabourer>();
-  /** labourId → (date from, projectId), oldest first. */
+  /** labourId → history rows (date, off a Project, onto one), oldest first. */
   readonly history = new Map<
     string,
-    { from: CalendarDate; projectId: string }[]
+    { date: CalendarDate; off: string | null; onto: string | null }[]
   >();
   categories: { id: string; name: string }[] = [];
 
@@ -36,11 +36,23 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
     from: CalendarDate,
   ): void {
     this.people.set(labourer.id, labourer);
-    this.history.set(labourer.id, [{ from, projectId }]);
+    this.history.set(labourer.id, [{ date: from, off: null, onto: projectId }]);
   }
 
-  transfer(labourId: string, projectId: string, from: CalendarDate): void {
-    this.history.get(labourId)?.push({ from, projectId });
+  /** On another Project as well, from a date (ADR CM-0033). */
+  alsoOn(labourId: string, projectId: string, from: CalendarDate): void {
+    this.history.get(labourId)?.push({ date: from, off: null, onto: projectId });
+  }
+
+  transfer(
+    labourId: string,
+    fromProjectId: string,
+    projectId: string,
+    date: CalendarDate,
+  ): void {
+    this.history
+      .get(labourId)
+      ?.push({ date, off: fromProjectId, onto: projectId });
   }
 
   balance(labourId: string): number {
@@ -53,11 +65,12 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
     return [...this.days.values()].filter((day) => !day.deleted);
   }
 
-  private on(labourId: string, date: CalendarDate): string | null {
-    let found: string | null = null;
+  private isOn(labourId: string, projectId: string, date: CalendarDate) {
+    let on = false;
     for (const row of this.history.get(labourId) ?? [])
-      if (row.from <= date) found = row.projectId;
-    return found;
+      if (row.date <= date && (row.onto === projectId || row.off === projectId))
+        on = row.onto === projectId;
+    return on;
   }
 
   today(): Promise<CalendarDate> {
@@ -76,17 +89,15 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
     return Promise.resolve(result);
   }
 
-  projectsOn(
+  onProject(
     _workspaceId: string,
     ids: readonly string[],
+    projectId: string,
     date: CalendarDate,
-  ): Promise<Map<string, string>> {
-    const result = new Map<string, string>();
-    for (const id of ids) {
-      const on = this.on(id, date);
-      if (on != null) result.set(id, on);
-    }
-    return Promise.resolve(result);
+  ): Promise<Set<string>> {
+    return Promise.resolve(
+      new Set(ids.filter((id) => this.isOn(id, projectId, date))),
+    );
   }
 
   labourersOn(
@@ -96,7 +107,9 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
   ): Promise<AttendanceLabourer[]> {
     return Promise.resolve(
       [...this.people.values()]
-        .filter((item) => item.isActive && this.on(item.id, date) === projectId)
+        .filter(
+          (item) => item.isActive && this.isOn(item.id, projectId, date),
+        )
         .sort((a, b) => a.name.localeCompare(b.name)),
     );
   }
@@ -104,6 +117,7 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
   daysOf(
     workspaceId: string,
     labourIds: readonly string[],
+    projectId: string,
     date: CalendarDate,
   ): Promise<StoredLabourDay[]> {
     return Promise.resolve(
@@ -112,6 +126,7 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
           (day) =>
             day.workspaceId === workspaceId &&
             labourIds.includes(day.labourId) &&
+            day.projectId === projectId &&
             day.date === date,
         )
         .map((day) => structuredClone(day)),
@@ -195,7 +210,9 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
       if (write.expectedUpdatedAt == null) {
         const clash = this.live().find(
           (day) =>
-            day.labourId === write.day.labourId && day.date === write.day.date,
+            day.labourId === write.day.labourId &&
+            day.projectId === write.day.projectId &&
+            day.date === write.day.date,
         );
         if (clash != null)
           throw conflict("ATTENDANCE_CHANGED", "Changed.", {

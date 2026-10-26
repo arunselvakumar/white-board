@@ -394,7 +394,9 @@ export async function worksheetLabourAttendance(
       overtimeWagePerHour: 10_000,
       weeklyHolidays: [0],
       labourCategoryId: options.categoryId,
-      currentProjectId: projectId,
+      projects: {
+        create: { workspaceId, projectId, since: day("2026-04-01") },
+      },
       ...audit(by),
     },
   });

@@ -118,7 +118,13 @@ export async function dashboardLabourAttendance(
       overtimeWagePerHour: 100_00,
       weeklyHolidays: [],
       joiningDate: calendarDateToDb(input.date),
-      currentProjectId: input.projectId,
+      projects: {
+        create: {
+          workspaceId,
+          projectId: input.projectId,
+          since: calendarDateToDb(input.date),
+        },
+      },
       createdAt: now,
       updatedAt: now,
       createdBy: by,

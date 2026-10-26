@@ -26,7 +26,7 @@ export async function createLabour(
       wagePerDay: (input.wagePerDayRupees ?? 800) * 100,
       overtimeWagePerHour: 0,
       weeklyHolidays: [],
-      currentProjectId: input.projectId,
+      projectIds: [input.projectId],
     },
   );
   return { id: created.item?.id ?? created.id ?? "", name };
