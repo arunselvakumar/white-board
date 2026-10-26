@@ -15,7 +15,10 @@ import type { LabourLookups } from "./labour-ports";
 const LOOKUPS: LabourLookups = {
   all: () =>
     Promise.resolve({
-      projects: [{ id: "p1", name: "Tower A" }],
+      projects: [
+        { id: "p1", name: "Tower A" },
+        { id: "p2", name: "Tower B" },
+      ],
       labourCategories: [
         { id: "c1", name: "Mason", disabled: false },
         { id: "c2", name: "Welder", disabled: true },
@@ -33,7 +36,7 @@ function row(number: number, cells: LabourSheetRow["cells"]): LabourSheetRow {
       wageType: "Daily wages",
       wagePerDay: 650,
       overtimeWagePerHour: "80.50",
-      project: "tower a",
+      projects: "tower a",
       ...cells,
     },
   };
@@ -74,7 +77,7 @@ describe("LabourImport", () => {
       row(3, {
         name: "",
         wagePerDay: "abc",
-        project: "Nowhere",
+        projects: "Tower A; Nowhere",
         labourCategory: "Welder",
         labourCode: "x1",
       }),
@@ -99,7 +102,7 @@ describe("LabourImport", () => {
     try {
       await importer.commit({
         workspaceId: "w1",
-        sheet: [row(2, {}), row(3, { project: "" })],
+        sheet: [row(2, {}), row(3, { projects: "Nowhere" })],
         by: "u1",
       });
     } catch (error) {
@@ -111,18 +114,25 @@ describe("LabourImport", () => {
 
     const result = await importer.commit({
       workspaceId: "w1",
-      sheet: [row(2, { openingBalance: -100 }), row(3, { name: "Manikandan" })],
+      sheet: [
+        row(2, { openingBalance: -100 }),
+        row(3, { name: "Manikandan", projects: "Tower B ; tower a;" }),
+        row(4, { name: "Ravi", projects: null }),
+      ],
       by: "u1",
     });
-    expect(result.imported).toBe(2);
-    const [first] = [...repository.labours.values()];
+    expect(result.imported).toBe(3);
+    const [first, second, third] = [...repository.labours.values()];
     expect(first?.details).toMatchObject({
       wagePerDay: 65_000,
       overtimeWagePerHour: 8_050,
       wageType: "daily",
     });
-    expect(first?.currentProjectId).toBe("p1");
-    expect([...repository.ledger.values()]).toEqual([[-10_000], []]);
+    expect(first?.projectIds).toEqual(["p1"]);
+    // Many, separated by ";", or none (ADR CM-0033).
+    expect(second?.projectIds).toEqual(["p2", "p1"]);
+    expect(third?.projectIds).toEqual([]);
+    expect([...repository.ledger.values()]).toEqual([[-10_000], [], []]);
     expect(repository.audits.map((audit) => audit.action)).toEqual([
       "labour.imported",
     ]);

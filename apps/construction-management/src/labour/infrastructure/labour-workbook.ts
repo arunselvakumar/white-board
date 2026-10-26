@@ -5,6 +5,7 @@ import { DomainError } from "@/src/shared-kernel/domain-error";
 import {
   LABOUR_COLUMNS,
   MAX_IMPORT_ROWS,
+  PROJECT_SEPARATOR,
   WEEKDAY_NAMES,
   type LabourCell,
   type LabourColumnKey,
@@ -77,7 +78,7 @@ export async function labourTemplate(lists: {
   );
   sheet.addRow(
     LABOUR_COLUMNS.map((column) => {
-      if (column.key === "project") return lists.projects[0] ?? "Your Project";
+      if (column.key === "projects") return lists.projects[0] ?? null;
       if (column.key === "labourCategory")
         return lists.labourCategories[0] ?? null;
       return column.example;
@@ -104,9 +105,9 @@ export async function labourTemplate(lists: {
     listSheet.getColumn(index + 1).width = 26;
   });
 
-  // Drop-downs on the data rows, pointing at the Lists sheet.
+  // Drop-downs on the data rows, pointing at the Lists sheet. Projects has
+  // none: a cell may name several, separated by ";".
   const dropDowns: [LabourColumnKey, number][] = [
-    ["project", 0],
     ["labourCategory", 1],
     ["supervisor", 2],
     ["wageType", 3],
@@ -169,7 +170,9 @@ export async function labourExport(
       workingHoursPerDay: Number(details.workingHoursPerDay),
       weeklyHolidays: WEEKDAYS(details.weeklyHolidays),
       openingBalance: money(labour.openingBalance),
-      project: labour.currentProject.name,
+      projects: labour.projects
+        .map((project) => project.name)
+        .join(`${PROJECT_SEPARATOR} `),
       labourCategory: labour.labourCategory?.name ?? null,
       supervisor: labour.supervisor?.name ?? null,
       contactNumber: details.contactNumber,
@@ -214,9 +217,13 @@ function headerKey(raw: string): string {
   return raw.toLowerCase().replace(/\(₹\)|\*|[^a-z0-9]/g, "");
 }
 
-const KEYS_BY_HEADER = new Map<string, LabourColumnKey>(
-  LABOUR_COLUMNS.map((column) => [headerKey(column.header), column.key]),
-);
+const KEYS_BY_HEADER = new Map<string, LabourColumnKey>([
+  ...LABOUR_COLUMNS.map(
+    (column) => [headerKey(column.header), column.key] as const,
+  ),
+  // Sheets from the template before ADR CM-0033 had one "Project*".
+  ["project", "projects"],
+]);
 
 function fileInvalid(message: string): DomainError {
   return new DomainError("IMPORT_FILE_INVALID", message);

@@ -40,7 +40,7 @@ async function addLabour(company: Company, projectId: string) {
       wagePerDay: 70_000,
       overtimeWagePerHour: 10_000,
       weeklyHolidays: [0],
-      currentProjectId: projectId,
+      projectIds: [projectId],
       openingBalance: 5_000,
     }),
   );

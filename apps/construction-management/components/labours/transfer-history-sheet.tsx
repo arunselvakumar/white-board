@@ -62,7 +62,9 @@ export function TransferHistorySheet({
                 </p>
                 <p className="flex flex-wrap items-center gap-1.5 text-sm font-medium">
                   {item.fromProject == null ? (
-                    <>Joined {item.toProject.name}</>
+                    <>Joined {item.toProject?.name}</>
+                  ) : item.toProject == null ? (
+                    <>Left {item.fromProject.name}</>
                   ) : (
                     <>
                       {item.fromProject.name}

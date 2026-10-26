@@ -89,7 +89,7 @@ async function seed(company: Company) {
             wagePerDay: 70_000,
             overtimeWagePerHour: 10_000,
             weeklyHolidays: [0],
-            currentProjectId: projectId,
+            projectIds: [projectId],
             openingBalance: 100_000,
           }),
         ),

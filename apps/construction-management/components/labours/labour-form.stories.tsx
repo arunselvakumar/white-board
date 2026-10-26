@@ -7,11 +7,13 @@ import { StoryQueryClient } from "@/components/designations/designation-story-su
 import { mockFetch } from "../../.storybook/mock-fetch";
 import {
   CATEGORY_LIST,
+  MALL,
   MASON,
   PROJECT_OPTIONS,
   DHURESH,
   SUPERVISOR_LIST,
   TOWER,
+  VILLA,
   withoutAmounts,
 } from "./labour-fixtures";
 import { EditLabourScreen, NewLabourScreen } from "./labour-form";
@@ -101,7 +103,6 @@ export const AddValidatesAndSaves: Story = {
       await canvas.findByText("Enter the Labour's name"),
     ).toBeVisible();
     await expect(canvas.getByText("Enter the wage per day")).toBeVisible();
-    await expect(canvas.getByText("Choose the Project")).toBeVisible();
     await expect(posts()).toBe(0);
 
     // The wage type decides which wage field shows.
@@ -146,7 +147,13 @@ export const AddValidatesAndSaves: Story = {
 
     await choose(canvas, body, userEvent, "Labour Category", "Mason");
     await expect(body.queryByRole("option", { name: "Welder" })).toBeNull();
-    await choose(canvas, body, userEvent, "Project", "Tower A");
+    await userEvent.click(canvas.getByRole("combobox", { name: "Projects" }));
+    await userEvent.click(await body.findByRole("option", { name: "Tower A" }));
+    await userEvent.click(body.getByRole("option", { name: "Mall Block C" }));
+    await userEvent.keyboard("{Escape}");
+    await expect(
+      canvas.getByRole("button", { name: "Remove Tower A" }),
+    ).toBeVisible();
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
 
     await waitFor(() => expect(sent(LABOURS)).toBeDefined());
@@ -162,7 +169,7 @@ export const AddValidatesAndSaves: Story = {
       weeklyHolidays: [0, 6],
       workingHoursPerDay: "8",
       labourCategoryId: MASON.id,
-      currentProjectId: TOWER.id,
+      projectIds: [TOWER.id, MALL.id],
       aadhaar: null,
     });
     await waitFor(() =>
@@ -187,8 +194,7 @@ export const WorkingHoursPerDay: Story = {
     ]);
     return api.restore;
   },
-  play: async ({ canvas, canvasElement, userEvent }) => {
-    const body = within(canvasElement.ownerDocument.body);
+  play: async ({ canvas, userEvent }) => {
     const hours = await canvas.findByLabelText("Working hours per day");
     await expect(hours).toHaveValue("8");
     await expect(
@@ -198,7 +204,6 @@ export const WorkingHoursPerDay: Story = {
     await userEvent.type(canvas.getByLabelText("Labour name"), "Ravi Kumar");
     await userEvent.type(canvas.getByLabelText("Joining date"), "2026-09-01");
     await userEvent.type(canvas.getByLabelText("Wage per day"), "700");
-    await choose(canvas, body, userEvent, "Project", "Tower A");
 
     const message = "Enter hours more than 0 and at most 24, like 8 or 8.5";
     for (const wrong of ["0", "24.5", "8.125"]) {
@@ -241,8 +246,7 @@ export const ServerErrorOnField: Story = {
     ]);
     return api.restore;
   },
-  play: async ({ canvas, canvasElement, userEvent }) => {
-    const body = within(canvasElement.ownerDocument.body);
+  play: async ({ canvas, userEvent }) => {
     await userEvent.type(
       await canvas.findByLabelText("Labour name"),
       "Dhuresh Nawin",
@@ -250,7 +254,6 @@ export const ServerErrorOnField: Story = {
     await userEvent.type(canvas.getByLabelText("Labour Id"), "L-001");
     await userEvent.type(canvas.getByLabelText("Joining date"), "2026-09-01");
     await userEvent.type(canvas.getByLabelText("Wage per day"), "700");
-    await choose(canvas, body, userEvent, "Project", "Tower A");
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await expect(
       await canvas.findByText("Another Labour has this Labour Id."),
@@ -317,10 +320,10 @@ export const EditWithoutFinancial: Story = {
     await expect(
       canvas.getByText("Leave blank to keep XXXXXXXX2346."),
     ).toBeVisible();
-    // No Project field on edit: Transfer moves a labourer.
+    // Edit shows their Projects too (ADR CM-0033).
     await expect(
-      canvas.queryByRole("combobox", { name: "Project" }),
-    ).toBeNull();
+      canvas.getByRole("button", { name: "Remove Tower A" }),
+    ).toBeVisible();
     await expect(
       await canvas.findByRole("link", { name: "Aadhaar card.pdf" }),
     ).toBeVisible();
@@ -338,10 +341,95 @@ export const EditWithoutFinancial: Story = {
     await expect(update).toMatchObject({
       name: "Dhuresh P.",
       workingHoursPerDay: "9.5",
+      projectIds: [TOWER.id],
       expectedUpdatedAt: DHURESH.updatedAt,
     });
     await expect("wagePerDay" in update).toBe(false);
     await expect("openingBalance" in update).toBe(false);
     await expect("aadhaar" in update).toBe(false);
+  },
+};
+
+/** Projects are not required: they can be ticked later (ADR CM-0033). */
+export const AddWithoutProject: Story = {
+  beforeEach: () => {
+    api = mockFetch([
+      ...LOOKUPS,
+      {
+        method: "POST",
+        path: LABOURS,
+        respond: () => Response.json(DHURESH, { status: 201 }),
+      },
+    ]);
+    return api.restore;
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.type(
+      await canvas.findByLabelText("Labour name"),
+      "Ravi Kumar",
+    );
+    await userEvent.type(canvas.getByLabelText("Joining date"), "2026-09-01");
+    await userEvent.type(canvas.getByLabelText("Wage per day"), "650");
+    await expect(
+      canvas.getByText(
+        "Where they work from the joining date. Leave empty to choose later.",
+      ),
+    ).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(sent(LABOURS)).toBeDefined());
+    await expect(sent(LABOURS)).toMatchObject({
+      name: "Ravi Kumar",
+      projectIds: [],
+    });
+  },
+};
+
+/** Edit ticks and unticks Projects; Transfer still moves on a date. */
+export const EditProjects: Story = {
+  render: () => (
+    <StoryQueryClient>
+      <EditLabourScreen id={DHURESH.id} />
+    </StoryQueryClient>
+  ),
+  beforeEach: () => {
+    api = mockFetch([
+      ...LOOKUPS,
+      {
+        path: `${LABOURS}/${DHURESH.id}`,
+        respond: () => Response.json(DHURESH),
+      },
+      {
+        path: `${LABOURS}/${DHURESH.id}/documents`,
+        respond: () => Response.json({ items: [] }),
+      },
+      {
+        method: "POST",
+        path: `${LABOURS}/${DHURESH.id}/update`,
+        respond: () => Response.json(DHURESH),
+      },
+    ]);
+    return api.restore;
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await expect(
+      await canvas.findByRole("heading", { name: "Edit Dhuresh Nawin" }),
+    ).toBeVisible();
+    await expect(canvas.getByText(/counts from today/)).toBeVisible();
+    await userEvent.click(canvas.getByRole("combobox", { name: "Projects" }));
+    await userEvent.click(
+      await body.findByRole("option", { name: "Villa Phase 2" }),
+    );
+    await userEvent.keyboard("{Escape}");
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Remove Tower A" }),
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+    await waitFor(() =>
+      expect(sent(`${LABOURS}/${DHURESH.id}/update`)).toBeDefined(),
+    );
+    await expect(sent(`${LABOURS}/${DHURESH.id}/update`)).toMatchObject({
+      projectIds: [VILLA.id],
+    });
   },
 };

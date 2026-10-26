@@ -42,7 +42,7 @@ export async function projectLabourSummary(
     db.constructionLabourLabour.findMany({
       where: {
         workspaceId,
-        currentProjectId: projectId,
+        projects: { some: { projectId } },
         isActive: true,
         deletedAt: null,
       },

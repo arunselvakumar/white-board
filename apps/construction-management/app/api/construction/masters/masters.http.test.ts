@@ -96,7 +96,6 @@ async function labourUsing(
       wageType: "daily",
       wagePerDay: 80_000,
       overtimeWagePerHour: 10_000,
-      currentProjectId: newId(),
       createdBy: "test",
       updatedBy: "test",
       ...refs,

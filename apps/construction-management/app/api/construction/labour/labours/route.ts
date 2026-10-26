@@ -61,8 +61,9 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * Adds a labourer on a Project (CM-205). The opening balance becomes the
- * first ledger entry, dated the joining date (ADR CM-0004).
+ * Adds a labourer on none, one or many Projects (CM-205, ADR CM-0033). The
+ * opening balance becomes the first ledger entry, dated the joining date
+ * (ADR CM-0004).
  */
 export async function POST(request: Request): Promise<Response> {
   try {

@@ -6,31 +6,21 @@ import {
   paiseToRupees,
   rupeesToPaise,
 } from "@/components/money/money-input";
-import { DEFAULT_WORKING_HOURS } from "@/src/labour/domain/wages";
+import {
+  LABOUR_WAGE,
+  checkWage,
+  wageDefaults,
+  wageErrorFields,
+  wagePayload,
+  wageValuesSchema,
+  type WageValues,
+} from "@/components/wages/wage-schema";
 import type {
   LabourInput,
   LabourResponse,
   LabourUpdateInput,
 } from "@/src/queries/labours";
 import { isValidAadhaar } from "@/src/shared-kernel/tax-ids";
-
-export const WEEKDAYS = [
-  { value: 0, label: "Sun" },
-  { value: 1, label: "Mon" },
-  { value: 2, label: "Tue" },
-  { value: 3, label: "Wed" },
-  { value: 4, label: "Thu" },
-  { value: 5, label: "Fri" },
-  { value: 6, label: "Sat" },
-] as const;
-
-const HOURS_RE = /^\d{1,2}(\.\d{1,2})?$/;
-
-/** More than 0 and at most 24 hours, two decimal places at most. */
-export function isWorkingHours(value: string): boolean {
-  const hours = value.trim();
-  return HOURS_RE.test(hours) && Number(hours) > 0 && Number(hours) <= 24;
-}
 
 const baseSchema = z.object({
   name: z
@@ -41,17 +31,9 @@ const baseSchema = z.object({
   labourCode: z.string().trim().max(30, "Use at most 30 characters"),
   fatherName: z.string().trim().max(100, "Use at most 100 characters"),
   joiningDate: z.string().min(1, "Enter the joining date"),
-  wageType: z.enum(["daily", "monthly"]),
-  /** Rupees as typed. */
-  wagePerDay: z.string(),
-  wagePerMonth: z.string(),
-  overtimeWagePerHour: z.string(),
-  /** Decimal hours as typed; time worked beyond it is overtime (ADR CM-0011). */
-  workingHoursPerDay: z.string().trim().refine(isWorkingHours, {
-    message: "Enter hours more than 0 and at most 24, like 8 or 8.5",
-  }),
+  /** The wage set-up shared with Staff (`components/wages`). */
+  wage: wageValuesSchema,
   openingBalance: z.string(),
-  weeklyHolidays: z.array(z.number()),
   uanNumber: z
     .string()
     .trim()
@@ -84,7 +66,8 @@ const baseSchema = z.object({
       message: "Enter a valid 10-digit mobile number",
     }),
   gender: z.enum(["", "male", "female", "other"]),
-  currentProjectId: z.string(),
+  /** None, one or many; not required (ADR CM-0033). */
+  projectIds: z.array(z.string()),
 });
 
 export type LabourFormValues = z.infer<typeof baseSchema>;
@@ -94,42 +77,14 @@ export type LabourFormValues = z.infer<typeof baseSchema>;
  * Financial the amounts are neither shown nor sent, so they keep their
  * stored values.
  */
-export function labourFormSchema(options: {
-  showAmounts: boolean;
-  isNew: boolean;
-}) {
+export function labourFormSchema(options: { showAmounts: boolean }) {
   return baseSchema.superRefine((values, ctx) => {
-    if (options.isNew && values.currentProjectId === "")
-      ctx.addIssue({
-        code: "custom",
-        path: ["currentProjectId"],
-        message: "Choose the Project",
-      });
+    checkWage(values.wage, ctx, {
+      ...LABOUR_WAGE,
+      path: ["wage"],
+      showAmounts: options.showAmounts,
+    });
     if (!options.showAmounts) return;
-    const wageField =
-      values.wageType === "daily" ? "wagePerDay" : "wagePerMonth";
-    const wage = values[wageField].trim();
-    if (wage === "" || rupeesToPaise(wage) === 0)
-      ctx.addIssue({
-        code: "custom",
-        path: [wageField],
-        message:
-          values.wageType === "daily"
-            ? "Enter the wage per day"
-            : "Enter the wage per month",
-      });
-    else if (!isRupees(wage))
-      ctx.addIssue({
-        code: "custom",
-        path: [wageField],
-        message: "Enter an amount in rupees, like 700 or 700.50",
-      });
-    if (!isRupees(values.overtimeWagePerHour))
-      ctx.addIssue({
-        code: "custom",
-        path: ["overtimeWagePerHour"],
-        message: "Enter the overtime wage per hour (0 if none)",
-      });
     if (
       values.openingBalance.trim() !== "" &&
       !isRupees(values.openingBalance, true)
@@ -151,13 +106,8 @@ export function labourFormDefaults(
       labourCode: "",
       fatherName: "",
       joiningDate: "",
-      wageType: "daily",
-      wagePerDay: "",
-      wagePerMonth: "",
-      overtimeWagePerHour: "0",
-      workingHoursPerDay: DEFAULT_WORKING_HOURS,
+      wage: wageDefaults(null, LABOUR_WAGE),
       openingBalance: "",
-      weeklyHolidays: [0],
       uanNumber: "",
       esicNumber: "",
       aadhaar: "",
@@ -165,20 +115,25 @@ export function labourFormDefaults(
       supervisorId: "",
       contactNumber: "",
       gender: "",
-      currentProjectId: "",
+      projectIds: [],
     };
   return {
     name: labour.name,
     labourCode: labour.labourCode ?? "",
     fatherName: labour.fatherName ?? "",
     joiningDate: labour.joiningDate,
-    wageType: labour.wageType,
-    wagePerDay: paiseToRupees(labour.wagePerDay),
-    wagePerMonth: paiseToRupees(labour.wagePerMonth),
-    overtimeWagePerHour: paiseToRupees(labour.overtimeWagePerHour),
-    workingHoursPerDay: labour.workingHoursPerDay,
+    wage: wageDefaults(
+      {
+        type: labour.wageType,
+        perDay: labour.wagePerDay,
+        perMonth: labour.wagePerMonth,
+        overtimePerHour: labour.overtimeWagePerHour,
+        workingHoursPerDay: labour.workingHoursPerDay,
+        weeklyHolidays: labour.weeklyHolidays,
+      },
+      LABOUR_WAGE,
+    ),
     openingBalance: paiseToRupees(labour.openingBalance),
-    weeklyHolidays: labour.weeklyHolidays,
     uanNumber: labour.uanNumber ?? "",
     esicNumber: labour.esicNumber ?? "",
     aadhaar: "",
@@ -186,21 +141,22 @@ export function labourFormDefaults(
     supervisorId: labour.supervisor?.id ?? "",
     contactNumber: labour.contactNumber?.replace(/^\+91/, "") ?? "",
     gender: labour.gender ?? "",
-    currentProjectId: labour.currentProject.id,
+    projectIds: labour.projects.map((project) => project.id),
   };
 }
 
 const blank = (value: string) => (value.trim() === "" ? null : value.trim());
 
 function details(values: LabourFormValues) {
+  const wage = wagePayload(values.wage);
   return {
     name: values.name.trim(),
     labourCode: blank(values.labourCode),
     fatherName: blank(values.fatherName),
     joiningDate: values.joiningDate,
-    wageType: values.wageType,
-    weeklyHolidays: [...values.weeklyHolidays].sort((a, b) => a - b),
-    workingHoursPerDay: values.workingHoursPerDay.trim(),
+    wageType: wage.type,
+    weeklyHolidays: wage.weeklyHolidays,
+    workingHoursPerDay: wage.workingHoursPerDay,
     uanNumber: blank(values.uanNumber),
     esicNumber: blank(values.esicNumber),
     labourCategoryId: blank(values.labourCategoryId),
@@ -210,16 +166,16 @@ function details(values: LabourFormValues) {
         ? null
         : normalizeMobile(values.contactNumber),
     gender: values.gender === "" ? null : values.gender,
+    projectIds: values.projectIds,
   };
 }
 
 function amounts(values: LabourFormValues) {
+  const wage = wagePayload(values.wage);
   return {
-    wagePerDay:
-      values.wageType === "daily" ? rupeesToPaise(values.wagePerDay) : null,
-    wagePerMonth:
-      values.wageType === "monthly" ? rupeesToPaise(values.wagePerMonth) : null,
-    overtimeWagePerHour: rupeesToPaise(values.overtimeWagePerHour) ?? 0,
+    wagePerDay: wage.perDay,
+    wagePerMonth: wage.perMonth,
+    overtimeWagePerHour: wage.overtimePerHour,
     openingBalance: rupeesToPaise(values.openingBalance) ?? 0,
   };
 }
@@ -230,13 +186,13 @@ export function createLabourPayload(values: LabourFormValues): LabourInput {
     ...details(values),
     ...amounts(values),
     aadhaar: blank(values.aadhaar),
-    currentProjectId: values.currentProjectId,
   };
 }
 
 /**
  * The Edit request body. A blank Aadhaar keeps the stored one; without
- * Financial the amounts are left out and kept.
+ * Financial the amounts are left out and kept. The Projects are sent in
+ * full: those ticked or unticked are on or off from today.
  */
 export function updateLabourPayload(
   values: LabourFormValues,
@@ -250,8 +206,12 @@ export function updateLabourPayload(
   };
 }
 
+type LabourField =
+  | Exclude<keyof LabourFormValues, "wage">
+  | `wage.${keyof WageValues}`;
+
 /** Server error codes → the field they belong to. */
-export const LABOUR_ERROR_FIELDS: Record<string, keyof LabourFormValues> = {
+export const LABOUR_ERROR_FIELDS: Record<string, LabourField> = {
   LABOUR_NAME_REQUIRED: "name",
   LABOUR_NAME_TOO_LONG: "name",
   LABOUR_CODE_TOO_LONG: "labourCode",
@@ -260,12 +220,7 @@ export const LABOUR_ERROR_FIELDS: Record<string, keyof LabourFormValues> = {
   JOINING_DATE_INVALID: "joiningDate",
   JOINING_DATE_AFTER_TRANSFER: "joiningDate",
   JOINING_DATE_AFTER_ATTENDANCE: "joiningDate",
-  WAGE_TYPE_INVALID: "wageType",
-  OVERTIME_WAGE_REQUIRED: "overtimeWagePerHour",
-  OVERTIME_WAGE_INVALID: "overtimeWagePerHour",
-  WORKING_HOURS_INVALID: "workingHoursPerDay",
   OPENING_BALANCE_INVALID: "openingBalance",
-  WEEKLY_HOLIDAYS_INVALID: "weeklyHolidays",
   UAN_INVALID: "uanNumber",
   ESIC_INVALID: "esicNumber",
   AADHAAR_INVALID: "aadhaar",
@@ -273,14 +228,12 @@ export const LABOUR_ERROR_FIELDS: Record<string, keyof LabourFormValues> = {
   GENDER_INVALID: "gender",
   LABOUR_CATEGORY_NOT_FOUND: "labourCategoryId",
   SUPERVISOR_NOT_FOUND: "supervisorId",
-  PROJECT_NOT_FOUND: "currentProjectId",
-  PROJECT_REQUIRED: "currentProjectId",
+  PROJECT_NOT_FOUND: "projectIds",
 };
 
 /** The field for a wage error depends on the wage type being saved. */
 export function labourErrorFields(
   values: LabourFormValues,
-): Record<string, keyof LabourFormValues> {
-  const wage = values.wageType === "daily" ? "wagePerDay" : "wagePerMonth";
-  return { ...LABOUR_ERROR_FIELDS, WAGE_REQUIRED: wage, WAGE_INVALID: wage };
+): Record<string, LabourField> {
+  return { ...LABOUR_ERROR_FIELDS, ...wageErrorFields("wage", values.wage) };
 }

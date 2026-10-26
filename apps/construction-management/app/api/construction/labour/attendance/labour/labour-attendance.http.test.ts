@@ -117,7 +117,7 @@ async function fixtures(company: Company) {
         joiningDate: "2026-09-01",
         overtimeWagePerHour: OT,
         weeklyHolidays: [],
-        currentProjectId: tower,
+        projectIds: [tower],
         supervisorId: sundar,
         labourCategoryId: mason,
         ...body,
@@ -423,7 +423,7 @@ describe("labour attendance HTTP", () => {
     expect(offProject).toMatchObject({
       status: StatusCodes.BAD_REQUEST,
       code: "LABOUR_NOT_ON_PROJECT",
-      details: { labourId: f.dhuresh, projectId: f.villa },
+      details: { labourId: f.dhuresh },
     });
     // Before the transfer the day belongs to the Tower; after, to the Villa.
     expect(
@@ -466,6 +466,43 @@ describe("labour attendance HTTP", () => {
       details: { labourId: f.kavitha },
     });
     expect(await ledgerSum(f.kavitha)).toBe(0);
+  });
+
+  it("marks a Labour on two Projects on each, the same day (ADR CM-0033)", async () => {
+    const company = await ownerWithCompany();
+    const f = await fixtures(company);
+    const both = await f.labour({
+      name: "Meena Selvi",
+      wageType: "daily",
+      wagePerDay: DAILY,
+      projectIds: [f.tower, f.villa],
+    });
+    const marks = [{ labourId: both, status: "present" }];
+    const [tower] = await marked(company.cookie, { ...body(f), marks });
+    const [villa] = await marked(company.cookie, {
+      ...body(f),
+      projectId: f.villa,
+      marks,
+    });
+    expect(tower?.id).not.toBe(villa?.id);
+    expect(await ledgerSum(both)).toBe(2 * DAILY);
+    for (const projectId of [f.tower, f.villa]) {
+      const day = await json<{
+        labourers: { labourId: string; attendance: unknown }[];
+      }>(await sheet(company.cookie, projectId, YESTERDAY));
+      expect(
+        day.labourers.find((row) => row.labourId === both)?.attendance,
+      ).toMatchObject({ status: "present" });
+    }
+    // Clearing one Project's day leaves the other.
+    const cleared = await clear(company.cookie, {
+      projectId: f.villa,
+      date: YESTERDAY,
+      labourIds: [both],
+      expected: { [both]: villa?.updatedAt },
+    });
+    expect(cleared.status).toBe(StatusCodes.NO_CONTENT);
+    expect(await ledgerSum(both)).toBe(DAILY);
   });
 
   it("applies the back-dated guard to a Member, and the Owner passes it", async () => {

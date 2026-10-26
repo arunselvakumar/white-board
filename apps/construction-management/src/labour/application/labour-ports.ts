@@ -2,13 +2,20 @@ import type { AuditEvent } from "@/src/shared-kernel/audit";
 import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 import type { ListCursor } from "@/src/shared-kernel/list-cursor";
 
-import type { Labour, LabourDetails } from "../domain/labour";
+import type {
+  Labour,
+  LabourDetails,
+  ProjectChanges,
+} from "../domain/labour";
 
-/** A row of a labourer's transfer history (CM-206). */
+/**
+ * A row of a labourer's transfer history (CM-206, ADR CM-0033): onto a
+ * Project (no `from`), off one (no `to`), or from one to another.
+ */
 export type LabourTransferRecord = {
   id: string;
   fromProjectId: string | null;
-  toProjectId: string;
+  toProjectId: string | null;
   transferDate: CalendarDate;
   remark: string | null;
   createdAt: Date;
@@ -19,6 +26,7 @@ export type LabourTransferRecord = {
 export type LabourMove = {
   labour: Labour;
   fromProjectId: string;
+  toProjectId: string;
   /** `updatedAt` when loaded: the compare-and-set guard. */
   loadedUpdatedAt: Date;
   transferDate: CalendarDate;
@@ -52,13 +60,16 @@ export type LabourRepository = {
    * Writes the labourer. `expectedUpdatedAt` (when given) must still match,
    * or `LABOUR_CHANGED`. `opening` reverses the live opening entries and
    * posts this amount on the joining date; `joiningDateChanged` moves the
-   * first history row to the new joining date.
+   * first history rows to the new joining date. `projects` writes the
+   * Projects ticked and unticked, each with a history row on `date`
+   * (ADR CM-0033).
    */
   update(input: {
     labour: Labour;
     expectedUpdatedAt: Date | null;
     opening: number | null;
     joiningDateChanged: boolean;
+    projects?: (ProjectChanges & { date: CalendarDate }) | null;
     audit: AuditEvent;
   }): Promise<void>;
   /**
@@ -73,10 +84,11 @@ export type LabourRepository = {
     moves: readonly LabourMove[],
     audits: readonly AuditEvent[],
   ): Promise<void>;
-  /** The latest live attendance date per labourer. */
+  /** The latest live attendance date per labourer on `projectId`. */
   latestAttendance(
     workspaceId: string,
     ids: readonly string[],
+    projectId: string,
   ): Promise<Map<string, CalendarDate>>;
   /** The earliest live attendance date of a labourer. */
   earliestAttendance(
@@ -85,6 +97,8 @@ export type LabourRepository = {
   ): Promise<CalendarDate | null>;
   /** Oldest first. */
   transfers(workspaceId: string, id: string): Promise<LabourTransferRecord[]>;
+  /** Today in the Company's time zone: the date of Projects ticked on Edit. */
+  today(workspaceId: string): Promise<CalendarDate>;
 };
 
 /** What screens show of a labourer. Amounts are paise. */
@@ -92,7 +106,8 @@ export type LabourReadModel = {
   id: string;
   details: Omit<LabourDetails, "aadhaar">;
   aadhaarMasked: string | null;
-  currentProject: { id: string; name: string };
+  /** The Projects they work on now, by name (ADR CM-0033). */
+  projects: { id: string; name: string }[];
   labourCategory: { id: string; name: string } | null;
   supervisor: { id: string; name: string } | null;
   isActive: boolean;

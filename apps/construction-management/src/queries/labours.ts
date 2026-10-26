@@ -130,6 +130,7 @@ export type LabourCommand =
   | {
       kind: "transfer";
       labourIds: string[];
+      fromProjectId: string | null;
       toProjectId: string;
       transferDate: string;
       remark: string | null;
@@ -139,6 +140,7 @@ export function runLabourCommand(command: LabourCommand): Promise<unknown> {
   if (command.kind === "transfer")
     return postJson(`${LABOURS_API}/transfer`, {
       labourIds: command.labourIds,
+      fromProjectId: command.fromProjectId,
       toProjectId: command.toProjectId,
       transferDate: command.transferDate,
       remark: command.remark,

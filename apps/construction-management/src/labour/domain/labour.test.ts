@@ -191,18 +191,60 @@ describe("Labour", () => {
       id: "l1",
       workspaceId: "w1",
       details: labourDetails(BASE),
-      projectId: "p1",
+      projectIds: ["p1", "p3", "p1", " "],
       by: "u1",
       now,
     });
 
-  it("refuses a transfer to the Project it is on", () => {
+  it("can start on no Project, or on many, each once", () => {
+    expect(labour().projectIds).toEqual(["p1", "p3"]);
+    const none = Labour.create({
+      id: "l2",
+      workspaceId: "w1",
+      details: labourDetails(BASE),
+      by: "u1",
+      now,
+    });
+    expect(none.projectIds).toEqual([]);
+  });
+
+  it("moves from one of its Projects to one it is not on", () => {
     const item = labour();
-    expect(codeOf(() => item.transferTo("p1", "u1", now))).toBe(
-      "TRANSFER_SAME_PROJECT",
-    );
-    expect(item.transferTo("p2", "u1", now)).toBe("p1");
-    expect(item.currentProjectId).toBe("p2");
+    expect(
+      codeOf(() => {
+        item.transfer("p1", "p3", "u1", now);
+      }),
+    ).toBe("TRANSFER_SAME_PROJECT");
+    expect(
+      codeOf(() => {
+        item.transfer("p1", "p1", "u1", now);
+      }),
+    ).toBe("TRANSFER_SAME_PROJECT");
+    expect(
+      codeOf(() => {
+        item.transfer("p9", "p2", "u1", now);
+      }),
+    ).toBe("LABOUR_NOT_ON_PROJECT");
+    item.transfer("p1", "p2", "u1", now);
+    expect(item.projectIds).toEqual(["p2", "p3"]);
+  });
+
+  it("ticks and unticks Projects, telling what changed", () => {
+    const item = labour();
+    const later = new Date("2026-10-09T06:00:00Z");
+    expect(item.setProjects(["p3", "p1"], "u2", later)).toEqual({
+      added: [],
+      removed: [],
+    });
+    expect(item.updatedAt).toEqual(now);
+    expect(item.setProjects(["p3", "p4"], "u2", later)).toEqual({
+      added: ["p4"],
+      removed: ["p1"],
+    });
+    expect(item.projectIds).toEqual(["p3", "p4"]);
+    expect(item.updatedBy).toBe("u2");
+    expect(item.setProjects([], "u2", later).removed).toEqual(["p3", "p4"]);
+    expect(item.projectIds).toEqual([]);
   });
 
   it("toggles active and stops after delete", () => {
