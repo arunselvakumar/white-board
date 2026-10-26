@@ -2,7 +2,13 @@ import { describe, expect, it } from "vitest";
 
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
-import { MAX_SALARY, NO_SALARY, sameSalary, staffSalary } from "./staff-salary";
+import {
+  MAX_SALARY,
+  NO_SALARY,
+  keepLeftOut,
+  sameSalary,
+  staffSalary,
+} from "./staff-salary";
 
 function codeOf(run: () => unknown): string | undefined {
   try {
@@ -83,6 +89,18 @@ describe("staffSalary (ADR CM-0033 §3)", () => {
     expect(sameSalary(staffSalary({}), NO_SALARY)).toBe(true);
     expect(sameSalary(staffSalary({ weeklyHolidays: [] }), NO_SALARY)).toBe(
       false,
+    );
+  });
+});
+
+describe("keepLeftOut", () => {
+  it("keeps what an edit leaves out and takes what it sends", () => {
+    const stored = staffSalary({ perMonth: 2_500_000, overtimePerHour: 100 });
+    expect(
+      staffSalary(keepLeftOut({ workingHoursPerDay: "9" }, stored)),
+    ).toEqual({ ...stored, workingHoursPerDay: "9" });
+    expect(staffSalary(keepLeftOut({ perMonth: null }, stored))).toMatchObject(
+      { perMonth: null, overtimePerHour: 0 },
     );
   });
 });

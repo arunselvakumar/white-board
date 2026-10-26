@@ -32,7 +32,7 @@ import {
 import { ProjectChecklistSkeleton } from "./team-members-skeletons";
 
 type Selection = {
-  /** The chosen Project ids. Without it the step keeps its own choice. */
+  /** The chosen Project ids. Without it the checklist keeps its own choice. */
   value?: readonly string[];
   onChange?: (projectIds: string[]) => void;
 };
@@ -115,11 +115,11 @@ function ProjectChecklist({ value, onChange }: Selection) {
 }
 
 /**
- * Select Projects (wizard step 2, CM-204): a checklist of the Company's
+ * The Projects card's checklist (CM-204, ADR CM-0033 §1): the Company's
  * Projects from `/projects/options`. Pass `value`/`onChange` to send the
  * choice with the new Team Member.
  */
-export function ProjectsStep(props: Selection) {
+export function ProjectsField(props: Selection) {
   return (
     <Suspense fallback={<ProjectChecklistSkeleton />}>
       <ProjectChecklist {...props} />
@@ -142,7 +142,7 @@ export function TeamMemberProjectsTab({ member }: { member: TeamMember }) {
   });
   return (
     <div className="space-y-4">
-      <ProjectsStep
+      <ProjectsField
         value={projectIds}
         onChange={(next) => {
           setProjectIds(next);

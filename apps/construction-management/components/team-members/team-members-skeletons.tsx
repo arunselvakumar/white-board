@@ -1,4 +1,5 @@
 import { FolderKanban, ShieldCheck, UserRound } from "lucide-react";
+import type { ReactNode } from "react";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   FormSkeleton,
@@ -85,14 +86,70 @@ const PERSON_FIELDS = DETAIL_FIELDS.slice(0, -2);
 
 function SignInSkeleton() {
   return (
-    <div className="bg-card space-y-2 rounded-xl border p-4 sm:p-5">
-      <p className="text-sm font-semibold">Sign-in</p>
+    <div className="bg-card space-y-4 rounded-xl border p-4 sm:p-5">
+      <p className="font-semibold">Sign-in</p>
       <FormSkeleton columns={2} actions={0} fields={[...SIGN_IN_FIELDS]} />
     </div>
   );
 }
 
-/** Add Staff while the Roles load: step 1, the details form. */
+const SALARY_FIELDS = [
+  { label: "Salary type" },
+  { label: "Salary per month" },
+  { label: "Working hours per day" },
+] as const;
+
+/** A card of the one-page form: its title, then what loads in it. */
+function CardSkeleton({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="bg-card space-y-4 rounded-xl border p-4 sm:p-5">
+      <p className="font-semibold">{title}</p>
+      {children}
+    </div>
+  );
+}
+
+/** Details, Salary and Sign-in, as Add Staff and Edit Staff show them. */
+function DetailCardsSkeleton({
+  label,
+  between,
+}: {
+  label: string;
+  between?: ReactNode;
+}) {
+  return (
+    <div className="space-y-6">
+      <CardSkeleton title="Details">
+        <div className="space-y-2">
+          <p className="text-sm font-medium">Member type</p>
+          <div className="grid gap-3 sm:grid-cols-2" aria-hidden="true">
+            <Skeleton className="h-[4.25rem] rounded-lg" />
+            <Skeleton className="h-[4.25rem] rounded-lg" />
+          </div>
+        </div>
+        <FormSkeleton
+          columns={2}
+          actions={0}
+          label={label}
+          fields={[...PERSON_FIELDS]}
+        />
+      </CardSkeleton>
+      <CardSkeleton title="Salary">
+        <FormSkeleton columns={2} actions={0} fields={[...SALARY_FIELDS]} />
+      </CardSkeleton>
+      {between}
+      <SignInSkeleton />
+    </div>
+  );
+}
+
+/** Add Staff while the Roles load: the one page of cards (ADR CM-0033 §1). */
 export function AddTeamMemberSkeleton() {
   return (
     <div className="w-full p-6">
@@ -100,31 +157,24 @@ export function AddTeamMemberSkeleton() {
         <PageHeader
           back={{ label: "Staff", href: STAFF_PATH }}
           title="Add Staff"
-          meta="Step 1 of 3: Details"
         />
-        <ol className="flex gap-1.5" aria-hidden="true">
-          <li className="bg-primary h-1 flex-1 rounded-full" />
-          <li className="bg-border h-1 flex-1 rounded-full" />
-          <li className="bg-border h-1 flex-1 rounded-full" />
-        </ol>
-        <div className="space-y-6">
-          <div className="bg-card space-y-6 rounded-xl border p-4 sm:p-5">
-            <div className="space-y-2">
-              <p className="text-sm font-semibold">Member type</p>
-              <div className="grid gap-3 sm:grid-cols-2" aria-hidden="true">
-                <Skeleton className="h-[4.25rem] rounded-lg" />
-                <Skeleton className="h-[4.25rem] rounded-lg" />
-              </div>
-            </div>
-            <FormSkeleton
-              columns={2}
-              actions={0}
-              label="Loading Roles"
-              fields={[...PERSON_FIELDS]}
-            />
-          </div>
-          <SignInSkeleton />
-        </div>
+        <DetailCardsSkeleton
+          label="Loading Roles"
+          between={
+            <>
+              <CardSkeleton title="Projects">
+                <ProjectChecklistSkeleton />
+              </CardSkeleton>
+              <CardSkeleton title="Role">
+                <FormSkeleton
+                  columns={1}
+                  actions={0}
+                  fields={[{ label: "Role" }]}
+                />
+              </CardSkeleton>
+            </>
+          }
+        />
       </div>
     </div>
   );
@@ -150,16 +200,7 @@ export function EditTeamMemberSkeleton() {
               Role
             </TabsTrigger>
           </TabsList>
-          <div className="space-y-6">
-            <FormSkeleton
-              className="bg-card rounded-xl border p-4 sm:p-5"
-              columns={2}
-              actions={0}
-              label="Loading staff member"
-              fields={[...PERSON_FIELDS]}
-            />
-            <SignInSkeleton />
-          </div>
+          <DetailCardsSkeleton label="Loading staff member" />
         </Tabs>
       </div>
     </div>

@@ -62,8 +62,17 @@ export type TeamMemberDetailsInput = {
   aadhaar?: string | null;
   pan?: string | null;
   emergencyContact: string | null;
-  /** Paise a month; left out keeps it, null clears it (ADR CM-0032). */
-  monthlySalary?: number | null;
+  /**
+   * The salary set-up (ADR CM-0033 §3). Left out keeps it; without
+   * Financial the type and amounts are left out (ADR CM-0032 §3).
+   */
+  salaryType?: "daily" | "monthly";
+  /** Paise; null clears it. */
+  salaryPerDay?: number | null;
+  salaryPerMonth?: number | null;
+  overtimeWagePerHour?: number;
+  workingHoursPerDay?: string;
+  weeklyHolidays?: number[];
   memberType: "normal" | "hrms";
 };
 

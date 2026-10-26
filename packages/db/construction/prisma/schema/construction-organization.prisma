@@ -120,6 +120,15 @@ model ConstructionOrganizationRoleMenuPermission {
   @@schema("construction_organization")
 }
 
+/// A staff member's salary is a day's or a month's (ADR CM-0033 §3).
+enum ConstructionOrganizationSalaryType {
+  daily
+  monthly
+
+  @@map("salary_type")
+  @@schema("construction_organization")
+}
+
 enum ConstructionOrganizationMemberType {
   normal
   hrms
@@ -145,39 +154,50 @@ enum ConstructionOrganizationTeamMemberStatus {
 /// email are each unique among live members (partial indexes in the
 /// migration); at least one is set.
 model ConstructionOrganizationTeamMember {
-  id               String                                   @id @db.Uuid
-  workspaceId      String                                   @map("workspace_id")
-  userId           String?                                  @map("user_id")
-  name             String
+  id                  String                                   @id @db.Uuid
+  workspaceId         String                                   @map("workspace_id")
+  userId              String?                                  @map("user_id")
+  name                String
   /// What they may do (ADR CM-0030). Null for the Owner, who can do
   /// everything; a Member without a Role can do nothing.
-  roleId           String?                                  @map("role_id") @db.Uuid
-  mobile           String?
-  email            String?
-  address          String?
-  aadhaarEncrypted String?                                  @map("aadhaar_encrypted")
-  aadhaarLast4     String?                                  @map("aadhaar_last4") @db.Char(4)
-  panEncrypted     String?                                  @map("pan_encrypted")
-  panLast4         String?                                  @map("pan_last4") @db.Char(4)
-  emergencyContact String?                                  @map("emergency_contact")
-  /// Paise a month; optional (ADR CM-0032). Seen and set with Financial on
-  /// Staff (`organization.team_members`). Separate from HRMS salary set-up.
-  monthlySalary    Int?                                     @map("monthly_salary")
+  roleId              String?                                  @map("role_id") @db.Uuid
+  mobile              String?
+  email               String?
+  address             String?
+  aadhaarEncrypted    String?                                  @map("aadhaar_encrypted")
+  aadhaarLast4        String?                                  @map("aadhaar_last4") @db.Char(4)
+  panEncrypted        String?                                  @map("pan_encrypted")
+  panLast4            String?                                  @map("pan_last4") @db.Char(4)
+  emergencyContact    String?                                  @map("emergency_contact")
+  /// The salary set-up, like a Labour's wage (ADR CM-0033 §3). The amounts
+  /// are optional paise, seen and set with Financial on Staff
+  /// (`organization.team_members`). Separate from HRMS salary set-up.
+  salaryType          ConstructionOrganizationSalaryType       @default(monthly) @map("salary_type")
+  /// Paise; set when `salary_type` is daily.
+  salaryPerDay        Int?                                     @map("salary_per_day")
+  /// Paise; set when `salary_type` is monthly.
+  salaryPerMonth      Int?                                     @map("salary_per_month")
+  /// Paise; 0 when none.
+  overtimeWagePerHour Int                                      @default(0) @map("overtime_wage_per_hour")
+  /// Time worked beyond it is overtime (ADR CM-0011).
+  workingHoursPerDay  Decimal                                  @default(8) @map("working_hours_per_day") @db.Decimal(4, 2)
+  /// 0 = Sunday … 6 = Saturday.
+  weeklyHolidays      Int[]                                    @default([0]) @map("weekly_holidays")
   /// Storage key of the photo set in My Profile (CM-115); a `stored_files` row.
-  photoKey         String?                                  @map("photo_key")
-  memberType       ConstructionOrganizationMemberType       @default(normal) @map("member_type")
-  isOwner          Boolean                                  @default(false) @map("is_owner")
-  status           ConstructionOrganizationTeamMemberStatus @default(joining_pending)
-  inviteToken      String?                                  @unique @map("invite_token")
-  invitedAt        DateTime?                                @map("invited_at") @db.Timestamptz(3)
-  joinedAt         DateTime?                                @map("joined_at") @db.Timestamptz(3)
-  createdAt        DateTime                                 @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt        DateTime                                 @default(now()) @map("updated_at") @db.Timestamptz(3)
-  createdBy        String                                   @map("created_by")
-  updatedBy        String                                   @map("updated_by")
-  deletedAt        DateTime?                                @map("deleted_at") @db.Timestamptz(3)
+  photoKey            String?                                  @map("photo_key")
+  memberType          ConstructionOrganizationMemberType       @default(normal) @map("member_type")
+  isOwner             Boolean                                  @default(false) @map("is_owner")
+  status              ConstructionOrganizationTeamMemberStatus @default(joining_pending)
+  inviteToken         String?                                  @unique @map("invite_token")
+  invitedAt           DateTime?                                @map("invited_at") @db.Timestamptz(3)
+  joinedAt            DateTime?                                @map("joined_at") @db.Timestamptz(3)
+  createdAt           DateTime                                 @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt           DateTime                                 @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy           String                                   @map("created_by")
+  updatedBy           String                                   @map("updated_by")
+  deletedAt           DateTime?                                @map("deleted_at") @db.Timestamptz(3)
 
-  role     ConstructionOrganizationRole?              @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  role     ConstructionOrganizationRole?               @relation(fields: [roleId], references: [id], onDelete: Restrict)
   projects ConstructionOrganizationTeamMemberProject[]
 
   @@index([workspaceId, createdAt])
@@ -206,21 +226,21 @@ model ConstructionOrganizationTeamMemberProject {
 /// the first save; no row means no limits. Validated by `BackdatedPolicy` in
 /// the shared kernel.
 model ConstructionOrganizationBackdatedEntryPolicy {
-  id                           String    @id @db.Uuid
-  workspaceId                  String    @unique @map("workspace_id")
+  id                    String    @id @db.Uuid
+  workspaceId           String    @unique @map("workspace_id")
   /// 0 = no restriction.
-  createDays                   Int       @map("create_days")
-  createOverrideRoleIds        String[]  @map("create_override_role_ids") @db.Uuid
-  editDays                     Int       @map("edit_days")
-  editOverrideRoleIds          String[]  @map("edit_override_role_ids") @db.Uuid
+  createDays            Int       @map("create_days")
+  createOverrideRoleIds String[]  @map("create_override_role_ids") @db.Uuid
+  editDays              Int       @map("edit_days")
+  editOverrideRoleIds   String[]  @map("edit_override_role_ids") @db.Uuid
   /// Inclusive; a calendar date in the Company time zone.
-  financialClosingDate         DateTime? @map("financial_closing_date") @db.Date
+  financialClosingDate  DateTime? @map("financial_closing_date") @db.Date
   /// `{ "<module key>": { mode, create: { days, overrideRoleIds }, edit } }`.
-  modules                      Json
-  createdAt                    DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt                    DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
-  createdBy                    String    @map("created_by")
-  updatedBy                    String    @map("updated_by")
+  modules               Json
+  createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy             String    @map("created_by")
+  updatedBy             String    @map("updated_by")
 
   @@map("backdated_entry_policies")
   @@schema("construction_organization")

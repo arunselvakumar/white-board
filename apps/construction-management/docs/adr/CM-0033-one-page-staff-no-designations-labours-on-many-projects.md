@@ -51,7 +51,7 @@ The issue listed five questions. The owner accepted the recommended answer to ea
 - **A staff salary stays optional; a Labour's wage stays required**, because attendance prices every Labour day from it.
 - **Staff have no opening balance.** Labours have a ledger (CM-0004); Staff do not.
 - `team_members.monthly_salary` becomes `salary_type` (daily | monthly), `salary_per_day`, `salary_per_month`, `overtime_wage_per_hour` (paise), `working_hours_per_day` (decimal 4,2, default 8) and `weekly_holidays` (int[]). Every existing monthly salary moves to `salary_type = monthly`, `salary_per_month`.
-- The **Financial** guard on Staff is unchanged from CM-0032 §3: without it the amounts are neither shown nor sent, and an update that leaves them out keeps them. Salary type, working hours and weekly holidays are not amounts and are always shown.
+- The **Financial** guard on Staff is unchanged from CM-0032 §3: without it the amounts are neither shown nor sent, and an update that leaves them out keeps them. Working hours and weekly holidays are not money and are always shown. The salary type is shown but kept with the amounts, because it picks which amount applies.
 - It is still **separate from HRMS**. The salary run and payslips read the HRMS salary set-up. Joining the two stays a later decision.
 
 ### 4. A Labour can be on any number of Projects

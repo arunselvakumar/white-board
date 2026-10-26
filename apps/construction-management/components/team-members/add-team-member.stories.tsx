@@ -11,7 +11,7 @@ import {
 
 import { mockFetch, type MockRoute } from "../../.storybook/mock-fetch";
 import { signInAs } from "../../.storybook/mocks/auth";
-import { AddTeamMemberWizard } from "./add-team-member-wizard";
+import { AddTeamMember } from "./add-team-member";
 import { teamMember } from "./team-member-fixtures";
 
 const MEMBERS_URL = "/api/construction/organization/team-members";
@@ -66,17 +66,17 @@ function createdAs(overrides: Parameters<typeof teamMember>[0] = {}) {
 
 const meta = {
   title: "Staff & Roles/Staff/AddStaff",
-  component: AddTeamMemberWizard,
+  component: AddTeamMember,
   args: { canSeeSalary: true },
   beforeEach() {
     signInAs("owner", { name: "Anugraha Engineers" });
   },
   render: (args) => (
     <QuerySuspense>
-      <AddTeamMemberWizard {...args} />
+      <AddTeamMember {...args} />
     </QuerySuspense>
   ),
-} satisfies Meta<typeof AddTeamMemberWizard>;
+} satisfies Meta<typeof AddTeamMember>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -106,13 +106,22 @@ export const InviteByEmail: Story = {
   play: async (context) => {
     const { canvas, canvasElement, userEvent } = context;
     const body = within(canvasElement.ownerDocument.body);
-    await userEvent.click(
-      await canvas.findByRole("button", { name: "Continue" }),
-    );
+    // One page: every card is there at once, with one button.
+    for (const card of ["Details", "Salary", "Projects", "Role", "Sign-in"])
+      await expect(
+        await canvas.findByRole("heading", { name: new RegExp(`^${card}`) }),
+      ).toBeVisible();
+    await expect(canvas.queryByText(/Step \d of/)).not.toBeInTheDocument();
+    await expect(
+      canvas.getByRole("link", { name: "Cancel" }),
+    ).toHaveAttribute("href", "/app/staff");
+    await userEvent.click(canvas.getByRole("button", { name: "Add Staff" }));
     await expect(await canvas.findByText("Enter the name")).toBeVisible();
     await expect(
       canvas.getByText("Enter a mobile number or an email"),
     ).toBeVisible();
+    // The first field in error takes the focus, so the page scrolls to it.
+    await expect(canvas.getByLabelText("Name")).toHaveFocus();
 
     await fillBasics(context);
     const invite = canvas.getByRole("checkbox", { name: /Invite them/ });
@@ -131,25 +140,30 @@ export const InviteByEmail: Story = {
     ).toBeVisible();
     await userEvent.type(canvas.getByLabelText("Mobile"), "77081 65767");
     await userEvent.type(canvas.getByLabelText("Aadhaar"), "2341 2341 2346");
-    // The salary is optional, in rupees, like a Labour's wage (ADR CM-0032).
-    await userEvent.type(canvas.getByLabelText("Salary per month"), "25k");
-    await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
+
+    // The salary is set up like a Labour's wage, Monthly by default, the
+    // amount optional; overtime shows once there is one (ADR CM-0033 §3).
     await expect(
-      await canvas.findByText(
-        "Enter an amount in rupees, like 25000 or 25000.50",
-      ),
+      canvas.queryByLabelText("Overtime per hour"),
+    ).not.toBeInTheDocument();
+    await userEvent.type(canvas.getByLabelText("Salary per month"), "25k");
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Add and invite" }),
+    );
+    await expect(
+      await canvas.findByText("Enter an amount in rupees, like 700 or 700.50"),
     ).toBeVisible();
     await userEvent.clear(canvas.getByLabelText("Salary per month"));
     await userEvent.type(canvas.getByLabelText("Salary per month"), "25,000");
-    await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
+    await userEvent.clear(canvas.getByLabelText("Overtime per hour"));
+    await userEvent.type(canvas.getByLabelText("Overtime per hour"), "150");
+    await userEvent.clear(canvas.getByLabelText("Working hours per day"));
+    await userEvent.type(canvas.getByLabelText("Working hours per day"), "9");
+    await userEvent.click(canvas.getByRole("button", { name: "Sat" }));
 
-    await userEvent.click(
-      await canvas.findByRole("checkbox", { name: /Sri Heights/ }),
-    );
-    await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
+    await userEvent.click(canvas.getByRole("checkbox", { name: /Sri Heights/ }));
 
-    // The Role step: pick one, and see its matrix read-only.
-    await expect(await canvas.findByText(/Step 3 of 3: Role/)).toBeVisible();
+    // No Role yet: the Role card says so.
     await userEvent.click(
       canvas.getByRole("button", { name: "Add and invite" }),
     );
@@ -157,6 +171,10 @@ export const InviteByEmail: Story = {
       await canvas.findByText("Choose a Role", { selector: "p" }),
     ).toBeVisible();
     await choose(context, "Role", /^Site Engineer/);
+    // What the Role may do folds away until asked for, read-only.
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Show what this Role may do" }),
+    );
     await expect(
       await canvas.findByRole("checkbox", { name: "Add — Attendance" }),
     ).toBeChecked();
@@ -184,7 +202,12 @@ export const InviteByEmail: Story = {
       roleId: SITE_ENGINEER_ROLE.id,
       invite: true,
       password: null,
-      monthlySalary: 2_500_000,
+      salaryType: "monthly",
+      salaryPerDay: null,
+      salaryPerMonth: 2_500_000,
+      overtimeWagePerHour: 15_000,
+      workingHoursPerDay: "9",
+      weeklyHolidays: [0, 6],
     });
     await expect("permissions" in sentBody()).toBe(false);
     await userEvent.click(
@@ -197,9 +220,34 @@ export const InviteByEmail: Story = {
   },
 };
 
+/** A Daily salary: the amount follows the type. */
+export const DailySalary: Story = {
+  beforeEach: serve(createdAs({ email: null })),
+  play: async (context) => {
+    const { canvas, userEvent } = context;
+    await fillBasics(context);
+    await userEvent.type(canvas.getByLabelText("Mobile"), "77081 65767");
+    await userEvent.click(canvas.getByRole("button", { name: "Daily" }));
+    await userEvent.type(canvas.getByLabelText("Salary per day"), "900");
+    await choose(context, "Role", /^Site Engineer/);
+    await userEvent.click(canvas.getByRole("button", { name: "Add Staff" }));
+    await waitFor(() =>
+      expect(sentBody()).toMatchObject({
+        salaryType: "daily",
+        salaryPerDay: 90_000,
+        salaryPerMonth: null,
+        overtimeWagePerHour: 0,
+        workingHoursPerDay: "8",
+        weeklyHolidays: [0],
+      }),
+    );
+  },
+};
+
 /**
- * Without Financial on Staff the salary is neither shown nor sent, as a
- * Labour's wage (ADR CM-0032).
+ * Without Financial on Staff the salary type and amounts are neither shown
+ * nor sent, as a Labour's wage (ADR CM-0032 §3); working hours and weekly
+ * holidays still are.
  */
 export const WithoutSalaryRight: Story = {
   args: { canSeeSalary: false },
@@ -215,15 +263,23 @@ export const WithoutSalaryRight: Story = {
     await expect(
       canvas.queryByLabelText("Salary per month"),
     ).not.toBeInTheDocument();
+    await expect(canvas.queryByText("Salary type")).not.toBeInTheDocument();
+    await expect(canvas.getByLabelText("Working hours per day")).toBeVisible();
     await userEvent.type(canvas.getByLabelText("Mobile"), "77081 65767");
-    await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
-    await userEvent.click(
-      await canvas.findByRole("button", { name: "Continue" }),
-    );
     await choose(context, "Role", /^Site Engineer/);
     await userEvent.click(canvas.getByRole("button", { name: "Add Staff" }));
     await waitFor(() => expect(sentBody()).toMatchObject({ invite: false }));
-    await expect("monthlySalary" in sentBody()).toBe(false);
+    for (const key of [
+      "salaryType",
+      "salaryPerDay",
+      "salaryPerMonth",
+      "overtimeWagePerHour",
+    ])
+      await expect(key in sentBody()).toBe(false);
+    await expect(sentBody()).toMatchObject({
+      workingHoursPerDay: "8",
+      weeklyHolidays: [0],
+    });
   },
 };
 
@@ -251,7 +307,8 @@ export const SetAPassword: Story = {
         "They can sign in now with their mobile or email and this password. They must change it the first time they sign in.",
       ),
     ).toBeVisible();
-    await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
+    await choose(context, "Role", /^Site Engineer/);
+    await userEvent.click(canvas.getByRole("button", { name: "Add Staff" }));
     await expect(
       await canvas.findByText("Use at least 8 characters"),
     ).toBeVisible();
@@ -263,11 +320,6 @@ export const SetAPassword: Story = {
       "type",
       "text",
     );
-    await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
-    await userEvent.click(
-      await canvas.findByRole("button", { name: "Continue" }),
-    );
-    await choose(context, "Role", /^Site Engineer/);
     await userEvent.click(canvas.getByRole("button", { name: "Add Staff" }));
 
     await expect(
@@ -307,10 +359,6 @@ export const ExistingAccount: Story = {
       canvas.getByLabelText("Set a password"),
       "site-pass-26",
     );
-    await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
-    await userEvent.click(
-      await canvas.findByRole("button", { name: "Continue" }),
-    );
     await choose(context, "Role", /^Site Engineer/);
     await userEvent.click(canvas.getByRole("button", { name: "Add Staff" }));
     await expect(
@@ -336,10 +384,6 @@ export const RecordOnly: Story = {
         "They are a record until you invite them or set a password. You can do either later from Edit Staff.",
       ),
     ).toBeVisible();
-    await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
-    await userEvent.click(
-      await canvas.findByRole("button", { name: "Continue" }),
-    );
     await choose(context, "Role", /^Site Engineer/);
     await userEvent.click(canvas.getByRole("button", { name: "Add Staff" }));
     await expect(
@@ -359,10 +403,6 @@ export const EmailWithoutInvite: Story = {
     await userEvent.click(
       canvas.getByRole("checkbox", { name: /Invite them/ }),
     );
-    await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
-    await userEvent.click(
-      await canvas.findByRole("button", { name: "Continue" }),
-    );
     await choose(context, "Role", /^Accountant/);
     await userEvent.click(canvas.getByRole("button", { name: "Add Staff" }));
     await expect(
@@ -372,20 +412,21 @@ export const EmailWithoutInvite: Story = {
   },
 };
 
+/** HRMS staff: no Projects card, and HRMS Staff is chosen for them. */
 export const HrmsMemberStartsOnHrmsStaff: Story = {
   beforeEach: serve(createdAs({ name: "Anitha", memberType: "hrms" })),
   play: async (context) => {
     const { canvas, userEvent } = context;
-    await userEvent.click(await canvas.findByText("HRMS only"));
+    await expect(
+      await canvas.findByRole("heading", { name: "Projects" }),
+    ).toBeVisible();
+    await userEvent.click(canvas.getByText("HRMS only"));
+    await expect(
+      canvas.queryByRole("heading", { name: "Projects" }),
+    ).not.toBeInTheDocument();
     await userEvent.type(canvas.getByLabelText("Name"), "Anitha");
     await userEvent.type(canvas.getByLabelText("Email"), "anitha@anugraha.in");
-    await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
-
-    await expect(await canvas.findByText(/Step 2 of 2: Role/)).toBeVisible();
     await expect(canvas.getByLabelText("Role")).toHaveTextContent("HRMS Staff");
-    await expect(
-      canvas.getByRole("checkbox", { name: "Add — Attendance" }),
-    ).toBeInTheDocument();
     await userEvent.click(
       canvas.getByRole("button", { name: "Add and invite" }),
     );
@@ -401,6 +442,7 @@ export const HrmsMemberStartsOnHrmsStaff: Story = {
   },
 };
 
+/** A server error lands on its field, in whichever card owns it. */
 export const MobileAlreadyInUse: Story = {
   beforeEach: serve(() =>
     Response.json(
@@ -415,10 +457,6 @@ export const MobileAlreadyInUse: Story = {
     const { canvas, userEvent } = context;
     await fillBasics(context, "Prabhu");
     await userEvent.type(canvas.getByLabelText("Mobile"), "7708165767");
-    await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
-    await userEvent.click(
-      await canvas.findByRole("button", { name: "Continue" }),
-    );
     await choose(context, "Role", /^Site Engineer/);
     await userEvent.click(canvas.getByRole("button", { name: "Add Staff" }));
     await expect(
@@ -426,19 +464,45 @@ export const MobileAlreadyInUse: Story = {
         "Another Team Member in this Company has this mobile number.",
       ),
     ).toBeVisible();
-    // Back on the details step, at the field.
-    await expect(canvas.getByLabelText("Mobile")).toBeVisible();
+    await expect(canvas.getByLabelText("Mobile")).toHaveFocus();
   },
 };
 
-/** At phone width the Sign-in section stacks; nothing scrolls sideways. */
+/** The salary's server errors land in the Salary card. */
+export const SalaryErrorOnField: Story = {
+  beforeEach: serve(() =>
+    Response.json(
+      {
+        code: "WORKING_HOURS_INVALID",
+        message:
+          "Working hours must be more than 0 and at most 24, in steps of 0.01.",
+      },
+      { status: 400 },
+    ),
+  ),
+  play: async (context) => {
+    const { canvas, userEvent } = context;
+    await fillBasics(context);
+    await userEvent.type(canvas.getByLabelText("Mobile"), "7708165767");
+    await choose(context, "Role", /^Site Engineer/);
+    await userEvent.click(canvas.getByRole("button", { name: "Add Staff" }));
+    await expect(
+      await canvas.findByText(
+        "Working hours must be more than 0 and at most 24, in steps of 0.01.",
+      ),
+    ).toBeVisible();
+    await expect(canvas.getByLabelText("Working hours per day")).toHaveFocus();
+  },
+};
+
+/** At phone width the cards stack; nothing scrolls sideways. */
 export const Phone: Story = {
   globals: { viewport: { value: "mobile1" } },
   beforeEach: serve(createdAs()),
   render: (args) => (
     <div data-testid="phone" style={{ width: 375 }}>
       <QuerySuspense>
-        <AddTeamMemberWizard {...args} />
+        <AddTeamMember {...args} />
       </QuerySuspense>
     </div>
   ),

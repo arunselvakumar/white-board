@@ -124,6 +124,30 @@ export function staffSalary(input: StaffSalaryInput): StaffSalary {
   };
 }
 
+/** An edit: each field left out keeps the stored one. */
+export function keepLeftOut(
+  patch: StaffSalaryInput,
+  current: StaffSalary,
+): StaffSalaryInput {
+  return {
+    type: patch.type === undefined ? current.type : patch.type,
+    perDay: patch.perDay === undefined ? current.perDay : patch.perDay,
+    perMonth: patch.perMonth === undefined ? current.perMonth : patch.perMonth,
+    overtimePerHour:
+      patch.overtimePerHour === undefined
+        ? current.overtimePerHour
+        : patch.overtimePerHour,
+    workingHoursPerDay:
+      patch.workingHoursPerDay === undefined
+        ? current.workingHoursPerDay
+        : patch.workingHoursPerDay,
+    weeklyHolidays:
+      patch.weeklyHolidays === undefined
+        ? current.weeklyHolidays
+        : patch.weeklyHolidays,
+  };
+}
+
 export function sameSalary(a: StaffSalary, b: StaffSalary): boolean {
   return (
     a.type === b.type &&

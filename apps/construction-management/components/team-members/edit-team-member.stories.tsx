@@ -87,39 +87,70 @@ export const EditDetailsKeepsAadhaar: Story = {
   },
 };
 
-/** The salary shows in rupees; clearing it sends null (ADR CM-0032). */
+/**
+ * The salary set-up shows in rupees, in the card order of Add Staff, and
+ * a change sends the whole set-up (ADR CM-0033 §3).
+ */
 export const EditSalary: Story = {
-  beforeEach: serve({ ...MEMBER, monthlySalary: 2_500_050 }, [
+  beforeEach: serve(
     {
-      method: "POST",
-      path: `${ONE}/update`,
-      respond: () => Response.json({ ...MEMBER, monthlySalary: 3_000_000 }),
+      ...MEMBER,
+      salaryPerMonth: 2_500_050,
+      overtimeWagePerHour: 10_000,
+      workingHoursPerDay: "9.5",
+      weeklyHolidays: [0, 6],
     },
-  ]),
+    [
+      {
+        method: "POST",
+        path: `${ONE}/update`,
+        respond: () => Response.json({ ...MEMBER, salaryPerMonth: 3_000_000 }),
+      },
+    ],
+  ),
   play: async ({ canvas, userEvent }) => {
     const salary = await canvas.findByLabelText("Salary per month");
     await expect(salary).toHaveValue("25000.50");
+    await expect(canvas.getByLabelText("Overtime per hour")).toHaveValue("100");
+    await expect(canvas.getByLabelText("Working hours per day")).toHaveValue(
+      "9.5",
+    );
+    const headings = canvas
+      .getAllByRole("heading", { level: 2 })
+      .map((heading) => heading.textContent.replace(/\W+$/, ""));
+    await expect(headings).toEqual(["Details", "Salary", "Sign-in"]);
     await userEvent.clear(salary);
     await userEvent.type(salary, "30000");
     await userEvent.click(canvas.getByRole("button", { name: "Save details" }));
     await waitFor(() =>
       expect(bodyOf(`${ONE}/update`)).toMatchObject({
-        monthlySalary: 3_000_000,
+        salaryType: "monthly",
+        salaryPerDay: null,
+        salaryPerMonth: 3_000_000,
+        overtimeWagePerHour: 10_000,
+        workingHoursPerDay: "9.5",
+        weeklyHolidays: [0, 6],
       }),
     );
   },
 };
 
-/** Without Financial on Staff the salary is not shown, and an edit keeps it. */
+/**
+ * Without Financial on Staff the type and amounts are not shown, and an
+ * edit keeps them; working hours and holidays are still theirs to change.
+ */
 export const SalaryHiddenWithoutRight: Story = {
   args: { canSeeSalary: false },
-  beforeEach: serve(MEMBER, [
-    {
-      method: "POST",
-      path: `${ONE}/update`,
-      respond: () => Response.json(MEMBER),
-    },
-  ]),
+  beforeEach: serve(
+    { ...MEMBER, overtimeWagePerHour: null },
+    [
+      {
+        method: "POST",
+        path: `${ONE}/update`,
+        respond: () => Response.json(MEMBER),
+      },
+    ],
+  ),
   play: async ({ canvas, userEvent }) => {
     await expect(
       await canvas.findByText(
@@ -135,9 +166,11 @@ export const SalaryHiddenWithoutRight: Story = {
     await waitFor(() =>
       expect(bodyOf(`${ONE}/update`)).toMatchObject({
         name: "Prabhu Saravanan K.",
+        workingHoursPerDay: "8",
       }),
     );
-    await expect("monthlySalary" in bodyOf(`${ONE}/update`)).toBe(false);
+    for (const key of ["salaryType", "salaryPerMonth", "overtimeWagePerHour"])
+      await expect(key in bodyOf(`${ONE}/update`)).toBe(false);
   },
 };
 

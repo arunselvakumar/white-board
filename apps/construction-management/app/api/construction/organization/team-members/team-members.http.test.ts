@@ -38,7 +38,12 @@ type Member = {
   canSetPassword: boolean;
   passwordIgnored?: string | null;
   aadhaarMasked: string | null;
-  monthlySalary: number | null;
+  salaryType: "daily" | "monthly";
+  salaryPerDay: number | null;
+  salaryPerMonth: number | null;
+  overtimeWagePerHour: number | null;
+  workingHoursPerDay: string;
+  weeklyHolidays: number[];
   invitePath: string | null;
 };
 type Page = {
@@ -234,6 +239,71 @@ describe("Team Members HTTP (CM-110)", () => {
     expect(await json(refused)).toMatchObject({ code: "PERMISSION_DENIED" });
   });
 
+  it("sets up a salary like a Labour's wage (ADR CM-0033 §3)", async () => {
+    const owner = await ownerWithCompany();
+    const body = (overrides: Record<string, unknown> = {}) => ({
+      name: "Prabhu Saravanan",
+      mobile: newMobile(),
+      memberType: "normal",
+      roleId: owner.roleId("Accountant"),
+      invite: false,
+      ...overrides,
+    });
+    const plain = await json<Member>(
+      await create(jsonRequest(BASE, owner.cookie, body())),
+    );
+    expect(plain).toMatchObject({
+      salaryType: "monthly",
+      salaryPerDay: null,
+      salaryPerMonth: null,
+      overtimeWagePerHour: 0,
+      workingHoursPerDay: "8",
+      weeklyHolidays: [0],
+    });
+
+    const daily = await create(
+      jsonRequest(
+        BASE,
+        owner.cookie,
+        body({
+          salaryType: "daily",
+          salaryPerDay: 90_000,
+          salaryPerMonth: 2_500_000,
+          overtimeWagePerHour: 12_500,
+          workingHoursPerDay: "9.5",
+          weeklyHolidays: [6, 0],
+        }),
+      ),
+    );
+    expect(daily.status).toBe(StatusCodes.CREATED);
+    // Only the amount of the chosen type is kept.
+    expect(await json<Member>(daily)).toMatchObject({
+      salaryType: "daily",
+      salaryPerDay: 90_000,
+      salaryPerMonth: null,
+      overtimeWagePerHour: 12_500,
+      workingHoursPerDay: "9.5",
+      weeklyHolidays: [0, 6],
+    });
+
+    for (const [overrides, code] of [
+      [{ workingHoursPerDay: "24.5" }, "WORKING_HOURS_INVALID"],
+      [{ weeklyHolidays: [7] }, "WEEKLY_HOLIDAYS_INVALID"],
+    ] as const) {
+      const refused = await create(
+        jsonRequest(BASE, owner.cookie, body(overrides)),
+      );
+      expect(refused.status).toBe(StatusCodes.BAD_REQUEST);
+      expect(await json(refused)).toMatchObject({ code });
+    }
+    for (const salaryPerMonth of [-1, 2_000_000_001, 12.5]) {
+      const refused = await create(
+        jsonRequest(BASE, owner.cookie, body({ salaryPerMonth })),
+      );
+      expect(refused.status).toBe(StatusCodes.BAD_REQUEST);
+    }
+  });
+
   it("keeps the salary behind Financial on Staff (ADR CM-0032)", async () => {
     const owner = await ownerWithCompany();
     const body = (overrides: Record<string, unknown> = {}) => ({
@@ -245,19 +315,22 @@ describe("Team Members HTTP (CM-110)", () => {
       ...overrides,
     });
     const created = await create(
-      jsonRequest(BASE, owner.cookie, body({ monthlySalary: 2_500_000 })),
+      jsonRequest(
+        BASE,
+        owner.cookie,
+        body({ salaryPerMonth: 2_500_000, overtimeWagePerHour: 10_000 }),
+      ),
     );
     expect(created.status).toBe(StatusCodes.CREATED);
     const prabhu = await json<Member>(created);
-    expect(prabhu.monthlySalary).toBe(2_500_000);
+    expect(prabhu.salaryPerMonth).toBe(2_500_000);
     const ownerSees = async (id: string) =>
-      (
-        await json<Member>(
-          await getOne(jsonRequest(`${BASE}/${id}`, owner.cookie), params(id)),
-        )
-      ).monthlySalary;
+      json<Member>(
+        await getOne(jsonRequest(`${BASE}/${id}`, owner.cookie), params(id)),
+      );
 
-    // A clerk without Financial sees none, and cannot set or change one.
+    // A clerk without Financial sees no amounts, and cannot set or change
+    // them or the salary type; working hours and holidays are theirs.
     const clerk = await memberWith(owner, {
       "organization.team_members": ["create", "read", "update"],
     });
@@ -270,27 +343,41 @@ describe("Team Members HTTP (CM-110)", () => {
         params(prabhu.id),
       ),
     );
-    expect(seen.monthlySalary).toBeNull();
+    expect(seen).toMatchObject({
+      salaryType: "monthly",
+      salaryPerDay: null,
+      salaryPerMonth: null,
+      overtimeWagePerHour: null,
+    });
     const edited = await update(
       jsonRequest(`${BASE}/${prabhu.id}/update`, clerk.cookie, {
         ...body({ mobile: seen.mobile }),
         name: "Prabhu K.",
-        monthlySalary: 100,
+        salaryType: "daily",
+        salaryPerDay: 100,
+        salaryPerMonth: null,
+        overtimeWagePerHour: 0,
+        workingHoursPerDay: "9",
       }),
       params(prabhu.id),
     );
     expect(edited.status).toBe(StatusCodes.OK);
-    expect(await ownerSees(prabhu.id)).toBe(2_500_000);
+    expect(await ownerSees(prabhu.id)).toMatchObject({
+      salaryType: "monthly",
+      salaryPerMonth: 2_500_000,
+      overtimeWagePerHour: 10_000,
+      workingHoursPerDay: "9",
+    });
     const byClerk = await json<Member>(
       await create(
         jsonRequest(
           BASE,
           clerk.cookie,
-          body({ roleId: clerkRole, monthlySalary: 100 }),
+          body({ roleId: clerkRole, salaryPerMonth: 100 }),
         ),
       ),
     );
-    expect(await ownerSees(byClerk.id)).toBeNull();
+    expect((await ownerSees(byClerk.id)).salaryPerMonth).toBeNull();
 
     // With Financial: null clears it, leaving it out keeps it.
     const accountant = await memberWith(owner, {
@@ -303,22 +390,19 @@ describe("Team Members HTTP (CM-110)", () => {
       }),
       params(prabhu.id),
     );
-    expect((await json<Member>(kept)).monthlySalary).toBe(2_500_000);
+    expect((await json<Member>(kept)).salaryPerMonth).toBe(2_500_000);
     const cleared = await update(
       jsonRequest(`${BASE}/${prabhu.id}/update`, accountant.cookie, {
         ...body({ mobile: seen.mobile }),
-        monthlySalary: null,
+        salaryPerMonth: null,
       }),
       params(prabhu.id),
     );
-    expect((await json<Member>(cleared)).monthlySalary).toBeNull();
-
-    for (const monthlySalary of [-1, 2_000_000_001, 12.5]) {
-      const refused = await create(
-        jsonRequest(BASE, owner.cookie, body({ monthlySalary })),
-      );
-      expect(refused.status).toBe(StatusCodes.BAD_REQUEST);
-    }
+    // No salary, no overtime.
+    expect(await json<Member>(cleared)).toMatchObject({
+      salaryPerMonth: null,
+      overtimeWagePerHour: 0,
+    });
   });
 
   it("lets a Member give only a Role they hold every cell of, never to themselves", async () => {

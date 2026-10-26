@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import {
   Controller,
   useWatch,
+  type FieldPath,
   type FieldValues,
   type UseFormReturn,
 } from "react-hook-form";
@@ -15,17 +16,21 @@ import { RadioGroup, RadioGroupItem } from "@repo/ui/components/radio-group";
 
 import { FieldError } from "@/components/auth/field-error";
 import { MobileField } from "@/components/auth/mobile-field";
+import { FormSection } from "@/components/forms/form-section";
+import { WageFields } from "@/components/wages/wage-fields";
 import {
-  MoneyInput,
-  isRupees,
-  rupeesToPaise,
-} from "@/components/money/money-input";
+  STAFF_SALARY,
+  checkWage,
+  wageDefaults,
+  wageErrorFields,
+  wagePayload,
+  wageValuesSchema,
+  type SavedWage,
+} from "@/components/wages/wage-schema";
+import type { TeamMember } from "@/src/queries/team-members";
 import { isValidAadhaar, isValidPan } from "@/src/shared-kernel/tax-ids";
 
-/** The API's cap (ADR CM-0032), as a Labour's wage. */
-const MAX_SALARY_PAISE = 2_000_000_000;
-
-/** The detail fields Add Staff (step 1) and Edit Staff share (CM-111). */
+/** The detail fields Add Staff and Edit Staff share (CM-111). */
 export const teamMemberDetailsObject = z.object({
   memberType: z.enum(["normal", "hrms"]),
   name: z.string().trim().min(1, "Enter the name").max(100, "Name is too long"),
@@ -56,34 +61,41 @@ export const teamMemberDetailsObject = z.object({
       message: "Enter a valid 10-character PAN",
     }),
   emergencyContact: z.string().trim().max(120, "Too long"),
-  /** Rupees; optional (ADR CM-0032). */
-  monthlySalary: z
-    .string()
-    .trim()
-    .refine((value) => value === "" || isRupees(value), {
-      message: "Enter an amount in rupees, like 25000 or 25000.50",
-    })
-    .refine((value) => (rupeesToPaise(value) ?? 0) <= MAX_SALARY_PAISE, {
-      message: "Enter at most ₹2 crore a month",
-    }),
+  /** Like a Labour's wage, the amount optional (ADR CM-0033 §3). */
+  salary: wageValuesSchema,
 });
 
-/** A mobile or an email; either one is enough (ADR CM-0030 §6). */
-export function hasMobileOrEmail(values: {
-  mobile: string;
-  email: string;
-}): boolean {
-  return values.mobile !== "" || values.email !== "";
+const MOBILE_OR_EMAIL_MESSAGE = "Enter a mobile number or an email";
+
+/**
+ * The checks across fields: a mobile or an email, either one is enough
+ * (ADR CM-0030 §6), and the salary. Without Financial (`canSeeSalary`
+ * false) the amounts are neither shown nor checked.
+ */
+export function checkDetails(canSeeSalary: boolean) {
+  return (
+    values: z.infer<typeof teamMemberDetailsObject>,
+    ctx: z.RefinementCtx,
+  ) => {
+    if (values.mobile === "" && values.email === "")
+      ctx.addIssue({
+        code: "custom",
+        path: ["mobile"],
+        message: MOBILE_OR_EMAIL_MESSAGE,
+      });
+    checkWage(values.salary, ctx, {
+      path: ["salary"],
+      ...STAFF_SALARY,
+      showAmounts: canSeeSalary,
+    });
+  };
 }
 
-export const MOBILE_OR_EMAIL_MESSAGE = "Enter a mobile number or an email";
+export function teamMemberDetailsSchema(canSeeSalary: boolean) {
+  return teamMemberDetailsObject.superRefine(checkDetails(canSeeSalary));
+}
 
-export const teamMemberDetailsSchema = teamMemberDetailsObject.refine(
-  hasMobileOrEmail,
-  { path: ["mobile"], message: MOBILE_OR_EMAIL_MESSAGE },
-);
-
-export type TeamMemberDetailsValues = z.infer<typeof teamMemberDetailsSchema>;
+export type TeamMemberDetailsValues = z.infer<typeof teamMemberDetailsObject>;
 
 export const EMPTY_DETAILS: TeamMemberDetailsValues = {
   memberType: "normal",
@@ -94,31 +106,46 @@ export const EMPTY_DETAILS: TeamMemberDetailsValues = {
   aadhaar: "",
   pan: "",
   emergencyContact: "",
-  monthlySalary: "",
+  salary: wageDefaults(null, STAFF_SALARY),
 };
 
-/** Server error codes → the field they belong to. */
-export const DETAIL_ERROR_FIELDS: Record<
-  string,
-  keyof TeamMemberDetailsValues
-> = {
-  MEMBER_NAME_REQUIRED: "name",
-  MEMBER_NAME_TOO_LONG: "name",
-  MOBILE_INVALID: "mobile",
-  MOBILE_OR_EMAIL_REQUIRED: "mobile",
-  MEMBER_MOBILE_IN_USE: "mobile",
-  MOBILE_LOCKED: "mobile",
-  EMAIL_INVALID: "email",
-  MEMBER_EMAIL_IN_USE: "email",
-  AADHAAR_INVALID: "aadhaar",
-  PAN_INVALID: "pan",
-  ADDRESS_TOO_LONG: "address",
-  SALARY_INVALID: "monthlySalary",
-};
+/** A saved member's salary set-up, as the Salary card holds it. */
+export function savedSalary(member: TeamMember): SavedWage {
+  return {
+    type: member.salaryType,
+    perDay: member.salaryPerDay,
+    perMonth: member.salaryPerMonth,
+    overtimePerHour: member.overtimeWagePerHour,
+    workingHoursPerDay: member.workingHoursPerDay,
+    weeklyHolidays: member.weeklyHolidays,
+  };
+}
+
+/** Server error codes → the field they belong to, the salary's included. */
+export function detailErrorFields(
+  values: TeamMemberDetailsValues,
+): Record<string, FieldPath<TeamMemberDetailsValues>> {
+  return {
+    MEMBER_NAME_REQUIRED: "name",
+    MEMBER_NAME_TOO_LONG: "name",
+    MOBILE_INVALID: "mobile",
+    MOBILE_OR_EMAIL_REQUIRED: "mobile",
+    MEMBER_MOBILE_IN_USE: "mobile",
+    MOBILE_LOCKED: "mobile",
+    EMAIL_INVALID: "email",
+    MEMBER_EMAIL_IN_USE: "email",
+    AADHAAR_INVALID: "aadhaar",
+    PAN_INVALID: "pan",
+    ADDRESS_TOO_LONG: "address",
+    EMERGENCY_CONTACT_TOO_LONG: "emergencyContact",
+    ...wageErrorFields("salary", values.salary),
+  };
+}
 
 /**
  * The request body for the details, from form values. Without
- * `canSeeSalary` the salary is left out, so an edit keeps it.
+ * `canSeeSalary` the salary type and amounts are left out, so an edit
+ * keeps them (ADR CM-0032 §3).
  */
 export function detailsInput(
   values: TeamMemberDetailsValues,
@@ -130,6 +157,7 @@ export function detailsInput(
         ? undefined
         : null
       : value;
+  const salary = wagePayload(values.salary);
   return {
     memberType: values.memberType,
     name: values.name,
@@ -140,12 +168,24 @@ export function detailsInput(
     pan: identifier(values.pan),
     emergencyContact:
       values.emergencyContact === "" ? null : values.emergencyContact,
-    monthlySalary: options.canSeeSalary
-      ? rupeesToPaise(values.monthlySalary)
-      : undefined,
+    ...(options.canSeeSalary
+      ? {
+          salaryType: salary.type,
+          salaryPerDay: salary.perDay,
+          salaryPerMonth: salary.perMonth,
+          overtimeWagePerHour: salary.overtimePerHour,
+        }
+      : {}),
+    workingHoursPerDay: salary.workingHoursPerDay,
+    weeklyHolidays: salary.weeklyHolidays,
   };
 }
 
+/**
+ * The cards Add Staff and Edit Staff share, in one order (ADR CM-0033 §1):
+ * Details, Salary, then `children` (Add Staff's Projects and Role), then
+ * Sign-in.
+ */
 export function TeamMemberDetailsFields<
   Values extends TeamMemberDetailsValues & FieldValues,
 >({
@@ -154,15 +194,18 @@ export function TeamMemberDetailsFields<
   mobileLocked = false,
   canSeeSalary,
   signIn,
+  children,
 }: {
   form: UseFormReturn<Values>;
-  /** Financial on Staff: without it the salary is neither shown nor sent. */
+  /** Financial on Staff: without it the amounts are neither shown nor sent. */
   canSeeSalary: boolean;
   /** Stored identifiers, shown as placeholders when editing. */
   masked?: { aadhaar: string | null; pan: string | null };
   mobileLocked?: boolean;
   /** Add Staff's Invite them and Set a password, under mobile and email. */
   signIn?: ReactNode;
+  /** Cards between Salary and Sign-in: Add Staff's Projects and Role. */
+  children?: ReactNode;
 }) {
   // Only the detail fields are read here; Add Staff's form has more.
   const form = wide as unknown as UseFormReturn<TeamMemberDetailsValues>;
@@ -172,9 +215,9 @@ export function TeamMemberDetailsFields<
   const mobileRequired = email.trim() === "";
   return (
     <div className="space-y-6">
-      <div className="bg-card space-y-6 rounded-xl border p-4 sm:p-5">
+      <FormSection title="Details">
         <fieldset className="space-y-2">
-          <legend className="text-sm font-semibold">
+          <legend className="text-sm font-medium">
             Member type
             <RequiredIndicator />
           </legend>
@@ -283,44 +326,35 @@ export function TeamMemberDetailsFields<
             <FieldError message={errors.emergencyContact?.message} />
           </div>
         </div>
-      </div>
+      </FormSection>
 
-      <div className="bg-card rounded-xl border p-4 sm:p-5">
-        <fieldset className="space-y-2" aria-describedby="member-salary-hint">
-          <legend className="text-sm font-semibold">Salary</legend>
-          <p id="member-salary-hint" className="text-muted-foreground text-xs">
-            {canSeeSalary
-              ? "Optional. Only people with the Financial right on Staff see it."
-              : "You cannot see salaries. Ask the Owner for the Financial right on Staff."}
-          </p>
-          {canSeeSalary && (
-            <div className="grid gap-4 pt-2 sm:grid-cols-2">
-              <div className="space-y-1.5">
-                <Label htmlFor="member-salary">Salary per month</Label>
-                <MoneyInput
-                  id="member-salary"
-                  className="h-10"
-                  placeholder="25000"
-                  aria-invalid={errors.monthlySalary != null}
-                  {...form.register("monthlySalary")}
-                />
-                <FieldError message={errors.monthlySalary?.message} />
-              </div>
-            </div>
-          )}
-        </fieldset>
-      </div>
+      <FormSection
+        title="Salary"
+        hint={
+          canSeeSalary
+            ? "Optional, like a Labour's wage. Only people with the Financial right on Staff see the amounts."
+            : "You cannot see salaries. Ask the Owner for the Financial right on Staff."
+        }
+      >
+        <WageFields
+          form={form}
+          name="salary"
+          idPrefix="member"
+          options={STAFF_SALARY}
+          showAmounts={canSeeSalary}
+          showType={canSeeSalary}
+        />
+      </FormSection>
 
-      <div className="bg-card rounded-xl border p-4 sm:p-5">
-        <fieldset className="space-y-2" aria-describedby="member-sign-in-hint">
-          <legend className="text-sm font-semibold">
-            Sign-in
-            <RequiredIndicator />
-          </legend>
-          <p id="member-sign-in-hint" className="text-muted-foreground text-xs">
-            A mobile number or an email. Either one is enough.
-          </p>
-          <div className="grid gap-4 pt-2 sm:grid-cols-2">
+      {children}
+
+      <FormSection
+        title="Sign-in"
+        required
+        hint="A mobile number or an email. Either one is enough."
+      >
+        <div className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="member-mobile" required={mobileRequired}>
                 Mobile
@@ -361,9 +395,9 @@ export function TeamMemberDetailsFields<
               <FieldError message={errors.email?.message} />
             </div>
           </div>
-          {signIn == null ? null : <div className="pt-2">{signIn}</div>}
-        </fieldset>
-      </div>
+          {signIn}
+        </div>
+      </FormSection>
     </div>
   );
 }

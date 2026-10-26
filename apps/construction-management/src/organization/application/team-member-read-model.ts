@@ -5,6 +5,7 @@ import {
 import { maskIdentifier } from "@/src/shared-kernel/tax-ids";
 
 import type { Role } from "../domain/role";
+import type { SalaryType } from "../domain/staff-salary";
 import type {
   MemberType,
   TeamMember,
@@ -24,8 +25,16 @@ export type TeamMemberReadModel = {
   aadhaarMasked: string | null;
   panMasked: string | null;
   emergencyContact: string | null;
-  /** Paise a month (ADR CM-0032); Response models null it without Financial. */
-  monthlySalary: number | null;
+  /** The salary set-up (ADR CM-0033 §3). */
+  salaryType: SalaryType;
+  /** Paise; Response models null the amounts without Financial. */
+  salaryPerDay: number | null;
+  salaryPerMonth: number | null;
+  overtimeWagePerHour: number;
+  /** Decimal hours, like "8" or "9.5". */
+  workingHoursPerDay: string;
+  /** 0 = Sunday … 6 = Saturday. */
+  weeklyHolidays: number[];
   memberType: MemberType;
   isOwner: boolean;
   status: TeamMemberStatus;
@@ -75,7 +84,12 @@ export function toTeamMemberReadModel(
       details.aadhaar == null ? null : maskIdentifier(details.aadhaar),
     panMasked: details.pan == null ? null : maskIdentifier(details.pan),
     emergencyContact: details.emergencyContact,
-    monthlySalary: member.monthlySalary,
+    salaryType: member.salary.type,
+    salaryPerDay: member.salary.perDay,
+    salaryPerMonth: member.salary.perMonth,
+    overtimeWagePerHour: member.salary.overtimePerHour,
+    workingHoursPerDay: member.salary.workingHoursPerDay,
+    weeklyHolidays: [...member.salary.weeklyHolidays],
     memberType: member.memberType,
     isOwner: member.isOwner,
     status: member.status,

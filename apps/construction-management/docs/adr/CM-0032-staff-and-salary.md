@@ -3,6 +3,7 @@
 - Status: accepted
 - Date: 2026-10-25
 - Amends: [CM-0030](CM-0030-users-and-roles.md) §2 (the menu, the page and its address, the words on screen)
+- Amended by: [CM-0033](CM-0033-one-page-staff-no-designations-labours-on-many-projects.md) (no Designations, so §1's "Designation stays" is superseded; §2's monthly amount becomes a salary set-up like a Labour's wage)
 - Relates to: [CM-0003](CM-0003-permission-matrix.md) (Permission Matrix, Financial), [CM-0024](CM-0024-new-menus-reach-existing-designations.md) (grant migrations), [CM-0012](CM-0012-hrms-product-decisions.md) (HRMS salary set-up)
 
 The client reviewed Users & Roles. To a builder, "User" reads as software jargon: the people they add are their **staff**. They asked for the menu to be **Staff & Roles**, and for every screen that said User to say Staff.

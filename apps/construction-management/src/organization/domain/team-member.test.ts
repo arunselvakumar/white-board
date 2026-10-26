@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { TeamMember, monthlySalary, teamMemberDetails } from "./team-member";
+import { NO_SALARY, staffSalary } from "./staff-salary";
+import { TeamMember, teamMemberDetails } from "./team-member";
 
 const NOW = new Date("2026-10-08T00:00:00Z");
 
@@ -63,43 +64,37 @@ describe("teamMemberDetails", () => {
   });
 });
 
-describe("monthlySalary (ADR CM-0032)", () => {
-  it("is optional paise: none for null or 0", () => {
-    expect(monthlySalary(2_500_000)).toBe(2_500_000);
-    expect(monthlySalary(null)).toBeNull();
-    expect(monthlySalary(undefined)).toBeNull();
-    expect(monthlySalary(0)).toBeNull();
-  });
-
-  it("rejects a negative, fractional or too large amount", () => {
-    for (const value of [-1, 12.5, 2_000_000_001])
-      expect(() => monthlySalary(value)).toThrow(
-        expect.objectContaining({ code: "SALARY_INVALID" }) as Error,
-      );
-  });
-
+describe("salary (ADR CM-0033 §3)", () => {
   it("is set on Add Staff and changed or cleared later", () => {
+    const salary = staffSalary({ perMonth: 2_500_000 });
     const member = TeamMember.invite({
       id: "member-1",
       workspaceId: "company-1",
       details,
-      monthlySalary: 2_500_000,
+      salary,
       memberType: "normal",
       roleId: "role-site",
       by: "owner",
       now: NOW,
     });
-    expect(member.monthlySalary).toBe(2_500_000);
-    expect(invite().monthlySalary).toBeNull();
+    expect(member.salary).toEqual(salary);
+    expect(invite().salary).toEqual(NO_SALARY);
     const later = new Date("2026-10-09T00:00:00Z");
-    member.setMonthlySalary(3_000_000, "accountant", later);
+    const daily = staffSalary({ type: "daily", perDay: 90_000 });
+    member.setSalary(daily, "accountant", later);
     expect(member).toMatchObject({
-      monthlySalary: 3_000_000,
+      salary: daily,
       updatedBy: "accountant",
       updatedAt: later,
     });
-    member.setMonthlySalary(null, "accountant", later);
-    expect(member.monthlySalary).toBeNull();
+    member.setSalary(NO_SALARY, "accountant", later);
+    expect(member.salary.perDay).toBeNull();
+  });
+
+  it("leaves the record untouched when nothing changed", () => {
+    const member = invite();
+    member.setSalary(staffSalary({}), "accountant", new Date("2026-10-09"));
+    expect(member.updatedBy).toBe("owner");
   });
 });
 

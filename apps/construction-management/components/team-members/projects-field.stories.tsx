@@ -7,7 +7,7 @@ import {
   StoryQueries,
   type ApiCall,
 } from "../../.storybook/mocks/api";
-import { ProjectsStep, TeamMemberProjectsTab } from "./projects-step";
+import { ProjectsField, TeamMemberProjectsTab } from "./projects-field";
 import { teamMember } from "./team-member-fixtures";
 
 const OPTIONS = "/api/construction/projects/projects/options";
@@ -21,15 +21,15 @@ function Controlled() {
   const [value, setValue] = useState<string[]>([]);
   return (
     <div className="space-y-3 p-6">
-      <ProjectsStep value={value} onChange={setValue} />
+      <ProjectsField value={value} onChange={setValue} />
       <output aria-label="Chosen">{value.join(",")}</output>
     </div>
   );
 }
 
 const meta = {
-  title: "Staff & Roles/Staff/ProjectsStep",
-  component: ProjectsStep,
+  title: "Staff & Roles/Staff/ProjectsField",
+  component: ProjectsField,
   beforeEach() {
     options = [
       { id: ASARIPALLAM, name: "Asaripallam Tower", status: "ongoing" },
@@ -55,7 +55,7 @@ const meta = {
       <Controlled />
     </StoryQueries>
   ),
-} satisfies Meta<typeof ProjectsStep>;
+} satisfies Meta<typeof ProjectsField>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

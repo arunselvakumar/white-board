@@ -11,6 +11,11 @@ import { newId } from "@/src/shared-kernel/ids";
 import type { Role } from "../domain/role";
 import type { RoleRepository } from "../domain/role-repository";
 import {
+  keepLeftOut,
+  staffSalary,
+  type StaffSalaryInput,
+} from "../domain/staff-salary";
+import {
   TeamMember,
   teamMemberDetails,
   type MemberType,
@@ -163,7 +168,7 @@ export class TeamMemberHandlers {
         status: member.status,
         projectIds: member.projectIds,
         roleId: member.roleId,
-        monthlySalary: member.monthlySalary,
+        salary: member.salary,
       },
     };
   }
@@ -230,8 +235,11 @@ export class TeamMemberHandlers {
     /** Who is giving the Role; the Owner when omitted (tests, seeds). */
     grantor?: MemberAccess;
     details: TeamMemberDetailsInput;
-    /** Paise a month; the route drops it without Financial (ADR CM-0032). */
-    monthlySalary?: number | null;
+    /**
+     * The salary set-up (ADR CM-0033 §3); none when left out. The route
+     * drops the type and amounts without Financial (ADR CM-0032 §3).
+     */
+    salary?: StaffSalaryInput;
     memberType: MemberType;
     projectIds?: readonly string[];
     roleId?: string | null;
@@ -240,6 +248,7 @@ export class TeamMemberHandlers {
   }): Promise<TeamMemberWithPassword> {
     const now = this.clock();
     const details = teamMemberDetails(input.details);
+    const salary = staffSalary(input.salary ?? {});
     const role =
       input.roleId == null
         ? null
@@ -259,7 +268,7 @@ export class TeamMemberHandlers {
       id: newId(now.getTime()),
       workspaceId: input.workspaceId,
       details,
-      monthlySalary: input.monthlySalary,
+      salary,
       memberType: input.memberType,
       projectIds: input.memberType === "hrms" ? [] : (input.projectIds ?? []),
       roleId: role?.id ?? null,
@@ -345,15 +354,16 @@ export class TeamMemberHandlers {
 
   /**
    * Edit details, salary and Member Type; the Role stays (ADR CM-0030).
-   * `monthlySalary` left out keeps the stored one (a member without
-   * Financial never sees it); null clears it (ADR CM-0032).
+   * Each salary field left out keeps the stored one (a member without
+   * Financial never sees the amounts); a null amount clears it (ADR
+   * CM-0032 §3, CM-0033 §3).
    */
   async update(input: {
     workspaceId: string;
     id: string;
     by: string;
     details: TeamMemberDetailsInput;
-    monthlySalary?: number | null;
+    salary?: StaffSalaryInput;
     memberType: MemberType;
   }): Promise<TeamMemberReadModel> {
     const now = this.clock();
@@ -375,8 +385,12 @@ export class TeamMemberHandlers {
     member.updateDetails(details, input.by, now, {
       mobileIsSignIn: this.mobileSignIn(),
     });
-    if (input.monthlySalary !== undefined)
-      member.setMonthlySalary(input.monthlySalary, input.by, now);
+    if (input.salary !== undefined)
+      member.setSalary(
+        staffSalary(keepLeftOut(input.salary, member.salary)),
+        input.by,
+        now,
+      );
     if (input.memberType !== member.memberType) {
       if (input.memberType === "hrms")
         await this.plan.assertCanAdd(input.workspaceId, "hrms_member");

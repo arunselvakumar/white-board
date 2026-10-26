@@ -25,7 +25,7 @@ import {
 } from "@repo/ui/components/tabs";
 
 import { PageHeader } from "@/components/app-shell/page-header";
-import { paiseToRupees } from "@/components/money/money-input";
+import { STAFF_SALARY, wageDefaults } from "@/components/wages/wage-schema";
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";
 import { STAFF_PATH } from "@/lib/staff-roles-nav";
@@ -41,15 +41,16 @@ import {
 } from "@/src/queries/team-members";
 
 import { MemberStatusBadge } from "./member-status-badge";
-import { TeamMemberProjectsTab } from "./projects-step";
+import { TeamMemberProjectsTab } from "./projects-field";
 import { RoleField } from "./role-field";
 import { SetPasswordDialog } from "./set-password-dialog";
 import { ShareInviteDialog } from "./share-invite-dialog";
 import { signInWays } from "./sign-in-options";
 import {
-  DETAIL_ERROR_FIELDS,
   TeamMemberDetailsFields,
+  detailErrorFields,
   detailsInput,
+  savedSalary,
   teamMemberDetailsSchema,
   type TeamMemberDetailsValues,
 } from "./team-member-details-fields";
@@ -64,7 +65,7 @@ function valuesOf(member: TeamMember): TeamMemberDetailsValues {
     aadhaar: "",
     pan: "",
     emergencyContact: member.emergencyContact ?? "",
-    monthlySalary: paiseToRupees(member.monthlySalary),
+    salary: wageDefaults(savedSalary(member), STAFF_SALARY),
   };
 }
 
@@ -84,8 +85,9 @@ function passwordNotice(outcome: TeamMember & PasswordOutcome): Notice {
 }
 
 /**
- * Edit Staff (CM-111, ADR CM-0030): Details, Projects and Role tabs, and
- * from the header Set a new password and the invitation.
+ * Edit Staff (CM-111, ADR CM-0030): Details (the Details, Salary and
+ * Sign-in cards, in Add Staff's order, ADR CM-0033 §1), Projects and Role
+ * tabs, and from the header Set a new password and the invitation.
  */
 export function EditTeamMember({
   id,
@@ -106,7 +108,7 @@ export function EditTeamMember({
   };
 
   const form = useForm<TeamMemberDetailsValues>({
-    resolver: zodResolver(teamMemberDetailsSchema),
+    resolver: zodResolver(teamMemberDetailsSchema(canSeeSalary)),
     defaultValues: valuesOf(member),
   });
   const details = useMutation({
@@ -246,10 +248,10 @@ export function EditTeamMember({
                   } catch (error) {
                     const { field, message } = fieldForCode(
                       error,
-                      DETAIL_ERROR_FIELDS,
+                      detailErrorFields(values),
                     );
                     if (field == null) form.setError("root", { message });
-                    else form.setError(field, { message });
+                    else form.setError(field, { message }, { shouldFocus: true });
                   }
                 })(event);
               }}

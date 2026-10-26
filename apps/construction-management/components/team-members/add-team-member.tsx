@@ -9,12 +9,13 @@ import {
 } from "@tanstack/react-query";
 import { CheckCircle2, Info, type LucideIcon } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useRef, useState } from "react";
+import { useForm, useWatch, type FieldPath } from "react-hook-form";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
+import { FormSection } from "@/components/forms/form-section";
 import { fieldForCode } from "@/lib/server-errors";
 import { STAFF_PATH } from "@/lib/staff-roles-nav";
 import { QueryHttpError } from "@/src/queries/http";
@@ -26,7 +27,7 @@ import {
   type TeamMember,
 } from "@/src/queries/team-members";
 
-import { ProjectsStep } from "./projects-step";
+import { ProjectsField } from "./projects-field";
 import { RoleField, hrmsStaffRoleId } from "./role-field";
 import { ShareInviteDialog } from "./share-invite-dialog";
 import {
@@ -37,41 +38,33 @@ import {
   type AddStaffValues,
 } from "./sign-in-options";
 import {
-  DETAIL_ERROR_FIELDS,
   EMPTY_DETAILS,
   TeamMemberDetailsFields,
+  detailErrorFields,
   detailsInput,
 } from "./team-member-details-fields";
 
-type Step = "details" | "projects" | "role";
-
-const STEP_LABELS: Record<Step, string> = {
-  details: "Details",
-  projects: "Select Projects",
-  role: "Role",
-};
-
 const EMPTY: AddStaffValues = { ...EMPTY_DETAILS, invite: true, password: "" };
 
-/** Server codes the Sign-in section owns, beyond the detail fields'. */
-const ERROR_FIELDS: Record<string, keyof AddStaffValues> = {
-  ...DETAIL_ERROR_FIELDS,
+/** Server codes the Sign-in card owns, beyond the detail fields'. */
+const SIGN_IN_ERROR_FIELDS: Record<string, FieldPath<AddStaffValues>> = {
   MEMBER_EMAIL_REQUIRED: "email",
   PASSWORD_TOO_SHORT: "password",
   PASSWORD_TOO_LONG: "password",
 };
 
-/** Server codes about the Role, shown on the Role step. */
+/** Server codes about the Role, shown on the Role card. */
 const ROLE_ERRORS = new Set(["ROLE_NOT_FOUND", "ROLE_REQUIRED"]);
 
 type Created = TeamMember &
   PasswordOutcome & { passwordSet: boolean; invited: boolean };
 
 /**
- * Add Staff (CM-111, ADR CM-0030 §6): details with how they sign in →
- * Projects → Role. HRMS members skip Projects and start on HRMS Staff.
+ * Add Staff (CM-111, ADR CM-0033 §1): one page of cards, Details, Salary,
+ * Projects, Role and Sign-in, with one button. HRMS members have no
+ * Projects card and start on HRMS Staff.
  */
-export function AddTeamMemberWizard({
+export function AddTeamMember({
   canSeeSalary,
 }: {
   /** Financial on Staff (ADR CM-0032). */
@@ -82,16 +75,16 @@ export function AddTeamMemberWizard({
   const companyName = company?.name ?? "your Company";
   const queryClient = useQueryClient();
   const form = useForm<AddStaffValues>({
-    resolver: zodResolver(addStaffSchema),
+    resolver: zodResolver(addStaffSchema(canSeeSalary)),
     defaultValues: EMPTY,
   });
   const [memberType, email, password, invite] = useWatch({
     control: form.control,
     name: ["memberType", "email", "password", "invite"],
   });
-  const [step, setStep] = useState<Step>("details");
   const [chosenRoleId, setChosenRoleId] = useState<string | null>(null);
   const [roleError, setRoleError] = useState<string | undefined>();
+  const roleCard = useRef<HTMLDivElement>(null);
   const [created, setCreated] = useState<Created | null>(null);
   const [projectIds, setProjectIds] = useState<string[]>([]);
 
@@ -99,12 +92,6 @@ export function AddTeamMemberWizard({
   const roleId =
     chosenRoleId ?? (memberType === "hrms" ? hrmsStaffRoleId(roles) : null);
   const inviting = inviteAvailable({ email, password }) && invite;
-
-  const steps: Step[] =
-    memberType === "hrms"
-      ? ["details", "role"]
-      : ["details", "projects", "role"];
-  const index = Math.max(0, steps.indexOf(step));
 
   const mutation = useMutation({
     mutationFn: createTeamMember,
@@ -117,15 +104,18 @@ export function AddTeamMemberWizard({
     },
   });
 
-  const next = async () => {
-    if (step === "details" && !(await form.trigger())) return;
-    const following = steps[index + 1];
-    if (following != null) setStep(following);
+  const showRoleError = (message: string) => {
+    setRoleError(message);
+    roleCard.current?.scrollIntoView({ block: "center" });
+    roleCard.current?.querySelector<HTMLElement>("button")?.focus({
+      preventScroll: true,
+    });
   };
 
+  // Client checks focus (and so scroll to) the first field in error.
   const submit = form.handleSubmit(async (values) => {
     if (roleId == null) {
-      setRoleError("Choose a Role");
+      showRoleError("Choose a Role");
       return;
     }
     setRoleError(undefined);
@@ -149,23 +139,24 @@ export function AddTeamMemberWizard({
       });
     } catch (error) {
       if (error instanceof QueryHttpError && ROLE_ERRORS.has(error.code)) {
-        setRoleError(error.message);
+        showRoleError(error.message);
         return;
       }
-      const { field, message } = fieldForCode(error, ERROR_FIELDS);
+      const { field, message } = fieldForCode(error, {
+        ...detailErrorFields(values),
+        ...SIGN_IN_ERROR_FIELDS,
+      });
       if (field == null) {
         form.setError("root", { message });
         return;
       }
-      form.setError(field, { message });
-      setStep("details");
+      // A server error lands on its field, wherever its card is.
+      form.setError(field, { message }, { shouldFocus: true });
     }
   });
 
   if (created != null)
     return <AddedUser created={created} companyName={companyName} />;
-
-  const last = index === steps.length - 1;
 
   return (
     <div className="w-full p-6">
@@ -173,77 +164,55 @@ export function AddTeamMemberWizard({
         <PageHeader
           back={{ label: "Staff", href: STAFF_PATH }}
           title="Add Staff"
-          meta={`Step ${String(index + 1)} of ${String(steps.length)}: ${STEP_LABELS[step]}`}
         />
-        <ol className="flex gap-1.5" aria-label="Steps">
-          {steps.map((item, position) => (
-            <li
-              key={item}
-              aria-current={item === step ? "step" : undefined}
-              className={`h-1 flex-1 rounded-full ${position <= index ? "bg-primary" : "bg-border"}`}
-            >
-              <span className="sr-only">{STEP_LABELS[item]}</span>
-            </li>
-          ))}
-        </ol>
 
         <form
           noValidate
           className="space-y-6"
           onSubmit={(event) => {
-            event.preventDefault();
-            if (last) void submit(event);
-            else void next();
+            void submit(event);
           }}
         >
-          {step === "details" && (
-            <TeamMemberDetailsFields
-              form={form}
-              canSeeSalary={canSeeSalary}
-              signIn={<SignInOptions form={form} companyName={companyName} />}
-            />
-          )}
-          {step === "projects" && (
-            <ProjectsStep value={projectIds} onChange={setProjectIds} />
-          )}
-          {step === "role" && (
-            <RoleField
-              id="member-role"
-              roles={roles}
-              value={roleId}
-              onChange={(value) => {
-                setChosenRoleId(value);
-                setRoleError(undefined);
-              }}
-              error={roleError}
-            />
-          )}
+          <TeamMemberDetailsFields
+            form={form}
+            canSeeSalary={canSeeSalary}
+            signIn={<SignInOptions form={form} companyName={companyName} />}
+          >
+            {memberType !== "hrms" && (
+              <FormSection title="Projects">
+                <ProjectsField value={projectIds} onChange={setProjectIds} />
+              </FormSection>
+            )}
+            <div ref={roleCard}>
+              <RoleField
+                id="member-role"
+                roles={roles}
+                value={roleId}
+                onChange={(value) => {
+                  setChosenRoleId(value);
+                  setRoleError(undefined);
+                }}
+                error={roleError}
+                previewOpen={false}
+              />
+            </div>
+          </TeamMemberDetailsFields>
 
           <FormAlert message={form.formState.errors.root?.message} />
 
-          <div className="flex justify-between gap-3">
-            {index > 0 ? (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  const previous = steps[index - 1];
-                  if (previous != null) setStep(previous);
-                }}
-              >
-                Back
-              </Button>
-            ) : (
-              <span />
-            )}
+          <div className="flex justify-end gap-3">
+            <Link
+              href={STAFF_PATH}
+              className={buttonVariants({ variant: "outline" })}
+            >
+              Cancel
+            </Link>
             <Button type="submit" disabled={mutation.isPending}>
-              {!last
-                ? "Continue"
-                : mutation.isPending
-                  ? "Adding…"
-                  : inviting
-                    ? "Add and invite"
-                    : "Add Staff"}
+              {mutation.isPending
+                ? "Adding…"
+                : inviting
+                  ? "Add and invite"
+                  : "Add Staff"}
             </Button>
           </div>
         </form>

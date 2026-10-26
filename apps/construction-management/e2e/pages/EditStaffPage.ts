@@ -22,6 +22,10 @@ export class EditStaffPage extends AppShellPage {
     return this.page.getByRole("textbox", { name: "Salary per month" });
   }
 
+  public get workingHoursField() {
+    return this.page.getByRole("textbox", { name: "Working hours per day" });
+  }
+
   public get saveDetailsButton() {
     return this.button("Save details");
   }

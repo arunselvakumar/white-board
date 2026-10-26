@@ -19,7 +19,7 @@ A person who can sign in: by email and password, by mobile and password, and by 
 _Avoid_: account, login, customer
 
 **Team Member**:
-A User's membership and employee record inside one Company: name, mobile, email, ids, an optional monthly salary, Member Type, projects, and their Role. The Staff & Roles screens call them **Staff** (Add Staff, Edit Staff, "1 Staff member"); code, APIs, audit events and other modules say Team Member (ADR CM-0030, CM-0032).
+A User's membership and employee record inside one Company: name, mobile, email, ids, a salary set-up like a Labour's wage (the amount optional), Member Type, projects, and their Role. The Staff & Roles screens call them **Staff** (Add Staff, Edit Staff, "1 Staff member"); code, APIs, audit events and other modules say Team Member (ADR CM-0030, CM-0032, CM-0033).
 _Avoid_: employee; User (in UI copy for this record)
 
 **Owner**:
