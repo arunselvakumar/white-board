@@ -12,7 +12,7 @@ import type { TeamMember } from "@/src/queries/team-members";
 import { mockFetch, type MockRoute } from "../../.storybook/mock-fetch";
 import { signInAs } from "../../.storybook/mocks/auth";
 import { EditTeamMember } from "./edit-team-member";
-import { DESIGNATION_LIST, teamMember } from "./team-member-fixtures";
+import { teamMember } from "./team-member-fixtures";
 
 const MEMBER = teamMember({ status: "active", userId: "user_prabhu" });
 const ONE = `/api/construction/organization/team-members/${MEMBER.id}`;
@@ -28,15 +28,11 @@ function bodyOf(path: string): Record<string, unknown> {
   >;
 }
 
-/** The member, the Designations and Roles, plus `extra` routes. */
+/** The member and the Roles, plus `extra` routes. */
 function serve(member: TeamMember, extra: MockRoute[] = []) {
   return () => {
     fetchMock?.restore();
     fetchMock = mockFetch([
-      {
-        path: "/api/construction/organization/designations",
-        respond: () => Response.json(DESIGNATION_LIST),
-      },
       { path: ROLES_URL, respond: () => Response.json({ items: ROLES }) },
       ...extra,
       { path: ONE, respond: () => Response.json(member) },
@@ -72,9 +68,7 @@ export const EditDetailsKeepsAadhaar: Story = {
   ]),
   play: async ({ canvas, userEvent }) => {
     const name = await canvas.findByLabelText("Name");
-    await expect(
-      canvas.getByText("Site Engineer · Role: Site Engineer"),
-    ).toBeVisible();
+    await expect(canvas.getByText("Role: Site Engineer")).toBeVisible();
     await expect(
       canvas.getByText("Leave blank to keep XXXXXXXX2346."),
     ).toBeVisible();

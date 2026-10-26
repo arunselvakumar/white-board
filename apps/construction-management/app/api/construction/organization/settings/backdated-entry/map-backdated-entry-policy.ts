@@ -3,13 +3,10 @@ import { BACKDATED_MODULES } from "@/src/shared-kernel/backdated-policy";
 
 import type { GetConstructionOrganizationBackdatedEntryPolicyResponseModel } from "./get-backdated-entry-policy-response-model";
 
-function limit(value: {
-  days: number;
-  overrideDesignationIds: readonly string[];
-}) {
+function limit(value: { days: number; overrideRoleIds: readonly string[] }) {
   return {
     days: value.days,
-    overrideDesignationIds: [...value.overrideDesignationIds],
+    overrideRoleIds: [...value.overrideRoleIds],
   };
 }
 

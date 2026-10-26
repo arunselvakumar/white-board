@@ -7,7 +7,6 @@ import { StatusCodes } from "http-status-codes";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { createCompanyHandlers } from "@/src/organization/infrastructure/create-company-handlers";
-import { createDesignationHandlers } from "@/src/organization/infrastructure/create-designation-handlers";
 import { createRoleHandlers } from "@/src/organization/infrastructure/create-role-handlers";
 import { createTeamMemberHandlers } from "@/src/organization/infrastructure/create-team-member-handlers";
 import { loadMemberAccess } from "@/src/shared-kernel/access/prisma-access-reader";
@@ -49,14 +48,11 @@ async function ownerCompany() {
     userMobile: null,
     userEmail: `${ownerId}@example.test`,
   });
-  const designations = await createDesignationHandlers().list(workspaceId);
-  const engineer = designations.find((item) => item.name === "Site Engineer");
   const roles = await createRoleHandlers().list(workspaceId);
   const engineerRole = roles.find((item) => item.name === "Site Engineer");
   return {
     workspaceId,
     ownerId,
-    engineerId: engineer?.id ?? "",
     engineerRoleId: engineerRole?.id ?? "",
   };
 }
@@ -108,8 +104,7 @@ describe("Join Requests (CM-109), SMS off (ADR CM-0009)", () => {
   });
 
   it("invite → the invitee sees it, accepts, and works in the Company", async () => {
-    const { workspaceId, ownerId, engineerId, engineerRoleId } =
-      await ownerCompany();
+    const { workspaceId, ownerId, engineerRoleId } = await ownerCompany();
     const email = newEmail();
     const invited = await members.invite({
       workspaceId,
@@ -117,7 +112,6 @@ describe("Join Requests (CM-109), SMS off (ADR CM-0009)", () => {
       memberType: "normal",
       details: {
         name: "Prabhu Saravanan",
-        designationId: engineerId,
         mobile: newMobile(),
         email,
       },
@@ -184,14 +178,13 @@ describe("Join Requests (CM-109), SMS off (ADR CM-0009)", () => {
   });
 
   it("sends nothing to a member with only a mobile", async () => {
-    const { workspaceId, ownerId, engineerId } = await ownerCompany();
+    const { workspaceId, ownerId } = await ownerCompany();
     const invited = await members.invite({
       workspaceId,
       by: ownerId,
       memberType: "normal",
       details: {
         name: "Prabhu",
-        designationId: engineerId,
         mobile: newMobile(),
       },
     });
@@ -203,14 +196,13 @@ describe("Join Requests (CM-109), SMS off (ADR CM-0009)", () => {
   });
 
   it("does not show or accept a request for someone else", async () => {
-    const { workspaceId, ownerId, engineerId } = await ownerCompany();
+    const { workspaceId, ownerId } = await ownerCompany();
     const invited = await members.invite({
       workspaceId,
       by: ownerId,
       memberType: "normal",
       details: {
         name: "Prabhu",
-        designationId: engineerId,
         email: newEmail(),
       },
     });
@@ -225,13 +217,13 @@ describe("Join Requests (CM-109), SMS off (ADR CM-0009)", () => {
   });
 
   it("a rejected request closes; a resent one can be accepted", async () => {
-    const { workspaceId, ownerId, engineerId } = await ownerCompany();
+    const { workspaceId, ownerId } = await ownerCompany();
     const email = newEmail();
     const invited = await members.invite({
       workspaceId,
       by: ownerId,
       memberType: "normal",
-      details: { name: "Prabhu", designationId: engineerId, email },
+      details: { name: "Prabhu", email },
     });
     const { cookie, userId } = await signInByEmail(email);
     const rejected = await reject(
@@ -261,13 +253,13 @@ describe("Join Requests (CM-109), SMS off (ADR CM-0009)", () => {
       workspaceId: first.workspaceId,
       by: first.ownerId,
       memberType: "normal",
-      details: { name: "Prabhu", designationId: first.engineerId, email },
+      details: { name: "Prabhu", email },
     });
     const b = await members.invite({
       workspaceId: second.workspaceId,
       by: second.ownerId,
       memberType: "hrms",
-      details: { name: "Prabhu", designationId: second.engineerId, email },
+      details: { name: "Prabhu", email },
     });
     const { cookie, userId } = await signInByEmail(email);
     for (const id of [a.id, b.id]) await acceptAs(cookie, id);
@@ -287,7 +279,7 @@ describe("Join Requests (CM-109), SMS on (ADR CM-0009)", () => {
   });
 
   it("texts the invitation, lists the mobile, and matches by mobile", async () => {
-    const { workspaceId, ownerId, engineerId } = await ownerCompany();
+    const { workspaceId, ownerId } = await ownerCompany();
     const mobile = newMobile();
     const email = newEmail();
     const invited = await members.invite({
@@ -296,7 +288,6 @@ describe("Join Requests (CM-109), SMS on (ADR CM-0009)", () => {
       memberType: "normal",
       details: {
         name: "Prabhu Saravanan",
-        designationId: engineerId,
         mobile,
         email,
       },

@@ -21,7 +21,7 @@ const resourceFields = {
     .string()
     .nullable()
     .describe(
-      "A second line: Designation (Team Members), Departments (Contractors), contact person (Suppliers) or mobile.",
+      "A second line: Role (Team Members), Departments (Contractors), contact person (Suppliers) or mobile.",
     ),
   isActive: z
     .boolean()

@@ -59,7 +59,6 @@ export const ConstructionHrmsLeaveBalanceRowResponseModel = z.object({
 export const ConstructionHrmsMemberLeaveBalancesResponseModel = z.object({
   memberId: z.uuid(),
   memberName: z.string(),
-  designationName: z.string().nullable(),
   leaveYear: z.string(),
   structureId: z.uuid().nullable(),
   rows: z.array(ConstructionHrmsLeaveBalanceRowResponseModel),
@@ -210,7 +209,6 @@ export function toMemberBalances(
   return {
     memberId: balances.memberId,
     memberName: balances.memberName,
-    designationName: balances.designationName,
     leaveYear: balances.leaveYear,
     structureId: balances.structureId,
     rows: balances.rows.map(toBalanceRow),

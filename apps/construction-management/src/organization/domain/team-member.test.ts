@@ -6,7 +6,6 @@ const NOW = new Date("2026-10-08T00:00:00Z");
 
 const details = teamMemberDetails({
   name: " Prabhu  Saravanan ",
-  designationId: "designation-1",
   mobile: "+917708165767",
   aadhaar: "2341 2341 2346",
   pan: "abcpe1234f",
@@ -35,23 +34,21 @@ describe("teamMemberDetails", () => {
   });
 
   it("needs a mobile or an email", () => {
-    expect(() => teamMemberDetails({ name: "A", designationId: "d" })).toThrow(
+    expect(() => teamMemberDetails({ name: "A" })).toThrow(
       expect.objectContaining({
         code: "MOBILE_OR_EMAIL_REQUIRED",
         message: "Enter an email to invite them, or at least a mobile number.",
       }) as Error,
     );
-    expect(
-      teamMemberDetails({ name: "A", designationId: "d", email: "a@b.in" })
-        .email,
-    ).toBe("a@b.in");
+    expect(teamMemberDetails({ name: "A", email: "a@b.in" }).email).toBe(
+      "a@b.in",
+    );
   });
 
   it("rejects a wrong Aadhaar or PAN", () => {
     expect(() =>
       teamMemberDetails({
         name: "A",
-        designationId: "d",
         mobile: "+917708165767",
         aadhaar: "234123412345",
       }),
@@ -59,7 +56,6 @@ describe("teamMemberDetails", () => {
     expect(() =>
       teamMemberDetails({
         name: "A",
-        designationId: "d",
         mobile: "+917708165767",
         pan: "ABCXE1234F",
       }),
@@ -225,37 +221,35 @@ describe("ownership and leaving (CM-907)", () => {
   it("makes a joined Normal member the Owner with every right", () => {
     const member = joined();
     member.assignToProjects(["project-1"], "owner", NOW);
-    member.becomeOwner("designation-owner", "owner", NOW);
+    member.becomeOwner("owner", NOW);
     expect(member).toMatchObject({
       isOwner: true,
       projectIds: [],
       roleId: null,
     });
-    expect(member.details.designationId).toBe("designation-owner");
   });
 
   it("refuses a member who has not joined, an HRMS member and the Owner", () => {
     expect(() => {
-      invite().becomeOwner(null, "owner", NOW);
+      invite().becomeOwner("owner", NOW);
     }).toThrow(
       expect.objectContaining({ code: "NEW_OWNER_NOT_ACTIVE" }) as Error,
     );
     expect(() => {
-      joined("hrms").becomeOwner(null, "owner", NOW);
+      joined("hrms").becomeOwner("owner", NOW);
     }).toThrow(expect.objectContaining({ code: "OWNER_IS_NORMAL" }) as Error);
     expect(() => {
-      owner().becomeOwner(null, "owner", NOW);
+      owner().becomeOwner("owner", NOW);
     }).toThrow(expect.objectContaining({ code: "ALREADY_OWNER" }) as Error);
   });
 
-  it("makes the old Owner a member on the given Role, keeping the Designation when none is given", () => {
+  it("makes the old Owner a member on the given Role", () => {
     const old = owner();
-    old.stepDownAsOwner(null, "role-admin", "owner", NOW);
+    old.stepDownAsOwner("role-admin", "owner", NOW);
     expect(old.isOwner).toBe(false);
-    expect(old.details.designationId).toBe("designation-1");
     expect(old.roleId).toBe("role-admin");
     expect(() => {
-      old.stepDownAsOwner(null, "role-admin", "owner", NOW);
+      old.stepDownAsOwner("role-admin", "owner", NOW);
     }).toThrow(expect.objectContaining({ code: "NOT_OWNER" }) as Error);
   });
 

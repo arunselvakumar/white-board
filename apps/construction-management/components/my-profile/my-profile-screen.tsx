@@ -13,10 +13,7 @@ import { MyProfileForm } from "./my-profile-form";
 export function MyProfileScreen() {
   const { data: profile } = useSuspenseQuery(myProfileQuery);
   const { company } = useActiveCompany();
-  const meta = [
-    profile.isOwner ? "Owner" : profile.designation.name,
-    company?.name,
-  ]
+  const meta = [profile.isOwner ? "Owner" : null, company?.name]
     .filter((part) => part != null && part !== "")
     .join(" · ");
 

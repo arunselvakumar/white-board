@@ -76,7 +76,6 @@ export type SkipReason =
 export type SkippedMember = {
   memberId: string;
   name: string;
-  designationName: string | null;
   reason: SkipReason;
   message: string;
 };
@@ -84,7 +83,6 @@ export type SkippedMember = {
 export type SalaryMember = {
   memberId: string;
   name: string;
-  designationName: string | null;
 };
 
 /** A slip as a screen sees it. */
@@ -182,10 +180,6 @@ function memberOf(
   return {
     memberId: slip.memberId,
     name: employee?.name ?? slip.details?.employee.name ?? "Removed member",
-    designationName:
-      employee?.designationName ??
-      slip.details?.employee.designationName ??
-      null,
   };
 }
 
@@ -338,7 +332,6 @@ export class SalaryRunHandlers {
       return {
         memberId: employee.memberId,
         name: employee.name,
-        designationName: employee.designationName,
         ...(reason ?? {
           reason: "not_calculated" as const,
           message: "Not calculated yet.",
@@ -426,7 +419,6 @@ export class SalaryRunHandlers {
       member: {
         memberId: me.memberId,
         name: me.name,
-        designationName: me.designationName,
       },
       records: slips.map((slip) => this.record(access, slip, me, me.memberId)),
     };
@@ -520,7 +512,6 @@ export class SalaryRunHandlers {
         skipped.push({
           memberId: employee.memberId,
           name: employee.name,
-          designationName: employee.designationName,
           ...reason,
         });
         continue;
@@ -618,7 +609,6 @@ export class SalaryRunHandlers {
         skipped.push({
           memberId,
           name: employee.name,
-          designationName: employee.designationName,
           reason: "calculation_failed",
           message: error.message,
         });
@@ -661,7 +651,6 @@ export class SalaryRunHandlers {
       pfWages: { wage: b.pf.wage, contributory: b.pf.contributoryWage },
       employee: {
         name: input.employee.name,
-        designationName: input.employee.designationName,
         uan: input.uan,
         esiIpNumber: input.esiIpNumber,
       },
@@ -1051,7 +1040,6 @@ export class SalaryRunHandlers {
       },
       member: {
         name: details?.employee.name ?? "Team Member",
-        designation: details?.employee.designationName ?? null,
         uan: details?.employee.uan ?? null,
         esiIpNumber: details?.employee.esiIpNumber ?? null,
       },

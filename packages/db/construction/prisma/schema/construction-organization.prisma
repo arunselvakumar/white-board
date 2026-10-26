@@ -1,5 +1,5 @@
 /// Construction Management — organization context (ADR CM-0001): the
-/// Company's profile and, later, Team Members, Designations, the Permission
+/// Company's profile and, later, Team Members, Roles, the Permission
 /// Matrix, settings and subscription. Lives in the app's own `construction`
 /// database. A Company is a Workspace in `identity`; rows hold its id as an
 /// opaque string and never join to `identity`.
@@ -77,26 +77,6 @@ model ConstructionOrganizationSubscription {
   @@schema("construction_organization")
 }
 
-/// A job title in a Company (CM-106). Since ADR CM-0030 it carries no
-/// access: that is the Team Member's Role. Each Company gets its own copy of
-/// the seed set. Names are unique among live rows (partial index,
-/// hand-written in the migration).
-model ConstructionOrganizationDesignation {
-  id                 String    @id @db.Uuid
-  workspaceId        String    @map("workspace_id")
-  name               String
-  isSeed             Boolean   @default(false) @map("is_seed")
-  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt          DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
-  createdBy          String    @map("created_by")
-  updatedBy          String    @map("updated_by")
-  deletedAt          DateTime? @map("deleted_at") @db.Timestamptz(3)
-
-  @@index([workspaceId])
-  @@map("designations")
-  @@schema("construction_organization")
-}
-
 /// A named Permission Matrix given to Team Members (ADR CM-0030). Editing
 /// it changes access for everyone on it. Names are unique among live rows
 /// (partial index, hand-written in the migration). Each Company gets its own
@@ -169,7 +149,6 @@ model ConstructionOrganizationTeamMember {
   workspaceId      String                                   @map("workspace_id")
   userId           String?                                  @map("user_id")
   name             String
-  designationId    String                                   @map("designation_id") @db.Uuid
   /// What they may do (ADR CM-0030). Null for the Owner, who can do
   /// everything; a Member without a Role can do nothing.
   roleId           String?                                  @map("role_id") @db.Uuid
@@ -222,7 +201,7 @@ model ConstructionOrganizationTeamMemberProject {
 }
 
 /// The Company's Back-dated Entry policy (CM-113, `modules/12`): default
-/// create and edit day limits with override Designations, the Financial
+/// create and edit day limits with override Roles (ADR CM-0033), the Financial
 /// Closing Date, and per-module settings. One row per Company, written on
 /// the first save; no row means no limits. Validated by `BackdatedPolicy` in
 /// the shared kernel.
@@ -231,12 +210,12 @@ model ConstructionOrganizationBackdatedEntryPolicy {
   workspaceId                  String    @unique @map("workspace_id")
   /// 0 = no restriction.
   createDays                   Int       @map("create_days")
-  createOverrideDesignationIds String[]  @map("create_override_designation_ids") @db.Uuid
+  createOverrideRoleIds        String[]  @map("create_override_role_ids") @db.Uuid
   editDays                     Int       @map("edit_days")
-  editOverrideDesignationIds   String[]  @map("edit_override_designation_ids") @db.Uuid
+  editOverrideRoleIds          String[]  @map("edit_override_role_ids") @db.Uuid
   /// Inclusive; a calendar date in the Company time zone.
   financialClosingDate         DateTime? @map("financial_closing_date") @db.Date
-  /// `{ "<module key>": { mode, create: { days, overrideDesignationIds }, edit } }`.
+  /// `{ "<module key>": { mode, create: { days, overrideRoleIds }, edit } }`.
   modules                      Json
   createdAt                    DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt                    DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)

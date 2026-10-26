@@ -35,7 +35,6 @@ async function hrmsMember(owner: Awaited<ReturnType<typeof ownerWithCompany>>) {
     memberType: "hrms",
     details: {
       name: "Chitra",
-      designationId: owner.designationId("Site Engineer"),
       email,
     },
     // Add User preselects HRMS Staff for an HRMS member (ADR CM-0030).
@@ -191,12 +190,11 @@ describe("HRMS Team Members (CM-318)", () => {
     const owner = await ownerWithCompany();
     await givePlan(owner.workspaceId);
     const members = createTeamMemberHandlers();
-    const designationId = owner.designationId("Site Engineer");
     const normal = await members.invite({
       workspaceId: owner.workspaceId,
       by: owner.userId,
       memberType: "normal",
-      details: { name: "Bala", designationId, mobile: "+919700000001" },
+      details: { name: "Bala", mobile: "+919700000001" },
     });
     // Basic has 10 HRMS seats.
     for (let index = 0; index < 10; index += 1)
@@ -206,7 +204,6 @@ describe("HRMS Team Members (CM-318)", () => {
         memberType: "hrms",
         details: {
           name: `Staff ${String(index)}`,
-          designationId,
           mobile: `+91970000${String(index + 10).padStart(4, "0")}`,
         },
       });
@@ -215,7 +212,7 @@ describe("HRMS Team Members (CM-318)", () => {
         workspaceId: owner.workspaceId,
         id: normal.id,
         by: owner.userId,
-        details: { name: "Bala", designationId, mobile: "+919700000001" },
+        details: { name: "Bala", mobile: "+919700000001" },
         memberType: "hrms",
       })
       .catch((caught: unknown) => caught);

@@ -1,13 +1,9 @@
 import { newId } from "@/src/shared-kernel/ids";
 
 import type { CompanyDetails } from "./company-details";
-import type { Designation } from "./designation";
 import type { CompanyCreated } from "./events";
 import type { Role } from "./role";
 import { TeamMember, teamMemberDetails } from "./team-member";
-
-/** The seed Designation the creator's own Team Member gets. */
-export const OWNER_DESIGNATION = "Owner";
 
 export type CompanyOwner = {
   userId: string;
@@ -28,7 +24,6 @@ export class NewCompany {
     readonly profileId: string,
     readonly details: CompanyDetails,
     readonly owner: CompanyOwner,
-    readonly designations: readonly Designation[],
     readonly roles: readonly Role[],
     readonly ownerMember: TeamMember,
     readonly createdAt: Date,
@@ -38,24 +33,16 @@ export class NewCompany {
     workspaceId: string;
     details: CompanyDetails;
     owner: CompanyOwner;
-    /** The Company's own copy of the seed Designations (CM-106). */
-    designations: readonly Designation[];
     /** The Company's own copy of the seed Roles (ADR CM-0030 §5). */
     roles: readonly Role[];
     now: Date;
   }): NewCompany {
-    const ownerDesignation =
-      input.designations.find((item) => item.name === OWNER_DESIGNATION) ??
-      input.designations[0];
-    if (ownerDesignation == null)
-      throw new Error("A new Company needs its seed Designations.");
     const ownerMember = TeamMember.owner({
       id: newId(input.now.getTime()),
       workspaceId: input.workspaceId,
       userId: input.owner.userId,
       details: teamMemberDetails({
         name: input.owner.name,
-        designationId: ownerDesignation.id,
         mobile: input.owner.mobile,
         email: input.owner.email,
       }),
@@ -66,7 +53,6 @@ export class NewCompany {
       newId(input.now.getTime()),
       input.details,
       input.owner,
-      input.designations,
       input.roles,
       ownerMember,
       input.now,

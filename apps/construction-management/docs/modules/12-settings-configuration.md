@@ -3,7 +3,7 @@
 Company-wide and per-project configuration that changes how other modules behave without changing their data:
 
 - **Manage Sequence IDs** — numbering rules for document numbers (PR, PO, GRN, Material Transfer, Petty Cash, Central Store MR, Delivery Note, Inspection Request, Other Party Sales Invoice).
-- **Back Dated Entry Control** — how far back users may create or edit entries, globally and per module, with designation overrides and a financial closing date.
+- **Back Dated Entry Control** — how far back users may create or edit entries, globally and per module, with override Roles (designations in BuildControl; ADR CM-0033) and a financial closing date.
 - **Currency settings** — company currency (INR default), number format, non-Indian company flag.
 - **Form configuration** — worksheet section toggles and ordering, worksheet approval setting, equipment usage field toggles, material received hide/show fields.
 - **Per-project Hide/Show Modules** and project tile ordering.
@@ -160,6 +160,8 @@ Rebuild (CM-114): parts are joined by the separator, empty parts skipped, in the
 
 ### BackdatedEntryGlobal
 
+_In the rebuild the override lists hold Role ids (`overrideRoleIds`), not designations (ADR CM-0033)._
+
 | Field                        | Legacy field                             | Type               | Required | Notes                            |
 | ---------------------------- | ---------------------------------------- | ------------------ | -------- | -------------------------------- |
 | Create days                  | `global.create.days`                     | int                | yes      | 0 = no restriction               |
@@ -307,11 +309,11 @@ stateDiagram-v2
     CheckClosing --> CheckDays: after closing date
     CheckDays --> Allowed: within N days or N = 0
     CheckDays --> CheckOverride: older than N days
-    CheckOverride --> Allowed: user designation in override list
+    CheckOverride --> Allowed: user's Role in override list
     CheckOverride --> Blocked: no override
 ```
 
-Override designations do **not** bypass the financial closing date; it blocks everyone, the Owner included (decided in CM-113). The Owner passes every day limit.
+Override Roles do **not** bypass the financial closing date; it blocks everyone, the Owner included (decided in CM-113). The Owner passes every day limit.
 
 ### 3. Change currency
 
@@ -343,7 +345,7 @@ Override designations do **not** bypass the financial closing date; it blocks ev
 - Start number ≥ 1; changing start number must not create duplicates (inferred).
 - Back-dated days: 0 = no restriction.
 - "No override" = hard block for all users including admins (as labelled).
-- Module override mode `global` inherits default; `custom` uses its own days and designations.
+- Module override mode `global` inherits default; `custom` uses its own days and override Roles.
 - Entry date checked is the module's `entry_date_field` (e.g. PurchaseRequestDate), not created_at.
 - Financial closing date blocks create/edit on or before it (inferred: inclusive).
 - Currency default INR, format `₹1,00,000.00`.
@@ -424,7 +426,7 @@ Company owner (`isCompanyOwner`) has all permissions (inferred).
 4. Are worksheet form settings per project or company-wide?
 5. Exact list of hideable Material Received fields.
 6. Does "Hide/Show Modules" apply to all users of the project or only the current user?
-7. ~~Can override designations bypass the financial closing date?~~ **Decided (CM-113):** no. The closing date blocks everyone, the Owner included; to post into a closed period the Owner moves the date, which is audited. Override designations and the Owner pass only the day limits.
+7. ~~Can override Roles (designations in BuildControl) bypass the financial closing date?~~ **Decided (CM-113):** no. The closing date blocks everyone, the Owner included; to post into a closed period the Owner moves the date, which is audited. Override designations and the Owner pass only the day limits.
 8. What does `MenuPermission/AssignMenu` do exactly — assign a menu set to a user, a designation, or a project?
 9. Do approval-capable modules have a per-module "approval required" switch besides Worksheet and Equipment Usage?
 10. Does changing currency affect existing documents/PDFs?

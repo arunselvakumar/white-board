@@ -39,18 +39,6 @@ export async function switchCompany(
   await api.post(`${ORGANIZATION}/companies/${companyId}/switch`);
 }
 
-export async function designationId(
-  api: ApiClient,
-  name = "Site Engineer",
-): Promise<string> {
-  const { items } = await api.get<{ items: { id: string; name: string }[] }>(
-    `${ORGANIZATION}/designations`,
-  );
-  const found = items.find((item) => item.name === name);
-  if (found == null) throw new Error(`No Designation ${name}`);
-  return found.id;
-}
-
 export async function roleId(api: ApiClient, name: string): Promise<string> {
   const { items } = await api.get<{ items: { id: string; name: string }[] }>(
     `${ORGANIZATION}/roles`,
@@ -105,7 +93,6 @@ export async function addMember(
       name,
       email,
       mobile: input.mobile ?? null,
-      designationId: await designationId(api),
       memberType: input.memberType ?? "normal",
       roleId: input.roleId,
       projectIds: input.projectIds ?? [],
@@ -135,7 +122,6 @@ export async function inviteMember(
     {
       name,
       email,
-      designationId: await designationId(api),
       memberType: "normal",
       roleId: input.roleId,
       invite: true,

@@ -802,14 +802,14 @@ describe("Leave requests HTTP (CM-312, CM-313)", () => {
         id: randomUUID(),
         workspaceId: owner.workspaceId,
         createDays: 0,
-        createOverrideDesignationIds: [],
+        createOverrideRoleIds: [],
         editDays: 0,
-        editOverrideDesignationIds: [],
+        editOverrideRoleIds: [],
         modules: {
           leave: {
             mode: "custom",
-            create: { days: 1, overrideDesignationIds: [] },
-            edit: { days: 0, overrideDesignationIds: [] },
+            create: { days: 1, overrideRoleIds: [] },
+            edit: { days: 0, overrideRoleIds: [] },
           },
         },
         createdBy: owner.userId,

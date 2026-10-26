@@ -14,10 +14,10 @@ import { DomainError } from "./domain-error";
  * - Days count calendar days in the Company time zone. An entry is
  *   "older than N days" when `today - entryDate > N`; N = 0 means no limit.
  *   Future dates are not this policy's concern.
- * - Override Designations may pass the day limit of the action they are
- *   listed on. The Owner passes every day limit.
+ * - Override Roles may pass the day limit of the action they are listed
+ *   on (ADR CM-0033). The Owner passes every day limit.
  * - The Financial Closing Date is inclusive and blocks everyone, override
- *   Designations and the Owner included. To post into a closed period the
+ *   Roles and the Owner included. To post into a closed period the
  *   Owner moves the date (an audited settings change).
  * - A module in `global` mode uses the default limits; in `custom` mode its
  *   own. The closing date always applies to every module.
@@ -252,8 +252,8 @@ export function backdatedModule(key: BackdatedModuleKey): BackdatedModule {
 export type BackdatedLimit = {
   /** 0 = no restriction. */
   days: number;
-  /** Designations allowed past `days`; empty = hard block for everyone but the Owner. */
-  overrideDesignationIds: readonly string[];
+  /** Roles allowed past `days`; empty = hard block for everyone but the Owner. */
+  overrideRoleIds: readonly string[];
 };
 
 export type BackdatedModuleSetting = {
@@ -275,7 +275,7 @@ export type BackdatedPolicy = {
 /** Upper bound on days, so a typo cannot store a 5-digit limit. */
 export const MAX_BACKDATED_DAYS = 3650;
 
-const NO_LIMIT: BackdatedLimit = { days: 0, overrideDesignationIds: [] };
+const NO_LIMIT: BackdatedLimit = { days: 0, overrideRoleIds: [] };
 
 /** A new Company: no limits, no closing date. */
 export const DEFAULT_BACKDATED_POLICY: BackdatedPolicy = {
@@ -292,7 +292,7 @@ export const DEFAULT_BACKDATED_POLICY: BackdatedPolicy = {
 
 export type BackdatedLimitInput = {
   days: number;
-  overrideDesignationIds?: readonly string[];
+  overrideRoleIds?: readonly string[];
 };
 
 export type BackdatedPolicyInput = {
@@ -321,7 +321,7 @@ function limitOf(input: BackdatedLimitInput | undefined): BackdatedLimit {
     );
   return {
     days: input.days,
-    overrideDesignationIds: [...new Set(input.overrideDesignationIds ?? [])],
+    overrideRoleIds: [...new Set(input.overrideRoleIds ?? [])],
   };
 }
 
@@ -355,16 +355,16 @@ export function createBackdatedPolicy(
   };
 }
 
-/** Every Designation id the policy names, for checking they exist. */
-export function referencedDesignationIds(policy: BackdatedPolicy): string[] {
+/** Every Role id the policy names, for checking they exist. */
+export function referencedRoleIds(policy: BackdatedPolicy): string[] {
   const ids = new Set<string>([
-    ...policy.create.overrideDesignationIds,
-    ...policy.edit.overrideDesignationIds,
+    ...policy.create.overrideRoleIds,
+    ...policy.edit.overrideRoleIds,
   ]);
   for (const setting of Object.values(policy.modules)) {
     if (setting.mode !== "custom") continue;
-    for (const id of setting.create.overrideDesignationIds) ids.add(id);
-    for (const id of setting.edit.overrideDesignationIds) ids.add(id);
+    for (const id of setting.create.overrideRoleIds) ids.add(id);
+    for (const id of setting.edit.overrideRoleIds) ids.add(id);
   }
   return [...ids];
 }
@@ -380,18 +380,15 @@ export function effectiveLimits(
     : { create: policy.create, edit: policy.edit };
 }
 
-/** Who is entering: the Team Member's Designation, and whether they are the Owner. */
+/** Who is entering: the Team Member's Role, and whether they are the Owner. */
 export type BackdatedActor = {
-  designationId: string | null;
+  roleId: string | null;
   isOwner: boolean;
 };
 
 function limitFor(limit: BackdatedLimit, actor: BackdatedActor): number {
   if (actor.isOwner) return 0;
-  if (
-    actor.designationId != null &&
-    limit.overrideDesignationIds.includes(actor.designationId)
-  )
+  if (actor.roleId != null && limit.overrideRoleIds.includes(actor.roleId))
     return 0;
   return limit.days;
 }

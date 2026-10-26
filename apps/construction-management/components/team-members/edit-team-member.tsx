@@ -32,7 +32,6 @@ import { STAFF_PATH } from "@/lib/staff-roles-nav";
 import { ROLES_KEY, rolesQuery } from "@/src/queries/roles";
 import {
   TEAM_MEMBERS_KEY,
-  designationOptionsQuery,
   resendTeamMemberInvite,
   setTeamMemberRole,
   teamMemberQuery,
@@ -59,7 +58,6 @@ function valuesOf(member: TeamMember): TeamMemberDetailsValues {
   return {
     memberType: member.memberType,
     name: member.name,
-    designationId: member.designation.id,
     mobile: member.mobile?.replace(/^\+91/, "") ?? "",
     email: member.email ?? "",
     address: member.address ?? "",
@@ -97,10 +95,9 @@ export function EditTeamMember({
   /** Financial on Staff (ADR CM-0032). */
   canSeeSalary: boolean;
 }) {
-  const [{ data: member }, { data: designations }, { data: roles }] =
-    useSuspenseQueries({
-      queries: [teamMemberQuery(id), designationOptionsQuery, rolesQuery],
-    });
+  const [{ data: member }, { data: roles }] = useSuspenseQueries({
+    queries: [teamMemberQuery(id), rolesQuery],
+  });
   const { company } = useActiveCompany();
   const queryClient = useQueryClient();
   const saved = async (updated: TeamMember) => {
@@ -158,12 +155,7 @@ export function EditTeamMember({
           title={member.name}
           meta={
             <span className="inline-flex flex-wrap items-center gap-2">
-              {[
-                member.designation.name,
-                member.role == null ? null : `Role: ${member.role.name}`,
-              ]
-                .filter(Boolean)
-                .join(" · ")}
+              {member.role == null ? null : `Role: ${member.role.name}`}
               <MemberStatusBadge status={member.status} />
             </span>
           }
@@ -264,7 +256,6 @@ export function EditTeamMember({
             >
               <TeamMemberDetailsFields
                 form={form}
-                designations={designations}
                 masked={{
                   aadhaar: member.aadhaarMasked,
                   pan: member.panMasked,

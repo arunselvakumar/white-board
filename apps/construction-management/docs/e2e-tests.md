@@ -27,22 +27,21 @@ bun run --cwd apps/construction-management test:e2e         # every test
 | should show only the chosen Company's Projects, when a User of two Companies picks one and then switches     | **@pr**         | `choose-company.spec.ts`  |
 | should show the impersonation banner on every page and end on Stop, when support staff sign in as a customer | **@pr**         | `sign-in-as.spec.ts`      |
 
-## Staff, Roles and Designations
+## Staff and Roles
 
-| Test                                                                                                                                       | Tags    | Spec                   |
-| ------------------------------------------------------------------------------------------------------------------------------------------ | ------- | ---------------------- |
-| should show the invitee as Active, when the Owner invites by email and they join from the emailed link                                     | **@pr** | `staff.spec.ts`        |
-| should add an Active staff member with their salary on the chosen Project and Role, when the Owner adds staff with a mobile and a password |         | `staff.spec.ts`        |
-| should list the invitee under Joining Pending with a shareable link, when the invitation is not accepted yet                               |         | `staff.spec.ts`        |
-| should show the invitation as Declined, when the invitee declines it                                                                       |         | `staff.spec.ts`        |
-| should take away the Company's Projects, when the Owner deletes a member                                                                   |         | `staff.spec.ts`        |
-| should find a staff member by name, when the Owner searches Staff                                                                          |         | `staff.spec.ts`        |
-| should make the member choose a new password, when the Owner sets one for them                                                             |         | `staff.spec.ts`        |
-| should show a view-only member just their Project, without Add buttons or admin menus, when their Role only grants Project View            | **@pr** | `roles.spec.ts`        |
-| should give a member new menus, when the Owner adds a grant to their Role                                                                  | **@pr** | `roles.spec.ts`        |
-| should add a Role with the ticked permissions, when the Owner duplicates a seed Role and edits the copy                                    |         | `roles.spec.ts`        |
-| should remove an unused custom Role, when the Owner deletes it                                                                             |         | `roles.spec.ts`        |
-| should offer the new Designation when adding staff, when the Owner adds one                                                                |         | `designations.spec.ts` |
+| Test                                                                                                                                       | Tags    | Spec            |
+| ------------------------------------------------------------------------------------------------------------------------------------------ | ------- | --------------- |
+| should show the invitee as Active, when the Owner invites by email and they join from the emailed link                                     | **@pr** | `staff.spec.ts` |
+| should add an Active staff member with their salary on the chosen Project and Role, when the Owner adds staff with a mobile and a password |         | `staff.spec.ts` |
+| should list the invitee under Joining Pending with a shareable link, when the invitation is not accepted yet                               |         | `staff.spec.ts` |
+| should show the invitation as Declined, when the invitee declines it                                                                       |         | `staff.spec.ts` |
+| should take away the Company's Projects, when the Owner deletes a member                                                                   |         | `staff.spec.ts` |
+| should find a staff member by name, when the Owner searches Staff                                                                          |         | `staff.spec.ts` |
+| should make the member choose a new password, when the Owner sets one for them                                                             |         | `staff.spec.ts` |
+| should show a view-only member just their Project, without Add buttons or admin menus, when their Role only grants Project View            | **@pr** | `roles.spec.ts` |
+| should give a member new menus, when the Owner adds a grant to their Role                                                                  | **@pr** | `roles.spec.ts` |
+| should add a Role with the ticked permissions, when the Owner duplicates a seed Role and edits the copy                                    |         | `roles.spec.ts` |
+| should remove an unused custom Role, when the Owner deletes it                                                                             |         | `roles.spec.ts` |
 
 ## Company, Settings, subscription and profile
 

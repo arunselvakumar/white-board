@@ -3,7 +3,6 @@ import type {
   DomainEventListener,
 } from "@/src/shared-kernel/events";
 
-import type { DesignationRepository } from "../domain/designation-repository";
 import type { TeamMemberRepository } from "../domain/team-member-repository";
 import type { CompanyProfileReader } from "./company-profile-reader";
 import type { TeamMemberInvited } from "./team-member-handlers";
@@ -11,7 +10,6 @@ import type { TeamMemberInvited } from "./team-member-handlers";
 export type InvitationMessage = {
   companyName: string;
   memberName: string;
-  designationName: string | null;
   link: string;
 };
 
@@ -36,7 +34,6 @@ function isInvited(event: DomainEvent): event is TeamMemberInvited {
 export class InvitationNotifier implements DomainEventListener {
   constructor(
     private readonly members: TeamMemberRepository,
-    private readonly designations: DesignationRepository,
     private readonly profiles: CompanyProfileReader,
     private readonly channels: InvitationChannels,
     private readonly origin: () => string,
@@ -52,17 +49,10 @@ export class InvitationNotifier implements DomainEventListener {
     );
     if (member?.status !== "joining_pending" || member.inviteToken == null)
       return;
-    const [profile, designation] = await Promise.all([
-      this.profiles.findByWorkspace(member.workspaceId),
-      this.designations.findById(
-        member.workspaceId,
-        member.details.designationId,
-      ),
-    ]);
+    const profile = await this.profiles.findByWorkspace(member.workspaceId);
     const message: InvitationMessage = {
       companyName: profile?.name ?? "your Company",
       memberName: member.details.name,
-      designationName: designation?.name ?? null,
       link: `${this.origin()}/join/${member.inviteToken}`,
     };
     const sends: Promise<void>[] = [];

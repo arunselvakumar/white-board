@@ -1,12 +1,12 @@
 import {
   createBackdatedPolicy,
-  referencedDesignationIds,
+  referencedRoleIds,
   type BackdatedPolicy,
   type BackdatedPolicyInput,
 } from "@/src/shared-kernel/backdated-policy";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
-import type { DesignationRepository } from "../domain/designation-repository";
+import type { RoleRepository } from "../domain/role-repository";
 
 export type StoredBackdatedPolicy = {
   policy: BackdatedPolicy;
@@ -35,7 +35,7 @@ export type BackdatedPolicyStore = {
 export class BackdatedPolicyHandlers {
   constructor(
     private readonly store: BackdatedPolicyStore,
-    private readonly designations: DesignationRepository,
+    private readonly roles: RoleRepository,
     private readonly clock: () => Date = () => new Date(),
   ) {}
 
@@ -51,19 +51,17 @@ export class BackdatedPolicyHandlers {
     by: string;
   }): Promise<StoredBackdatedPolicy> {
     const policy = createBackdatedPolicy(input.policy);
-    const named = referencedDesignationIds(policy);
+    const named = referencedRoleIds(policy);
     if (named.length > 0) {
       const live = new Set(
-        (await this.designations.listAll(input.workspaceId)).map(
-          (designation) => designation.id,
-        ),
+        (await this.roles.listAll(input.workspaceId)).map((role) => role.id),
       );
       const missing = named.filter((id) => !live.has(id));
       if (missing.length > 0)
         throw new DomainError(
-          "DESIGNATION_NOT_FOUND",
-          "Some override Designations no longer exist. Choose them again.",
-          { details: { designationIds: missing } },
+          "ROLE_NOT_FOUND",
+          "Some override Roles no longer exist. Choose them again.",
+          { details: { roleIds: missing } },
         );
     }
     const now = this.clock();

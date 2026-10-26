@@ -40,8 +40,6 @@ function employee(overrides: Partial<HrmsEmployee>): HrmsEmployee {
     userId: "u1",
     name: "Prabhu",
     memberType: "normal",
-    designationId: "d1",
-    designationName: "Site Engineer",
     projectIds: [],
     active: true,
     isOwner: false,

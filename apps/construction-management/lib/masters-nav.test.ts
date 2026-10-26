@@ -17,19 +17,19 @@ describe("MASTERS_GROUPS", () => {
   });
 
   it("finds the section a page belongs to", () => {
-    expect(activeMastersSection("/app/masters/designations")?.label).toBe(
-      "Designations",
+    expect(activeMastersSection("/app/masters/contractors")?.label).toBe(
+      "Contractors",
     );
-    expect(activeMastersSection("/app/masters/designations/d1")?.label).toBe(
-      "Designations",
+    expect(activeMastersSection("/app/masters/contractors/c1")?.label).toBe(
+      "Contractors",
     );
     expect(activeMastersSection("/app/settings")).toBeUndefined();
-    // Team Members moved to Staff & Roles → Staff (ADR CM-0030).
+    // Team Members moved to Staff & Roles → Staff (ADR CM-0030), and
+    // Designations are gone (ADR CM-0033).
     expect(activeMastersSection("/app/masters/team-members")).toBeUndefined();
-    expect(MASTERS_GROUPS[0]?.sections.map((section) => section.label)).toEqual(
-      ["Designations"],
-    );
+    expect(activeMastersSection("/app/masters/designations")).toBeUndefined();
+    expect(MASTERS_GROUPS[0]?.label).toBe("Parties");
     expect(activeMastersSection("/app/masters")).toBeUndefined();
-    expect(activeMastersSection("/app/masters/designationsx")).toBeUndefined();
+    expect(activeMastersSection("/app/masters/contractorsx")).toBeUndefined();
   });
 });

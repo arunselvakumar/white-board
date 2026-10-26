@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 
-import type { DesignationRepository } from "../domain/designation-repository";
 import { TeamMember, teamMemberDetails } from "../domain/team-member";
 import type { TeamMemberRepository } from "../domain/team-member-repository";
 import type { CompanyProfileReader } from "./company-profile-reader";
@@ -18,7 +17,6 @@ function setup(contact: { mobile?: string; email?: string }) {
     workspaceId: "company-a",
     details: teamMemberDetails({
       name: "Prabhu Saravanan",
-      designationId: "designation-1",
       ...contact,
     }),
     memberType: "normal",
@@ -32,9 +30,6 @@ function setup(contact: { mobile?: string; email?: string }) {
         workspaceId === member.workspaceId && id === member.id ? member : null,
       ),
   } as Partial<TeamMemberRepository> as TeamMemberRepository;
-  const designations = {
-    findById: () => Promise.resolve(null),
-  } as Partial<DesignationRepository> as DesignationRepository;
   const profiles: CompanyProfileReader = {
     findByWorkspace: () => Promise.resolve(null),
   };
@@ -58,7 +53,6 @@ function setup(contact: { mobile?: string; email?: string }) {
   const notify = (smsEnabled?: () => boolean) =>
     new InvitationNotifier(
       members,
-      designations,
       profiles,
       channels,
       () => "https://cm.example.test",

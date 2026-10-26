@@ -162,7 +162,7 @@ export const accountOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: `${OWNERSHIP_PATH}/transfer`,
     summary:
-      "Transfer ownership with a `transfer_ownership` code (Owner only): the Team Member becomes `owner` with the Owner Designation; the caller becomes a `member` with the Admin Designation and its matrix. 409 `NEW_OWNER_NOT_ACTIVE` / `OWNER_IS_NORMAL`; 409 `COMPANY_DELETION_SCHEDULED` during a deletion's cooling-off",
+      "Transfer ownership with a `transfer_ownership` code (Owner only): the Team Member becomes `owner`; the caller becomes a `member` on the Admin Role. 409 `NEW_OWNER_NOT_ACTIVE` / `OWNER_IS_NORMAL`; 409 `COMPANY_DELETION_SCHEDULED` during a deletion's cooling-off",
     tags: ACCOUNT,
     body: TransferConstructionOrganizationOwnershipRequestModel,
     successStatus: StatusCodes.OK,

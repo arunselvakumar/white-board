@@ -7,7 +7,6 @@ import { CONSTRUCTION } from "./product";
 export type TeamInvitationEmailProps = {
   companyName: string;
   memberName: string;
-  designationName: string | null;
   joinUrl: string;
 };
 
@@ -15,7 +14,6 @@ export type TeamInvitationEmailProps = {
 export function TeamInvitationEmail({
   companyName,
   memberName,
-  designationName,
   joinUrl,
 }: TeamInvitationEmailProps) {
   return (
@@ -27,9 +25,8 @@ export function TeamInvitationEmail({
         Join {companyName}
       </Heading>
       <Text style={styles.text}>
-        {memberName}, {companyName} has added you to their team
-        {designationName == null ? "" : ` as ${designationName}`} on
-        Construction Management.
+        {memberName}, {companyName} has added you to their team on Construction
+        Management.
       </Text>
       <Button href={joinUrl} style={styles.button}>
         Accept the invitation
@@ -45,7 +42,6 @@ export function TeamInvitationEmail({
 TeamInvitationEmail.PreviewProps = {
   companyName: "Patil Builders",
   memberName: "Suresh Kale",
-  designationName: "Site Engineer",
   joinUrl: "https://app.example.com/join/Zt0kenZt0kenZt0kenZt0ken",
 } satisfies TeamInvitationEmailProps;
 

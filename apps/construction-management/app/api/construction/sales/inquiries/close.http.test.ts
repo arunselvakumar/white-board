@@ -287,14 +287,14 @@ describe("Close as Converted (CM-1007)", () => {
         id: newId(),
         workspaceId: ctx.ws,
         createDays: 0,
-        createOverrideDesignationIds: [],
+        createOverrideRoleIds: [],
         editDays: 0,
-        editOverrideDesignationIds: [],
+        editOverrideRoleIds: [],
         modules: {
           booking: {
             mode: "custom",
-            create: { days: 2, overrideDesignationIds: [] },
-            edit: { days: 2, overrideDesignationIds: [] },
+            create: { days: 2, overrideRoleIds: [] },
+            edit: { days: 2, overrideRoleIds: [] },
           },
         },
         createdBy: ctx.by,

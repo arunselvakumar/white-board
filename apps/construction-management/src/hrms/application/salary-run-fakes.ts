@@ -507,8 +507,6 @@ export function employee(
     userId: `user-${memberId}`,
     name: `Member ${memberId}`,
     memberType: "hrms",
-    designationId: "d-1",
-    designationName: "Site Engineer",
     projectIds: [],
     active: true,
     isOwner: false,

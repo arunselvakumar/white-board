@@ -121,7 +121,6 @@ async function company(name?: string) {
     memberType: "normal",
     details: {
       name: "Bala Normal",
-      designationId: owner.designationId("Site Engineer"),
       mobile: `+9196${String(Math.floor(Math.random() * 1e8)).padStart(8, "0")}`,
     },
   });
@@ -131,7 +130,6 @@ async function company(name?: string) {
     memberType: "hrms",
     details: {
       name: "Chitra Hrms",
-      designationId: owner.designationId("Site Engineer"),
       mobile: `+9195${String(Math.floor(Math.random() * 1e8)).padStart(8, "0")}`,
     },
   });

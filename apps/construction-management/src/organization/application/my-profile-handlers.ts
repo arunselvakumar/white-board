@@ -3,7 +3,6 @@ import { notFound } from "@/src/shared-kernel/domain-error";
 import type { StoredObject } from "@/src/shared-kernel/files";
 import { maskIdentifier } from "@/src/shared-kernel/tax-ids";
 
-import type { DesignationRepository } from "../domain/designation-repository";
 import { teamMemberDetails, type TeamMember } from "../domain/team-member";
 import type { TeamMemberRepository } from "../domain/team-member-repository";
 import { photoNotFound, type CompanyImages } from "./company-images";
@@ -20,8 +19,7 @@ export type MyProfile = TeamMemberReadModel & {
 };
 
 /**
- * What a member may change about themself. Designation is the Owner's call,
- * so it is not here. Mobile is applied only while SMS is off (ADR CM-0009);
+ * What a member may change about themself. Mobile is applied only while SMS is off (ADR CM-0009);
  * while it is on the mobile is their sign-in and is ignored. An omitted
  * field stays as it is; null clears it.
  */
@@ -61,7 +59,6 @@ function audited(member: TeamMember) {
 export class MyProfileHandlers {
   constructor(
     private readonly members: TeamMemberRepository,
-    private readonly designations: DesignationRepository,
     private readonly photos: MemberPhotoStore,
     private readonly images: CompanyImages,
     private readonly clock: () => Date = () => new Date(),
@@ -80,17 +77,10 @@ export class MyProfileHandlers {
   }
 
   private async view(member: TeamMember): Promise<MyProfile> {
-    const [designations, photoKey] = await Promise.all([
-      this.designations.listAll(member.workspaceId),
-      this.photos.photoKey(member.workspaceId, member.id),
-    ]);
-    const designationNames = new Map(
-      designations.map((item) => [item.id, item.name]),
-    );
+    const photoKey = await this.photos.photoKey(member.workspaceId, member.id);
     // My Profile shows neither the Role nor the password controls.
     return {
       ...toTeamMemberReadModel(member, {
-        designationNames,
         roles: new Map(),
         usersInOtherCompanies: new Set(),
       }),
@@ -125,7 +115,6 @@ export class MyProfileHandlers {
     const mobileIsSignIn = this.mobileSignIn();
     const details = teamMemberDetails({
       name: changes.name,
-      designationId: current.designationId,
       mobile:
         mobileIsSignIn || changes.mobile === undefined
           ? current.mobile

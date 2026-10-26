@@ -33,7 +33,6 @@ export const ConstructionHrmsSalarySlipModel = z.object({
   id: z.uuid(),
   memberId: z.uuid(),
   memberName: z.string(),
-  designationName: z.string().nullable(),
   month,
   kind: z.enum(SALARY_SLIP_KINDS),
   status: z.enum(SALARY_SLIP_STATUSES),
@@ -152,7 +151,6 @@ export type ConstructionHrmsSalarySlipModel = z.infer<
 const SkippedModel = z.object({
   memberId: z.uuid(),
   name: z.string(),
-  designationName: z.string().nullable(),
   reason: z.enum([
     "not_joined",
     "not_configured",
@@ -208,7 +206,6 @@ export const ListConstructionHrmsMySalariesResponseModel = z.object({
     .object({
       memberId: z.uuid(),
       name: z.string(),
-      designationName: z.string().nullable(),
     })
     .nullable(),
   items: z.array(ConstructionHrmsSalarySlipModel),
@@ -339,7 +336,6 @@ export function toSalarySlipModel(
     id: slip.id,
     memberId: slip.memberId,
     memberName: member.name,
-    designationName: member.designationName,
     month: slip.month,
     kind: slip.kind,
     status: slip.status,

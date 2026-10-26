@@ -59,7 +59,6 @@ export type LeaveBalanceRow = LeaveBalance & {
 export type MemberLeaveBalances = {
   memberId: string;
   memberName: string;
-  designationName: string | null;
   leaveYear: string;
   structureId: string | null;
   rows: LeaveBalanceRow[];
@@ -202,7 +201,6 @@ export class LeaveBalanceHandlers {
       return {
         memberId: member.memberId,
         memberName: member.name,
-        designationName: member.designationName,
         leaveYear: year.key,
         structureId: plan?.structureId ?? null,
         rows,

@@ -43,7 +43,6 @@ async function memberOfTwoCompanies() {
       workspaceId: second.workspaceId,
       userId: member.userId,
       name: "Member in Velan",
-      designationId: second.designationId("Site Engineer"),
       email: member.email,
       memberType: "normal",
       status: "active",

@@ -43,12 +43,6 @@ type Column = {
 const COLUMNS: Column[] = [
   { header: "Member", width: 24, kind: "text", value: (r) => r.member.name },
   {
-    header: "Designation",
-    width: 18,
-    kind: "text",
-    value: (r) => r.member.designationName,
-  },
-  {
     header: "Status",
     width: 11,
     kind: "text",
@@ -341,12 +335,12 @@ export async function teamSalaryWorkbook(input: {
     advanceSheet.addRow(["No advances paid this month."]);
 
   const skippedSheet = workbook.addWorksheet("Not calculated");
-  header(skippedSheet, ["Member", "Designation", "Why"]);
-  [24, 18, 44].forEach((width, index) => {
+  header(skippedSheet, ["Member", "Why"]);
+  [24, 44].forEach((width, index) => {
     skippedSheet.getColumn(index + 1).width = width;
   });
   for (const item of input.skipped)
-    skippedSheet.addRow([item.name, item.designationName, item.message]);
+    skippedSheet.addRow([item.name, item.message]);
   if (input.skipped.length === 0)
     skippedSheet.addRow(["Every member has a salary this month."]);
 

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueryClient } from "@/components/designations/designation-story-support";
+import { StoryQueryClient } from "@/components/masters/masters-story-support";
 
 import { mockFetch } from "../../../.storybook/mock-fetch";
 import { ProjectResourcesPage } from "./project-resources-page";

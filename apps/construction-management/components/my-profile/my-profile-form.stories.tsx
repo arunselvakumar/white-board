@@ -21,10 +21,6 @@ function myProfile(overrides: Partial<MyProfileModel> = {}): MyProfileModel {
   return {
     id: "0199c3a0-0000-7000-8000-000000000002",
     name: "Prabhu Saravanan",
-    designation: {
-      id: "0199c3a0-0000-7000-8000-000000000003",
-      name: "Site Engineer",
-    },
     mobile: "+919812345678",
     mobileEditable: false,
     email: null,
@@ -105,9 +101,7 @@ export const EditAndSave: Story = {
     return server(myProfile()).restore;
   },
   play: async ({ canvas, userEvent }) => {
-    await expect(
-      await canvas.findByText("Site Engineer · Anugraha Engineers"),
-    ).toBeVisible();
+    await expect(await canvas.findByText("Anugraha Engineers")).toBeVisible();
     const mobile = canvas.getByLabelText("Mobile");
     await expect(mobile).toHaveValue("+91 98123 45678");
     await expect(mobile).toBeDisabled();
@@ -334,10 +328,6 @@ export const NoIdentityNumbersYet: Story = {
       myProfile({
         name: "Arun Selva Kumar",
         isOwner: true,
-        designation: {
-          id: "0199c3a0-0000-7000-8000-000000000004",
-          name: "Owner",
-        },
         aadhaarMasked: null,
         panMasked: null,
       }),

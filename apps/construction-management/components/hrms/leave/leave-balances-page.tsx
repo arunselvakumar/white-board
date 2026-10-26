@@ -207,11 +207,6 @@ function TeamBalances({ canManage }: { canManage: boolean }) {
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="truncate font-medium">{member.memberName}</p>
-                    {member.designationName != null ? (
-                      <p className="text-muted-foreground truncate text-xs">
-                        {member.designationName}
-                      </p>
-                    ) : null}
                   </div>
                   <div className="flex shrink-0 gap-1">
                     <Button
@@ -310,7 +305,7 @@ function BalanceDialogs({
   year: string;
   initialising: boolean;
   adjusting: string | null;
-  members: { memberId: string; name: string; designationName: string | null }[];
+  members: { memberId: string; name: string }[];
   onCloseInitialise: () => void;
   onCloseAdjust: () => void;
   onDone: (message: string) => void;

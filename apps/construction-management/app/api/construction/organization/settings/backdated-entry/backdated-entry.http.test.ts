@@ -51,14 +51,14 @@ async function json<T>(response: Response): Promise<T> {
 }
 
 type PolicyBody = {
-  create: { days: number; overrideDesignationIds: string[] };
-  edit: { days: number; overrideDesignationIds: string[] };
+  create: { days: number; overrideRoleIds: string[] };
+  edit: { days: number; overrideRoleIds: string[] };
   financialClosingDate: string | null;
   modules: {
     key: string;
     group: string;
     mode: string;
-    create: { days: number; overrideDesignationIds: string[] };
+    create: { days: number; overrideRoleIds: string[] };
   }[];
   updatedAt: string | null;
 };
@@ -76,12 +76,11 @@ async function newCompany() {
     userMobile: null,
     userEmail: `${userId}@example.test`,
   });
-  const designations =
-    await prisma.constructionOrganizationDesignation.findMany({
-      where: { workspaceId: created.workspaceId },
-    });
+  const roles = await prisma.constructionOrganizationRole.findMany({
+    where: { workspaceId: created.workspaceId },
+  });
   const idOf = (name: string) =>
-    designations.find((item) => item.name === name)?.id ?? "";
+    roles.find((item) => item.name === name)?.id ?? "";
   return {
     workspaceId: created.workspaceId,
     ownerId: userId,
@@ -90,24 +89,28 @@ async function newCompany() {
   };
 }
 
-/** An active Member holding `flags` on Settings, through their Role. */
+/**
+ * An active Member holding `flags` on Settings, through their Role, or on
+ * the given Role.
+ */
 async function newMember(
   workspaceId: string,
-  designationId: string,
   flags: Flag[],
+  onRole?: string,
 ): Promise<string> {
   const userId = randomUUID();
   const memberId = randomUUID();
-  const roleId = await roleWith(workspaceId, "test", {
-    "organization.settings": flags,
-  });
+  const roleId =
+    onRole ??
+    (await roleWith(workspaceId, "test", {
+      "organization.settings": flags,
+    }));
   await prisma.constructionOrganizationTeamMember.create({
     data: {
       id: memberId,
       workspaceId,
       userId,
       name: "Ravi",
-      designationId,
       roleId,
       mobile: `+9198${String(Math.floor(Math.random() * 1e8)).padStart(8, "0")}`,
       status: "active",
@@ -136,8 +139,8 @@ describe("Back-dated Entry policy HTTP (CM-113)", () => {
     const response = await getPolicy(getRequest());
     expect(response.status).toBe(StatusCodes.OK);
     const body = await json<PolicyBody>(response);
-    expect(body.create).toEqual({ days: 0, overrideDesignationIds: [] });
-    expect(body.edit).toEqual({ days: 0, overrideDesignationIds: [] });
+    expect(body.create).toEqual({ days: 0, overrideRoleIds: [] });
+    expect(body.edit).toEqual({ days: 0, overrideRoleIds: [] });
     expect(body.financialClosingDate).toBeNull();
     expect(body.updatedAt).toBeNull();
     expect(body.modules).toHaveLength(31);
@@ -153,15 +156,15 @@ describe("Back-dated Entry policy HTTP (CM-113)", () => {
     session({ userId: company.ownerId, workspaceId: company.workspaceId });
     const response = await updatePolicy(
       updateRequest({
-        create: { days: 3, overrideDesignationIds: [company.accountantId] },
-        edit: { days: 1, overrideDesignationIds: [] },
+        create: { days: 3, overrideRoleIds: [company.accountantId] },
+        edit: { days: 1, overrideRoleIds: [] },
         financialClosingDate: "2026-03-31",
         modules: [
           {
             key: "labour_attendance",
             mode: "custom",
-            create: { days: 1, overrideDesignationIds: [company.engineerId] },
-            edit: { days: 0, overrideDesignationIds: [] },
+            create: { days: 1, overrideRoleIds: [company.engineerId] },
+            edit: { days: 0, overrideRoleIds: [] },
           },
         ],
         expectedUpdatedAt: null,
@@ -178,15 +181,15 @@ describe("Back-dated Entry policy HTTP (CM-113)", () => {
     const read = await json<PolicyBody>(await getPolicy(getRequest()));
     expect(read.create).toEqual({
       days: 3,
-      overrideDesignationIds: [company.accountantId],
+      overrideRoleIds: [company.accountantId],
     });
     expect(read.updatedAt).toBe(saved.updatedAt);
 
     // A save based on a stale read is refused instead of overwriting.
     const stale = await updatePolicy(
       updateRequest({
-        create: { days: 0, overrideDesignationIds: [] },
-        edit: { days: 0, overrideDesignationIds: [] },
+        create: { days: 0, overrideRoleIds: [] },
+        edit: { days: 0, overrideRoleIds: [] },
         financialClosingDate: null,
         expectedUpdatedAt: null,
       }),
@@ -213,8 +216,8 @@ describe("Back-dated Entry policy HTTP (CM-113)", () => {
     const policy = await loadBackdatedPolicy(prisma, company.workspaceId);
     const memberUserId = await newMember(
       company.workspaceId,
-      company.engineerId,
       [],
+      company.engineerId,
     );
     const actor = await loadBackdatedActor(prisma, {
       workspaceId: company.workspaceId,
@@ -222,7 +225,7 @@ describe("Back-dated Entry policy HTTP (CM-113)", () => {
       role: "member",
     });
     expect(actor).toEqual({
-      designationId: company.engineerId,
+      roleId: company.engineerId,
       isOwner: false,
     });
     expect(() => {
@@ -245,14 +248,14 @@ describe("Back-dated Entry policy HTTP (CM-113)", () => {
     }).not.toThrow();
   });
 
-  it("rejects bad days and Designations of another Company", async () => {
+  it("rejects bad days and Roles of another Company", async () => {
     const company = await newCompany();
     const other = await newCompany();
     session({ userId: company.ownerId, workspaceId: company.workspaceId });
     const badDays = await updatePolicy(
       updateRequest({
-        create: { days: -1, overrideDesignationIds: [] },
-        edit: { days: 0, overrideDesignationIds: [] },
+        create: { days: -1, overrideRoleIds: [] },
+        edit: { days: 0, overrideRoleIds: [] },
         financialClosingDate: null,
         expectedUpdatedAt: null,
       }),
@@ -262,24 +265,22 @@ describe("Back-dated Entry policy HTTP (CM-113)", () => {
 
     const foreign = await updatePolicy(
       updateRequest({
-        create: { days: 1, overrideDesignationIds: [other.accountantId] },
-        edit: { days: 0, overrideDesignationIds: [] },
+        create: { days: 1, overrideRoleIds: [other.accountantId] },
+        edit: { days: 0, overrideRoleIds: [] },
         financialClosingDate: null,
         expectedUpdatedAt: null,
       }),
     );
     expect(foreign.status).toBe(StatusCodes.BAD_REQUEST);
     expect(await json(foreign)).toMatchObject({
-      code: "DESIGNATION_NOT_FOUND",
-      details: { designationIds: [other.accountantId] },
+      code: "ROLE_NOT_FOUND",
+      details: { roleIds: [other.accountantId] },
     });
   });
 
   it("lets a Member with Settings read but only update with the update flag", async () => {
     const company = await newCompany();
-    const reader = await newMember(company.workspaceId, company.engineerId, [
-      "read",
-    ]);
+    const reader = await newMember(company.workspaceId, ["read"]);
     session({
       userId: reader,
       workspaceId: company.workspaceId,
@@ -288,18 +289,15 @@ describe("Back-dated Entry policy HTTP (CM-113)", () => {
     expect((await getPolicy(getRequest())).status).toBe(StatusCodes.OK);
     const denied = await updatePolicy(
       updateRequest({
-        create: { days: 1, overrideDesignationIds: [] },
-        edit: { days: 0, overrideDesignationIds: [] },
+        create: { days: 1, overrideRoleIds: [] },
+        edit: { days: 0, overrideRoleIds: [] },
         financialClosingDate: null,
         expectedUpdatedAt: null,
       }),
     );
     expect(denied.status).toBe(StatusCodes.FORBIDDEN);
 
-    const editor = await newMember(company.workspaceId, company.engineerId, [
-      "read",
-      "update",
-    ]);
+    const editor = await newMember(company.workspaceId, ["read", "update"]);
     session({
       userId: editor,
       workspaceId: company.workspaceId,
@@ -307,8 +305,8 @@ describe("Back-dated Entry policy HTTP (CM-113)", () => {
     });
     const allowed = await updatePolicy(
       updateRequest({
-        create: { days: 1, overrideDesignationIds: [] },
-        edit: { days: 0, overrideDesignationIds: [] },
+        create: { days: 1, overrideRoleIds: [] },
+        edit: { days: 0, overrideRoleIds: [] },
         financialClosingDate: null,
         expectedUpdatedAt: null,
       }),

@@ -11,7 +11,10 @@ export const ListConstructionOrganizationOwnershipCandidatesResponseModel =
       z.object({
         id: z.string().describe("Team Member id"),
         name: z.string(),
-        designation: z.string().nullable(),
+        role: z
+          .string()
+          .nullable()
+          .describe("Their Role's name; null when they have none"),
       }),
     ),
   });

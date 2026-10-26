@@ -25,11 +25,11 @@ export const backdatedLimitFields = z.object({
     .min(0)
     .max(MAX_BACKDATED_DAYS)
     .describe("How many days back an entry may be dated. 0 = no restriction."),
-  overrideDesignationIds: z
+  overrideRoleIds: z
     .array(z.uuid())
     .max(200)
     .describe(
-      "Designations allowed past the limit. Empty = hard block for everyone but the Owner.",
+      "Roles allowed past the limit (ADR CM-0033). Empty = hard block for everyone but the Owner.",
     ),
 });
 

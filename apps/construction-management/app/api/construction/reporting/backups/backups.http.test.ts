@@ -666,7 +666,7 @@ describe("backups: full Company (CM-906)", () => {
       csvLines(files, "hrms/holidays/hrms_holidays.csv").join("\n"),
     ).toContain("Diwali");
     const employees = csvLines(files, "hrms/employees/hrms_employees.csv");
-    expect(employees[0]).toContain("Employee,Designation,Member Type");
+    expect(employees[0]).toContain("Employee,Member Type");
     expect(employees.length).toBeGreaterThan(1);
     expect(csvLines(files, "hrms/salary/hrms_salary_slips.csv")[0]).toContain(
       "Net Payable (₹)",

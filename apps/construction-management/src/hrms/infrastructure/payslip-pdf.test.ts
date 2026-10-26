@@ -51,7 +51,6 @@ function payslip(name: string) {
     slip: SLIP,
     member: {
       name,
-      designation: "Site Engineer",
       uan: "100200300400",
       esiIpNumber: null,
     },

@@ -14,7 +14,7 @@ export const COMPANY_SETUP_STEPS = [
   "Setting up your database",
   "Provisioning your system",
   "Setting up master data",
-  "Adding Designations and leave types",
+  "Adding Roles and leave types",
   "Opening Cash and Bank accounts",
   "Getting your Projects ready",
 ] as const;

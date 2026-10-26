@@ -75,7 +75,6 @@ export async function attendanceMonthWorkbook(
   totals.addRow([]);
   header(totals, [
     "Team Member",
-    "Designation",
     "Working Days",
     "Present",
     "Half Days",
@@ -92,7 +91,6 @@ export async function attendanceMonthWorkbook(
     const c = row.counts;
     totals.addRow([
       row.member.name,
-      row.member.designationName ?? "",
       c.workingDays,
       c.present,
       c.halfDays,
@@ -107,11 +105,10 @@ export async function attendanceMonthWorkbook(
     ]);
   }
   totals.getColumn(1).width = 28;
-  totals.getColumn(2).width = 20;
-  for (let index = 3; index <= 13; index += 1)
+  for (let index = 2; index <= 12; index += 1)
     totals.getColumn(index).width = 12;
+  totals.getColumn(11).numFmt = "0.00";
   totals.getColumn(12).numFmt = "0.00";
-  totals.getColumn(13).numFmt = "0.00";
   totals.views = [{ state: "frozen", ySplit: 4 }];
 
   const grid = workbook.addWorksheet("Days");

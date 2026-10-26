@@ -522,14 +522,14 @@ describe("Purchase Requests", () => {
         id: newId(),
         workspaceId: ctx.company.workspaceId,
         createDays: 0,
-        createOverrideDesignationIds: [],
+        createOverrideRoleIds: [],
         editDays: 0,
-        editOverrideDesignationIds: [],
+        editOverrideRoleIds: [],
         modules: {
           purchase_request: {
             mode: "custom",
-            create: { days: 3, overrideDesignationIds: [] },
-            edit: { days: 3, overrideDesignationIds: [] },
+            create: { days: 3, overrideRoleIds: [] },
+            edit: { days: 3, overrideRoleIds: [] },
           },
         },
         createdBy: ctx.company.ownerId,

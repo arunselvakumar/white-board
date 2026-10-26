@@ -117,7 +117,6 @@ export function buildPayslip(input: {
   slip: PayslipSlip;
   member: {
     name: string;
-    designation: string | null;
     uan: string | null;
     esiIpNumber: string | null;
   };
@@ -132,9 +131,6 @@ export function buildPayslip(input: {
   );
   const member: PayslipFact[] = [
     { label: "Name", value: input.member.name },
-    ...(input.member.designation == null
-      ? []
-      : [{ label: "Designation", value: input.member.designation }]),
     { label: "Month", value: monthLabel(slip.month) },
     ...(input.member.uan == null
       ? []

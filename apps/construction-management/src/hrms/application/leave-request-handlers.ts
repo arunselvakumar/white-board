@@ -260,7 +260,6 @@ export class LeaveRequestHandlers {
       members: members.map((member) => ({
         memberId: member.memberId,
         name: member.name,
-        designationName: member.designationName,
       })),
       leaveTypes: types
         .filter((type) => type.isActive)

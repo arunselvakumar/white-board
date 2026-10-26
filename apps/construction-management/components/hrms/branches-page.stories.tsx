@@ -52,14 +52,12 @@ const EMPLOYEES: HrmsBranchList["employees"] = [
     memberId: "0199d0a0-0000-7000-8000-0000000000a1",
     name: "Prabhu Saravanan",
     memberType: "normal",
-    designationName: "Site Engineer",
     active: true,
   },
   {
     memberId: "0199d0a0-0000-7000-8000-0000000000a2",
     name: "Meena Rajan",
     memberType: "hrms",
-    designationName: "Accountant",
     active: true,
   },
 ];

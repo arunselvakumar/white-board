@@ -56,7 +56,6 @@ export class PrismaTeamMemberRepository implements TeamMemberRepository {
       userId: row.userId,
       details: {
         name: row.name,
-        designationId: row.designationId,
         mobile: row.mobile,
         email: row.email,
         address: row.address,
@@ -94,7 +93,6 @@ export class PrismaTeamMemberRepository implements TeamMemberRepository {
       workspaceId: member.workspaceId,
       userId: member.userId,
       name: details.name,
-      designationId: details.designationId,
       roleId: member.roleId,
       mobile: details.mobile,
       email: details.email,
@@ -318,15 +316,5 @@ export class PrismaTeamMemberRepository implements TeamMemberRepository {
         status: { in: ["joining_pending", "active"] },
       },
     });
-  }
-
-  async usesDesignation(
-    workspaceId: string,
-    designationId: string,
-  ): Promise<boolean> {
-    const count = await this.db.constructionOrganizationTeamMember.count({
-      where: { workspaceId, designationId, deletedAt: null },
-    });
-    return count > 0;
   }
 }

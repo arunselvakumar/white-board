@@ -7,7 +7,7 @@ import {
   assertCanCreate,
   assertCanEdit,
   createBackdatedPolicy,
-  referencedDesignationIds,
+  referencedRoleIds,
   resolveBackdatedLimits,
   type BackdatedActor,
 } from "./backdated-policy";
@@ -15,15 +15,15 @@ import { addDays, daysBetween, todayIn } from "./calendar-date";
 import { DomainError } from "./domain-error";
 
 const TODAY = "2026-10-08";
-const ENGINEER = "designation-engineer";
-const ACCOUNTANT = "designation-accountant";
+const ENGINEER = "role-engineer";
+const ACCOUNTANT = "role-accountant";
 
-const engineer: BackdatedActor = { designationId: ENGINEER, isOwner: false };
+const engineer: BackdatedActor = { roleId: ENGINEER, isOwner: false };
 const accountant: BackdatedActor = {
-  designationId: ACCOUNTANT,
+  roleId: ACCOUNTANT,
   isOwner: false,
 };
-const owner: BackdatedActor = { designationId: null, isOwner: true };
+const owner: BackdatedActor = { roleId: null, isOwner: true };
 
 function errorOf(run: () => void): DomainError {
   try {
@@ -125,9 +125,9 @@ describe("assertCanCreate / assertCanEdit", () => {
     ).toBe("BACKDATED_EDIT_BLOCKED");
   });
 
-  it("lets override Designations and the Owner past the day limit", () => {
+  it("lets override Roles and the Owner past the day limit", () => {
     const policy = createBackdatedPolicy({
-      create: { days: 2, overrideDesignationIds: [ACCOUNTANT] },
+      create: { days: 2, overrideRoleIds: [ACCOUNTANT] },
       edit: { days: 2 },
     });
     expect(() => {
@@ -153,7 +153,7 @@ describe("assertCanCreate / assertCanEdit", () => {
         {
           key: "labour_attendance",
           mode: "custom",
-          create: { days: 1, overrideDesignationIds: [ENGINEER] },
+          create: { days: 1, overrideRoleIds: [ENGINEER] },
           edit: { days: 0 },
         },
         // Global mode ignores the stored custom values.
@@ -200,7 +200,7 @@ describe("assertCanCreate / assertCanEdit", () => {
 
   it("locks the closing date inclusively for everyone, overrides and Owner included", () => {
     const policy = createBackdatedPolicy({
-      create: { days: 0, overrideDesignationIds: [ACCOUNTANT] },
+      create: { days: 0, overrideRoleIds: [ACCOUNTANT] },
       edit: { days: 0 },
       financialClosingDate: "2026-03-31",
     });
@@ -257,25 +257,25 @@ describe("createBackdatedPolicy", () => {
     ).toBe("FINANCIAL_CLOSING_DATE_INVALID");
   });
 
-  it("de-duplicates Designations and lists those custom modules use", () => {
+  it("de-duplicates Roles and lists those custom modules use", () => {
     const policy = createBackdatedPolicy({
-      create: { days: 1, overrideDesignationIds: [ENGINEER, ENGINEER] },
+      create: { days: 1, overrideRoleIds: [ENGINEER, ENGINEER] },
       edit: { days: 0 },
       modules: [
         {
           key: "booking",
           mode: "custom",
-          create: { days: 1, overrideDesignationIds: [ACCOUNTANT] },
+          create: { days: 1, overrideRoleIds: [ACCOUNTANT] },
         },
         {
           key: "inquiry",
           mode: "global",
-          create: { days: 1, overrideDesignationIds: ["ignored"] },
+          create: { days: 1, overrideRoleIds: ["ignored"] },
         },
       ],
     });
-    expect(policy.create.overrideDesignationIds).toEqual([ENGINEER]);
-    expect(referencedDesignationIds(policy).sort()).toEqual(
+    expect(policy.create.overrideRoleIds).toEqual([ENGINEER]);
+    expect(referencedRoleIds(policy).sort()).toEqual(
       [ACCOUNTANT, ENGINEER].sort(),
     );
   });

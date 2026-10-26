@@ -8,7 +8,6 @@ import { vi } from "vitest";
 import { POST as createCompanyRoute } from "@/app/api/construction/organization/companies/route";
 import { addMonths } from "@/src/organization/domain/subscription";
 import { createCompanyHandlers } from "@/src/organization/infrastructure/create-company-handlers";
-import { createDesignationHandlers } from "@/src/organization/infrastructure/create-designation-handlers";
 import { createRoleHandlers } from "@/src/organization/infrastructure/create-role-handlers";
 import { createTeamMemberHandlers } from "@/src/organization/infrastructure/create-team-member-handlers";
 import type { Flag, PermissionGrants } from "@/src/shared-kernel/access";
@@ -33,12 +32,6 @@ export async function ownerWithCompany(name = "Anugraha Engineers") {
   if (!created.ok)
     throw new Error(`Company creation failed: ${String(created.status)}`);
   const { id: workspaceId } = (await created.json()) as { id: string };
-  const designations = await createDesignationHandlers().list(workspaceId);
-  const designationId = (designationName: string) => {
-    const found = designations.find((item) => item.name === designationName);
-    if (found == null) throw new Error(`No Designation ${designationName}`);
-    return found.id;
-  };
   const roles = await createRoleHandlers().list(workspaceId);
   /** A seed Role's id (ADR CM-0030 §5). */
   const roleId = (roleName: string) => {
@@ -46,7 +39,7 @@ export async function ownerWithCompany(name = "Anugraha Engineers") {
     if (found == null) throw new Error(`No Role ${roleName}`);
     return found.id;
   };
-  return { ...owner, workspaceId, designationId, roleId };
+  return { ...owner, workspaceId, roleId };
 }
 
 /**
@@ -77,7 +70,6 @@ export async function memberWith(
   company: {
     workspaceId: string;
     userId: string;
-    designationId: (name: string) => string;
   },
   permissions: PermissionGrants,
 ) {
@@ -88,7 +80,6 @@ export async function memberWith(
     memberType: "normal",
     details: {
       name: "Member",
-      designationId: company.designationId("Site Engineer"),
       email,
     },
     roleId: await roleWith(company.workspaceId, company.userId, permissions),
@@ -152,7 +143,7 @@ export async function givePlan(
 // Mocked sessions over real data (track D's helpers).
 
 /**
- * A real Company (Workspace, profile, Designations, the Owner's Team
+ * A real Company (Workspace, profile, seed Roles, the Owner's Team
  * Member) with a fresh Owner. Mobiles are random so tests never collide.
  */
 export async function newCompany(name = "Anugraha Engineers"): Promise<{
@@ -190,16 +181,12 @@ export async function addMember(
   permissions: Record<string, readonly Flag[]>,
   details: { aadhaar?: string; pan?: string; email?: string } = {},
 ): Promise<{ userId: string; memberId: string }> {
-  const designations = await createDesignationHandlers().list(workspaceId);
-  const designationId =
-    designations.find((item) => item.name === "Site Engineer")?.id ?? "";
   const member = await createTeamMemberHandlers().invite({
     workspaceId,
     by: ownerId,
     memberType: "normal",
     details: {
       name: "Prabhu Saravanan",
-      designationId,
       mobile: `+9197${String(Math.floor(Math.random() * 1e8)).padStart(8, "0")}`,
       ...details,
     },

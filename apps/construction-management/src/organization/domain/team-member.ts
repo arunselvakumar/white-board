@@ -19,7 +19,6 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export type TeamMemberDetails = {
   name: string;
-  designationId: string;
   /**
    * E.164. A contact; also a way to sign in and join while SMS is on
    * (ADR CM-0009). Mobile or email is required.
@@ -41,7 +40,6 @@ function optional(value: string | null | undefined): string | null {
 /** Validates and tidies a Team Member's details (`modules/01` TeamMember). */
 export function teamMemberDetails(input: {
   name: string;
-  designationId: string;
   mobile?: string | null;
   email?: string | null;
   address?: string | null;
@@ -60,8 +58,6 @@ export function teamMemberDetails(input: {
       "MEMBER_NAME_TOO_LONG",
       "Name must be at most 100 characters.",
     );
-  if (input.designationId.trim().length === 0)
-    throw new DomainError("DESIGNATION_REQUIRED", "Choose a Designation.");
   const mobile = optional(input.mobile);
   if (mobile != null && !E164.test(mobile))
     throw new DomainError("MOBILE_INVALID", "Enter a valid mobile number.");
@@ -97,7 +93,6 @@ export function teamMemberDetails(input: {
     );
   return {
     name,
-    designationId: input.designationId,
     mobile,
     email,
     address,
@@ -437,11 +432,10 @@ export class TeamMember {
 
   /**
    * Transfer ownership (CM-907): this joined, active, Normal Team Member
-   * becomes the Owner, with the Owner Designation (kept when the Company
-   * has none) and every right, so no Role. The Owner is on every Project,
-   * so the assignments go.
+   * becomes the Owner, with every right, so no Role (ADR CM-0033). The
+   * Owner is on every Project, so the assignments go.
    */
-  becomeOwner(ownerDesignationId: string | null, by: string, now: Date): void {
+  becomeOwner(by: string, now: Date): void {
     if (this.props.isOwner)
       throw conflict("ALREADY_OWNER", "This Team Member is already the Owner.");
     if (
@@ -463,34 +457,18 @@ export class TeamMember {
       isOwner: true,
       roleId: null,
       projectIds: [],
-      details: {
-        ...this.props.details,
-        designationId: ownerDesignationId ?? this.props.details.designationId,
-      },
     };
     this.touch(by, now);
   }
 
-  /**
-   * The Owner after handing the Company over (CM-907): a member with the
-   * Admin Designation (kept when the Company has none) and `roleId`.
-   */
-  stepDownAsOwner(
-    designationId: string | null,
-    roleId: string,
-    by: string,
-    now: Date,
-  ): void {
+  /** The Owner after handing the Company over (CM-907): a member on `roleId`. */
+  stepDownAsOwner(roleId: string, by: string, now: Date): void {
     if (!this.props.isOwner)
       throw conflict("NOT_OWNER", "Only the Owner can hand the Company over.");
     this.props = {
       ...this.props,
       isOwner: false,
       roleId,
-      details: {
-        ...this.props.details,
-        designationId: designationId ?? this.props.details.designationId,
-      },
     };
     this.touch(by, now);
   }

@@ -190,14 +190,12 @@ function MonthSalaries({
     ...regular.map((slip) => ({
       memberId: slip.memberId,
       name: slip.memberName,
-      designationName: slip.designationName,
     })),
     ...data.skipped
       .filter((item) => item.reason === "not_calculated")
       .map((item) => ({
         memberId: item.memberId,
         name: item.name,
-        designationName: item.designationName,
       })),
   ].sort((a, b) => a.name.localeCompare(b.name));
 
@@ -413,11 +411,6 @@ function MonthSalaries({
                   <span className="block truncate font-medium">
                     {item.name}
                   </span>
-                  {item.designationName != null ? (
-                    <span className="text-muted-foreground block text-sm">
-                      {item.designationName}
-                    </span>
-                  ) : null}
                 </span>
                 <span className="text-muted-foreground text-sm">
                   {item.message}
@@ -598,7 +591,6 @@ function SlipRow({
             </span>
             <span className="text-muted-foreground block text-sm">
               {days(slip.days.payable)} payable
-              {slip.designationName == null ? "" : ` · ${slip.designationName}`}
             </span>
           </span>
           <SalaryStatusBadge status={slip.status} />

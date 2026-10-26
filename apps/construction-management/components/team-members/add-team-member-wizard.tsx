@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   useMutation,
   useQueryClient,
-  useSuspenseQueries,
+  useSuspenseQuery,
 } from "@tanstack/react-query";
 import { CheckCircle2, Info, type LucideIcon } from "lucide-react";
 import Link from "next/link";
@@ -22,7 +22,6 @@ import { ROLES_KEY, rolesQuery } from "@/src/queries/roles";
 import {
   TEAM_MEMBERS_KEY,
   createTeamMember,
-  designationOptionsQuery,
   type PasswordOutcome,
   type TeamMember,
 } from "@/src/queries/team-members";
@@ -78,9 +77,7 @@ export function AddTeamMemberWizard({
   /** Financial on Staff (ADR CM-0032). */
   canSeeSalary: boolean;
 }) {
-  const [{ data: designations }, { data: roles }] = useSuspenseQueries({
-    queries: [designationOptionsQuery, rolesQuery],
-  });
+  const { data: roles } = useSuspenseQuery(rolesQuery);
   const { company } = useActiveCompany();
   const companyName = company?.name ?? "your Company";
   const queryClient = useQueryClient();
@@ -202,7 +199,6 @@ export function AddTeamMemberWizard({
           {step === "details" && (
             <TeamMemberDetailsFields
               form={form}
-              designations={designations}
               canSeeSalary={canSeeSalary}
               signIn={<SignInOptions form={form} companyName={companyName} />}
             />

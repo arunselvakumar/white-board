@@ -1,7 +1,6 @@
 "use client";
 
 import { normalizeMobile } from "@repo/auth/construction/react";
-import Link from "next/link";
 import type { ReactNode } from "react";
 import {
   Controller,
@@ -13,13 +12,6 @@ import { z } from "zod";
 import { Input } from "@repo/ui/components/input";
 import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@repo/ui/components/select";
 
 import { FieldError } from "@/components/auth/field-error";
 import { MobileField } from "@/components/auth/mobile-field";
@@ -28,7 +20,6 @@ import {
   isRupees,
   rupeesToPaise,
 } from "@/components/money/money-input";
-import type { DesignationOption } from "@/src/queries/team-members";
 import { isValidAadhaar, isValidPan } from "@/src/shared-kernel/tax-ids";
 
 /** The API's cap (ADR CM-0032), as a Labour's wage. */
@@ -38,7 +29,6 @@ const MAX_SALARY_PAISE = 2_000_000_000;
 export const teamMemberDetailsObject = z.object({
   memberType: z.enum(["normal", "hrms"]),
   name: z.string().trim().min(1, "Enter the name").max(100, "Name is too long"),
-  designationId: z.string().min(1, "Choose a Designation"),
   mobile: z
     .string()
     .trim()
@@ -98,7 +88,6 @@ export type TeamMemberDetailsValues = z.infer<typeof teamMemberDetailsSchema>;
 export const EMPTY_DETAILS: TeamMemberDetailsValues = {
   memberType: "normal",
   name: "",
-  designationId: "",
   mobile: "",
   email: "",
   address: "",
@@ -115,8 +104,6 @@ export const DETAIL_ERROR_FIELDS: Record<
 > = {
   MEMBER_NAME_REQUIRED: "name",
   MEMBER_NAME_TOO_LONG: "name",
-  DESIGNATION_REQUIRED: "designationId",
-  DESIGNATION_NOT_FOUND: "designationId",
   MOBILE_INVALID: "mobile",
   MOBILE_OR_EMAIL_REQUIRED: "mobile",
   MEMBER_MOBILE_IN_USE: "mobile",
@@ -146,7 +133,6 @@ export function detailsInput(
   return {
     memberType: values.memberType,
     name: values.name,
-    designationId: values.designationId,
     mobile: values.mobile === "" ? null : normalizeMobile(values.mobile),
     email: values.email === "" ? null : values.email,
     address: values.address === "" ? null : values.address,
@@ -164,14 +150,12 @@ export function TeamMemberDetailsFields<
   Values extends TeamMemberDetailsValues & FieldValues,
 >({
   form: wide,
-  designations,
   masked,
   mobileLocked = false,
   canSeeSalary,
   signIn,
 }: {
   form: UseFormReturn<Values>;
-  designations: DesignationOption[];
   /** Financial on Staff: without it the salary is neither shown nor sent. */
   canSeeSalary: boolean;
   /** Stored identifiers, shown as placeholders when editing. */
@@ -186,10 +170,6 @@ export function TeamMemberDetailsFields<
   // A mobile or an email is needed: Mobile is marked while Email is blank.
   const email = useWatch({ control: form.control, name: "email" });
   const mobileRequired = email.trim() === "";
-  const items = designations.map((item) => ({
-    value: item.id,
-    label: item.name,
-  }));
   return (
     <div className="space-y-6">
       <div className="bg-card space-y-6 rounded-xl border p-4 sm:p-5">
@@ -237,7 +217,7 @@ export function TeamMemberDetailsFields<
         </fieldset>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 sm:col-span-2">
             <Label htmlFor="member-name" required>
               Name
             </Label>
@@ -249,56 +229,6 @@ export function TeamMemberDetailsFields<
               {...form.register("name")}
             />
             <FieldError message={errors.name?.message} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="member-designation" required>
-              Designation
-            </Label>
-            <Controller
-              name="designationId"
-              control={form.control}
-              render={({ field }) => (
-                <Select
-                  items={items}
-                  value={field.value === "" ? null : field.value}
-                  onValueChange={(value) => {
-                    if (value != null) field.onChange(value);
-                  }}
-                >
-                  <SelectTrigger
-                    id="member-designation"
-                    className="w-full min-w-0"
-                    aria-required
-                  >
-                    <SelectValue placeholder="Choose a Designation" />
-                  </SelectTrigger>
-                  <SelectContent
-                    align="start"
-                    alignItemWithTrigger={false}
-                    aria-label="Designations"
-                  >
-                    {items.map((item) => (
-                      <SelectItem key={item.value} value={item.value}>
-                        {item.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            {designations.length === 0 && (
-              <p className="text-muted-foreground text-xs">
-                No Designations yet.{" "}
-                <Link
-                  href="/app/masters/designations/new"
-                  className="text-primary underline underline-offset-4"
-                >
-                  Add a Designation
-                </Link>{" "}
-                first.
-              </p>
-            )}
-            <FieldError message={errors.designationId?.message} />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="member-aadhaar">Aadhaar</Label>

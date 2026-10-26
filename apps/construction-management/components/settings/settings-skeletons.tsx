@@ -79,7 +79,7 @@ export function BackdatedEntrySkeleton() {
       >
         <SettingsCard
           title="Default limits"
-          description="Apply to every module set to Global. With no override Designations, the limit is a hard block for everyone but the Owner."
+          description="Apply to every module set to Global. With no override Roles, the limit is a hard block for everyone but the Owner."
         >
           <FormSkeleton
             columns={2}
@@ -87,12 +87,12 @@ export function BackdatedEntrySkeleton() {
             fields={[
               { label: "Restrict creating entries older than" },
               {
-                label: "Designations that may create older entries",
+                label: "Roles that may create older entries",
                 control: "select",
               },
               { label: "Restrict editing entries older than" },
               {
-                label: "Designations that may edit older entries",
+                label: "Roles that may edit older entries",
                 control: "select",
               },
             ]}

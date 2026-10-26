@@ -696,14 +696,14 @@ describe("Material Transfer (CM-507)", () => {
         id: newId(),
         workspaceId: owner.workspaceId,
         createDays: 0,
-        createOverrideDesignationIds: [],
+        createOverrideRoleIds: [],
         editDays: 0,
-        editOverrideDesignationIds: [],
+        editOverrideRoleIds: [],
         modules: {
           material_transfer: {
             mode: "custom",
-            create: { days: 2, overrideDesignationIds: [] },
-            edit: { days: 2, overrideDesignationIds: [] },
+            create: { days: 2, overrideRoleIds: [] },
+            edit: { days: 2, overrideRoleIds: [] },
           },
         },
         createdBy: owner.userId,

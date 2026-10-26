@@ -8,7 +8,6 @@ import { z } from "zod";
 export const GetConstructionOrganizationMyProfileResponseModel = z.object({
   id: z.uuid(),
   name: z.string(),
-  designation: z.object({ id: z.uuid(), name: z.string().nullable() }),
   mobile: z
     .string()
     .nullable()
