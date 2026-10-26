@@ -78,7 +78,6 @@ describe("GET /api/construction/organization/me/profile", () => {
       name: "Arun Selva Kumar",
       mobile: ownerMobile,
       isOwner: true,
-      designation: { name: "Owner" },
       photoUrl: null,
     });
   });

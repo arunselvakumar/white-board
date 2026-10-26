@@ -189,14 +189,14 @@ describe("Holidays HTTP (CM-305)", () => {
         id: randomUUID(),
         workspaceId: owner.workspaceId,
         createDays: 0,
-        createOverrideDesignationIds: [],
+        createOverrideRoleIds: [],
         editDays: 0,
-        editOverrideDesignationIds: [],
+        editOverrideRoleIds: [],
         modules: {
           holiday: {
             mode: "custom",
-            create: { days: 3, overrideDesignationIds: [] },
-            edit: { days: 3, overrideDesignationIds: [] },
+            create: { days: 3, overrideRoleIds: [] },
+            edit: { days: 3, overrideRoleIds: [] },
           },
         },
         createdBy: owner.userId,

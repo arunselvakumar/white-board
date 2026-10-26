@@ -427,14 +427,14 @@ describe("Bookings (CM-1006, CM-0022 §7)", () => {
         id: newId(),
         workspaceId: ctx.ws,
         createDays: 0,
-        createOverrideDesignationIds: [],
+        createOverrideRoleIds: [],
         editDays: 0,
-        editOverrideDesignationIds: [],
+        editOverrideRoleIds: [],
         modules: {
           booking: {
             mode: "custom",
-            create: { days: 3, overrideDesignationIds: [] },
-            edit: { days: 3, overrideDesignationIds: [] },
+            create: { days: 3, overrideRoleIds: [] },
+            edit: { days: 3, overrideRoleIds: [] },
           },
         },
         createdBy: ctx.by,

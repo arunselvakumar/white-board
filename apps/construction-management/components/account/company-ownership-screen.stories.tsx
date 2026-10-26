@@ -31,9 +31,9 @@ function serve(start: typeof SCHEDULED | null = null) {
           {
             id: "member-prabhu",
             name: "Prabhu Saravanan",
-            designation: "Site Engineer",
+            role: "Site Engineer",
           },
-          { id: "member-meena", name: "Meena Sakthi", designation: null },
+          { id: "member-meena", name: "Meena Sakthi", role: null },
         ],
       });
     if (call.method === "POST" && call.path === `${ORG}/action-codes`)

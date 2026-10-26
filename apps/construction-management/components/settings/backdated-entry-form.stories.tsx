@@ -14,14 +14,14 @@ import { BackdatedEntryForm } from "./backdated-entry-form";
 const ACCOUNTANT = "0199c0de-0000-7000-8000-000000000001";
 const ENGINEER = "0199c0de-0000-7000-8000-000000000002";
 
-const DESIGNATIONS = {
+const ROLES = {
   items: [
     { id: ACCOUNTANT, name: "Accountant" },
     { id: ENGINEER, name: "Site Engineer" },
   ],
 };
 
-const none = { days: 0, overrideDesignationIds: [] };
+const none = { days: 0, overrideRoleIds: [] };
 
 const POLICY: GetConstructionOrganizationBackdatedEntryPolicyResponseModel = {
   create: none,
@@ -61,8 +61,8 @@ const meta = {
     lastCalls = [];
     const api = mockApi((call) => {
       lastCalls.push(call);
-      if (call.path === "/api/construction/organization/designations")
-        return Response.json(DESIGNATIONS);
+      if (call.path === "/api/construction/organization/roles")
+        return Response.json(ROLES);
       if (
         call.path === "/api/construction/organization/settings/backdated-entry"
       )
@@ -109,7 +109,7 @@ export const SavesDefaultLimitsAndClosingDate: Story = {
     await userEvent.clear(createDays);
     await userEvent.type(createDays, "3");
     await userEvent.click(
-      canvas.getByLabelText("Designations that may create older entries"),
+      canvas.getByLabelText("Roles that may create older entries"),
     );
     await userEvent.click(
       await body.findByRole("option", { name: "Accountant" }),
@@ -127,8 +127,8 @@ export const SavesDefaultLimitsAndClosingDate: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Save changes" }));
     await expect(await canvas.findByText("Changes saved.")).toBeVisible();
     await expect(updates()[0]).toMatchObject({
-      create: { days: 3, overrideDesignationIds: [ACCOUNTANT] },
-      edit: { days: 0, overrideDesignationIds: [] },
+      create: { days: 3, overrideRoleIds: [ACCOUNTANT] },
+      edit: { days: 0, overrideRoleIds: [] },
       financialClosingDate: "2026-03-31",
       expectedUpdatedAt: null,
     });
@@ -149,7 +149,7 @@ export const OverridesOneModule: Story = {
     await userEvent.clear(days);
     await userEvent.type(days, "1");
     await userEvent.click(
-      dialog.getByLabelText("Designations that may create older entries"),
+      dialog.getByLabelText("Roles that may create older entries"),
     );
     await userEvent.click(
       await body.findByRole("option", { name: "Site Engineer" }),
@@ -173,7 +173,7 @@ export const OverridesOneModule: Story = {
       sent.modules.find((item) => item.key === "labour_attendance"),
     ).toMatchObject({
       mode: "custom",
-      create: { days: 1, overrideDesignationIds: [ENGINEER] },
+      create: { days: 1, overrideRoleIds: [ENGINEER] },
     });
   },
 };
@@ -196,9 +196,8 @@ export const ShowsServerErrors: Story = {
     updateResponse = () =>
       Response.json(
         {
-          code: "DESIGNATION_NOT_FOUND",
-          message:
-            "Some override Designations no longer exist. Choose them again.",
+          code: "ROLE_NOT_FOUND",
+          message: "Some override Roles no longer exist. Choose them again.",
         },
         { status: 400 },
       );
@@ -206,7 +205,7 @@ export const ShowsServerErrors: Story = {
       await canvas.findByRole("button", { name: "Save changes" }),
     );
     await expect(await canvas.findByRole("alert")).toHaveTextContent(
-      "Some override Designations no longer exist.",
+      "Some override Roles no longer exist.",
     );
   },
 };

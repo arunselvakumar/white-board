@@ -14,48 +14,48 @@ import {
   useComboboxAnchor,
 } from "@repo/ui/components/combobox";
 
-import type { DesignationOption } from "@/src/queries/settings";
+import type { RoleOption } from "@/src/queries/settings";
 
 /**
- * Pick any number of Designations (override Designations on Back-dated
- * Entry). Stores ids; ids of deleted Designations are dropped on change.
+ * Pick any number of Roles (override Roles on Back-dated Entry, ADR
+ * CM-0033). Stores ids; ids of deleted Roles are dropped on change.
  */
-export function DesignationMultiSelect({
+export function RoleMultiSelect({
   id,
-  designations,
+  roles,
   value,
   onChange,
   disabled = false,
 }: {
   id: string;
-  designations: readonly DesignationOption[];
+  roles: readonly RoleOption[];
   value: readonly string[];
   onChange: (ids: string[]) => void;
   disabled?: boolean;
 }) {
   const anchor = useComboboxAnchor();
   const selected = useMemo(
-    () => designations.filter((item) => value.includes(item.id)),
-    [designations, value],
+    () => roles.filter((item) => value.includes(item.id)),
+    [roles, value],
   );
 
   return (
     <Combobox
-      items={designations as DesignationOption[]}
+      items={roles as RoleOption[]}
       multiple
       value={selected}
       disabled={disabled}
-      itemToStringLabel={(item: DesignationOption) => item.name}
-      isItemEqualToValue={(item: DesignationOption, other: DesignationOption) =>
+      itemToStringLabel={(item: RoleOption) => item.name}
+      isItemEqualToValue={(item: RoleOption, other: RoleOption) =>
         item.id === other.id
       }
-      onValueChange={(next: DesignationOption[]) => {
+      onValueChange={(next: RoleOption[]) => {
         onChange(next.map((item) => item.id));
       }}
     >
       <ComboboxChips ref={anchor} className="min-h-10 w-full">
         <ComboboxValue>
-          {(items: DesignationOption[]) => (
+          {(items: RoleOption[]) => (
             <>
               {items.map((item) => (
                 <ComboboxChip
@@ -76,9 +76,9 @@ export function DesignationMultiSelect({
         </ComboboxValue>
       </ComboboxChips>
       <ComboboxContent anchor={anchor}>
-        <ComboboxEmpty>No Designations found.</ComboboxEmpty>
-        <ComboboxList aria-label="Designations">
-          {(item: DesignationOption) => (
+        <ComboboxEmpty>No Roles found.</ComboboxEmpty>
+        <ComboboxList aria-label="Roles">
+          {(item: RoleOption) => (
             <ComboboxItem key={item.id} value={item}>
               {item.name}
             </ComboboxItem>

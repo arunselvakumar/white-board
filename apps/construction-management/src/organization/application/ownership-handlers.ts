@@ -8,8 +8,6 @@ import {
 } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
 
-import type { DesignationRepository } from "../domain/designation-repository";
-import { OWNER_DESIGNATION } from "../domain/new-company";
 import { Role } from "../domain/role";
 import type { RoleRepository } from "../domain/role-repository";
 import type { TeamMember } from "../domain/team-member";
@@ -18,8 +16,7 @@ import type { TeamMemberRepository } from "../domain/team-member-repository";
 /** Checks and uses a code the User was sent (`src/shared-kernel/action-codes`). */
 export type ActionCodeCheck = (input: VerifyActionCodeInput) => Promise<void>;
 
-/** The Designation, and the Role, the old Owner gets (ADR CM-0030). */
-export const ADMIN_DESIGNATION = "Admin";
+/** The Role the old Owner gets (ADR CM-0030). */
 export const ADMIN_ROLE = "Admin";
 
 /**
@@ -41,7 +38,8 @@ export type OwnershipTransferStore = {
 export type OwnershipCandidate = {
   id: string;
   name: string;
-  designation: string | null;
+  /** Their Role's name (ADR CM-0033); null when they have none. */
+  role: string | null;
 };
 
 function byName(name: string) {
@@ -72,7 +70,6 @@ function accessRoleName(name: string, taken: ReadonlySet<string>): string {
 export class OwnershipHandlers {
   constructor(
     private readonly members: TeamMemberRepository,
-    private readonly designations: DesignationRepository,
     private readonly roles: RoleRepository,
     private readonly store: OwnershipTransferStore,
     private readonly codes: ActionCodeCheck,
@@ -81,32 +78,31 @@ export class OwnershipHandlers {
 
   /** Active, joined Normal Team Members other than the Owner, by name. */
   async candidates(workspaceId: string): Promise<OwnershipCandidate[]> {
-    const [page, designations] = await Promise.all([
+    const [page, roles] = await Promise.all([
       this.members.list({
         workspaceId,
         limit: 1000,
         status: "active",
         memberType: "normal",
       }),
-      this.designations.listAll(workspaceId),
+      this.roles.listAll(workspaceId),
     ]);
-    const names = new Map(designations.map((item) => [item.id, item.name]));
+    const names = new Map(roles.map((role) => [role.id, role.name]));
     return page.items
       .filter((member) => !member.isOwner && member.userId != null)
       .map((member) => ({
         id: member.id,
         name: member.details.name,
-        designation: names.get(member.details.designationId) ?? null,
+        role: member.roleId == null ? null : (names.get(member.roleId) ?? null),
       }))
       .sort((a, b) => a.name.localeCompare(b.name, "en-IN"));
   }
 
   /**
-   * Makes the Team Member `memberId` the Owner. The new Owner gets the
-   * Owner Designation and every right; the old Owner becomes a member
-   * with the Admin Designation and the Admin Role — or, when the Company
-   * has deleted that Role, a Role made for them with every right (ADR
-   * CM-0030). Refusals: 404
+   * Makes the Team Member `memberId` the Owner. The new Owner gets every
+   * right and no Role; the old Owner becomes a member on the Admin Role —
+   * or, when the Company has deleted that Role, a Role made for them with
+   * every right (ADR CM-0030). Refusals: 404
    * `TEAM_MEMBER_NOT_FOUND`, 409 `NEW_OWNER_NOT_ACTIVE` / `OWNER_IS_NORMAL`
    * / `ALREADY_OWNER`, and the code's own refusals.
    */
@@ -129,12 +125,7 @@ export class OwnershipHandlers {
       );
     if (to.id === from.id)
       throw conflict("ALREADY_OWNER", "You are already the Owner.");
-    const [designations, roles] = await Promise.all([
-      this.designations.listAll(input.workspaceId),
-      this.roles.listAll(input.workspaceId),
-    ]);
-    const owner = designations.find(byName(OWNER_DESIGNATION)) ?? null;
-    const admin = designations.find(byName(ADMIN_DESIGNATION)) ?? null;
+    const roles = await this.roles.listAll(input.workspaceId);
     const adminRole = roles.find(byName(ADMIN_ROLE)) ?? null;
     const fromRole =
       adminRole ??
@@ -150,15 +141,14 @@ export class OwnershipHandlers {
         now,
       });
     const before = {
-      from: { designationId: from.details.designationId, isOwner: true },
+      from: { isOwner: true },
       to: {
-        designationId: to.details.designationId,
         isOwner: false,
         roleId: to.roleId,
       },
     };
-    to.becomeOwner(owner?.id ?? null, input.by, now);
-    from.stepDownAsOwner(admin?.id ?? null, fromRole.id, input.by, now);
+    to.becomeOwner(input.by, now);
+    from.stepDownAsOwner(fromRole.id, input.by, now);
     await this.codes({
       userId: input.by,
       purpose: "transfer_ownership",
@@ -183,14 +173,12 @@ export class OwnershipHandlers {
             from: {
               memberId: from.id,
               userId: from.userId,
-              designationId: from.details.designationId,
               isOwner: false,
               roleId: from.roleId,
             },
             to: {
               memberId: to.id,
               userId: to.userId,
-              designationId: to.details.designationId,
               isOwner: true,
             },
           },

@@ -140,8 +140,7 @@ function TeamToday() {
                 <div className="min-w-0 flex-1 space-y-0.5">
                   <p className="truncate font-medium">{item.member.name}</p>
                   <p className="text-muted-foreground truncate text-sm">
-                    {item.member.designationName ?? "—"}
-                    {line == null ? null : ` · ${line}`}
+                    {line ?? "—"}
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center justify-end gap-1.5">

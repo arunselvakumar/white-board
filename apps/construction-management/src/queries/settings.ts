@@ -18,19 +18,19 @@ import { apiJson } from "./http";
 
 const SETTINGS = "/api/construction/organization/settings";
 
-/** Designations as Settings needs them: id and name only. */
-export type DesignationOption = { id: string; name: string };
+/** Roles as Settings needs them: id and name only. */
+export type RoleOption = { id: string; name: string };
 
 /**
- * The Company's Designations for override pickers. The Designations route
- * is owned by the Designations screens (CM-112); Settings reads only
+ * The Company's Roles for override pickers (ADR CM-0033). The Roles route
+ * is owned by Role Management (ADR CM-0030); Settings reads only
  * `items[].id` and `items[].name`.
  */
-export const designationOptionsQuery = queryOptions({
-  queryKey: ["organization", "designations", "options"],
-  queryFn: async (): Promise<DesignationOption[]> => {
-    const body = await apiJson<{ items: DesignationOption[] }>(
-      "/api/construction/organization/designations",
+export const roleOptionsQuery = queryOptions({
+  queryKey: ["organization", "roles", "options"],
+  queryFn: async (): Promise<RoleOption[]> => {
+    const body = await apiJson<{ items: RoleOption[] }>(
+      "/api/construction/organization/roles",
     );
     return body.items.map((item) => ({ id: item.id, name: item.name }));
   },

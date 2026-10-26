@@ -17,8 +17,8 @@ const NAME_WIDTHS = ["9rem", "12rem", "7.5rem", "10.5rem", "8rem"];
 const LINE_WIDTHS = ["55%", "40%", "62%", "48%", "36%"];
 
 /**
- * Rows shaped like the list: name and status badge, Designation · contact,
- * the Role, menu.
+ * Rows shaped like the list: name and status badge, contact, the Role,
+ * menu.
  */
 export function TeamMemberRowsSkeleton() {
   return (
@@ -72,7 +72,6 @@ export function ProjectChecklistSkeleton() {
 /** Edit Staff while the member loads: header, the tabs, the details form. */
 const DETAIL_FIELDS = [
   { label: "Name" },
-  { label: "Designation", control: "select" },
   { label: "Aadhaar" },
   { label: "PAN" },
   { label: "Address" },
@@ -93,7 +92,7 @@ function SignInSkeleton() {
   );
 }
 
-/** Add Staff while the Designations and Roles load: step 1, the details form. */
+/** Add Staff while the Roles load: step 1, the details form. */
 export function AddTeamMemberSkeleton() {
   return (
     <div className="w-full p-6">
@@ -120,7 +119,7 @@ export function AddTeamMemberSkeleton() {
             <FormSkeleton
               columns={2}
               actions={0}
-              label="Loading Designations"
+              label="Loading Roles"
               fields={[...PERSON_FIELDS]}
             />
           </div>

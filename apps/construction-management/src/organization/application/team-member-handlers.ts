@@ -8,7 +8,6 @@ import {
 import type { EventDispatcher } from "@/src/shared-kernel/events";
 import { newId } from "@/src/shared-kernel/ids";
 
-import type { DesignationRepository } from "../domain/designation-repository";
 import type { Role } from "../domain/role";
 import type { RoleRepository } from "../domain/role-repository";
 import {
@@ -32,7 +31,6 @@ import {
 
 export type TeamMemberDetailsInput = {
   name: string;
-  designationId: string;
   mobile?: string | null;
   email?: string | null;
   address?: string | null;
@@ -68,7 +66,7 @@ function assertPassword(password: string): void {
 export type ProjectTeamMemberReadModel = {
   id: string;
   name: string;
-  /** Designation, and "Joining Pending" until they accept. */
+  /** Their Role, and "Joining Pending" until they accept. */
   detail: string | null;
   /** False for a declined Join Request: it stays but cannot be added again. */
   isActive: boolean;
@@ -92,7 +90,6 @@ export type TeamMemberInvited = {
 export class TeamMemberHandlers {
   constructor(
     private readonly members: TeamMemberRepository,
-    private readonly designations: DesignationRepository,
     private readonly roles: RoleRepository,
     private readonly plan: PlanGate,
     private readonly events: EventDispatcher,
@@ -114,26 +111,11 @@ export class TeamMemberHandlers {
     return member;
   }
 
-  private async designation(workspaceId: string, id: string) {
-    const designation = await this.designations.findById(workspaceId, id);
-    if (designation == null)
-      throw new DomainError(
-        "DESIGNATION_NOT_FOUND",
-        "Choose a Designation from the list.",
-      );
-    return designation;
-  }
-
   private async role(workspaceId: string, id: string): Promise<Role> {
     const role = await this.roles.findById(workspaceId, id);
     if (role == null)
       throw new DomainError("ROLE_NOT_FOUND", "Choose a Role from the list.");
     return role;
-  }
-
-  private async names(workspaceId: string): Promise<Map<string, string>> {
-    const all = await this.designations.listAll(workspaceId);
-    return new Map(all.map((item) => [item.id, item.name]));
   }
 
   private async lookups(
@@ -143,15 +125,13 @@ export class TeamMemberHandlers {
     const userIds = members.flatMap((member) =>
       member.userId == null || member.isOwner ? [] : [member.userId],
     );
-    const [designationNames, roles, usersInOtherCompanies] = await Promise.all([
-      this.names(workspaceId),
+    const [roles, usersInOtherCompanies] = await Promise.all([
       this.roles.listAll(workspaceId),
       userIds.length === 0 || this.accounts == null
         ? new Set<string>()
         : this.accounts.inOtherCompanies(workspaceId, userIds),
     ]);
     return {
-      designationNames,
       roles: new Map(roles.map((role) => [role.id, role])),
       usersInOtherCompanies,
     };
@@ -179,7 +159,6 @@ export class TeamMemberHandlers {
       before,
       after: {
         name: member.details.name,
-        designationId: member.details.designationId,
         memberType: member.memberType,
         status: member.status,
         projectIds: member.projectIds,
@@ -261,7 +240,6 @@ export class TeamMemberHandlers {
   }): Promise<TeamMemberWithPassword> {
     const now = this.clock();
     const details = teamMemberDetails(input.details);
-    await this.designation(input.workspaceId, details.designationId);
     const role =
       input.roleId == null
         ? null
@@ -394,7 +372,6 @@ export class TeamMemberHandlers {
           ? member.details.pan
           : input.details.pan,
     });
-    await this.designation(input.workspaceId, details.designationId);
     member.updateDetails(details, input.by, now, {
       mobileIsSignIn: this.mobileSignIn(),
     });
@@ -512,12 +489,18 @@ export class TeamMemberHandlers {
     workspaceId: string,
     members: readonly TeamMember[],
   ): Promise<ProjectTeamMemberReadModel[]> {
-    const names = await this.names(workspaceId);
+    const roles = new Map(
+      (await this.roles.listAll(workspaceId)).map((role) => [
+        role.id,
+        role.name,
+      ]),
+    );
     return members.map((member) => {
-      const designation = names.get(member.details.designationId) ?? null;
+      const role =
+        member.roleId == null ? null : (roles.get(member.roleId) ?? null);
       const pending =
         member.status === "joining_pending" ? "Joining Pending" : null;
-      const detail = [designation, pending].filter(Boolean).join(" · ");
+      const detail = [role, pending].filter(Boolean).join(" · ");
       return {
         id: member.id,
         name: member.details.name,

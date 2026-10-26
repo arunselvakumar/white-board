@@ -2,7 +2,7 @@ import { prisma } from "@repo/construction-db";
 import { StatusCodes } from "http-status-codes";
 import { describe, expect, it } from "vitest";
 
-import { GET as listDesignations } from "@/app/api/construction/organization/designations/route";
+import { GET as listDepartments } from "@/app/api/construction/masters/departments/route";
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import { jsonRequest, memberWith, ownerWithCompany } from "@/test/companies";
 import { TEST_ORIGIN } from "@/test/sessions";
@@ -237,10 +237,10 @@ describe("Role Management HTTP (ADR CM-0030)", () => {
   it("changes access for everyone on the Role from their next request", async () => {
     const owner = await ownerWithCompany();
     const member = await memberWith(owner, {
-      "organization.designations": ["read"],
+      "masters.departments": ["read"],
     });
     expect(
-      (await listDesignations(jsonRequest(`${TEST_ORIGIN}/x`, member.cookie)))
+      (await listDepartments(jsonRequest(`${TEST_ORIGIN}/x`, member.cookie)))
         .status,
     ).toBe(StatusCodes.OK);
     const theirs = (await list(owner.cookie)).find(
@@ -249,7 +249,7 @@ describe("Role Management HTTP (ADR CM-0030)", () => {
     if (theirs == null) throw new Error("No Role with the member on it");
     const saved = await update(owner.cookie, theirs, { permissions: {} });
     expect(saved.status).toBe(StatusCodes.OK);
-    const after = await listDesignations(
+    const after = await listDepartments(
       jsonRequest(`${TEST_ORIGIN}/x`, member.cookie),
     );
     expect(after.status).toBe(StatusCodes.FORBIDDEN);

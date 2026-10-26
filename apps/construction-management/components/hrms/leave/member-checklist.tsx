@@ -6,7 +6,6 @@ import { Label } from "@repo/ui/components/label";
 export type PickableMember = {
   memberId: string;
   name: string;
-  designationName: string | null;
 };
 
 /** Team Members with a checkbox each and "All Team Members" on top. */
@@ -63,11 +62,6 @@ export function MemberChecklist({
               className="min-w-0 flex-1 font-normal"
             >
               <span className="truncate font-medium">{member.name}</span>
-              {member.designationName != null ? (
-                <span className="text-muted-foreground truncate text-xs">
-                  {member.designationName}
-                </span>
-              ) : null}
             </Label>
           </li>
         ))}

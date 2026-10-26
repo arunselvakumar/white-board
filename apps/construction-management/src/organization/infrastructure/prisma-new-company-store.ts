@@ -4,7 +4,6 @@ import { recordAudit } from "@/src/shared-kernel/audit";
 
 import type { NewCompanyStore } from "../application/new-company-store";
 import type { NewCompany } from "../domain/new-company";
-import { insertDesignations } from "./prisma-designation-repository";
 import { insertRoles } from "./prisma-role-repository";
 import type { PrismaTeamMemberRepository } from "./prisma-team-member-repository";
 
@@ -38,7 +37,6 @@ export class PrismaNewCompanyStore implements NewCompanyStore {
           updatedBy: ownerId,
         },
       });
-      await insertDesignations(tx, company.designations);
       await insertRoles(tx, company.roles);
       await this.members.write(tx, company.ownerMember);
       await recordAudit(tx, {

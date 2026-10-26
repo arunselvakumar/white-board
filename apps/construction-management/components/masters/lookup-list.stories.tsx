@@ -4,7 +4,7 @@ import { expect, waitFor, within } from "storybook/test";
 import {
   calledPath,
   StoryQueryClient,
-} from "@/components/designations/designation-story-support";
+} from "@/components/masters/masters-story-support";
 
 import { DepartmentsList, LabourCategoriesList } from "./lookup-list";
 import {

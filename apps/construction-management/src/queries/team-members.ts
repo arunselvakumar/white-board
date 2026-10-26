@@ -56,7 +56,6 @@ export const TEAM_MEMBERS_KEY = ["organization", "team-members"] as const;
 
 export type TeamMemberDetailsInput = {
   name: string;
-  designationId: string;
   mobile: string | null;
   email: string | null;
   address: string | null;
@@ -131,16 +130,3 @@ export function revealTeamMemberIds(id: string) {
     `/${encodeURIComponent(id)}/reveal`,
   );
 }
-
-export type DesignationOption = { id: string; name: string };
-
-/** Designations for the Team Member form (the route is CM-112's). */
-export const designationOptionsQuery = queryOptions({
-  queryKey: ["organization", "designations", "options"],
-  queryFn: async () =>
-    (
-      await apiJson<{ items: DesignationOption[] }>(
-        "/api/construction/organization/designations",
-      )
-    ).items,
-});

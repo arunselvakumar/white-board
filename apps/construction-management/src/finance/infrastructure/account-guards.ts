@@ -23,7 +23,7 @@ export type FinanceBackdatedCheck = (
 ) => void;
 
 /**
- * Loads the policy, the actor's designation and the Company's today once,
+ * Loads the policy, the actor's Role and the Company's today once,
  * then checks any number of finance dates. Throws the kernel's 403
  * `FINANCIAL_PERIOD_CLOSED` / `BACKDATED_*_BLOCKED`.
  */

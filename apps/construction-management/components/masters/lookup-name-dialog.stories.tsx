@@ -4,7 +4,7 @@ import { expect, fn, waitFor, within } from "storybook/test";
 import {
   sentTo,
   StoryQueryClient,
-} from "@/components/designations/designation-story-support";
+} from "@/components/masters/masters-story-support";
 
 import { LookupNameDialog } from "./lookup-name-dialog";
 import { DEPARTMENTS_SCREEN, LABOUR_CATEGORIES_SCREEN } from "./lookup-screens";

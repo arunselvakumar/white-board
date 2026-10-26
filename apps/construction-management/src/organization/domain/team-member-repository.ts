@@ -48,6 +48,4 @@ export type TeamMemberRepository = {
     workspaceId: string,
     memberType: "normal" | "hrms",
   ): Promise<number>;
-  /** Whether any live Team Member holds this Designation. */
-  usesDesignation(workspaceId: string, designationId: string): Promise<boolean>;
 };

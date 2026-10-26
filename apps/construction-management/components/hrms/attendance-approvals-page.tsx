@@ -185,15 +185,7 @@ function ApprovalList() {
               className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center"
             >
               <div className="min-w-0 flex-1 space-y-1.5">
-                <p className="font-medium">
-                  {name}
-                  {item.member?.designationName == null ? null : (
-                    <span className="text-muted-foreground font-normal">
-                      {" "}
-                      · {item.member.designationName}
-                    </span>
-                  )}
-                </p>
+                <p className="font-medium">{name}</p>
                 <p className="text-sm tabular-nums">
                   {formatWeekdayDate(entry.date)} · In{" "}
                   {formatClock(entry.checkInAt, data.timeZone)}

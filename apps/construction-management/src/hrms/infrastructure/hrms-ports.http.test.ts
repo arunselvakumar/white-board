@@ -12,7 +12,7 @@ import { createHrmsPorts } from "./create-hrms-ports";
 const ports = createHrmsPorts();
 
 describe("hrms ports over Postgres (M3 foundation)", () => {
-  it("lists Team Members as employees with Designation and Projects", async () => {
+  it("lists Team Members as employees with their Projects", async () => {
     const company = await newCompany();
     const projectId = await addProject(company.workspaceId, company.ownerId);
     const member = await addMember(company.workspaceId, company.ownerId, {
@@ -35,7 +35,6 @@ describe("hrms ports over Postgres (M3 foundation)", () => {
     expect(found.get(member.memberId)).toMatchObject({
       userId: member.userId,
       memberType: "normal",
-      designationName: "Site Engineer",
       projectIds: [projectId],
       active: true,
       isOwner: false,

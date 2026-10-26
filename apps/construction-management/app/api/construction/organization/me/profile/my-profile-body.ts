@@ -11,7 +11,6 @@ export function myProfileBody(
   return {
     id: profile.id,
     name: profile.name,
-    designation: profile.designation,
     mobile: profile.mobile,
     mobileEditable: profile.mobileEditable,
     email: profile.email,

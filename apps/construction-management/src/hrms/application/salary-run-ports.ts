@@ -84,7 +84,6 @@ export type SalarySlipDetails = {
   pfWages?: { wage: number; contributory: number };
   employee: {
     name: string;
-    designationName: string | null;
     uan: string | null;
     esiIpNumber: string | null;
   };

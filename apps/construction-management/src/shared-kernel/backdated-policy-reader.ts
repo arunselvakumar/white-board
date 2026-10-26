@@ -17,10 +17,10 @@ type PolicyRow =
 function limitFromJson(value: unknown): BackdatedLimitInput | undefined {
   if (value == null || typeof value !== "object") return undefined;
   const record = value as Record<string, unknown>;
-  const ids = record["overrideDesignationIds"];
+  const ids = record["overrideRoleIds"];
   return {
     days: typeof record["days"] === "number" ? record["days"] : 0,
-    overrideDesignationIds: Array.isArray(ids)
+    overrideRoleIds: Array.isArray(ids)
       ? ids.filter((id): id is string => typeof id === "string")
       : [],
   };
@@ -49,11 +49,11 @@ export function backdatedPolicyFromRow(row: PolicyRow): BackdatedPolicy {
   return createBackdatedPolicy({
     create: {
       days: row.createDays,
-      overrideDesignationIds: row.createOverrideDesignationIds,
+      overrideRoleIds: row.createOverrideRoleIds,
     },
     edit: {
       days: row.editDays,
-      overrideDesignationIds: row.editOverrideDesignationIds,
+      overrideRoleIds: row.editOverrideRoleIds,
     },
     financialClosingDate:
       row.financialClosingDate == null
@@ -83,7 +83,7 @@ export async function loadBackdatedActor(
   db: Pick<PrismaClient, "constructionOrganizationTeamMember">,
   session: { workspaceId: string; userId: string; role: "owner" | "member" },
 ): Promise<BackdatedActor> {
-  if (session.role === "owner") return { designationId: null, isOwner: true };
+  if (session.role === "owner") return { roleId: null, isOwner: true };
   const member = await db.constructionOrganizationTeamMember.findFirst({
     where: {
       workspaceId: session.workspaceId,
@@ -91,7 +91,7 @@ export async function loadBackdatedActor(
       status: "active",
       deletedAt: null,
     },
-    select: { designationId: true },
+    select: { roleId: true },
   });
-  return { designationId: member?.designationId ?? null, isOwner: false };
+  return { roleId: member?.roleId ?? null, isOwner: false };
 }

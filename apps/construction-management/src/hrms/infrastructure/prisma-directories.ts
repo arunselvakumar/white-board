@@ -9,9 +9,7 @@ import type {
 
 type Db = Pick<
   PrismaClient,
-  | "constructionOrganizationTeamMember"
-  | "constructionOrganizationDesignation"
-  | "constructionProjectsProject"
+  "constructionOrganizationTeamMember" | "constructionProjectsProject"
 >;
 
 const MEMBER_SELECT = {
@@ -19,7 +17,6 @@ const MEMBER_SELECT = {
   userId: true,
   name: true,
   memberType: true,
-  designationId: true,
   status: true,
   isOwner: true,
   projects: { select: { projectId: true } },
@@ -30,7 +27,6 @@ type MemberRow = {
   userId: string | null;
   name: string;
   memberType: "normal" | "hrms";
-  designationId: string;
   status: "joining_pending" | "active" | "rejected" | "left";
   isOwner: boolean;
   projects: { projectId: string }[];
@@ -38,7 +34,7 @@ type MemberRow = {
 
 /**
  * Team Members as HRMS employees, read from
- * `construction_organization.team_members` and `designations` by id. The
+ * `construction_organization.team_members` by id. The
  * organization context is referenced by id only, so this is a plain read
  * of its tables (as the labour context's directories do). Live means not
  * removed and not rejected.
@@ -46,26 +42,12 @@ type MemberRow = {
 export class PrismaEmployeeDirectory implements EmployeeDirectory {
   constructor(private readonly db: Db) {}
 
-  private async toEmployees(
-    workspaceId: string,
-    rows: MemberRow[],
-  ): Promise<HrmsEmployee[]> {
-    const designationIds = [...new Set(rows.map((row) => row.designationId))];
-    const designations =
-      designationIds.length === 0
-        ? []
-        : await this.db.constructionOrganizationDesignation.findMany({
-            where: { workspaceId, id: { in: designationIds } },
-            select: { id: true, name: true },
-          });
-    const names = new Map(designations.map((item) => [item.id, item.name]));
+  private toEmployees(rows: MemberRow[]): HrmsEmployee[] {
     return rows.map((row) => ({
       memberId: row.id,
       userId: row.userId,
       name: row.name,
       memberType: row.memberType,
-      designationId: row.designationId,
-      designationName: names.get(row.designationId) ?? null,
       projectIds: row.projects.map((project) => project.projectId),
       active: row.status === "active",
       isOwner: row.isOwner,
@@ -78,7 +60,7 @@ export class PrismaEmployeeDirectory implements EmployeeDirectory {
       select: MEMBER_SELECT,
       orderBy: [{ name: "asc" }, { id: "asc" }],
     });
-    return this.toEmployees(workspaceId, rows);
+    return this.toEmployees(rows);
   }
 
   async find(
@@ -95,7 +77,7 @@ export class PrismaEmployeeDirectory implements EmployeeDirectory {
       },
       select: MEMBER_SELECT,
     });
-    const employees = await this.toEmployees(workspaceId, rows);
+    const employees = this.toEmployees(rows);
     return new Map(employees.map((employee) => [employee.memberId, employee]));
   }
 
@@ -113,7 +95,7 @@ export class PrismaEmployeeDirectory implements EmployeeDirectory {
       select: MEMBER_SELECT,
     });
     if (row == null) return null;
-    const [employee] = await this.toEmployees(workspaceId, [row]);
+    const [employee] = this.toEmployees([row]);
     return employee ?? null;
   }
 }

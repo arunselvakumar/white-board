@@ -22,7 +22,7 @@ export type ResourceKind = (typeof RESOURCE_KINDS)[number];
 export type ProjectResource = {
   id: string;
   name: string;
-  /** Designation, Departments, contact person or mobile. */
+  /** Role, Departments, contact person or mobile. */
   detail: string | null;
   /** Inactive parties stay on the Project but are not offered again. */
   isActive: boolean;

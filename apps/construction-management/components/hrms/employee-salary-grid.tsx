@@ -231,10 +231,7 @@ export function EmployeeSalaryGrid() {
     return items
       .map((item, index) => ({ item, index }))
       .filter(
-        ({ item }) =>
-          needle === "" ||
-          item.name.toLowerCase().includes(needle) ||
-          (item.designationName ?? "").toLowerCase().includes(needle),
+        ({ item }) => needle === "" || item.name.toLowerCase().includes(needle),
       );
   }, [items, query]);
 
@@ -526,9 +523,6 @@ function MemberRow({
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0 space-y-0.5">
           <p className="font-medium">{item.name}</p>
-          <p className="text-muted-foreground text-sm">
-            {item.designationName ?? "No designation"}
-          </p>
         </div>
         <div className="flex flex-wrap gap-1.5">
           {item.memberType === "hrms" ? (

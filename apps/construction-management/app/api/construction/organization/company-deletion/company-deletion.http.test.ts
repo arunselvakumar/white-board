@@ -3,9 +3,9 @@ import { StatusCodes } from "http-status-codes";
 import { describe, expect, it } from "vitest";
 
 import {
-  GET as listDesignations,
-  POST as addDesignation,
-} from "@/app/api/construction/organization/designations/route";
+  GET as listDepartments,
+  POST as addDepartment,
+} from "@/app/api/construction/masters/departments/route";
 import { POST as revealMine } from "@/app/api/construction/organization/me/profile/reveal-identifiers/route";
 import { POST as transfer } from "@/app/api/construction/organization/ownership/transfer/route";
 import { codeFor, requestCode } from "@/test/accounts";
@@ -23,10 +23,10 @@ function scheduleDeletion(cookie: string, companyName: string, code: string) {
   return schedule(jsonRequest(BASE, cookie, { companyName, code }));
 }
 
-function newDesignation(cookie: string) {
-  return addDesignation(
-    jsonRequest(`${ORG}/designations`, cookie, {
-      name: `Surveyor ${crypto.randomUUID().slice(0, 6)}`,
+function newDepartment(cookie: string) {
+  return addDepartment(
+    jsonRequest(`${TEST_ORIGIN}/api/construction/masters/departments`, cookie, {
+      name: `Survey ${crypto.randomUUID().slice(0, 6)}`,
     }),
   );
 }
@@ -78,7 +78,7 @@ describe("Delete Company (CM-907)", () => {
   it("schedules 30 days ahead, makes the Company read-only, and the Owner can cancel", async () => {
     const owner = await ownerWithCompany("Anugraha Engineers");
     const member = await memberWith(owner, {
-      "organization.designations": ["read", "create"],
+      "masters.departments": ["read", "create"],
     });
     const code = await codeFor(owner, "delete_company");
     // Case and spacing are forgiven.
@@ -108,7 +108,7 @@ describe("Delete Company (CM-907)", () => {
 
     // Every write is refused, for the Owner and members alike.
     for (const cookie of [owner.cookie, member.cookie]) {
-      const write = await newDesignation(cookie);
+      const write = await newDepartment(cookie);
       expect(write.status).toBe(StatusCodes.CONFLICT);
       expect(await write.json()).toMatchObject({
         code: "COMPANY_DELETION_SCHEDULED",
@@ -125,8 +125,11 @@ describe("Delete Company (CM-907)", () => {
     // Reads, codes and reveals stay open.
     expect(
       (
-        await listDesignations(
-          jsonRequest(`${ORG}/designations`, member.cookie),
+        await listDepartments(
+          jsonRequest(
+            `${TEST_ORIGIN}/api/construction/masters/departments`,
+            member.cookie,
+          ),
         )
       ).status,
     ).toBe(StatusCodes.OK);
@@ -160,7 +163,7 @@ describe("Delete Company (CM-907)", () => {
     ).toEqual({
       deletion: null,
     });
-    expect((await newDesignation(member.cookie)).status).toBe(
+    expect((await newDepartment(member.cookie)).status).toBe(
       StatusCodes.CREATED,
     );
     const again = await cancel(jsonRequest(`${BASE}/cancel`, owner.cookie, {}));
@@ -175,7 +178,7 @@ describe("Delete Company (CM-907)", () => {
       (await scheduleDeletion(doomed.cookie, "Anugraha Engineers", code))
         .status,
     ).toBe(StatusCodes.CREATED);
-    expect((await newDesignation(other.cookie)).status).toBe(
+    expect((await newDepartment(other.cookie)).status).toBe(
       StatusCodes.CREATED,
     );
   });

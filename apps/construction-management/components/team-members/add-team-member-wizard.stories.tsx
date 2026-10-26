@@ -12,9 +12,8 @@ import {
 import { mockFetch, type MockRoute } from "../../.storybook/mock-fetch";
 import { signInAs } from "../../.storybook/mocks/auth";
 import { AddTeamMemberWizard } from "./add-team-member-wizard";
-import { DESIGNATION_LIST, teamMember } from "./team-member-fixtures";
+import { teamMember } from "./team-member-fixtures";
 
-const DESIGNATIONS_URL = "/api/construction/organization/designations";
 const MEMBERS_URL = "/api/construction/organization/team-members";
 const SRI_HEIGHTS = "0199a000-0000-7000-8000-000000000001";
 
@@ -31,14 +30,10 @@ function sentBody(): Record<string, unknown> {
   >;
 }
 
-/** Designations, Roles, Projects, and `created` as the POST's answer. */
+/** Roles, Projects, and `created` as the POST's answer. */
 function serve(created: () => Response, extra: MockRoute[] = []) {
   return () => {
     fetchMock = mockFetch([
-      {
-        path: DESIGNATIONS_URL,
-        respond: () => Response.json(DESIGNATION_LIST),
-      },
       { path: ROLES_URL, respond: () => Response.json({ items: ROLES }) },
       {
         path: "/api/construction/projects/projects/options",
@@ -97,13 +92,12 @@ async function choose(
   await userEvent.click(await body.findByRole("option", { name }));
 }
 
-/** Name and Designation, the two fields every path fills. */
+/** The name, the one field every path fills. */
 async function fillBasics(context: Context, name = "Prabhu Saravanan") {
   await context.userEvent.type(
     await context.canvas.findByLabelText("Name"),
     name,
   );
-  await choose(context, "Designation", "Site Engineer");
 }
 
 /** Email typed: Invite them ticks itself; the share link follows. */
@@ -384,7 +378,6 @@ export const HrmsMemberStartsOnHrmsStaff: Story = {
     const { canvas, userEvent } = context;
     await userEvent.click(await canvas.findByText("HRMS only"));
     await userEvent.type(canvas.getByLabelText("Name"), "Anitha");
-    await choose(context, "Designation", "Accountant");
     await userEvent.type(canvas.getByLabelText("Email"), "anitha@anugraha.in");
     await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
 
@@ -435,24 +428,6 @@ export const MobileAlreadyInUse: Story = {
     ).toBeVisible();
     // Back on the details step, at the field.
     await expect(canvas.getByLabelText("Mobile")).toBeVisible();
-  },
-};
-
-export const NoDesignationsYet: Story = {
-  beforeEach() {
-    fetchMock = mockFetch([
-      {
-        path: DESIGNATIONS_URL,
-        respond: () => Response.json({ items: [], total: 0 }),
-      },
-      { path: ROLES_URL, respond: () => Response.json({ items: ROLES }) },
-    ]);
-    return fetchMock.restore;
-  },
-  play: async ({ canvas }) => {
-    await expect(
-      await canvas.findByRole("link", { name: "Add a Designation" }),
-    ).toHaveAttribute("href", "/app/masters/designations/new");
   },
 };
 

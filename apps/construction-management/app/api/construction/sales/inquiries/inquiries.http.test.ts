@@ -612,14 +612,14 @@ describe("Inquiries (CM-1003)", () => {
         id: newId(),
         workspaceId: ctx.ws,
         createDays: 0,
-        createOverrideDesignationIds: [],
+        createOverrideRoleIds: [],
         editDays: 0,
-        editOverrideDesignationIds: [],
+        editOverrideRoleIds: [],
         modules: {
           inquiry: {
             mode: "custom",
-            create: { days: 3, overrideDesignationIds: [] },
-            edit: { days: 3, overrideDesignationIds: [] },
+            create: { days: 3, overrideRoleIds: [] },
+            edit: { days: 3, overrideRoleIds: [] },
           },
         },
         createdBy: ctx.by,

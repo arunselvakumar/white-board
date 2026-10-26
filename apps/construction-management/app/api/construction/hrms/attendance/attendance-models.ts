@@ -170,7 +170,6 @@ export type ConstructionHrmsAttendanceDayResponseModel = z.infer<
 const MemberModel = z.object({
   memberId: z.uuid(),
   name: z.string(),
-  designationName: z.string().nullable(),
   memberType: z.enum(["normal", "hrms"]),
 });
 
@@ -350,7 +349,6 @@ export function toMemberResponse(member: HrmsEmployee) {
   return {
     memberId: member.memberId,
     name: member.name,
-    designationName: member.designationName,
     memberType: member.memberType,
   };
 }

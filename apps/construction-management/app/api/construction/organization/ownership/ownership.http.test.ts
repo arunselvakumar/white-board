@@ -24,16 +24,11 @@ async function role(workspaceId: string, userId: string) {
   return row.role;
 }
 
-async function memberRow(workspaceId: string, userId: string) {
-  const row = await prisma.constructionOrganizationTeamMember.findFirstOrThrow({
+function memberRow(workspaceId: string, userId: string) {
+  return prisma.constructionOrganizationTeamMember.findFirstOrThrow({
     where: { workspaceId, userId, deletedAt: null },
     include: { role: true },
   });
-  const designation =
-    await prisma.constructionOrganizationDesignation.findUniqueOrThrow({
-      where: { id: row.designationId },
-    });
-  return { ...row, designation };
 }
 
 describe("Transfer ownership (CM-907)", () => {
@@ -58,10 +53,14 @@ describe("Transfer ownership (CM-907)", () => {
     );
     expect(response.status).toBe(StatusCodes.OK);
     const body = (await response.json()) as {
-      items: { id: string; name: string; designation: string | null }[];
+      items: { id: string; name: string; role: string | null }[];
     };
     expect(body.items).toEqual([
-      { id: member.memberId, name: "Member", designation: "Site Engineer" },
+      {
+        id: member.memberId,
+        name: "Member",
+        role: expect.stringMatching(/^Access /) as unknown,
+      },
     ]);
   });
 
@@ -95,11 +94,9 @@ describe("Transfer ownership (CM-907)", () => {
     await expect(role(owner.workspaceId, owner.userId)).resolves.toBe("member");
     const newOwner = await memberRow(owner.workspaceId, member.userId);
     expect(newOwner).toMatchObject({ isOwner: true });
-    expect(newOwner.designation.name).toBe("Owner");
     expect(newOwner.roleId).toBeNull();
     const oldOwner = await memberRow(owner.workspaceId, owner.userId);
     expect(oldOwner.isOwner).toBe(false);
-    expect(oldOwner.designation.name).toBe("Admin");
     expect(oldOwner.role).toMatchObject({ name: "Admin", isSeed: true });
 
     const audit =

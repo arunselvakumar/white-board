@@ -14,10 +14,6 @@ function member(overrides: Partial<TeamMember>): TeamMember {
     id: "0199c3a0-0000-7000-8000-000000000101",
     userId: null,
     name: "Prabhu Saravanan",
-    designation: {
-      id: "0199c3a0-0000-7000-8000-000000000201",
-      name: "Site Engineer",
-    },
     mobile: "+917708165767",
     email: "prabhu@sakthi.in",
     address: null,
@@ -45,7 +41,6 @@ function member(overrides: Partial<TeamMember>): TeamMember {
 const OWNER = member({
   id: "0199c3a0-0000-7000-8000-000000000100",
   name: "Arun Selva Kumar",
-  designation: { id: "0199c3a0-0000-7000-8000-000000000200", name: "Owner" },
   isOwner: true,
   status: "active",
   userId: "user_owner",
@@ -57,10 +52,6 @@ const PENDING = member({});
 const HRMS = member({
   id: "0199c3a0-0000-7000-8000-000000000102",
   name: "Anitha Selvi",
-  designation: {
-    id: "0199c3a0-0000-7000-8000-000000000202",
-    name: "Accountant",
-  },
   memberType: "hrms",
   status: "active",
   mobile: null,

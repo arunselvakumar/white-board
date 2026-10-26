@@ -40,7 +40,6 @@ type Member = {
   aadhaarMasked: string | null;
   monthlySalary: number | null;
   invitePath: string | null;
-  designation: { name: string | null };
 };
 type Page = {
   items: Member[];
@@ -65,7 +64,6 @@ describe("Team Members HTTP (CM-110)", () => {
     const created = await create(
       jsonRequest(BASE, owner.cookie, {
         name: "Prabhu Saravanan",
-        designationId: owner.designationId("Site Engineer"),
         email: newEmail(),
         aadhaar: "2341 2341 2346",
         memberType: "normal",
@@ -78,7 +76,6 @@ describe("Team Members HTTP (CM-110)", () => {
     expect(prabhu).toMatchObject({
       status: "joining_pending",
       aadhaarMasked: "XXXXXXXX2346",
-      designation: { name: "Site Engineer" },
       role: { id: owner.roleId("Site Engineer"), name: "Site Engineer" },
       canSetPassword: true,
       passwordIgnored: null,
@@ -120,7 +117,6 @@ describe("Team Members HTTP (CM-110)", () => {
       await update(
         jsonRequest(`${BASE}/${prabhu.id}/update`, owner.cookie, {
           name: "Prabhu K.",
-          designationId: owner.designationId("Accountant"),
           email: (
             await json<{ email: string }>(
               await getOne(
@@ -178,7 +174,6 @@ describe("Team Members HTTP (CM-110)", () => {
       await create(
         jsonRequest(BASE, owner.cookie, {
           name,
-          designationId: owner.designationId("Site Supervisor"),
           email: newEmail(),
           memberType: "normal",
           roleId: owner.roleId("Site Supervisor"),
@@ -230,7 +225,6 @@ describe("Team Members HTTP (CM-110)", () => {
     const refused = await create(
       jsonRequest(BASE, viewer.cookie, {
         name: "X",
-        designationId: owner.designationId("Admin"),
         email: newEmail(),
         memberType: "normal",
         roleId: owner.roleId("Accountant"),
@@ -244,7 +238,6 @@ describe("Team Members HTTP (CM-110)", () => {
     const owner = await ownerWithCompany();
     const body = (overrides: Record<string, unknown> = {}) => ({
       name: "Prabhu Saravanan",
-      designationId: owner.designationId("Site Engineer"),
       mobile: newMobile(),
       memberType: "normal",
       roleId: owner.roleId("Accountant"),
@@ -336,7 +329,6 @@ describe("Team Members HTTP (CM-110)", () => {
     });
     const body = (roleId: string) => ({
       name: "New",
-      designationId: owner.designationId("Site Supervisor"),
       email: newEmail(),
       memberType: "normal",
       roleId,
@@ -427,7 +419,6 @@ describe("Team Members HTTP (CM-110)", () => {
       await create(
         jsonRequest(BASE, other.cookie, {
           name: "Theirs",
-          designationId: other.designationId("Admin"),
           email: newEmail(),
           memberType: "normal",
           roleId: other.roleId("Accountant"),
@@ -442,7 +433,6 @@ describe("Team Members HTTP (CM-110)", () => {
     const theirRole = await create(
       jsonRequest(BASE, owner.cookie, {
         name: "X",
-        designationId: owner.designationId("Admin"),
         email: newEmail(),
         memberType: "normal",
         roleId: other.roleId("Accountant"),
@@ -453,7 +443,6 @@ describe("Team Members HTTP (CM-110)", () => {
     const noRole = await create(
       jsonRequest(BASE, owner.cookie, {
         name: "X",
-        designationId: owner.designationId("Admin"),
         email: newEmail(),
         memberType: "normal",
       }),
@@ -476,7 +465,6 @@ describe("Team Members HTTP (CM-110)", () => {
     const changed = await update(
       jsonRequest(`${BASE}/${member.memberId}/update`, owner.cookie, {
         name: "Member",
-        designationId: owner.designationId("Site Engineer"),
         email: member.email,
         mobile,
         memberType: "normal",
@@ -494,7 +482,6 @@ describe("Team Members HTTP (CM-110)", () => {
     const owner = await ownerWithCompany();
     const body = {
       name: "Mobile Only",
-      designationId: owner.designationId("Site Supervisor"),
       mobile: newMobile(),
       memberType: "normal",
       roleId: owner.roleId("Site Supervisor"),
@@ -549,7 +536,6 @@ describe("Team Members HTTP, SMS on (ADR CM-0009)", () => {
     const refused = await update(
       jsonRequest(`${BASE}/${member.memberId}/update`, owner.cookie, {
         name: "Member",
-        designationId: owner.designationId("Site Engineer"),
         email: member.email,
         mobile: newMobile(),
         memberType: "normal",
@@ -566,7 +552,6 @@ describe("Team Members HTTP, SMS on (ADR CM-0009)", () => {
       await create(
         jsonRequest(BASE, owner.cookie, {
           name: "Mobile Only",
-          designationId: owner.designationId("Site Supervisor"),
           mobile: newMobile(),
           memberType: "normal",
           roleId: owner.roleId("Site Supervisor"),

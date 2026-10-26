@@ -70,10 +70,7 @@ export function TransferOwnershipDialog({
   const errors = form.formState.errors;
   const items = (candidates.data?.items ?? []).map((item) => ({
     value: item.id,
-    label:
-      item.designation == null
-        ? item.name
-        : `${item.name} · ${item.designation}`,
+    label: item.role == null ? item.name : `${item.name} · ${item.role}`,
   }));
 
   const submit = async (values: Parsed) => {

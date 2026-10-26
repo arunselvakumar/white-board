@@ -12,7 +12,6 @@ import { POST as webhook } from "@/app/api/webhooks/razorpay/route";
 import { PaymentsNotConfiguredError } from "@/src/organization/application/subscription-handlers";
 import { addMonths } from "@/src/organization/domain/subscription";
 import { createCompanyHandlers } from "@/src/organization/infrastructure/create-company-handlers";
-import { createDesignationHandlers } from "@/src/organization/infrastructure/create-designation-handlers";
 import { createSubscriptionHandlers } from "@/src/organization/infrastructure/create-subscription-handlers";
 import { createTeamMemberHandlers } from "@/src/organization/infrastructure/create-team-member-handlers";
 import { FakePaymentGateway } from "@/src/organization/infrastructure/fake-payment-gateway";
@@ -90,10 +89,7 @@ async function newCompany() {
     userMobile: null,
     userEmail: `${userId}@example.test`,
   });
-  const designations = await createDesignationHandlers().list(workspaceId);
-  const designationId =
-    designations.find((item) => item.name === "Site Engineer")?.id ?? "";
-  return { workspaceId, userId, designationId };
+  return { workspaceId, userId };
 }
 
 const BILLING = {
@@ -498,7 +494,7 @@ describe("Checkout and Razorpay (CM-117)", () => {
 
 describe("Plan enforcement (CM-118)", () => {
   it("neither limits nor ends a Company with no plan", async () => {
-    const { workspaceId, userId, designationId } = await newCompany();
+    const { workspaceId, userId } = await newCompany();
     signIn(userId, workspaceId);
     expect(
       await requireAccess(
@@ -518,14 +514,13 @@ describe("Plan enforcement (CM-118)", () => {
         memberType: "normal",
         details: {
           name: `Member ${String(index)}`,
-          designationId,
           mobile: `+9197${String(index).padStart(8, "0")}`,
         },
       });
   });
 
   it("refuses a Team Member beyond the plan with 402 and the limit", async () => {
-    const { workspaceId, userId, designationId } = await newCompany();
+    const { workspaceId, userId } = await newCompany();
     await givePlan(workspaceId);
     const members = createTeamMemberHandlers();
     const invite = (index: number, memberType: "normal" | "hrms") =>
@@ -535,7 +530,6 @@ describe("Plan enforcement (CM-118)", () => {
         memberType,
         details: {
           name: `Member ${String(index)}`,
-          designationId,
           mobile: `+9198${String(index).padStart(8, "0")}`,
         },
       });
@@ -562,7 +556,7 @@ describe("Plan enforcement (CM-118)", () => {
   });
 
   it("makes an ended plan read-only: writes 402, reads and export allowed, renewal open", async () => {
-    const { workspaceId, userId, designationId } = await newCompany();
+    const { workspaceId, userId } = await newCompany();
     await givePlan(workspaceId, { endsAt: new Date(Date.now() - 60_000) });
     signIn(userId, workspaceId);
     const request = () =>
@@ -605,7 +599,7 @@ describe("Plan enforcement (CM-118)", () => {
         workspaceId,
         by: userId,
         memberType: "normal",
-        details: { name: "Late", designationId, mobile: "+919811111111" },
+        details: { name: "Late", mobile: "+919811111111" },
       }),
     ).rejects.toMatchObject({ code: "PLAN_EXPIRED" });
 

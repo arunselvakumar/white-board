@@ -56,7 +56,6 @@ function addUser(
   return create(
     jsonRequest(BASE, owner.cookie, {
       name: "Murugan Pillai",
-      designationId: owner.designationId("Site Supervisor"),
       memberType: "normal",
       roleId: owner.roleId("Site Supervisor"),
       ...fields,

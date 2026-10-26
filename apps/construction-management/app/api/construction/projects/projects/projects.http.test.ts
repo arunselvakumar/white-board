@@ -512,7 +512,6 @@ describe("Projects HTTP (CM-204)", () => {
       createTeamMember(
         jsonRequest(members, owner.cookie, {
           name: "Prabhu Saravanan",
-          designationId: owner.designationId("Site Engineer"),
           email: `prabhu-${newId()}@example.test`,
           memberType: "normal",
           projectIds,

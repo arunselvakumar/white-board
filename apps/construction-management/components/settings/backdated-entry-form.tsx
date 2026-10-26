@@ -20,7 +20,7 @@ import { PageHeader } from "@/components/app-shell/page-header";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   backdatedEntryPolicyQuery,
-  designationOptionsQuery,
+  roleOptionsQuery,
   updateBackdatedEntryPolicy,
 } from "@/src/queries/settings";
 import {
@@ -76,8 +76,8 @@ const MODULE_LABELS = new Map<string, string>(
 
 /** Back-dated Entry settings (CM-113): default limits, module overrides, Financial Closing Date. */
 export function BackdatedEntryForm() {
-  const [{ data: policy }, { data: designations }] = useSuspenseQueries({
-    queries: [backdatedEntryPolicyQuery, designationOptionsQuery],
+  const [{ data: policy }, { data: roles }] = useSuspenseQueries({
+    queries: [backdatedEntryPolicyQuery, roleOptionsQuery],
   });
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState<BackdatedModuleKey | null>(null);
@@ -147,9 +147,8 @@ export function BackdatedEntryForm() {
                 Default limits
               </h2>
               <p className="text-muted-foreground text-sm">
-                Apply to every module set to Global. With no override
-                Designations, the limit is a hard block for everyone but the
-                Owner.
+                Apply to every module set to Global. With no override Roles, the
+                limit is a hard block for everyone but the Owner.
               </p>
             </div>
             <BackdatedLimitFields
@@ -157,7 +156,7 @@ export function BackdatedEntryForm() {
               control={form.control}
               register={form.register}
               errors={errors}
-              designations={designations}
+              roles={roles}
             />
           </section>
 
@@ -273,7 +272,7 @@ export function BackdatedEntryForm() {
             label={MODULE_LABELS.get(editing) ?? editing}
             setting={editingSetting}
             defaults={defaults}
-            designations={designations}
+            roles={roles}
             onClose={() => {
               setEditing(null);
             }}

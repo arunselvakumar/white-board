@@ -59,7 +59,6 @@ const LIST: HrmsShiftAssignments = {
         memberId: MEENA,
         name: "Meena Rajan",
         memberType: "hrms",
-        designationName: "Accountant",
         active: true,
       },
       current: null,
@@ -71,7 +70,6 @@ const LIST: HrmsShiftAssignments = {
         memberId: PRABHU,
         name: "Prabhu Saravanan",
         memberType: "normal",
-        designationName: "Site Engineer",
         active: true,
       },
       current: {
@@ -122,7 +120,6 @@ const LIST: HrmsShiftAssignments = {
         memberId: RAVI,
         name: "Ravi Kumar",
         memberType: "normal",
-        designationName: null,
         active: false,
       },
       current: null,

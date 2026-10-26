@@ -15,7 +15,6 @@ export type TeamMemberReadModel = {
   id: string;
   userId: string | null;
   name: string;
-  designation: { id: string; name: string | null };
   /** Null for the Owner, and for a member left without one. */
   role: { id: string; name: string } | null;
   mobile: string | null;
@@ -48,7 +47,6 @@ export type TeamMemberReadModel = {
 
 /** What a Team Member's view needs besides the record itself. */
 export type TeamMemberLookups = {
-  designationNames: ReadonlyMap<string, string>;
   /** Live Roles of the Company by id. */
   roles: ReadonlyMap<string, Role>;
   /** Users who also belong to another Company. */
@@ -69,10 +67,6 @@ export function toTeamMemberReadModel(
     id: member.id,
     userId: member.userId,
     name: details.name,
-    designation: {
-      id: details.designationId,
-      name: lookups.designationNames.get(details.designationId) ?? null,
-    },
     role: role == null ? null : { id: role.id, name: role.name },
     mobile: details.mobile,
     email: details.email,

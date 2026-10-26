@@ -15,7 +15,6 @@ export const ZONE = "Asia/Kolkata";
 const MEMBER = {
   memberId: "0199d0a0-0000-7000-8000-000000000001",
   name: "Prabhu Saravanan",
-  designationName: "Site Engineer",
   memberType: "normal" as const,
 };
 
@@ -110,19 +109,18 @@ export function checkedIn(
 }
 
 const PEOPLE = [
-  ["Prabhu Saravanan", "Site Engineer"],
-  ["Meena Rajan", "Accountant"],
-  ["Karthik Ravi", "Store Keeper"],
-  ["Divya Lakshmi", "Office Assistant"],
-  ["Arun Selva Kumar", null],
+  "Prabhu Saravanan",
+  "Meena Rajan",
+  "Karthik Ravi",
+  "Divya Lakshmi",
+  "Arun Selva Kumar",
 ] as const;
 
 export function member(index: number) {
-  const [name, designationName] = PEOPLE[index] ?? ["Someone", null];
+  const name = PEOPLE[index] ?? "Someone";
   return {
     memberId: `0199d0a0-0000-7000-8000-${String(100 + index).padStart(12, "0")}`,
     name,
-    designationName,
     memberType: "normal" as const,
   };
 }

@@ -112,12 +112,6 @@ export function BranchMembersDialog({
                   />
                   <span className="min-w-0 flex-1 truncate">
                     {employee.name}
-                    {employee.designationName == null ? null : (
-                      <span className="text-muted-foreground">
-                        {" "}
-                        · {employee.designationName}
-                      </span>
-                    )}
                   </span>
                   {employee.memberType === "hrms" ? (
                     <Badge variant="secondary">HRMS</Badge>

@@ -43,14 +43,12 @@ export class AddStaffPage extends AppShellPage {
 
   public async fillDetails(input: {
     name: string;
-    designation?: string;
     email?: string;
     mobile?: string;
     password?: string;
     salary?: string;
   }) {
     await this.nameField.fill(input.name);
-    await this.choose("Designation", input.designation ?? "Site Engineer");
     if (input.mobile != null) await this.mobileField.fill(input.mobile);
     if (input.email != null) await this.emailField.fill(input.email);
     if (input.salary != null) await this.salaryField.fill(input.salary);

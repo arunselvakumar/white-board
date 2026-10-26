@@ -304,7 +304,6 @@ function MarkPaidForm({
 export type AdvanceMember = {
   memberId: string;
   name: string;
-  designationName: string | null;
 };
 
 const advanceSchema = z.object({
@@ -396,10 +395,7 @@ function AdvanceForm({
   const mode = useWatch({ control: form.control, name: "mode" });
   const items = members.map((member) => ({
     value: member.memberId,
-    label:
-      member.designationName == null
-        ? member.name
-        : `${member.name} · ${member.designationName}`,
+    label: member.name,
   }));
   const submit = form.handleSubmit(async (values) => {
     try {

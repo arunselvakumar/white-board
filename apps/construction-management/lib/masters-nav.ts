@@ -1,5 +1,4 @@
 import {
-  BadgeCheck,
   CircleAlert,
   Tag,
   Landmark,
@@ -44,19 +43,6 @@ export type MastersGroup = {
  * a group (or a new group) here; nothing else needs to change.
  */
 export const MASTERS_GROUPS: readonly MastersGroup[] = [
-  {
-    label: "Company",
-    sections: [
-      {
-        href: "/app/masters/designations",
-        label: "Designations",
-        title: "Designations",
-        description:
-          "Job titles your team hold: Site Engineer, Store Keeper, Accountant…",
-        icon: BadgeCheck,
-      },
-    ],
-  },
   {
     label: "Parties",
     sections: [

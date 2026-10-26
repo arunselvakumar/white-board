@@ -1555,11 +1555,6 @@ const SPECS: Record<string, EntitySpec> = {
   team_members: master(`${OG}.team_members t`, [
     id(),
     col("name", "Name", "t.name"),
-    col(
-      "designation",
-      "Designation",
-      nameIn(`${OG}.designations`, "t.designation_id"),
-    ),
     col("mobile", "Mobile", "t.mobile"),
     col("email", "Email", "t.email"),
     col("address", "Address", "t.address"),
@@ -1584,12 +1579,6 @@ const SPECS: Record<string, EntitySpec> = {
       `(SELECT string_agg(x.name, ', ' ORDER BY x.name) FROM ${OG}.team_member_projects a JOIN ${PJ}.projects x ON x.id = a.project_id::uuid WHERE a.member_id = t.id AND x.deleted_at IS NULL)`,
     ),
     col("joinedAt", "Joined On", "t.joined_at", "datetime"),
-    ...stamps(),
-  ]),
-  designations: master(`${OG}.designations t`, [
-    id(),
-    col("name", "Designation", "t.name"),
-    col("isSeed", "Built in", "t.is_seed", "bool"),
     ...stamps(),
   ]),
   departments: simpleMaster(`${MS}.departments`, "Department"),
@@ -1794,11 +1783,6 @@ const SPECS: Record<string, EntitySpec> = {
   hrms_employees: master(`${OG}.team_members t`, [
     id(),
     col("name", "Employee", "t.name"),
-    col(
-      "designation",
-      "Designation",
-      nameIn(`${OG}.designations`, "t.designation_id"),
-    ),
     col("memberType", "Member Type", "t.member_type::text", "enum"),
     col("status", "Status", "t.status::text", "enum"),
     col("mobile", "Mobile", "t.mobile"),
@@ -2413,7 +2397,6 @@ const MEMBERSHIP_COLUMNS: BackupColumn[] = [
   { field: "role", label: "Role", type: "enum" },
   { field: "teamMemberId", label: "Team Member ID", type: "id" },
   { field: "name", label: "Name", type: "text" },
-  { field: "designation", label: "Designation", type: "text" },
   { field: "mobile", label: "Mobile", type: "text" },
   { field: "email", label: "Email", type: "text" },
   { field: "address", label: "Address", type: "text" },
@@ -2469,13 +2452,12 @@ export function createMyDataReader(): MyDataReader {
       const members = await prisma.$queryRaw<Record<string, BackupRawValue>[]>(
         Prisma.sql`
           SELECT t.workspace_id AS "companyId", t.id::text AS "teamMemberId",
-                 t.name, d.name AS designation, t.mobile, t.email, t.address,
+                 t.name, t.mobile, t.email, t.address,
                  CASE WHEN t.aadhaar_last4 IS NULL THEN NULL ELSE 'XXXX XXXX ' || t.aadhaar_last4 END AS aadhaar,
                  CASE WHEN t.pan_last4 IS NULL THEN NULL ELSE 'XXXXXX' || t.pan_last4 END AS pan,
                  t.emergency_contact AS "emergencyContact", t.status::text AS status,
                  t.joined_at AS "joinedAt"
             FROM construction_organization.team_members t
-            LEFT JOIN construction_organization.designations d ON d.id = t.designation_id
            WHERE t.user_id = ${userId} AND t.deleted_at IS NULL
            ORDER BY t.created_at`,
       );

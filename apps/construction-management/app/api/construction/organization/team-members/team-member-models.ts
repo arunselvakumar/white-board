@@ -28,7 +28,6 @@ export const TeamMemberIdParamsModel = z.object({ id: z.uuid() });
 
 export const teamMemberDetailFields = {
   name: z.string().trim().min(1).max(100),
-  designationId: z.uuid(),
   mobile: z.string().trim().max(20).nullish(),
   email: z.string().trim().max(254).nullish(),
   address: z.string().trim().max(500).nullish(),
@@ -51,7 +50,6 @@ export const ConstructionOrganizationTeamMemberResponseModel = z.object({
   id: z.uuid(),
   userId: z.string().nullable(),
   name: z.string(),
-  designation: z.object({ id: z.uuid(), name: z.string().nullable() }),
   role: z
     .object({ id: z.uuid(), name: z.string() })
     .nullable()

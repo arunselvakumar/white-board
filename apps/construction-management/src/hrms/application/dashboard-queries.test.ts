@@ -38,8 +38,6 @@ function employee(memberId: string, name: string, userId: string) {
     userId,
     name,
     memberType: "normal",
-    designationId: "d1",
-    designationName: "Site Engineer",
     projectIds: [],
     active: true,
     isOwner: false,
@@ -360,7 +358,6 @@ function balances(member: HrmsEmployee): MemberLeaveBalances {
   return {
     memberId: member.memberId,
     memberName: member.name,
-    designationName: member.designationName,
     leaveYear: "2026",
     structureId: null,
     rows: [
