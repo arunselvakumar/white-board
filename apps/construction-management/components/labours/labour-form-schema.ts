@@ -207,8 +207,7 @@ export function updateLabourPayload(
 }
 
 type LabourField =
-  | Exclude<keyof LabourFormValues, "wage">
-  | `wage.${keyof WageValues}`;
+  Exclude<keyof LabourFormValues, "wage"> | `wage.${keyof WageValues}`;
 
 /** Server error codes → the field they belong to. */
 export const LABOUR_ERROR_FIELDS: Record<string, LabourField> = {

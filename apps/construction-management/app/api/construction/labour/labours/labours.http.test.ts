@@ -744,7 +744,10 @@ describe("Labour register (CM-205 – CM-207)", () => {
     const rows = (await history(meena.id)).items;
     const [left, joined] = rows.slice(-2);
     expect(left).toMatchObject({ fromProject: { id: tower }, toProject: null });
-    expect(joined).toMatchObject({ fromProject: null, toProject: { id: villa } });
+    expect(joined).toMatchObject({
+      fromProject: null,
+      toProject: { id: villa },
+    });
     const today = left?.transferDate ?? "";
     expect(joined?.transferDate).toBe(today);
     expect(await options(tower, today)).toEqual([]);

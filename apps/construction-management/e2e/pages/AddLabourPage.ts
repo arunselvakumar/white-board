@@ -21,7 +21,8 @@ export class AddLabourPage extends AppShellPage {
       await this.choose("Labour Category", input.category);
     for (const project of input.projects ?? [])
       await this.choose("Projects", project);
-    if ((input.projects ?? []).length > 0) await this.page.keyboard.press("Escape");
+    if ((input.projects ?? []).length > 0)
+      await this.page.keyboard.press("Escape");
   }
 
   public get saveButton() {

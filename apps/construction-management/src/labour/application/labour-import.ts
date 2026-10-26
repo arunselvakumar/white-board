@@ -339,8 +339,7 @@ export class LabourImport {
       );
     const now = this.clock();
     const items: NewLabour[] = checked.map((row) => {
-      if (row.details == null)
-        throw new Error("A valid row has details.");
+      if (row.details == null) throw new Error("A valid row has details.");
       return {
         labour: Labour.create({
           id: newId(now.getTime()),

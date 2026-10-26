@@ -41,7 +41,9 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
 
   /** On another Project as well, from a date (ADR CM-0033). */
   alsoOn(labourId: string, projectId: string, from: CalendarDate): void {
-    this.history.get(labourId)?.push({ date: from, off: null, onto: projectId });
+    this.history
+      .get(labourId)
+      ?.push({ date: from, off: null, onto: projectId });
   }
 
   transfer(
@@ -107,9 +109,7 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
   ): Promise<AttendanceLabourer[]> {
     return Promise.resolve(
       [...this.people.values()]
-        .filter(
-          (item) => item.isActive && this.isOn(item.id, projectId, date),
-        )
+        .filter((item) => item.isActive && this.isOn(item.id, projectId, date))
         .sort((a, b) => a.name.localeCompare(b.name)),
     );
   }
