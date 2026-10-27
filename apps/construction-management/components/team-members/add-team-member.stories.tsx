@@ -106,11 +106,18 @@ export const InviteByEmail: Story = {
   play: async (context) => {
     const { canvas, canvasElement, userEvent } = context;
     const body = within(canvasElement.ownerDocument.body);
-    // One page: every card is there at once, with one button.
-    for (const card of ["Details", "Salary", "Projects", "Role", "Sign-in"])
-      await expect(
-        await canvas.findByRole("heading", { name: new RegExp(`^${card}`) }),
-      ).toBeVisible();
+    // One page: every card is there at once, in order, with one button.
+    await canvas.findByRole("heading", { name: /^Projects/ });
+    const cards = canvas
+      .getAllByRole("heading", { level: 2 })
+      .map((heading) => heading.textContent.replace(/\W+$/, ""));
+    await expect(cards).toEqual([
+      "Details",
+      "Role",
+      "Sign-in",
+      "Salary",
+      "Projects",
+    ]);
     await expect(canvas.queryByText(/Step \d of/)).not.toBeInTheDocument();
     await expect(canvas.getByRole("link", { name: "Cancel" })).toHaveAttribute(
       "href",
