@@ -269,5 +269,6 @@ describe("organization.company_purge (CM-907)", () => {
         where: { id: other.owner.workspaceId },
       }),
     ).resolves.toBe(1);
-  });
+    // Seeds two busy Companies across every schema: over 4 s on CI.
+  }, 30_000);
 });
