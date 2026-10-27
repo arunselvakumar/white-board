@@ -118,7 +118,7 @@ export const EditSalary: Story = {
     const headings = canvas
       .getAllByRole("heading", { level: 2 })
       .map((heading) => heading.textContent.replace(/\W+$/, ""));
-    await expect(headings).toEqual(["Details", "Salary", "Sign-in"]);
+    await expect(headings).toEqual(["Details", "Sign-in", "Salary"]);
     await userEvent.clear(salary);
     await userEvent.type(salary, "30000");
     await userEvent.click(canvas.getByRole("button", { name: "Save details" }));

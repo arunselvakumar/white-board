@@ -62,8 +62,8 @@ type Created = TeamMember &
   PasswordOutcome & { passwordSet: boolean; invited: boolean };
 
 /**
- * Add Staff (CM-111, ADR CM-0033 §1): one page of cards, Details, Salary,
- * Projects, Role and Sign-in, with one button. HRMS members have no
+ * Add Staff (CM-111, ADR CM-0033 §1): one page of cards, Details, Role,
+ * Sign-in, Salary and Projects, with one button. HRMS members have no
  * Projects card and start on HRMS Staff.
  */
 export function AddTeamMember({
@@ -177,23 +177,25 @@ export function AddTeamMember({
             form={form}
             canSeeSalary={canSeeSalary}
             signIn={<SignInOptions form={form} companyName={companyName} />}
+            role={
+              <RoleField
+                id={ROLE_FIELD_ID}
+                roles={roles}
+                value={roleId}
+                onChange={(value) => {
+                  setChosenRoleId(value);
+                  setRoleError(undefined);
+                }}
+                error={roleError}
+                previewOpen={false}
+              />
+            }
           >
             {memberType !== "hrms" && (
               <FormSection title="Projects">
                 <ProjectsField value={projectIds} onChange={setProjectIds} />
               </FormSection>
             )}
-            <RoleField
-              id={ROLE_FIELD_ID}
-              roles={roles}
-              value={roleId}
-              onChange={(value) => {
-                setChosenRoleId(value);
-                setRoleError(undefined);
-              }}
-              error={roleError}
-              previewOpen={false}
-            />
           </TeamMemberDetailsFields>
 
           <FormAlert message={form.formState.errors.root?.message} />

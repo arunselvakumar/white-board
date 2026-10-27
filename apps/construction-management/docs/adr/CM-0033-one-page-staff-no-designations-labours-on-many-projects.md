@@ -19,11 +19,12 @@ The issue listed five questions. The owner accepted the recommended answer to ea
 
 ### 1. Add Staff is one page
 
-- Add Staff is one page of cards, in the style of Add Labour: **Details**, **Salary**, **Projects**, **Role**, **Sign-in**, then one **Add Staff** (or **Add and invite**) button with Cancel beside it. There is no step bar.
+- Add Staff is one page of cards, in the style of Add Labour: **Details**, **Role**, **Sign-in**, **Salary**, **Projects**, then one **Add Staff** (or **Add and invite**) button with Cancel beside it. There is no step bar.
 - HRMS staff see no Projects card and start on the **HRMS Staff** Role, as before.
 - A server error is shown on its field, in whichever card owns it, and the page scrolls to the first error.
 - The outcome screen (can sign in now / invited / a record, with Share invite link) is unchanged.
 - Edit Staff shows its cards in the same order.
+- The card order was revised on 2026-10-27 at the client's request (it was Details, Salary, Projects, Role, Sign-in): who they are and how they sign in come first, pay and Projects after.
 
 ### 2. There are no Designations
 
