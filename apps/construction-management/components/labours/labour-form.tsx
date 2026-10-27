@@ -55,7 +55,7 @@ import {
 } from "./labour-form-schema";
 import { projectsLabel } from "./labour-projects";
 
-export const LABOURS_PATH = "/app/masters/labours";
+export const LABOURS_PATH = "/app/labours";
 
 const NONE = "__none";
 

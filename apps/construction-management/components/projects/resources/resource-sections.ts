@@ -8,8 +8,10 @@ export type ResourceSectionInfo = {
   singular: string;
   /** Under the section title. */
   description: string;
-  /** The master where this kind of party is added. */
+  /** The page where this kind of party is added. */
   addPath: string;
+  /** The main-menu area that page is in, for the empty states. */
+  area: string;
   icon: LucideIcon;
 };
 
@@ -22,6 +24,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
     description:
       "Team Members on a Project see it and work on it. The Owner is on every Project.",
     addPath: "/app/staff/new",
+    area: "Staff & Roles",
     icon: Users,
   },
   {
@@ -30,6 +33,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
     singular: "Contractor",
     description: "Parties that execute work on this Project.",
     addPath: "/app/masters/contractors/new",
+    area: "Masters",
     icon: Hammer,
   },
   {
@@ -38,6 +42,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
     singular: "Supplier",
     description: "Parties that sell material for this Project.",
     addPath: "/app/masters/suppliers/new",
+    area: "Masters",
     icon: Truck,
   },
   {
@@ -46,7 +51,8 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
     singular: "Vendor",
     description:
       "Labour gangs on this Project; they appear on its attendance screen.",
-    addPath: "/app/masters/vendors/new",
+    addPath: "/app/vendors/new",
+    area: "Labour & Vendors",
     icon: Handshake,
   },
 ];

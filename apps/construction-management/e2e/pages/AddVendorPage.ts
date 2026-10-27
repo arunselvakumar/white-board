@@ -2,7 +2,7 @@ import { AppShellPage } from "./AppShellPage";
 
 export class AddVendorPage extends AppShellPage {
   public get url() {
-    return "/app/masters/vendors/new";
+    return "/app/vendors/new";
   }
 
   public async fill(input: {

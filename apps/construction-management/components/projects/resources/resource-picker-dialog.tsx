@@ -97,7 +97,7 @@ function PickerBody({
             </EmptyMedia>
             <EmptyTitle>No {section.title} yet</EmptyTitle>
             <EmptyDescription>
-              Add {section.title} in Masters, then choose them here.
+              Add {section.title} in {section.area}, then choose them here.
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>

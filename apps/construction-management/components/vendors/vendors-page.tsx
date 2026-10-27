@@ -76,7 +76,7 @@ import {
 
 import { ProjectFilterSkeleton, VendorRowsSkeleton } from "./vendors-skeletons";
 
-export const VENDORS_PATH = "/app/masters/vendors";
+export const VENDORS_PATH = "/app/vendors";
 
 const STATUS_FILTERS: FilterTab<VendorListFilter["status"]>[] = [
   { value: "all", label: "All", icon: LayoutGrid },
@@ -90,7 +90,7 @@ function editPath(id: string): string {
   return `${VENDORS_PATH}/${encodeURIComponent(id)}`;
 }
 
-/** Masters → Vendors (CM-209): search, status tabs, Project filter, row actions. */
+/** Labour & Vendors → Vendors (CM-209): search, status tabs, Project filter, row actions. */
 export function VendorsPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<VendorListFilter["status"]>("all");
@@ -111,7 +111,6 @@ export function VendorsPage() {
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
-          back={{ label: "Masters", href: "/app/masters" }}
           title="Vendors"
           meta="Labour gangs you hire by the head, with their shift rates."
           actions={addLink}

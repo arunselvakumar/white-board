@@ -628,7 +628,7 @@ export class LabourAttendanceHandlers {
       if (!labourer.isActive)
         throw rowError(
           "LABOUR_INACTIVE",
-          `${labourer.name} is inactive. Activate them in Masters → Labours to mark attendance.`,
+          `${labourer.name} is inactive. Activate them in Labour & Vendors → Labours to mark attendance.`,
           "invalid",
           { labourId: labourer.id },
         );

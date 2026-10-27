@@ -3,12 +3,13 @@ import { describe, expect, it } from "vitest";
 import { APP_NAV, isAppNavActive } from "./app-nav";
 
 describe("APP_NAV", () => {
-  it("has the Company Dashboard, the three top-level areas, Staff & Roles, then Settings", () => {
+  it("has the Company Dashboard, the three top-level areas, Labour & Vendors, Staff & Roles, then Settings", () => {
     expect(APP_NAV.map((item) => item.label)).toEqual([
       "Dashboard",
       "Projects",
       "Workspace",
       "Masters",
+      "Labour & Vendors",
       "Staff & Roles",
       "Settings",
     ]);

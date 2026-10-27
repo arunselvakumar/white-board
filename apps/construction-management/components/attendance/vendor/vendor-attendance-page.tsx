@@ -33,7 +33,7 @@ import { cn } from "@repo/ui/lib/utils";
 import { formatPaise } from "@/components/money/money-input";
 import { vendorAttendanceDayQuery } from "@/src/queries/vendor-attendance";
 
-import { VENDOR_MASTERS_PATH, VendorDayCard } from "./vendor-day-card";
+import { VENDORS_PAGE_PATH, VendorDayCard } from "./vendor-day-card";
 import { VendorMonthView } from "./vendor-month-view";
 import { VendorOvertimeView } from "./vendor-overtime-view";
 import { VendorDayGridSkeleton } from "@/components/attendance/attendance-skeletons";
@@ -58,12 +58,13 @@ function NoVendors() {
         </EmptyMedia>
         <EmptyTitle>No vendors on this Project</EmptyTitle>
         <EmptyDescription>
-          Assign a vendor to this Project in Masters → Vendors, with a rate card
-          of shifts and Labour Category rates, to record its headcount.
+          Assign a vendor to this Project in Labour & Vendors → Vendors, with a
+          rate card of shifts and Labour Category rates, to record its
+          headcount.
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
-        <Link href={VENDOR_MASTERS_PATH} className={buttonVariants()}>
+        <Link href={VENDORS_PAGE_PATH} className={buttonVariants()}>
           Go to Vendors
         </Link>
       </EmptyContent>

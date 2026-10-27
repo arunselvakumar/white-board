@@ -1,5 +1,6 @@
 import { HardHat, Wrench, type LucideIcon } from "lucide-react";
 
+import type { PageHeaderBack } from "@/components/app-shell/page-header";
 import type { LookupList } from "@/src/queries/masters";
 
 /** The words and icon of a name-only masters list screen. */
@@ -15,6 +16,8 @@ export type LookupScreenConfig = {
   emptyDescription: string;
   deleteDescription: string;
   icon: LucideIcon;
+  /** Back to Masters, or null on a main-menu page (Labour Categories). */
+  back: PageHeaderBack | null;
   /**
    * Labour Categories: each row has a skill (CM-0016 §6), shown on the row
    * and set in the dialog; a Default row can be edited for its skill only.
@@ -42,6 +45,7 @@ export const LABOUR_CATEGORIES_SCREEN: LookupScreenConfig = {
   deleteDescription:
     "It will no longer be offered anywhere. A Labour Category that Labours, Vendor rate cards or attendance use cannot be deleted; disable it instead.",
   icon: HardHat,
+  back: null,
   withSkill: true,
 };
 
@@ -58,4 +62,5 @@ export const DEPARTMENTS_SCREEN: LookupScreenConfig = {
     "Add the trades and work categories you book work under, like RCC or Plumbing.",
   deleteDescription: "It will no longer be offered anywhere.",
   icon: Wrench,
+  back: { label: "Masters", href: "/app/masters" },
 };

@@ -504,7 +504,7 @@ export class VendorAttendanceHandlers {
     if (!vendor.projectIds.includes(input.projectId))
       throw new DomainError(
         "VENDOR_NOT_ON_PROJECT",
-        `${vendor.name} is not assigned to this Project. Add the Project to the Vendor in Masters → Vendors.`,
+        `${vendor.name} is not assigned to this Project. Add the Project to the Vendor in Labour & Vendors → Vendors.`,
         { details: { vendorId: vendor.id, projectId: input.projectId } },
       );
     if (!vendor.isActive)

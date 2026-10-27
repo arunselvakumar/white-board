@@ -11,13 +11,9 @@ import {
   Ruler,
   Fence,
   Hammer,
-  Handshake,
-  HardHat,
   Layers,
-  Shovel,
   Tractor,
   Truck,
-  UserCheck,
   Waves,
   Wrench,
   type LucideIcon,
@@ -132,42 +128,6 @@ export const MASTERS_GROUPS: readonly MastersGroup[] = [
         description:
           "Every quotation file your Contractors and Suppliers gave.",
         icon: Files,
-      },
-    ],
-  },
-  {
-    label: "Labour & Vendors",
-    sections: [
-      {
-        href: "/app/masters/labours",
-        label: "Labours",
-        title: "Labours",
-        description:
-          "Your own Labours: wage, Project, transfers and Excel import.",
-        icon: Shovel,
-      },
-      {
-        href: "/app/masters/vendors",
-        label: "Vendors",
-        title: "Vendors",
-        description:
-          "Labour gangs you hire by the head, with a rate card per shift.",
-        icon: Handshake,
-      },
-      {
-        href: "/app/masters/labour-categories",
-        label: "Labour Categories",
-        title: "Labour Categories",
-        description:
-          "Trades Labours and a Vendor's headcount are booked under.",
-        icon: HardHat,
-      },
-      {
-        href: "/app/masters/supervisors",
-        label: "Supervisors",
-        title: "Supervisors",
-        description: "The people on site who look after a group of Labours.",
-        icon: UserCheck,
       },
     ],
   },

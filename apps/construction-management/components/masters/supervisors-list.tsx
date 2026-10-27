@@ -43,7 +43,7 @@ function details(supervisor: SupervisorItem): string | null {
 }
 
 /**
- * Masters → Supervisors (CM-203): search, Add, and per row Edit / Disable /
+ * Labour & Vendors → Supervisors (CM-203): search, Add, and per row Edit / Disable /
  * Enable / Delete. Disabled Supervisors stay listed, muted.
  */
 export function SupervisorsList() {
@@ -51,6 +51,7 @@ export function SupervisorsList() {
     <Suspense
       fallback={
         <MasterListPageSkeleton
+          back={null}
           title="Supervisors"
           meta={SUPERVISORS_META}
           actions={<MasterAddButtonSkeleton label="Add Supervisor" />}
@@ -104,7 +105,6 @@ function SupervisorsListContent() {
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
-          back={{ label: "Masters", href: "/app/masters" }}
           title="Supervisors"
           meta={SUPERVISORS_META}
           actions={addButton}

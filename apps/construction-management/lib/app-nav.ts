@@ -1,6 +1,7 @@
 /**
  * The main menu: the Company Dashboard (CM-902), the three top-level areas
- * (`docs/00-overview.md`, "The shape of the product"), then Settings: the
+ * (`docs/00-overview.md`, "The shape of the product"), Labour & Vendors,
+ * Staff & Roles, then Settings: the
  * Company profile and the Advanced Settings. Each area grows its own
  * screens in later milestones. The Dashboard shows only
  * with the Dashboard menu's Read flag (`AppShell`'s `canOpenDashboard`).
@@ -32,7 +33,15 @@ export const APP_NAV = [
     label: "Masters",
     title: "Masters",
     description:
-      "Your Company's lists: Contractors, Suppliers, Materials, Measurement Units, Terms & Conditions, Vendors, Labours and Departments.",
+      "Your Company's lists: Contractors, Suppliers, Materials, Measurement Units, Terms & Conditions and Departments.",
+  },
+  {
+    // The area opens on Labours; Vendors and their lists sit beside it.
+    href: "/app/labours",
+    label: "Labour & Vendors",
+    title: "Labour & Vendors",
+    description:
+      "Your own Labours, the Vendors you hire gangs from, Labour Categories and Supervisors.",
   },
   {
     // The area opens on Staff; Role Management sits beside it in the submenu.

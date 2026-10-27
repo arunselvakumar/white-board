@@ -373,6 +373,11 @@
         animation: sidebar-icon-swing 520ms ease-out;
       }
 
+      /* Labour & Vendors: the hard hat nods, like a worker saying yes. */
+      &.lucide-hard-hat {
+        animation: sidebar-icon-nod 520ms ease-out;
+      }
+
       &.lucide-octagon-pause {
         animation: none;
 

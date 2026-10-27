@@ -1,6 +1,7 @@
 import {
   Briefcase,
   Building2,
+  HardHat,
   LayoutDashboard,
   Library,
   Settings,
@@ -17,6 +18,7 @@ export const APP_NAV_ICONS: Record<AppNavHref, LucideIcon> = {
   "/app/projects": Building2,
   "/app/workspace": Briefcase,
   "/app/masters": Library,
+  "/app/labours": HardHat,
   "/app/staff": UsersRound,
   "/app/settings": Settings,
 };

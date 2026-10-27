@@ -18,7 +18,7 @@ import {
 import { isAppNavActive, type AppNavHref } from "@/lib/app-nav";
 
 import { APP_NAV_ICONS } from "./app-nav-icons";
-import { SubmenuRow } from "./submenu-row";
+import { SUBMENU_BUTTON_CLASS, SUBMENU_CLASS, SubmenuRow } from "./submenu-row";
 
 export type AreaNavGroup = {
   /** Shown above the group; an area with one group can leave it out. */
@@ -28,7 +28,7 @@ export type AreaNavGroup = {
 
 /**
  * A top-level area in the sidebar with a submenu of its screens, grouped
- * (Masters, Workspace, Staff & Roles). The submenu opens by itself on any
+ * (Masters, Workspace, Labour & Vendors, Staff & Roles). The submenu opens by itself on any
  * page of the area and can be folded away elsewhere. A page of the area is
  * one under its link or one a submenu entry owns (`currentHref`): Staff &
  * Roles links to Staff, and Role Management sits beside it.
@@ -82,13 +82,13 @@ export function AreaNavMenu({
           open={open}
         />
         <CollapsibleContent>
-          <SidebarMenuSub aria-label={label} className="mt-1">
+          <SidebarMenuSub aria-label={label} className={SUBMENU_CLASS}>
             {groups.map((group) => (
-              <li key={group.label ?? label} className="mt-2 first:mt-1">
+              <li key={group.label ?? label} className="mt-4 first:mt-0">
                 {group.label != null && (
                   <p
                     id={groupLabelId(label, group.label)}
-                    className="text-sidebar-foreground/55 px-2 pb-1 text-[0.7rem] font-semibold tracking-wide uppercase"
+                    className="text-sidebar-foreground/55 px-2.5 pb-1.5 text-[0.7rem] font-semibold tracking-wide uppercase"
                   >
                     {group.label}
                   </p>
@@ -99,7 +99,7 @@ export function AreaNavMenu({
                       ? undefined
                       : groupLabelId(label, group.label)
                   }
-                  className="flex flex-col gap-0.5"
+                  className="flex flex-col gap-1"
                 >
                   {group.sections.map((section) => {
                     const active = currentHref === section.href;
@@ -108,7 +108,7 @@ export function AreaNavMenu({
                         <SidebarMenuSubButton
                           isActive={active}
                           aria-current={active ? "page" : undefined}
-                          className="text-sidebar-foreground/80"
+                          className={SUBMENU_BUTTON_CLASS}
                           render={<Link href={section.href} />}
                         >
                           <section.icon />

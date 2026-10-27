@@ -2,18 +2,21 @@ import type { Page } from "@playwright/test";
 
 import { AppShellPage } from "./AppShellPage";
 
-/** A Masters list (`/app/masters/<list>`): Add, search and its rows. */
+/**
+ * A list page (`/app/masters/<list>`, or a Labour & Vendors list such as
+ * `/app/supervisors`): Add, search and its rows.
+ */
 export class MasterListPage extends AppShellPage {
   constructor(
     page: Page,
-    private readonly list: string,
+    private readonly path: string,
     private readonly title: string,
   ) {
     super(page);
   }
 
   public get url() {
-    return `/app/masters/${this.list}`;
+    return this.path;
   }
 
   public get pageHeading() {

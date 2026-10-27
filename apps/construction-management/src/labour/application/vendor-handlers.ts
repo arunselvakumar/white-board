@@ -254,7 +254,7 @@ export class VendorHandlers {
       if (category.disabled)
         throw new DomainError(
           "LABOUR_CATEGORY_DISABLED",
-          `${category.name} is disabled in Masters, so it cannot be added to a rate card.`,
+          `${category.name} is disabled in Labour Categories, so it cannot be added to a rate card.`,
           { details: { labourCategoryId: id } },
         );
     }

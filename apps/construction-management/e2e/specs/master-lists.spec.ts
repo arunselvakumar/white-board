@@ -45,7 +45,11 @@ companyTest.describe("Masters lists", () => {
       `should list the new entry, when the Owner adds one to ${entry.title}`,
       async ({ page }) => {
         const name = unique(entry.name);
-        const master = new MasterListPage(page, entry.list, entry.title);
+        const master = new MasterListPage(
+          page,
+          `/app/masters/${entry.list}`,
+          entry.title,
+        );
         await master.goto();
         await master.button(entry.add).first().click();
         const dialog = page.getByRole("dialog");

@@ -14,7 +14,7 @@ projectTest.describe("Masters", () => {
 
       const categories = new MasterListPage(
         page,
-        "labour-categories",
+        "/app/labour-categories",
         "Labour Categories",
       );
       await categories.goto();
@@ -26,7 +26,7 @@ projectTest.describe("Masters", () => {
 
       const supervisors = new MasterListPage(
         page,
-        "supervisors",
+        "/app/supervisors",
         "Supervisors",
       );
       await supervisors.goto();
@@ -56,7 +56,7 @@ projectTest.describe("Masters", () => {
 
       const suppliersForm = new MasterListPage(
         page,
-        "suppliers/new",
+        "/app/masters/suppliers/new",
         "Add Supplier",
       );
       await suppliersForm.goto();
@@ -64,13 +64,21 @@ projectTest.describe("Masters", () => {
       await suppliersForm.field("GSTIN").fill("33AAPFA0939F1ZM");
       await suppliersForm.field("PAN").fill("AAPFA0939F");
       await page.getByRole("button", { name: "Save", exact: true }).click();
-      const suppliers = new MasterListPage(page, "suppliers", "Suppliers");
+      const suppliers = new MasterListPage(
+        page,
+        "/app/masters/suppliers",
+        "Suppliers",
+      );
       await expect(page).toHaveURL(/\/app\/masters\/suppliers/);
       await suppliers.goto();
       await expect(suppliers.main.getByText(supplier)).toBeVisible();
 
       await page.goto("/app/masters/materials/new");
-      const materials = new MasterListPage(page, "materials", "Materials");
+      const materials = new MasterListPage(
+        page,
+        "/app/masters/materials",
+        "Materials",
+      );
       await materials.field("Material name").fill(material);
       await materials.choose("Measurement Unit", /^Bag/);
       await page.getByRole("button", { name: "Save", exact: true }).click();

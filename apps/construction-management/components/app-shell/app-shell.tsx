@@ -31,6 +31,7 @@ import { projectIdFromPath } from "@/lib/project-nav";
 import { APP_NAV_ICONS } from "./app-nav-icons";
 import { BrandMark } from "./brand-mark";
 import { CompanySwitcher } from "./company-switcher";
+import { LabourVendorsNavMenu } from "./labour-vendors-nav-menu";
 import { MastersNavMenu } from "./masters-nav-menu";
 import { CompanyDeletionBanner } from "./company-deletion-banner";
 import { PlanBanner } from "./plan-banner";
@@ -159,8 +160,8 @@ export function AppShell({
 
 /**
  * The Company Dashboard (with Dashboard Read), the three areas: Projects,
- * Workspace and Masters (each with its submenu), Staff & Roles, then
- * Settings.
+ * Workspace and Masters (each with its submenu), Labour & Vendors, Staff &
+ * Roles, then Settings.
  */
 function MainMenu({
   pathname,
@@ -185,6 +186,14 @@ function MainMenu({
               if (item.href === "/app/masters")
                 return (
                   <MastersNavMenu
+                    key={item.href}
+                    pathname={pathname}
+                    buttonClassName={NAV_BUTTON_CLASS}
+                  />
+                );
+              if (item.href === "/app/labours")
+                return (
+                  <LabourVendorsNavMenu
                     key={item.href}
                     pathname={pathname}
                     buttonClassName={NAV_BUTTON_CLASS}

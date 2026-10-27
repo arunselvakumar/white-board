@@ -40,7 +40,11 @@ import {
   MenuSkeleton,
   SKELETON_WIDTHS,
 } from "@/components/app-shell/app-shell-skeletons";
-import { SubmenuRow } from "@/components/app-shell/submenu-row";
+import {
+  SUBMENU_BUTTON_CLASS,
+  SUBMENU_CLASS,
+  SubmenuRow,
+} from "@/components/app-shell/submenu-row";
 import { projectTypeLabel } from "@/src/projects/domain/project-type";
 import { projectHomeQuery } from "@/src/queries/project-home";
 import { projectQuery } from "@/src/queries/projects";
@@ -318,7 +322,7 @@ function ProjectNavItem({
       <Collapsible open={submenu.open} onOpenChange={submenu.onOpenChange}>
         <SubmenuRow button={button} label={section.label} open={submenu.open} />
         <CollapsibleContent>
-          <SidebarMenuSub aria-label={section.label} className="mt-1">
+          <SidebarMenuSub aria-label={section.label} className={SUBMENU_CLASS}>
             {submenu.links.map((link) => {
               const linkActive = link === currentLink;
               return (
@@ -326,7 +330,7 @@ function ProjectNavItem({
                   <SidebarMenuSubButton
                     isActive={linkActive}
                     aria-current={linkActive ? "page" : undefined}
-                    className="text-sidebar-foreground/80"
+                    className={SUBMENU_BUTTON_CLASS}
                     render={<Link href={link.href} />}
                   >
                     <span>{link.label}</span>
