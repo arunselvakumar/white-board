@@ -143,7 +143,7 @@ function ResourceCard({
             <EmptyTitle>No {section.title} on this Project</EmptyTitle>
             <EmptyDescription>
               {canEdit
-                ? `Choose them with Edit, or add a new ${section.singular} in Masters.`
+                ? `Choose them with Edit, or add a new ${section.singular} in ${section.area}.`
                 : `Nobody has put ${section.title} on this Project yet.`}
             </EmptyDescription>
           </EmptyHeader>

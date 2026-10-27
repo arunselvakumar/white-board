@@ -58,8 +58,9 @@ function NoVendors() {
         </EmptyMedia>
         <EmptyTitle>No vendors on this Project</EmptyTitle>
         <EmptyDescription>
-          Assign a vendor to this Project in Masters → Vendors, with a rate card
-          of shifts and Labour Category rates, to record its headcount.
+          Assign a vendor to this Project in Labour & Vendors → Vendors, with a
+          rate card of shifts and Labour Category rates, to record its
+          headcount.
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>

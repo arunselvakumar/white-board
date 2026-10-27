@@ -213,7 +213,7 @@ function LookupListContent({ config }: { config: LookupScreenConfig }) {
   );
 }
 
-/** Masters → Labour Categories (CM-203). */
+/** Labour & Vendors → Labour Categories (CM-203). */
 export function LabourCategoriesList() {
   return <LookupListScreen config={LABOUR_CATEGORIES_SCREEN} />;
 }

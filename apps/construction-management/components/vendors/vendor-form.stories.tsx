@@ -226,7 +226,7 @@ export const AddShowsServerErrorOnTheRow: Story = {
             {
               code: "LABOUR_CATEGORY_DISABLED",
               message:
-                "Mason is disabled in Masters, so it cannot be added to a rate card.",
+                "Mason is disabled in Labour Categories, so it cannot be added to a rate card.",
               details: { labourCategoryId: MASON.id },
             },
             { status: 400 },
@@ -255,7 +255,7 @@ export const AddShowsServerErrorOnTheRow: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await expect(
       await canvas.findByText(
-        "Mason is disabled in Masters, so it cannot be added to a rate card.",
+        "Mason is disabled in Labour Categories, so it cannot be added to a rate card.",
       ),
     ).toBeVisible();
     await expect(

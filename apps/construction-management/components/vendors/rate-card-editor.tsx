@@ -29,7 +29,7 @@ import { emptyRate, emptyShift } from "./vendor-form-schema";
 export type CategoryChoice = {
   value: string;
   label: string;
-  /** Disabled in Masters: kept where it already is, not offered for new rows. */
+  /** Disabled in Labour Categories: kept where it already is, not offered for new rows. */
   disabled: boolean;
 };
 

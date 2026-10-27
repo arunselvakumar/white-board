@@ -238,7 +238,7 @@ export const ServerErrorOnLine: Story = {
   },
 };
 
-/** No vendors on the Project: point to Masters → Vendors. */
+/** No vendors on the Project: point to Labour & Vendors → Vendors. */
 export const EmptyProject: Story = {
   beforeEach: () => {
     api = mockApi((call) =>

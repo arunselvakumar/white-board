@@ -20,7 +20,7 @@ projectTest.describe("Vendors", () => {
         ratePerDay: "900",
       });
       await addVendorPage.saveButton.click();
-      await expect(page).toHaveURL(/\/app\/masters\/vendors$/);
+      await expect(page).toHaveURL(/\/app\/vendors$/);
 
       const attendancePage = new VendorAttendancePage(page, project.id);
       await attendancePage.goto();

@@ -384,7 +384,7 @@ export class Vendor {
     if (!this.props.isActive)
       throw new DomainError(
         "VENDOR_INACTIVE",
-        `${this.props.name} is an inactive Vendor. Activate them in Masters to add them to a Project.`,
+        `${this.props.name} is an inactive Vendor. Activate them in Labour & Vendors → Vendors to add them to a Project.`,
         { details: { id: this.props.id } },
       );
     this.props = {

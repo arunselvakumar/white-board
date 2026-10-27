@@ -58,8 +58,8 @@ function NoLabourers() {
         </EmptyMedia>
         <EmptyTitle>No Labours on this Project</EmptyTitle>
         <EmptyDescription>
-          Add Labours to this Project in Masters → Labours, or transfer them
-          here, to mark their attendance.
+          Add Labours to this Project in Labour & Vendors → Labours, or transfer
+          them here, to mark their attendance.
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>

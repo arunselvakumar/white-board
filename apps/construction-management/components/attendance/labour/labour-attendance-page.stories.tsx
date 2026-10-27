@@ -675,7 +675,7 @@ export const MonthGrid: Story = {
   },
 };
 
-/** A Project with no labourers points to Masters → Labours. */
+/** A Project with no labourers points to Labour & Vendors → Labours. */
 export const EmptyProject: Story = {
   beforeEach: () => {
     api = mockApi((call) =>
