@@ -183,8 +183,8 @@ export function detailsInput(
 
 /**
  * The cards Add Staff and Edit Staff share, in one order (ADR CM-0033 §1):
- * Details, Salary, then `children` (Add Staff's Projects and Role), then
- * Sign-in.
+ * Details, `role` (Add Staff's Role), Sign-in, Salary, then `children`
+ * (Add Staff's Projects).
  */
 export function TeamMemberDetailsFields<
   Values extends TeamMemberDetailsValues & FieldValues,
@@ -194,6 +194,7 @@ export function TeamMemberDetailsFields<
   mobileLocked = false,
   canSeeSalary,
   signIn,
+  role,
   children,
 }: {
   form: UseFormReturn<Values>;
@@ -204,7 +205,9 @@ export function TeamMemberDetailsFields<
   mobileLocked?: boolean;
   /** Add Staff's Invite them and Set a password, under mobile and email. */
   signIn?: ReactNode;
-  /** Cards between Salary and Sign-in: Add Staff's Projects and Role. */
+  /** The card between Details and Sign-in: Add Staff's Role. */
+  role?: ReactNode;
+  /** Cards after Salary: Add Staff's Projects. */
   children?: ReactNode;
 }) {
   // Only the detail fields are read here; Add Staff's form has more.
@@ -328,25 +331,7 @@ export function TeamMemberDetailsFields<
         </div>
       </FormSection>
 
-      <FormSection
-        title="Salary"
-        hint={
-          canSeeSalary
-            ? "Optional, like a Labour's wage. Only people with the Financial right on Staff see the amounts."
-            : "You cannot see salaries. Ask the Owner for the Financial right on Staff."
-        }
-      >
-        <WageFields
-          form={form}
-          name="salary"
-          idPrefix="member"
-          options={STAFF_SALARY}
-          showAmounts={canSeeSalary}
-          showType={canSeeSalary}
-        />
-      </FormSection>
-
-      {children}
+      {role}
 
       <FormSection
         title="Sign-in"
@@ -398,6 +383,26 @@ export function TeamMemberDetailsFields<
           {signIn}
         </div>
       </FormSection>
+
+      <FormSection
+        title="Salary"
+        hint={
+          canSeeSalary
+            ? "Optional, like a Labour's wage. Only people with the Financial right on Staff see the amounts."
+            : "You cannot see salaries. Ask the Owner for the Financial right on Staff."
+        }
+      >
+        <WageFields
+          form={form}
+          name="salary"
+          idPrefix="member"
+          options={STAFF_SALARY}
+          showAmounts={canSeeSalary}
+          showType={canSeeSalary}
+        />
+      </FormSection>
+
+      {children}
     </div>
   );
 }
