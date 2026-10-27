@@ -174,7 +174,7 @@ export const Empty: Story = {
     await expect(await canvas.findByText("No Labours yet")).toBeVisible();
     await expect(
       canvas.getAllByRole("link", { name: "Add Labour" }).at(-1),
-    ).toHaveAttribute("href", "/app/masters/labours/new");
+    ).toHaveAttribute("href", "/app/labours/new");
     await expect(
       canvas.getByRole("button", { name: "Import from Excel" }),
     ).toBeVisible();

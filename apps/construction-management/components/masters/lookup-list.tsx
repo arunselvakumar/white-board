@@ -47,6 +47,7 @@ export function LookupListScreen({ config }: { config: LookupScreenConfig }) {
     <Suspense
       fallback={
         <MasterListPageSkeleton
+          back={config.back}
           title={config.plural}
           meta={config.description}
           actions={<MasterAddButtonSkeleton label={`Add ${config.singular}`} />}
@@ -92,7 +93,7 @@ function LookupListContent({ config }: { config: LookupScreenConfig }) {
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
-          back={{ label: "Masters", href: "/app/masters" }}
+          back={config.back ?? undefined}
           title={config.plural}
           meta={config.description}
           actions={addButton}

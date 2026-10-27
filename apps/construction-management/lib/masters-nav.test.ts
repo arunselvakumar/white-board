@@ -28,6 +28,11 @@ describe("MASTERS_GROUPS", () => {
     // Designations are gone (ADR CM-0033).
     expect(activeMastersSection("/app/masters/team-members")).toBeUndefined();
     expect(activeMastersSection("/app/masters/designations")).toBeUndefined();
+    // Labours, Vendors and their lists are their own area, Labour & Vendors.
+    expect(activeMastersSection("/app/labours")).toBeUndefined();
+    expect(MASTERS_GROUPS.map((group) => group.label)).not.toContain(
+      "Labour & Vendors",
+    );
     expect(MASTERS_GROUPS[0]?.label).toBe("Parties");
     expect(activeMastersSection("/app/masters")).toBeUndefined();
     expect(activeMastersSection("/app/masters/contractorsx")).toBeUndefined();

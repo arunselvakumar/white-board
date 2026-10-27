@@ -170,7 +170,7 @@ export const AddWithRateCard: Story = {
 
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await waitFor(() =>
-      expect(getRouter().push).toHaveBeenCalledWith("/app/masters/vendors"),
+      expect(getRouter().push).toHaveBeenCalledWith("/app/vendors"),
     );
     const bodySent = sent(VENDORS) as Record<string, unknown>;
     await expect(bodySent).toMatchObject({
@@ -294,7 +294,7 @@ export const AddWithoutRateCardWarns: Story = {
     await expect(canvas.getByRole("status")).toHaveTextContent("No rate card");
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await waitFor(() =>
-      expect(getRouter().push).toHaveBeenCalledWith("/app/masters/vendors"),
+      expect(getRouter().push).toHaveBeenCalledWith("/app/vendors"),
     );
     await expect(sent(VENDORS)).toMatchObject({
       name: "Sundar Gang",
@@ -341,7 +341,7 @@ export const EditReplacesTheRateCard: Story = {
     );
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await waitFor(() =>
-      expect(getRouter().push).toHaveBeenCalledWith("/app/masters/vendors"),
+      expect(getRouter().push).toHaveBeenCalledWith("/app/vendors"),
     );
     await expect(sent(`${EDIT_PATH}/update`)).toMatchObject({
       expectedUpdatedAt: MUTHU_GANG.updatedAt,
@@ -412,7 +412,7 @@ export const EditWithoutFinancialHidesAmounts: Story = {
     ).toBeNull();
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await waitFor(() =>
-      expect(getRouter().push).toHaveBeenCalledWith("/app/masters/vendors"),
+      expect(getRouter().push).toHaveBeenCalledWith("/app/vendors"),
     );
     await expect(sent(`${EDIT_PATH}/update`)).toMatchObject({
       openingBalance: null,

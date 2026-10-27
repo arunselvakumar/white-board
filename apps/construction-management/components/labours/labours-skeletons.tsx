@@ -12,7 +12,7 @@ import {
   FormSectionSkeleton,
 } from "@/components/masters/masters-skeletons";
 
-/** Masters → Labours while it loads (ADR-0047). */
+/** Labour & Vendors → Labours while it loads (ADR-0047). */
 
 /** The Labours table; Balance shows only with the Financial flag. */
 const LABOUR_COLUMNS: SkeletonColumn[] = [
@@ -81,10 +81,7 @@ export function LabourFilesSkeleton() {
 /** Edit Labour while the Labour loads. */
 export function LabourFormSkeleton() {
   return (
-    <FormPageSkeleton
-      back={{ label: "Labours", href: "/app/masters/labours" }}
-      meta
-    >
+    <FormPageSkeleton back={{ label: "Labours", href: "/app/labours" }} meta>
       <div className="space-y-6">
         <FormSectionSkeleton title="Basic">
           <FormSkeleton

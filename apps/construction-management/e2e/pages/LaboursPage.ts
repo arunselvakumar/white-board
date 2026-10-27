@@ -2,7 +2,7 @@ import { AppShellPage } from "./AppShellPage";
 
 export class LaboursPage extends AppShellPage {
   public get url() {
-    return "/app/masters/labours";
+    return "/app/labours";
   }
 
   public get table() {

@@ -12,7 +12,7 @@ import {
   FormSectionSkeleton,
 } from "@/components/masters/masters-skeletons";
 
-/** Masters → Vendors while it loads (ADR-0047). */
+/** Labour & Vendors → Vendors while it loads (ADR-0047). */
 
 /** The Vendors table's columns; Balance shows only with the Financial flag. */
 const VENDOR_COLUMNS: SkeletonColumn[] = [
@@ -46,7 +46,7 @@ export function ProjectFilterSkeleton() {
 /** Edit Vendor while the Vendor loads: details, Projects, rate card. */
 export function VendorFormSkeleton() {
   return (
-    <FormPageSkeleton back={{ label: "Vendors", href: "/app/masters/vendors" }}>
+    <FormPageSkeleton back={{ label: "Vendors", href: "/app/vendors" }}>
       <div className="space-y-6">
         <FormSectionSkeleton title="Details">
           <FormSkeleton

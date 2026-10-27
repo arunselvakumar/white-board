@@ -46,7 +46,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
     singular: "Vendor",
     description:
       "Labour gangs on this Project; they appear on its attendance screen.",
-    addPath: "/app/masters/vendors/new",
+    addPath: "/app/vendors/new",
     icon: Handshake,
   },
 ];

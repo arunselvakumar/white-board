@@ -206,7 +206,7 @@ export const EmptyStates: Story = {
     for (const [title, path] of [
       ["Contractor", "/app/masters/contractors/new"],
       ["Supplier", "/app/masters/suppliers/new"],
-      ["Vendor", "/app/masters/vendors/new"],
+      ["Vendor", "/app/vendors/new"],
     ] as const)
       await expect(
         canvas.getByRole("link", { name: `Add a ${title}` }),
@@ -219,7 +219,7 @@ export const EmptyStates: Story = {
     await expect(await dialog.findByText("No Vendors yet")).toBeVisible();
     await expect(
       dialog.getByRole("link", { name: "Add a Vendor" }),
-    ).toHaveAttribute("href", "/app/masters/vendors/new");
+    ).toHaveAttribute("href", "/app/vendors/new");
   },
 };
 

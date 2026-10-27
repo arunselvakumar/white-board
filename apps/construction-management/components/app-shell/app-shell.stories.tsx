@@ -5,6 +5,7 @@ import { AppAreaPage } from "@/components/app-shell/app-area-page";
 import { AppShell } from "@/components/app-shell/app-shell";
 import { APP_NAV, appPageByHref, type AppNavHref } from "@/lib/app-nav";
 import { HRMS_SECTIONS } from "@/lib/hrms-nav";
+import { LABOUR_VENDORS_SECTIONS } from "@/lib/labour-vendors-nav";
 import { MASTERS_GROUPS } from "@/lib/masters-nav";
 import { STAFF_ROLES_SECTIONS } from "@/lib/staff-roles-nav";
 
@@ -242,6 +243,47 @@ export const StaffRolesSubmenu: Story = {
     ).not.toHaveAttribute("aria-current");
     // Team Members live under Staff & Roles, not Masters.
     await expect(nav.queryByRole("link", { name: "Team Members" })).toBeNull();
+  },
+};
+
+/**
+ * Labour & Vendors folds out like Staff & Roles: Labours, Vendors, Labour
+ * Categories and Supervisors, out of Masters. On a Vendor the area is open
+ * and Vendors is current; the area link itself opens Labours.
+ */
+export const LabourVendorsSubmenu: Story = {
+  parameters: {
+    nextjs: { navigation: { pathname: "/app/vendors/v1" } },
+  },
+  render: () => (
+    <AppShell>
+      <p>Edit Vendor</p>
+    </AppShell>
+  ),
+  play: async (context) => {
+    const nav = await mainMenu(context);
+    const links = nav.getAllByRole("link").map((link) => link.textContent);
+    // After Masters, before Staff & Roles.
+    await expect(links.indexOf("Labour & Vendors")).toBeGreaterThan(
+      links.indexOf("Masters"),
+    );
+    await expect(links.indexOf("Labour & Vendors")).toBeLessThan(
+      links.indexOf("Staff & Roles"),
+    );
+    await expect(
+      nav.getByRole("link", { name: "Labour & Vendors" }),
+    ).toHaveAttribute("href", "/app/labours");
+    const submenu = within(nav.getByRole("list", { name: "Labour & Vendors" }));
+    for (const section of LABOUR_VENDORS_SECTIONS)
+      await expect(
+        submenu.getByRole("link", { name: section.label }),
+      ).toHaveAttribute("href", section.href);
+    await expect(
+      submenu.getByRole("link", { name: "Vendors" }),
+    ).toHaveAttribute("aria-current", "page");
+    await expect(
+      nav.getByRole("link", { name: "Labour & Vendors" }),
+    ).not.toHaveAttribute("aria-current");
   },
 };
 

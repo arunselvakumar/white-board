@@ -2,7 +2,7 @@ import { AppShellPage } from "./AppShellPage";
 
 export class AddLabourPage extends AppShellPage {
   public get url() {
-    return "/app/masters/labours/new";
+    return "/app/labours/new";
   }
 
   public async fill(input: {

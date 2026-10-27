@@ -51,10 +51,10 @@ import {
   type VendorDayFormValues,
 } from "./vendor-day-form";
 
-export const VENDOR_MASTERS_PATH = "/app/masters/vendors";
+export const VENDORS_PAGE_PATH = "/app/vendors";
 
 function vendorEditPath(id: string): string {
-  return `${VENDOR_MASTERS_PATH}/${encodeURIComponent(id)}`;
+  return `${VENDORS_PAGE_PATH}/${encodeURIComponent(id)}`;
 }
 
 function money(paise: number | null): string {

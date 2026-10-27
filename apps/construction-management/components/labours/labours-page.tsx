@@ -147,7 +147,7 @@ function FilterSelect({
   );
 }
 
-/** Masters → Labours (CM-207): the register by Project, with transfer and import. */
+/** Labour & Vendors → Labours (CM-207): the register by Project, with transfer and import. */
 export function LaboursPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<LabourListFilter["status"]>("all");
@@ -190,7 +190,6 @@ export function LaboursPage() {
     <div className="w-full p-6">
       <div className="w-full max-w-5xl space-y-6">
         <PageHeader
-          back={{ label: "Masters", href: "/app/masters" }}
           title="Labours"
           meta="Your own Labours: wages, Projects and transfers."
           actions={
