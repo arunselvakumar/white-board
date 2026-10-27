@@ -22,7 +22,6 @@ import { authCompanyMemberships } from "./auth-company-memberships";
 import { createPlanGate } from "./create-subscription-handlers";
 import { invitationChannels } from "./invitation-channels";
 import { PrismaCompanyProfileReader } from "./prisma-company-profile-reader";
-import { PrismaDesignationRepository } from "./prisma-designation-repository";
 import { PrismaRoleRepository } from "./prisma-role-repository";
 import { PrismaTeamMemberRepository } from "./prisma-team-member-repository";
 import { privateDataCipher } from "./private-data-cipher";
@@ -36,14 +35,12 @@ export function createTeamMemberHandlers(deps?: {
 }) {
   const db = deps?.prisma ?? prisma;
   const members = new PrismaTeamMemberRepository(db, privateDataCipher);
-  const designations = new PrismaDesignationRepository(db);
   const profiles = new PrismaCompanyProfileReader(db);
   const events =
     deps?.events ??
     new InProcessEventDispatcher([
       new InvitationNotifier(
         members,
-        designations,
         profiles,
         deps?.channels ?? invitationChannels,
         constructionOrigin,
@@ -52,7 +49,6 @@ export function createTeamMemberHandlers(deps?: {
     ]);
   return new TeamMemberHandlers(
     members,
-    designations,
     new PrismaRoleRepository(db),
     deps?.plan ?? createPlanGate({ prisma: db }),
     events,

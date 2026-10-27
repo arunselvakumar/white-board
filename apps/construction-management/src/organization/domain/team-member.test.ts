@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { TeamMember, monthlySalary, teamMemberDetails } from "./team-member";
+import { NO_SALARY, staffSalary } from "./staff-salary";
+import { TeamMember, teamMemberDetails } from "./team-member";
 
 const NOW = new Date("2026-10-08T00:00:00Z");
 
 const details = teamMemberDetails({
   name: " Prabhu  Saravanan ",
-  designationId: "designation-1",
   mobile: "+917708165767",
   aadhaar: "2341 2341 2346",
   pan: "abcpe1234f",
@@ -35,23 +35,21 @@ describe("teamMemberDetails", () => {
   });
 
   it("needs a mobile or an email", () => {
-    expect(() => teamMemberDetails({ name: "A", designationId: "d" })).toThrow(
+    expect(() => teamMemberDetails({ name: "A" })).toThrow(
       expect.objectContaining({
         code: "MOBILE_OR_EMAIL_REQUIRED",
         message: "Enter an email to invite them, or at least a mobile number.",
       }) as Error,
     );
-    expect(
-      teamMemberDetails({ name: "A", designationId: "d", email: "a@b.in" })
-        .email,
-    ).toBe("a@b.in");
+    expect(teamMemberDetails({ name: "A", email: "a@b.in" }).email).toBe(
+      "a@b.in",
+    );
   });
 
   it("rejects a wrong Aadhaar or PAN", () => {
     expect(() =>
       teamMemberDetails({
         name: "A",
-        designationId: "d",
         mobile: "+917708165767",
         aadhaar: "234123412345",
       }),
@@ -59,7 +57,6 @@ describe("teamMemberDetails", () => {
     expect(() =>
       teamMemberDetails({
         name: "A",
-        designationId: "d",
         mobile: "+917708165767",
         pan: "ABCXE1234F",
       }),
@@ -67,43 +64,37 @@ describe("teamMemberDetails", () => {
   });
 });
 
-describe("monthlySalary (ADR CM-0032)", () => {
-  it("is optional paise: none for null or 0", () => {
-    expect(monthlySalary(2_500_000)).toBe(2_500_000);
-    expect(monthlySalary(null)).toBeNull();
-    expect(monthlySalary(undefined)).toBeNull();
-    expect(monthlySalary(0)).toBeNull();
-  });
-
-  it("rejects a negative, fractional or too large amount", () => {
-    for (const value of [-1, 12.5, 2_000_000_001])
-      expect(() => monthlySalary(value)).toThrow(
-        expect.objectContaining({ code: "SALARY_INVALID" }) as Error,
-      );
-  });
-
+describe("salary (ADR CM-0033 §3)", () => {
   it("is set on Add Staff and changed or cleared later", () => {
+    const salary = staffSalary({ perMonth: 2_500_000 });
     const member = TeamMember.invite({
       id: "member-1",
       workspaceId: "company-1",
       details,
-      monthlySalary: 2_500_000,
+      salary,
       memberType: "normal",
       roleId: "role-site",
       by: "owner",
       now: NOW,
     });
-    expect(member.monthlySalary).toBe(2_500_000);
-    expect(invite().monthlySalary).toBeNull();
+    expect(member.salary).toEqual(salary);
+    expect(invite().salary).toEqual(NO_SALARY);
     const later = new Date("2026-10-09T00:00:00Z");
-    member.setMonthlySalary(3_000_000, "accountant", later);
+    const daily = staffSalary({ type: "daily", perDay: 90_000 });
+    member.setSalary(daily, "accountant", later);
     expect(member).toMatchObject({
-      monthlySalary: 3_000_000,
+      salary: daily,
       updatedBy: "accountant",
       updatedAt: later,
     });
-    member.setMonthlySalary(null, "accountant", later);
-    expect(member.monthlySalary).toBeNull();
+    member.setSalary(NO_SALARY, "accountant", later);
+    expect(member.salary.perDay).toBeNull();
+  });
+
+  it("leaves the record untouched when nothing changed", () => {
+    const member = invite();
+    member.setSalary(staffSalary({}), "accountant", new Date("2026-10-09"));
+    expect(member.updatedBy).toBe("owner");
   });
 });
 
@@ -225,37 +216,35 @@ describe("ownership and leaving (CM-907)", () => {
   it("makes a joined Normal member the Owner with every right", () => {
     const member = joined();
     member.assignToProjects(["project-1"], "owner", NOW);
-    member.becomeOwner("designation-owner", "owner", NOW);
+    member.becomeOwner("owner", NOW);
     expect(member).toMatchObject({
       isOwner: true,
       projectIds: [],
       roleId: null,
     });
-    expect(member.details.designationId).toBe("designation-owner");
   });
 
   it("refuses a member who has not joined, an HRMS member and the Owner", () => {
     expect(() => {
-      invite().becomeOwner(null, "owner", NOW);
+      invite().becomeOwner("owner", NOW);
     }).toThrow(
       expect.objectContaining({ code: "NEW_OWNER_NOT_ACTIVE" }) as Error,
     );
     expect(() => {
-      joined("hrms").becomeOwner(null, "owner", NOW);
+      joined("hrms").becomeOwner("owner", NOW);
     }).toThrow(expect.objectContaining({ code: "OWNER_IS_NORMAL" }) as Error);
     expect(() => {
-      owner().becomeOwner(null, "owner", NOW);
+      owner().becomeOwner("owner", NOW);
     }).toThrow(expect.objectContaining({ code: "ALREADY_OWNER" }) as Error);
   });
 
-  it("makes the old Owner a member on the given Role, keeping the Designation when none is given", () => {
+  it("makes the old Owner a member on the given Role", () => {
     const old = owner();
-    old.stepDownAsOwner(null, "role-admin", "owner", NOW);
+    old.stepDownAsOwner("role-admin", "owner", NOW);
     expect(old.isOwner).toBe(false);
-    expect(old.details.designationId).toBe("designation-1");
     expect(old.roleId).toBe("role-admin");
     expect(() => {
-      old.stepDownAsOwner(null, "role-admin", "owner", NOW);
+      old.stepDownAsOwner("role-admin", "owner", NOW);
     }).toThrow(expect.objectContaining({ code: "NOT_OWNER" }) as Error);
   });
 

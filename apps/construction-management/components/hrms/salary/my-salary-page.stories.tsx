@@ -36,7 +36,6 @@ function serve(items = [OCTOBER, SEPTEMBER]) {
         member: {
           memberId: ME,
           name: "Arun Selva Kumar",
-          designationName: "Project Manager",
         },
         items,
       },

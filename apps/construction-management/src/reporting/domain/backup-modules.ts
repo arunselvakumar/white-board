@@ -358,9 +358,6 @@ const MASTER_MODULES: readonly BackupModule[] = [
   master("organization.team_members", "Team Members", "team-members", [
     "team_members",
   ]),
-  master("organization.designations", "Designations", "designations", [
-    "designations",
-  ]),
   master("masters.departments", "Departments", "departments", ["departments"]),
   master("masters.contractors", "Contractors", "contractors", ["contractors"]),
   master("masters.suppliers", "Suppliers", "suppliers", ["suppliers"]),

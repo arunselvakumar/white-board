@@ -4,7 +4,6 @@ import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
 import { assertKnownProjects } from "@/src/organization/application/project-directory";
-import { can } from "@/src/shared-kernel/access";
 import {
   decodeListCursor,
   encodeListCursor,
@@ -15,6 +14,7 @@ import { teamMemberHandlers as handlers, projectDirectory } from "./handlers";
 import { ListConstructionOrganizationTeamMembersRequestModel } from "./list-team-members-request-model";
 import type { ListConstructionOrganizationTeamMembersResponseModel } from "./list-team-members-response-model";
 import {
+  salaryInput,
   toTeamMemberResponse,
   toTeamMemberWithPasswordResponse,
 } from "./team-member-models";
@@ -87,7 +87,12 @@ export async function POST(request: Request): Promise<Response> {
       roleId,
       invite,
       password,
-      monthlySalary,
+      salaryType,
+      salaryPerDay,
+      salaryPerMonth,
+      overtimeWagePerHour,
+      workingHoursPerDay,
+      weeklyHolidays,
       ...details
     } = model;
     if (memberType === "normal")
@@ -103,13 +108,17 @@ export async function POST(request: Request): Promise<Response> {
       memberType,
       details,
       // Only someone who may see salaries may set one (ADR CM-0032).
-      monthlySalary: can(
+      salary: salaryInput(
+        {
+          salaryType,
+          salaryPerDay,
+          salaryPerMonth,
+          overtimeWagePerHour,
+          workingHoursPerDay,
+          weeklyHolidays,
+        },
         session.access,
-        "organization.team_members",
-        "financial",
-      )
-        ? monthlySalary
-        : null,
+      ),
       projectIds,
       roleId,
       invite,

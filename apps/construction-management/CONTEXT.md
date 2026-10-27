@@ -19,7 +19,7 @@ A person who can sign in: by email and password, by mobile and password, and by 
 _Avoid_: account, login, customer
 
 **Team Member**:
-A User's membership and employee record inside one Company: name, Designation, mobile, email, ids, an optional monthly salary, Member Type, projects, and their Role. The Staff & Roles screens call them **Staff** (Add Staff, Edit Staff, "1 Staff member"); code, APIs, audit events and other modules say Team Member (ADR CM-0030, CM-0032).
+A User's membership and employee record inside one Company: name, mobile, email, ids, a salary set-up like a Labour's wage (the amount optional), Member Type, projects, and their Role. The Staff & Roles screens call them **Staff** (Add Staff, Edit Staff, "1 Staff member"); code, APIs, audit events and other modules say Team Member (ADR CM-0030, CM-0032, CM-0033).
 _Avoid_: employee; User (in UI copy for this record)
 
 **Owner**:
@@ -33,10 +33,6 @@ Every other Team Member. Role `member` in `@repo/auth`; what a Member may do com
 **Normal** (works on projects) or **HRMS** (attendance, leave and salary only; no projects).
 _Avoid_: user type, employee type
 
-**Designation**:
-A job title in a Company (Site Engineer, Store Keeper, Accountant…). Carries no access since ADR CM-0030; that is the Role.
-_Avoid_: role, position
-
 **Join Request**:
 An invitation to a Company as seen by the invitee. Pending until accepted; the Team Member shows **Joining Pending** until then.
 _Avoid_: invite request
@@ -45,7 +41,7 @@ _Avoid_: invite request
 
 **Role**:
 A named Permission Matrix in a Company (Admin, Site Engineer, HRMS Staff…), given to Team Members on Staff & Roles → Role Management. Every Team Member but the Owner has exactly one. Editing a Role changes access for everyone on it (ADR CM-0030).
-_Avoid_: designation, permission template, group
+_Avoid_: designation, job title, permission template, group
 
 **Permission Matrix**:
 Per Role, per Menu, a set of Flags. Decides what the Team Members on that Role see and do.
@@ -265,7 +261,7 @@ The document number format per module, e.g. `PR/26-27/P1/00001`. Counters restar
 _Avoid_: serial number, invoice number
 
 **Back-dated Entry**:
-An entry dated in the past. How many days back a Team Member may create or edit one is set per module, can be overridden by Designation, and stops at the Financial Closing Date.
+An entry dated in the past. How many days back a Team Member may create or edit one is set per module, can be overridden by Role (ADR CM-0033), and stops at the Financial Closing Date.
 _Avoid_: backdate, past entry
 
 **Plan / Subscription**:
@@ -449,7 +445,6 @@ _Avoid_: price (unless it is a rate), cost
 | Company               | organization, tenant, org, firm |
 | Team Member           | user, employee, staff           |
 | Owner                 | admin, super admin              |
-| Designation           | role, position                  |
 | Permission Matrix     | roles, ACL                      |
 | Labour                | worker, labourer                |
 | Vendor (labour gang)  | supplier, contractor            |

@@ -434,7 +434,13 @@ describe("Progress Reports: the Daily Progress Report", () => {
           overtimeWagePerHour: 0,
           weeklyHolidays: [0],
           labourCategoryId: categoryId,
-          currentProjectId: ctx.projectId,
+          projects: {
+            create: {
+              workspaceId: ws,
+              projectId: ctx.projectId,
+              since: new Date("2026-01-01T00:00:00Z"),
+            },
+          },
           ...audit,
         },
       });

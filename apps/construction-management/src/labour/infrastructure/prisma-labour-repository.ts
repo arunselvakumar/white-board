@@ -24,14 +24,25 @@ import type {
   LabourTransferRecord,
   NewLabour,
 } from "../application/labour-ports";
-import { Labour } from "../domain/labour";
+import { Labour, type ProjectChanges } from "../domain/labour";
 import { workingHours, type Weekday } from "../domain/wages";
 import { lockLiveParties } from "./party-locks";
+import { companyToday } from "./prisma-labour-queries";
 import { prismaLedger } from "./prisma-ledger";
 
 type Tx = Prisma.TransactionClient;
 
-export type LabourRow = Prisma.ConstructionLabourLabourGetPayload<object>;
+/** The labourer's Projects, oldest first (ADR CM-0033). */
+const WITH_PROJECTS = {
+  projects: {
+    select: { projectId: true },
+    orderBy: [{ since: "asc" }, { projectId: "asc" }],
+  },
+} as const satisfies Prisma.ConstructionLabourLabourInclude;
+
+export type LabourRow = Prisma.ConstructionLabourLabourGetPayload<{
+  include: typeof WITH_PROJECTS;
+}>;
 
 /** A labourer row as the aggregate; Aadhaar decrypted. */
 export function labourFromRow(
@@ -63,7 +74,7 @@ export function labourFromRow(
       contactNumber: row.contactNumber,
       gender: row.gender,
     },
-    currentProjectId: row.currentProjectId,
+    projectIds: row.projects.map((project) => project.projectId),
     isActive: row.isActive,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
@@ -142,7 +153,6 @@ export class PrismaLabourRepository implements LabourRepository {
       supervisorId: details.supervisorId,
       contactNumber: details.contactNumber,
       gender: details.gender,
-      currentProjectId: labour.currentProjectId,
       isActive: labour.isActive,
       updatedAt: labour.updatedAt,
       updatedBy: labour.updatedBy,
@@ -152,6 +162,7 @@ export class PrismaLabourRepository implements LabourRepository {
   async findById(workspaceId: string, id: string): Promise<Labour | null> {
     const row = await this.db.constructionLabourLabour.findFirst({
       where: { id, workspaceId, deletedAt: null },
+      include: WITH_PROJECTS,
     });
     return row == null ? null : labourFromRow(row, this.cipher);
   }
@@ -163,6 +174,7 @@ export class PrismaLabourRepository implements LabourRepository {
     if (ids.length === 0) return [];
     const rows = await this.db.constructionLabourLabour.findMany({
       where: { workspaceId, id: { in: [...ids] }, deletedAt: null },
+      include: WITH_PROJECTS,
     });
     return rows.map((row) => labourFromRow(row, this.cipher));
   }
@@ -212,14 +224,25 @@ export class PrismaLabourRepository implements LabourRepository {
               ...this.columns(labour),
             })),
           });
-          // The first history row: on the Project from the joining date.
+          // On each Project from the joining date, with its first history row.
+          const joined = items.flatMap(({ labour }) =>
+            labour.projectIds.map((projectId) => ({ labour, projectId })),
+          );
+          await tx.constructionLabourLabourProject.createMany({
+            data: joined.map(({ labour, projectId }) => ({
+              workspaceId: labour.workspaceId,
+              labourId: labour.id,
+              projectId,
+              since: calendarDateToDb(labour.details.joiningDate),
+            })),
+          });
           await tx.constructionLabourTransfer.createMany({
-            data: items.map(({ labour }) => ({
+            data: joined.map(({ labour, projectId }) => ({
               id: newId(),
               workspaceId: labour.workspaceId,
               labourId: labour.id,
               fromProjectId: null,
-              toProjectId: labour.currentProjectId,
+              toProjectId: projectId,
               transferDate: calendarDateToDb(labour.details.joiningDate),
               createdAt: labour.createdAt,
               createdBy: labour.createdBy,
@@ -250,11 +273,20 @@ export class PrismaLabourRepository implements LabourRepository {
     expectedUpdatedAt: Date | null;
     opening: number | null;
     joiningDateChanged: boolean;
+    projects?: (ProjectChanges & { date: CalendarDate }) | null;
     audit: AuditEvent;
   }): Promise<void> {
-    const { labour } = input;
+    const { labour, projects } = input;
     try {
       await this.db.$transaction(async (tx) => {
+        const joinedOn = input.joiningDateChanged
+          ? ((
+              await tx.constructionLabourLabour.findUnique({
+                where: { id: labour.id },
+                select: { joiningDate: true },
+              })
+            )?.joiningDate ?? null)
+          : null;
         const written = await tx.constructionLabourLabour.updateMany({
           where: {
             id: labour.id,
@@ -270,18 +302,69 @@ export class PrismaLabourRepository implements LabourRepository {
           if (input.expectedUpdatedAt == null) throw labourNotFound();
           throw labourChanged();
         }
-        if (input.joiningDateChanged) {
-          const first = await tx.constructionLabourTransfer.findFirst({
-            where: { labourId: labour.id, fromProjectId: null },
-            orderBy: [{ transferDate: "asc" }, { createdAt: "asc" }],
+        if (joinedOn != null) {
+          // The rows written with the labourer, onto a Project on the old
+          // joining date, move to the new one, and so do those Projects.
+          const initial = await tx.constructionLabourTransfer.findMany({
+            where: {
+              labourId: labour.id,
+              fromProjectId: null,
+              transferDate: joinedOn,
+            },
+            select: { id: true, toProjectId: true },
           });
-          if (first != null)
-            await tx.constructionLabourTransfer.update({
-              where: { id: first.id },
-              data: {
-                transferDate: calendarDateToDb(labour.details.joiningDate),
+          const joiningDate = calendarDateToDb(labour.details.joiningDate);
+          await tx.constructionLabourTransfer.updateMany({
+            where: { id: { in: initial.map((row) => row.id) } },
+            data: { transferDate: joiningDate },
+          });
+          await tx.constructionLabourLabourProject.updateMany({
+            where: {
+              labourId: labour.id,
+              since: joinedOn,
+              projectId: {
+                in: initial.flatMap((row) =>
+                  row.toProjectId == null ? [] : [row.toProjectId],
+                ),
               },
-            });
+            },
+            data: { since: joiningDate },
+          });
+        }
+        if (projects != null) {
+          const date = calendarDateToDb(projects.date);
+          await tx.constructionLabourLabourProject.deleteMany({
+            where: { labourId: labour.id, projectId: { in: projects.removed } },
+          });
+          await tx.constructionLabourLabourProject.createMany({
+            data: projects.added.map((projectId) => ({
+              workspaceId: labour.workspaceId,
+              labourId: labour.id,
+              projectId,
+              since: date,
+            })),
+          });
+          await tx.constructionLabourTransfer.createMany({
+            data: [
+              ...projects.removed.map((projectId) => ({
+                fromProjectId: projectId,
+                toProjectId: null,
+              })),
+              ...projects.added.map((projectId) => ({
+                fromProjectId: null,
+                toProjectId: projectId,
+              })),
+            ].map((move, index) => ({
+              // Removals list before additions in the history.
+              id: newId(labour.updatedAt.getTime() + index),
+              workspaceId: labour.workspaceId,
+              labourId: labour.id,
+              ...move,
+              transferDate: date,
+              createdAt: labour.updatedAt,
+              createdBy: labour.updatedBy,
+            })),
+          });
         }
         if (input.opening != null) {
           await prismaLedger.reverseSource(
@@ -354,16 +437,26 @@ export class PrismaLabourRepository implements LabourRepository {
               id: labour.id,
               workspaceId: labour.workspaceId,
               deletedAt: null,
-              currentProjectId: move.fromProjectId,
               updatedAt: move.loadedUpdatedAt,
             },
             data: {
-              currentProjectId: labour.currentProjectId,
               updatedAt: labour.updatedAt,
               updatedBy: labour.updatedBy,
             },
           });
           if (written.count === 0) throw labourChanged();
+          const left = await tx.constructionLabourLabourProject.deleteMany({
+            where: { labourId: labour.id, projectId: move.fromProjectId },
+          });
+          if (left.count === 0) throw labourChanged();
+          await tx.constructionLabourLabourProject.create({
+            data: {
+              workspaceId: labour.workspaceId,
+              labourId: labour.id,
+              projectId: move.toProjectId,
+              since: calendarDateToDb(move.transferDate),
+            },
+          });
         }
         await tx.constructionLabourTransfer.createMany({
           data: moves.map((move) => ({
@@ -371,7 +464,7 @@ export class PrismaLabourRepository implements LabourRepository {
             workspaceId: move.labour.workspaceId,
             labourId: move.labour.id,
             fromProjectId: move.fromProjectId,
-            toProjectId: move.labour.currentProjectId,
+            toProjectId: move.toProjectId,
             transferDate: calendarDateToDb(move.transferDate),
             remark: move.remark,
             createdAt: move.labour.updatedAt,
@@ -384,14 +477,24 @@ export class PrismaLabourRepository implements LabourRepository {
     );
   }
 
+  today(workspaceId: string): Promise<CalendarDate> {
+    return companyToday(this.db, workspaceId);
+  }
+
   async latestAttendance(
     workspaceId: string,
     ids: readonly string[],
+    projectId: string,
   ): Promise<Map<string, CalendarDate>> {
     if (ids.length === 0) return new Map();
     const rows = await this.db.constructionLabourAttendance.groupBy({
       by: ["labourId"],
-      where: { workspaceId, labourId: { in: [...ids] }, deletedAt: null },
+      where: {
+        workspaceId,
+        projectId,
+        labourId: { in: [...ids] },
+        deletedAt: null,
+      },
       _max: { attendanceDate: true },
     });
     const latest = new Map<string, CalendarDate>();

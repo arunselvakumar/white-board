@@ -201,7 +201,7 @@ export function prismaReportSource(db: PrismaClient): ReportSource {
     const rows = await db.constructionLabourLabour.findMany({
       where: {
         workspaceId,
-        currentProjectId: projectId,
+        projects: { some: { projectId } },
         deletedAt: null,
         ...(joinedBy == null
           ? {}

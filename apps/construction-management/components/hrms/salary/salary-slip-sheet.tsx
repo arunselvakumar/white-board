@@ -285,11 +285,6 @@ export function SalarySlipSheet({
           <div className="space-y-5 px-4 pb-6">
             <div className="flex flex-wrap items-center gap-2 text-sm">
               <SalaryStatusBadge status={slip.status} />
-              {slip.designationName != null ? (
-                <span className="text-muted-foreground">
-                  {slip.designationName}
-                </span>
-              ) : null}
               {slip.structureName != null ? (
                 <span className="text-muted-foreground">
                   · {slip.structureName}

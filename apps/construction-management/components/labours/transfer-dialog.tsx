@@ -28,10 +28,14 @@ import { fieldForCode } from "@/lib/server-errors";
 import { useLabourCommand } from "@/src/queries/labours";
 import { projectOptionsQuery } from "@/src/queries/projects";
 
+import { projectsLabel } from "./labour-projects";
+
+type ProjectRef = { id: string; name: string };
+
 export type TransferTarget = {
   id: string;
   name: string;
-  currentProject: { id: string; name: string };
+  projects: ProjectRef[];
 };
 
 /** Today on this device, `YYYY-MM-DD`. */
@@ -40,39 +44,116 @@ export function localToday(now: Date = new Date()): string {
   return new Date(now.getTime() - offset).toISOString().slice(0, 10);
 }
 
+/** The Projects every one of `labours` is on: where they can all move from. */
+function sharedProjects(labours: readonly TransferTarget[]): ProjectRef[] {
+  const [first, ...rest] = labours;
+  return (first?.projects ?? []).filter((project) =>
+    rest.every((labour) => labour.projects.some((p) => p.id === project.id)),
+  );
+}
+
+function SelectField({
+  id,
+  label,
+  choices,
+  value,
+  onChange,
+  placeholder,
+  error,
+}: {
+  id: string;
+  label: string;
+  choices: { value: string; label: string }[];
+  value: string | null;
+  onChange: (value: string | null) => void;
+  placeholder: string;
+  error?: string;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <Label htmlFor={id} required>
+        {label}
+      </Label>
+      <Select items={choices} value={value} onValueChange={onChange}>
+        <SelectTrigger
+          id={id}
+          className="w-full min-w-0"
+          aria-required
+          aria-invalid={error != null}
+        >
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent
+          align="start"
+          alignItemWithTrigger={false}
+          aria-label={label}
+        >
+          {choices.map((choice) => (
+            <SelectItem key={choice.value} value={choice.value}>
+              {choice.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <FieldError message={error} />
+    </div>
+  );
+}
+
 /**
- * Transfer one or many labourers to a Project from a date (CM-206). The
- * date is their first day on the new Project.
+ * Transfer one or many labourers from one Project to another from a date
+ * (CM-206). The date is their first day on the new Project; their other
+ * Projects stay (ADR CM-0033). `fromProjectId` picks the Project they
+ * leave when they share it, e.g. the list's Project filter.
  */
 export function TransferDialog({
   labours,
+  fromProjectId = null,
   open,
   onOpenChange,
   onTransferred,
 }: {
   labours: TransferTarget[];
+  fromProjectId?: string | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onTransferred?: () => void;
 }) {
   const projects = useQuery({ ...projectOptionsQuery, enabled: open });
   const command = useLabourCommand();
+  const [chosenFrom, setChosenFrom] = useState<string | null>(null);
   const [projectId, setProjectId] = useState<string | null>(null);
   const [date, setDate] = useState(localToday);
   const [remark, setRemark] = useState("");
   const [problem, setProblem] = useState<{
-    field: "project" | "date" | null;
+    field: "from" | "project" | "date" | null;
     message: string;
   } | null>(null);
 
   const single = labours.length === 1 ? labours[0] : undefined;
-  const sources = new Set(labours.map((labour) => labour.currentProject.id));
+  const shared = sharedProjects(labours);
+  const fromChoices = shared.map((project) => ({
+    value: project.id,
+    label: project.name,
+  }));
+  // The chosen Project, else the list's filter, else the only one shared.
+  const from =
+    chosenFrom ??
+    (shared.some((project) => project.id === fromProjectId)
+      ? fromProjectId
+      : shared.length === 1
+        ? (shared[0]?.id ?? null)
+        : null);
+  // A labourer cannot move to a Project they are already on.
+  const taken = new Set(
+    labours.flatMap((labour) => labour.projects.map((project) => project.id)),
+  );
   const choices = (projects.data?.items ?? [])
-    // One labourer cannot move to the Project they are on.
-    .filter((project) => project.id !== single?.currentProject.id)
+    .filter((project) => !taken.has(project.id))
     .map((project) => ({ value: project.id, label: project.name }));
 
   const reset = () => {
+    setChosenFrom(null);
     setProjectId(null);
     setDate(localToday());
     setRemark("");
@@ -80,6 +161,16 @@ export function TransferDialog({
   };
 
   const submit = async () => {
+    if (from == null) {
+      setProblem({
+        field: "from",
+        message:
+          shared.length === 0
+            ? "These Labours share no Project. Transfer them from one Project at a time."
+            : "Choose the Project they move from",
+      });
+      return;
+    }
     if (projectId == null) {
       setProblem({ field: "project", message: "Choose the Project" });
       return;
@@ -93,6 +184,7 @@ export function TransferDialog({
       await command.mutateAsync({
         kind: "transfer",
         labourIds: labours.map((labour) => labour.id),
+        fromProjectId: from,
         toProjectId: projectId,
         transferDate: date,
         remark: remark.trim() === "" ? null : remark.trim(),
@@ -107,6 +199,8 @@ export function TransferDialog({
         TRANSFER_BEFORE_LAST_TRANSFER: "date",
         TRANSFER_SAME_PROJECT: "project",
         PROJECT_NOT_FOUND: "project",
+        LABOUR_NOT_ON_PROJECT: "from",
+        TRANSFER_FROM_PROJECT_REQUIRED: "from",
       } as const);
       setProblem({ field, message });
     }
@@ -129,8 +223,8 @@ export function TransferDialog({
           </DialogTitle>
           <DialogDescription>
             {single != null
-              ? `Now on ${single.currentProject.name}. Attendance from the transfer date is marked on the new Project; their balance moves with them.`
-              : `From ${String(sources.size)} ${sources.size === 1 ? "Project" : "Projects"}. Attendance from the transfer date is marked on the new Project; balances move with them.`}
+              ? `Now on ${projectsLabel(single.projects)}. Attendance from the transfer date is marked on the new Project; their balance moves with them and their other Projects stay.`
+              : "Attendance from the transfer date is marked on the new Project; balances move with them and their other Projects stay."}
           </DialogDescription>
         </DialogHeader>
         <form
@@ -141,49 +235,28 @@ export function TransferDialog({
             void submit();
           }}
         >
-          <div className="space-y-1.5">
-            <Label htmlFor="transfer-project" required>
-              To Project
-            </Label>
-            <Select
-              items={choices}
-              value={projectId}
-              onValueChange={(value) => {
-                setProjectId(value);
-              }}
-            >
-              <SelectTrigger
-                id="transfer-project"
-                className="w-full min-w-0"
-                aria-required
-                aria-invalid={problem?.field === "project"}
-              >
-                <SelectValue
-                  placeholder={
-                    projects.isPending
-                      ? "Loading Projects…"
-                      : "Select a Project"
-                  }
-                />
-              </SelectTrigger>
-              <SelectContent
-                align="start"
-                alignItemWithTrigger={false}
-                aria-label="Projects"
-              >
-                {choices.map((choice) => (
-                  <SelectItem key={choice.value} value={choice.value}>
-                    {choice.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FieldError
-              message={
-                problem?.field === "project" ? problem.message : undefined
-              }
-            />
-          </div>
+          <SelectField
+            id="transfer-from"
+            label="From Project"
+            choices={fromChoices}
+            value={from}
+            onChange={setChosenFrom}
+            placeholder={
+              shared.length === 0 ? "No shared Project" : "Select a Project"
+            }
+            error={problem?.field === "from" ? problem.message : undefined}
+          />
+          <SelectField
+            id="transfer-project"
+            label="To Project"
+            choices={choices}
+            value={projectId}
+            onChange={setProjectId}
+            placeholder={
+              projects.isPending ? "Loading Projects…" : "Select a Project"
+            }
+            error={problem?.field === "project" ? problem.message : undefined}
+          />
           <div className="space-y-1.5">
             <Label htmlFor="transfer-date" required>
               Transfer date

@@ -5,7 +5,6 @@ import type { DomainEvent } from "@/src/shared-kernel/events";
 
 import { PermissionSet } from "@/src/shared-kernel/access";
 
-import { Designation } from "../domain/designation";
 import type { NewCompany } from "../domain/new-company";
 import { Role } from "../domain/role";
 import {
@@ -42,16 +41,6 @@ function setup(storeFails = false) {
         return Promise.resolve();
       },
     },
-    ({ workspaceId, by, now }) => [
-      Designation.create({
-        id: "d1",
-        workspaceId,
-        name: "Owner",
-        isSeed: true,
-        by,
-        now,
-      }),
-    ],
     ({ workspaceId, by, now }) => [
       Role.create({
         id: "r1",
@@ -94,16 +83,12 @@ describe("CreateCompanyHandler", () => {
       mobile: "+917708165767",
       email: null,
     });
-    expect(created[0]?.designations.map((item) => item.name)).toEqual([
-      "Owner",
-    ]);
     expect(created[0]?.roles.map((item) => item.name)).toEqual(["Admin"]);
     expect(created[0]?.ownerMember).toMatchObject({
       isOwner: true,
       status: "active",
       userId: "user-1",
     });
-    expect(created[0]?.ownerMember.details.designationId).toBe("d1");
     expect(created[0]?.details.value).toMatchObject({
       currency: "INR",
       timezone: "Asia/Kolkata",

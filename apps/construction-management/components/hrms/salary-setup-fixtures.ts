@@ -136,7 +136,6 @@ export const EMPLOYEES: EmployeeSalariesModel = {
       memberId: MEMBER_IDS.owner,
       name: "Arun Selva Kumar",
       memberType: "normal",
-      designationName: "Owner",
       active: true,
       status: "configured",
       config: {
@@ -156,7 +155,6 @@ export const EMPLOYEES: EmployeeSalariesModel = {
       memberId: MEMBER_IDS.engineer,
       name: "Bala Murugan",
       memberType: "normal",
-      designationName: "Site Engineer",
       active: true,
       status: "not_set",
       config: null,
@@ -165,7 +163,6 @@ export const EMPLOYEES: EmployeeSalariesModel = {
       memberId: MEMBER_IDS.clerk,
       name: "Chitra Devi",
       memberType: "hrms",
-      designationName: "Store Keeper",
       active: false,
       status: "not_set",
       config: null,

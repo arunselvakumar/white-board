@@ -101,7 +101,6 @@ const employee = z.object({
   memberId: z.uuid(),
   name: z.string(),
   memberType: z.enum(["normal", "hrms"]),
-  designationName: z.string().nullable(),
   /** False while Joining Pending. */
   active: z.boolean(),
 });
@@ -174,7 +173,6 @@ export function toEmployeeOption(item: HrmsEmployee) {
     memberId: item.memberId,
     name: item.name,
     memberType: item.memberType,
-    designationName: item.designationName,
     active: item.active,
   };
 }

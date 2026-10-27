@@ -280,14 +280,14 @@ describe("Follow-ups (CM-1004)", () => {
         id: newId(),
         workspaceId: ctx.ws,
         createDays: 0,
-        createOverrideDesignationIds: [],
+        createOverrideRoleIds: [],
         editDays: 0,
-        editOverrideDesignationIds: [],
+        editOverrideRoleIds: [],
         modules: {
           inquiry_follow_up: {
             mode: "custom",
-            create: { days: 1, overrideDesignationIds: [] },
-            edit: { days: 1, overrideDesignationIds: [] },
+            create: { days: 1, overrideRoleIds: [] },
+            edit: { days: 1, overrideRoleIds: [] },
           },
         },
         createdBy: ctx.by,

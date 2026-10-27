@@ -4,11 +4,15 @@ import { z } from "zod";
 import {
   FLAGS,
   MENUS,
+  can,
   financialValue,
   type MemberAccess,
   type PermissionGrants,
 } from "@/src/shared-kernel/access";
-import { MAX_MONTHLY_SALARY } from "@/src/organization/domain/team-member";
+import {
+  MAX_SALARY,
+  type StaffSalaryInput,
+} from "@/src/organization/domain/staff-salary";
 import {
   PASSWORD_MAX,
   PASSWORD_MIN,
@@ -26,23 +30,43 @@ export const PermissionGrantsModel = z.partialRecord(
 
 export const TeamMemberIdParamsModel = z.object({ id: z.uuid() });
 
+const paise = z.number().int().min(0).max(MAX_SALARY).nullish();
+
 export const teamMemberDetailFields = {
   name: z.string().trim().min(1).max(100),
-  designationId: z.uuid(),
   mobile: z.string().trim().max(20).nullish(),
   email: z.string().trim().max(254).nullish(),
   address: z.string().trim().max(500).nullish(),
   aadhaar: z.string().trim().max(14).nullish(),
   pan: z.string().trim().max(10).nullish(),
   emergencyContact: z.string().trim().max(120).nullish(),
-  monthlySalary: z
-    .number()
-    .int()
-    .min(0)
-    .max(MAX_MONTHLY_SALARY)
+  salaryType: z
+    .enum(["daily", "monthly"])
+    .optional()
+    .describe(
+      "A day's or a month's salary (ADR CM-0033 §3); Monthly when left out on create. Ignored without Financial on Staff",
+    ),
+  salaryPerDay: paise.describe(
+    "Paise; optional, for a daily salary. Ignored without Financial on Staff; on edit, leave it out to keep it and send null to clear it",
+  ),
+  salaryPerMonth: paise.describe(
+    "Paise; optional, for a monthly salary. Ignored without Financial on Staff; on edit, leave it out to keep it and send null to clear it",
+  ),
+  overtimeWagePerHour: paise.describe(
+    "Paise an hour, 0 when none; dropped when there is no salary. Ignored without Financial on Staff",
+  ),
+  workingHoursPerDay: z
+    .union([z.string().max(12), z.number()])
     .nullish()
     .describe(
-      "Paise a month; optional (ADR CM-0032). Ignored without Financial on Staff; on edit, leave it out to keep it and send null to clear it",
+      "Decimal hours a day, 0 < h ≤ 24, two places at most (ADR CM-0011); 8 when left out on create, kept when left out on edit",
+    ),
+  weeklyHolidays: z
+    .array(z.int())
+    .max(7)
+    .optional()
+    .describe(
+      "0 = Sunday … 6 = Saturday; Sunday when left out on create, kept when left out on edit",
     ),
   memberType: z.enum(["normal", "hrms"]),
 };
@@ -51,7 +75,6 @@ export const ConstructionOrganizationTeamMemberResponseModel = z.object({
   id: z.uuid(),
   userId: z.string().nullable(),
   name: z.string(),
-  designation: z.object({ id: z.uuid(), name: z.string().nullable() }),
   role: z
     .object({ id: z.uuid(), name: z.string() })
     .nullable()
@@ -64,13 +87,34 @@ export const ConstructionOrganizationTeamMemberResponseModel = z.object({
   aadhaarMasked: z.string().nullable(),
   panMasked: z.string().nullable(),
   emergencyContact: z.string().nullable(),
-  monthlySalary: z
+  salaryType: z
+    .enum(["daily", "monthly"])
+    .describe("A day's or a month's salary (ADR CM-0033 §3)"),
+  salaryPerDay: z
     .number()
     .int()
     .nullable()
     .describe(
-      "Paise a month (ADR CM-0032); null when none, or without Financial on Staff",
+      "Paise; null when none, for a monthly salary, or without Financial on Staff",
     ),
+  salaryPerMonth: z
+    .number()
+    .int()
+    .nullable()
+    .describe(
+      "Paise; null when none, for a daily salary, or without Financial on Staff",
+    ),
+  overtimeWagePerHour: z
+    .number()
+    .int()
+    .nullable()
+    .describe("Paise an hour; null without Financial on Staff"),
+  workingHoursPerDay: z
+    .string()
+    .describe("Decimal hours a day; time beyond it is overtime (ADR CM-0011)"),
+  weeklyHolidays: z
+    .array(z.int().min(0).max(6))
+    .describe("0 = Sunday … 6 = Saturday"),
   memberType: z.enum(["normal", "hrms"]),
   isOwner: z.boolean(),
   status: z.enum(["joining_pending", "active", "rejected", "left"]),
@@ -99,18 +143,48 @@ export type ConstructionOrganizationTeamMemberResponseModel = z.infer<
   typeof ConstructionOrganizationTeamMemberResponseModel
 >;
 
-/** The salary only with Financial on Staff (ADR CM-0032). */
+/**
+ * The salary set-up from a request. Without Financial on Staff the type and
+ * amounts are dropped, so an edit keeps them and Add Staff has none (ADR
+ * CM-0032 §3); the type goes too, because it picks which amount applies.
+ */
+export function salaryInput(
+  model: {
+    salaryType?: "daily" | "monthly" | undefined;
+    salaryPerDay?: number | null | undefined;
+    salaryPerMonth?: number | null | undefined;
+    overtimeWagePerHour?: number | null | undefined;
+    workingHoursPerDay?: string | number | null | undefined;
+    weeklyHolidays?: number[] | undefined;
+  },
+  access: MemberAccess,
+): StaffSalaryInput {
+  const hours =
+    model.workingHoursPerDay === null ? undefined : model.workingHoursPerDay;
+  if (!can(access, "organization.team_members", "financial"))
+    return { workingHoursPerDay: hours, weeklyHolidays: model.weeklyHolidays };
+  return {
+    type: model.salaryType,
+    perDay: model.salaryPerDay,
+    perMonth: model.salaryPerMonth,
+    overtimePerHour: model.overtimeWagePerHour,
+    workingHoursPerDay: hours,
+    weeklyHolidays: model.weeklyHolidays,
+  };
+}
+
+/** The amounts only with Financial on Staff (ADR CM-0032 §3). */
 export function toTeamMemberResponse(
   member: TeamMemberReadModel,
   access: MemberAccess,
 ): ConstructionOrganizationTeamMemberResponseModel {
+  const money = (paise: number | null) =>
+    financialValue(access, "organization.team_members", paise);
   return {
     ...member,
-    monthlySalary: financialValue(
-      access,
-      "organization.team_members",
-      member.monthlySalary,
-    ),
+    salaryPerDay: money(member.salaryPerDay),
+    salaryPerMonth: money(member.salaryPerMonth),
+    overtimeWagePerHour: money(member.overtimeWagePerHour),
     mobileLocked:
       isConstructionSmsEnabled() &&
       // Same rule as TeamMember.updateDetails: locked once past Joining Pending.

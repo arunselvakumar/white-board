@@ -98,22 +98,27 @@ export type LabourAttendanceStore = {
     workspaceId: string,
     ids: readonly string[],
   ): Promise<Map<string, AttendanceLabourer>>;
-  /** The Project each labourer worked in on `date` (transfer history). */
-  projectsOn(
+  /**
+   * Which labourers worked on `projectId` on `date` (transfer history); a
+   * labourer may be on several Projects (ADR CM-0033).
+   */
+  onProject(
     workspaceId: string,
     ids: readonly string[],
+    projectId: string,
     date: CalendarDate,
-  ): Promise<Map<string, string>>;
+  ): Promise<Set<string>>;
   /** Active labourers on the Project on `date`, by name. */
   labourersOn(
     workspaceId: string,
     projectId: string,
     date: CalendarDate,
   ): Promise<AttendanceLabourer[]>;
-  /** Live rows of these labourers on `date`, in any Project. */
+  /** Live rows of these labourers on `projectId` on `date`. */
   daysOf(
     workspaceId: string,
     labourIds: readonly string[],
+    projectId: string,
     date: CalendarDate,
   ): Promise<StoredLabourDay[]>;
   findById(workspaceId: string, id: string): Promise<StoredLabourDay | null>;
@@ -606,10 +611,10 @@ export class LabourAttendanceHandlers {
     await this.assertProject(workspaceId, input.projectId);
 
     const ids = input.marks.map((mark) => mark.labourId);
-    const [labourers, projectsOn, existingDays] = await Promise.all([
+    const [labourers, onProject, existingDays] = await Promise.all([
       this.store.labourers(workspaceId, ids),
-      this.store.projectsOn(workspaceId, ids, date),
-      this.store.daysOf(workspaceId, ids, date),
+      this.store.onProject(workspaceId, ids, input.projectId, date),
+      this.store.daysOf(workspaceId, ids, input.projectId, date),
     ]);
     for (const mark of input.marks) {
       const labourer = labourers.get(mark.labourId);
@@ -627,13 +632,12 @@ export class LabourAttendanceHandlers {
           "invalid",
           { labourId: labourer.id },
         );
-      const on = projectsOn.get(labourer.id) ?? null;
-      if (on !== input.projectId)
+      if (!onProject.has(labourer.id))
         throw rowError(
           "LABOUR_NOT_ON_PROJECT",
           `${labourer.name} was not on this Project on ${date}.`,
           "invalid",
-          { labourId: labourer.id, projectId: on },
+          { labourId: labourer.id },
         );
     }
 
@@ -776,7 +780,12 @@ export class LabourAttendanceHandlers {
       by: actor.userId,
       now,
     });
-    const saved = await this.store.daysOf(workspaceId, ids, date);
+    const saved = await this.store.daysOf(
+      workspaceId,
+      ids,
+      input.projectId,
+      date,
+    );
     const order = new Map(ids.map((id, index) => [id, index]));
     saved.sort(
       (a, b) => (order.get(a.labourId) ?? 0) - (order.get(b.labourId) ?? 0),
@@ -811,13 +820,10 @@ export class LabourAttendanceHandlers {
     const days = await this.store.daysOf(
       actor.workspaceId,
       input.labourIds,
+      input.projectId,
       date,
     );
-    const byLabour = new Map(
-      days
-        .filter((day) => day.projectId === input.projectId)
-        .map((day) => [day.labourId, day]),
-    );
+    const byLabour = new Map(days.map((day) => [day.labourId, day]));
     const clears = input.labourIds.map((labourId) => {
       const day = byLabour.get(labourId);
       if (day == null)
@@ -953,7 +959,7 @@ export class LabourAttendanceHandlers {
     ];
     const allIds = [...listed, ...otherIds];
     const [yesterdayDays, models] = await Promise.all([
-      this.store.daysOf(workspaceId, allIds, addDays(date, -1)),
+      this.store.daysOf(workspaceId, allIds, projectId, addDays(date, -1)),
       this.readModels(workspaceId, marked),
     ]);
     const yesterday = new Map(yesterdayDays.map((day) => [day.labourId, day]));

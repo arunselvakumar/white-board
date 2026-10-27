@@ -33,8 +33,12 @@ export class AddStaffPage extends AppShellPage {
     return this.page.getByRole("textbox", { name: "Set a password" });
   }
 
-  public get continueButton() {
-    return this.button("Continue");
+  public get workingHoursField() {
+    return this.page.getByRole("textbox", { name: "Working hours per day" });
+  }
+
+  public get cancelLink() {
+    return this.page.getByRole("link", { name: "Cancel" });
   }
 
   public projectCheckbox(name: string) {
@@ -43,14 +47,13 @@ export class AddStaffPage extends AppShellPage {
 
   public async fillDetails(input: {
     name: string;
-    designation?: string;
     email?: string;
     mobile?: string;
     password?: string;
+    /** Rupees a month: Monthly is the default salary type. */
     salary?: string;
   }) {
     await this.nameField.fill(input.name);
-    await this.choose("Designation", input.designation ?? "Site Engineer");
     if (input.mobile != null) await this.mobileField.fill(input.mobile);
     if (input.email != null) await this.emailField.fill(input.email);
     if (input.salary != null) await this.salaryField.fill(input.salary);

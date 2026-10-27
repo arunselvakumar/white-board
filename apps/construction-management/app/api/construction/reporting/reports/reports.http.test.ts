@@ -88,7 +88,13 @@ async function seed(company: Company) {
         overtimeWagePerHour: 10_000,
         weeklyHolidays: [0],
         labourCategoryId: mason,
-        currentProjectId: tower,
+        projects: {
+          create: {
+            workspaceId: ws,
+            projectId: tower,
+            since: date("2026-06-01"),
+          },
+        },
         ...extra,
         ...AUDIT,
       },

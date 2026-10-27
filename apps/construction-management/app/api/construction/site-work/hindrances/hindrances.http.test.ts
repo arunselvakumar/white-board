@@ -488,14 +488,14 @@ describe("Hindrance register", () => {
         id: newId(),
         workspaceId: ctx.company.workspaceId,
         createDays: 0,
-        createOverrideDesignationIds: [],
+        createOverrideRoleIds: [],
         editDays: 0,
-        editOverrideDesignationIds: [],
+        editOverrideRoleIds: [],
         modules: {
           hindrance: {
             mode: "custom",
-            create: { days: 3, overrideDesignationIds: [] },
-            edit: { days: 3, overrideDesignationIds: [] },
+            create: { days: 3, overrideRoleIds: [] },
+            edit: { days: 3, overrideRoleIds: [] },
           },
         },
         createdBy: ctx.company.ownerId,

@@ -56,15 +56,23 @@ export const TEAM_MEMBERS_KEY = ["organization", "team-members"] as const;
 
 export type TeamMemberDetailsInput = {
   name: string;
-  designationId: string;
   mobile: string | null;
   email: string | null;
   address: string | null;
   aadhaar?: string | null;
   pan?: string | null;
   emergencyContact: string | null;
-  /** Paise a month; left out keeps it, null clears it (ADR CM-0032). */
-  monthlySalary?: number | null;
+  /**
+   * The salary set-up (ADR CM-0033 §3). Left out keeps it; without
+   * Financial the type and amounts are left out (ADR CM-0032 §3).
+   */
+  salaryType?: "daily" | "monthly";
+  /** Paise; null clears it. */
+  salaryPerDay?: number | null;
+  salaryPerMonth?: number | null;
+  overtimeWagePerHour?: number;
+  workingHoursPerDay?: string;
+  weeklyHolidays?: number[];
   memberType: "normal" | "hrms";
 };
 
@@ -131,16 +139,3 @@ export function revealTeamMemberIds(id: string) {
     `/${encodeURIComponent(id)}/reveal`,
   );
 }
-
-export type DesignationOption = { id: string; name: string };
-
-/** Designations for the Team Member form (the route is CM-112's). */
-export const designationOptionsQuery = queryOptions({
-  queryKey: ["organization", "designations", "options"],
-  queryFn: async () =>
-    (
-      await apiJson<{ items: DesignationOption[] }>(
-        "/api/construction/organization/designations",
-      )
-    ).items,
-});

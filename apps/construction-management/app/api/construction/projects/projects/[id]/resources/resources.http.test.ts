@@ -163,7 +163,6 @@ async function hrmsMember(company: Company): Promise<string> {
     memberType: "hrms",
     details: {
       name: "Kavitha HRMS",
-      designationId: company.designationId("Site Engineer"),
       email: newEmail(),
     },
   });
@@ -217,7 +216,8 @@ describe("Project Resources (CM-406)", () => {
     ]);
     expect(afterTeam.teamMembers[1]).toMatchObject({
       id: engineer.memberId,
-      detail: "Site Engineer",
+      // Their Role's name (ADR CM-0033).
+      detail: expect.stringMatching(/^Access /) as unknown,
     });
 
     for (const [kind, id] of [

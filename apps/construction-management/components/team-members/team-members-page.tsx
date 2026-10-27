@@ -262,9 +262,7 @@ function TeamMemberRows({
                   {member.isOwner && <Badge variant="outline">Owner</Badge>}
                 </div>
                 <p className="text-muted-foreground truncate text-sm">
-                  {member.designation.name ?? "No Designation"}
-                  {contactLine(member).length > 0 &&
-                    ` · ${contactLine(member)}`}
+                  {contactLine(member) || "No contact"}
                 </p>
                 {/* On a phone the Role sits under the details. */}
                 <p className="truncate text-sm sm:hidden">

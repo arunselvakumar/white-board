@@ -5,6 +5,7 @@ import { conflict } from "@/src/shared-kernel/domain-error";
 import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 import type { PrivateDataCipher } from "@/src/shared-kernel/private-data";
 
+import { staffSalary } from "../domain/staff-salary";
 import { TeamMember } from "../domain/team-member";
 import type {
   TeamMemberListPage,
@@ -56,7 +57,6 @@ export class PrismaTeamMemberRepository implements TeamMemberRepository {
       userId: row.userId,
       details: {
         name: row.name,
-        designationId: row.designationId,
         mobile: row.mobile,
         email: row.email,
         address: row.address,
@@ -70,7 +70,14 @@ export class PrismaTeamMemberRepository implements TeamMemberRepository {
             : this.cipher().decrypt(row.panEncrypted),
         emergencyContact: row.emergencyContact,
       },
-      monthlySalary: row.monthlySalary,
+      salary: staffSalary({
+        type: row.salaryType,
+        perDay: row.salaryPerDay,
+        perMonth: row.salaryPerMonth,
+        overtimePerHour: row.overtimeWagePerHour,
+        workingHoursPerDay: row.workingHoursPerDay.toString(),
+        weeklyHolidays: row.weeklyHolidays,
+      }),
       memberType: row.memberType,
       isOwner: row.isOwner,
       status: row.status,
@@ -94,7 +101,6 @@ export class PrismaTeamMemberRepository implements TeamMemberRepository {
       workspaceId: member.workspaceId,
       userId: member.userId,
       name: details.name,
-      designationId: details.designationId,
       roleId: member.roleId,
       mobile: details.mobile,
       email: details.email,
@@ -106,7 +112,12 @@ export class PrismaTeamMemberRepository implements TeamMemberRepository {
         details.pan == null ? null : this.cipher().encrypt(details.pan),
       panLast4: details.pan?.slice(-4) ?? null,
       emergencyContact: details.emergencyContact,
-      monthlySalary: member.monthlySalary,
+      salaryType: member.salary.type,
+      salaryPerDay: member.salary.perDay,
+      salaryPerMonth: member.salary.perMonth,
+      overtimeWagePerHour: member.salary.overtimePerHour,
+      workingHoursPerDay: member.salary.workingHoursPerDay,
+      weeklyHolidays: [...member.salary.weeklyHolidays],
       memberType: member.memberType,
       isOwner: member.isOwner,
       status: member.status,
@@ -318,15 +329,5 @@ export class PrismaTeamMemberRepository implements TeamMemberRepository {
         status: { in: ["joining_pending", "active"] },
       },
     });
-  }
-
-  async usesDesignation(
-    workspaceId: string,
-    designationId: string,
-  ): Promise<boolean> {
-    const count = await this.db.constructionOrganizationTeamMember.count({
-      where: { workspaceId, designationId, deletedAt: null },
-    });
-    return count > 0;
   }
 }

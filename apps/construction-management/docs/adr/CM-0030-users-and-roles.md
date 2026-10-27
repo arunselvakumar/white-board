@@ -4,7 +4,7 @@
 - Date: 2026-10-24
 - Amends: [CM-0003](CM-0003-permission-matrix.md) (per-member matrix, Designation templates copied), [CM-0002](CM-0002-company-workspace-and-mobile-otp.md) and [CM-0009](CM-0009-email-sign-in-while-sms-is-off.md) (who can sign in, and how), [CM-0024](CM-0024-new-menus-reach-existing-designations.md) (grant migrations now target seeded Roles)
 - Relates to: [CM-0028](CM-0028-settings-main-menu.md) (main-menu items)
-- Amended by: [CM-0032](CM-0032-staff-and-salary.md) (screens say Staff, at `/app/staff`; an optional monthly salary)
+- Amended by: [CM-0032](CM-0032-staff-and-salary.md) (screens say Staff, at `/app/staff`; an optional monthly salary); [CM-0033](CM-0033-one-page-staff-no-designations-labours-on-many-projects.md) (Designations removed; Back-dated Entry overrides name Roles)
 - Numbering: written as CM-0029 and renumbered after [CM-0029](CM-0029-sign-in-as-a-customer.md) (sign in as a customer) reached `main` first. The two migrations' comments still say CM-0029; migrations are not edited once they may have run.
 
 Team Members sat under Masters → Company, and the last step of Add Team Member was a full Permission Matrix for that one person. The owner wants a **Users & Roles** main-menu item with two pages, **Users** and **Role Management**. What a person may do should be a **Role** that is defined once and given to many Users. A User is the Team Member who can sign in. Email must not be required: site staff without an email sign in with their mobile and a password the admin sets, and must change it the first time they sign in.

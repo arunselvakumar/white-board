@@ -342,10 +342,16 @@ describe("Projects HTTP (CM-204)", () => {
     await prisma.$executeRaw`
       INSERT INTO construction_labour.labours
         (id, workspace_id, name, joining_date, wage_type, wage_per_day,
-         overtime_wage_per_hour, current_project_id, created_by, updated_by)
+         overtime_wage_per_hour, created_by, updated_by)
       VALUES
         (${labourId}::uuid, ${owner.workspaceId}, 'Ramu', DATE '2026-10-01',
-         'daily', 70000, 10000, ${kumari.id}::uuid, ${owner.userId}, ${owner.userId})
+         'daily', 70000, 10000, ${owner.userId}, ${owner.userId})
+    `;
+    await prisma.$executeRaw`
+      INSERT INTO construction_labour.labour_projects
+        (workspace_id, labour_id, project_id, since)
+      VALUES
+        (${owner.workspaceId}, ${labourId}::uuid, ${kumari.id}::uuid, DATE '2026-10-01')
     `;
     const refused = await deleteProject(
       jsonRequest(`${BASE}/${kumari.id}/delete`, owner.cookie, {}),
@@ -512,7 +518,6 @@ describe("Projects HTTP (CM-204)", () => {
       createTeamMember(
         jsonRequest(members, owner.cookie, {
           name: "Prabhu Saravanan",
-          designationId: owner.designationId("Site Engineer"),
           email: `prabhu-${newId()}@example.test`,
           memberType: "normal",
           projectIds,

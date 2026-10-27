@@ -35,8 +35,6 @@ export type HrmsEmployee = {
   userId: string | null;
   name: string;
   memberType: "normal" | "hrms";
-  designationId: string;
-  designationName: string | null;
   /** Projects the member is assigned to; empty for HRMS Team Members. */
   projectIds: readonly string[];
   /** Joined (status active); a Joining Pending member is not yet active. */

@@ -66,7 +66,7 @@ async function seed() {
         wagePerDay: 70_000,
         overtimeWagePerHour: 10_000,
         weeklyHolidays: [0],
-        currentProjectId: tower,
+        projectIds: [tower],
         openingBalance: 0,
       }),
     ),

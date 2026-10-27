@@ -29,9 +29,15 @@ export const SUNDAR = {
   name: "Sundar Rajan",
 };
 
+export const MALL = {
+  id: "0199a1b2-0000-7000-8000-00000000a003",
+  name: "Mall Block C",
+};
+
 export const PROJECT_OPTIONS = [
   { ...TOWER, status: "ongoing" },
   { ...VILLA, status: "ongoing" },
+  { ...MALL, status: "ongoing" },
 ];
 
 const lookup = (item: { id: string; name: string }, disabled = false) => ({
@@ -89,7 +95,7 @@ export const DHURESH: LabourResponse = {
   supervisor: SUNDAR,
   contactNumber: "+917708165767",
   gender: "male",
-  currentProject: TOWER,
+  projects: [TOWER],
   isActive: true,
   photoUrl: null,
   createdAt: AT,
@@ -111,7 +117,7 @@ export const MEENA: LabourResponse = {
   labourCategory: HELPER,
   supervisor: null,
   gender: "female",
-  currentProject: VILLA,
+  projects: [VILLA],
 };
 
 export const MURUGAN: LabourResponse = {
@@ -121,6 +127,17 @@ export const MURUGAN: LabourResponse = {
   labourCode: null,
   isActive: false,
   balance: 0,
+  // On many Projects at once (ADR CM-0033).
+  projects: [TOWER, VILLA, MALL],
+};
+
+/** A Labour added before any Project: Projects are optional. */
+export const RAVI: LabourResponse = {
+  ...DHURESH,
+  id: "0199a1b2-0000-7000-8000-00000000b004",
+  name: "Ravi Kumar",
+  labourCode: "L-004",
+  projects: [],
 };
 
 export function listOf(items: LabourResponse[]): LabourList {
@@ -148,7 +165,7 @@ const values = (name: string, project: string | null) => ({
   wagePerMonth: null,
   overtimeWagePerHour: 8_000,
   openingBalance: null,
-  project,
+  projects: project,
   labourCategory: "Mason",
   supervisor: null,
 });
@@ -161,7 +178,7 @@ export const PREVIEW_WITH_ERRORS: LabourImportPreview = {
       ok: false,
       errors: [
         {
-          field: "project",
+          field: "projects",
           code: "PROJECT_NOT_FOUND",
           message: 'No Project is called "Nowhere".',
         },

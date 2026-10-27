@@ -10,8 +10,7 @@ import { FieldError } from "@/components/auth/field-error";
 import { PasswordField } from "@/components/auth/password-field";
 
 import {
-  MOBILE_OR_EMAIL_MESSAGE,
-  hasMobileOrEmail,
+  checkDetails,
   teamMemberDetailsObject,
 } from "./team-member-details-fields";
 
@@ -24,19 +23,18 @@ export const temporaryPassword = z
   .min(PASSWORD_MIN, `Use at least ${String(PASSWORD_MIN)} characters`)
   .max(PASSWORD_MAX, `Use at most ${String(PASSWORD_MAX)} characters`);
 
-/** Add Staff's details step: the details plus how they will sign in. */
-export const addStaffSchema = teamMemberDetailsObject
-  .extend({
-    invite: z.boolean(),
-    // Blank means no password; otherwise a Temporary Password.
-    password: z.union([z.literal(""), temporaryPassword]),
-  })
-  .refine(hasMobileOrEmail, {
-    path: ["mobile"],
-    message: MOBILE_OR_EMAIL_MESSAGE,
-  });
+const addStaffObject = teamMemberDetailsObject.extend({
+  invite: z.boolean(),
+  // Blank means no password; otherwise a Temporary Password.
+  password: z.union([z.literal(""), temporaryPassword]),
+});
 
-export type AddStaffValues = z.infer<typeof addStaffSchema>;
+/** Add Staff's form: the details plus how they will sign in. */
+export function addStaffSchema(canSeeSalary: boolean) {
+  return addStaffObject.superRefine(checkDetails(canSeeSalary));
+}
+
+export type AddStaffValues = z.infer<typeof addStaffObject>;
 
 /**
  * What they can sign in with, in words: "their mobile or email" when they

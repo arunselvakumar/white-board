@@ -18,8 +18,10 @@ import {
   labourDetails,
   maskAadhaar,
   openingBalance,
+  uniqueProjectIds,
   type LabourDetails,
   type LabourDetailsInput,
+  type ProjectChanges,
 } from "../domain/labour";
 import type {
   LabourCategoryDirectory,
@@ -38,7 +40,8 @@ import type {
 } from "./labour-ports";
 
 export type CreateLabourInput = LabourDetailsInput & {
-  currentProjectId: string;
+  /** None, one or many (ADR CM-0033); each is on from the joining date. */
+  projectIds?: readonly string[];
   /** Paise, signed; 0 when absent. */
   openingBalance?: number | null;
 };
@@ -47,7 +50,8 @@ export type CreateLabourInput = LabourDetailsInput & {
  * An edit of the register entry. Money fields and Aadhaar left `undefined`
  * keep their stored values (a Team Member without Financial never sees
  * them); `null` Aadhaar removes it. Working hours left out or `null` keep
- * theirs.
+ * theirs. Projects left out keep theirs; the ones ticked or unticked are
+ * on or off from today (ADR CM-0033).
  */
 export type UpdateLabourInput = Omit<
   LabourDetailsInput,
@@ -57,6 +61,7 @@ export type UpdateLabourInput = Omit<
   wagePerMonth?: number | null;
   overtimeWagePerHour?: number | null;
   openingBalance?: number | null;
+  projectIds?: readonly string[];
   expectedUpdatedAt: Date;
 };
 
@@ -75,7 +80,7 @@ export function labourSnapshot(labour: Labour) {
   return {
     ...details,
     aadhaarMasked: maskAadhaar(aadhaar),
-    currentProjectId: labour.currentProjectId,
+    projectIds: [...labour.projectIds],
     isActive: labour.isActive,
   };
 }
@@ -136,20 +141,21 @@ export class LabourHandlers {
   async assertReferences(
     workspaceId: string,
     refs: {
-      projectId?: string;
+      projectIds?: readonly string[];
       labourCategoryId: string | null;
       supervisorId: string | null;
     },
     previous?: Pick<LabourDetails, "labourCategoryId" | "supervisorId">,
   ): Promise<void> {
-    if (refs.projectId != null) {
-      const projects = await this.directories.projects.find(workspaceId, [
-        refs.projectId,
-      ]);
-      if (!projects.has(refs.projectId))
+    if (refs.projectIds != null && refs.projectIds.length > 0) {
+      const projects = await this.directories.projects.find(
+        workspaceId,
+        refs.projectIds,
+      );
+      if (refs.projectIds.some((id) => !projects.has(id)))
         throw withField(
           notFound("PROJECT_NOT_FOUND", "This Project was not found."),
-          "currentProjectId",
+          "projectIds",
         );
     }
     if (
@@ -237,8 +243,9 @@ export class LabourHandlers {
   }): Promise<LabourReadModel> {
     const details = labourDetails(input.labour);
     const opening = openingBalance(input.labour.openingBalance);
+    const projectIds = uniqueProjectIds(input.labour.projectIds ?? []);
     await this.assertReferences(input.workspaceId, {
-      projectId: input.labour.currentProjectId,
+      projectIds,
       labourCategoryId: details.labourCategoryId,
       supervisorId: details.supervisorId,
     });
@@ -248,7 +255,7 @@ export class LabourHandlers {
       id: newId(now.getTime()),
       workspaceId: input.workspaceId,
       details,
-      projectId: input.labour.currentProjectId,
+      projectIds,
       by: input.by,
       now,
     });
@@ -292,9 +299,15 @@ export class LabourHandlers {
           : patch.workingHoursPerDay,
       aadhaar: patch.aadhaar === undefined ? current.aadhaar : patch.aadhaar,
     });
+    // Only Projects newly ticked must be live; a deleted one can be unticked.
+    const wantedProjects =
+      patch.projectIds === undefined
+        ? null
+        : uniqueProjectIds(patch.projectIds);
     await this.assertReferences(
       input.workspaceId,
       {
+        projectIds: wantedProjects?.filter((id) => !labour.isOn(id)),
         labourCategoryId: details.labourCategoryId,
         supervisorId: details.supervisorId,
       },
@@ -324,12 +337,26 @@ export class LabourHandlers {
         : openingBalance(patch.openingBalance);
     const repost = wanted !== stored || (joiningDateChanged && stored !== 0);
 
-    labour.update(details, input.by, this.clock());
+    const now = this.clock();
+    labour.update(details, input.by, now);
+    let projects: (ProjectChanges & { date: CalendarDate }) | null = null;
+    if (wantedProjects != null) {
+      const changes = labour.setProjects(wantedProjects, input.by, now);
+      if (changes.added.length > 0 || changes.removed.length > 0) {
+        // On or off from today; never before they joined.
+        const today = await this.labours.today(input.workspaceId);
+        projects = {
+          ...changes,
+          date: today < details.joiningDate ? details.joiningDate : today,
+        };
+      }
+    }
     await this.labours.update({
       labour,
       expectedUpdatedAt: patch.expectedUpdatedAt,
       opening: repost ? wanted : null,
       joiningDateChanged,
+      projects,
       audit: this.audit(labour, input.by, "labour.updated", {
         before: { ...before, openingBalance: stored },
         after: { ...labourSnapshot(labour), openingBalance: wanted },
@@ -338,13 +365,21 @@ export class LabourHandlers {
     return this.view(input.workspaceId, labour.id);
   }
 
-  /** A joining date may not pass the first real transfer or the first attendance day. */
+  /**
+   * A joining date may not pass the first later change of Projects (a
+   * transfer, or a Project ticked or unticked on Edit) or the first
+   * attendance day. The rows written with the labourer move with it.
+   */
   private async assertJoiningDate(
     labour: Labour,
     joiningDate: CalendarDate,
   ): Promise<void> {
     const history = await this.labours.transfers(labour.workspaceId, labour.id);
-    const firstMove = history.find((row) => row.fromProjectId != null);
+    const firstMove = history.find(
+      (row) =>
+        row.fromProjectId != null ||
+        row.transferDate !== labour.details.joiningDate,
+    );
     if (firstMove != null && joiningDate > firstMove.transferDate)
       throw new DomainError(
         "JOINING_DATE_AFTER_TRANSFER",
@@ -418,14 +453,17 @@ export class LabourHandlers {
   }
 
   /**
-   * Moves one or more labourers to `toProjectId` from `transferDate`
-   * (CM-206). All or none: any refusal stops the whole command. The caller
-   * checks `transfer` on the destination; this checks each source Project.
+   * Moves one or more labourers from `fromProjectId` to `toProjectId` from
+   * `transferDate` (CM-206); their other Projects stay (ADR CM-0033).
+   * Without `fromProjectId`, each labourer leaves their only Project. All
+   * or none: any refusal stops the whole command. The caller checks
+   * `transfer` on the destination; this checks each source Project.
    */
   async transfer(input: {
     workspaceId: string;
     access: MemberAccess;
     labourIds: readonly string[];
+    fromProjectId?: string | null;
     toProjectId: string;
     transferDate: string;
     remark?: string | null;
@@ -450,16 +488,20 @@ export class LabourHandlers {
         "The remark must be at most 500 characters.",
       );
     await this.assertReferences(input.workspaceId, {
-      projectId: input.toProjectId,
+      projectIds: [input.toProjectId],
       labourCategoryId: null,
       supervisorId: null,
     });
     const labours = await this.labours.findMany(input.workspaceId, ids);
     if (labours.length !== ids.length) throw labourNotFound();
-    for (const labour of labours)
+    const sources = new Map<string, string>();
+    for (const labour of labours) {
+      const from = input.fromProjectId ?? onlyProject(labour);
       assertCan(input.access, "labour.labour", "transfer", {
-        projectId: labour.currentProjectId,
+        projectId: from,
       });
+      sources.set(labour.id, from);
+    }
 
     const history = new Map<string, CalendarDate>();
     await Promise.all(
@@ -469,34 +511,47 @@ export class LabourHandlers {
         if (last != null) history.set(labour.id, last.transferDate);
       }),
     );
-    const attendance = await this.labours.latestAttendance(
-      input.workspaceId,
-      ids,
-    );
+    const attendance = new Map<string, CalendarDate>();
+    for (const from of new Set(sources.values())) {
+      const leaving = labours
+        .filter((labour) => sources.get(labour.id) === from)
+        .map((labour) => labour.id);
+      for (const [id, date] of await this.labours.latestAttendance(
+        input.workspaceId,
+        leaving,
+        from,
+      ))
+        attendance.set(id, date);
+    }
     const now = this.clock();
     const moves: LabourMove[] = [];
     const audits: AuditEvent[] = [];
     for (const labour of labours) {
+      const fromProjectId = sources.get(labour.id) ?? "";
+      const before = [...labour.projectIds];
+      const loadedUpdatedAt = labour.updatedAt;
+      labour.transfer(fromProjectId, input.toProjectId, input.by, now);
       assertTransferDate({
         name: labour.details.name,
         transferDate,
         lastTransferDate: history.get(labour.id) ?? null,
         latestAttendanceDate: attendance.get(labour.id) ?? null,
       });
-      const loadedUpdatedAt = labour.updatedAt;
-      const fromProjectId = labour.transferTo(input.toProjectId, input.by, now);
       moves.push({
         labour,
         fromProjectId,
+        toProjectId: input.toProjectId,
         loadedUpdatedAt,
         transferDate,
         remark: remark.length === 0 ? null : remark,
       });
       audits.push(
         this.audit(labour, input.by, "labour.transferred", {
-          before: { currentProjectId: fromProjectId },
+          before: { projectIds: before },
           after: {
-            currentProjectId: input.toProjectId,
+            projectIds: [...labour.projectIds],
+            fromProjectId,
+            toProjectId: input.toProjectId,
             transferDate,
             remark: remark.length === 0 ? null : remark,
           },
@@ -514,7 +569,7 @@ export class LabourHandlers {
   ): Promise<
     (LabourTransferRecord & {
       fromProject: { id: string; name: string } | null;
-      toProject: { id: string; name: string };
+      toProject: { id: string; name: string } | null;
     })[]
   > {
     await this.load(workspaceId, id);
@@ -522,20 +577,33 @@ export class LabourHandlers {
     const names = await this.directories.projects.find(
       workspaceId,
       rows.flatMap((row) =>
-        row.fromProjectId == null
-          ? [row.toProjectId]
-          : [row.fromProjectId, row.toProjectId],
+        [row.fromProjectId, row.toProjectId].filter(
+          (projectId): projectId is string => projectId != null,
+        ),
       ),
     );
-    const project = (projectId: string) =>
-      names.get(projectId) ?? { id: projectId, name: "Deleted Project" };
+    const project = (projectId: string | null) =>
+      projectId == null
+        ? null
+        : (names.get(projectId) ?? { id: projectId, name: "Deleted Project" });
     return rows.map((row) => ({
       ...row,
-      fromProject:
-        row.fromProjectId == null ? null : project(row.fromProjectId),
+      fromProject: project(row.fromProjectId),
       toProject: project(row.toProjectId),
     }));
   }
+}
+
+/** The Project a labourer leaves when the transfer names none. */
+function onlyProject(labour: Labour): string {
+  const [only, ...more] = labour.projectIds;
+  if (only == null || more.length > 0)
+    throw new DomainError(
+      "TRANSFER_FROM_PROJECT_REQUIRED",
+      `${labour.details.name} works on ${labour.projectIds.length === 0 ? "no Project" : "more than one Project"}. Choose the Project they move from.`,
+      { details: { labourId: labour.id, field: "fromProjectId" } },
+    );
+  return only;
 }
 
 export function labourCodeTaken(): DomainError {

@@ -77,7 +77,7 @@ export class PrismaBalanceStore implements BalanceStore {
           workspaceId,
           deletedAt: null,
           OR: [
-            { currentProjectId: projectId, joiningDate: joinedBy },
+            { projects: { some: { projectId } }, joiningDate: joinedBy },
             { id: { in: withEntries } },
           ],
         },
@@ -86,7 +86,7 @@ export class PrismaBalanceStore implements BalanceStore {
           name: true,
           labourCode: true,
           isActive: true,
-          currentProjectId: true,
+          projects: { where: { projectId }, select: { projectId: true } },
         },
       });
       return byName(
@@ -95,7 +95,7 @@ export class PrismaBalanceStore implements BalanceStore {
           name: row.name,
           code: row.labourCode,
           isActive: row.isActive,
-          onProject: row.currentProjectId === projectId,
+          onProject: row.projects.length > 0,
         })),
       );
     }
@@ -141,7 +141,7 @@ export class PrismaBalanceStore implements BalanceStore {
           name: true,
           labourCode: true,
           isActive: true,
-          currentProjectId: true,
+          projects: { where: { projectId }, select: { projectId: true } },
         },
       });
       return row == null
@@ -151,7 +151,7 @@ export class PrismaBalanceStore implements BalanceStore {
             name: row.name,
             code: row.labourCode,
             isActive: row.isActive,
-            onProject: row.currentProjectId === projectId,
+            onProject: row.projects.length > 0,
           };
     }
     const row = await this.db.constructionLabourVendor.findFirst({

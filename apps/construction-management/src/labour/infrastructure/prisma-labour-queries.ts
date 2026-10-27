@@ -19,7 +19,17 @@ import type {
 import { workingHours, type Weekday } from "../domain/wages";
 import { prismaLedger } from "./prisma-ledger";
 
-type Row = Prisma.ConstructionLabourLabourGetPayload<object>;
+/** The labourer's Projects, oldest first (ADR CM-0033). */
+const WITH_PROJECTS = {
+  projects: {
+    select: { projectId: true },
+    orderBy: [{ since: "asc" }, { projectId: "asc" }],
+  },
+} as const satisfies Prisma.ConstructionLabourLabourInclude;
+
+type Row = Prisma.ConstructionLabourLabourGetPayload<{
+  include: typeof WITH_PROJECTS;
+}>;
 
 /** Today in the Company's time zone (its profile; India by default). */
 export async function companyToday(
@@ -45,7 +55,7 @@ function whereOf(
     { workspaceId: filter.workspaceId, deletedAt: null },
   ];
   if (filter.projectId != null)
-    filters.push({ currentProjectId: filter.projectId });
+    filters.push({ projects: { some: { projectId: filter.projectId } } });
   if (filter.active != null) filters.push({ isActive: filter.active });
   if (filter.supervisorId != null)
     filters.push({ supervisorId: filter.supervisorId });
@@ -87,7 +97,13 @@ export class PrismaLabourQueries implements LabourQueries {
         this.db.constructionProjectsProject.findMany({
           where: {
             workspaceId,
-            id: { in: unique(rows.map((row) => row.currentProjectId)) },
+            id: {
+              in: unique(
+                rows.flatMap((row) =>
+                  row.projects.map((project) => project.projectId),
+                ),
+              ),
+            },
           },
           select: { id: true, name: true },
         }),
@@ -135,10 +151,13 @@ export class PrismaLabourQueries implements LabourQueries {
       },
       aadhaarMasked:
         row.aadhaarLast4 == null ? null : `XXXXXXXX${row.aadhaarLast4}`,
-      currentProject: projectNames.get(row.currentProjectId) ?? {
-        id: row.currentProjectId,
-        name: "Deleted Project",
-      },
+      projects: row.projects.map(
+        ({ projectId }) =>
+          projectNames.get(projectId) ?? {
+            id: projectId,
+            name: "Deleted Project",
+          },
+      ),
       labourCategory:
         row.labourCategoryId == null
           ? null
@@ -159,6 +178,7 @@ export class PrismaLabourQueries implements LabourQueries {
   async get(workspaceId: string, id: string): Promise<LabourReadModel | null> {
     const row = await this.db.constructionLabourLabour.findFirst({
       where: { id, workspaceId, deletedAt: null },
+      include: WITH_PROJECTS,
     });
     if (row == null) return null;
     const [model] = await this.readModels(workspaceId, [row]);
@@ -200,6 +220,7 @@ export class PrismaLabourQueries implements LabourQueries {
         ? [{ createdAt: "asc" }, { id: "asc" }]
         : [{ createdAt: "desc" }, { id: "desc" }],
       take: filter.limit + 1,
+      include: WITH_PROJECTS,
     });
     const hasMore = page.length > filter.limit;
     const rows = page.slice(0, filter.limit);
@@ -219,6 +240,7 @@ export class PrismaLabourQueries implements LabourQueries {
       where: { AND: whereOf(filter) },
       orderBy: [{ name: "asc" }, { id: "asc" }],
       take: 10_000,
+      include: WITH_PROJECTS,
     });
     return this.readModels(filter.workspaceId, rows);
   }
@@ -229,7 +251,9 @@ export class PrismaLabourQueries implements LabourQueries {
     date: CalendarDate,
   ): Promise<LabourOption[]> {
     const day = calendarDateToDb(date);
-    // Active labourers whose history puts them on the Project that day.
+    // Active labourers whose history puts them on the Project that day: the
+    // latest row on or before it that names the Project moves them onto it
+    // (ADR CM-0033). Their other Projects do not matter.
     const ids = await this.db.$queryRaw<{ id: string }[]>`
       SELECT l.id::text AS id
       FROM construction_labour.labours l
@@ -238,12 +262,15 @@ export class PrismaLabourQueries implements LabourQueries {
         AND l.is_active
         AND l.joining_date <= ${day}
         AND (
-          SELECT t.to_project_id
+          SELECT t.to_project_id IS NOT DISTINCT FROM ${projectId}::uuid
           FROM construction_labour.labour_transfers t
-          WHERE t.labour_id = l.id AND t.transfer_date <= ${day}
+          WHERE t.labour_id = l.id
+            AND t.transfer_date <= ${day}
+            AND (t.to_project_id = ${projectId}::uuid
+              OR t.from_project_id = ${projectId}::uuid)
           ORDER BY t.transfer_date DESC, t.created_at DESC, t.id DESC
           LIMIT 1
-        ) = ${projectId}::uuid
+        )
     `;
     if (ids.length === 0) return [];
     const rows = await this.db.constructionLabourLabour.findMany({

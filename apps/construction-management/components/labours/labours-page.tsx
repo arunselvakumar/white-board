@@ -87,6 +87,7 @@ import { projectOptionsQuery } from "@/src/queries/projects";
 
 import { ImportDialog } from "./import-dialog";
 import { LABOURS_PATH } from "./labour-form";
+import { ProjectChips } from "./labour-projects";
 import { TransferDialog, type TransferTarget } from "./transfer-dialog";
 import { TransferHistorySheet } from "./transfer-history-sheet";
 import { LabourRowsSkeleton } from "./labours-skeletons";
@@ -191,7 +192,7 @@ export function LaboursPage() {
         <PageHeader
           back={{ label: "Masters", href: "/app/masters" }}
           title="Labours"
-          meta="Your own Labours: wages, Project and transfers."
+          meta="Your own Labours: wages, Projects and transfers."
           actions={
             <div className="flex flex-wrap gap-2">
               <Button
@@ -367,7 +368,7 @@ function LabourRows({
           <EmptyDescription>
             {filtered
               ? "Try another name, status, Project, category or Supervisor."
-              : "Add the Labours on your own roll with their wage and Project, or import them from Excel."}
+              : "Add the Labours on your own roll with their wage and Projects, or import them from Excel."}
           </EmptyDescription>
         </EmptyHeader>
         {!filtered && (
@@ -445,7 +446,7 @@ function LabourRows({
               <TableHead>Name</TableHead>
               <TableHead>Labour Id</TableHead>
               <TableHead>Category</TableHead>
-              <TableHead>Project</TableHead>
+              <TableHead>Projects</TableHead>
               <TableHead>Wage</TableHead>
               {showBalance && (
                 <TableHead className="text-right">Balance</TableHead>
@@ -482,8 +483,8 @@ function LabourRows({
                 <TableCell className="text-muted-foreground">
                   {labour.labourCategory?.name ?? "—"}
                 </TableCell>
-                <TableCell className="max-w-40 truncate">
-                  {labour.currentProject.name}
+                <TableCell>
+                  <ProjectChips projects={labour.projects} />
                 </TableCell>
                 <TableCell className="tabular-nums">
                   {wageText(labour)}
@@ -591,6 +592,7 @@ function LabourRows({
       )}
       <TransferDialog
         labours={transferring ?? []}
+        fromProjectId={filter.projectId}
         open={transferring != null}
         onOpenChange={(open) => {
           if (!open) setTransferring(null);

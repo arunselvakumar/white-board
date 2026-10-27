@@ -7,7 +7,6 @@ import { can } from "@/src/shared-kernel/access";
 import { loadMemberAccess } from "@/src/shared-kernel/access/prisma-access-reader";
 
 import { createCompanyHandlers } from "./create-company-handlers";
-import { createDesignationHandlers } from "./create-designation-handlers";
 import { createRoleHandlers } from "./create-role-handlers";
 import { createTeamMemberHandlers } from "./create-team-member-handlers";
 
@@ -28,13 +27,10 @@ async function newCompany() {
     userMobile: "+919800000001",
     userEmail: null,
   });
-  const designations = await createDesignationHandlers().list(workspaceId);
   const roles = await createRoleHandlers().list(workspaceId);
-  const byName = (name: string) =>
-    designations.find((item) => item.name === name)?.id ?? "";
   const roleId = (name: string) =>
     roles.find((item) => item.name === name)?.id ?? "";
-  return { workspaceId, userId, byName, roleId };
+  return { workspaceId, userId, roleId };
 }
 
 describe("Team Members on Postgres (CM-108)", () => {
@@ -49,20 +45,19 @@ describe("Team Members on Postgres (CM-108)", () => {
         isOwner: true,
         status: "active",
         mobile: "+919800000001",
-        designation: expect.objectContaining({ name: "Owner" }) as unknown,
+        role: null,
       }),
     ]);
   });
 
   it("invites on a Role and stores Aadhaar and PAN encrypted", async () => {
-    const { workspaceId, userId, byName, roleId } = await newCompany();
+    const { workspaceId, userId, roleId } = await newCompany();
     const invited = await handlers.invite({
       workspaceId,
       by: userId,
       memberType: "normal",
       details: {
         name: "Prabhu Saravanan",
-        designationId: byName("Site Engineer"),
         email: "prabhu@sakthi.in",
         aadhaar: "234123412346",
         pan: "ABCPE1234F",
@@ -105,14 +100,13 @@ describe("Team Members on Postgres (CM-108)", () => {
   });
 
   it("puts an HRMS member on HRMS Staff with no projects", async () => {
-    const { workspaceId, userId, byName, roleId } = await newCompany();
+    const { workspaceId, userId, roleId } = await newCompany();
     const hrms = await handlers.invite({
       workspaceId,
       by: userId,
       memberType: "hrms",
       details: {
         name: "Anitha",
-        designationId: byName("Accountant"),
         email: "anitha@p.in",
       },
       projectIds: ["project-a"],
@@ -129,7 +123,7 @@ describe("Team Members on Postgres (CM-108)", () => {
   });
 
   it("keeps mobiles and emails unique among live members", async () => {
-    const { workspaceId, userId, byName } = await newCompany();
+    const { workspaceId, userId } = await newCompany();
     const base = {
       workspaceId,
       by: userId,
@@ -139,7 +133,6 @@ describe("Team Members on Postgres (CM-108)", () => {
       ...base,
       details: {
         name: "A",
-        designationId: byName("Admin"),
         mobile: "+919800000003",
       },
     });
@@ -148,7 +141,6 @@ describe("Team Members on Postgres (CM-108)", () => {
         ...base,
         details: {
           name: "B",
-          designationId: byName("Admin"),
           mobile: "+919800000003",
         },
       }),
@@ -159,7 +151,6 @@ describe("Team Members on Postgres (CM-108)", () => {
         ...base,
         details: {
           name: "B",
-          designationId: byName("Admin"),
           mobile: "+919800000003",
         },
       }),
@@ -167,7 +158,7 @@ describe("Team Members on Postgres (CM-108)", () => {
   });
 
   it("lists with search, status and cursor pages", async () => {
-    const { workspaceId, userId, byName } = await newCompany();
+    const { workspaceId, userId } = await newCompany();
     for (const [index, name] of ["Abirami", "Bhavesh", "Chetan"].entries())
       await handlers.invite({
         workspaceId,
@@ -175,7 +166,6 @@ describe("Team Members on Postgres (CM-108)", () => {
         memberType: "normal",
         details: {
           name,
-          designationId: byName("Site Supervisor"),
           mobile: `+91980000010${String(index)}`,
         },
       });
@@ -207,14 +197,13 @@ describe("Team Members on Postgres (CM-108)", () => {
   });
 
   it("loads an active member's Role matrix and projects for can()", async () => {
-    const { workspaceId, userId, byName, roleId } = await newCompany();
+    const { workspaceId, userId, roleId } = await newCompany();
     const invited = await handlers.invite({
       workspaceId,
       by: userId,
       memberType: "normal",
       details: {
         name: "Prabhu",
-        designationId: byName("Site Engineer"),
         email: "prabhu@sakthi.in",
       },
       projectIds: ["project-a"],

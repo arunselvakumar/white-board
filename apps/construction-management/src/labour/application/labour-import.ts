@@ -15,6 +15,7 @@ import {
 } from "../domain/labour";
 import {
   MAX_IMPORT_ROWS,
+  PROJECT_SEPARATOR,
   WEEKDAY_NAMES,
   type LabourCell,
   type LabourColumnKey,
@@ -42,7 +43,7 @@ export type ImportRowValues = {
   wagePerMonth: number | null;
   overtimeWagePerHour: number | null;
   openingBalance: number | null;
-  project: string | null;
+  projects: string | null;
   labourCategory: string | null;
   supervisor: string | null;
 };
@@ -63,7 +64,7 @@ export type ImportPreview = {
 
 type Checked = ImportRow & {
   details: LabourDetails | null;
-  projectId: string | null;
+  projectIds: string[];
   opening: number;
 };
 
@@ -215,17 +216,21 @@ export class LabourImport {
         }
         return found.id;
       };
-      const projectName = text(cells.project);
-      let projectId: string | null = null;
-      if (projectName === "")
-        fail("project", "PROJECT_REQUIRED", "Enter the Project.");
-      else
-        projectId = lookup(
-          "project",
-          projects,
-          "PROJECT_NOT_FOUND",
-          `No Project is called "${projectName}".`,
-        );
+      // None, one or many Projects, separated by ";" (ADR CM-0033).
+      const projectsText = text(cells.projects);
+      const projectIds: string[] = [];
+      for (const name of projectsText.split(PROJECT_SEPARATOR)) {
+        const projectName = name.trim();
+        if (projectName === "") continue;
+        const found = projects.get(projectName.toLowerCase());
+        if (found == null)
+          fail(
+            "projects",
+            "PROJECT_NOT_FOUND",
+            `No Project is called "${projectName}".`,
+          );
+        else if (!projectIds.includes(found.id)) projectIds.push(found.id);
+      }
       const labourCategoryId = lookup(
         "labourCategory",
         categories,
@@ -297,12 +302,12 @@ export class LabourImport {
           wagePerMonth,
           overtimeWagePerHour,
           openingBalance,
-          project: projectName || null,
+          projects: projectsText || null,
           labourCategory: text(cells.labourCategory) || null,
           supervisor: text(cells.supervisor) || null,
         },
         details: ok && "details" in checked ? checked.details : null,
-        projectId,
+        projectIds,
         opening: openingBalance ?? 0,
       };
     });
@@ -334,14 +339,13 @@ export class LabourImport {
       );
     const now = this.clock();
     const items: NewLabour[] = checked.map((row) => {
-      if (row.details == null || row.projectId == null)
-        throw new Error("A valid row has details and a Project.");
+      if (row.details == null) throw new Error("A valid row has details.");
       return {
         labour: Labour.create({
           id: newId(now.getTime()),
           workspaceId: input.workspaceId,
           details: row.details,
-          projectId: row.projectId,
+          projectIds: row.projectIds,
           by: input.by,
           now,
         }),

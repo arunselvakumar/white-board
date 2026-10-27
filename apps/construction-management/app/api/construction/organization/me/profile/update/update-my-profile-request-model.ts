@@ -1,9 +1,8 @@
 import { z } from "zod";
 
 /**
- * What a Team Member may change about themself (CM-115). Designation is the
- * Owner's call, so it is not accepted. An omitted field stays as it is; null
- * clears it.
+ * What a Team Member may change about themself (CM-115). An omitted field
+ * stays as it is; null clears it.
  */
 export const UpdateConstructionOrganizationMyProfileRequestModel = z.object({
   name: z.string().trim().min(1).max(100),

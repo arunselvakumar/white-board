@@ -5,6 +5,7 @@ import {
 import { maskIdentifier } from "@/src/shared-kernel/tax-ids";
 
 import type { Role } from "../domain/role";
+import type { SalaryType } from "../domain/staff-salary";
 import type {
   MemberType,
   TeamMember,
@@ -15,7 +16,6 @@ export type TeamMemberReadModel = {
   id: string;
   userId: string | null;
   name: string;
-  designation: { id: string; name: string | null };
   /** Null for the Owner, and for a member left without one. */
   role: { id: string; name: string } | null;
   mobile: string | null;
@@ -25,8 +25,16 @@ export type TeamMemberReadModel = {
   aadhaarMasked: string | null;
   panMasked: string | null;
   emergencyContact: string | null;
-  /** Paise a month (ADR CM-0032); Response models null it without Financial. */
-  monthlySalary: number | null;
+  /** The salary set-up (ADR CM-0033 §3). */
+  salaryType: SalaryType;
+  /** Paise; Response models null the amounts without Financial. */
+  salaryPerDay: number | null;
+  salaryPerMonth: number | null;
+  overtimeWagePerHour: number;
+  /** Decimal hours, like "8" or "9.5". */
+  workingHoursPerDay: string;
+  /** 0 = Sunday … 6 = Saturday. */
+  weeklyHolidays: number[];
   memberType: MemberType;
   isOwner: boolean;
   status: TeamMemberStatus;
@@ -48,7 +56,6 @@ export type TeamMemberReadModel = {
 
 /** What a Team Member's view needs besides the record itself. */
 export type TeamMemberLookups = {
-  designationNames: ReadonlyMap<string, string>;
   /** Live Roles of the Company by id. */
   roles: ReadonlyMap<string, Role>;
   /** Users who also belong to another Company. */
@@ -69,10 +76,6 @@ export function toTeamMemberReadModel(
     id: member.id,
     userId: member.userId,
     name: details.name,
-    designation: {
-      id: details.designationId,
-      name: lookups.designationNames.get(details.designationId) ?? null,
-    },
     role: role == null ? null : { id: role.id, name: role.name },
     mobile: details.mobile,
     email: details.email,
@@ -81,7 +84,12 @@ export function toTeamMemberReadModel(
       details.aadhaar == null ? null : maskIdentifier(details.aadhaar),
     panMasked: details.pan == null ? null : maskIdentifier(details.pan),
     emergencyContact: details.emergencyContact,
-    monthlySalary: member.monthlySalary,
+    salaryType: member.salary.type,
+    salaryPerDay: member.salary.perDay,
+    salaryPerMonth: member.salary.perMonth,
+    overtimeWagePerHour: member.salary.overtimePerHour,
+    workingHoursPerDay: member.salary.workingHoursPerDay,
+    weeklyHolidays: [...member.salary.weeklyHolidays],
     memberType: member.memberType,
     isOwner: member.isOwner,
     status: member.status,

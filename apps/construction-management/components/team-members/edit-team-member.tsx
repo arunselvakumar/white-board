@@ -25,14 +25,13 @@ import {
 } from "@repo/ui/components/tabs";
 
 import { PageHeader } from "@/components/app-shell/page-header";
-import { paiseToRupees } from "@/components/money/money-input";
+import { STAFF_SALARY, wageDefaults } from "@/components/wages/wage-schema";
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";
 import { STAFF_PATH } from "@/lib/staff-roles-nav";
 import { ROLES_KEY, rolesQuery } from "@/src/queries/roles";
 import {
   TEAM_MEMBERS_KEY,
-  designationOptionsQuery,
   resendTeamMemberInvite,
   setTeamMemberRole,
   teamMemberQuery,
@@ -42,15 +41,16 @@ import {
 } from "@/src/queries/team-members";
 
 import { MemberStatusBadge } from "./member-status-badge";
-import { TeamMemberProjectsTab } from "./projects-step";
+import { TeamMemberProjectsTab } from "./projects-field";
 import { RoleField } from "./role-field";
 import { SetPasswordDialog } from "./set-password-dialog";
 import { ShareInviteDialog } from "./share-invite-dialog";
 import { signInWays } from "./sign-in-options";
 import {
-  DETAIL_ERROR_FIELDS,
   TeamMemberDetailsFields,
+  detailErrorFields,
   detailsInput,
+  savedSalary,
   teamMemberDetailsSchema,
   type TeamMemberDetailsValues,
 } from "./team-member-details-fields";
@@ -59,14 +59,13 @@ function valuesOf(member: TeamMember): TeamMemberDetailsValues {
   return {
     memberType: member.memberType,
     name: member.name,
-    designationId: member.designation.id,
     mobile: member.mobile?.replace(/^\+91/, "") ?? "",
     email: member.email ?? "",
     address: member.address ?? "",
     aadhaar: "",
     pan: "",
     emergencyContact: member.emergencyContact ?? "",
-    monthlySalary: paiseToRupees(member.monthlySalary),
+    salary: wageDefaults(savedSalary(member), STAFF_SALARY),
   };
 }
 
@@ -86,8 +85,9 @@ function passwordNotice(outcome: TeamMember & PasswordOutcome): Notice {
 }
 
 /**
- * Edit Staff (CM-111, ADR CM-0030): Details, Projects and Role tabs, and
- * from the header Set a new password and the invitation.
+ * Edit Staff (CM-111, ADR CM-0030): Details (the Details, Salary and
+ * Sign-in cards, in Add Staff's order, ADR CM-0033 §1), Projects and Role
+ * tabs, and from the header Set a new password and the invitation.
  */
 export function EditTeamMember({
   id,
@@ -97,10 +97,9 @@ export function EditTeamMember({
   /** Financial on Staff (ADR CM-0032). */
   canSeeSalary: boolean;
 }) {
-  const [{ data: member }, { data: designations }, { data: roles }] =
-    useSuspenseQueries({
-      queries: [teamMemberQuery(id), designationOptionsQuery, rolesQuery],
-    });
+  const [{ data: member }, { data: roles }] = useSuspenseQueries({
+    queries: [teamMemberQuery(id), rolesQuery],
+  });
   const { company } = useActiveCompany();
   const queryClient = useQueryClient();
   const saved = async (updated: TeamMember) => {
@@ -109,7 +108,7 @@ export function EditTeamMember({
   };
 
   const form = useForm<TeamMemberDetailsValues>({
-    resolver: zodResolver(teamMemberDetailsSchema),
+    resolver: zodResolver(teamMemberDetailsSchema(canSeeSalary)),
     defaultValues: valuesOf(member),
   });
   const details = useMutation({
@@ -158,12 +157,7 @@ export function EditTeamMember({
           title={member.name}
           meta={
             <span className="inline-flex flex-wrap items-center gap-2">
-              {[
-                member.designation.name,
-                member.role == null ? null : `Role: ${member.role.name}`,
-              ]
-                .filter(Boolean)
-                .join(" · ")}
+              {member.role == null ? null : `Role: ${member.role.name}`}
               <MemberStatusBadge status={member.status} />
             </span>
           }
@@ -254,17 +248,17 @@ export function EditTeamMember({
                   } catch (error) {
                     const { field, message } = fieldForCode(
                       error,
-                      DETAIL_ERROR_FIELDS,
+                      detailErrorFields(values),
                     );
                     if (field == null) form.setError("root", { message });
-                    else form.setError(field, { message });
+                    else
+                      form.setError(field, { message }, { shouldFocus: true });
                   }
                 })(event);
               }}
             >
               <TeamMemberDetailsFields
                 form={form}
-                designations={designations}
                 masked={{
                   aadhaar: member.aadhaarMasked,
                   pan: member.panMasked,

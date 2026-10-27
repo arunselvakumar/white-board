@@ -241,7 +241,7 @@ export const financeDirectory: FinanceDirectory = {
           where: {
             ...base,
             isActive: true,
-            ...(projectId == null ? {} : { currentProjectId: projectId }),
+            ...(projectId == null ? {} : { projects: { some: { projectId } } }),
           },
           select,
           orderBy,

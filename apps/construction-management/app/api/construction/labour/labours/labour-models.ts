@@ -44,7 +44,8 @@ export const ConstructionLabourLabourResponseModel = z.object({
   /** E.164. */
   contactNumber: z.string().nullable(),
   gender: z.enum(["male", "female", "other"]).nullable(),
-  currentProject: ref,
+  /** The Projects they work on now: none, one or many (ADR CM-0033). */
+  projects: z.array(ref),
   isActive: z.boolean(),
   /** Same-origin URL of the photo (versioned), or null. */
   photoUrl: z.string().nullable(),
@@ -85,7 +86,7 @@ export function toLabourResponse(
     supervisor: item.supervisor,
     contactNumber: details.contactNumber,
     gender: details.gender,
-    currentProject: item.currentProject,
+    projects: item.projects,
     isActive: item.isActive,
     photoUrl:
       item.photoKey == null
@@ -134,7 +135,8 @@ export const CreateConstructionLabourLabourRequestModel = z.object({
   openingBalance: paise.nullable().optional(),
   /** 12 digits; stored encrypted. */
   aadhaar: optionalText,
-  currentProjectId: z.uuid(),
+  /** None, one or many; on each from the joining date (ADR CM-0033). */
+  projectIds: z.array(z.uuid()).max(500).optional(),
 });
 
 export type CreateConstructionLabourLabourRequestModel = z.infer<
@@ -151,6 +153,11 @@ export const UpdateConstructionLabourLabourRequestModel = z.object({
   openingBalance: paise.nullable().optional(),
   /** Omit to keep the stored Aadhaar; null removes it. */
   aadhaar: optionalText,
+  /**
+   * Every Project they work on. Omit to keep. One ticked or unticked is on
+   * or off from today, with a row in the transfer history (ADR CM-0033).
+   */
+  projectIds: z.array(z.uuid()).max(500).optional(),
   /** The `updatedAt` the edit started from; else 409 `LABOUR_CHANGED`. */
   expectedUpdatedAt: z.iso.datetime(),
 });
@@ -203,6 +210,11 @@ export type ListConstructionLabourLaboursResponseModel = z.infer<
 
 export const TransferConstructionLabourLaboursRequestModel = z.object({
   labourIds: z.array(z.uuid()).min(1).max(500),
+  /**
+   * The Project they leave; their other Projects stay. Omit when each
+   * works on one Project only (ADR CM-0033).
+   */
+  fromProjectId: z.uuid().nullable().optional(),
   toProjectId: z.uuid(),
   /** The first day in the new Project. */
   transferDate: z.string().describe("Calendar date, YYYY-MM-DD."),
@@ -215,9 +227,10 @@ export const TransferConstructionLabourLaboursResponseModel = z.object({
 
 export const ConstructionLabourLabourTransferResponseModel = z.object({
   id: z.uuid(),
-  /** Null on the first row (added to the Project). */
+  /** Null when added to a Project (with the Labour, or ticked on Edit). */
   fromProject: ref.nullable(),
-  toProject: ref,
+  /** Null when taken off a Project on Edit (ADR CM-0033). */
+  toProject: ref.nullable(),
   transferDate: calendarDate,
   remark: z.string().nullable(),
   createdAt: z.iso.datetime(),
@@ -276,7 +289,8 @@ const importValues = z.object({
   wagePerMonth: paise.nullable(),
   overtimeWagePerHour: paise.nullable(),
   openingBalance: paise.nullable(),
-  project: z.string().nullable(),
+  /** The Projects cell as typed: names separated by ";". */
+  projects: z.string().nullable(),
   labourCategory: z.string().nullable(),
   supervisor: z.string().nullable(),
 });

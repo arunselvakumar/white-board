@@ -35,8 +35,6 @@ staffPageTest.describe("Staff", () => {
       const addStaffPage = new AddStaffPage(page);
       await addStaffPage.fillDetails({ name, email });
       await expect(addStaffPage.inviteCheckbox).toBeChecked();
-      await addStaffPage.continueButton.click();
-      await addStaffPage.continueButton.click();
       await addStaffPage.chooseRole("Site Engineer");
       await addStaffPage.button("Add and invite").click();
       await expect(addStaffPage.heading(`${name} is invited`)).toBeVisible();
@@ -78,9 +76,9 @@ staffPageTest.describe("Staff", () => {
         password: PASSWORD,
         salary: "18,000",
       });
-      await addStaffPage.continueButton.click();
+      // One page: Details, Salary, Projects, Role and Sign-in together.
+      await addStaffPage.workingHoursField.fill("9");
       await addStaffPage.projectCheckbox(project.name).check();
-      await addStaffPage.continueButton.click();
       await addStaffPage.chooseRole("Site Supervisor");
       await addStaffPage.button("Add Staff").click();
       await expect(
@@ -95,6 +93,7 @@ staffPageTest.describe("Staff", () => {
       await row.getByRole("link", { name }).click();
       const editStaffPage = new EditStaffPage(page);
       await expect(editStaffPage.salaryField).toHaveValue("18000");
+      await expect(editStaffPage.workingHoursField).toHaveValue("9");
       await editStaffPage.tab("Projects").click();
       await expect(
         page.getByRole("checkbox", { name: project.name }),

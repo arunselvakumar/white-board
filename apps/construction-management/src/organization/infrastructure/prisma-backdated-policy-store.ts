@@ -26,9 +26,9 @@ function policyChanged() {
 function columns(policy: BackdatedPolicy) {
   return {
     createDays: policy.create.days,
-    createOverrideDesignationIds: [...policy.create.overrideDesignationIds],
+    createOverrideRoleIds: [...policy.create.overrideRoleIds],
     editDays: policy.edit.days,
-    editOverrideDesignationIds: [...policy.edit.overrideDesignationIds],
+    editOverrideRoleIds: [...policy.edit.overrideRoleIds],
     financialClosingDate:
       policy.financialClosingDate == null
         ? null

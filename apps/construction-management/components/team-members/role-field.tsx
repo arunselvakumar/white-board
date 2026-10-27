@@ -1,7 +1,9 @@
 "use client";
 
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, ChevronDown } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import { Button } from "@repo/ui/components/button";
 import { Label } from "@repo/ui/components/label";
 import {
   Select,
@@ -12,6 +14,7 @@ import {
 } from "@repo/ui/components/select";
 
 import { FieldError } from "@/components/auth/field-error";
+import { FormSection } from "@/components/forms/form-section";
 import { PermissionMatrix } from "@/components/permissions/permission-matrix";
 import { ROLES_PATH } from "@/lib/staff-roles-nav";
 import type { Role } from "@/src/queries/roles";
@@ -26,8 +29,10 @@ export function hrmsStaffRoleId(roles: readonly Role[]): string | null {
 const noop = () => undefined;
 
 /**
- * Pick a Role, and see what it lets them do: the Role's Permission Matrix,
- * read-only. The matrix is changed on Role Management, for everyone on it.
+ * The Role card: pick a Role, and see what it lets them do, the Role's
+ * Permission Matrix, read-only. The matrix is changed on Role Management,
+ * for everyone on it. On Add Staff it folds away (`previewOpen` false) so
+ * the Sign-in card stays close.
  */
 export function RoleField({
   id,
@@ -35,20 +40,24 @@ export function RoleField({
   value,
   onChange,
   error,
+  previewOpen = true,
 }: {
   id: string;
   roles: readonly Role[];
   value: string | null;
   onChange: (roleId: string) => void;
   error?: string;
+  /** Whether "What this Role may do" starts open. */
+  previewOpen?: boolean;
 }) {
   const items = roles.map((role) => ({ value: role.id, label: role.name }));
   const chosen = roles.find((role) => role.id === value) ?? null;
+  const [open, setOpen] = useState(previewOpen);
   return (
-    <div className="space-y-6">
-      <div className="bg-card rounded-xl border p-4 sm:p-5">
+    <FormSection title="Role" required>
+      <div className="space-y-6">
         <div className="max-w-md space-y-1.5">
-          <Label htmlFor={id} required>
+          <Label htmlFor={id} className="sr-only">
             Role
           </Label>
           <Select
@@ -101,34 +110,59 @@ export function RoleField({
             </p>
           )}
         </div>
-      </div>
-      {chosen != null && (
-        <section aria-labelledby={`${id}-preview`} className="space-y-2">
-          <div className="flex flex-wrap items-end justify-between gap-2">
-            <div className="space-y-1">
-              <h2 id={`${id}-preview`} className="font-semibold">
-                What this Role may do
-              </h2>
-              <p className="text-muted-foreground text-sm">
-                Everyone on this Role gets the same access. Change it on Role
-                Management.
-              </p>
+        {chosen != null && (
+          <Button
+            type="button"
+            variant="outline"
+            aria-expanded={open}
+            aria-controls={`${id}-preview-panel`}
+            onClick={() => {
+              setOpen(!open);
+            }}
+          >
+            {open ? "Hide what this Role may do" : "Show what this Role may do"}
+            <ChevronDown
+              aria-hidden="true"
+              className={
+                open
+                  ? "rotate-180 transition-transform"
+                  : "transition-transform"
+              }
+            />
+          </Button>
+        )}
+        {chosen != null && open && (
+          <section
+            id={`${id}-preview-panel`}
+            aria-labelledby={`${id}-preview`}
+            className="space-y-2"
+          >
+            <div className="flex flex-wrap items-end justify-between gap-2">
+              <div className="space-y-1">
+                <h3 id={`${id}-preview`} className="font-semibold">
+                  What this Role may do
+                </h3>
+                <p className="text-muted-foreground text-sm">
+                  Everyone on this Role gets the same access. Change it on Role
+                  Management.
+                </p>
+              </div>
+              <Link
+                href={`${ROLES_PATH}/${encodeURIComponent(chosen.id)}`}
+                className="text-primary inline-flex items-center gap-1 text-sm underline-offset-4 hover:underline"
+              >
+                Open in Role Management
+                <ArrowUpRight aria-hidden="true" className="size-4" />
+              </Link>
             </div>
-            <Link
-              href={`${ROLES_PATH}/${encodeURIComponent(chosen.id)}`}
-              className="text-primary inline-flex items-center gap-1 text-sm underline-offset-4 hover:underline"
-            >
-              Open in Role Management
-              <ArrowUpRight aria-hidden="true" className="size-4" />
-            </Link>
-          </div>
-          <PermissionMatrix
-            value={chosen.permissions}
-            onChange={noop}
-            readOnly
-          />
-        </section>
-      )}
-    </div>
+            <PermissionMatrix
+              value={chosen.permissions}
+              onChange={noop}
+              readOnly
+            />
+          </section>
+        )}
+      </div>
+    </FormSection>
   );
 }

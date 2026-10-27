@@ -7,6 +7,8 @@ import {
   normalizeAadhaar,
 } from "@/src/shared-kernel/tax-ids";
 
+import { NO_SALARY, sameSalary, type StaffSalary } from "./staff-salary";
+
 /** Normal Team Members work on Projects; HRMS ones only use HRMS (ADR CM-0002). */
 export type MemberType = "normal" | "hrms";
 
@@ -19,7 +21,6 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export type TeamMemberDetails = {
   name: string;
-  designationId: string;
   /**
    * E.164. A contact; also a way to sign in and join while SMS is on
    * (ADR CM-0009). Mobile or email is required.
@@ -41,7 +42,6 @@ function optional(value: string | null | undefined): string | null {
 /** Validates and tidies a Team Member's details (`modules/01` TeamMember). */
 export function teamMemberDetails(input: {
   name: string;
-  designationId: string;
   mobile?: string | null;
   email?: string | null;
   address?: string | null;
@@ -60,8 +60,6 @@ export function teamMemberDetails(input: {
       "MEMBER_NAME_TOO_LONG",
       "Name must be at most 100 characters.",
     );
-  if (input.designationId.trim().length === 0)
-    throw new DomainError("DESIGNATION_REQUIRED", "Choose a Designation.");
   const mobile = optional(input.mobile);
   if (mobile != null && !E164.test(mobile))
     throw new DomainError("MOBILE_INVALID", "Enter a valid mobile number.");
@@ -97,7 +95,6 @@ export function teamMemberDetails(input: {
     );
   return {
     name,
-    designationId: input.designationId,
     mobile,
     email,
     address,
@@ -105,23 +102,6 @@ export function teamMemberDetails(input: {
     pan,
     emergencyContact,
   };
-}
-
-/** The largest monthly salary in paise (₹2 crore), as a Labour's wage. */
-export const MAX_MONTHLY_SALARY = 2_000_000_000;
-
-/**
- * An optional monthly salary in paise (ADR CM-0032): null or 0 is none.
- * Separate from the HRMS salary set-up the salary run reads.
- */
-export function monthlySalary(value: number | null | undefined): number | null {
-  if (value == null || value === 0) return null;
-  if (!Number.isSafeInteger(value) || value < 0 || value > MAX_MONTHLY_SALARY)
-    throw new DomainError(
-      "SALARY_INVALID",
-      "The salary must be a positive amount in paise, at most ₹2 crore a month.",
-    );
-  return value;
 }
 
 /** An unguessable token for the invite link (`/join/<token>`). */
@@ -135,8 +115,8 @@ export type TeamMemberProps = {
   /** Set when the invitee accepts (or for the Owner from the start). */
   userId: string | null;
   details: TeamMemberDetails;
-  /** Paise a month, or null (ADR CM-0032). */
-  monthlySalary: number | null;
+  /** The salary set-up; the amounts may be null (ADR CM-0033 §3). */
+  salary: StaffSalary;
   memberType: MemberType;
   isOwner: boolean;
   status: TeamMemberStatus;
@@ -170,7 +150,8 @@ export class TeamMember {
     id: string;
     workspaceId: string;
     details: TeamMemberDetails;
-    monthlySalary?: number | null;
+    /** Validated with `staffSalary`; none when left out. */
+    salary?: StaffSalary;
     memberType: MemberType;
     projectIds?: readonly string[];
     roleId: string | null;
@@ -182,7 +163,7 @@ export class TeamMember {
       workspaceId: input.workspaceId,
       userId: null,
       details: input.details,
-      monthlySalary: monthlySalary(input.monthlySalary),
+      salary: input.salary ?? NO_SALARY,
       memberType: input.memberType,
       isOwner: false,
       status: "joining_pending",
@@ -214,7 +195,7 @@ export class TeamMember {
       workspaceId: input.workspaceId,
       userId: input.userId,
       details: input.details,
-      monthlySalary: null,
+      salary: NO_SALARY,
       memberType: "normal",
       isOwner: true,
       status: "active",
@@ -247,8 +228,8 @@ export class TeamMember {
   get details(): TeamMemberDetails {
     return this.props.details;
   }
-  get monthlySalary(): number | null {
-    return this.props.monthlySalary;
+  get salary(): StaffSalary {
+    return this.props.salary;
   }
   get memberType(): MemberType {
     return this.props.memberType;
@@ -322,11 +303,10 @@ export class TeamMember {
     this.touch(by, now);
   }
 
-  /** Sets or clears the monthly salary (ADR CM-0032). */
-  setMonthlySalary(paise: number | null, by: string, now: Date): void {
-    const salary = monthlySalary(paise);
-    if (salary === this.props.monthlySalary) return;
-    this.props = { ...this.props, monthlySalary: salary };
+  /** Replaces the salary set-up (ADR CM-0033 §3). */
+  setSalary(salary: StaffSalary, by: string, now: Date): void {
+    if (sameSalary(salary, this.props.salary)) return;
+    this.props = { ...this.props, salary };
     this.touch(by, now);
   }
 
@@ -437,11 +417,10 @@ export class TeamMember {
 
   /**
    * Transfer ownership (CM-907): this joined, active, Normal Team Member
-   * becomes the Owner, with the Owner Designation (kept when the Company
-   * has none) and every right, so no Role. The Owner is on every Project,
-   * so the assignments go.
+   * becomes the Owner, with every right, so no Role (ADR CM-0033). The
+   * Owner is on every Project, so the assignments go.
    */
-  becomeOwner(ownerDesignationId: string | null, by: string, now: Date): void {
+  becomeOwner(by: string, now: Date): void {
     if (this.props.isOwner)
       throw conflict("ALREADY_OWNER", "This Team Member is already the Owner.");
     if (
@@ -463,34 +442,18 @@ export class TeamMember {
       isOwner: true,
       roleId: null,
       projectIds: [],
-      details: {
-        ...this.props.details,
-        designationId: ownerDesignationId ?? this.props.details.designationId,
-      },
     };
     this.touch(by, now);
   }
 
-  /**
-   * The Owner after handing the Company over (CM-907): a member with the
-   * Admin Designation (kept when the Company has none) and `roleId`.
-   */
-  stepDownAsOwner(
-    designationId: string | null,
-    roleId: string,
-    by: string,
-    now: Date,
-  ): void {
+  /** The Owner after handing the Company over (CM-907): a member on `roleId`. */
+  stepDownAsOwner(roleId: string, by: string, now: Date): void {
     if (!this.props.isOwner)
       throw conflict("NOT_OWNER", "Only the Owner can hand the Company over.");
     this.props = {
       ...this.props,
       isOwner: false,
       roleId,
-      details: {
-        ...this.props.details,
-        designationId: designationId ?? this.props.details.designationId,
-      },
     };
     this.touch(by, now);
   }

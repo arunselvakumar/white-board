@@ -14,9 +14,8 @@ export const dynamic = "force-dynamic";
 
 /**
  * Hands the Company to another Team Member (Owner only, with a
- * `transfer_ownership` code). They become `owner` with the Owner
- * Designation; the caller becomes a `member` with the Admin Designation
- * and its matrix. Audited as `company.ownership_transferred`.
+ * `transfer_ownership` code). They become `owner`; the caller becomes a
+ * `member` on the Admin Role. Audited as `company.ownership_transferred`.
  */
 export async function POST(request: Request): Promise<Response> {
   try {

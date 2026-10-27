@@ -15,7 +15,7 @@ import {
 import { Label } from "@repo/ui/components/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/radio-group";
 
-import type { DesignationOption } from "@/src/queries/settings";
+import type { RoleOption } from "@/src/queries/settings";
 
 import {
   BackdatedLimitFields,
@@ -45,14 +45,14 @@ export function BackdatedModuleDialog({
   label,
   setting,
   defaults,
-  designations,
+  roles,
   onApply,
   onClose,
 }: {
   label: string;
   setting: ModuleSettingValues;
   defaults: { create: LimitValues; edit: LimitValues };
-  designations: readonly DesignationOption[];
+  roles: readonly RoleOption[];
   onApply: (setting: ModuleSettingValues) => void;
   onClose: () => void;
 }) {
@@ -126,7 +126,7 @@ export function BackdatedModuleDialog({
               control={form.control}
               register={form.register}
               errors={form.formState.errors}
-              designations={designations}
+              roles={roles}
             />
           )}
 

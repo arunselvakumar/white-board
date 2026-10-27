@@ -32,7 +32,7 @@ Who uses it:
 - **Statutory**: UAN Number, ESIC Number, Aadhaar Number.
 - **Category & Contact**: Labour Category (seed: Carpenter, Electrician, Helper, Labour, Mason, Plumber, Skilled, Unskilled, Welder), Supervisor (a team member), Contact Number, Gender.
 - **Uploads**: Labour Photo, Other Documents.
-- **Project**: Select Project — the labour's current project assignment.
+- **Projects**: a searchable, tickable list — none, one or many; not required (ADR CM-0033). On Add and Edit.
 - **List actions**: Import (`labour/import`) with Sample Export (`labour/sample-export`), Export labour list, Hide (`labour/hide`), Active/Inactive toggle, Add/Edit Supervisor, Transfer, Transfer Multiple Labour; Combo (`labour/combo`).
 - **Transfer history** (`#/labourTransferHistory`) — trail of project moves.
 
@@ -136,44 +136,44 @@ Attendance and vendor-attendance save endpoints were not captured (concatenated 
 
 ### Labour
 
-| Field               | Type                                | Required      | Notes                                                             |
-| ------------------- | ----------------------------------- | ------------- | ----------------------------------------------------------------- |
-| id                  | uuid                                | yes           |                                                                   |
-| companyId           | FK → Company                        | yes           |                                                                   |
-| name                | string                              | yes           | "Labour Name\*"                                                   |
-| labourCode          | string                              | no            | "Labour Id"; uniqueness not captured                              |
-| joiningDate         | date                                | yes           |                                                                   |
-| wageType            | enum{DAILY, MONTHLY}                | yes           |                                                                   |
-| wagePerDay          | decimal(14,2)                       | if DAILY      |                                                                   |
-| wagePerMonth        | decimal(14,2)                       | if MONTHLY    |                                                                   |
-| overtimeWagePerHour | decimal(14,2)                       | yes           | "Overtime Wage per Hour\*"                                        |
-| workingHoursPerDay  | decimal(4,2)                        | no            | New (CM-220): hours a day, default 8; beyond it is overtime       |
-| weeklyHolidays      | enum{SUN,MON,TUE,WED,THU,FRI,SAT}[] | no            | Toggles                                                           |
-| openingBalance      | decimal(14,2)                       | no            | Editable; carry-in for Labour payments                            |
-| uanNumber           | string                              | no            | EPFO UAN                                                          |
-| esicNumber          | string                              | no            |                                                                   |
-| aadhaarNumber       | string                              | no            | Sensitive; mask in UI (inferred, consistent with profile masking) |
-| labourCategoryId    | FK → LabourCategory                 | no            |                                                                   |
-| supervisorId        | FK → TeamMember                     | no            |                                                                   |
-| contactNumber       | string                              | no            |                                                                   |
-| gender              | enum{MALE, FEMALE, OTHER}           | no            | Values not captured (inferred)                                    |
-| photo               | file                                | no            |                                                                   |
-| documents           | file[]                              | no            |                                                                   |
-| currentProjectId    | FK → Project                        | no (inferred) | "Select Project"                                                  |
-| isActive            | bool                                | yes           | Active/Inactive                                                   |
-| isHidden            | bool                                | yes           | `labour/hide` (difference from inactive is an open question)      |
+| Field               | Type                                | Required   | Notes                                                             |
+| ------------------- | ----------------------------------- | ---------- | ----------------------------------------------------------------- |
+| id                  | uuid                                | yes        |                                                                   |
+| companyId           | FK → Company                        | yes        |                                                                   |
+| name                | string                              | yes        | "Labour Name\*"                                                   |
+| labourCode          | string                              | no         | "Labour Id"; uniqueness not captured                              |
+| joiningDate         | date                                | yes        |                                                                   |
+| wageType            | enum{DAILY, MONTHLY}                | yes        |                                                                   |
+| wagePerDay          | decimal(14,2)                       | if DAILY   |                                                                   |
+| wagePerMonth        | decimal(14,2)                       | if MONTHLY |                                                                   |
+| overtimeWagePerHour | decimal(14,2)                       | yes        | "Overtime Wage per Hour\*"                                        |
+| workingHoursPerDay  | decimal(4,2)                        | no         | New (CM-220): hours a day, default 8; beyond it is overtime       |
+| weeklyHolidays      | enum{SUN,MON,TUE,WED,THU,FRI,SAT}[] | no         | Toggles                                                           |
+| openingBalance      | decimal(14,2)                       | no         | Editable; carry-in for Labour payments                            |
+| uanNumber           | string                              | no         | EPFO UAN                                                          |
+| esicNumber          | string                              | no         |                                                                   |
+| aadhaarNumber       | string                              | no         | Sensitive; mask in UI (inferred, consistent with profile masking) |
+| labourCategoryId    | FK → LabourCategory                 | no         |                                                                   |
+| supervisorId        | FK → TeamMember                     | no         |                                                                   |
+| contactNumber       | string                              | no         |                                                                   |
+| gender              | enum{MALE, FEMALE, OTHER}           | no         | Values not captured (inferred)                                    |
+| photo               | file                                | no         |                                                                   |
+| documents           | file[]                              | no         |                                                                   |
+| projectIds          | FK → Project[]                      | no         | "Projects"; none, one or many (ADR CM-0033), `labour_projects`    |
+| isActive            | bool                                | yes        | Active/Inactive                                                   |
+| isHidden            | bool                                | yes        | `labour/hide` (difference from inactive is an open question)      |
 
-### LabourProjectAssignment (transfer history)
+### LabourProjectAssignment (transfer history, `labour_transfers`)
 
-| Field         | Type            | Required       | Notes                    |
-| ------------- | --------------- | -------------- | ------------------------ |
-| id            | uuid            | yes            |                          |
-| labourId      | FK → Labour     | yes            |                          |
-| fromProjectId | FK → Project    | no             | Null on first assignment |
-| toProjectId   | FK → Project    | yes            |                          |
-| transferDate  | date            | yes (inferred) |                          |
-| transferredBy | FK → TeamMember | yes (inferred) |                          |
-| remark        | text            | no (inferred)  |                          |
+| Field         | Type            | Required       | Notes                   |
+| ------------- | --------------- | -------------- | ----------------------- |
+| id            | uuid            | yes            |                         |
+| labourId      | FK → Labour     | yes            |                         |
+| fromProjectId | FK → Project    | no             | Null when added to one  |
+| toProjectId   | FK → Project    | no             | Null when taken off one |
+| transferDate  | date            | yes (inferred) |                         |
+| transferredBy | FK → TeamMember | yes (inferred) |                         |
+| remark        | text            | no (inferred)  |                         |
 
 ### LabourAttendance
 
@@ -270,14 +270,14 @@ Unique (labourId, attendanceDate) — inferred; whether a labour can have two sh
 
 1. Supervisor or admin opens Master → Labours → Add (`#/addLabour`).
 2. Enters name, wage type and wage, OT wage/hr, joining date, weekly holidays, opening balance, statutory ids, category, supervisor, contact, gender, photo, documents.
-3. Selects the current project. A first assignment row is written (inferred).
+3. Ticks any number of Projects, or none (ADR CM-0033). Each gets a history row on the joining date. Projects ticked or unticked later on Edit Labour get a row dated today.
 4. Alternatively bulk-import from Excel using the sample export.
 
 ### 2. Transfer labour between projects
 
 1. From the labour list, Transfer (single) or Transfer Multiple Labour.
-2. Pick destination project (and date — inferred).
-3. Labour's current project changes; a row is appended to transfer history (`#/labourTransferHistory`).
+2. Pick the Project they leave (preset when they share one, or from the list filter), the destination and the date.
+3. The Project they leave is swapped for the destination; their other Projects stay. A row is appended to transfer history (`#/labourTransferHistory`).
 4. Attendance from the transfer date onward is marked in the new project (inferred).
 
 ### 3. Labour lifecycle
@@ -532,6 +532,7 @@ These settle the open questions below for M2. Where this section and the legacy 
 - Aadhaar is encrypted and masked like a Team Member's (shared-kernel `PrivateDataCipher`), and checked by its Verhoeff digit. UAN is 12 digits. ESIC is 10 or 17 digits. Contact numbers are E.164.
 - `fatherName` is added for the muster roll (Form XVI and XVII need it).
 - **Transfer** (open question 8): carries a transfer date (the first day in the new Project) and an optional remark. The destination must differ from the current Project. The labourer's balance belongs to the labourer, not the Project, and moves with them. Each ledger entry carries the Project it was earned in. A transfer dated before the latest attendance in the old Project is refused (`TRANSFER_BEFORE_ATTENDANCE`).
+- **Many Projects** (ADR CM-0033): a Labour is on none, one or many Projects (`labour_projects`). A transfer moves them from one of their Projects (`fromProjectId`; optional when they are on exactly one) to one they are not on; the others stay. Ticking or unticking a Project on Edit Labour writes a history row dated today with no `from` or no `to`. On a date a Labour is on a Project when the latest history row naming it moves them onto it, so they appear on the attendance sheet of each such Project. Attendance is one live row per Labour per Project per day; marking the same day on two Projects is the supervisor's call. The import and export `Projects` column lists names separated by `;`.
 
 **Labour attendance**
 

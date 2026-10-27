@@ -232,7 +232,6 @@ export const GetConstructionHrmsLeaveOptionsResponseModel = z.object({
     z.object({
       memberId: z.uuid(),
       name: z.string(),
-      designationName: z.string().nullable(),
     }),
   ),
   leaveTypes: z.array(

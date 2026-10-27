@@ -70,7 +70,8 @@ export const LABOUR_COLUMNS = [
     width: 18,
     money: true,
   },
-  { key: "project", header: "Project*", example: null, width: 24 },
+  // None, one or many, separated by ";" (ADR CM-0033).
+  { key: "projects", header: "Projects", example: null, width: 28 },
   {
     key: "labourCategory",
     header: "Labour Category",
@@ -129,5 +130,8 @@ export type LabourSheetRow = {
 };
 
 export const WEEKDAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+/** Between Project names in the Projects column. */
+export const PROJECT_SEPARATOR = ";";
 
 export const MAX_IMPORT_ROWS = 1000;

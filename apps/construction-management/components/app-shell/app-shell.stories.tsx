@@ -160,11 +160,11 @@ export const NavIconMotion: Story = {
 
 export const MastersSubmenu: Story = {
   parameters: {
-    nextjs: { navigation: { pathname: "/app/masters/designations" } },
+    nextjs: { navigation: { pathname: "/app/masters/contractors" } },
   },
   render: () => (
     <AppShell>
-      <p>Designations</p>
+      <p>Contractors</p>
     </AppShell>
   ),
   play: async ({ canvas, canvasElement, userEvent }) => {
@@ -180,7 +180,7 @@ export const MastersSubmenu: Story = {
         ).toHaveAttribute("href", section.href);
     }
     await expect(
-      submenu.getByRole("link", { name: "Designations" }),
+      submenu.getByRole("link", { name: "Contractors" }),
     ).toHaveAttribute("aria-current", "page");
     await expect(nav.getByRole("link", { name: "Masters" })).toHaveAttribute(
       "href",
@@ -240,7 +240,7 @@ export const StaffRolesSubmenu: Story = {
     await expect(
       nav.getByRole("link", { name: "Staff & Roles" }),
     ).not.toHaveAttribute("aria-current");
-    // Masters → Company keeps only Designations.
+    // Team Members live under Staff & Roles, not Masters.
     await expect(nav.queryByRole("link", { name: "Team Members" })).toBeNull();
   },
 };
@@ -305,11 +305,11 @@ export const WorkspaceSubmenu: Story = {
  */
 export const SubmenuArrowsCentred: Story = {
   parameters: {
-    nextjs: { navigation: { pathname: "/app/masters/designations" } },
+    nextjs: { navigation: { pathname: "/app/masters/contractors" } },
   },
   render: () => (
     <AppShell>
-      <p>Designations</p>
+      <p>Contractors</p>
     </AppShell>
   ),
   play: async ({ canvas, canvasElement, userEvent }) => {

@@ -83,7 +83,7 @@ export type LabourDetailsInput = {
 
 /** One problem with one field, for forms and the Excel import preview. */
 export type FieldProblem = {
-  field: keyof LabourDetailsInput | "openingBalance" | "currentProjectId";
+  field: keyof LabourDetailsInput | "openingBalance" | "projectIds";
   code: string;
   message: string;
 };
@@ -299,12 +299,20 @@ export function maskAadhaar(aadhaar: string | null): string | null {
   return aadhaar == null ? null : maskIdentifier(aadhaar);
 }
 
+/** Each Project once, blanks dropped, in the order given. */
+export function uniqueProjectIds(projectIds: readonly string[]): string[] {
+  return [...new Set(projectIds.map((id) => id.trim()).filter(Boolean))];
+}
+
 export type LabourProps = {
   id: string;
   workspaceId: string;
   details: LabourDetails;
-  /** Changes only by a transfer (CM-206). */
-  currentProjectId: string;
+  /**
+   * The Projects they work on now (ADR CM-0033): none, one or many. Changed
+   * on Add and Edit Labour and by a transfer (CM-206).
+   */
+  projectIds: readonly string[];
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -313,6 +321,9 @@ export type LabourProps = {
   deletedAt: Date | null;
 };
 
+/** What ticking and unticking Projects on Edit Labour changed. */
+export type ProjectChanges = { added: string[]; removed: string[] };
+
 /**
  * A labourer on the Company's own roll (CM-205). A record, not a User. The
  * opening balance is a ledger entry, not a field (ADR CM-0004).
@@ -320,23 +331,20 @@ export type LabourProps = {
 export class Labour {
   private constructor(private props: LabourProps) {}
 
+  /** Projects are optional: they can be ticked later (ADR CM-0033). */
   static create(input: {
     id: string;
     workspaceId: string;
     details: LabourDetails;
-    projectId: string;
+    projectIds?: readonly string[];
     by: string;
     now: Date;
   }): Labour {
-    if (input.projectId.trim().length === 0)
-      throw new DomainError("PROJECT_REQUIRED", "Choose the Project.", {
-        details: { field: "currentProjectId" },
-      });
     return new Labour({
       id: input.id,
       workspaceId: input.workspaceId,
       details: input.details,
-      currentProjectId: input.projectId,
+      projectIds: uniqueProjectIds(input.projectIds ?? []),
       isActive: true,
       createdAt: input.now,
       updatedAt: input.now,
@@ -359,8 +367,8 @@ export class Labour {
   get details(): LabourDetails {
     return this.props.details;
   }
-  get currentProjectId(): string {
-    return this.props.currentProjectId;
+  get projectIds(): readonly string[] {
+    return this.props.projectIds;
   }
   get isActive(): boolean {
     return this.props.isActive;
@@ -381,6 +389,10 @@ export class Labour {
     return this.props.deletedAt;
   }
 
+  isOn(projectId: string): boolean {
+    return this.props.projectIds.includes(projectId);
+  }
+
   private touch(by: string, now: Date): void {
     this.props.updatedAt = now;
     this.props.updatedBy = by;
@@ -399,6 +411,58 @@ export class Labour {
     this.touch(by, now);
   }
 
+  /**
+   * Ticks and unticks Projects on Edit Labour (ADR CM-0033). Returns what
+   * changed, for the history.
+   */
+  setProjects(
+    projectIds: readonly string[],
+    by: string,
+    now: Date,
+  ): ProjectChanges {
+    this.assertLive();
+    const wanted = uniqueProjectIds(projectIds);
+    const added = wanted.filter((id) => !this.isOn(id));
+    const removed = this.props.projectIds.filter((id) => !wanted.includes(id));
+    if (added.length === 0 && removed.length === 0) return { added, removed };
+    this.props.projectIds = [
+      ...this.props.projectIds.filter((id) => wanted.includes(id)),
+      ...added,
+    ];
+    this.touch(by, now);
+    return { added, removed };
+  }
+
+  /**
+   * Moves the labourer from one of their Projects to another (CM-206). The
+   * balance belongs to the labourer and moves with them; the date rules are
+   * checked by the command against attendance and history.
+   */
+  transfer(
+    fromProjectId: string,
+    toProjectId: string,
+    by: string,
+    now: Date,
+  ): void {
+    this.assertLive();
+    if (!this.isOn(fromProjectId))
+      throw conflict(
+        "LABOUR_NOT_ON_PROJECT",
+        `${this.props.details.name} does not work on the Project they would leave.`,
+        { labourId: this.props.id },
+      );
+    if (fromProjectId === toProjectId || this.isOn(toProjectId))
+      throw conflict(
+        "TRANSFER_SAME_PROJECT",
+        `${this.props.details.name} already works on this Project. Choose another Project.`,
+        { labourId: this.props.id },
+      );
+    this.props.projectIds = this.props.projectIds.map((id) =>
+      id === fromProjectId ? toProjectId : id,
+    );
+    this.touch(by, now);
+  }
+
   activate(by: string, now: Date): void {
     this.assertLive();
     if (this.props.isActive) return;
@@ -413,25 +477,6 @@ export class Labour {
     this.touch(by, now);
   }
 
-  /**
-   * Moves the labourer to another Project (CM-206). The balance belongs to
-   * the labourer and moves with them; the date rules are checked by the
-   * command against attendance and history.
-   */
-  transferTo(projectId: string, by: string, now: Date): string {
-    this.assertLive();
-    if (projectId === this.props.currentProjectId)
-      throw conflict(
-        "TRANSFER_SAME_PROJECT",
-        `${this.props.details.name} already works on this Project. Choose another Project.`,
-        { labourId: this.props.id },
-      );
-    const from = this.props.currentProjectId;
-    this.props.currentProjectId = projectId;
-    this.touch(by, now);
-    return from;
-  }
-
   delete(by: string, now: Date): void {
     this.assertLive();
     this.props.deletedAt = now;
@@ -441,9 +486,9 @@ export class Labour {
 
 /**
  * The transfer date rules (CM-206): on or after the labourer's last
- * transfer (the first is the joining date), and after every day they were
- * marked in attendance, since attendance from the transfer date is marked
- * in the new Project.
+ * history row (the first is the joining date), and after every day they
+ * were marked in attendance on the Project they leave, since attendance
+ * there stops on the transfer date.
  */
 export function assertTransferDate(input: {
   name: string;
@@ -457,7 +502,7 @@ export function assertTransferDate(input: {
   )
     throw conflict(
       "TRANSFER_BEFORE_LAST_TRANSFER",
-      `${input.name} moved to their current Project on ${input.lastTransferDate}. Choose that date or later.`,
+      `${input.name}'s Projects last changed on ${input.lastTransferDate}. Choose that date or later.`,
       { lastTransferDate: input.lastTransferDate },
     );
   if (
@@ -466,7 +511,7 @@ export function assertTransferDate(input: {
   )
     throw conflict(
       "TRANSFER_BEFORE_ATTENDANCE",
-      `${input.name} has attendance up to ${input.latestAttendanceDate} in their current Project. Choose a later date.`,
+      `${input.name} has attendance up to ${input.latestAttendanceDate} on the Project they leave. Choose a later date.`,
       { latestAttendanceDate: input.latestAttendanceDate },
     );
 }

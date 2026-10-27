@@ -12,7 +12,6 @@ import {
 import type { CompanyDirectory } from "../application/company-directory";
 import { CreateCompanyHandler } from "../application/create-company";
 import { AuthCompanyDirectory } from "./auth-company-directory";
-import { seedDesignations } from "./designation-seeds";
 import { PrismaNewCompanyStore } from "./prisma-new-company-store";
 import { PrismaTeamMemberRepository } from "./prisma-team-member-repository";
 import { privateDataCipher } from "./private-data-cipher";
@@ -31,7 +30,6 @@ export function createCompanyHandlers(deps?: {
         db,
         new PrismaTeamMemberRepository(db, privateDataCipher),
       ),
-      seedDesignations,
       seedRoles,
       deps?.events ?? new InProcessEventDispatcher(companyCreatedListeners()),
     ),

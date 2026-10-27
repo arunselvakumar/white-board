@@ -19,7 +19,6 @@ import {
 } from "./prisma-account-deletion-store";
 import { PrismaCompanyDeletionStore } from "./prisma-company-deletion-store";
 import { PrismaCompanyProfileReader } from "./prisma-company-profile-reader";
-import { PrismaDesignationRepository } from "./prisma-designation-repository";
 import { PrismaOwnershipTransferStore } from "./prisma-ownership-transfer-store";
 import { PrismaRoleRepository } from "./prisma-role-repository";
 import { PrismaTeamMemberRepository } from "./prisma-team-member-repository";
@@ -37,7 +36,6 @@ export function createOwnershipHandlers(deps?: { prisma?: PrismaClient }) {
   const roles = new PrismaRoleRepository(db);
   return new OwnershipHandlers(
     members,
-    new PrismaDesignationRepository(db),
     roles,
     new PrismaOwnershipTransferStore(db, members, roles),
     verifyActionCode,

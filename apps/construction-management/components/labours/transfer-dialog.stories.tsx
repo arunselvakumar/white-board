@@ -1,10 +1,17 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, waitFor, within } from "storybook/test";
 
-import { StoryQueryClient } from "@/components/designations/designation-story-support";
+import { StoryQueryClient } from "@/components/masters/masters-story-support";
 
 import { mockFetch } from "../../.storybook/mock-fetch";
-import { PROJECT_OPTIONS, DHURESH, MEENA, VILLA } from "./labour-fixtures";
+import {
+  DHURESH,
+  MALL,
+  MEENA,
+  PROJECT_OPTIONS,
+  TOWER,
+  VILLA,
+} from "./labour-fixtures";
 import { TransferDialog } from "./transfer-dialog";
 
 const TRANSFER = "/api/construction/labour/labours/transfer";
@@ -65,7 +72,7 @@ export const TransferOne: Story = {
     await userEvent.click(
       inDialog.getByRole("combobox", { name: "To Project" }),
     );
-    // Dhuresh is on Tower A, so only the other Project is offered.
+    // Dhuresh is on Tower A: they move from it, and it is not offered.
     await expect(
       await body.findByRole("option", { name: "Villa Phase 2" }),
     ).toBeInTheDocument();
@@ -80,6 +87,7 @@ export const TransferOne: Story = {
     await waitFor(() => expect(args.onTransferred).toHaveBeenCalled());
     await expect(sentBody()).toEqual({
       labourIds: [DHURESH.id],
+      fromProjectId: TOWER.id,
       toProjectId: VILLA.id,
       transferDate: "2026-10-04",
       remark: "Slab work",
@@ -89,13 +97,13 @@ export const TransferOne: Story = {
 };
 
 export const RefusedBeforeAttendance: Story = {
-  args: { labours: [DHURESH, MEENA] },
+  args: { labours: [DHURESH, { ...MEENA, projects: [TOWER] }] },
   beforeEach: serve(() =>
     Response.json(
       {
         code: "TRANSFER_BEFORE_ATTENDANCE",
         message:
-          "Dhuresh Nawin has attendance up to 2026-10-06 in their current Project. Choose a later date.",
+          "Dhuresh Nawin has attendance up to 2026-10-06 on the Project they leave. Choose a later date.",
       },
       { status: 409 },
     ),
@@ -121,5 +129,52 @@ export const RefusedBeforeAttendance: Story = {
       "true",
     );
     await expect(args.onTransferred).not.toHaveBeenCalled();
+  },
+};
+
+/**
+ * A Labour on two Projects moves from the one chosen; the other stays
+ * (ADR CM-0033). Projects they are already on are not offered.
+ */
+export const FromOneOfMany: Story = {
+  args: { labours: [{ ...DHURESH, projects: [TOWER, VILLA] }] },
+  beforeEach: serve(() => Response.json({ items: [DHURESH] })),
+  play: async ({ args, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    const dialog = await body.findByRole("dialog", {
+      name: "Transfer Dhuresh Nawin",
+    });
+    const inDialog = within(dialog);
+    await expect(dialog).toHaveTextContent("Now on Tower A, Villa Phase 2.");
+    await userEvent.click(inDialog.getByRole("button", { name: "Transfer" }));
+    await expect(
+      await inDialog.findByText("Choose the Project they move from"),
+    ).toBeVisible();
+
+    await userEvent.click(
+      inDialog.getByRole("combobox", { name: "From Project" }),
+    );
+    await userEvent.click(
+      await body.findByRole("option", { name: "Villa Phase 2" }),
+    );
+    await userEvent.click(
+      inDialog.getByRole("combobox", { name: "To Project" }),
+    );
+    await expect(
+      await body.findByRole("option", { name: "Mall Block C" }),
+    ).toBeInTheDocument();
+    await expect(body.queryByRole("option", { name: "Tower A" })).toBeNull();
+    await userEvent.click(body.getByRole("option", { name: "Mall Block C" }));
+    const date = inDialog.getByLabelText("Transfer date");
+    await userEvent.clear(date);
+    await userEvent.type(date, "2026-10-04");
+    await userEvent.click(inDialog.getByRole("button", { name: "Transfer" }));
+
+    await waitFor(() => expect(args.onTransferred).toHaveBeenCalled());
+    await expect(sentBody()).toMatchObject({
+      labourIds: [DHURESH.id],
+      fromProjectId: VILLA.id,
+      toProjectId: MALL.id,
+    });
   },
 };

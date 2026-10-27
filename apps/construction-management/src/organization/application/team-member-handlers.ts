@@ -8,9 +8,13 @@ import {
 import type { EventDispatcher } from "@/src/shared-kernel/events";
 import { newId } from "@/src/shared-kernel/ids";
 
-import type { DesignationRepository } from "../domain/designation-repository";
 import type { Role } from "../domain/role";
 import type { RoleRepository } from "../domain/role-repository";
+import {
+  keepLeftOut,
+  staffSalary,
+  type StaffSalaryInput,
+} from "../domain/staff-salary";
 import {
   TeamMember,
   teamMemberDetails,
@@ -32,7 +36,6 @@ import {
 
 export type TeamMemberDetailsInput = {
   name: string;
-  designationId: string;
   mobile?: string | null;
   email?: string | null;
   address?: string | null;
@@ -68,7 +71,7 @@ function assertPassword(password: string): void {
 export type ProjectTeamMemberReadModel = {
   id: string;
   name: string;
-  /** Designation, and "Joining Pending" until they accept. */
+  /** Their Role, and "Joining Pending" until they accept. */
   detail: string | null;
   /** False for a declined Join Request: it stays but cannot be added again. */
   isActive: boolean;
@@ -92,7 +95,6 @@ export type TeamMemberInvited = {
 export class TeamMemberHandlers {
   constructor(
     private readonly members: TeamMemberRepository,
-    private readonly designations: DesignationRepository,
     private readonly roles: RoleRepository,
     private readonly plan: PlanGate,
     private readonly events: EventDispatcher,
@@ -114,26 +116,11 @@ export class TeamMemberHandlers {
     return member;
   }
 
-  private async designation(workspaceId: string, id: string) {
-    const designation = await this.designations.findById(workspaceId, id);
-    if (designation == null)
-      throw new DomainError(
-        "DESIGNATION_NOT_FOUND",
-        "Choose a Designation from the list.",
-      );
-    return designation;
-  }
-
   private async role(workspaceId: string, id: string): Promise<Role> {
     const role = await this.roles.findById(workspaceId, id);
     if (role == null)
       throw new DomainError("ROLE_NOT_FOUND", "Choose a Role from the list.");
     return role;
-  }
-
-  private async names(workspaceId: string): Promise<Map<string, string>> {
-    const all = await this.designations.listAll(workspaceId);
-    return new Map(all.map((item) => [item.id, item.name]));
   }
 
   private async lookups(
@@ -143,15 +130,13 @@ export class TeamMemberHandlers {
     const userIds = members.flatMap((member) =>
       member.userId == null || member.isOwner ? [] : [member.userId],
     );
-    const [designationNames, roles, usersInOtherCompanies] = await Promise.all([
-      this.names(workspaceId),
+    const [roles, usersInOtherCompanies] = await Promise.all([
       this.roles.listAll(workspaceId),
       userIds.length === 0 || this.accounts == null
         ? new Set<string>()
         : this.accounts.inOtherCompanies(workspaceId, userIds),
     ]);
     return {
-      designationNames,
       roles: new Map(roles.map((role) => [role.id, role])),
       usersInOtherCompanies,
     };
@@ -179,12 +164,11 @@ export class TeamMemberHandlers {
       before,
       after: {
         name: member.details.name,
-        designationId: member.details.designationId,
         memberType: member.memberType,
         status: member.status,
         projectIds: member.projectIds,
         roleId: member.roleId,
-        monthlySalary: member.monthlySalary,
+        salary: member.salary,
       },
     };
   }
@@ -251,8 +235,11 @@ export class TeamMemberHandlers {
     /** Who is giving the Role; the Owner when omitted (tests, seeds). */
     grantor?: MemberAccess;
     details: TeamMemberDetailsInput;
-    /** Paise a month; the route drops it without Financial (ADR CM-0032). */
-    monthlySalary?: number | null;
+    /**
+     * The salary set-up (ADR CM-0033 §3); none when left out. The route
+     * drops the type and amounts without Financial (ADR CM-0032 §3).
+     */
+    salary?: StaffSalaryInput;
     memberType: MemberType;
     projectIds?: readonly string[];
     roleId?: string | null;
@@ -261,7 +248,7 @@ export class TeamMemberHandlers {
   }): Promise<TeamMemberWithPassword> {
     const now = this.clock();
     const details = teamMemberDetails(input.details);
-    await this.designation(input.workspaceId, details.designationId);
+    const salary = staffSalary(input.salary ?? {});
     const role =
       input.roleId == null
         ? null
@@ -281,7 +268,7 @@ export class TeamMemberHandlers {
       id: newId(now.getTime()),
       workspaceId: input.workspaceId,
       details,
-      monthlySalary: input.monthlySalary,
+      salary,
       memberType: input.memberType,
       projectIds: input.memberType === "hrms" ? [] : (input.projectIds ?? []),
       roleId: role?.id ?? null,
@@ -367,15 +354,16 @@ export class TeamMemberHandlers {
 
   /**
    * Edit details, salary and Member Type; the Role stays (ADR CM-0030).
-   * `monthlySalary` left out keeps the stored one (a member without
-   * Financial never sees it); null clears it (ADR CM-0032).
+   * Each salary field left out keeps the stored one (a member without
+   * Financial never sees the amounts); a null amount clears it (ADR
+   * CM-0032 §3, CM-0033 §3).
    */
   async update(input: {
     workspaceId: string;
     id: string;
     by: string;
     details: TeamMemberDetailsInput;
-    monthlySalary?: number | null;
+    salary?: StaffSalaryInput;
     memberType: MemberType;
   }): Promise<TeamMemberReadModel> {
     const now = this.clock();
@@ -394,12 +382,15 @@ export class TeamMemberHandlers {
           ? member.details.pan
           : input.details.pan,
     });
-    await this.designation(input.workspaceId, details.designationId);
     member.updateDetails(details, input.by, now, {
       mobileIsSignIn: this.mobileSignIn(),
     });
-    if (input.monthlySalary !== undefined)
-      member.setMonthlySalary(input.monthlySalary, input.by, now);
+    if (input.salary !== undefined)
+      member.setSalary(
+        staffSalary(keepLeftOut(input.salary, member.salary)),
+        input.by,
+        now,
+      );
     if (input.memberType !== member.memberType) {
       if (input.memberType === "hrms")
         await this.plan.assertCanAdd(input.workspaceId, "hrms_member");
@@ -512,12 +503,18 @@ export class TeamMemberHandlers {
     workspaceId: string,
     members: readonly TeamMember[],
   ): Promise<ProjectTeamMemberReadModel[]> {
-    const names = await this.names(workspaceId);
+    const roles = new Map(
+      (await this.roles.listAll(workspaceId)).map((role) => [
+        role.id,
+        role.name,
+      ]),
+    );
     return members.map((member) => {
-      const designation = names.get(member.details.designationId) ?? null;
+      const role =
+        member.roleId == null ? null : (roles.get(member.roleId) ?? null);
       const pending =
         member.status === "joining_pending" ? "Joining Pending" : null;
-      const detail = [designation, pending].filter(Boolean).join(" · ");
+      const detail = [role, pending].filter(Boolean).join(" · ");
       return {
         id: member.id,
         name: member.details.name,

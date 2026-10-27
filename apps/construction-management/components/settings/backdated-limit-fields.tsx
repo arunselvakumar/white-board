@@ -13,10 +13,9 @@ import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 
 import { FieldError } from "@/components/auth/field-error";
-import type { DesignationOption } from "@/src/queries/settings";
+import { MultiSelect } from "@/components/ui/multi-select";
+import type { RoleOption } from "@/src/queries/settings";
 import { MAX_BACKDATED_DAYS } from "@/src/shared-kernel/backdated-policy";
-
-import { DesignationMultiSelect } from "./designation-multi-select";
 
 export const limitSchema = z.object({
   days: z
@@ -24,7 +23,7 @@ export const limitSchema = z.object({
     .int("Use whole days")
     .min(0, "Enter 0 or more days")
     .max(MAX_BACKDATED_DAYS, `Use at most ${String(MAX_BACKDATED_DAYS)} days`),
-  overrideDesignationIds: z.array(z.string()),
+  overrideRoleIds: z.array(z.string()),
 });
 
 export type LimitValues = z.infer<typeof limitSchema>;
@@ -35,28 +34,28 @@ const ACTIONS = [
   {
     key: "create",
     daysLabel: "Restrict creating entries older than",
-    overrideLabel: "Designations that may create older entries",
+    overrideLabel: "Roles that may create older entries",
   },
   {
     key: "edit",
     daysLabel: "Restrict editing entries older than",
-    overrideLabel: "Designations that may edit older entries",
+    overrideLabel: "Roles that may edit older entries",
   },
 ] as const;
 
-/** Create and edit day limits, each with its override Designations. */
+/** Create and edit day limits, each with its override Roles (ADR CM-0033). */
 export function BackdatedLimitFields<Values extends WithLimits>({
   idPrefix,
   control,
   register,
   errors,
-  designations,
+  roles,
 }: {
   idPrefix: string;
   control: Control<Values>;
   register: UseFormRegister<Values>;
   errors: FieldErrors<Values>;
-  designations: readonly DesignationOption[];
+  roles: readonly RoleOption[];
 }) {
   const limitErrors = errors as FieldErrors<WithLimits>;
   return (
@@ -90,14 +89,17 @@ export function BackdatedLimitFields<Values extends WithLimits>({
             <div className="space-y-1.5">
               <Label htmlFor={overrideId}>{action.overrideLabel}</Label>
               <Controller
-                name={`${action.key}.overrideDesignationIds` as Path<Values>}
+                name={`${action.key}.overrideRoleIds` as Path<Values>}
                 control={control}
                 render={({ field }) => (
-                  <DesignationMultiSelect
+                  <MultiSelect
                     id={overrideId}
-                    designations={designations}
+                    options={roles}
                     value={field.value as string[]}
                     onChange={field.onChange}
+                    placeholder="No override"
+                    empty="No Roles found."
+                    listLabel="Roles"
                   />
                 )}
               />

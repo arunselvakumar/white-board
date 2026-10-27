@@ -229,7 +229,7 @@ export const PaysAnAdvance: Story = {
     await userEvent.click(within(dialog).getByLabelText("Team Member"));
     await userEvent.click(
       await screen.findByRole("option", {
-        name: "Priya Raman · Site Engineer",
+        name: "Priya Raman",
       }),
     );
     await userEvent.type(within(dialog).getByLabelText("Amount"), "9000");

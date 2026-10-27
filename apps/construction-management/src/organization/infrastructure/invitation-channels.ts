@@ -7,9 +7,7 @@ import type {
 } from "../application/invitation-notifier";
 
 function text(message: InvitationMessage): string {
-  const role =
-    message.designationName == null ? "" : ` as ${message.designationName}`;
-  return `${message.memberName}, you are invited to join ${message.companyName}${role} on Construction Management. Open ${message.link} and sign in with this number to accept.`;
+  return `${message.memberName}, you are invited to join ${message.companyName} on Construction Management. Open ${message.link} and sign in with this number to accept.`;
 }
 
 /** Invitation email (React Email, CM-119) and SMS. */
@@ -18,7 +16,6 @@ export const invitationChannels: InvitationChannels = {
     const rendered = await renderTeamInvitationEmail({
       companyName: message.companyName,
       memberName: message.memberName,
-      designationName: message.designationName,
       joinUrl: message.link,
     });
     await constructionMessaging.sendEmail({ to, ...rendered });

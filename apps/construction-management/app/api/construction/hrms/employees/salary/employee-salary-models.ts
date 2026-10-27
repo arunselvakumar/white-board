@@ -26,7 +26,6 @@ export const ConstructionHrmsEmployeeSalaryRowModel = z.object({
   memberId: z.uuid(),
   name: z.string(),
   memberType: z.enum(["normal", "hrms"]),
-  designationName: z.string().nullable(),
   /** Joined; a Joining Pending member is not yet active. */
   active: z.boolean(),
   status: z
@@ -144,7 +143,6 @@ export function toEmployeeSalaryRow(
     memberId: employee.memberId,
     name: employee.name,
     memberType: employee.memberType,
-    designationName: employee.designationName,
     active: employee.active,
     status: stored == null ? "not_set" : "configured",
     config:

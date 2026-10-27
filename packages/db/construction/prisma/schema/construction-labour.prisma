@@ -55,8 +55,6 @@ model ConstructionLabourLabour {
   gender              ConstructionLabourGender?
   /// Storage key; a `stored_files` row.
   photoKey            String?                    @map("photo_key")
-  /// Changes only by a transfer (CM-206).
-  currentProjectId    String                     @map("current_project_id") @db.Uuid
   /// Inactive labourers leave the attendance list; their records stay.
   isActive            Boolean                    @default(true) @map("is_active")
   createdAt           DateTime                   @default(now()) @map("created_at") @db.Timestamptz(3)
@@ -66,24 +64,45 @@ model ConstructionLabourLabour {
   deletedAt           DateTime?                  @map("deleted_at") @db.Timestamptz(3)
   deletedBy           String?                    @map("deleted_by")
 
+  projects   ConstructionLabourLabourProject[]
   transfers  ConstructionLabourTransfer[]
   attendance ConstructionLabourAttendance[]
 
-  @@index([workspaceId, currentProjectId])
   @@index([workspaceId, name])
   @@map("labours")
   @@schema("construction_labour")
 }
 
-/// Where a labourer works, from when (CM-206). The first row, written when
-/// the labourer is added, has no `from_project_id`. Append-only.
+/// The Projects a labourer works on now (ADR CM-0033): none, one or many.
+/// Changed by Add and Edit Labour and by a transfer, each of which also
+/// writes a `labour_transfers` row.
+model ConstructionLabourLabourProject {
+  workspaceId String   @map("workspace_id")
+  labourId    String   @map("labour_id") @db.Uuid
+  projectId   String   @map("project_id") @db.Uuid
+  /// The first day on the Project.
+  since       DateTime @db.Date
+
+  labour ConstructionLabourLabour @relation(fields: [labourId], references: [id], onDelete: Cascade)
+
+  @@id([labourId, projectId])
+  @@index([workspaceId, projectId])
+  @@map("labour_projects")
+  @@schema("construction_labour")
+}
+
+/// Where a labourer works, from when (CM-206, ADR CM-0033). Rows added with
+/// the labourer, or a Project ticked on Edit, have no `from_project_id`; a
+/// Project unticked on Edit has no `to_project_id`; a transfer has both.
+/// A labourer is on a Project on a date when the latest row on or before
+/// it that names the Project moves them to it. Append-only.
 model ConstructionLabourTransfer {
   id            String   @id @db.Uuid
   workspaceId   String   @map("workspace_id")
   labourId      String   @map("labour_id") @db.Uuid
   fromProjectId String?  @map("from_project_id") @db.Uuid
-  toProjectId   String   @map("to_project_id") @db.Uuid
-  /// The first day in the new project.
+  toProjectId   String?  @map("to_project_id") @db.Uuid
+  /// The first day in the new project (or the first day off the old one).
   transferDate  DateTime @map("transfer_date") @db.Date
   remark        String?
   createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
@@ -93,6 +112,7 @@ model ConstructionLabourTransfer {
 
   @@index([labourId, transferDate])
   @@index([workspaceId, toProjectId])
+  @@index([workspaceId, fromProjectId])
   @@map("labour_transfers")
   @@schema("construction_labour")
 }
@@ -108,9 +128,9 @@ enum ConstructionLabourAttendanceStatus {
   @@schema("construction_labour")
 }
 
-/// One labourer, one day (CM-210): one live row per labourer per date
-/// (partial unique index in the migration), in the Project they worked in
-/// that day. The wage is a snapshot; `earned` is what the day pays before
+/// One labourer, one Project, one day (CM-210, ADR CM-0033): one live row
+/// per labourer per Project per date (partial unique index in the
+/// migration), on a Project they were on that day. The wage is a snapshot; `earned` is what the day pays before
 /// overtime. Re-marking a day updates the row and reverses its old ledger
 /// entries.
 model ConstructionLabourAttendance {

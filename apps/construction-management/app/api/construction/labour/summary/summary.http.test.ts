@@ -39,7 +39,13 @@ async function labourer(company: Company, projectId: string, isActive = true) {
       wagePerDay: 80_000,
       overtimeWagePerHour: 10_000,
       weeklyHolidays: [],
-      currentProjectId: projectId,
+      projects: {
+        create: {
+          workspaceId: company.workspaceId,
+          projectId,
+          since: calendarDateToDb("2026-01-01"),
+        },
+      },
       isActive,
       createdBy: company.userId,
       updatedBy: company.userId,

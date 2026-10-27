@@ -126,9 +126,9 @@ export const STORY_ASSIGNMENT: LeaveAssignmentModel = {
 };
 
 const MEMBERS = [
-  { memberId: ME, name: "Arun Selva Kumar", designationName: "Owner" },
-  { memberId: PRIYA, name: "Priya Raman", designationName: "Site Engineer" },
-  { memberId: RAVI, name: "Ravi Kumar", designationName: "Store Keeper" },
+  { memberId: ME, name: "Arun Selva Kumar" },
+  { memberId: PRIYA, name: "Priya Raman" },
+  { memberId: RAVI, name: "Ravi Kumar" },
 ];
 
 export function storyOptions(
@@ -194,7 +194,6 @@ export function storyBalances(
   return {
     memberId,
     memberName,
-    designationName: "Site Engineer",
     leaveYear: "2026",
     structureId: null,
     rows: [

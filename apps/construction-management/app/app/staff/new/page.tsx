@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { AddTeamMemberWizard } from "@/components/team-members/add-team-member-wizard";
+import { AddTeamMember } from "@/components/team-members/add-team-member";
 import { AddTeamMemberSkeleton } from "@/components/team-members/team-members-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 import { RolesNoAccess } from "@/components/roles/roles-no-access";
@@ -17,7 +17,7 @@ export default async function Page() {
   if (!can.create) return <RolesNoAccess what="adding Staff" />;
   return (
     <QuerySuspense fallback={<AddTeamMemberSkeleton />}>
-      <AddTeamMemberWizard canSeeSalary={can.financial} />
+      <AddTeamMember canSeeSalary={can.financial} />
     </QuerySuspense>
   );
 }

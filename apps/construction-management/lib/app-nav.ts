@@ -32,7 +32,7 @@ export const APP_NAV = [
     label: "Masters",
     title: "Masters",
     description:
-      "Your Company's lists: Designations, Contractors, Suppliers, Materials, Measurement Units, Terms & Conditions, Vendors, Labours and Departments.",
+      "Your Company's lists: Contractors, Suppliers, Materials, Measurement Units, Terms & Conditions, Vendors, Labours and Departments.",
   },
   {
     // The area opens on Staff; Role Management sits beside it in the submenu.

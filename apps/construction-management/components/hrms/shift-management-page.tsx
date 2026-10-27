@@ -214,12 +214,6 @@ export function ShiftManagementPage() {
                 <div className="min-w-0 flex-1 space-y-1">
                   <Label htmlFor={id} className="block truncate font-medium">
                     {item.member.name}
-                    {item.member.designationName == null ? null : (
-                      <span className="text-muted-foreground font-normal">
-                        {" "}
-                        · {item.member.designationName}
-                      </span>
-                    )}
                   </Label>
                   <p className="text-muted-foreground text-sm">
                     {currentLine(item)}

@@ -64,7 +64,6 @@ export const ListConstructionHrmsShiftAssignmentsResponseModel = z.object({
         memberId: z.uuid(),
         name: z.string(),
         memberType: z.enum(["normal", "hrms"]),
-        designationName: z.string().nullable(),
         /** False while Joining Pending. */
         active: z.boolean(),
       }),
@@ -112,7 +111,6 @@ export function toMemberAssignmentsResponse(item: MemberAssignments) {
       memberId: item.employee.memberId,
       name: item.employee.name,
       memberType: item.employee.memberType,
-      designationName: item.employee.designationName,
       active: item.employee.active,
     },
     current: item.current == null ? null : toAssignmentResponse(item.current),

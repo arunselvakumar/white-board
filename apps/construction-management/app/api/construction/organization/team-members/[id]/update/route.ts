@@ -1,18 +1,18 @@
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
-import { can } from "@/src/shared-kernel/access";
 
 import { teamMemberHandlers as handlers } from "../../handlers";
 import {
   TeamMemberIdParamsModel,
+  salaryInput,
   toTeamMemberResponse,
 } from "../../team-member-models";
 import { UpdateConstructionOrganizationTeamMemberRequestModel } from "./update-team-member-request-model";
 
 export const dynamic = "force-dynamic";
 
-/** Edit details, salary and Member Type (CM-110, ADR CM-0032). */
+/** Edit details, salary and Member Type (CM-110, ADR CM-0032, CM-0033). */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },
@@ -27,7 +27,16 @@ export async function POST(
     const { id } = parseOrThrow(
       TeamMemberIdParamsModel.safeParse(await context.params),
     );
-    const { memberType, monthlySalary, ...details } = parseOrThrow(
+    const {
+      memberType,
+      salaryType,
+      salaryPerDay,
+      salaryPerMonth,
+      overtimeWagePerHour,
+      workingHoursPerDay,
+      weeklyHolidays,
+      ...details
+    } = parseOrThrow(
       UpdateConstructionOrganizationTeamMemberRequestModel.safeParse(
         await request.json(),
       ),
@@ -37,14 +46,18 @@ export async function POST(
       id,
       by: session.userId,
       details,
-      // Without Financial the salary is never seen, so it is kept (ADR CM-0032).
-      monthlySalary: can(
+      // Without Financial the amounts are never seen, so they are kept (ADR CM-0032).
+      salary: salaryInput(
+        {
+          salaryType,
+          salaryPerDay,
+          salaryPerMonth,
+          overtimeWagePerHour,
+          workingHoursPerDay,
+          weeklyHolidays,
+        },
         session.access,
-        "organization.team_members",
-        "financial",
-      )
-        ? monthlySalary
-        : undefined,
+      ),
       memberType,
     });
     return Response.json(toTeamMemberResponse(member, session.access));

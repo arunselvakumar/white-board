@@ -587,14 +587,14 @@ describe("Testing Reports HTTP (CM-409)", () => {
           id: newId(),
           workspaceId: owner.workspaceId,
           createDays: 0,
-          createOverrideDesignationIds: [],
+          createOverrideRoleIds: [],
           editDays: 0,
-          editOverrideDesignationIds: [],
+          editOverrideRoleIds: [],
           modules: {
             material_testing_report: {
               mode: "custom",
-              create: { days: 3, overrideDesignationIds: [] },
-              edit: { days: 3, overrideDesignationIds: [] },
+              create: { days: 3, overrideRoleIds: [] },
+              edit: { days: 3, overrideRoleIds: [] },
             },
           },
           createdBy: owner.userId,

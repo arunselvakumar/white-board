@@ -179,7 +179,7 @@ export function ImportDialog({
                   <TableRow>
                     <TableHead className="w-14">Row</TableHead>
                     <TableHead>Name</TableHead>
-                    <TableHead>Project</TableHead>
+                    <TableHead>Projects</TableHead>
                     <TableHead>Wage</TableHead>
                     <TableHead>Check</TableHead>
                   </TableRow>
@@ -191,7 +191,7 @@ export function ImportDialog({
                       <TableCell className="font-medium">
                         {row.values.name || "—"}
                       </TableCell>
-                      <TableCell>{row.values.project ?? "—"}</TableCell>
+                      <TableCell>{row.values.projects ?? "—"}</TableCell>
                       <TableCell className="tabular-nums">
                         {wageText(row.values)}
                       </TableCell>
