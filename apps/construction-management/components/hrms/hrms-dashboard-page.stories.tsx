@@ -54,10 +54,7 @@ export const TeamToday: Story = {
     });
     await expect(present).toHaveTextContent("8");
     await expect(present).toHaveTextContent("2 late");
-    await expect(present).toHaveAttribute(
-      "href",
-      "/app/workspace/hrms/attendance/team",
-    );
+    await expect(present).toHaveAttribute("href", "/app/hrms/attendance/team");
     await expect(
       within(snapshot).getByRole("link", { name: /Pending approvals/ }),
     ).toHaveTextContent("4");
@@ -83,12 +80,9 @@ export const TeamToday: Story = {
     await expect(items[0]).toHaveTextContent("Divya Lakshmi · Missed checkout");
     await expect(items[0]).toHaveAttribute(
       "href",
-      "/app/workspace/hrms/attendance/approvals",
+      "/app/hrms/attendance/approvals",
     );
-    await expect(items[1]).toHaveAttribute(
-      "href",
-      "/app/workspace/hrms/leave/approvals",
-    );
+    await expect(items[1]).toHaveAttribute("href", "/app/hrms/leave/approvals");
 
     const leave = canvas.getByRole("list", { name: "Upcoming leave" });
     await expect(within(leave).getAllByRole("listitem")).toHaveLength(3);
@@ -101,15 +95,15 @@ export const TeamToday: Story = {
     const actions = canvas.getByRole("navigation", { name: "Quick actions" });
     await expect(
       within(actions).getByRole("link", { name: "Check out" }),
-    ).toHaveAttribute("href", "/app/workspace/hrms/attendance/my");
+    ).toHaveAttribute("href", "/app/hrms/attendance/my");
     await expect(
       within(actions).getByRole("link", { name: "Apply leave" }),
-    ).toHaveAttribute("href", "/app/workspace/hrms/leave/my");
+    ).toHaveAttribute("href", "/app/hrms/leave/my");
     const approvals = within(actions).getByRole("link", { name: /Approvals/ });
     await expect(approvals).toHaveTextContent("4");
     await expect(approvals).toHaveAttribute(
       "href",
-      "/app/workspace/hrms/attendance/approvals",
+      "/app/hrms/attendance/approvals",
     );
   },
 };
@@ -126,14 +120,8 @@ export const MemberWithoutViewAll: Story = {
       name: /Back-dated day|Casual Leave/,
     });
     await expect(mine).toHaveLength(2);
-    await expect(mine[0]).toHaveAttribute(
-      "href",
-      "/app/workspace/hrms/attendance/my",
-    );
-    await expect(mine[1]).toHaveAttribute(
-      "href",
-      "/app/workspace/hrms/leave/my",
-    );
+    await expect(mine[0]).toHaveAttribute("href", "/app/hrms/attendance/my");
+    await expect(mine[1]).toHaveAttribute("href", "/app/hrms/leave/my");
     await expect(canvas.queryByText("Today's snapshot")).toBeNull();
     await expect(canvas.queryByText("Pending approvals")).toBeNull();
     const actions = canvas.getByRole("navigation", { name: "Quick actions" });
@@ -153,7 +141,7 @@ export const NoTeamMembersYet: Story = {
     ).toHaveAttribute("href", "/app/staff");
     await expect(
       canvas.getByRole("link", { name: "Configuration" }),
-    ).toHaveAttribute("href", "/app/workspace/hrms/configuration");
+    ).toHaveAttribute("href", "/app/hrms/configuration");
     await expect(
       canvas.getByText("Nothing is waiting for your decision."),
     ).toBeVisible();

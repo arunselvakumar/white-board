@@ -42,7 +42,7 @@ function serve(member: TeamMember, extra: MockRoute[] = []) {
 }
 
 const meta = {
-  title: "Staff & Roles/Staff/EditStaff",
+  title: "Human Resources/Staff/EditStaff",
   component: EditTeamMember,
   args: { id: MEMBER.id, canSeeSalary: true },
   beforeEach() {

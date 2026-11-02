@@ -2,7 +2,7 @@ import type { Page } from "@playwright/test";
 
 import { AppShellPage } from "./AppShellPage";
 
-/** A screen of Workspace → HRMS (`/app/workspace/hrms/...`). */
+/** A screen of Human Resources → HRMS (`/app/hrms/...`). */
 export class HrmsPage extends AppShellPage {
   constructor(
     page: Page,
@@ -12,7 +12,7 @@ export class HrmsPage extends AppShellPage {
   }
 
   public get url() {
-    return `/app/workspace/hrms${this.path}`;
+    return `/app/hrms${this.path}`;
   }
 
   public section(name: string) {

@@ -53,7 +53,7 @@ export const NotCheckedIn: Story = {
     await expect(await canvas.findByText("Not checked in")).toBeVisible();
     await expect(
       canvas.getByRole("link", { name: "Check In" }),
-    ).toHaveAttribute("href", "/app/workspace/hrms/attendance/my");
+    ).toHaveAttribute("href", "/app/hrms/attendance/my");
   },
 };
 

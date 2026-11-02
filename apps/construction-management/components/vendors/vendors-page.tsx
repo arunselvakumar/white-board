@@ -90,7 +90,7 @@ function editPath(id: string): string {
   return `${VENDORS_PATH}/${encodeURIComponent(id)}`;
 }
 
-/** Labour & Vendors → Vendors (CM-209): search, status tabs, Project filter, row actions. */
+/** Human Resources → Vendors (CM-209): search, status tabs, Project filter, row actions. */
 export function VendorsPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<VendorListFilter["status"]>("all");

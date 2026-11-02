@@ -604,6 +604,7 @@ describe("Notifications HTTP (CM-904)", () => {
       "materials",
       "master_records",
       "central_store",
+      "human_resources",
       "hrms",
       "others",
       "downloads",

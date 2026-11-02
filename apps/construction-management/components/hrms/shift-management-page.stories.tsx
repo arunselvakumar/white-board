@@ -182,7 +182,7 @@ export const NoShiftsToAssign: Story = {
     ).toBeVisible();
     await expect(
       canvas.getByRole("link", { name: "Go to Shifts" }),
-    ).toHaveAttribute("href", "/app/workspace/hrms/configuration/shifts");
+    ).toHaveAttribute("href", "/app/hrms/configuration/shifts");
   },
 };
 

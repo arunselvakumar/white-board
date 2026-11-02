@@ -3,7 +3,7 @@ import type { Page } from "@playwright/test";
 import { AppShellPage } from "./AppShellPage";
 
 /**
- * A list page (`/app/masters/<list>`, or a Labour & Vendors list such as
+ * A list page (`/app/masters/<list>`, or a Human Resources list such as
  * `/app/supervisors`): Add, search and its rows.
  */
 export class MasterListPage extends AppShellPage {

@@ -101,7 +101,7 @@ function page(items: TeamMember[]) {
 }
 
 const meta = {
-  title: "Staff & Roles/Staff/List",
+  title: "Human Resources/Staff/List",
   component: TeamMembersPage,
   beforeEach() {
     signInAs("owner", { name: "Anugraha Engineers" });

@@ -43,6 +43,8 @@ Company (tenant)
     Chat, Notifications, Support                              → modules/13
 ```
 
+In our build (ADR CM-0034) the main menu is Dashboard, Projects, **Human Resources** (Staff and Roles, HRMS, Labours and Vendors), Workspace (Central Store, Central Inventory, Central Payment, Central Reports), Masters and Settings. The tree above is the legacy shape the modules were specified from.
+
 Three things define the product's character:
 
 1. **Everything hangs off a Project, and most things hang off a Location inside it.** A worksheet, an issue, an inspection, a PR, a task, a booking — each points at `Wing → Floor → Unit`, or at an Amenity, or at a Common Development. The building structure (module 03) is therefore the first thing a company sets up.

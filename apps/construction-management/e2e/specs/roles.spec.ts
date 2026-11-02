@@ -28,7 +28,15 @@ rolesPageTest.describe("Role Management", () => {
       await expect(projectsPage.addProjectLink).toHaveCount(0);
       await expect(projectsPage.menuLink("Projects")).toBeVisible();
       await expect(projectsPage.menuLink("Dashboard")).toHaveCount(0);
-      await expect(projectsPage.menuLink("Staff & Roles")).toHaveCount(0);
+      // Human Resources shows for everyone; its Staff group needs Team
+      // Members or Role Management Read (ADR CM-0034).
+      await expect(projectsPage.menuLink("Human Resources")).toBeVisible();
+      await projectsPage.mainMenu
+        .getByRole("button", { name: "Show Human Resources list" })
+        .click();
+      await expect(projectsPage.menuLink("Labours")).toBeVisible();
+      await expect(projectsPage.menuLink(/^Staff$/)).toHaveCount(0);
+      await expect(projectsPage.menuLink("Role Management")).toHaveCount(0);
 
       await page.goto("/app/roles/new");
       await expect(
@@ -50,7 +58,10 @@ rolesPageTest.describe("Role Management", () => {
       const memberPage = await member.page();
       const memberProjects = new ProjectsPage(memberPage);
       await memberProjects.goto();
-      await expect(memberProjects.menuLink("Staff & Roles")).toHaveCount(0);
+      await memberProjects.mainMenu
+        .getByRole("button", { name: "Show Human Resources list" })
+        .click();
+      await expect(memberProjects.menuLink("Role Management")).toHaveCount(0);
 
       const roleForm = new RoleFormPage(ownerPage, member.roleId);
       await roleForm.goto();
@@ -59,7 +70,10 @@ rolesPageTest.describe("Role Management", () => {
       await expect(ownerPage).toHaveURL("/app/roles");
 
       await memberPage.reload();
-      await expect(memberProjects.menuLink("Staff & Roles")).toBeVisible();
+      await memberProjects.mainMenu
+        .getByRole("button", { name: "Show Human Resources list" })
+        .click();
+      await expect(memberProjects.menuLink("Role Management")).toBeVisible();
     },
   );
 

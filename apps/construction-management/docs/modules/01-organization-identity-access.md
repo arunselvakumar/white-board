@@ -663,7 +663,7 @@ Dashboard, Wings, Create Location, Project Drawings, Testing Report, Equipment U
 
 ## Decisions for the build — Staff and salary (ADR CM-0032)
 
-- **Screens say Staff.** Staff & Roles → Staff (`/app/staff`, no redirect from `/app/users`) and Role Management; Add Staff, Edit Staff; the Permission Matrix row for `organization.team_members` is "Staff". Code, APIs and audit events keep Team Member.
+- **Screens say Staff.** Human Resources → Staff (`/app/staff`, no redirect from `/app/users`) and Role Management; Add Staff, Edit Staff; the Permission Matrix row for `organization.team_members` is "Staff". Code, APIs and audit events keep Team Member.
 - **Monthly salary.** `team_members.monthly_salary` (paise, nullable, at most ₹2 crore; `SALARY_INVALID`). `POST /team-members` and `POST /team-members/{id}/update` take `monthlySalary`; on update, leaving it out keeps it and null clears it. Separate from the HRMS salary set-up (CM-315), which the salary run reads.
 - **Financial on Staff.** `organization.team_members` is `CRUDF`. Without Financial, responses carry `monthlySalary: null` and a sent salary is ignored. The migration grants it to seeded Admin Roles (CM-0024).
 

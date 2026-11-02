@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
-import { HRMS_PATH } from "@/lib/hrms-nav";
-
 import { WorkspaceIndex } from "./workspace-index";
 
 const meta = {
@@ -24,10 +22,8 @@ export const Default: Story = {
     await expect(
       canvas.getByRole("heading", { name: "Workspace" }),
     ).toBeVisible();
-    await expect(canvas.getByRole("link", { name: /^HRMS/ })).toHaveAttribute(
-      "href",
-      HRMS_PATH,
-    );
+    // HRMS is under Human Resources now (ADR CM-0034).
+    await expect(canvas.queryByRole("link", { name: /^HRMS/ })).toBeNull();
     await expect(
       canvas.getByRole("link", { name: /^Central Store/ }),
     ).toHaveAttribute("href", "/app/workspace/central-store");
@@ -43,8 +39,8 @@ export const Default: Story = {
   },
 };
 
-/** Without the Central Store menus only HRMS shows. */
-export const HrmsOnly: Story = {
+/** Without any of the Central menus the page says so. */
+export const Nothing: Story = {
   args: {
     centralStore: false,
     centralInventory: false,
@@ -53,5 +49,6 @@ export const HrmsOnly: Story = {
   },
   play: async ({ canvas }) => {
     await expect(canvas.queryByRole("link", { name: /^Central/ })).toBeNull();
+    await expect(canvas.getByText(/Nothing here for you yet/)).toBeVisible();
   },
 };

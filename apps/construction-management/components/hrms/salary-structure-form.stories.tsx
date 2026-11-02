@@ -136,7 +136,7 @@ export const AddValidatesAndSaves: Story = {
     });
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
-        "/app/workspace/hrms/configuration/salary-structures",
+        "/app/hrms/configuration/salary-structures",
       ),
     );
   },

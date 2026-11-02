@@ -24,7 +24,7 @@ function bodyOf(path: string): unknown {
 }
 
 const meta = {
-  title: "Staff & Roles/Role Management/Form",
+  title: "Human Resources/Role Management/Form",
   component: EditRoleScreen,
   args: { id: SITE_ENGINEER_ROLE.id, canUpdate: true },
   render: (args) => (

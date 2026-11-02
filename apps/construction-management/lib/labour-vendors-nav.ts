@@ -18,7 +18,7 @@ export type LabourVendorsSection = {
 export const LABOURS_PAGE_PATH = "/app/labours";
 
 /**
- * Labour & Vendors in the main menu, beside Staff & Roles: your own
+ * The Labour group of Human Resources (ADR CM-0034): your own
  * Labours, the Vendors you hire gangs from, and the lists both are booked
  * under. The area opens on Labours.
  */
@@ -54,7 +54,7 @@ export const LABOUR_VENDORS_SECTIONS: readonly LabourVendorsSection[] = [
   },
 ];
 
-/** The Labour & Vendors section a path belongs to (its page or anything under it). */
+/** The Labour section a path belongs to (its page or anything under it). */
 export function activeLabourVendorsSection(
   pathname: string,
 ): LabourVendorsSection | undefined {

@@ -58,7 +58,7 @@ function NoLabourers() {
         </EmptyMedia>
         <EmptyTitle>No Labours on this Project</EmptyTitle>
         <EmptyDescription>
-          Add Labours to this Project in Labour & Vendors → Labours, or transfer
+          Add Labours to this Project in Human Resources → Labours, or transfer
           them here, to mark their attendance.
         </EmptyDescription>
       </EmptyHeader>

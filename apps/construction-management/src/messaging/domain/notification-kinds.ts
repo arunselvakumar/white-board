@@ -173,20 +173,20 @@ export const APPROVAL_DOCUMENTS: Record<string, ApprovalDocument> = {
   leave_request: {
     menu: "hrms.leaves",
     label: "Leave request",
-    approverHref: () => "/app/workspace/hrms/leave/approvals",
-    creatorHref: () => "/app/workspace/hrms/leave/my",
+    approverHref: () => "/app/hrms/leave/approvals",
+    creatorHref: () => "/app/hrms/leave/my",
   },
   leave_cancellation: {
     menu: "hrms.leaves",
     label: "Leave cancellation",
-    approverHref: () => "/app/workspace/hrms/leave/approvals",
-    creatorHref: () => "/app/workspace/hrms/leave/my",
+    approverHref: () => "/app/hrms/leave/approvals",
+    creatorHref: () => "/app/hrms/leave/my",
   },
   attendance_correction: {
     menu: "hrms.attendance",
     label: "Attendance correction",
-    approverHref: () => "/app/workspace/hrms/attendance/approvals",
-    creatorHref: () => "/app/workspace/hrms/attendance/my",
+    approverHref: () => "/app/hrms/attendance/approvals",
+    creatorHref: () => "/app/hrms/attendance/my",
   },
 };
 
@@ -231,7 +231,7 @@ export const LINKS = {
     location.kind === "project"
       ? `/app/projects/${location.id}/materials/inventory`
       : `/app/workspace/central-store/${location.id}`,
-  mySalary: "/app/workspace/hrms/salary/my",
+  mySalary: "/app/hrms/salary/my",
   // Sales (CM-1006)
   booking: (projectId: string, id: string) =>
     `/app/projects/${projectId}/bookings/list/${id}`,

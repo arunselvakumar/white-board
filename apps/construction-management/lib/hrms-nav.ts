@@ -19,8 +19,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-/** Where HRMS lives: Workspace → HRMS (`modules/10` "Workspace placement"). */
-export const HRMS_PATH = "/app/workspace/hrms";
+/** Where HRMS lives: Human Resources → HRMS (ADR CM-0034; Workspace → HRMS before it). */
+export const HRMS_PATH = "/app/hrms";
 
 export type HrmsPage = {
   href: string;
@@ -54,10 +54,10 @@ const CONFIGURATION = `${HRMS_PATH}/configuration`;
 
 /**
  * The HRMS area: its sections (the tabs under HRMS and the sidebar's
- * Workspace submenu) and each section's pages (the sub-tabs). This is the
+ * Human Resources submenu) and each section's pages (the sub-tabs). This is the
  * one place HRMS navigation is defined. To build a screen, replace the
  * `HrmsComingSoon` in its `page.tsx`; to add a screen, add a page here and
- * its `page.tsx` under `app/app/workspace/hrms/`.
+ * its `page.tsx` under `app/app/hrms/`.
  */
 export const HRMS_SECTIONS: readonly HrmsSection[] = [
   {

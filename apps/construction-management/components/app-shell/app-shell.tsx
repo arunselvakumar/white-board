@@ -31,13 +31,12 @@ import { projectIdFromPath } from "@/lib/project-nav";
 import { APP_NAV_ICONS } from "./app-nav-icons";
 import { BrandMark } from "./brand-mark";
 import { CompanySwitcher } from "./company-switcher";
-import { LabourVendorsNavMenu } from "./labour-vendors-nav-menu";
+import { HumanResourcesNavMenu } from "./human-resources-nav-menu";
 import { MastersNavMenu } from "./masters-nav-menu";
 import { CompanyDeletionBanner } from "./company-deletion-banner";
 import { PlanBanner } from "./plan-banner";
 import { ProjectNavMenu } from "./project-nav-menu";
 import { UserMenu } from "./user-menu";
-import { StaffRolesNavMenu } from "./staff-roles-nav-menu";
 import { WorkspaceNavMenu } from "./workspace-nav-menu";
 
 const NAV_BUTTON_CLASS =
@@ -50,12 +49,13 @@ const FOOTER_LINKS = [
 ] as const;
 
 /**
- * Authenticated chrome: the Company Dashboard, the three areas, Staff &
- * Roles and Settings, the Active Company, the account menu. Inside a
+ * Authenticated chrome: the Company Dashboard, Projects, Human Resources,
+ * Workspace, Masters and Settings, the Active Company, the account menu. Inside a
  * Project the areas give way to the Project's own menu (ADR CM-0020).
  * `canOpenDashboard` is the Dashboard menu's Read flag (CM-902): without it
  * the Dashboard is not in the menu. `canOpenStaffRoles` is Team Members or
- * Role Management Read (ADR CM-0030): without either, Staff & Roles is not.
+ * Role Management Read (ADR CM-0030): without either, the Staff group of
+ * Human Resources is not (ADR CM-0034).
  */
 export function AppShell({
   children,
@@ -159,9 +159,9 @@ export function AppShell({
 }
 
 /**
- * The Company Dashboard (with Dashboard Read), the three areas: Projects,
- * Workspace and Masters (each with its submenu), Labour & Vendors, Staff &
- * Roles, then Settings.
+ * The Company Dashboard (with Dashboard Read), Projects, then the areas
+ * with a submenu each: Human Resources, Workspace and Masters, then
+ * Settings (ADR CM-0034).
  */
 function MainMenu({
   pathname,
@@ -191,21 +191,13 @@ function MainMenu({
                     buttonClassName={NAV_BUTTON_CLASS}
                   />
                 );
-              if (item.href === "/app/labours")
-                return (
-                  <LabourVendorsNavMenu
-                    key={item.href}
-                    pathname={pathname}
-                    buttonClassName={NAV_BUTTON_CLASS}
-                  />
-                );
-              if (item.href === "/app/staff" && !canOpenStaffRoles) return null;
               if (item.href === "/app/staff")
                 return (
-                  <StaffRolesNavMenu
+                  <HumanResourcesNavMenu
                     key={item.href}
                     pathname={pathname}
                     buttonClassName={NAV_BUTTON_CLASS}
+                    canOpenStaffRoles={canOpenStaffRoles}
                   />
                 );
               if (item.href === "/app/workspace")

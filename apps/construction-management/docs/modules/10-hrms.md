@@ -13,7 +13,9 @@ Who uses it:
 | Employee (Normal or HRMS Team Member)                                    | Checks in and out, adds missed checkout or backdated attendance, applies for leave, requests cancellation, views own salary slips             |
 | **HRMS Team Member** (member type)                                       | An employee who uses **only** HRMS: no projects, permissions come from the HRMS default permission set                                        |
 
-Workspace placement: HRMS lives in the **Workspace** bottom tab (Workspace → HRMS, labelled "beta" in the legacy app). The home Projects tab also shows a **"Not checked in / Check In"** banner driven by HRMS attendance state (see module 11).
+Workspace placement (legacy): HRMS lives in the **Workspace** bottom tab (Workspace → HRMS, labelled "beta" in the legacy app). The home Projects tab also shows a **"Not checked in / Check In"** banner driven by HRMS attendance state (see module 11).
+
+In our build HRMS is a group of the **Human Resources** main-menu area, at `/app/hrms` (ADR CM-0034); the old `/app/workspace/hrms` addresses redirect there.
 
 ---
 
@@ -749,7 +751,7 @@ M3 answered every open question below in [ADR CM-0012](../adr/CM-0012-hrms-produ
 
 **Built in the M3 foundation (CM-302, CM-303)**
 
-- **Where things live.** One context, `hrms` (`construction_hrms`, API `/api/construction/hrms/...`, screens under Workspace → HRMS at `/app/workspace/hrms`). Every M3 table exists from CM-302; later tickets add code, not tables. Team Members, Projects and Designations are read through ports (`src/hrms/application/ports.ts`) implemented with plain reads of the organization and projects tables. A member is a Team Member id (`member_id`).
+- **Where things live.** One context, `hrms` (`construction_hrms`, API `/api/construction/hrms/...`, screens under Human Resources → HRMS at `/app/hrms` (ADR CM-0034)). Every M3 table exists from CM-302; later tickets add code, not tables. Team Members, Projects and Designations are read through ports (`src/hrms/application/ports.ts`) implemented with plain reads of the organization and projects tables. A member is a Team Member id (`member_id`).
 - **HRMS Settings** (menu `hrms.settings`): defaults are the legacy values (GPS disabled, 15 min grace, 8 h day, 4 h half day, Monday–Friday, 1 approval level, calendar leave year, carry forward, accrual and auto salary off). Grace 0–120 whole minutes; working hours above 0 and at most 24; half-day hours above 0 and below the working hours (two decimals each); working days unique ISO weekdays, at least one; approval levels 1 or 2; carry-forward cap 0 or more, required only when carry forward is on; the auto salary day is 1–28 (not 31, so it exists every month), required only when auto calculation is on. A switched-off value is cleared. The **PT state** is a GST state code, chosen in Settings (not taken from the Company address, which has no state field). The whole form is saved at once (`POST …/settings/update`, like every other update in the app) with `updatedAt` → 409 `HRMS_SETTINGS_CHANGED`.
 - **Leave ledger signs** (ADR CM-0004): credits are positive (initial, accrual, carry forward, released, restored), debits negative (reserved, used); an adjustment has a reason. Applying reserves; approval releases the reservation and posts `used`; rejection or withdrawal releases; an approved cancellation restores. An accrual period, a year's initial credit and a year's carry forward are posted once (unique indexes).
 - **Professional tax slabs** can differ for men and women (Maharashtra), so the member's gender sits on their salary configuration; without it the general slab applies (ADR CM-0008).
@@ -829,7 +831,7 @@ M3 answered every open question below in [ADR CM-0012](../adr/CM-0012-hrms-produ
 14. Employee salary configurations are effective-dated: the same start date updates in place, a later one adds a row (history kept), an earlier one is refused (`EFFECTIVE_FROM_BEFORE_CURRENT`).
 15. Save All is all or none; stale rows return 409 `EMPLOYEE_SALARY_CHANGED` with `details.memberIds`; other errors carry `details.memberId` (and `field`).
 16. Employee Management: a Not Set member needs create, a configured one update; amounts are null without Financial, and sending amounts without Financial is refused; without Financial a member can still change structure, start date, gender, UAN and ESI IP.
-17. An HRMS Team Member is sent from the Projects home to Workspace → HRMS.
+17. An HRMS Team Member is sent from the Projects home to Human Resources → HRMS (Workspace → HRMS until ADR CM-0034).
 
 **Salary run (CM-316, CM-317)**
 
