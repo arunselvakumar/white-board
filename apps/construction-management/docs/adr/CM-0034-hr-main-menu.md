@@ -66,7 +66,7 @@ Two main-menu items and a Workspace submenu answer the one question "who works f
 - Putting the Staff **Salary** card and HRMS → Configuration → **Employees** next to each other in one submenu makes the two salary set-ups (CM-0032 §2, CM-0033 §3, "joining the two is a later decision") visible to every Owner. That decision should follow in its own ADR and PR: one salary on the staff record, read by the salary run, and the Employees page retired or reduced to a status view. This ADR does not decide it.
 - `docs/00-overview.md` "The shape of the product" and `modules/10` "Workspace placement" describe the legacy tabs; both get a note that HRMS is under Human Resources here.
 - Bookmarks to `/app/workspace/hrms/…` keep working. Nothing else moves.
-- Push notifications are muted per matrix category (`NOTIFICATION_GROUPS`). The five menus leave the Master records group for a new Human Resources group. A migration copies a Master records mute to Human Resources once, so a member who had muted Master records to silence Staff or Labour pushes stays silent; from then on the two groups are muted apart.
+- Push notifications are muted per matrix category (`NOTIFICATION_GROUPS`). The five menus leave the Master records group for a new Human Resources group. A migration copies a Master records mute to Human Resources once, so a member who had muted Master records to silence Staff or Labour pushes stays silent; from then on the two groups are muted apart. The notification settings screen saves one group's switch at a time (`POST preferences/update` takes `{ group, muted }`), so a tab opened before the deploy cannot drop the copied mute.
 
 ## Considered options
 

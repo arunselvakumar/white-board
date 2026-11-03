@@ -10,9 +10,11 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Sets the menu groups whose push is muted (the whole list). In-app
- * notifications are not mutable: the Notification flag decides them.
- * 400 `UNKNOWN_NOTIFICATION_GROUP` for a group that does not exist.
+ * Mutes or unmutes push for one menu group; the other groups stay as they
+ * are, so a tab opened before a group was added (or a mute copied by a
+ * migration) cannot drop it. In-app notifications are not mutable: the
+ * Notification flag decides them. 400 `UNKNOWN_NOTIFICATION_GROUP` for a
+ * group that does not exist.
  */
 export async function POST(request: Request): Promise<Response> {
   try {
@@ -25,9 +27,10 @@ export async function POST(request: Request): Promise<Response> {
     );
     return Response.json(
       toPreferencesResponse(
-        await notifications.updatePreferences(
+        await notifications.setGroupMuted(
           session.userId,
-          model.mutedGroups,
+          model.group,
+          model.muted,
         ),
       ),
     );

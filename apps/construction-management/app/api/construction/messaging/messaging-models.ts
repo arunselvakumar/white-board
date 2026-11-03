@@ -121,7 +121,9 @@ export type ConstructionMessagingPreferencesResponseModel = z.infer<
 >;
 
 export const UpdateConstructionMessagingPreferencesRequestModel = z.object({
-  mutedGroups: z.array(z.string().min(1).max(60)).max(20),
+  /** One menu group and whether its push is muted; the other groups stay. */
+  group: z.string().min(1).max(60),
+  muted: z.boolean(),
 });
 
 export const ConstructionMessagingPushConfigResponseModel = z.object({

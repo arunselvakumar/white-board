@@ -72,6 +72,9 @@ export const Nothing: Story = {
   },
   play: async ({ canvas }) => {
     await expect(canvas.queryByRole("link", { name: /^Central/ })).toBeNull();
+    await expect(
+      canvas.queryByRole("link", { name: /^Party Balance/ }),
+    ).toBeNull();
     await expect(canvas.getByText(/Nothing here for you yet/)).toBeVisible();
   },
 };

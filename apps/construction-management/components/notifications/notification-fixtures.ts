@@ -233,12 +233,13 @@ export function mockNotificationApi(options: NotificationApiOptions = {}) {
     if (call.method === "GET" && path === `${MESSAGING_API}/preferences`)
       return Response.json(preferences);
     if (writes && path === `${MESSAGING_API}/preferences/update`) {
-      const { mutedGroups } = call.body as { mutedGroups: string[] };
+      const change = call.body as { group: string; muted: boolean };
       preferences = {
-        groups: preferences.groups.map((group) => ({
-          ...group,
-          muted: mutedGroups.includes(group.key),
-        })),
+        groups: preferences.groups.map((group) =>
+          group.key === change.group
+            ? { ...group, muted: change.muted }
+            : group,
+        ),
       };
       return Response.json(preferences);
     }

@@ -129,10 +129,12 @@ export function deletePushSubscription(endpoint: string): Promise<void> {
   return post("/push-subscriptions/delete", { endpoint });
 }
 
-export function updateNotificationPreferences(
-  mutedGroups: string[],
-): Promise<NotificationPreferences> {
-  return post("/preferences/update", { mutedGroups });
+/** One group's switch; the server keeps the others. */
+export function updateNotificationPreferences(change: {
+  group: string;
+  muted: boolean;
+}): Promise<NotificationPreferences> {
+  return post("/preferences/update", change);
 }
 
 /**

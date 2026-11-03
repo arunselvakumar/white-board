@@ -165,23 +165,26 @@ export class NotificationHandlers {
     };
   }
 
-  /** Mutes push for these groups (in-app stays: the N flag decides it). */
-  async updatePreferences(
+  /**
+   * Mutes or unmutes push for one group (in-app stays: the N flag decides
+   * it). One switch at a time, so a stale screen keeps the groups it does
+   * not know about, such as a mute a migration copied over.
+   */
+  async setGroupMuted(
     userId: string,
-    mutedGroups: readonly string[],
+    group: string,
+    muted: boolean,
   ): Promise<NotificationPreferences> {
-    const unknown = mutedGroups.filter((key) => !isNotificationGroup(key));
-    if (unknown.length > 0)
+    if (!isNotificationGroup(group))
       throw new DomainError(
         "UNKNOWN_NOTIFICATION_GROUP",
         "Choose groups from the list.",
-        { details: { groups: unknown } },
+        { details: { groups: [group] } },
       );
-    await this.deps.preferences.save(
-      userId,
-      [...new Set(mutedGroups)],
-      this.now(),
-    );
+    const current = new Set(await this.deps.preferences.mutedGroups(userId));
+    if (muted) current.add(group);
+    else current.delete(group);
+    await this.deps.preferences.save(userId, [...current], this.now());
     return this.preferences(userId);
   }
 

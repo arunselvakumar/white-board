@@ -219,12 +219,7 @@ function MutedGroups() {
                   checked={!group.muted}
                   disabled={update.isPending}
                   onCheckedChange={(on) => {
-                    const muted = preferences.data.groups
-                      .filter((other) =>
-                        other.key === group.key ? !on : other.muted,
-                      )
-                      .map((other) => other.key);
-                    update.mutate(muted);
+                    update.mutate({ group: group.key, muted: !on });
                   }}
                 />
               </li>
