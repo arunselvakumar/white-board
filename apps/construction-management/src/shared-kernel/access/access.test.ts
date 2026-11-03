@@ -67,12 +67,13 @@ describe("the menu catalogue", () => {
       // 92 legacy cells + Terms & Conditions CRUD (ADR CM-0015 §13) + Tags
       // CRUD (ADR CM-0019 §1) + Role Management CRUD (ADR CM-0030) + Staff
       // Financial (ADR CM-0032) − Designations CRUD (ADR CM-0033) − the 23
-      // cells of Human Resources (ADR CM-0034).
-      master_records: 78,
+      // cells of Human Resources (ADR CM-0034) + Labour Categories CRUD back
+      // from Human Resources (ADR CM-0035).
+      master_records: 82,
       central_store: 20,
-      // Staff (5), Role Management (4), Labours (5), Labour Categories (4)
-      // and Vendors (5), out of Master records (ADR CM-0034).
-      human_resources: 23,
+      // Staff (5), Role Management (4), Labours (5) and Vendors (5), out of
+      // Master records (ADR CM-0034, CM-0035).
+      human_resources: 19,
       hrms: 57,
       others: 1,
     });

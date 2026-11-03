@@ -11,7 +11,10 @@ import {
   MASON,
   PROJECT_OPTIONS,
   DHURESH,
+  MEENA,
+  RAVI,
   SUPERVISOR_LIST,
+  listOf,
   TOWER,
   VILLA,
   withoutAmounts,
@@ -47,6 +50,11 @@ const LOOKUPS = [
   {
     path: "/api/construction/masters/supervisors",
     respond: () => Response.json(SUPERVISOR_LIST),
+  },
+  // Reports To searches the active Labours (ADR CM-0035).
+  {
+    path: LABOURS,
+    respond: () => Response.json(listOf([DHURESH, MEENA, RAVI])),
   },
 ];
 
@@ -431,5 +439,198 @@ export const EditProjects: Story = {
     await expect(sent(`${LABOURS}/${DHURESH.id}/update`)).toMatchObject({
       projectIds: [VILLA.id],
     });
+  },
+};
+
+/**
+ * Reports To (ADR CM-0035): the saved Labour shows by name; the picker
+ * offers other active Labours, never the one being edited, and can be
+ * cleared.
+ */
+export const EditReportsTo: Story = {
+  render: () => (
+    <StoryQueryClient>
+      <EditLabourScreen id={MEENA.id} />
+    </StoryQueryClient>
+  ),
+  beforeEach: () => {
+    api = mockFetch([
+      ...LOOKUPS,
+      {
+        path: `${LABOURS}/${MEENA.id}`,
+        respond: () => Response.json(MEENA),
+      },
+      {
+        path: `${LABOURS}/${MEENA.id}/documents`,
+        respond: () => Response.json({ items: [] }),
+      },
+      {
+        method: "POST",
+        path: `${LABOURS}/${MEENA.id}/update`,
+        respond: () => Response.json(MEENA),
+      },
+    ]);
+    return api.restore;
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await expect(
+      await canvas.findByRole("heading", { name: "Edit Meena Selvi" }),
+    ).toBeVisible();
+    const reportsTo = canvas.getByRole("combobox", { name: "Reports To" });
+    await expect(reportsTo).toHaveValue("Dhuresh Nawin");
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Clear Reports To" }),
+    );
+    await expect(reportsTo).toHaveValue("");
+    await userEvent.click(canvas.getByRole("button", { name: "Show Labours" }));
+    const list = within(await body.findByRole("listbox", { name: "Labours" }));
+    await expect(
+      await list.findByRole("option", { name: /Ravi Kumar/ }),
+    ).toBeVisible();
+    // Meena cannot report to herself.
+    await expect(
+      list.queryByRole("option", { name: /Meena Selvi/ }),
+    ).toBeNull();
+    await userEvent.click(list.getByRole("option", { name: /Ravi Kumar/ }));
+    await expect(reportsTo).toHaveValue("Ravi Kumar");
+
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+    await waitFor(() =>
+      expect(sent(`${LABOURS}/${MEENA.id}/update`)).toBeDefined(),
+    );
+    await expect(sent(`${LABOURS}/${MEENA.id}/update`)).toMatchObject({
+      reportsToId: RAVI.id,
+    });
+  },
+};
+
+/** A loop the server refuses shows on Reports To. */
+export const ReportsToLoopRefused: Story = {
+  render: () => (
+    <StoryQueryClient>
+      <EditLabourScreen id={MEENA.id} />
+    </StoryQueryClient>
+  ),
+  beforeEach: () => {
+    api = mockFetch([
+      ...LOOKUPS,
+      {
+        path: `${LABOURS}/${MEENA.id}`,
+        respond: () => Response.json(MEENA),
+      },
+      {
+        path: `${LABOURS}/${MEENA.id}/documents`,
+        respond: () => Response.json({ items: [] }),
+      },
+      {
+        method: "POST",
+        path: `${LABOURS}/${MEENA.id}/update`,
+        respond: () =>
+          Response.json(
+            {
+              code: "REPORTS_TO_LOOP",
+              message:
+                "Dhuresh Nawin reports to this Labour, so this Labour cannot report to them.",
+            },
+            { status: 400 },
+          ),
+      },
+    ]);
+    return api.restore;
+  },
+  play: async ({ canvas, userEvent }) => {
+    await canvas.findByRole("heading", { name: "Edit Meena Selvi" });
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+    await expect(
+      await canvas.findByText(
+        "Dhuresh Nawin reports to this Labour, so this Labour cannot report to them.",
+      ),
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("combobox", { name: "Reports To" }),
+    ).toHaveAttribute("aria-invalid", "true");
+  },
+};
+
+const BAR_BENDER = {
+  id: "0199a1b2-0000-7000-8000-00000000c009",
+  name: "Bar Bender",
+  skill: "skilled",
+  isSeed: false,
+  disabled: false,
+  createdAt: "2026-11-03T06:30:00.000Z",
+  updatedAt: "2026-11-03T06:30:00.000Z",
+};
+
+/**
+ * Add under Labour Category opens a slide-over from the right. Saving adds
+ * the category, reloads the choices and picks it, without saving the
+ * Labour.
+ */
+export const AddCategoryFromForm: Story = {
+  beforeEach: () => {
+    let added = false;
+    api = mockFetch([
+      ...LOOKUPS.filter(
+        (route) => route.path !== "/api/construction/masters/labour-categories",
+      ),
+      {
+        path: "/api/construction/masters/labour-categories",
+        respond: () =>
+          Response.json(
+            added
+              ? {
+                  items: [BAR_BENDER, ...CATEGORY_LIST.items],
+                  total: CATEGORY_LIST.total + 1,
+                }
+              : CATEGORY_LIST,
+          ),
+      },
+      {
+        method: "POST",
+        path: "/api/construction/masters/labour-categories",
+        respond: () => {
+          added = true;
+          return Response.json(BAR_BENDER, { status: 201 });
+        },
+      },
+    ]);
+    return api.restore;
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await canvas.findByRole("heading", { name: "Add Labour" });
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Add Labour Category" }),
+    );
+    const sheet = within(
+      await body.findByRole("dialog", { name: "Add Labour Category" }),
+    );
+    await userEvent.click(sheet.getByRole("button", { name: "Save" }));
+    await expect(
+      await sheet.findByText("Enter the Labour Category name"),
+    ).toBeVisible();
+    await userEvent.type(
+      sheet.getByLabelText("Labour Category name"),
+      "Bar Bender",
+    );
+    await userEvent.click(sheet.getByRole("button", { name: "Save" }));
+
+    await waitFor(() =>
+      expect(
+        body.queryByRole("dialog", { name: "Add Labour Category" }),
+      ).toBeNull(),
+    );
+    await expect(sent("/api/construction/masters/labour-categories")).toEqual({
+      name: "Bar Bender",
+      skill: "skilled",
+    });
+    // The Labour is not saved; the new category is chosen.
+    await expect(sent(LABOURS)).toBeUndefined();
+    await expect(
+      canvas.getByRole("combobox", { name: "Labour Category" }),
+    ).toHaveTextContent("Bar Bender");
   },
 };

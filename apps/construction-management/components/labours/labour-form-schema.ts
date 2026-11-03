@@ -59,6 +59,8 @@ const baseSchema = z.object({
     }),
   labourCategoryId: z.string(),
   supervisorId: z.string(),
+  /** Another Labour's id, or "" for none (ADR CM-0035). */
+  reportsToId: z.string(),
   contactNumber: z
     .string()
     .trim()
@@ -113,6 +115,7 @@ export function labourFormDefaults(
       aadhaar: "",
       labourCategoryId: "",
       supervisorId: "",
+      reportsToId: "",
       contactNumber: "",
       gender: "",
       projectIds: [],
@@ -139,6 +142,7 @@ export function labourFormDefaults(
     aadhaar: "",
     labourCategoryId: labour.labourCategory?.id ?? "",
     supervisorId: labour.supervisor?.id ?? "",
+    reportsToId: labour.reportsTo?.id ?? "",
     contactNumber: labour.contactNumber?.replace(/^\+91/, "") ?? "",
     gender: labour.gender ?? "",
     projectIds: labour.projects.map((project) => project.id),
@@ -161,6 +165,7 @@ function details(values: LabourFormValues) {
     esicNumber: blank(values.esicNumber),
     labourCategoryId: blank(values.labourCategoryId),
     supervisorId: blank(values.supervisorId),
+    reportsToId: blank(values.reportsToId),
     contactNumber:
       values.contactNumber.trim() === ""
         ? null
@@ -227,6 +232,9 @@ export const LABOUR_ERROR_FIELDS: Record<string, LabourField> = {
   GENDER_INVALID: "gender",
   LABOUR_CATEGORY_NOT_FOUND: "labourCategoryId",
   SUPERVISOR_NOT_FOUND: "supervisorId",
+  REPORTS_TO_NOT_FOUND: "reportsToId",
+  REPORTS_TO_SELF: "reportsToId",
+  REPORTS_TO_LOOP: "reportsToId",
   PROJECT_NOT_FOUND: "projectIds",
 };
 

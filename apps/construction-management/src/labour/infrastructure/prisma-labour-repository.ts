@@ -6,7 +6,7 @@ import {
   calendarDateToDb,
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
-import { conflict } from "@/src/shared-kernel/domain-error";
+import { DomainError, conflict } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
 import {
   isPrismaError,
@@ -17,6 +17,8 @@ import type { PrivateDataCipher } from "@/src/shared-kernel/private-data";
 import {
   labourCodeTaken,
   labourNotFound,
+  reportsToLoop,
+  reportsToNotFound,
 } from "../application/labour-handlers";
 import type {
   LabourMove,
@@ -71,6 +73,7 @@ export function labourFromRow(
           : cipher().decrypt(row.aadhaarEncrypted),
       labourCategoryId: row.labourCategoryId,
       supervisorId: row.supervisorId,
+      reportsToId: row.reportsToId,
       contactNumber: row.contactNumber,
       gender: row.gender,
     },
@@ -108,6 +111,49 @@ function openingEntry(labour: Labour, amount: number) {
 
 /** The labour register's writes, each in one transaction (ADR CM-0004). */
 /** Whether any live attendance or wage payment exists for the labourer. */
+/**
+ * Reports To inside the write (ADR CM-0035). The handler checks the choice
+ * first; this repeats it under locks so two edits at once cannot make a
+ * loop (A → B and B → A) and a delete cannot slip in between: one advisory
+ * lock per Company serialises Reports To writes, and the chosen Labour's
+ * row is held FOR SHARE, which a delete's FOR UPDATE waits on.
+ */
+async function guardReportsTo(tx: Tx, labours: readonly Labour[]) {
+  const chosen = labours.filter((labour) => labour.details.reportsToId != null);
+  const [first] = chosen;
+  if (first == null) return;
+  const workspaceId = first.workspaceId;
+  await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`construction_labour.reports_to:${workspaceId}`}, 0))`;
+  try {
+    await lockLiveParties(
+      tx,
+      workspaceId,
+      "labour",
+      chosen.map((labour) => labour.details.reportsToId ?? ""),
+      "share",
+    );
+  } catch (error) {
+    if (error instanceof DomainError && error.code === "LABOUR_NOT_FOUND")
+      throw reportsToNotFound();
+    throw error;
+  }
+  for (const labour of chosen) {
+    // Walk up from the chosen Labour; reaching this one is a loop.
+    const [found] = await tx.$queryRaw<{ loops: boolean }[]>`
+      WITH RECURSIVE chain(id, depth) AS (
+        SELECT reports_to_id, 1 FROM construction_labour.labours
+         WHERE id = ${labour.details.reportsToId}::uuid
+        UNION
+        SELECT l.reports_to_id, c.depth + 1
+          FROM construction_labour.labours l
+          JOIN chain c ON l.id = c.id
+         WHERE c.depth < 1000
+      )
+      SELECT EXISTS (SELECT 1 FROM chain WHERE id = ${labour.id}::uuid) AS loops`;
+    if (found?.loops === true) throw reportsToLoop();
+  }
+}
+
 async function hasRecords(
   tx: Tx,
   workspaceId: string,
@@ -151,6 +197,7 @@ export class PrismaLabourRepository implements LabourRepository {
       aadhaarLast4: details.aadhaar?.slice(-4) ?? null,
       labourCategoryId: details.labourCategoryId,
       supervisorId: details.supervisorId,
+      reportsToId: details.reportsToId,
       contactNumber: details.contactNumber,
       gender: details.gender,
       isActive: labour.isActive,
@@ -215,6 +262,10 @@ export class PrismaLabourRepository implements LabourRepository {
     try {
       await this.db.$transaction(
         async (tx) => {
+          await guardReportsTo(
+            tx,
+            items.map(({ labour }) => labour),
+          );
           await tx.constructionLabourLabour.createMany({
             data: items.map(({ labour }) => ({
               id: labour.id,
@@ -279,6 +330,7 @@ export class PrismaLabourRepository implements LabourRepository {
     const { labour, projects } = input;
     try {
       await this.db.$transaction(async (tx) => {
+        await guardReportsTo(tx, [labour]);
         const joinedOn = input.joiningDateChanged
           ? ((
               await tx.constructionLabourLabour.findUnique({
@@ -418,7 +470,30 @@ export class PrismaLabourRepository implements LabourRepository {
         "labour",
         labour.id,
       );
-      await recordAudit(tx, audit);
+      // Whoever reported to them now reports to no one (ADR CM-0035); the
+      // audit event names them.
+      const reports = await tx.constructionLabourLabour.findMany({
+        where: { workspaceId: labour.workspaceId, reportsToId: labour.id },
+        select: { id: true },
+      });
+      if (reports.length > 0)
+        await tx.constructionLabourLabour.updateMany({
+          where: { id: { in: reports.map((report) => report.id) } },
+          data: {
+            reportsToId: null,
+            updatedAt: labour.updatedAt,
+            updatedBy: labour.updatedBy,
+          },
+        });
+      await recordAudit(
+        tx,
+        reports.length === 0
+          ? audit
+          : {
+              ...audit,
+              after: { reportsCleared: reports.map((report) => report.id) },
+            },
+      );
       return "deleted";
     });
   }

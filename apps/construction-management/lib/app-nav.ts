@@ -29,7 +29,7 @@ export const APP_NAV = [
     label: "Human Resources",
     title: "Human Resources",
     description:
-      "Your staff and their Roles, HRMS for their attendance, leave and salary, and your own Labours, the Vendors you hire gangs from, Labour Categories and Supervisors.",
+      "Your staff and their Roles, HRMS for their attendance, leave and salary, and your own Labours, their Supervisors and the Vendors you hire gangs from.",
   },
   {
     href: "/app/workspace",

@@ -50,6 +50,9 @@ model ConstructionLabourLabour {
   aadhaarLast4        String?                    @map("aadhaar_last4") @db.Char(4)
   labourCategoryId    String?                    @map("labour_category_id") @db.Uuid
   supervisorId        String?                    @map("supervisor_id") @db.Uuid
+  /// The Labour this labourer reports to, if any (ADR CM-0035): another
+  /// live labourer of the same Company, never themselves, never a loop.
+  reportsToId         String?                    @map("reports_to_id") @db.Uuid
   /// E.164.
   contactNumber       String?                    @map("contact_number")
   gender              ConstructionLabourGender?
@@ -64,11 +67,14 @@ model ConstructionLabourLabour {
   deletedAt           DateTime?                  @map("deleted_at") @db.Timestamptz(3)
   deletedBy           String?                    @map("deleted_by")
 
+  reportsTo  ConstructionLabourLabour?         @relation("LabourReportsTo", fields: [reportsToId], references: [id], onDelete: SetNull)
+  reports    ConstructionLabourLabour[]        @relation("LabourReportsTo")
   projects   ConstructionLabourLabourProject[]
   transfers  ConstructionLabourTransfer[]
   attendance ConstructionLabourAttendance[]
 
   @@index([workspaceId, name])
+  @@index([reportsToId])
   @@map("labours")
   @@schema("construction_labour")
 }

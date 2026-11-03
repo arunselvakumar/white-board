@@ -164,6 +164,13 @@ export class FakeLabourRepository implements LabourRepository {
     const entries = this.ledger.get(labour.id) ?? [];
     const live = entries.reduce((sum, amount) => sum + amount, 0);
     this.ledger.set(labour.id, [...entries, -live]);
+    for (const report of this.labours.values())
+      if (report.deletedAt == null && report.details.reportsToId === labour.id)
+        report.update(
+          { ...report.details, reportsToId: null },
+          labour.updatedBy,
+          labour.updatedAt,
+        );
     this.audits.push(audit);
     return Promise.resolve("deleted");
   }
@@ -243,6 +250,16 @@ export function fakeQueries(repository: FakeLabourRepository): LabourQueries {
       })),
       labourCategory: null,
       supervisor: null,
+      reportsTo:
+        details.reportsToId == null
+          ? null
+          : await repository
+              .findById(workspaceId, details.reportsToId)
+              .then((manager) =>
+                manager == null
+                  ? null
+                  : { id: manager.id, name: manager.details.name },
+              ),
       isActive: labour.isActive,
       photoKey: null,
       openingBalance: opening,

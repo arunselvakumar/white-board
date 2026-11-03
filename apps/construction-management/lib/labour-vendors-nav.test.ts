@@ -6,12 +6,11 @@ import {
 } from "./labour-vendors-nav";
 
 describe("LABOUR_VENDORS_SECTIONS", () => {
-  it("has Labours, Vendors, Labour Categories, then Supervisors, at the root", () => {
+  it("has Labours, Supervisors, then Vendors, at the root", () => {
     expect(LABOUR_VENDORS_SECTIONS.map((section) => section.href)).toEqual([
       "/app/labours",
-      "/app/vendors",
-      "/app/labour-categories",
       "/app/supervisors",
+      "/app/vendors",
     ]);
   });
 
@@ -23,9 +22,13 @@ describe("LABOUR_VENDORS_SECTIONS", () => {
     expect(activeLabourVendorsSection("/app/vendors/v1")?.label).toBe(
       "Vendors",
     );
-    expect(activeLabourVendorsSection("/app/labour-categories")?.label).toBe(
-      "Labour Categories",
+    expect(activeLabourVendorsSection("/app/supervisors")?.label).toBe(
+      "Supervisors",
     );
+    // Labour Categories are under Masters now (ADR CM-0035).
+    expect(
+      activeLabourVendorsSection("/app/masters/labour-categories"),
+    ).toBeUndefined();
     expect(activeLabourVendorsSection("/app/laboursx")).toBeUndefined();
     expect(activeLabourVendorsSection("/app/masters/labours")).toBeUndefined();
   });

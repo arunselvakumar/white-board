@@ -41,6 +41,8 @@ export const ConstructionLabourLabourResponseModel = z.object({
   aadhaarMasked: z.string().nullable(),
   labourCategory: ref.nullable(),
   supervisor: ref.nullable(),
+  /** The Labour they report to (ADR CM-0035). */
+  reportsTo: ref.nullable(),
   /** E.164. */
   contactNumber: z.string().nullable(),
   gender: z.enum(["male", "female", "other"]).nullable(),
@@ -84,6 +86,7 @@ export function toLabourResponse(
     aadhaarMasked: item.aadhaarMasked,
     labourCategory: item.labourCategory,
     supervisor: item.supervisor,
+    reportsTo: item.reportsTo,
     contactNumber: details.contactNumber,
     gender: details.gender,
     projects: item.projects,
@@ -119,6 +122,11 @@ const labourFields = {
   esicNumber: optionalText,
   labourCategoryId: z.uuid().nullable().optional(),
   supervisorId: z.uuid().nullable().optional(),
+  /**
+   * Another live, active Labour (ADR CM-0035); never this one, never a
+   * loop. Null for none; omit on update to keep.
+   */
+  reportsToId: z.uuid().nullable().optional(),
   /** E.164, or a 10-digit Indian mobile. */
   contactNumber: optionalText,
   gender: z.enum(["male", "female", "other"]).nullable().optional(),

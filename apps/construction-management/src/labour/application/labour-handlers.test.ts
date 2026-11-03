@@ -302,4 +302,97 @@ describe("LabourHandlers", () => {
       "LABOUR_NOT_FOUND",
     );
   });
+  describe("Reports To (ADR CM-0035)", () => {
+    async function three() {
+      const { repository, handlers } = setup();
+      const add = (name: string, reportsToId?: string) =>
+        handlers.create({
+          workspaceId: "w1",
+          labour: { ...INPUT, name, reportsToId },
+          by: "u1",
+        });
+      const mason = await add("Mason");
+      const helper = await add("Helper", mason.id);
+      const boy = await add("Boy", helper.id);
+      return { repository, handlers, mason, helper, boy };
+    }
+
+    function edit(
+      handlers: LabourHandlers,
+      labour: { id: string; updatedAt: Date; details: { name: string } },
+      reportsToId: string | null | undefined,
+    ) {
+      return handlers.update({
+        workspaceId: "w1",
+        id: labour.id,
+        labour: {
+          name: labour.details.name,
+          joiningDate: INPUT.joiningDate,
+          wageType: "daily",
+          reportsToId,
+          expectedUpdatedAt: labour.updatedAt,
+        },
+        by: "u1",
+      });
+    }
+
+    it("saves another Labour, by name, and keeps it when left out", async () => {
+      const { handlers, mason, helper } = await three();
+      expect(helper.reportsTo).toEqual({ id: mason.id, name: "Mason" });
+      const kept = await edit(handlers, helper, undefined);
+      expect(kept.details.reportsToId).toBe(mason.id);
+      const cleared = await edit(handlers, kept, null);
+      expect(cleared.reportsTo).toBeNull();
+    });
+
+    it("refuses an unknown or inactive Labour, themselves, and a loop", async () => {
+      const { handlers, mason, helper, boy } = await three();
+      expect(
+        await codeOf(() =>
+          handlers.create({
+            workspaceId: "w1",
+            labour: { ...INPUT, reportsToId: "nobody" },
+            by: "u1",
+          }),
+        ),
+      ).toBe("REPORTS_TO_NOT_FOUND");
+      expect(await codeOf(() => edit(handlers, mason, mason.id))).toBe(
+        "REPORTS_TO_SELF",
+      );
+      // Direct (Mason → Helper → Mason) and through others (via Boy).
+      expect(await codeOf(() => edit(handlers, mason, helper.id))).toBe(
+        "REPORTS_TO_LOOP",
+      );
+      expect(await codeOf(() => edit(handlers, mason, boy.id))).toBe(
+        "REPORTS_TO_LOOP",
+      );
+      await handlers.setActive({
+        workspaceId: "w1",
+        id: mason.id,
+        active: false,
+        by: "u1",
+      });
+      expect(
+        await codeOf(() =>
+          handlers.create({
+            workspaceId: "w1",
+            labour: { ...INPUT, reportsToId: mason.id },
+            by: "u1",
+          }),
+        ),
+      ).toBe("REPORTS_TO_NOT_FOUND");
+      // Already saved: an edit of something else keeps it.
+      const fresh = await handlers.get("w1", helper.id);
+      expect((await edit(handlers, fresh, mason.id)).reportsTo?.id).toBe(
+        mason.id,
+      );
+    });
+
+    it("clears Reports To on the Labours of one deleted", async () => {
+      const { repository, handlers, mason, helper } = await three();
+      await handlers.delete({ workspaceId: "w1", id: mason.id, by: "u1" });
+      expect((await handlers.get("w1", helper.id)).reportsTo).toBeNull();
+      expect(repository.labours.get(helper.id)?.details.reportsToId).toBeNull();
+    });
+  });
 });

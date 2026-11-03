@@ -34,6 +34,18 @@ describe("MASTERS_GROUPS", () => {
       "Human Resources",
     );
     expect(MASTERS_GROUPS[0]?.label).toBe("Parties");
+    // Labour Categories are Masters → Labour → Categories (ADR CM-0035).
+    expect(
+      MASTERS_GROUPS.find((group) => group.label === "Labour")?.sections,
+    ).toEqual([
+      expect.objectContaining({
+        href: "/app/masters/labour-categories",
+        label: "Categories",
+      }),
+    ]);
+    expect(activeMastersSection("/app/masters/labour-categories")?.title).toBe(
+      "Labour Categories",
+    );
     expect(activeMastersSection("/app/masters")).toBeUndefined();
     expect(activeMastersSection("/app/masters/contractorsx")).toBeUndefined();
   });

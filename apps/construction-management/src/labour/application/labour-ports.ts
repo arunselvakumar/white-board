@@ -106,6 +106,8 @@ export type LabourReadModel = {
   projects: { id: string; name: string }[];
   labourCategory: { id: string; name: string } | null;
   supervisor: { id: string; name: string } | null;
+  /** The Labour they report to (ADR CM-0035). */
+  reportsTo: { id: string; name: string } | null;
   isActive: boolean;
   photoKey: string | null;
   openingBalance: number;

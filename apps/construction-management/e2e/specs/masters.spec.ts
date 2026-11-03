@@ -14,10 +14,13 @@ projectTest.describe("Masters", () => {
 
       const categories = new MasterListPage(
         page,
-        "/app/labour-categories",
+        "/app/masters/labour-categories",
         "Labour Categories",
       );
-      await categories.goto();
+      // The old Human Resources address redirects here (ADR CM-0035).
+      await page.goto("/app/labour-categories");
+      await expect(page).toHaveURL(/\/app\/masters\/labour-categories$/);
+      await expect(categories.pageHeading).toBeVisible();
       await categories.button("Add Labour Category").first().click();
       await categories.dialog.getByLabel("Labour Category name").fill(category);
       await categories.choose("Skill", "Skilled");

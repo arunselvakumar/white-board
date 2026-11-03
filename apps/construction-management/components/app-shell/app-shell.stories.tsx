@@ -219,7 +219,7 @@ export const MastersSubmenu: Story = {
 /**
  * Human Resources (ADR CM-0034) folds out like Masters, in three groups:
  * Staff (Staff, Role Management), HRMS (its five sections) and Labour
- * (Labours, Vendors, Labour Categories, Supervisors). On Role Management
+ * (Labours, Supervisors, Vendors; ADR CM-0035). On Role Management
  * the area is open and that entry is current; the area link itself opens
  * Staff.
  */

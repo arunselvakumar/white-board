@@ -60,7 +60,7 @@ _Avoid_: default password
 ### Masters and parties
 
 **Masters**:
-The Company's reference lists (Departments, Contractors, Suppliers, Materials, Units, Accounts…). A main-menu area. Staff, Labours and Vendors are not Masters: they are under Human Resources (ADR CM-0034).
+The Company's reference lists (Departments, Contractors, Suppliers, Materials, Units, Accounts…). A main-menu area. Staff, Labours and Vendors are not Masters: they are under Human Resources (ADR CM-0034). Labour Categories are: Masters → Labour → Categories (ADR CM-0035).
 _Avoid_: settings (for these lists), catalog
 
 **Department**:
@@ -80,11 +80,15 @@ A labour-supply party (a gang or mukadam). Attendance is counted per labour cate
 _Avoid_: supplier, contractor (for gangs)
 
 **Labour**:
-An individual worker on the Company's own roll, with a daily or monthly wage and an OT rate. A record, not a User.
+An individual worker on the Company's own roll, with a daily or monthly wage and an OT rate. A record, not a User. May **Report To** another Labour (ADR CM-0035).
 _Avoid_: worker, employee, staff
 
+**Reports To**:
+The Labour a Labour answers to on site, like a helper to the mason. Optional, another active Labour of the Company, never themselves and never a loop. Not the Supervisor, who is a Supervisor record, not a Labour.
+_Avoid_: manager, reporting manager, boss
+
 **Labour Category**:
-The trade a Labour or a Vendor's headcount is booked under (Mason, Carpenter, Helper…). Seeded per Company; seed rows can be disabled, not renamed.
+The trade a Labour or a Vendor's headcount is booked under (Mason, Carpenter, Helper…). Seeded per Company; seed rows can be disabled, not renamed. Kept in Masters → Labour → Categories (ADR CM-0035), and addable from the Labour form.
 _Avoid_: skill, trade (for this list)
 
 **Supervisor**:
@@ -233,7 +237,7 @@ _Avoid_: address, position (in UI copy)
 The cross-project area of the app: Central Store, Central Inventory, Central Payment, Party Balance, Central Reports. A main-menu area. HRMS was here until ADR CM-0034. Not the tenant — that is the Company.
 
 **Human Resources (area)**:
-The main-menu area for everyone the Company employs (ADR CM-0034), in three groups: Staff (Staff, Role Management), HRMS (attendance, leave and salary for staff) and Labour (Labours, Vendors, Labour Categories, Supervisors). Written out in the menu, never shortened. It opens on Staff.
+The main-menu area for everyone the Company employs (ADR CM-0034), in three groups: Staff (Staff, Role Management), HRMS (attendance, leave and salary for staff) and Labour (Labours, Supervisors, Vendors; ADR CM-0035). Written out in the menu, never shortened. It opens on Staff.
 _Avoid_: HR, People, Team (for the area)
 
 ### Documents
