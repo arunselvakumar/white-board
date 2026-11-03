@@ -55,6 +55,7 @@ type Labour = {
   projects: { id: string; name: string }[];
   labourCategory: { id: string; name: string } | null;
   supervisor: { id: string; name: string } | null;
+  reportsTo: { id: string; name: string } | null;
   isActive: boolean;
   photoUrl: string | null;
   updatedAt: string;
@@ -874,6 +875,74 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect(entries.reduce((sum, entry) => sum + entry.amount, 0)).toBe(0);
     // The Labour Id is free again.
     await created(company.cookie, labourBody(tower, { labourCode: "T-1" }));
+  });
+
+  it("keeps Reports To: another active Labour, never themselves or a loop, cleared when they go (ADR CM-0035)", async () => {
+    const company = await ownerWithCompany();
+    const other = await ownerWithCompany("Sakthi Constructions");
+    const { tower } = await fixtures(company);
+    const theirs = await fixtures(other);
+    const mason = await created(
+      company.cookie,
+      labourBody(tower, { name: "Mason" }),
+    );
+    const helper = await created(
+      company.cookie,
+      labourBody(tower, { name: "Helper", reportsToId: mason.id }),
+    );
+    expect(helper.reportsTo).toEqual({ id: mason.id, name: "Mason" });
+    expect((await get(company.cookie, helper.id)).reportsTo?.name).toBe(
+      "Mason",
+    );
+    const listed = await json<{ items: Labour[] }>(
+      await listLabours(jsonRequest(`${BASE}?q=Helper`, company.cookie)),
+    );
+    expect(listed.items[0]?.reportsTo?.id).toBe(mason.id);
+
+    // Left out on update keeps it.
+    const kept = await json<Labour>(
+      await update(company.cookie, helper, { name: "Helper One" }),
+    );
+    expect(kept.reportsTo?.id).toBe(mason.id);
+
+    expect(
+      await codeOf(
+        await update(company.cookie, mason, {
+          reportsToId: mason.id,
+        }),
+      ),
+    ).toBe("REPORTS_TO_SELF");
+    const loop = await update(company.cookie, mason, {
+      reportsToId: helper.id,
+    });
+    expect(loop.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(
+      await json<{ code: string; details?: { field?: string } }>(loop),
+    ).toMatchObject({
+      code: "REPORTS_TO_LOOP",
+      details: { field: "reportsToId" },
+    });
+    const foreign = await created(other.cookie, labourBody(theirs.tower));
+    expect(
+      await codeOf(
+        await create(
+          company.cookie,
+          labourBody(tower, { reportsToId: foreign.id }),
+        ),
+      ),
+    ).toBe("REPORTS_TO_NOT_FOUND");
+
+    // Deleting the Mason clears it on the Helper, and the audit names them.
+    const deleted = await deleteLabour(
+      jsonRequest(`${BASE}/${mason.id}/delete`, company.cookie, {}),
+      params(mason.id),
+    );
+    expect(deleted.status).toBe(StatusCodes.NO_CONTENT);
+    expect((await get(company.cookie, helper.id)).reportsTo).toBeNull();
+    const audit = await prisma.constructionOrganizationAuditEvent.findFirst({
+      where: { entityId: mason.id, action: "labour.deleted" },
+    });
+    expect(audit?.after).toEqual({ reportsCleared: [helper.id] });
   });
 
   it("keeps Companies apart", async () => {

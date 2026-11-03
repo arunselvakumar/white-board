@@ -71,6 +71,7 @@ export function labourFromRow(
           : cipher().decrypt(row.aadhaarEncrypted),
       labourCategoryId: row.labourCategoryId,
       supervisorId: row.supervisorId,
+      reportsToId: row.reportsToId,
       contactNumber: row.contactNumber,
       gender: row.gender,
     },
@@ -151,6 +152,7 @@ export class PrismaLabourRepository implements LabourRepository {
       aadhaarLast4: details.aadhaar?.slice(-4) ?? null,
       labourCategoryId: details.labourCategoryId,
       supervisorId: details.supervisorId,
+      reportsToId: details.reportsToId,
       contactNumber: details.contactNumber,
       gender: details.gender,
       isActive: labour.isActive,
@@ -418,7 +420,30 @@ export class PrismaLabourRepository implements LabourRepository {
         "labour",
         labour.id,
       );
-      await recordAudit(tx, audit);
+      // Whoever reported to them now reports to no one (ADR CM-0035); the
+      // audit event names them.
+      const reports = await tx.constructionLabourLabour.findMany({
+        where: { workspaceId: labour.workspaceId, reportsToId: labour.id },
+        select: { id: true },
+      });
+      if (reports.length > 0)
+        await tx.constructionLabourLabour.updateMany({
+          where: { id: { in: reports.map((report) => report.id) } },
+          data: {
+            reportsToId: null,
+            updatedAt: labour.updatedAt,
+            updatedBy: labour.updatedBy,
+          },
+        });
+      await recordAudit(
+        tx,
+        reports.length === 0
+          ? audit
+          : {
+              ...audit,
+              after: { reportsCleared: reports.map((report) => report.id) },
+            },
+      );
       return "deleted";
     });
   }

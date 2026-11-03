@@ -196,6 +196,50 @@ export class LabourHandlers {
     }
   }
 
+  /**
+   * Reports To (ADR CM-0035): a live, active labourer of the Company when
+   * newly chosen; never the labourer themselves, and never a loop (A reports
+   * to B who reports, in the end, to A).
+   */
+  private async assertReportsTo(
+    workspaceId: string,
+    labourId: string | null,
+    reportsToId: string | null,
+    previous: string | null = null,
+  ): Promise<void> {
+    if (reportsToId == null || reportsToId === previous) return;
+    if (reportsToId === labourId)
+      throw new DomainError(
+        "REPORTS_TO_SELF",
+        "A Labour cannot report to themselves.",
+        { details: { field: "reportsToId" } },
+      );
+    const manager = await this.labours.findById(workspaceId, reportsToId);
+    if (!manager?.isActive)
+      throw withField(
+        notFound(
+          "REPORTS_TO_NOT_FOUND",
+          "This Labour was not found or is inactive.",
+        ),
+        "reportsToId",
+      );
+    if (labourId == null) return;
+    const seen = new Set<string>([reportsToId]);
+    let next = manager.details.reportsToId;
+    while (next != null && !seen.has(next)) {
+      if (next === labourId)
+        throw new DomainError(
+          "REPORTS_TO_LOOP",
+          `${manager.details.name} reports to this Labour, so this Labour cannot report to them.`,
+          { details: { field: "reportsToId" } },
+        );
+      seen.add(next);
+      next =
+        (await this.labours.findById(workspaceId, next))?.details.reportsToId ??
+        null;
+    }
+  }
+
   private async assertCodeFree(
     workspaceId: string,
     code: string | null,
@@ -249,6 +293,7 @@ export class LabourHandlers {
       labourCategoryId: details.labourCategoryId,
       supervisorId: details.supervisorId,
     });
+    await this.assertReportsTo(input.workspaceId, null, details.reportsToId);
     await this.assertCodeFree(input.workspaceId, details.labourCode);
     const now = this.clock();
     const labour = Labour.create({
@@ -298,6 +343,10 @@ export class LabourHandlers {
           ? current.workingHoursPerDay
           : patch.workingHoursPerDay,
       aadhaar: patch.aadhaar === undefined ? current.aadhaar : patch.aadhaar,
+      reportsToId:
+        patch.reportsToId === undefined
+          ? current.reportsToId
+          : patch.reportsToId,
     });
     // Only Projects newly ticked must be live; a deleted one can be unticked.
     const wantedProjects =
@@ -312,6 +361,12 @@ export class LabourHandlers {
         supervisorId: details.supervisorId,
       },
       current,
+    );
+    await this.assertReportsTo(
+      input.workspaceId,
+      labour.id,
+      details.reportsToId,
+      current.reportsToId,
     );
     if (
       details.labourCode != null &&

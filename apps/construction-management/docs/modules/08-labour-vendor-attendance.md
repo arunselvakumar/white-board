@@ -155,6 +155,7 @@ Attendance and vendor-attendance save endpoints were not captured (concatenated 
 | aadhaarNumber       | string                              | no         | Sensitive; mask in UI (inferred, consistent with profile masking) |
 | labourCategoryId    | FK → LabourCategory                 | no         |                                                                   |
 | supervisorId        | FK → TeamMember                     | no         |                                                                   |
+| reportsToId         | FK → Labour                         | no         | New (ADR CM-0035): "Reports To", another active Labour; no loops  |
 | contactNumber       | string                              | no         |                                                                   |
 | gender              | enum{MALE, FEMALE, OTHER}           | no         | Values not captured (inferred)                                    |
 | photo               | file                                | no         |                                                                   |

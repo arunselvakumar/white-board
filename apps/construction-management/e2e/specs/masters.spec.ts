@@ -14,7 +14,7 @@ projectTest.describe("Masters", () => {
 
       const categories = new MasterListPage(
         page,
-        "/app/labour-categories",
+        "/app/masters/labour-categories",
         "Labour Categories",
       );
       await categories.goto();

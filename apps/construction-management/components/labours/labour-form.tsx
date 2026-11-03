@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import {
   Controller,
   useForm,
@@ -44,6 +44,7 @@ import {
 import { lookupListQuery, supervisorsQuery } from "@/src/queries/masters";
 import { projectOptionsQuery } from "@/src/queries/projects";
 
+import { LabourCategorySheet } from "./labour-category-sheet";
 import { LabourFiles } from "./labour-files";
 import {
   createLabourPayload,
@@ -54,6 +55,7 @@ import {
   type LabourFormValues,
 } from "./labour-form-schema";
 import { projectsLabel } from "./labour-projects";
+import { ReportsToPicker } from "./reports-to-picker";
 
 export const LABOURS_PATH = "/app/labours";
 
@@ -84,6 +86,7 @@ function ChoiceField({
   placeholder,
   error,
   required = false,
+  action,
 }: {
   id: string;
   label: string;
@@ -93,6 +96,8 @@ function ChoiceField({
   placeholder: string;
   error?: string;
   required?: boolean;
+  /** A link under the field, on the right (Add Labour Category). */
+  action?: ReactNode;
 }) {
   return (
     <div className="space-y-1.5">
@@ -136,7 +141,14 @@ function ChoiceField({
           </Select>
         )}
       />
-      <FieldError message={error} />
+      {action == null ? (
+        <FieldError message={error} />
+      ) : (
+        <div className="flex items-start justify-between gap-3">
+          <FieldError message={error} />
+          <div className="ml-auto shrink-0">{action}</div>
+        </div>
+      )}
     </div>
   );
 }
@@ -164,6 +176,7 @@ export function LabourForm({
     defaultValues: labourFormDefaults(labour),
   });
   const errors = form.formState.errors;
+  const [addingCategory, setAddingCategory] = useState(false);
 
   const categories = useQuery(lookupListQuery("labour-categories"));
   const supervisors = useQuery(supervisorsQuery);
@@ -361,6 +374,18 @@ export function LabourForm({
             choices={categoryChoices}
             placeholder="Choose a Labour Category"
             error={errors.labourCategoryId?.message}
+            action={
+              <button
+                type="button"
+                className="text-primary text-sm font-medium underline-offset-4 hover:underline"
+                aria-label="Add Labour Category"
+                onClick={() => {
+                  setAddingCategory(true);
+                }}
+              >
+                Add
+              </button>
+            }
           />
           <ChoiceField
             id="labour-supervisor"
@@ -371,6 +396,32 @@ export function LabourForm({
             placeholder="Choose a Supervisor"
             error={errors.supervisorId?.message}
           />
+          <div className="space-y-1.5">
+            <Label htmlFor="labour-reports-to">Reports To</Label>
+            <Controller
+              name="reportsToId"
+              control={form.control}
+              render={({ field }) => (
+                <ReportsToPicker
+                  id="labour-reports-to"
+                  value={field.value}
+                  onChange={field.onChange}
+                  saved={labour?.reportsTo ?? null}
+                  excludeId={labour?.id}
+                  invalid={errors.reportsToId != null}
+                  aria-describedby="labour-reports-to-hint"
+                />
+              )}
+            />
+            <p
+              id="labour-reports-to-hint"
+              className="text-muted-foreground text-xs"
+            >
+              Another Labour they answer to on site, like a mason&apos;s helper
+              to the mason.
+            </p>
+            <FieldError message={errors.reportsToId?.message} />
+          </div>
           <div className="space-y-1.5">
             <Label htmlFor="labour-contact-number">Contact number</Label>
             <MobileField
@@ -453,6 +504,16 @@ export function LabourForm({
           Cancel
         </Link>
       </div>
+      <LabourCategorySheet
+        open={addingCategory}
+        onOpenChange={setAddingCategory}
+        onAdded={(category) => {
+          form.setValue("labourCategoryId", category.id, {
+            shouldDirty: true,
+            shouldValidate: true,
+          });
+        }}
+      />
     </form>
   );
 }

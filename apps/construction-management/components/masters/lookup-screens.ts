@@ -16,7 +16,7 @@ export type LookupScreenConfig = {
   emptyDescription: string;
   deleteDescription: string;
   icon: LucideIcon;
-  /** Back to Masters, or null on a main-menu page (Labour Categories). */
+  /** Back to Masters, or null on a main-menu page. */
   back: PageHeaderBack | null;
   /**
    * Labour Categories: each row has a skill (CM-0016 §6), shown on the row
@@ -45,7 +45,7 @@ export const LABOUR_CATEGORIES_SCREEN: LookupScreenConfig = {
   deleteDescription:
     "It will no longer be offered anywhere. A Labour Category that Labours, Vendor rate cards or attendance use cannot be deleted; disable it instead.",
   icon: HardHat,
-  back: null,
+  back: { label: "Masters", href: "/app/masters" },
   withSkill: true,
 };
 

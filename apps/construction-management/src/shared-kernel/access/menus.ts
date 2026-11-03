@@ -7,7 +7,7 @@ export const MENU_CATEGORIES = [
   { key: "materials", label: "Materials" },
   { key: "master_records", label: "Master records" },
   { key: "central_store", label: "Central store" },
-  // Staff, Roles, Labours, Labour Categories and Vendors (ADR CM-0034).
+  // Staff, Roles, Labours and Vendors (ADR CM-0034, CM-0035).
   { key: "human_resources", label: "Human Resources" },
   { key: "hrms", label: "HRMS" },
   { key: "others", label: "Others" },
@@ -179,8 +179,9 @@ const DEFINITIONS = [
     "RP",
     false,
   ],
-  // Master records. Staff, Role Management, Labours, Labour Categories and
-  // Vendors sit in the Human Resources category, like the sidebar (ADR CM-0034).
+  // Master records. Staff, Role Management, Labours and Vendors sit in the
+  // Human Resources category, like the sidebar (ADR CM-0034); Labour
+  // Categories went back to Masters with the sidebar (ADR CM-0035).
   ["masters.master_records", "Master Records", "master_records", "R", false],
   ["organization.team_members", "Staff", "human_resources", "CRUDF", false],
   ["masters.departments", "Departments", "master_records", "CRUD", false],
@@ -228,7 +229,7 @@ const DEFINITIONS = [
   [
     "masters.labour_categories",
     "Labour Categories",
-    "human_resources",
+    "master_records",
     "CRUD",
     false,
   ],

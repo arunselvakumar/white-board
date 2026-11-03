@@ -35,7 +35,7 @@ export function activeHumanResourcesHref(pathname: string): string | undefined {
 /**
  * Human Resources in the sidebar (ADR CM-0034), in three groups: Staff
  * (Staff, Role Management), HRMS (its five sections) and Labour (Labours,
- * Vendors, Labour Categories, Supervisors). The area opens on Staff.
+ * Supervisors, Vendors; ADR CM-0035). The area opens on Staff.
  * Without Team Members or Role Management Read the Staff group is left out
  * and the area opens on HRMS instead, so an HRMS Team Member lands on
  * their own screens.

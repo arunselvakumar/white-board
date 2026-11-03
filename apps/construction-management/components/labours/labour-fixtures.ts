@@ -93,6 +93,7 @@ export const DHURESH: LabourResponse = {
   aadhaarMasked: "XXXXXXXX2346",
   labourCategory: MASON,
   supervisor: SUNDAR,
+  reportsTo: null,
   contactNumber: "+917708165767",
   gender: "male",
   projects: [TOWER],
@@ -116,6 +117,8 @@ export const MEENA: LabourResponse = {
   aadhaarMasked: null,
   labourCategory: HELPER,
   supervisor: null,
+  // A helper who answers to the mason (ADR CM-0035).
+  reportsTo: { id: DHURESH.id, name: DHURESH.name },
   gender: "female",
   projects: [VILLA],
 };

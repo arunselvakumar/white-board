@@ -11,6 +11,7 @@ import {
   Ruler,
   Fence,
   Hammer,
+  HardHat,
   Layers,
   Tractor,
   Truck,
@@ -156,6 +157,20 @@ export const MASTERS_GROUPS: readonly MastersGroup[] = [
         description:
           "Owned and rented plant: where it is, maintenance and hire rates.",
         icon: Tractor,
+      },
+    ],
+  },
+  {
+    // Labour Categories left Human Resources for Masters (ADR CM-0035).
+    label: "Labour",
+    sections: [
+      {
+        href: "/app/masters/labour-categories",
+        label: "Categories",
+        title: "Labour Categories",
+        description:
+          "Trades Labours and a Vendor's headcount are booked under.",
+        icon: HardHat,
       },
     ],
   },

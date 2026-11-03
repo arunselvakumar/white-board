@@ -92,7 +92,7 @@ export class PrismaLabourQueries implements LabourQueries {
       ...new Set(values.filter((value): value is string => value != null)),
     ];
     const today = await companyToday(this.db, workspaceId, this.clock());
-    const [projects, categories, supervisors, openings, balances] =
+    const [projects, categories, supervisors, managers, openings, balances] =
       await Promise.all([
         this.db.constructionProjectsProject.findMany({
           where: {
@@ -121,6 +121,14 @@ export class PrismaLabourQueries implements LabourQueries {
           },
           select: { id: true, name: true },
         }),
+        this.db.constructionLabourLabour.findMany({
+          where: {
+            workspaceId,
+            deletedAt: null,
+            id: { in: unique(rows.map((row) => row.reportsToId)) },
+          },
+          select: { id: true, name: true },
+        }),
         prismaLedger.openingBalances(this.db, workspaceId, "labour", ids),
         prismaLedger.balances(this.db, workspaceId, "labour", ids, today),
       ]);
@@ -129,6 +137,7 @@ export class PrismaLabourQueries implements LabourQueries {
     const projectNames = byId(projects);
     const categoryNames = byId(categories);
     const supervisorNames = byId(supervisors);
+    const managerNames = byId(managers);
     return rows.map((row) => ({
       id: row.id,
       details: {
@@ -146,6 +155,7 @@ export class PrismaLabourQueries implements LabourQueries {
         esicNumber: row.esicNumber,
         labourCategoryId: row.labourCategoryId,
         supervisorId: row.supervisorId,
+        reportsToId: row.reportsToId,
         contactNumber: row.contactNumber,
         gender: row.gender,
       },
@@ -166,6 +176,10 @@ export class PrismaLabourQueries implements LabourQueries {
         row.supervisorId == null
           ? null
           : (supervisorNames.get(row.supervisorId) ?? null),
+      reportsTo:
+        row.reportsToId == null
+          ? null
+          : (managerNames.get(row.reportsToId) ?? null),
       isActive: row.isActive,
       photoKey: row.photoKey,
       openingBalance: openings.get(row.id) ?? 0,

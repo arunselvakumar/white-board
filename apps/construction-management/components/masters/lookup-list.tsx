@@ -213,7 +213,7 @@ function LookupListContent({ config }: { config: LookupScreenConfig }) {
   );
 }
 
-/** Human Resources → Labour Categories (CM-203). */
+/** Masters → Labour → Categories (CM-203, ADR CM-0035). */
 export function LabourCategoriesList() {
   return <LookupListScreen config={LABOUR_CATEGORIES_SCREEN} />;
 }
