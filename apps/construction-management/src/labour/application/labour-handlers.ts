@@ -215,24 +215,12 @@ export class LabourHandlers {
         { details: { field: "reportsToId" } },
       );
     const manager = await this.labours.findById(workspaceId, reportsToId);
-    if (!manager?.isActive)
-      throw withField(
-        notFound(
-          "REPORTS_TO_NOT_FOUND",
-          "This Labour was not found or is inactive.",
-        ),
-        "reportsToId",
-      );
+    if (!manager?.isActive) throw reportsToNotFound();
     if (labourId == null) return;
     const seen = new Set<string>([reportsToId]);
     let next = manager.details.reportsToId;
     while (next != null && !seen.has(next)) {
-      if (next === labourId)
-        throw new DomainError(
-          "REPORTS_TO_LOOP",
-          `${manager.details.name} reports to this Labour, so this Labour cannot report to them.`,
-          { details: { field: "reportsToId" } },
-        );
+      if (next === labourId) throw reportsToLoop(manager.details.name);
       seen.add(next);
       next =
         (await this.labours.findById(workspaceId, next))?.details.reportsToId ??
@@ -666,5 +654,24 @@ export function labourCodeTaken(): DomainError {
     "LABOUR_CODE_TAKEN",
     "Another Labour has this Labour Id.",
     { kind: "conflict", details: { field: "labourCode" } },
+  );
+}
+
+export function reportsToNotFound(): DomainError {
+  return withField(
+    notFound(
+      "REPORTS_TO_NOT_FOUND",
+      "This Labour was not found or is inactive.",
+    ),
+    "reportsToId",
+  );
+}
+
+/** The chosen Labour already reports, directly or through others, to this one. */
+export function reportsToLoop(name = "The chosen Labour"): DomainError {
+  return new DomainError(
+    "REPORTS_TO_LOOP",
+    `${name} reports to this Labour, so this Labour cannot report to them.`,
+    { details: { field: "reportsToId" } },
   );
 }

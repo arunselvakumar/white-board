@@ -904,6 +904,16 @@ describe("Labour register (CM-205 – CM-207)", () => {
       await update(company.cookie, helper, { name: "Helper One" }),
     );
     expect(kept.reportsTo?.id).toBe(mason.id);
+    // An explicit null clears it.
+    const cleared = await json<Labour>(
+      await update(company.cookie, kept, { reportsToId: null }),
+    );
+    expect(cleared.reportsTo).toBeNull();
+    expect((await get(company.cookie, helper.id)).reportsTo).toBeNull();
+    const restored = await update(company.cookie, cleared, {
+      reportsToId: mason.id,
+    });
+    expect(restored.status).toBe(StatusCodes.OK);
 
     expect(
       await codeOf(
@@ -943,6 +953,31 @@ describe("Labour register (CM-205 – CM-207)", () => {
       where: { entityId: mason.id, action: "labour.deleted" },
     });
     expect(audit?.after).toEqual({ reportsCleared: [helper.id] });
+  });
+
+  it("refuses the second of two saves at once that would make a Reports To loop (ADR CM-0035)", async () => {
+    const company = await ownerWithCompany();
+    const { tower } = await fixtures(company);
+    const [first, second] = await Promise.all([
+      created(company.cookie, labourBody(tower, { name: "First" })),
+      created(company.cookie, labourBody(tower, { name: "Second" })),
+    ]);
+    // Both pass the check before the write; the lock lets only one through.
+    const results = await Promise.all([
+      update(company.cookie, first, { reportsToId: second.id }),
+      update(company.cookie, second, { reportsToId: first.id }),
+    ]);
+    const statuses = results.map((response) => response.status).sort();
+    expect(statuses).toEqual([StatusCodes.OK, StatusCodes.BAD_REQUEST]);
+    const refused = results.find((response) => !response.ok);
+    expect(refused == null ? null : await codeOf(refused)).toBe(
+      "REPORTS_TO_LOOP",
+    );
+    const [one, two] = await Promise.all([
+      get(company.cookie, first.id),
+      get(company.cookie, second.id),
+    ]);
+    expect([one.reportsTo, two.reportsTo].filter(Boolean)).toHaveLength(1);
   });
 
   it("keeps Companies apart", async () => {

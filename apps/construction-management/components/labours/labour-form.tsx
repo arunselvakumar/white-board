@@ -177,6 +177,11 @@ export function LabourForm({
   });
   const errors = form.formState.errors;
   const [addingCategory, setAddingCategory] = useState(false);
+  /** Added from the slide-over: offered even if the list reload fails. */
+  const [addedCategory, setAddedCategory] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   const categories = useQuery(lookupListQuery("labour-categories"));
   const supervisors = useQuery(supervisorsQuery);
@@ -185,6 +190,14 @@ export function LabourForm({
     categories.data?.items,
     labour?.labourCategory,
   );
+  if (
+    addedCategory != null &&
+    !categoryChoices.some((choice) => choice.value === addedCategory.id)
+  )
+    categoryChoices.push({
+      value: addedCategory.id,
+      label: addedCategory.name,
+    });
   const supervisorChoices = useChoices(
     supervisors.data?.items,
     labour?.supervisor,
@@ -375,16 +388,18 @@ export function LabourForm({
             placeholder="Choose a Labour Category"
             error={errors.labourCategoryId?.message}
             action={
-              <button
+              <Button
                 type="button"
-                className="text-primary text-sm font-medium underline-offset-4 hover:underline"
+                variant="link"
+                size="xs"
+                className="h-auto px-0 text-sm font-medium"
                 aria-label="Add Labour Category"
                 onClick={() => {
                   setAddingCategory(true);
                 }}
               >
                 Add
-              </button>
+              </Button>
             }
           />
           <ChoiceField
@@ -508,6 +523,7 @@ export function LabourForm({
         open={addingCategory}
         onOpenChange={setAddingCategory}
         onAdded={(category) => {
+          setAddedCategory({ id: category.id, name: category.name });
           form.setValue("labourCategoryId", category.id, {
             shouldDirty: true,
             shouldValidate: true,

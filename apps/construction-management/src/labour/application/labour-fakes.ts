@@ -165,7 +165,7 @@ export class FakeLabourRepository implements LabourRepository {
     const live = entries.reduce((sum, amount) => sum + amount, 0);
     this.ledger.set(labour.id, [...entries, -live]);
     for (const report of this.labours.values())
-      if (report.details.reportsToId === labour.id)
+      if (report.deletedAt == null && report.details.reportsToId === labour.id)
         report.update(
           { ...report.details, reportsToId: null },
           labour.updatedBy,

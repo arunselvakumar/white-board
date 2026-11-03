@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { Button } from "@repo/ui/components/button";
 import {
   Sheet,
@@ -24,10 +25,20 @@ function AddCategoryForm({
   onClose: () => void;
   onAdded: (category: LookupItem) => void;
 }) {
+  // Cancelled while saving: the category is still created, but it neither
+  // replaces a later choice nor closes a sheet opened again since.
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
   const lookup = useLookupNameForm({
     config: LABOUR_CATEGORIES_SCREEN,
     item: null,
     onSaved: (saved) => {
+      if (!mounted.current) return;
       if (saved != null) onAdded(saved);
       onClose();
     },
