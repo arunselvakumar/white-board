@@ -856,7 +856,7 @@ M3 answered every open question below in [ADR CM-0012](../adr/CM-0012-hrms-produ
 3. The trend covers the last 14 Company dates including today; today's bar equals today's breakdown.
 4. Tiles: Present today (present + half day), On leave (half-day leave included), Not checked in, Employees (active Team Members, the Owner included).
 5. Pending approvals list only what the caller can decide now, oldest first, at most 5; upcoming team leaves run 14 days and include pending requests; the next 4 holidays are shown with optional ones flagged.
-6. The Workspace HRMS tile shows "Present today x of y", "On leave" and "To approve" to members with View All, their own day otherwise, and stays a plain link without HRMS access.
+6. The former Workspace HRMS tile showed "Present today x of y", "On leave" and "To approve" to members with View All, their own day otherwise, and stayed a plain link without HRMS access. It is gone: HRMS is a group of Human Resources at `/app/hrms` (ADR CM-0034), and the HRMS Dashboard shows those figures.
 
 **PF / ESI exports and polish (CM-320)**
 

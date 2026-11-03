@@ -17,7 +17,8 @@ describe("APP_NAV", () => {
   it("opens Human Resources on Staff, written out and never shortened", () => {
     const area = APP_NAV.find((item) => item.label === "Human Resources");
     expect(area?.href).toBe("/app/staff");
-    expect(APP_NAV.some((item) => item.label === "HR")).toBe(false);
+    const labels: readonly string[] = APP_NAV.map((item) => item.label);
+    expect(labels).not.toContain("HR");
   });
 
   it("marks an area active on its pages only", () => {
