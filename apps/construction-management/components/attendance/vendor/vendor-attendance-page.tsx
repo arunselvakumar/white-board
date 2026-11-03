@@ -58,7 +58,7 @@ function NoVendors() {
         </EmptyMedia>
         <EmptyTitle>No vendors on this Project</EmptyTitle>
         <EmptyDescription>
-          Assign a vendor to this Project in Labour & Vendors → Vendors, with a
+          Assign a vendor to this Project in Human Resources → Vendors, with a
           rate card of shifts and Labour Category rates, to record its
           headcount.
         </EmptyDescription>

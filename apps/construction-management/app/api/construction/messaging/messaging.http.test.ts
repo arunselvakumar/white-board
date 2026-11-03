@@ -468,7 +468,7 @@ describe("Notifications HTTP (CM-904)", () => {
 
     // Muted: the next one is skipped and logged.
     await updatePreferences(
-      post("/preferences/update", { mutedGroups: ["materials"] }),
+      post("/preferences/update", { group: "materials", muted: true }),
     );
     const [mutedId] = await createNotifier().notify(ctx.ws, [me.userId], {
       type: "approval.requested",
@@ -604,21 +604,26 @@ describe("Notifications HTTP (CM-904)", () => {
       "materials",
       "master_records",
       "central_store",
+      "human_resources",
       "hrms",
       "others",
       "downloads",
     ]);
     expect(initial.groups.every((group) => !group.muted)).toBe(true);
+    // One switch at a time: the second save keeps the first.
+    await updatePreferences(
+      post("/preferences/update", { group: "hrms", muted: true }),
+    );
     const updated = await json<{ groups: { key: string; muted: boolean }[] }>(
       await updatePreferences(
-        post("/preferences/update", { mutedGroups: ["hrms", "downloads"] }),
+        post("/preferences/update", { group: "downloads", muted: true }),
       ),
     );
     expect(
       updated.groups.filter((group) => group.muted).map((group) => group.key),
     ).toEqual(["hrms", "downloads"]);
     const unknown = await updatePreferences(
-      post("/preferences/update", { mutedGroups: ["chat"] }),
+      post("/preferences/update", { group: "chat", muted: true }),
     );
     expect(unknown.status).toBe(StatusCodes.BAD_REQUEST);
     expect(await json(unknown)).toMatchObject({

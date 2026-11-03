@@ -28,7 +28,9 @@ const nextConfig: NextConfig = {
   },
   // Settings moved out of Masters to its own menu item: the Company profile
   // and the Advanced Settings now live under /app/settings. Team Members
-  // left Masters for Staff & Roles → Users (ADR CM-0030 §2).
+  // left Masters for Staff (ADR CM-0030 §2). HRMS left Workspace for Human
+  // Resources (ADR CM-0034); HRMS Team Members land there on sign-in and
+  // check in from phone bookmarks, so the old address keeps working.
   redirects: () =>
     Promise.resolve([
       {
@@ -44,6 +46,16 @@ const nextConfig: NextConfig = {
       {
         source: "/app/masters/team-members/:path*",
         destination: "/app/staff/:path*",
+        permanent: true,
+      },
+      {
+        source: "/app/workspace/hrms",
+        destination: "/app/hrms",
+        permanent: true,
+      },
+      {
+        source: "/app/workspace/hrms/:path*",
+        destination: "/app/hrms/:path*",
         permanent: true,
       },
     ]),

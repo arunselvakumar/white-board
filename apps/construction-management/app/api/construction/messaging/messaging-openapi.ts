@@ -137,7 +137,7 @@ export const messagingOpenApiOperations: OpenApiOperation[] = [
   {
     method: "post",
     path: `${MESSAGING_PATH}/preferences/update`,
-    summary: "Set the menu groups whose push is muted",
+    summary: "Mute or unmute push for one menu group",
     tags: TAGS,
     body: UpdateConstructionMessagingPreferencesRequestModel,
     successStatus: StatusCodes.OK,

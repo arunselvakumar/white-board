@@ -7,6 +7,8 @@ export const MENU_CATEGORIES = [
   { key: "materials", label: "Materials" },
   { key: "master_records", label: "Master records" },
   { key: "central_store", label: "Central store" },
+  // Staff, Roles, Labours, Labour Categories and Vendors (ADR CM-0034).
+  { key: "human_resources", label: "Human Resources" },
   { key: "hrms", label: "HRMS" },
   { key: "others", label: "Others" },
 ] as const;
@@ -177,13 +179,14 @@ const DEFINITIONS = [
     "RP",
     false,
   ],
-  // Master records.
+  // Master records. Staff, Role Management, Labours, Labour Categories and
+  // Vendors sit in the Human Resources category, like the sidebar (ADR CM-0034).
   ["masters.master_records", "Master Records", "master_records", "R", false],
-  ["organization.team_members", "Staff", "master_records", "CRUDF", false],
+  ["organization.team_members", "Staff", "human_resources", "CRUDF", false],
   ["masters.departments", "Departments", "master_records", "CRUD", false],
   ["masters.contractors", "Contractors", "master_records", "CRUD", false],
   ["masters.suppliers", "Supplier", "master_records", "CRUD", false],
-  ["masters.vendors", "Vendors", "master_records", "CRUDF", false],
+  ["masters.vendors", "Vendors", "human_resources", "CRUDF", false],
   ["masters.equipments", "Equipments", "master_records", "CRUDPNTOF", false],
   ["organization.settings", "Setting", "master_records", "CRUD", false],
   [
@@ -210,7 +213,7 @@ const DEFINITIONS = [
   ],
   ["masters.units", "Add Measurement Unit", "master_records", "CRUD", false],
   // Role Management (ADR CM-0030): the Roles Team Members are given.
-  ["organization.roles", "Role Management", "master_records", "CRUD", false],
+  ["organization.roles", "Role Management", "human_resources", "CRUD", false],
   ["masters.quotations", "View Quotations", "master_records", "R", false],
   ["masters.amenities", "Amenities", "master_records", "CRUD", false],
   [
@@ -221,11 +224,11 @@ const DEFINITIONS = [
     false,
   ],
   ["masters.work_types", "Work Type", "master_records", "CRUD", false],
-  ["masters.labours", "Labours", "master_records", "CRUDF", false],
+  ["masters.labours", "Labours", "human_resources", "CRUDF", false],
   [
     "masters.labour_categories",
     "Labour Categories",
-    "master_records",
+    "human_resources",
     "CRUD",
     false,
   ],

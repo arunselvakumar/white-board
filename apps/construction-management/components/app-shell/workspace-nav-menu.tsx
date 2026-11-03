@@ -2,9 +2,7 @@
 
 import { Boxes, FileSpreadsheet, Scale, Wallet, Warehouse } from "lucide-react";
 
-import { HRMS_SECTIONS, activeHrmsSection } from "@/lib/hrms-nav";
-
-import { AreaNavMenu } from "./area-nav-menu";
+import { AreaNavMenu, type AreaNavGroup } from "./area-nav-menu";
 
 const CENTRAL_STORE_SECTIONS = [
   {
@@ -40,29 +38,28 @@ const REPORT_SECTIONS = [
   },
 ] as const;
 
-/** The Workspace submenu, one group per cross-project module. */
-const WORKSPACE_GROUPS = [
-  { label: "HRMS", sections: HRMS_SECTIONS },
+/**
+ * The Workspace submenu, one group per cross-project module. HRMS was the
+ * first group until it moved to Human Resources (ADR CM-0034).
+ */
+const WORKSPACE_GROUPS: readonly AreaNavGroup[] = [
   { label: "Materials", sections: CENTRAL_STORE_SECTIONS },
   { label: "Payments", sections: PAYMENT_SECTIONS },
   // Central Reports (CM-903).
   { label: "Reports", sections: REPORT_SECTIONS },
 ];
 
+const WORKSPACE_SECTIONS = WORKSPACE_GROUPS.flatMap((group) => group.sections);
+
 /** The submenu entry a Workspace page belongs to. */
 function activeWorkspaceHref(pathname: string): string | undefined {
-  const area = [
-    ...CENTRAL_STORE_SECTIONS,
-    ...PAYMENT_SECTIONS,
-    ...REPORT_SECTIONS,
-  ].find(
+  return WORKSPACE_SECTIONS.find(
     (section) =>
       pathname === section.href || pathname.startsWith(`${section.href}/`),
-  );
-  return area?.href ?? activeHrmsSection(pathname)?.href;
+  )?.href;
 }
 
-/** Workspace in the sidebar: the area link plus HRMS's sections. */
+/** Workspace in the sidebar: the area link plus its modules. */
 export function WorkspaceNavMenu({
   pathname,
   buttonClassName,

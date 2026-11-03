@@ -43,7 +43,7 @@ function details(supervisor: SupervisorItem): string | null {
 }
 
 /**
- * Labour & Vendors → Supervisors (CM-203): search, Add, and per row Edit / Disable /
+ * Human Resources → Supervisors (CM-203): search, Add, and per row Edit / Disable /
  * Enable / Delete. Disabled Supervisors stay listed, muted.
  */
 export function SupervisorsList() {

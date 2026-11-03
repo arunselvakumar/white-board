@@ -288,7 +288,7 @@ describe("notification listeners (CM-904)", () => {
     ]);
     expect(sent[1]?.draft).toMatchObject({
       body: "Site handover that week",
-      href: "/app/workspace/hrms/leave/my",
+      href: "/app/hrms/leave/my",
     });
   });
 
@@ -422,7 +422,7 @@ describe("notification listeners (CM-904)", () => {
       draft: {
         type: "salary.paid",
         title: "Your salary for September 2026 was paid",
-        href: "/app/workspace/hrms/salary/my",
+        href: "/app/hrms/salary/my",
       },
     });
   });

@@ -15,11 +15,11 @@ The Company the current Session is working in. Every API call is scoped to it; i
 _Avoid_: current org, selected tenant
 
 **User**:
-A person who can sign in: by email and password, by mobile and password, and by mobile OTP once SMS is on (ADR CM-0009, CM-0030). A User exists once, across all their Companies. The **Staff** page (Staff & Roles → Staff) lists the Company's Team Members, including records that cannot sign in yet.
+A person who can sign in: by email and password, by mobile and password, and by mobile OTP once SMS is on (ADR CM-0009, CM-0030). A User exists once, across all their Companies. The **Staff** page (Human Resources → Staff) lists the Company's Team Members, including records that cannot sign in yet.
 _Avoid_: account, login, customer
 
 **Team Member**:
-A User's membership and employee record inside one Company: name, mobile, email, ids, a salary set-up like a Labour's wage (the amount optional), Member Type, projects, and their Role. The Staff & Roles screens call them **Staff** (Add Staff, Edit Staff, "1 Staff member"); code, APIs, audit events and other modules say Team Member (ADR CM-0030, CM-0032, CM-0033).
+A User's membership and employee record inside one Company: name, mobile, email, ids, a salary set-up like a Labour's wage (the amount optional), Member Type, projects, and their Role. The Staff screens call them **Staff** (Add Staff, Edit Staff, "1 Staff member"); code, APIs, audit events and other modules say Team Member (ADR CM-0030, CM-0032, CM-0033).
 _Avoid_: employee; User (in UI copy for this record)
 
 **Owner**:
@@ -40,7 +40,7 @@ _Avoid_: invite request
 ### Access
 
 **Role**:
-A named Permission Matrix in a Company (Admin, Site Engineer, HRMS Staff…), given to Team Members on Staff & Roles → Role Management. Every Team Member but the Owner has exactly one. Editing a Role changes access for everyone on it (ADR CM-0030).
+A named Permission Matrix in a Company (Admin, Site Engineer, HRMS Staff…), given to Team Members on Human Resources → Role Management. Every Team Member but the Owner has exactly one. Editing a Role changes access for everyone on it (ADR CM-0030).
 _Avoid_: designation, job title, permission template, group
 
 **Permission Matrix**:
@@ -60,7 +60,7 @@ _Avoid_: default password
 ### Masters and parties
 
 **Masters**:
-The Company's reference lists (Departments, Contractors, Suppliers, Vendors, Labours, Materials, Units, Accounts…). One of the three top-level areas.
+The Company's reference lists (Departments, Contractors, Suppliers, Materials, Units, Accounts…). A main-menu area. Staff, Labours and Vendors are not Masters: they are under Human Resources (ADR CM-0034).
 _Avoid_: settings (for these lists), catalog
 
 **Department**:
@@ -230,7 +230,11 @@ The code name of a site entry's location: its Location Type and the ids it point
 _Avoid_: address, position (in UI copy)
 
 **Workspace (area)**:
-The cross-project area of the app: HRMS, Central Payment, Central Store, Central Reports, Central Inventory. One of the three top-level areas. Not the tenant — that is the Company.
+The cross-project area of the app: Central Store, Central Inventory, Central Payment, Party Balance, Central Reports. A main-menu area. HRMS was here until ADR CM-0034. Not the tenant — that is the Company.
+
+**Human Resources (area)**:
+The main-menu area for everyone the Company employs (ADR CM-0034), in three groups: Staff (Staff, Role Management), HRMS (attendance, leave and salary for staff) and Labour (Labours, Vendors, Labour Categories, Supervisors). Written out in the menu, never shortened. It opens on Staff.
+_Avoid_: HR, People, Team (for the area)
 
 ### Documents
 
@@ -305,15 +309,15 @@ _Avoid_: attendance sheet
 ### HRMS (staff attendance, leave and salary)
 
 **HRMS**:
-The Workspace area for the Company's own salaried staff: check-in attendance, shifts, holidays, leave and monthly salary ([`modules/10`](./docs/modules/10-hrms.md)). Separate from Labour attendance and wages; the two registers never mix. Spelt in capitals.
-_Avoid_: HR, payroll (for the whole area), Hrms
+The HRMS group of the Human Resources area, for the Company's own salaried staff: check-in attendance, shifts, holidays, leave and monthly salary ([`modules/10`](./docs/modules/10-hrms.md)). Separate from Labour attendance and wages; the two registers never mix. Spelt in capitals.
+_Avoid_: HR (that is the Human Resources area, written out), payroll (for the whole module), Hrms
 
 **Employee**:
 A Team Member as HRMS pays them: a monthly salary, attendance on their own phone. The word names only the Employees page (Employee Management, each member's salary set-up); everywhere else say Team Member or member. An Employee is a User; a Labour is a record that never signs in, and nobody is both (ADR CM-0012 §18).
 _Avoid_: staff, worker, labour (for an Employee); employee (for a Labour)
 
 **HRMS Team Member**:
-A Team Member whose Member Type is HRMS: attendance, leave and salary only, no Projects. Counts against the plan's HRMS seats; the Projects home sends them to Workspace → HRMS.
+A Team Member whose Member Type is HRMS: attendance, leave and salary only, no Projects. Counts against the plan's HRMS seats; the Projects home sends them to Human Resources → HRMS.
 _Avoid_: HRMS user, HRMS employee
 
 **Branch**:

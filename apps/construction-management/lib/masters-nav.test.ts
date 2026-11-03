@@ -24,14 +24,14 @@ describe("MASTERS_GROUPS", () => {
       "Contractors",
     );
     expect(activeMastersSection("/app/settings")).toBeUndefined();
-    // Team Members moved to Staff & Roles → Staff (ADR CM-0030), and
+    // Team Members moved to Human Resources → Staff (ADR CM-0030), and
     // Designations are gone (ADR CM-0033).
     expect(activeMastersSection("/app/masters/team-members")).toBeUndefined();
     expect(activeMastersSection("/app/masters/designations")).toBeUndefined();
-    // Labours, Vendors and their lists are their own area, Labour & Vendors.
+    // Labours, Vendors and their lists are the Labour group of Human Resources (ADR CM-0034).
     expect(activeMastersSection("/app/labours")).toBeUndefined();
     expect(MASTERS_GROUPS.map((group) => group.label)).not.toContain(
-      "Labour & Vendors",
+      "Human Resources",
     );
     expect(MASTERS_GROUPS[0]?.label).toBe("Parties");
     expect(activeMastersSection("/app/masters")).toBeUndefined();

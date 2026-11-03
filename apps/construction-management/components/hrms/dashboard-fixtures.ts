@@ -1,6 +1,6 @@
 import type { HrmsDashboardModel } from "@/src/queries/hrms-dashboard";
 
-/** Story data for the HRMS Dashboard and the Workspace tile (CM-319). */
+/** Story data for the HRMS Dashboard (CM-319). */
 
 export const DASHBOARD_TODAY = "2026-10-10";
 const ZONE = "Asia/Kolkata";

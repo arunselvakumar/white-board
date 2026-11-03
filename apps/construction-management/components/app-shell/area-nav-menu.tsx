@@ -28,13 +28,15 @@ export type AreaNavGroup = {
 
 /**
  * A top-level area in the sidebar with a submenu of its screens, grouped
- * (Masters, Workspace, Labour & Vendors, Staff & Roles). The submenu opens by itself on any
+ * (Masters, Workspace, Human Resources). The submenu opens by itself on any
  * page of the area and can be folded away elsewhere. A page of the area is
- * one under its link or one a submenu entry owns (`currentHref`): Staff &
- * Roles links to Staff, and Role Management sits beside it.
+ * one under its link or one a submenu entry owns (`currentHref`): Human
+ * Resources links to Staff, and Role Management, HRMS and the Labour lists
+ * sit beside it.
  */
 export function AreaNavMenu({
   href,
+  linkHref,
   label,
   groups,
   currentHref,
@@ -42,6 +44,8 @@ export function AreaNavMenu({
   buttonClassName,
 }: {
   href: AppNavHref;
+  /** Where the area link goes when not `href` (Human Resources without Staff). */
+  linkHref?: string;
   label: string;
   groups: readonly AreaNavGroup[];
   /** The submenu entry the page belongs to, if any. */
@@ -72,7 +76,7 @@ export function AreaNavMenu({
               tooltip={label}
               aria-current={onIndex ? "page" : undefined}
               className={buttonClassName}
-              render={<Link href={href} />}
+              render={<Link href={linkHref ?? href} />}
             >
               <Icon />
               <span>{label}</span>

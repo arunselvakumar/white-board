@@ -65,7 +65,7 @@ function createdAs(overrides: Parameters<typeof teamMember>[0] = {}) {
 }
 
 const meta = {
-  title: "Staff & Roles/Staff/AddStaff",
+  title: "Human Resources/Staff/AddStaff",
   component: AddTeamMember,
   args: { canSeeSalary: true },
   beforeEach() {

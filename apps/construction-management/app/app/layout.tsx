@@ -26,7 +26,7 @@ export default async function AppLayout({
     "read",
   );
 
-  // Staff & Roles needs Team Members or Role Management Read (ADR CM-0030).
+  // The Staff group of Human Resources needs Team Members or Role Management Read (ADR CM-0030, CM-0034).
   const canOpenStaffRoles =
     (await viewerCan("organization.team_members", "read")) ||
     (await viewerCan("organization.roles", "read"));

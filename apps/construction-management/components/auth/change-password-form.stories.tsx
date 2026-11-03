@@ -123,7 +123,7 @@ export const WrongCurrentPassword: Story = {
 };
 
 export const KeepsRedirect: Story = {
-  args: { redirectUrl: "/app/workspace/hrms" },
+  args: { redirectUrl: "/app/hrms" },
   beforeEach: serve(),
   play: async ({ canvas, userEvent }) => {
     await userEvent.type(canvas.getByLabelText("Current password"), TEMPORARY);
@@ -137,7 +137,7 @@ export const KeepsRedirect: Story = {
     );
     await waitFor(() =>
       expect(authMocks.navigateInApp).toHaveBeenCalledWith(
-        "/continue?redirect_url=%2Fapp%2Fworkspace%2Fhrms",
+        "/continue?redirect_url=%2Fapp%2Fhrms",
       ),
     );
   },

@@ -213,7 +213,7 @@ function LookupListContent({ config }: { config: LookupScreenConfig }) {
   );
 }
 
-/** Labour & Vendors → Labour Categories (CM-203). */
+/** Human Resources → Labour Categories (CM-203). */
 export function LabourCategoriesList() {
   return <LookupListScreen config={LABOUR_CATEGORIES_SCREEN} />;
 }

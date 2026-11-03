@@ -211,7 +211,7 @@ export const MuteGroup: Story = {
     );
     await expect(
       callsTo(api, "POST", `${MESSAGING_API}/preferences/update`)[0]?.body,
-    ).toEqual({ mutedGroups: ["payment_accounting", "hrms"] });
+    ).toEqual({ group: "hrms", muted: true });
     await waitFor(() => expect(hrms).not.toBeChecked());
   },
 };

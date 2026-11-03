@@ -1,10 +1,11 @@
 /**
- * The main menu: the Company Dashboard (CM-902), the three top-level areas
- * (`docs/00-overview.md`, "The shape of the product"), Labour & Vendors,
- * Staff & Roles, then Settings: the
- * Company profile and the Advanced Settings. Each area grows its own
- * screens in later milestones. The Dashboard shows only
- * with the Dashboard menu's Read flag (`AppShell`'s `canOpenDashboard`).
+ * The main menu (ADR CM-0034): the Company Dashboard (CM-902), Projects,
+ * Human Resources (Staff, HRMS and Labour; the area opens on Staff), the
+ * two cross-project areas Workspace and Masters (`docs/00-overview.md`,
+ * "The shape of the product"), then Settings: the Company profile and the
+ * Advanced Settings. Each area grows its own screens in later milestones.
+ * The Dashboard shows only with the Dashboard menu's Read flag
+ * (`AppShell`'s `canOpenDashboard`).
  */
 export const APP_NAV = [
   {
@@ -22,11 +23,20 @@ export const APP_NAV = [
       "Your Company's Projects will show here: daily work, materials, labour and payments per site.",
   },
   {
+    // The area opens on Staff; HRMS and the Labour lists sit beside it in
+    // the submenu.
+    href: "/app/staff",
+    label: "Human Resources",
+    title: "Human Resources",
+    description:
+      "Your staff and their Roles, HRMS for their attendance, leave and salary, and your own Labours, the Vendors you hire gangs from, Labour Categories and Supervisors.",
+  },
+  {
     href: "/app/workspace",
     label: "Workspace",
     title: "Workspace",
     description:
-      "Work across all your Projects: HRMS for your staff's attendance, leave and salary, Central Store for your warehouses, Material Requests and Delivery Notes, and Central Inventory for stock everywhere, Central Payment for dues and balances, and Central Reports for reports across your Projects.",
+      "Work across all your Projects: Central Store for your warehouses, Material Requests and Delivery Notes, Central Inventory for stock everywhere, Central Payment for dues and balances, and Central Reports for reports across your Projects.",
   },
   {
     href: "/app/masters",
@@ -34,22 +44,6 @@ export const APP_NAV = [
     title: "Masters",
     description:
       "Your Company's lists: Contractors, Suppliers, Materials, Measurement Units, Terms & Conditions and Departments.",
-  },
-  {
-    // The area opens on Labours; Vendors and their lists sit beside it.
-    href: "/app/labours",
-    label: "Labour & Vendors",
-    title: "Labour & Vendors",
-    description:
-      "Your own Labours, the Vendors you hire gangs from, Labour Categories and Supervisors.",
-  },
-  {
-    // The area opens on Staff; Role Management sits beside it in the submenu.
-    href: "/app/staff",
-    label: "Staff & Roles",
-    title: "Staff & Roles",
-    description:
-      "Your staff and how they sign in, and the Roles that decide what each one may do.",
   },
   {
     href: "/app/settings",

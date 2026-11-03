@@ -48,7 +48,7 @@ companyTest.describe("HRMS calendar and dashboard", () => {
         geolocation: CHENNAI,
         permissions: ["geolocation"],
       });
-      await memberPage.goto("/app/workspace/hrms/attendance/my");
+      await memberPage.goto("/app/hrms/attendance/my");
       await memberPage
         .getByRole("button", { name: "Check In", exact: true })
         .click();

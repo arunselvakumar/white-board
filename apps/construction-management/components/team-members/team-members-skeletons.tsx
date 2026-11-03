@@ -12,7 +12,7 @@ import { PageHeader } from "@/components/app-shell/page-header";
 import { PageHeaderSkeleton } from "@/components/app-shell/page-header-skeleton";
 import { STAFF_PATH } from "@/lib/staff-roles-nav";
 
-/** Staff & Roles → Staff while it loads (ADR-0047). */
+/** Human Resources → Staff while it loads (ADR-0047). */
 
 const NAME_WIDTHS = ["9rem", "12rem", "7.5rem", "10.5rem", "8rem"];
 const LINE_WIDTHS = ["55%", "40%", "62%", "48%", "36%"];

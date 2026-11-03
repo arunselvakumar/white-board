@@ -16,7 +16,8 @@ import {
 import { HrmsPageFallback } from "@/components/hrms/hrms-skeletons";
 
 /**
- * The HRMS area (M3): title, the five sections as tabs, and the current
+ * The HRMS area (M3; under Human Resources since ADR CM-0034, so no back
+ * link): title, the five sections as tabs, and the current
  * section's pages as sub-tabs. Both rows scroll sideways on a phone. Pages
  * render below and keep their own padding and width. The tab rows are
  * `contain: inline-size` so nine Configuration tabs scroll inside their row
@@ -34,7 +35,6 @@ export function HrmsShell({ children }: { children: ReactNode }) {
       <div className="w-full space-y-4 px-6 pt-6">
         <div className="w-full max-w-6xl">
           <PageHeader
-            back={{ label: "Workspace", href: "/app/workspace" }}
             title="HRMS"
             meta="Attendance, leave and salary for your Team Members."
           />

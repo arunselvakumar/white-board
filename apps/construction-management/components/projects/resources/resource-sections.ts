@@ -24,7 +24,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
     description:
       "Team Members on a Project see it and work on it. The Owner is on every Project.",
     addPath: "/app/staff/new",
-    area: "Staff & Roles",
+    area: "Human Resources",
     icon: Users,
   },
   {
@@ -52,7 +52,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
     description:
       "Labour gangs on this Project; they appear on its attendance screen.",
     addPath: "/app/vendors/new",
-    area: "Labour & Vendors",
+    area: "Human Resources",
     icon: Handshake,
   },
 ];

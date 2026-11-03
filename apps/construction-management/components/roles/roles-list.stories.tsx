@@ -67,7 +67,7 @@ function serve(initial: Role[], inUseLater?: string) {
 }
 
 const meta = {
-  title: "Staff & Roles/Role Management/List",
+  title: "Human Resources/Role Management/List",
   component: RolesList,
   args: { actions: ALL_ROLE_ACTIONS },
   render: (args) => (

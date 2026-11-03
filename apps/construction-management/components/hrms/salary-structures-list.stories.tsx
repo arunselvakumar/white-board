@@ -60,10 +60,7 @@ export const Empty: Story = {
     ).toBeVisible();
     await expect(
       canvas.getByRole("link", { name: "Add salary structure" }),
-    ).toHaveAttribute(
-      "href",
-      "/app/workspace/hrms/configuration/salary-structures/new",
-    );
+    ).toHaveAttribute("href", "/app/hrms/configuration/salary-structures/new");
   },
 };
 
