@@ -95,6 +95,24 @@ function pill() {
   return element;
 }
 
+/**
+ * Presses `key` until `option` is highlighted. Focus reaches the list a
+ * frame after it appears, and a key pressed sooner lands on the trigger,
+ * which ignores it; each of these keys lands on the same row when pressed
+ * again.
+ */
+async function pressUntilHighlighted(
+  userEvent: { keyboard: (text: string) => Promise<void> },
+  key: string,
+  option: HTMLElement,
+) {
+  await userEvent.keyboard(key);
+  await waitFor(async () => {
+    if (!option.hasAttribute("data-highlighted")) await userEvent.keyboard(key);
+    await expect(option).toHaveAttribute("data-highlighted");
+  });
+}
+
 export const Open: Story = {
   args: { defaultOpen: true, tags: true },
   play: async () => {
@@ -160,17 +178,23 @@ export const Keyboard: Story = {
     await userEvent.keyboard("{ArrowDown}");
     await screen.findByRole("listbox", { name: "Courses" });
 
-    await userEvent.keyboard("{End}");
     const last = screen.getByRole("option", { name: "MS Office" });
-    await waitFor(() => expect(last).toHaveAttribute("data-highlighted"));
+    await pressUntilHighlighted(userEvent, "{End}", last);
     await waitFor(() =>
       expect(pill().style.transform).toBe(`translateY(${last.offsetTop}px)`),
     );
 
-    await userEvent.keyboard("{Home}");
-    await userEvent.keyboard("p");
-    const python = screen.getByRole("option", { name: "Python" });
-    await waitFor(() => expect(python).toHaveAttribute("data-highlighted"));
+    await pressUntilHighlighted(
+      userEvent,
+      "{Home}",
+      screen.getByRole("option", { name: "DCA" }),
+    );
+    // Python is the only Course starting with "p", so typing it again is safe.
+    await pressUntilHighlighted(
+      userEvent,
+      "p",
+      screen.getByRole("option", { name: "Python" }),
+    );
 
     await userEvent.keyboard("{Enter}");
     await waitFor(() => expect(screen.queryByRole("listbox")).toBeNull());

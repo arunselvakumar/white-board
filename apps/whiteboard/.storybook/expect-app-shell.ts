@@ -1,4 +1,4 @@
-import { expect, within } from "storybook/test";
+import { expect, waitFor, within } from "storybook/test";
 
 import { APP_NAV, type AppNavItem } from "../lib/app-nav";
 
@@ -22,7 +22,9 @@ type Canvas = {
 /**
  * Opens the sidebar where it is a sheet (below `md`) and returns it; from
  * `md` up it is already beside the page. The shell's chrome lives in it
- * (ADR-0050): the Workspace switcher, the account row, the menu.
+ * (ADR-0050): the Workspace switcher, the account row, the menu. The newest
+ * sheet is this story's (the last story's may still be closing), and a sheet
+ * starts transparent, so checks wait until it has finished opening.
  */
 export async function openSidebar(
   canvasElement: HTMLElement,
@@ -32,7 +34,11 @@ export async function openSidebar(
   const body = within(document.body);
   if ((document.defaultView?.innerWidth ?? 1280) < 768) {
     await userEvent.click(body.getByRole("button", { name: "Toggle Sidebar" }));
-    return body.findByRole("dialog");
+    const sheets = await body.findAllByRole("dialog", { name: "Sidebar" });
+    const sheet = sheets[sheets.length - 1];
+    if (sheet == null) throw new Error("The Sidebar sheet did not open");
+    await waitFor(() => expect(sheet).toBeVisible());
+    return sheet;
   }
   const sidebar = document.querySelector('[data-slot="sidebar-inner"]');
   if (!(sidebar instanceof HTMLElement)) throw new Error("Sidebar is missing");
