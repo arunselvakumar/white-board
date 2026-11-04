@@ -131,7 +131,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           <SidebarFootnote>{VERSION}</SidebarFootnote>
         </SidebarFooter>
       </Sidebar>
-      <SidebarInset className="min-w-0">
+      {/* Room for SidebarReopenTrigger while the sidebar is collapsed (ADR-0050). */}
+      <SidebarInset className="min-w-0 md:peer-data-[state=collapsed]:pl-12">
         {/* No top bar from md up: the sidebar carries it (ADR-0050). */}
         <SidebarReopenTrigger />
         <SidebarPhoneBar>

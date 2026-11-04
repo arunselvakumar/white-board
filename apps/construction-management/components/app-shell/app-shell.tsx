@@ -151,7 +151,8 @@ export function AppShell({
       </Sidebar>
       {/* min-w-0: a wide child (a table, a chart) scrolls inside
           itself instead of widening the page past the sidebar. */}
-      <SidebarInset className="min-w-0">
+      {/* Room for SidebarReopenTrigger while the sidebar is collapsed (ADR-0050). */}
+      <SidebarInset className="min-w-0 md:peer-data-[state=collapsed]:pl-12">
         {/* Below md only: from md up the sidebar carries the shell (ADR-0050). */}
         <SidebarReopenTrigger />
         <SidebarPhoneBar className="top-(--impersonation-bar)">
