@@ -6,6 +6,7 @@ import type {
   NotificationView,
   NotificationsView,
 } from "@/src/queries/notifications";
+import { openSidebar } from "../../.storybook/expect-app-shell";
 import { signInAs } from "../../.storybook/mocks/auth";
 
 import {
@@ -200,12 +201,17 @@ export const OwnerHasNoBell: Story = {
       <Placeholder />
     </AppShell>
   ),
-  play: async ({ canvas }) => {
-    await expect(
-      canvas.getByRole("button", { name: "Account menu for Arun" }),
-    ).toBeVisible();
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    // Neither the phone bar nor the sidebar's account row has a bell.
     await expect(
       canvas.queryByRole("button", { name: /^Notifications/ }),
+    ).toBeNull();
+    const sidebar = within(await openSidebar(canvasElement, userEvent));
+    await expect(
+      sidebar.getByRole("button", { name: "Account menu for Arun" }),
+    ).toBeVisible();
+    await expect(
+      sidebar.queryByRole("button", { name: /^Notifications/ }),
     ).toBeNull();
     await expect(callsTo("GET /notifications/unread-count")).toHaveLength(0);
   },

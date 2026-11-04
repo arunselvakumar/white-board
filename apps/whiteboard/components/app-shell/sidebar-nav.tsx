@@ -25,9 +25,13 @@ import type { DashboardResponse } from "@/src/queries/dashboard";
 import { APP_NAV_ICONS } from "./app-nav-icons";
 import { useSidebarDashboard } from "./use-sidebar-dashboard";
 
-/** A sidebar row (ADR-0049): 40 px, the active row on the primary pill. */
+/**
+ * A sidebar row (ADR-0049): 40 px, the active row on the primary pill. It
+ * draws no hover background: the `SidebarGlide` pill moves under the
+ * hovered row instead (ADR-0050).
+ */
 export const SIDEBAR_ROW_CLASS =
-  "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground data-active:bg-sidebar-primary data-active:text-sidebar-primary-foreground data-active:[&_svg]:text-sidebar-primary-foreground data-active:font-semibold h-10 gap-3 rounded-xl px-3 transition-colors [&_svg]:size-[18px] [&_svg]:text-sidebar-foreground/65 hover:[&_svg]:text-sidebar-foreground";
+  "text-sidebar-foreground/70 hover:bg-transparent hover:text-sidebar-foreground data-active:bg-sidebar-primary data-active:text-sidebar-primary-foreground data-active:[&_svg]:text-sidebar-primary-foreground data-active:font-semibold h-10 gap-3 rounded-xl px-3 transition-colors [&_svg]:size-[18px] [&_svg]:text-sidebar-foreground/65 hover:[&_svg]:text-sidebar-foreground";
 
 /** The rows the menu search keeps (`@repo/ui`'s rule, shared with Construction Management). */
 export function filterMenu<Item extends { label: string }>(

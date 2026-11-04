@@ -17,10 +17,11 @@ const TOGGLE_CLASS =
 /**
  * A submenu entry (ADR-0049): a 36px row with room between its icon and
  * words (the sidebar's own sub-button is 28px), on the primary pill when
- * it is the current page, like a top-level row.
+ * it is the current page, like a top-level row. No hover background of its
+ * own: the `SidebarGlide` pill moves under it (ADR-0050).
  */
 export const SUBMENU_BUTTON_CLASS =
-  "text-sidebar-foreground/70 hover:text-sidebar-foreground data-active:bg-sidebar-primary data-active:text-sidebar-primary-foreground data-active:font-semibold data-active:[&>svg]:text-sidebar-primary-foreground h-9 translate-x-0 gap-2.5 rounded-lg px-2.5 [&>svg]:size-[17px] [&>svg]:text-sidebar-foreground/65";
+  "text-sidebar-foreground/70 hover:bg-transparent hover:text-sidebar-foreground data-active:bg-sidebar-primary data-active:text-sidebar-primary-foreground data-active:font-semibold data-active:[&>svg]:text-sidebar-primary-foreground h-9 translate-x-0 gap-2.5 rounded-lg px-2.5 [&>svg]:size-[17px] [&>svg]:text-sidebar-foreground/65";
 
 /**
  * The open submenu: indented under its row with no left rule (ADR-0049),

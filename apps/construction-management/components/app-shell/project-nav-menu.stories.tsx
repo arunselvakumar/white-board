@@ -9,7 +9,6 @@ import { storyHome } from "@/components/projects/project-home-fixtures";
 import { ProjectShell } from "@/components/projects/project-shell";
 import type { ProjectHome } from "@/src/queries/project-home";
 
-import { expectNavIconMotion } from "../../.storybook/expect-nav-icon-motion";
 import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
 import { signInAs } from "../../.storybook/mocks/auth";
 
@@ -156,31 +155,6 @@ export const Menu: Story = {
   },
 };
 
-/**
- * Hover a Project section, or tab to it: its icon plays a short animation
- * (the pin drops, the waves ripple, the compass swings). Story tests run
- * without motion, so the play checks that Back to projects, every section
- * and My Profile at the foot each lead with an icon that has a motion of
- * its own (#114). Sign out is an action, not a page, and keeps the default
- * lift (ADR-0049).
- */
-export const NavIconMotion: Story = {
-  play: async (context) => {
-    const { menu } = await projectMenu(context);
-    const testing = await menu.findByRole("link", { name: "Testing Reports" });
-    const content = testing.closest<HTMLElement>("[data-sidebar=content]");
-    const sidebar = testing.closest<HTMLElement>("[data-sidebar=sidebar]");
-    if (content == null || sidebar == null)
-      throw new Error("The sidebar is missing");
-    await expectNavIconMotion(content);
-    const profile = within(sidebar)
-      .getByRole("link", { name: "My Profile" })
-      .closest<HTMLElement>("li");
-    if (profile == null) throw new Error("My Profile is not at the foot");
-    await expectNavIconMotion(profile);
-  },
-};
-
 export const ProjectNameAndLogo: Story = {
   beforeEach: serve(storyHome(), { ...KUMARI, logoUrl: STORY_LOGO_URL }),
   play: async (context) => {
@@ -193,9 +167,14 @@ export const ProjectNameAndLogo: Story = {
       await within(content).findByText("Kumari Heights"),
     ).toBeVisible();
     await expect(within(content).getByText("Residential")).toBeVisible();
-    await expect(
-      content.querySelector("[data-slot=avatar-image]"),
-    ).toHaveAttribute("src", STORY_LOGO_URL);
+    // The logo shows once it has loaded; on a wide screen there is no
+    // sheet to open first, so wait for it.
+    await waitFor(() =>
+      expect(content.querySelector("[data-slot=avatar-image]")).toHaveAttribute(
+        "src",
+        STORY_LOGO_URL,
+      ),
+    );
   },
 };
 

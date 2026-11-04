@@ -6,6 +6,7 @@ import { Bell, CheckCheck } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@repo/ui/components/button";
+import { cn } from "@repo/ui/lib/utils";
 import {
   Popover,
   PopoverContent,
@@ -28,11 +29,13 @@ export function bellLabel(unreadCount: number): string {
 }
 
 /**
- * The bell in the app shell header (ADR-0041 §1). It never suspends: the
- * unread count is polled in the background, and a failed read shows a bell
- * with no count rather than breaking the header.
+ * The bell in the app shell (ADR-0041 §1): beside the account menu in the
+ * sidebar from `md` up, in the phone bar below it (ADR-0050). It never
+ * suspends: the unread count is polled in the background, and a failed read
+ * shows a bell with no count rather than breaking the shell. `className`
+ * styles the button for where it sits (the sidebar's colours, say).
  */
-export function NotificationBell() {
+export function NotificationBell({ className }: { className?: string }) {
   const { workspaceId, userId } = useAuth();
   const scope = `${workspaceId ?? ""}:${userId ?? ""}`;
   const [open, setOpen] = useState(false);
@@ -46,7 +49,7 @@ export function NotificationBell() {
           <Button
             variant="ghost"
             size="icon"
-            className="relative rounded-full"
+            className={cn("relative rounded-full", className)}
             aria-label={bellLabel(unreadCount)}
           />
         }
@@ -55,6 +58,7 @@ export function NotificationBell() {
         {unreadCount > 0 ? (
           <span
             aria-hidden="true"
+            data-slot="notification-bell-count"
             className="bg-destructive ring-card absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] leading-none font-semibold text-white tabular-nums ring-2"
           >
             {unreadCount > 99 ? "99+" : unreadCount}

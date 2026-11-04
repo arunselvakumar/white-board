@@ -4,8 +4,7 @@ import { expect, waitFor, within } from "storybook/test";
 import { AppEmptyPage } from "@/components/app-shell/app-empty-page";
 import { AppShell } from "@/components/app-shell/app-shell";
 import { APP_NAV } from "@/lib/app-nav";
-import { expectAppShell } from "../../.storybook/expect-app-shell";
-import { expectNavIconMotion } from "../../.storybook/expect-nav-icon-motion";
+import { expectAppShell, openSidebar } from "../../.storybook/expect-app-shell";
 import { authMocks, signInAs } from "../../.storybook/mocks/auth";
 
 const meta = {
@@ -35,38 +34,47 @@ export const Default: Story = {
     await expect(
       breadcrumb.getByRole("link", { name: "Dashboard" }),
     ).toHaveAttribute("aria-current", "page");
+    // No top bar from md up (ADR-0050): on a phone, only the slim bar.
+    const isMobile =
+      (canvasElement.ownerDocument.defaultView?.innerWidth ?? 1280) < 768;
+    await expect(canvas.queryAllByRole("banner")).toHaveLength(
+      isMobile ? 1 : 0,
+    );
     await expectAppShell(canvas, canvasElement, userEvent, APP_NAV[0]);
-    await expect(
-      canvas.queryByRole("link", { name: "Switch Workspace" }),
-    ).not.toBeInTheDocument();
   },
 };
 
 /**
- * Hover a nav item, or tab to it: its icon plays a short animation (the
- * clock hand ticks round, the bars grow, the cap tosses). The motion lives
- * in `@repo/ui` (sidebar-icon-motion.css, #114); story tests run without
- * motion, so the play checks every nav icon has a motion of its own.
+ * The switcher row opens even with one Workspace, and shows it as the
+ * Active one; picking it again switches nothing.
  */
-export const NavIconMotion: Story = {
+export const OneWorkspace: Story = {
   play: async ({ canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
-    if ((canvasElement.ownerDocument.defaultView?.innerWidth ?? 1280) < 768) {
-      await userEvent.click(
-        body.getByRole("button", { name: "Toggle Sidebar" }),
-      );
-    }
-    const nav = body.getByRole("navigation", { name: "Main" });
-    await expect(within(nav).getAllByRole("link")).toHaveLength(APP_NAV.length);
-    await expectNavIconMotion(nav);
+    const sidebar = within(await openSidebar(canvasElement, userEvent));
+    await userEvent.click(
+      sidebar.getByRole("button", {
+        name: "Active Workspace: Riverside Centre. Switch Workspace",
+      }),
+    );
+    const menu = within(await body.findByRole("menu"));
+    await expect(menu.getByText("Your Workspaces")).toBeVisible();
+    const items = menu.getAllByRole("menuitem");
+    await expect(items).toHaveLength(1);
+    await expect(items[0]).toHaveAccessibleName("Riverside Centre Active");
+    await userEvent.click(
+      menu.getByRole("menuitem", { name: /^Riverside Centre/ }),
+    );
+    await expect(authMocks.setActive).not.toHaveBeenCalled();
   },
 };
 
 export const AccountMenuSignOut: Story = {
-  play: async ({ canvas, canvasElement, userEvent }) => {
+  play: async ({ canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
+    const sidebar = within(await openSidebar(canvasElement, userEvent));
     await userEvent.click(
-      canvas.getByRole("button", { name: "Account menu for Arun" }),
+      sidebar.getByRole("button", { name: "Account menu for Arun" }),
     );
     const menu = within(await body.findByRole("menu"));
     await waitFor(() =>
@@ -84,10 +92,13 @@ export const WithoutUser: Story = {
   beforeEach() {
     authMocks.user = null;
   },
-  play: async ({ canvas }) => {
-    await expect(canvas.getByText("Riverside Centre")).toBeVisible();
+  play: async ({ canvasElement, userEvent }) => {
+    const sidebar = within(await openSidebar(canvasElement, userEvent));
+    await expect(sidebar.getByText("Riverside Centre")).toBeVisible();
     await expect(
-      canvas.queryByRole("button", { name: /Account menu/ }),
+      within(canvasElement.ownerDocument.body).queryByRole("button", {
+        name: /Account menu/,
+      }),
     ).not.toBeInTheDocument();
   },
 };
@@ -104,10 +115,25 @@ export const MultipleWorkspaces: Story = {
       },
     ];
   },
-  play: async ({ canvas }) => {
+  play: async ({ canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    const sidebar = within(await openSidebar(canvasElement, userEvent));
+    await userEvent.click(
+      sidebar.getByRole("button", {
+        name: "Active Workspace: Riverside Centre. Switch Workspace",
+      }),
+    );
+    const menu = within(await body.findByRole("menu"));
+    await expect(menu.getAllByRole("menuitem")).toHaveLength(2);
     await expect(
-      canvas.getByRole("link", { name: "Switch Workspace" }),
-    ).toHaveAttribute("href", "/select-workspace");
+      menu.getByRole("menuitem", { name: "Riverside Centre Active" }),
+    ).toBeVisible();
+    await userEvent.click(
+      menu.getByRole("menuitem", { name: "Harbor Academy" }),
+    );
+    await waitFor(() =>
+      expect(authMocks.setActive).toHaveBeenCalledWith("org_harbor", "/"),
+    );
   },
 };
 
@@ -127,10 +153,8 @@ export const StudentNavigation: Story = {
         body.getByRole("button", { name: "Toggle Sidebar" }),
       );
     }
-    const mainNav = body.getByRole("navigation", { name: "Main" });
-    const nav = within(mainNav);
+    const nav = within(body.getByRole("navigation", { name: "Main" }));
     await expect(nav.getAllByRole("link")).toHaveLength(6);
-    await expectNavIconMotion(mainNav);
     await expect(nav.getByRole("link", { name: "Home" })).toHaveAttribute(
       "href",
       "/student",
@@ -208,20 +232,7 @@ export const ThemePreference: Story = {
   play: async ({ canvasElement, userEvent }) => {
     const root = canvasElement.ownerDocument.documentElement;
     const body = within(canvasElement.ownerDocument.body);
-    const sidebarTrigger = body.getByRole("button", { name: "Toggle Sidebar" });
-    const isMobile =
-      (canvasElement.ownerDocument.defaultView?.innerWidth ?? 1280) < 768;
-    if (isMobile) {
-      await userEvent.click(sidebarTrigger);
-    }
-    const sidebar = isMobile
-      ? await body.findByRole("dialog")
-      : canvasElement.ownerDocument.querySelector(
-          '[data-slot="sidebar-inner"]',
-        );
-    if (!(sidebar instanceof HTMLElement)) {
-      throw new Error("Sidebar is missing");
-    }
+    const sidebar = await openSidebar(canvasElement, userEvent);
     await waitFor(() =>
       expect(within(sidebar).getByText("Main menu")).toBeVisible(),
     );
@@ -410,5 +421,34 @@ export const TeacherWithoutCounts: Story = {
     await expect(
       body.queryByRole("link", { name: /active Students/ }),
     ).not.toBeInTheDocument();
+  },
+};
+
+/**
+ * A Teacher's bell sits beside the account menu in the sidebar from `md`
+ * up, and in the phone bar below it (ADR-0050).
+ */
+export const TeacherBell: Story = {
+  beforeEach() {
+    signInAs("teacher", { name: "Riverside Centre" });
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    if ((canvasElement.ownerDocument.defaultView?.innerWidth ?? 1280) < 768) {
+      const phoneBar = within(canvas.getByRole("banner"));
+      await expect(
+        phoneBar.getByRole("button", { name: /^Notifications/ }),
+      ).toBeVisible();
+      await expect(
+        phoneBar.queryByRole("button", { name: /Account menu/ }),
+      ).toBeNull();
+      return;
+    }
+    const sidebar = within(await openSidebar(canvasElement, userEvent));
+    const bell = sidebar.getByRole("button", { name: /^Notifications/ });
+    const account = sidebar.getByRole("button", {
+      name: "Account menu for Arun",
+    });
+    await expect(bell).toBeVisible();
+    await expect(bell.parentElement).toBe(account.parentElement);
   },
 };

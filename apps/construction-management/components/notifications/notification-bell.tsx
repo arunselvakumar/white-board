@@ -6,6 +6,7 @@ import { Bell, CheckCheck } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
+import { cn } from "@repo/ui/lib/utils";
 import {
   Popover,
   PopoverContent,
@@ -26,11 +27,13 @@ import { BellListSkeleton } from "./notifications-skeletons";
 export const NOTIFICATIONS_PAGE = "/app/notifications";
 
 /**
- * The bell in the top bar (CM-904): the unread count, polled in the
- * background, and a popover of the latest ten. It never suspends; a failed
- * read shows a bell with no count rather than breaking the header.
+ * The bell (CM-904): the unread count, polled in the background, and a
+ * popover of the latest ten. The shell puts it in the sidebar's account row
+ * and, on a phone, in the top bar (ADR-0050); `className` styles the button
+ * for where it sits. It never suspends; a failed read shows a bell with no
+ * count rather than breaking the shell.
  */
-export function NotificationBell() {
+export function NotificationBell({ className }: { className?: string } = {}) {
   const { workspaceId } = useCompanyAuth();
   const [open, setOpen] = useState(false);
   const unread = useQuery({
@@ -47,7 +50,7 @@ export function NotificationBell() {
           <Button
             variant="ghost"
             size="icon"
-            className="relative rounded-full"
+            className={cn("relative rounded-full", className)}
             aria-label={bellLabel(count)}
           />
         }

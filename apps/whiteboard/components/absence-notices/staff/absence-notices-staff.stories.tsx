@@ -187,7 +187,8 @@ export const Owner: Story = {
     await expect(dca.getByText("1 Student gave notice")).toBeVisible();
     await expect(dca.getByText("Travel")).toBeVisible();
 
-    await expect(canvas.queryByText(/@/)).toBeNull();
+    // The page shows no email; the sidebar's account row does (ADR-0049).
+    await expect(within(canvas.getByRole("main")).queryByText(/@/)).toBeNull();
     await expect(hasNoHorizontalOverflow(canvasElement)).toBe(true);
   },
 };

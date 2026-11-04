@@ -6,9 +6,8 @@ import {
   useCompanyAuthSnapshot,
 } from "@repo/auth/construction/react";
 import { useMutation } from "@tanstack/react-query";
-import { Building, Check, ChevronsUpDown, Plus } from "lucide-react";
+import { Check, Plus } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@repo/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,10 +17,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
+import { SidebarSwitcher } from "@repo/ui/components/sidebar-chrome";
 
 import { switchCompany } from "@/src/queries/companies";
 
-/** The Active Company in the header, and switching to another one (CM-105). */
+import { BrandMark } from "./brand-mark";
+
+/**
+ * The first row of the sidebar (ADR-0050): the product mark, the Active
+ * Company and the product's name, opening the User's Companies to switch
+ * to another one (CM-105) or create a new one.
+ */
 export function CompanySwitcher() {
   const { company } = useActiveCompany();
   const { companies } = useCompanyAuthSnapshot();
@@ -36,21 +42,18 @@ export function CompanySwitcher() {
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
-          <Button
-            variant="ghost"
-            size="sm"
-            // Shrinks (Buttons don't by default), so a long name truncates
-            // on a phone instead of widening the header past the screen.
-            className="text-muted-foreground hover:text-foreground min-w-0 shrink gap-2 font-normal"
+          <SidebarSwitcher
+            mark={<BrandMark className="size-9 rounded-xl" />}
+            name={company?.name ?? "No Company"}
+            detail="Construction Management"
             aria-label={`Active Company: ${company?.name ?? "none"}. Switch Company`}
           />
         }
+      />
+      <DropdownMenuContent
+        align="start"
+        className="w-(--anchor-width) min-w-56"
       >
-        <Building aria-hidden="true" className="size-4 shrink-0" />
-        <span className="truncate">{company?.name ?? "No Company"}</span>
-        <ChevronsUpDown aria-hidden="true" className="size-3.5 shrink-0" />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-64">
         <DropdownMenuGroup>
           <DropdownMenuLabel>Your Companies</DropdownMenuLabel>
           {companies.map((item) => {

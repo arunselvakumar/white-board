@@ -3,8 +3,7 @@
 import { useSignOut, useUser, type AuthUser } from "@repo/auth/react";
 import { cn } from "@repo/ui/lib/utils";
 import { Ellipsis, LogOut } from "lucide-react";
-import Image from "next/image";
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import {
   Avatar,
   AvatarFallback,
@@ -62,7 +61,7 @@ function UserAvatar({
 
 /**
  * The account menu: the User's name and email, and Sign out. `trigger` is
- * the button that opens it (the avatar in the top bar, `…` in the sidebar).
+ * the button that opens it (`…` on the sidebar's account row).
  */
 function AccountMenu({
   user,
@@ -105,60 +104,14 @@ function AccountMenu({
 }
 
 /**
- * The avatar menu in the top bar. On desktop the account lives in the
- * sidebar (ADR-0049), so AppShell shows this one on a phone only.
+ * The account row, second in the sidebar (ADR-0050): avatar, name, email,
+ * then `before` (the notification bell, where the role has one) and the
+ * `…` account menu. Without a User there is no account to show; the
+ * switcher row above still carries the Whiteboard mark.
  */
-export function UserMenu() {
+export function SidebarUserAccount({ before }: { before?: ReactNode }) {
   const { user } = useUser();
   if (user == null) return null;
-  const displayName = displayNameOf(user);
-
-  return (
-    <AccountMenu
-      user={user}
-      displayName={displayName}
-      trigger={
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rounded-full"
-          aria-label={`Account menu for ${displayName}`}
-        >
-          <UserAvatar
-            user={user}
-            displayName={displayName}
-            className="size-8"
-            fallbackClassName="bg-primary/10 text-primary"
-          />
-        </Button>
-      }
-    />
-  );
-}
-
-/**
- * The account row at the top of the sidebar: avatar, name, email and the
- * `…` account menu. Without a User it shows the Whiteboard mark instead.
- */
-export function SidebarUserAccount() {
-  const { user } = useUser();
-
-  if (user == null) {
-    return (
-      <SidebarAccount
-        avatar={
-          <Image
-            src="/whiteboard-logo.svg"
-            alt=""
-            width={36}
-            height={36}
-            className="size-9 shrink-0 rounded-xl"
-          />
-        }
-        name="Whiteboard"
-      />
-    );
-  }
 
   const displayName = displayNameOf(user);
   return (
@@ -174,20 +127,23 @@ export function SidebarUserAccount() {
       name={displayName}
       detail={user.email}
       action={
-        <AccountMenu
-          user={user}
-          displayName={displayName}
-          trigger={
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-foreground shrink-0"
-              aria-label={`Account menu for ${displayName}`}
-            >
-              <Ellipsis />
-            </Button>
-          }
-        />
+        <div className="flex shrink-0 items-center gap-0.5">
+          {before}
+          <AccountMenu
+            user={user}
+            displayName={displayName}
+            trigger={
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                className="text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-foreground shrink-0"
+                aria-label={`Account menu for ${displayName}`}
+              >
+                <Ellipsis />
+              </Button>
+            }
+          />
+        </div>
       }
     />
   );
