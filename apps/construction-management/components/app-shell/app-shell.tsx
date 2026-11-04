@@ -5,12 +5,13 @@ import { LogOut, UserRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
-import { Separator } from "@repo/ui/components/separator";
 import {
   SidebarFootnote,
+  SidebarPhoneBar,
   SidebarSearch,
   SidebarSectionLabel,
 } from "@repo/ui/components/sidebar-chrome";
+import { SidebarGlide } from "@repo/ui/components/sidebar-glide";
 import { SkipLink } from "@repo/ui/components/skip-link";
 import {
   Sidebar,
@@ -24,7 +25,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
-  SidebarTrigger,
   useSidebar,
 } from "@repo/ui/components/sidebar";
 
@@ -55,22 +55,26 @@ import { PlanBanner } from "./plan-banner";
 import { ProjectNavMenu } from "./project-nav-menu";
 import { SidebarAccountRow } from "./sidebar-account-row";
 import { SidebarPlanCard } from "./sidebar-plan-card";
-import { UserMenu } from "./user-menu";
 import { WORKSPACE_GROUPS, WorkspaceNavMenu } from "./workspace-nav-menu";
 
-/** A sidebar row (ADR-0049): muted on the ink panel, the primary pill when current. */
+/**
+ * A sidebar row (ADR-0049): muted on the ink panel, the primary pill when
+ * current. No hover background of its own: the `SidebarGlide` pill moves
+ * under the hovered row (ADR-0050).
+ */
 const NAV_BUTTON_CLASS =
-  "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground data-active:bg-sidebar-primary data-active:text-sidebar-primary-foreground data-active:[&_svg]:text-sidebar-primary-foreground data-active:font-semibold h-10 gap-3 rounded-xl px-3 transition-colors [&_svg]:size-[18px] [&_svg]:text-sidebar-foreground/65 hover:[&_svg]:text-sidebar-foreground";
+  "text-sidebar-foreground/70 hover:bg-transparent hover:text-sidebar-foreground data-active:bg-sidebar-primary data-active:text-sidebar-primary-foreground data-active:[&_svg]:text-sidebar-primary-foreground data-active:font-semibold h-10 gap-3 rounded-xl px-3 transition-colors [&_svg]:size-[18px] [&_svg]:text-sidebar-foreground/65 hover:[&_svg]:text-sidebar-foreground";
 
 /** From package.json at build time (next.config.ts), so the browser never gets the dependency list. */
 const VERSION = `v${process.env["NEXT_PUBLIC_APP_VERSION"] ?? "0.0.0"}`;
 
 /**
- * Authenticated chrome (ADR-0049): the ink sidebar with the User's account
- * row, the menu search, the Company Dashboard, Projects, Human Resources,
- * Workspace, Masters and Settings, then the plan card, My Profile and Sign
- * out; the top bar with the product, the Active Company and the
- * notifications. Inside a Project the areas give way to the Project's own
+ * Authenticated chrome (ADR-0049, ADR-0050): the ink sidebar carries it
+ * all, with no top bar from `md` up: the Company switcher, the User's
+ * account row with the notification bell, the menu search, the Company
+ * Dashboard, Projects, Human Resources, Workspace, Masters and Settings,
+ * then the plan card, My Profile and Sign out. On a phone a slim bar opens
+ * the sidebar sheet and keeps the bell in reach. Inside a Project the areas give way to the Project's own
  * menu (ADR CM-0020). `canOpenDashboard` is the Dashboard menu's Read flag
  * (CM-902): without it the Dashboard is not in the menu.
  * `canOpenStaffRoles` is Team Members or Role Management Read (ADR
@@ -108,6 +112,7 @@ export function AppShell({
         className="[&_[data-slot=sidebar-inner]]:ring-sidebar-border p-3 [&_[data-slot=sidebar-inner]]:rounded-2xl"
       >
         <SidebarHeader className="gap-3 px-3 pt-4 pb-2">
+          <CompanySwitcher />
           <SidebarAccountRow />
           <SidebarSearch
             aria-label="Search menu"
@@ -119,21 +124,23 @@ export function AppShell({
           />
         </SidebarHeader>
         <SidebarContent>
-          {projectId == null ? (
-            <MainMenu
-              pathname={pathname}
-              query={query}
-              canOpenDashboard={canOpenDashboard}
-              canOpenStaffRoles={canOpenStaffRoles}
-            />
-          ) : (
-            <ProjectNavMenu
-              projectId={projectId}
-              pathname={pathname}
-              query={query}
-              buttonClassName={NAV_BUTTON_CLASS}
-            />
-          )}
+          <SidebarGlide>
+            {projectId == null ? (
+              <MainMenu
+                pathname={pathname}
+                query={query}
+                canOpenDashboard={canOpenDashboard}
+                canOpenStaffRoles={canOpenStaffRoles}
+              />
+            ) : (
+              <ProjectNavMenu
+                projectId={projectId}
+                pathname={pathname}
+                query={query}
+                buttonClassName={NAV_BUTTON_CLASS}
+              />
+            )}
+          </SidebarGlide>
         </SidebarContent>
         <SidebarFooter className="gap-2 px-3 pt-2 pb-3">
           <SidebarPlanCard />
@@ -144,24 +151,16 @@ export function AppShell({
       {/* min-w-0: a wide child (a table, a chart) scrolls inside
           itself instead of widening the page past the sidebar. */}
       <SidebarInset className="min-w-0">
-        <header className="bg-card/85 border-border/70 sticky top-(--impersonation-bar) z-20 flex h-16 shrink-0 items-center gap-2 border-b px-4 backdrop-blur sm:px-6 print:hidden">
-          <SidebarTrigger />
-          <div className="flex shrink-0 items-center gap-2">
-            <BrandMark className="size-7 rounded-lg" />
-            <span className="hidden text-sm font-semibold sm:inline">
-              Construction Management
-            </span>
-          </div>
-          <Separator orientation="vertical" className="mx-1 h-4" />
-          <CompanySwitcher />
-          <div className="ml-auto flex items-center gap-1">
+        {/* Below md only: from md up the sidebar carries the shell (ADR-0050). */}
+        <SidebarPhoneBar className="top-(--impersonation-bar)">
+          <BrandMark className="size-7 rounded-lg" />
+          <span className="min-w-0 truncate text-sm font-semibold">
+            Construction Management
+          </span>
+          <div className="ml-auto flex shrink-0 items-center">
             <NotificationBell />
-            {/* On a wide screen the account menu is the sidebar's account row. */}
-            <div className="md:hidden">
-              <UserMenu />
-            </div>
           </div>
-        </header>
+        </SidebarPhoneBar>
         <PlanBanner />
         <CompanyDeletionBanner />
         {/* tabIndex -1: Skip to content can move focus here without adding a Tab stop. */}
@@ -189,33 +188,35 @@ function FooterMenu({ pathname }: { pathname: string }) {
   const onProfile =
     pathname === profileHref || pathname.startsWith(`${profileHref}/`);
   return (
-    <SidebarMenu className="gap-1">
-      <SidebarMenuItem>
-        <SidebarMenuButton
-          isActive={onProfile}
-          tooltip="My Profile"
-          aria-current={onProfile ? "page" : undefined}
-          className={NAV_BUTTON_CLASS}
-          render={<Link href={profileHref} />}
-        >
-          <UserRound />
-          <span className="min-w-0 flex-1 truncate">My Profile</span>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-      <SidebarMenuItem>
-        <SidebarMenuButton
-          tooltip="Sign out"
-          className={NAV_BUTTON_CLASS}
-          disabled={fetchStatus === "fetching"}
-          onClick={() => {
-            void signOut();
-          }}
-        >
-          <LogOut />
-          <span className="min-w-0 flex-1 truncate">Sign out</span>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-    </SidebarMenu>
+    <SidebarGlide className="flex-none">
+      <SidebarMenu className="gap-1">
+        <SidebarMenuItem>
+          <SidebarMenuButton
+            isActive={onProfile}
+            tooltip="My Profile"
+            aria-current={onProfile ? "page" : undefined}
+            className={NAV_BUTTON_CLASS}
+            render={<Link href={profileHref} />}
+          >
+            <UserRound />
+            <span className="min-w-0 flex-1 truncate">My Profile</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+        <SidebarMenuItem>
+          <SidebarMenuButton
+            tooltip="Sign out"
+            className={NAV_BUTTON_CLASS}
+            disabled={fetchStatus === "fetching"}
+            onClick={() => {
+              void signOut();
+            }}
+          >
+            <LogOut />
+            <span className="min-w-0 flex-1 truncate">Sign out</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    </SidebarGlide>
   );
 }
 

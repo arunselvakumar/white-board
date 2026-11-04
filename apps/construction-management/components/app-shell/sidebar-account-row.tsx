@@ -8,12 +8,15 @@ import {
 } from "@repo/ui/components/dropdown-menu";
 import { SidebarAccount } from "@repo/ui/components/sidebar-chrome";
 
+import { NotificationBell } from "@/components/notifications/notification-bell";
+
 import { BrandMark } from "./brand-mark";
 import { AccountAvatar, UserMenuContent, useAccount } from "./user-menu";
 
 /**
- * The top of the sidebar (ADR-0049): the signed-in User's avatar, name and
- * email, and `…` for the account menu. Nobody signed in: the product mark
+ * The sidebar's second row, under the Company switcher (ADR-0049,
+ * ADR-0050): the signed-in User's avatar, name and email, the notification
+ * bell, and `…` for the account menu. Nobody signed in: the product mark
  * and name, with no menu.
  */
 export function SidebarAccountRow() {
@@ -39,24 +42,27 @@ export function SidebarAccountRow() {
       name={account.displayName}
       detail={account.email}
       action={
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                className="text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-foreground aria-expanded:bg-sidebar-accent aria-expanded:text-sidebar-foreground shrink-0"
-                aria-label={`Account menu for ${account.displayName}`}
-              />
-            }
-          >
-            <Ellipsis />
-          </DropdownMenuTrigger>
-          <UserMenuContent
-            displayName={account.displayName}
-            email={account.email}
-          />
-        </DropdownMenu>
+        <div className="flex shrink-0 items-center gap-0.5">
+          <NotificationBell className="text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-foreground aria-expanded:bg-sidebar-accent aria-expanded:text-sidebar-foreground [&_[data-testid=notification-badge]]:ring-sidebar size-8 [&>svg]:size-[18px]" />
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className="text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-foreground aria-expanded:bg-sidebar-accent aria-expanded:text-sidebar-foreground shrink-0"
+                  aria-label={`Account menu for ${account.displayName}`}
+                />
+              }
+            >
+              <Ellipsis />
+            </DropdownMenuTrigger>
+            <UserMenuContent
+              displayName={account.displayName}
+              email={account.email}
+            />
+          </DropdownMenu>
+        </div>
       }
     />
   );

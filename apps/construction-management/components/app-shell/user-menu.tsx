@@ -13,15 +13,12 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@repo/ui/components/avatar";
-import { Button } from "@repo/ui/components/button";
 import {
-  DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
 
 import { myProfileQuery } from "@/src/queries/my-profile";
@@ -81,8 +78,8 @@ export function AccountAvatar({
 /**
  * The account menu's items: the User's name and email, My Profile,
  * Downloads (their reports across Projects, CM-901), Your Subscription and
- * Sign out. The top bar (on a phone) and the sidebar's account row each
- * open it from their own trigger.
+ * Sign out. The sidebar's account row opens it from its `…` button
+ * (ADR-0050).
  */
 export function UserMenuContent({
   displayName,
@@ -128,40 +125,5 @@ export function UserMenuContent({
         Sign out
       </DropdownMenuItem>
     </DropdownMenuContent>
-  );
-}
-
-/**
- * The account menu behind the User's avatar. The shell shows it in the top
- * bar on a phone only; on a wide screen the sidebar's account row opens
- * the same menu (ADR-0049).
- */
-export function UserMenu({ photoUrl }: { photoUrl?: string | null } = {}) {
-  const account = useAccount(photoUrl);
-  if (account == null) return null;
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        render={
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full"
-            aria-label={`Account menu for ${account.displayName}`}
-          />
-        }
-      >
-        <AccountAvatar
-          photo={account.photo}
-          displayName={account.displayName}
-          className="size-8"
-        />
-      </DropdownMenuTrigger>
-      <UserMenuContent
-        displayName={account.displayName}
-        email={account.email}
-      />
-    </DropdownMenu>
   );
 }
