@@ -41,10 +41,10 @@ export const Default: Story = {
       ).toBeVisible();
       // The default photo, credited as Unsplash asks.
       await expect(
-        canvas.getByRole("link", { name: "Hammilton Ojijo" }),
+        canvas.getByRole("link", { name: "Arron Choi" }),
       ).toHaveAttribute(
         "href",
-        "https://unsplash.com/@ojijohammilton?utm_source=construction_management&utm_medium=referral",
+        "https://unsplash.com/@arronchoi?utm_source=construction_management&utm_medium=referral",
       );
     }
   },

@@ -66,14 +66,16 @@
   --chart-4: #c7900a;
   --chart-5: #d24a36;
   --radius: 0.75rem;
-  --sidebar: #ffffff;
-  --sidebar-foreground: #16182a;
-  --sidebar-primary: #595fae;
+  /* The ink sidebar (ADR-0049): a near-black panel in both themes, with the
+     brand primary lifted so an active row reads on it. */
+  --sidebar: #13141b;
+  --sidebar-foreground: #f1f0f7;
+  --sidebar-primary: #6b72dc;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f1f2f8;
-  --sidebar-accent-foreground: #16182a;
-  --sidebar-border: #e8e9f1;
-  --sidebar-ring: #595fae;
+  --sidebar-accent: #1f2130;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #272a3a;
+  --sidebar-ring: #8f96e8;
   /* Skeleton bars: a light tint of the primary, so loading matches the palette (ADR-0047). */
   --skeleton: color-mix(in srgb, var(--primary) 16%, transparent);
   --skeleton-highlight: color-mix(in oklab, var(--card) 75%, transparent);
@@ -104,14 +106,15 @@
   --chart-3: #4fb97d;
   --chart-4: #e4b033;
   --chart-5: #e25f4a;
-  --sidebar: #161822;
-  --sidebar-foreground: #eceaf4;
-  --sidebar-primary: #7b82c4;
-  --sidebar-primary-foreground: #12141c;
-  --sidebar-accent: #232636;
+  /* Ink sidebar (ADR-0049), a step darker than the page so the panel still reads. */
+  --sidebar: #0d0e14;
+  --sidebar-foreground: #f1f0f7;
+  --sidebar-primary: #6b72dc;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1b1d29;
   --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #262a3a;
-  --sidebar-ring: #7b82c4;
+  --sidebar-border: #262838;
+  --sidebar-ring: #8f96e8;
   --skeleton: color-mix(in srgb, var(--primary) 20%, transparent);
   --skeleton-highlight: color-mix(in oklab, var(--primary) 16%, transparent);
 }

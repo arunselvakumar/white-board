@@ -1,11 +1,17 @@
 "use client";
 
-import { useAuth, useWorkspace, useWorkspaceList } from "@repo/auth/react";
-import { Building2 } from "lucide-react";
+import {
+  useAuth,
+  useSignOut,
+  useUser,
+  useWorkspace,
+  useWorkspaceList,
+} from "@repo/auth/react";
+import { Building2, LogOut } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 import { Separator } from "@repo/ui/components/separator";
 import { SkipLink } from "@repo/ui/components/skip-link";
 import { Button } from "@repo/ui/components/button";
@@ -15,7 +21,6 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarInset,
   SidebarMenu,
@@ -24,91 +29,116 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@repo/ui/components/sidebar";
+import {
+  SidebarFootnote,
+  SidebarSearch,
+  SidebarSectionLabel,
+} from "@repo/ui/components/sidebar-chrome";
 
 import { NotificationBell } from "@/components/notifications/notification-bell";
-import { isAppNavActive, navForRole } from "@/lib/app-nav";
+import { navForRole } from "@/lib/app-nav";
 
-import { APP_NAV_ICONS } from "./app-nav-icons";
+/** From package.json at build time (next.config.ts), so the browser never gets the dependency list. */
+const VERSION = `v${process.env["NEXT_PUBLIC_APP_VERSION"] ?? "0.0.0"}`;
+
 import { AppBreadcrumbs } from "./app-breadcrumbs";
+import { SIDEBAR_ROW_CLASS, SidebarMainNav } from "./sidebar-nav";
+import { SidebarTodayCard } from "./sidebar-today-card";
 import { ThemeToggle } from "./theme-toggle";
-import { UserMenu } from "./user-menu";
+import { SidebarUserAccount, UserMenu } from "./user-menu";
 
-const NAV_BUTTON_CLASS =
-  "text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-foreground data-active:bg-sidebar-accent data-active:text-sidebar-foreground data-active:[&_svg]:text-sidebar-primary h-10 gap-3 rounded-xl px-3 transition-colors data-active:shadow-[inset_0_0_0_1px_var(--sidebar-border)] [&_svg]:size-[18px]";
+/** Sign out, the last row of the sidebar. */
+function SidebarSignOut() {
+  const { user } = useUser();
+  const { signOut, fetchStatus } = useSignOut();
+  if (user == null) return null;
+
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton
+        className={SIDEBAR_ROW_CLASS}
+        disabled={fetchStatus === "fetching"}
+        onClick={() => {
+          void signOut();
+        }}
+      >
+        <LogOut />
+        <span className="min-w-0 flex-1 truncate">Sign out</span>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+}
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const pathname = usePathname() || "/";
   const { workspace } = useWorkspace();
   const { workspaces } = useWorkspaceList();
   const { role } = useAuth();
+  const pathname = usePathname() || "/";
+  const [menuQuery, setMenuQuery] = useState("");
+  // Picking a row clears the search, so the next time the menu opens (the
+  // phone sheet, say) nothing looks missing (state adjusted in render).
+  const [queryPathname, setQueryPathname] = useState(pathname);
+  if (queryPathname !== pathname) {
+    setQueryPathname(pathname);
+    setMenuQuery("");
+  }
   const workspaceName = workspace?.name ?? "Workspace";
   const navigation = navForRole(role);
 
   return (
-    <SidebarProvider>
+    <SidebarProvider style={{ "--sidebar-width": "17.5rem" } as CSSProperties}>
       <SkipLink />
-      <Sidebar variant="sidebar" collapsible="offcanvas">
-        <SidebarHeader className="px-4 pt-6 pb-2">
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                size="lg"
-                tooltip="Whiteboard"
-                render={<Link href="/" />}
-              >
-                <Image
-                  src="/whiteboard-logo.svg"
-                  alt=""
-                  width={36}
-                  height={36}
-                  className="size-9"
-                />
-                <span className="text-sidebar-foreground truncate text-lg font-semibold tracking-tight">
-                  Whiteboard
-                </span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
+      <Sidebar
+        variant="floating"
+        collapsible="offcanvas"
+        className="[&_[data-slot=sidebar-inner]]:ring-sidebar-border p-3 [&_[data-slot=sidebar-inner]]:rounded-2xl"
+      >
+        <SidebarHeader className="gap-3 px-3 pt-4 pb-2">
+          <SidebarUserAccount />
+          <SidebarSearch
+            aria-label="Search menu"
+            placeholder="Search menu…"
+            value={menuQuery}
+            onChange={(event) => {
+              setMenuQuery(event.target.value);
+            }}
+          />
         </SidebarHeader>
         <SidebarContent>
-          <SidebarGroup className="px-3 pt-4">
-            <SidebarGroupLabel className="text-sidebar-foreground/65 px-3 text-[11px] font-semibold tracking-[0.12em] uppercase">
-              Main menu
-            </SidebarGroupLabel>
+          <SidebarGroup className="px-3 pt-2">
+            <SidebarSectionLabel>Main menu</SidebarSectionLabel>
             <SidebarGroupContent>
-              <nav aria-label="Main">
-                <SidebarMenu className="gap-1">
-                  {navigation.map((item) => {
-                    const Icon = APP_NAV_ICONS[item.href];
-                    const active = isAppNavActive(pathname, item.href);
-                    return (
-                      <SidebarMenuItem key={item.href}>
-                        <SidebarMenuButton
-                          isActive={active}
-                          tooltip={item.label}
-                          aria-current={active ? "page" : undefined}
-                          className={NAV_BUTTON_CLASS}
-                          render={<Link href={item.href} />}
-                        >
-                          <Icon />
-                          <span>{item.label}</span>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    );
-                  })}
-                </SidebarMenu>
-              </nav>
+              <SidebarMainNav items={navigation} query={menuQuery} />
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
-        <SidebarFooter className="border-sidebar-border mx-3 border-t px-0 pt-3 pb-4">
-          <ThemeToggle />
+        <SidebarFooter className="gap-2 px-3 pt-2 pb-3">
+          {role === "owner" ? <SidebarTodayCard /> : null}
+          <SidebarMenu className="gap-1">
+            <SidebarMenuItem>
+              <ThemeToggle />
+            </SidebarMenuItem>
+            <SidebarSignOut />
+          </SidebarMenu>
+          <SidebarFootnote>{VERSION}</SidebarFootnote>
         </SidebarFooter>
       </Sidebar>
-      <SidebarInset>
+      <SidebarInset className="min-w-0">
         <header className="bg-card/85 border-border/70 sticky top-0 z-20 flex h-16 shrink-0 items-center gap-2 border-b px-4 backdrop-blur sm:px-6 print:hidden">
           <SidebarTrigger />
-          <Separator orientation="vertical" className="mr-1 h-4" />
+          <p className="text-foreground flex shrink-0 items-center gap-2">
+            <Image
+              src="/whiteboard-logo.svg"
+              alt=""
+              width={28}
+              height={28}
+              className="size-7 rounded-lg"
+            />
+            <span className="hidden text-sm font-semibold sm:inline">
+              Whiteboard
+            </span>
+          </p>
+          <Separator orientation="vertical" className="mx-1 h-4" />
           <p className="text-foreground flex min-w-0 items-center gap-2 text-sm">
             <span
               aria-hidden="true"
@@ -130,7 +160,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="ml-auto flex items-center gap-1">
             {/* Only Teachers receive Notifications for now (ADR-0041 §1). */}
             {role === "teacher" ? <NotificationBell /> : null}
-            <UserMenu />
+            {/* On desktop the account menu lives in the sidebar (ADR-0049). */}
+            <div className="md:hidden">
+              <UserMenu />
+            </div>
           </div>
         </header>
         <div className="px-4 pt-4 sm:px-6 print:hidden">

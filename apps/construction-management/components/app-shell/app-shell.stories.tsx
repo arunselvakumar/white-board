@@ -158,17 +158,75 @@ export const WithoutStaffRoles: Story = {
  * building rises, the briefcase is lifted, the books lean). The motion
  * lives in `@repo/ui` (sidebar-icon-motion.css, #114); story tests run
  * without motion, so the play checks that the main menu's and the foot's
- * icons each have a motion of their own.
+ * page links each have a motion of their own. Sign out, at the foot, is an
+ * action rather than a page and keeps the default lift (ADR-0049).
  */
 export const NavIconMotion: Story = {
   ...shellAt("/app/dashboard"),
   play: async (context) => {
     const nav = await mainMenu(context);
+    const dashboard = nav.getByRole("link", { name: "Dashboard" });
+    const main = dashboard.closest<HTMLElement>("nav");
+    const sidebar = dashboard.closest<HTMLElement>("[data-sidebar=sidebar]");
+    if (main == null || sidebar == null)
+      throw new Error("The sidebar is missing");
+    await expectNavIconMotion(main);
+    const profile = within(sidebar)
+      .getByRole("link", { name: "My Profile" })
+      .closest<HTMLElement>("li");
+    if (profile == null) throw new Error("My Profile is not at the foot");
+    await expectNavIconMotion(profile);
+  },
+};
+
+/**
+ * The menu search narrows the main menu by label (ADR-0049): an entry's
+ * label or its group's heading keeps it, an area whose label matches
+ * shows all of it, and an area with a match is held open.
+ */
+export const MenuSearch: Story = {
+  ...shellAt("/app/projects"),
+  play: async (context) => {
+    const { userEvent } = context;
+    const nav = await mainMenu(context);
     const sidebar = nav
-      .getByRole("link", { name: "Dashboard" })
+      .getByRole("link", { name: "Projects" })
       .closest<HTMLElement>("[data-sidebar=sidebar]");
     if (sidebar == null) throw new Error("The sidebar is missing");
-    await expectNavIconMotion(sidebar);
+    const search = within(sidebar).getByRole("searchbox", {
+      name: "Search menu",
+    });
+
+    await userEvent.type(search, "payment");
+    const workspace = within(
+      await nav.findByRole("list", { name: "Workspace" }),
+    );
+    await expect(
+      workspace.getByRole("link", { name: "Central Payment" }),
+    ).toBeVisible();
+    await expect(
+      workspace.queryByRole("link", { name: "Central Store" }),
+    ).toBeNull();
+    await expect(nav.queryByRole("link", { name: "Projects" })).toBeNull();
+
+    await userEvent.clear(search);
+    await userEvent.type(search, "Masters");
+    const masters = within(await nav.findByRole("list", { name: "Masters" }));
+    await expect(
+      masters.getByRole("link", { name: "Contractors" }),
+    ).toBeVisible();
+
+    await userEvent.clear(search);
+    await userEvent.type(search, "zzz");
+    await expect(
+      await within(sidebar).findByText("No menu item matches “zzz”."),
+    ).toBeVisible();
+
+    await userEvent.clear(search);
+    for (const item of APP_NAV)
+      await expect(
+        await nav.findByRole("link", { name: item.label }),
+      ).toBeVisible();
   },
 };
 

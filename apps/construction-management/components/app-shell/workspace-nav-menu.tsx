@@ -42,7 +42,7 @@ const REPORT_SECTIONS = [
  * The Workspace submenu, one group per cross-project module. HRMS was the
  * first group until it moved to Human Resources (ADR CM-0034).
  */
-const WORKSPACE_GROUPS: readonly AreaNavGroup[] = [
+export const WORKSPACE_GROUPS: readonly AreaNavGroup[] = [
   { label: "Materials", sections: CENTRAL_STORE_SECTIONS },
   { label: "Payments", sections: PAYMENT_SECTIONS },
   // Central Reports (CM-903).
@@ -59,22 +59,30 @@ function activeWorkspaceHref(pathname: string): string | undefined {
   )?.href;
 }
 
-/** Workspace in the sidebar: the area link plus its modules. */
+/**
+ * Workspace in the sidebar: the area link plus its modules. `groups` and
+ * `forceOpen` narrow it to what the menu search matches.
+ */
 export function WorkspaceNavMenu({
   pathname,
   buttonClassName,
+  groups = WORKSPACE_GROUPS,
+  forceOpen,
 }: {
   pathname: string;
   buttonClassName: string;
+  groups?: readonly AreaNavGroup[];
+  forceOpen?: boolean;
 }) {
   return (
     <AreaNavMenu
       href="/app/workspace"
       label="Workspace"
-      groups={WORKSPACE_GROUPS}
+      groups={groups}
       currentHref={activeWorkspaceHref(pathname)}
       pathname={pathname}
       buttonClassName={buttonClassName}
+      forceOpen={forceOpen}
     />
   );
 }
