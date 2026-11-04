@@ -1,15 +1,10 @@
 import type { StaticImageData } from "next/image";
 
-import apartmentBlocks from "./photos/apartment-blocks.webp";
-import concreteFrame from "./photos/concrete-frame.webp";
-import craneTwilight from "./photos/crane-twilight.webp";
-import cranesPurpleSky from "./photos/cranes-purple-sky.webp";
-import pouringConcrete from "./photos/pouring-concrete.webp";
-import rebarSunset from "./photos/rebar-sunset.webp";
-import scaffoldClimber from "./photos/scaffold-climber.webp";
-import siteCrew from "./photos/site-crew.webp";
-import towerAndCrane from "./photos/tower-and-crane.webp";
-import towerCraneDusk from "./photos/tower-crane-dusk.webp";
+import axelTowers from "./photos/axel-towers.webp";
+import blueprintReview from "./photos/blueprint-review.webp";
+import crewAtWork from "./photos/crew-at-work.webp";
+import hammerCrew from "./photos/hammer-crew.webp";
+import redHardHat from "./photos/red-hard-hat.webp";
 
 /** A photo for the brand panel, with the credit Unsplash asks for. */
 export type AuthPhoto = {
@@ -21,52 +16,35 @@ export type AuthPhoto = {
 
 /**
  * Site photos from Unsplash (Unsplash License: free to use, no permission
- * needed). Stored in the repo at 1600 px so sign-in never waits on a third
+ * needed). Stored in the repo at 1600 px wide so sign-in never waits on a third
  * party; `next/image` serves the size each screen needs.
  */
 export const AUTH_PHOTOS = [
   {
-    image: pouringConcrete,
-    photographer: "Hammilton Ojijo",
-    username: "ojijohammilton",
+    image: hammerCrew,
+    photographer: "Arron Choi",
+    username: "arronchoi",
   },
   {
-    image: towerCraneDusk,
-    photographer: "James Sullivan",
-    username: "iamjsullivan",
+    image: axelTowers,
+    photographer: "Joakim Nådell",
+    username: "joakimnadell",
   },
   {
-    image: siteCrew,
-    photographer: "Adhitya Sibikumar",
-    username: "adhitya_2505",
+    image: blueprintReview,
+    photographer: "Pedro Miranda",
+    username: "mirandanef",
   },
   {
-    image: towerAndCrane,
-    photographer: "Ryunosuke Kikuno",
-    username: "ryunosuke_kikuno",
+    image: redHardHat,
+    photographer: "Mina Rad",
+    username: "miinrad",
   },
   {
-    image: apartmentBlocks,
-    photographer: "Parth Savani",
-    username: "iparthsavani",
+    image: crewAtWork,
+    photographer: "Nate Johnston",
+    username: "natejohnston",
   },
-  {
-    image: rebarSunset,
-    photographer: "Abhishek Kirloskar",
-    username: "nuvolephotos",
-  },
-  {
-    image: concreteFrame,
-    photographer: "Parth Savani",
-    username: "iparthsavani",
-  },
-  {
-    image: craneTwilight,
-    photographer: "Hansjörg Keller",
-    username: "kel_foto",
-  },
-  { image: cranesPurpleSky, photographer: "krzhck", username: "krzhck" },
-  { image: scaffoldClimber, photographer: "Jay Ee", username: "da_b_da" },
 ] as const satisfies readonly AuthPhoto[];
 
 /** One photo per visit; the server picks so the first paint has it. */
