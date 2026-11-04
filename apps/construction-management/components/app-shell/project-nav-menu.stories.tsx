@@ -160,16 +160,24 @@ export const Menu: Story = {
  * Hover a Project section, or tab to it: its icon plays a short animation
  * (the pin drops, the waves ripple, the compass swings). Story tests run
  * without motion, so the play checks that Back to projects, every section
- * and the foot each lead with an icon that has a motion of its own (#114).
+ * and My Profile at the foot each lead with an icon that has a motion of
+ * its own (#114). Sign out is an action, not a page, and keeps the default
+ * lift (ADR-0049).
  */
 export const NavIconMotion: Story = {
   play: async (context) => {
     const { menu } = await projectMenu(context);
-    const sidebar = (
-      await menu.findByRole("link", { name: "Testing Reports" })
-    ).closest<HTMLElement>("[data-sidebar=sidebar]");
-    if (sidebar == null) throw new Error("The sidebar is missing");
-    await expectNavIconMotion(sidebar);
+    const testing = await menu.findByRole("link", { name: "Testing Reports" });
+    const content = testing.closest<HTMLElement>("[data-sidebar=content]");
+    const sidebar = testing.closest<HTMLElement>("[data-sidebar=sidebar]");
+    if (content == null || sidebar == null)
+      throw new Error("The sidebar is missing");
+    await expectNavIconMotion(content);
+    const profile = within(sidebar)
+      .getByRole("link", { name: "My Profile" })
+      .closest<HTMLElement>("li");
+    if (profile == null) throw new Error("My Profile is not at the foot");
+    await expectNavIconMotion(profile);
   },
 };
 

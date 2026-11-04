@@ -7,6 +7,7 @@ import {
   Collapsible,
   CollapsibleContent,
 } from "@repo/ui/components/collapsible";
+import { SidebarSectionLabel } from "@repo/ui/components/sidebar-chrome";
 import {
   SidebarMenuButton,
   SidebarMenuItem,
@@ -32,7 +33,8 @@ export type AreaNavGroup = {
  * page of the area and can be folded away elsewhere. A page of the area is
  * one under its link or one a submenu entry owns (`currentHref`): Human
  * Resources links to Staff, and Role Management, HRMS and the Labour lists
- * sit beside it.
+ * sit beside it. While the menu search has a query, `groups` are the
+ * matching ones and `forceOpen` holds the submenu open (`menu-filter.ts`).
  */
 export function AreaNavMenu({
   href,
@@ -42,6 +44,7 @@ export function AreaNavMenu({
   currentHref,
   pathname,
   buttonClassName,
+  forceOpen = false,
 }: {
   href: AppNavHref;
   /** Where the area link goes when not `href` (Human Resources without Staff). */
@@ -52,6 +55,8 @@ export function AreaNavMenu({
   currentHref: string | undefined;
   pathname: string;
   buttonClassName: string;
+  /** Held open while the menu search matches something in the area. */
+  forceOpen?: boolean;
 }) {
   const inArea = isAppNavActive(pathname, href) || currentHref != null;
   const [open, setOpen] = useState(inArea);
@@ -65,10 +70,11 @@ export function AreaNavMenu({
   const Icon = APP_NAV_ICONS[href];
   // The area's own page, unless a submenu entry is that page too.
   const onIndex = pathname === href && currentHref == null;
+  const shownOpen = open || forceOpen;
 
   return (
     <SidebarMenuItem>
-      <Collapsible open={open} onOpenChange={setOpen}>
+      <Collapsible open={shownOpen} onOpenChange={setOpen}>
         <SubmenuRow
           button={
             <SidebarMenuButton
@@ -79,23 +85,23 @@ export function AreaNavMenu({
               render={<Link href={linkHref ?? href} />}
             >
               <Icon />
-              <span>{label}</span>
+              <span className="min-w-0 flex-1 truncate">{label}</span>
             </SidebarMenuButton>
           }
           label={label}
-          open={open}
+          open={shownOpen}
         />
         <CollapsibleContent>
           <SidebarMenuSub aria-label={label} className={SUBMENU_CLASS}>
             {groups.map((group) => (
-              <li key={group.label ?? label} className="mt-4 first:mt-0">
+              <li key={group.label ?? label} className="mt-3 first:mt-0">
                 {group.label != null && (
-                  <p
+                  <SidebarSectionLabel
                     id={groupLabelId(label, group.label)}
-                    className="text-sidebar-foreground/55 px-2.5 pb-1.5 text-[0.7rem] font-semibold tracking-wide uppercase"
+                    className="h-7 px-2.5"
                   >
                     {group.label}
-                  </p>
+                  </SidebarSectionLabel>
                 )}
                 <ul
                   aria-labelledby={
@@ -116,7 +122,9 @@ export function AreaNavMenu({
                           render={<Link href={section.href} />}
                         >
                           <section.icon />
-                          <span>{section.label}</span>
+                          <span className="min-w-0 flex-1 truncate">
+                            {section.label}
+                          </span>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     );

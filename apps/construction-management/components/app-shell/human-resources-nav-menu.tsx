@@ -33,25 +33,39 @@ export function activeHumanResourcesHref(pathname: string): string | undefined {
 }
 
 /**
+ * The Human Resources groups: without Team Members or Role Management Read
+ * the Staff group is left out.
+ */
+export function humanResourcesGroups(
+  canOpenStaffRoles: boolean,
+): readonly AreaNavGroup[] {
+  return canOpenStaffRoles
+    ? [STAFF_GROUP, HRMS_GROUP, LABOUR_GROUP]
+    : [HRMS_GROUP, LABOUR_GROUP];
+}
+
+/**
  * Human Resources in the sidebar (ADR CM-0034), in three groups: Staff
  * (Staff, Role Management), HRMS (its five sections) and Labour (Labours,
  * Supervisors, Vendors; ADR CM-0035). The area opens on Staff.
  * Without Team Members or Role Management Read the Staff group is left out
  * and the area opens on HRMS instead, so an HRMS Team Member lands on
- * their own screens.
+ * their own screens. `groups` and `forceOpen` narrow it to what the menu
+ * search matches.
  */
 export function HumanResourcesNavMenu({
   pathname,
   buttonClassName,
   canOpenStaffRoles,
+  groups = humanResourcesGroups(canOpenStaffRoles),
+  forceOpen,
 }: {
   pathname: string;
   buttonClassName: string;
   canOpenStaffRoles: boolean;
+  groups?: readonly AreaNavGroup[];
+  forceOpen?: boolean;
 }) {
-  const groups = canOpenStaffRoles
-    ? [STAFF_GROUP, HRMS_GROUP, LABOUR_GROUP]
-    : [HRMS_GROUP, LABOUR_GROUP];
   return (
     <AreaNavMenu
       href={STAFF_PATH}
@@ -61,6 +75,7 @@ export function HumanResourcesNavMenu({
       currentHref={activeHumanResourcesHref(pathname)}
       pathname={pathname}
       buttonClassName={buttonClassName}
+      forceOpen={forceOpen}
     />
   );
 }

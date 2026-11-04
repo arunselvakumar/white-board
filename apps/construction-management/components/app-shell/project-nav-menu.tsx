@@ -8,10 +8,10 @@ import {
   Collapsible,
   CollapsibleContent,
 } from "@repo/ui/components/collapsible";
+import { SidebarSectionLabel } from "@repo/ui/components/sidebar-chrome";
 import {
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -20,20 +20,28 @@ import {
   SidebarMenuSubItem,
 } from "@repo/ui/components/sidebar";
 
-import { attendanceNavLinks } from "@/components/attendance/attendance-tabs";
+import {
+  ATTENDANCE_TABS,
+  attendanceNavLinks,
+} from "@/components/attendance/attendance-tabs";
 import { usePaymentsNavLinks } from "@/components/finance/payments-hub/payments-nav";
+import { PAYMENTS_TABS } from "@/components/finance/payments-hub/payments-tabs";
 import { useMaterialsNavLinks } from "@/components/procurement/materials-hub/materials-nav";
+import { MATERIALS_TABS } from "@/components/procurement/materials-hub/materials-tabs";
 import { ProjectAvatar } from "@/components/projects/project-avatar";
 import { PROJECT_MODULE_ICONS } from "@/components/projects/project-module-icons";
 import { useEquipmentNavLinks } from "@/components/site-work/equipment/equipment-nav";
+import { EQUIPMENT_TABS } from "@/components/site-work/equipment/equipment-tabs";
 // Sales (CM-1006)
 import { bookingsNavLinks } from "@/components/sales/bookings/bookings-nav";
 // Sales (CM-1002)
 import { useInquiryNavLinks } from "@/components/sales/inquiries/inquiry-nav";
+import { INQUIRY_TABS } from "@/components/sales/inquiries/inquiry-tabs";
 import {
   activeProjectSegment,
   projectBasePath,
   projectNavGroups,
+  type ProjectNavGroup,
   type ProjectNavSection,
 } from "@/lib/project-nav";
 import {
@@ -45,14 +53,27 @@ import {
   SUBMENU_CLASS,
   SubmenuRow,
 } from "@/components/app-shell/submenu-row";
+import type { ProjectModuleKey } from "@/src/projects/domain/project-modules";
 import { projectTypeLabel } from "@/src/projects/domain/project-type";
+import { BOOKINGS_TABS } from "@/src/queries/sales-units";
 import { projectHomeQuery } from "@/src/queries/project-home";
 import { projectQuery } from "@/src/queries/projects";
 
-const GROUP_LABEL_CLASS =
-  "text-sidebar-foreground/65 px-3 text-[11px] font-semibold tracking-[0.12em] uppercase";
+import {
+  filterMenuArea,
+  labelMatches,
+  menuQuery,
+  noMatchMessage,
+} from "./menu-filter";
 
 type SubLink = { href: string; label: string };
+
+/**
+ * Under a menu search query: `all` when the module (or its heading)
+ * matched and shows every tab, else only the tabs matching `query`. The
+ * submenu is held open either way.
+ */
+type EntryFilter = { query: string; all: boolean };
 
 type EntryProps = {
   projectId: string;
@@ -61,21 +82,85 @@ type EntryProps = {
   active: boolean;
   pathname: string;
   buttonClassName: string;
+  filter: EntryFilter | null;
 };
+
+/**
+ * Every tab a module can fold out, by label, for the menu search. The
+ * submenu itself may show fewer once the viewer's access loads.
+ */
+function submenuLabels(key: ProjectModuleKey): readonly { label: string }[] {
+  switch (key) {
+    case "attendance":
+      return ATTENDANCE_TABS;
+    case "payments":
+      return PAYMENTS_TABS;
+    case "materials":
+      return MATERIALS_TABS;
+    case "equipment_usage":
+      return EQUIPMENT_TABS;
+    case "bookings":
+      return BOOKINGS_TABS;
+    case "inquiries":
+      return INQUIRY_TABS;
+    default:
+      return [];
+  }
+}
+
+type ShownGroup = {
+  label: string;
+  sections: { section: ProjectNavSection; filter: EntryFilter | null }[];
+};
+
+/**
+ * The Project's groups and modules under the (normalised) menu search
+ * query (`menu-filter.ts`): a heading that matches keeps all its modules,
+ * a module matches by its label or one of its tabs', and a heading with no
+ * module left goes.
+ */
+function filterProjectGroups(
+  groups: readonly ProjectNavGroup[],
+  query: string,
+): ShownGroup[] {
+  return groups.flatMap((group): ShownGroup[] => {
+    const headingMatches = query !== "" && labelMatches(group.label, query);
+    const sections = group.sections.flatMap(
+      (section): ShownGroup["sections"] => {
+        if (query === "") return [{ section, filter: null }];
+        if (headingMatches) return [{ section, filter: { query, all: true } }];
+        const match = filterMenuArea(
+          section.label,
+          [{ sections: submenuLabels(section.key) }],
+          query,
+        );
+        return match == null
+          ? []
+          : [{ section, filter: { query, all: match.all } }];
+      },
+    );
+    return sections.length === 0 ? [] : [{ label: group.label, sections }];
+  });
+}
 
 /**
  * The sidebar inside a Project (ADR CM-0020): Back to projects, the
  * Project's logo and name, then its modules under fixed headings. Modules
  * with tabs (Attendance, Payments, Materials, Equipment) fold out into a
- * submenu that opens by itself on any of their pages.
+ * submenu that opens by itself on any of their pages. The menu search
+ * narrows the modules and their tabs; Back to projects and the Project
+ * stay.
  */
 export function ProjectNavMenu({
   projectId,
   pathname,
+  query = "",
   buttonClassName,
 }: {
   projectId: string;
   pathname: string;
+  /** The sidebar's menu search, as typed. */
+  query?: string;
   buttonClassName: string;
 }) {
   // The shell sits outside the page's Suspense boundary: plain reads, never suspend.
@@ -92,6 +177,7 @@ export function ProjectNavMenu({
     projectId,
     groups.flatMap((group) => group.sections.map((section) => section.segment)),
   );
+  const shown = filterProjectGroups(groups, menuQuery(query));
 
   // Opening a Project on a module low in the menu (Payments, Reports)
   // scrolls its entry into view, once the menu has loaded.
@@ -109,13 +195,12 @@ export function ProjectNavMenu({
         <SidebarMenu className="gap-3">
           <SidebarMenuItem>
             <SidebarMenuButton
-              variant="outline"
               tooltip="Back to projects"
               className={buttonClassName}
               render={<Link href="/app/projects" />}
             >
               <ArrowLeft />
-              <span>Back to projects</span>
+              <span className="min-w-0 flex-1 truncate">Back to projects</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <li className="flex min-w-0 items-center gap-3 px-3 py-1">
@@ -154,15 +239,20 @@ export function ProjectNavMenu({
               ))}
             </SidebarMenu>
           </SidebarGroup>
+        ) : shown.length === 0 && groups.length > 0 ? (
+          <p className="text-sidebar-foreground/55 px-6 py-2 text-sm">
+            {noMatchMessage(query)}
+          </p>
         ) : (
-          groups.map((group) => (
+          shown.map((group) => (
             <SidebarGroup key={group.label} className="px-3 py-1.5">
-              <SidebarGroupLabel className={GROUP_LABEL_CLASS}>
+              {/* data-sidebar: the group's label, as the kit's own marks it. */}
+              <SidebarSectionLabel data-sidebar="group-label">
                 {group.label}
-              </SidebarGroupLabel>
+              </SidebarSectionLabel>
               <SidebarGroupContent>
                 <SidebarMenu className="gap-1">
-                  {group.sections.map((section) => (
+                  {group.sections.map(({ section, filter }) => (
                     <ProjectNavEntry
                       key={section.key}
                       projectId={projectId}
@@ -170,6 +260,7 @@ export function ProjectNavMenu({
                       active={section.segment === current}
                       pathname={pathname}
                       buttonClassName={buttonClassName}
+                      filter={filter}
                     />
                   ))}
                 </SidebarMenu>
@@ -206,19 +297,20 @@ function ProjectNavEntry(props: EntryProps) {
 /**
  * A submenu's open state: open on the module's pages, foldable by hand,
  * and opened again on arriving at one of them (state adjusted in render).
+ * Held open while the menu search has a query (`filter`).
  */
-function useSubmenuOpen(active: boolean) {
+function useSubmenuOpen({ active, filter }: EntryProps) {
   const [open, setOpen] = useState(active);
   const [wasActive, setWasActive] = useState(active);
   if (active !== wasActive) {
     setWasActive(active);
     if (active) setOpen(true);
   }
-  return [open, setOpen] as const;
+  return [open || filter != null, setOpen] as const;
 }
 
 function AttendanceEntry(props: EntryProps) {
-  const [open, setOpen] = useSubmenuOpen(props.active);
+  const [open, setOpen] = useSubmenuOpen(props);
   return (
     <ProjectNavItem
       {...props}
@@ -232,7 +324,7 @@ function AttendanceEntry(props: EntryProps) {
 }
 
 function PaymentsEntry(props: EntryProps) {
-  const [open, setOpen] = useSubmenuOpen(props.active);
+  const [open, setOpen] = useSubmenuOpen(props);
   const links = usePaymentsNavLinks(props.projectId, open);
   return (
     <ProjectNavItem
@@ -243,7 +335,7 @@ function PaymentsEntry(props: EntryProps) {
 }
 
 function MaterialsEntry(props: EntryProps) {
-  const [open, setOpen] = useSubmenuOpen(props.active);
+  const [open, setOpen] = useSubmenuOpen(props);
   const links = useMaterialsNavLinks(props.projectId, open);
   return (
     <ProjectNavItem
@@ -254,7 +346,7 @@ function MaterialsEntry(props: EntryProps) {
 }
 
 function EquipmentEntry(props: EntryProps) {
-  const [open, setOpen] = useSubmenuOpen(props.active);
+  const [open, setOpen] = useSubmenuOpen(props);
   const links = useEquipmentNavLinks(props.projectId, open);
   return (
     <ProjectNavItem
@@ -266,7 +358,7 @@ function EquipmentEntry(props: EntryProps) {
 
 // Sales (CM-1002): the Inquiries module's tabs.
 function InquiriesEntry(props: EntryProps) {
-  const [open, setOpen] = useSubmenuOpen(props.active);
+  const [open, setOpen] = useSubmenuOpen(props);
   const links = useInquiryNavLinks(props.projectId, open);
   return (
     <ProjectNavItem
@@ -286,6 +378,7 @@ function ProjectNavItem({
   active,
   pathname,
   buttonClassName,
+  filter,
   submenu,
 }: EntryProps & {
   submenu?: {
@@ -311,11 +404,19 @@ function ProjectNavItem({
       render={<Link href={href} />}
     >
       <Icon />
-      <span>{section.label}</span>
+      <span className="min-w-0 flex-1 truncate">{section.label}</span>
     </SidebarMenuButton>
   );
 
   if (submenu == null) return <SidebarMenuItem>{button}</SidebarMenuItem>;
+
+  const links =
+    filter == null || filter.all
+      ? submenu.links
+      : submenu.links.filter((link) => labelMatches(link.label, filter.query));
+  // The matching tab is one the viewer may not read: the module alone.
+  if (links.length === 0 && filter != null && !filter.all)
+    return <SidebarMenuItem>{button}</SidebarMenuItem>;
 
   return (
     <SidebarMenuItem>
@@ -323,7 +424,7 @@ function ProjectNavItem({
         <SubmenuRow button={button} label={section.label} open={submenu.open} />
         <CollapsibleContent>
           <SidebarMenuSub aria-label={section.label} className={SUBMENU_CLASS}>
-            {submenu.links.map((link) => {
+            {links.map((link) => {
               const linkActive = link === currentLink;
               return (
                 <SidebarMenuSubItem key={link.href}>
@@ -333,7 +434,9 @@ function ProjectNavItem({
                     className={SUBMENU_BUTTON_CLASS}
                     render={<Link href={link.href} />}
                   >
-                    <span>{link.label}</span>
+                    <span className="min-w-0 flex-1 truncate">
+                      {link.label}
+                    </span>
                   </SidebarMenuSubButton>
                 </SidebarMenuSubItem>
               );
@@ -347,7 +450,7 @@ function ProjectNavItem({
 
 // Sales (CM-1006): Bookings → Units, Bookings.
 function BookingsEntry(props: EntryProps) {
-  const [open, setOpen] = useSubmenuOpen(props.active);
+  const [open, setOpen] = useSubmenuOpen(props);
   return (
     <ProjectNavItem
       {...props}

@@ -1,10 +1,16 @@
 "use client";
 
-import { CreditCard, UserRound } from "lucide-react";
+import { useCompanySignOut } from "@repo/auth/construction/react";
+import { LogOut, UserRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { Separator } from "@repo/ui/components/separator";
+import {
+  SidebarFootnote,
+  SidebarSearch,
+  SidebarSectionLabel,
+} from "@repo/ui/components/sidebar-chrome";
 import { SkipLink } from "@repo/ui/components/skip-link";
 import {
   Sidebar,
@@ -12,7 +18,6 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarInset,
   SidebarMenu,
@@ -26,36 +31,51 @@ import {
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { ReadyDownloadToast } from "@/components/notifications/ready-download-toast";
 import { APP_NAV, isAppNavActive } from "@/lib/app-nav";
+import { MASTERS_GROUPS } from "@/lib/masters-nav";
 import { projectIdFromPath } from "@/lib/project-nav";
+import packageJson from "@/package.json";
 
 import { APP_NAV_ICONS } from "./app-nav-icons";
+import type { AreaNavGroup } from "./area-nav-menu";
 import { BrandMark } from "./brand-mark";
 import { CompanySwitcher } from "./company-switcher";
-import { HumanResourcesNavMenu } from "./human-resources-nav-menu";
+import {
+  HumanResourcesNavMenu,
+  humanResourcesGroups,
+} from "./human-resources-nav-menu";
 import { MastersNavMenu } from "./masters-nav-menu";
 import { CompanyDeletionBanner } from "./company-deletion-banner";
+import {
+  filterMenuArea,
+  labelMatches,
+  menuQuery,
+  noMatchMessage,
+  type AreaMatch,
+} from "./menu-filter";
 import { PlanBanner } from "./plan-banner";
 import { ProjectNavMenu } from "./project-nav-menu";
+import { SidebarAccountRow } from "./sidebar-account-row";
+import { SidebarPlanCard } from "./sidebar-plan-card";
 import { UserMenu } from "./user-menu";
-import { WorkspaceNavMenu } from "./workspace-nav-menu";
+import { WORKSPACE_GROUPS, WorkspaceNavMenu } from "./workspace-nav-menu";
 
+/** A sidebar row (ADR-0049): muted on the ink panel, the primary pill when current. */
 const NAV_BUTTON_CLASS =
-  "text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-foreground data-active:bg-sidebar-accent data-active:text-sidebar-foreground data-active:[&_svg]:text-sidebar-primary h-10 gap-3 rounded-xl px-3 transition-colors data-active:shadow-[inset_0_0_0_1px_var(--sidebar-border)] [&_svg]:size-[18px]";
+  "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground data-active:bg-sidebar-primary data-active:text-sidebar-primary-foreground data-active:[&_svg]:text-sidebar-primary-foreground data-active:font-semibold h-10 gap-3 rounded-xl px-3 transition-colors [&_svg]:size-[18px] [&_svg]:text-sidebar-foreground/65 hover:[&_svg]:text-sidebar-foreground";
 
-/** Account pages that sit at the foot of the sidebar, below the areas. */
-const FOOTER_LINKS = [
-  { href: "/app/profile", label: "My Profile", icon: UserRound },
-  { href: "/app/subscription", label: "Your Subscription", icon: CreditCard },
-] as const;
+const VERSION = `v${packageJson.version}`;
 
 /**
- * Authenticated chrome: the Company Dashboard, Projects, Human Resources,
- * Workspace, Masters and Settings, the Active Company, the account menu. Inside a
- * Project the areas give way to the Project's own menu (ADR CM-0020).
- * `canOpenDashboard` is the Dashboard menu's Read flag (CM-902): without it
- * the Dashboard is not in the menu. `canOpenStaffRoles` is Team Members or
- * Role Management Read (ADR CM-0030): without either, the Staff group of
- * Human Resources is not (ADR CM-0034).
+ * Authenticated chrome (ADR-0049): the ink sidebar with the User's account
+ * row, the menu search, the Company Dashboard, Projects, Human Resources,
+ * Workspace, Masters and Settings, then the plan card, My Profile and Sign
+ * out; the top bar with the product, the Active Company and the
+ * notifications. Inside a Project the areas give way to the Project's own
+ * menu (ADR CM-0020). `canOpenDashboard` is the Dashboard menu's Read flag
+ * (CM-902): without it the Dashboard is not in the menu.
+ * `canOpenStaffRoles` is Team Members or Role Management Read (ADR
+ * CM-0030): without either, the Staff group of Human Resources is not (ADR
+ * CM-0034).
  */
 export function AppShell({
   children,
@@ -68,34 +88,33 @@ export function AppShell({
 }) {
   const pathname = usePathname() || "/app";
   const projectId = projectIdFromPath(pathname);
+  const [query, setQuery] = useState("");
 
   return (
-    <SidebarProvider>
+    <SidebarProvider style={{ "--sidebar-width": "17.5rem" } as CSSProperties}>
       <SkipLink />
       <CloseMobileSidebarOnNavigate pathname={pathname} />
-      <Sidebar variant="sidebar" collapsible="offcanvas">
-        <SidebarHeader className="px-4 pt-6 pb-2">
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                size="lg"
-                tooltip="Construction Management"
-                render={<Link href="/app/projects" />}
-              >
-                <BrandMark className="size-9 rounded-xl" />
-                <span className="text-sidebar-foreground truncate text-base leading-tight font-semibold tracking-tight">
-                  Construction
-                  <br />
-                  Management
-                </span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
+      <Sidebar
+        variant="floating"
+        collapsible="offcanvas"
+        className="[&_[data-slot=sidebar-inner]]:ring-sidebar-border p-3 [&_[data-slot=sidebar-inner]]:rounded-2xl"
+      >
+        <SidebarHeader className="gap-3 px-3 pt-4 pb-2">
+          <SidebarAccountRow />
+          <SidebarSearch
+            aria-label="Search menu"
+            placeholder="Search menu…"
+            value={query}
+            onChange={(event) => {
+              setQuery(event.target.value);
+            }}
+          />
         </SidebarHeader>
         <SidebarContent>
           {projectId == null ? (
             <MainMenu
               pathname={pathname}
+              query={query}
               canOpenDashboard={canOpenDashboard}
               canOpenStaffRoles={canOpenStaffRoles}
             />
@@ -103,31 +122,15 @@ export function AppShell({
             <ProjectNavMenu
               projectId={projectId}
               pathname={pathname}
+              query={query}
               buttonClassName={NAV_BUTTON_CLASS}
             />
           )}
         </SidebarContent>
-        <SidebarFooter className="border-sidebar-border mx-3 border-t px-0 pt-3 pb-4">
-          <SidebarMenu className="gap-1">
-            {FOOTER_LINKS.map((item) => {
-              const active =
-                pathname === item.href || pathname.startsWith(`${item.href}/`);
-              return (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    isActive={active}
-                    tooltip={item.label}
-                    aria-current={active ? "page" : undefined}
-                    className={NAV_BUTTON_CLASS}
-                    render={<Link href={item.href} />}
-                  >
-                    <item.icon />
-                    <span>{item.label}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              );
-            })}
-          </SidebarMenu>
+        <SidebarFooter className="gap-2 px-3 pt-2 pb-3">
+          <SidebarPlanCard />
+          <FooterMenu pathname={pathname} />
+          <SidebarFootnote>{VERSION}</SidebarFootnote>
         </SidebarFooter>
       </Sidebar>
       {/* min-w-0: a wide child (a table, a chart) scrolls inside
@@ -135,11 +138,20 @@ export function AppShell({
       <SidebarInset className="min-w-0">
         <header className="bg-card/85 border-border/70 sticky top-(--impersonation-bar) z-20 flex h-16 shrink-0 items-center gap-2 border-b px-4 backdrop-blur sm:px-6 print:hidden">
           <SidebarTrigger />
-          <Separator orientation="vertical" className="mr-1 h-4" />
+          <div className="flex shrink-0 items-center gap-2">
+            <BrandMark className="size-7 rounded-lg" />
+            <span className="hidden text-sm font-semibold sm:inline">
+              Construction Management
+            </span>
+          </div>
+          <Separator orientation="vertical" className="mx-1 h-4" />
           <CompanySwitcher />
           <div className="ml-auto flex items-center gap-1">
             <NotificationBell />
-            <UserMenu />
+            {/* On a wide screen the account menu is the sidebar's account row. */}
+            <div className="md:hidden">
+              <UserMenu />
+            </div>
           </div>
         </header>
         <PlanBanner />
@@ -159,73 +171,147 @@ export function AppShell({
 }
 
 /**
+ * The foot of the sidebar, below the plan card: My Profile, then Sign out.
+ * Your Subscription is the plan card's link. Outside the Main navigation:
+ * Sign out is an action, not a page.
+ */
+function FooterMenu({ pathname }: { pathname: string }) {
+  const { signOut, fetchStatus } = useCompanySignOut();
+  const profileHref = "/app/profile";
+  const onProfile =
+    pathname === profileHref || pathname.startsWith(`${profileHref}/`);
+  return (
+    <SidebarMenu className="gap-1">
+      <SidebarMenuItem>
+        <SidebarMenuButton
+          isActive={onProfile}
+          tooltip="My Profile"
+          aria-current={onProfile ? "page" : undefined}
+          className={NAV_BUTTON_CLASS}
+          render={<Link href={profileHref} />}
+        >
+          <UserRound />
+          <span className="min-w-0 flex-1 truncate">My Profile</span>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+      <SidebarMenuItem>
+        <SidebarMenuButton
+          tooltip="Sign out"
+          className={NAV_BUTTON_CLASS}
+          disabled={fetchStatus === "fetching"}
+          onClick={() => {
+            void signOut();
+          }}
+        >
+          <LogOut />
+          <span className="min-w-0 flex-1 truncate">Sign out</span>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  );
+}
+
+type MainMenuRow = {
+  item: (typeof APP_NAV)[number];
+  /** An area's groups under the menu search; null for a plain row. */
+  match: AreaMatch<AreaNavGroup> | null;
+};
+
+/** The areas with a submenu, by their main-menu link. */
+function areaGroups(
+  href: string,
+  canOpenStaffRoles: boolean,
+): readonly AreaNavGroup[] | undefined {
+  switch (href) {
+    case "/app/staff":
+      return humanResourcesGroups(canOpenStaffRoles);
+    case "/app/workspace":
+      return WORKSPACE_GROUPS;
+    case "/app/masters":
+      return MASTERS_GROUPS;
+    default:
+      return undefined;
+  }
+}
+
+/**
  * The Company Dashboard (with Dashboard Read), Projects, then the areas
  * with a submenu each: Human Resources, Workspace and Masters, then
- * Settings (ADR CM-0034).
+ * Settings (ADR CM-0034). The menu search narrows it (`menu-filter.ts`).
  */
 function MainMenu({
   pathname,
+  query,
   canOpenDashboard,
   canOpenStaffRoles,
 }: {
   pathname: string;
+  query: string;
   canOpenDashboard: boolean;
   canOpenStaffRoles: boolean;
 }) {
+  const q = menuQuery(query);
+  const rows = APP_NAV.flatMap((item): MainMenuRow[] => {
+    if (item.href === "/app/dashboard" && !canOpenDashboard) return [];
+    const groups = areaGroups(item.href, canOpenStaffRoles);
+    if (groups == null)
+      return labelMatches(item.label, q) ? [{ item, match: null }] : [];
+    const match = filterMenuArea(item.label, groups, q);
+    return match == null ? [] : [{ item, match }];
+  });
+
   return (
-    <SidebarGroup className="px-3 pt-4">
-      <SidebarGroupLabel className="text-sidebar-foreground/65 px-3 text-[11px] font-semibold tracking-[0.12em] uppercase">
-        Main menu
-      </SidebarGroupLabel>
+    <SidebarGroup className="px-3 pt-2">
+      <SidebarSectionLabel>Main menu</SidebarSectionLabel>
       <SidebarGroupContent>
         <nav aria-label="Main">
-          <SidebarMenu className="gap-1">
-            {APP_NAV.map((item) => {
-              if (item.href === "/app/dashboard" && !canOpenDashboard)
-                return null;
-              if (item.href === "/app/masters")
+          {rows.length === 0 ? (
+            <p className="text-sidebar-foreground/55 px-3 py-2 text-sm">
+              {noMatchMessage(query)}
+            </p>
+          ) : (
+            <SidebarMenu className="gap-1">
+              {rows.map(({ item, match }) => {
+                if (match != null) {
+                  const area = {
+                    pathname,
+                    buttonClassName: NAV_BUTTON_CLASS,
+                    groups: match.groups,
+                    forceOpen: match.forceOpen,
+                  };
+                  if (item.href === "/app/masters")
+                    return <MastersNavMenu key={item.href} {...area} />;
+                  if (item.href === "/app/staff")
+                    return (
+                      <HumanResourcesNavMenu
+                        key={item.href}
+                        {...area}
+                        canOpenStaffRoles={canOpenStaffRoles}
+                      />
+                    );
+                  return <WorkspaceNavMenu key={item.href} {...area} />;
+                }
+                const Icon = APP_NAV_ICONS[item.href];
+                const active = isAppNavActive(pathname, item.href);
                 return (
-                  <MastersNavMenu
-                    key={item.href}
-                    pathname={pathname}
-                    buttonClassName={NAV_BUTTON_CLASS}
-                  />
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      isActive={active}
+                      tooltip={item.label}
+                      aria-current={active ? "page" : undefined}
+                      className={NAV_BUTTON_CLASS}
+                      render={<Link href={item.href} />}
+                    >
+                      <Icon />
+                      <span className="min-w-0 flex-1 truncate">
+                        {item.label}
+                      </span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 );
-              if (item.href === "/app/staff")
-                return (
-                  <HumanResourcesNavMenu
-                    key={item.href}
-                    pathname={pathname}
-                    buttonClassName={NAV_BUTTON_CLASS}
-                    canOpenStaffRoles={canOpenStaffRoles}
-                  />
-                );
-              if (item.href === "/app/workspace")
-                return (
-                  <WorkspaceNavMenu
-                    key={item.href}
-                    pathname={pathname}
-                    buttonClassName={NAV_BUTTON_CLASS}
-                  />
-                );
-              const Icon = APP_NAV_ICONS[item.href];
-              const active = isAppNavActive(pathname, item.href);
-              return (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    isActive={active}
-                    tooltip={item.label}
-                    aria-current={active ? "page" : undefined}
-                    className={NAV_BUTTON_CLASS}
-                    render={<Link href={item.href} />}
-                  >
-                    <Icon />
-                    <span>{item.label}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              );
-            })}
-          </SidebarMenu>
+              })}
+            </SidebarMenu>
+          )}
         </nav>
       </SidebarGroupContent>
     </SidebarGroup>

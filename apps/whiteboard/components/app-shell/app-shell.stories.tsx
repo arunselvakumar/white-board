@@ -231,11 +231,11 @@ export const ThemePreference: Story = {
     await expect(
       canvasElement.ownerDocument.defaultView?.getComputedStyle(activeNav)
         .backgroundColor,
-    ).toBe("rgb(241, 242, 248)");
+    ).toBe("rgb(107, 114, 220)");
     await expect(
       canvasElement.ownerDocument.defaultView?.getComputedStyle(sidebar)
         .backgroundColor,
-    ).toBe("rgb(255, 255, 255)");
+    ).toBe("rgb(19, 20, 27)");
     const toggle = body.getByRole("switch", { name: "Dark mode" });
 
     await expect(toggle).not.toBeChecked();
@@ -246,7 +246,7 @@ export const ThemePreference: Story = {
       expect(
         canvasElement.ownerDocument.defaultView?.getComputedStyle(sidebar)
           .backgroundColor,
-      ).toBe("rgb(22, 24, 34)"),
+      ).toBe("rgb(13, 14, 20)"),
     );
     await expect(
       canvasElement.ownerDocument.defaultView?.localStorage.getItem(
