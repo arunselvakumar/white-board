@@ -19,6 +19,26 @@ type Canvas = {
   getByText: (text: string) => HTMLElement;
 };
 
+/**
+ * Opens the sidebar where it is a sheet (below `md`) and returns it; from
+ * `md` up it is already beside the page. The shell's chrome lives in it
+ * (ADR-0050): the Workspace switcher, the account row, the menu.
+ */
+export async function openSidebar(
+  canvasElement: HTMLElement,
+  userEvent: UserEvent,
+): Promise<HTMLElement> {
+  const document = canvasElement.ownerDocument;
+  const body = within(document.body);
+  if ((document.defaultView?.innerWidth ?? 1280) < 768) {
+    await userEvent.click(body.getByRole("button", { name: "Toggle Sidebar" }));
+    return body.findByRole("dialog");
+  }
+  const sidebar = document.querySelector('[data-slot="sidebar-inner"]');
+  if (!(sidebar instanceof HTMLElement)) throw new Error("Sidebar is missing");
+  return sidebar;
+}
+
 export async function expectAppShell(
   canvas: Canvas,
   canvasElement: HTMLElement,
@@ -29,22 +49,17 @@ export async function expectAppShell(
     canvas.getByRole("heading", { name: current.title }),
   ).toBeVisible();
   await expect(canvas.getByText(current.description)).toBeVisible();
-  await expect(canvas.getByText("Riverside Centre")).toBeVisible();
-  await expect(
-    canvas.getByRole("button", { name: "Account menu for Arun" }),
-  ).toBeVisible();
 
-  const view = canvasElement.ownerDocument.defaultView;
-  let scope: Canvas = canvas;
-  if (view != null && view.innerWidth < 768) {
-    await userEvent.click(
-      canvas.getByRole("button", { name: "Toggle Sidebar" }),
-    );
-    const dialog = await within(canvasElement.ownerDocument.body).findByRole(
-      "dialog",
-    );
-    scope = within(dialog);
-  }
+  const scope: Canvas = within(await openSidebar(canvasElement, userEvent));
+  await expect(
+    scope.getByRole("button", {
+      name: "Active Workspace: Riverside Centre. Switch Workspace",
+    }),
+  ).toBeVisible();
+  await expect(scope.getByText("Riverside Centre")).toBeVisible();
+  await expect(
+    scope.getByRole("button", { name: "Account menu for Arun" }),
+  ).toBeVisible();
 
   const mainNav = within(scope.getByRole("navigation", { name: "Main" }));
   for (const item of APP_NAV) {

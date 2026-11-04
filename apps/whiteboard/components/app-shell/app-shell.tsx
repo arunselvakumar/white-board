@@ -1,20 +1,11 @@
 "use client";
 
-import {
-  useAuth,
-  useSignOut,
-  useUser,
-  useWorkspace,
-  useWorkspaceList,
-} from "@repo/auth/react";
-import { Building2, LogOut } from "lucide-react";
+import { useAuth, useSignOut, useUser } from "@repo/auth/react";
+import { LogOut } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type CSSProperties, type ReactNode } from "react";
-import { Separator } from "@repo/ui/components/separator";
 import { SkipLink } from "@repo/ui/components/skip-link";
-import { Button } from "@repo/ui/components/button";
 import {
   Sidebar,
   SidebarContent,
@@ -27,13 +18,14 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
-  SidebarTrigger,
 } from "@repo/ui/components/sidebar";
 import {
   SidebarFootnote,
+  SidebarPhoneBar,
   SidebarSearch,
   SidebarSectionLabel,
 } from "@repo/ui/components/sidebar-chrome";
+import { SidebarGlide } from "@repo/ui/components/sidebar-glide";
 
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { navForRole } from "@/lib/app-nav";
@@ -45,7 +37,12 @@ import { AppBreadcrumbs } from "./app-breadcrumbs";
 import { SIDEBAR_ROW_CLASS, SidebarMainNav } from "./sidebar-nav";
 import { SidebarTodayCard } from "./sidebar-today-card";
 import { ThemeToggle } from "./theme-toggle";
-import { SidebarUserAccount, UserMenu } from "./user-menu";
+import { SidebarUserAccount } from "./user-menu";
+import { WorkspaceSwitcher } from "./workspace-switcher";
+
+/** The bell on the sidebar's account row, in the sidebar's colours. */
+const SIDEBAR_BELL_CLASS =
+  "text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-foreground size-9 shrink-0 rounded-[min(var(--radius-md),12px)] [&>svg]:size-[18px] [&>[data-slot=notification-bell-count]]:ring-sidebar";
 
 /** Sign out, the last row of the sidebar. */
 function SidebarSignOut() {
@@ -70,8 +67,6 @@ function SidebarSignOut() {
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const { workspace } = useWorkspace();
-  const { workspaces } = useWorkspaceList();
   const { role } = useAuth();
   const pathname = usePathname() || "/";
   const [menuQuery, setMenuQuery] = useState("");
@@ -82,7 +77,6 @@ export function AppShell({ children }: { children: ReactNode }) {
     setQueryPathname(pathname);
     setMenuQuery("");
   }
-  const workspaceName = workspace?.name ?? "Workspace";
   const navigation = navForRole(role);
 
   return (
@@ -94,7 +88,15 @@ export function AppShell({ children }: { children: ReactNode }) {
         className="[&_[data-slot=sidebar-inner]]:ring-sidebar-border p-3 [&_[data-slot=sidebar-inner]]:rounded-2xl"
       >
         <SidebarHeader className="gap-3 px-3 pt-4 pb-2">
-          <SidebarUserAccount />
+          <WorkspaceSwitcher />
+          <SidebarUserAccount
+            before={
+              // Only Teachers receive Notifications for now (ADR-0041 §1).
+              role === "teacher" ? (
+                <NotificationBell className={SIDEBAR_BELL_CLASS} />
+              ) : null
+            }
+          />
           <SidebarSearch
             aria-label="Search menu"
             placeholder="Search menu…"
@@ -105,68 +107,49 @@ export function AppShell({ children }: { children: ReactNode }) {
           />
         </SidebarHeader>
         <SidebarContent>
-          <SidebarGroup className="px-3 pt-2">
-            <SidebarSectionLabel>Main menu</SidebarSectionLabel>
-            <SidebarGroupContent>
-              <SidebarMainNav items={navigation} query={menuQuery} />
-            </SidebarGroupContent>
-          </SidebarGroup>
+          {/* One hover pill per scrolling region (ADR-0050). */}
+          <SidebarGlide>
+            <SidebarGroup className="px-3 pt-2">
+              <SidebarSectionLabel>Main menu</SidebarSectionLabel>
+              <SidebarGroupContent>
+                <SidebarMainNav items={navigation} query={menuQuery} />
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarGlide>
         </SidebarContent>
         <SidebarFooter className="gap-2 px-3 pt-2 pb-3">
           {role === "owner" ? <SidebarTodayCard /> : null}
-          <SidebarMenu className="gap-1">
-            <SidebarMenuItem>
-              <ThemeToggle />
-            </SidebarMenuItem>
-            <SidebarSignOut />
-          </SidebarMenu>
+          <SidebarGlide>
+            <SidebarMenu className="gap-1">
+              <SidebarMenuItem>
+                <ThemeToggle />
+              </SidebarMenuItem>
+              <SidebarSignOut />
+            </SidebarMenu>
+          </SidebarGlide>
           <SidebarFootnote>{VERSION}</SidebarFootnote>
         </SidebarFooter>
       </Sidebar>
       <SidebarInset className="min-w-0">
-        <header className="bg-card/85 border-border/70 sticky top-0 z-20 flex h-16 shrink-0 items-center gap-2 border-b px-4 backdrop-blur sm:px-6 print:hidden">
-          <SidebarTrigger />
-          <p className="text-foreground flex shrink-0 items-center gap-2">
+        {/* No top bar from md up: the sidebar carries it (ADR-0050). */}
+        <SidebarPhoneBar>
+          <p className="text-foreground flex min-w-0 items-center gap-2">
             <Image
               src="/whiteboard-logo.svg"
               alt=""
               width={28}
               height={28}
-              className="size-7 rounded-lg"
+              className="size-7 shrink-0 rounded-lg"
             />
-            <span className="hidden text-sm font-semibold sm:inline">
-              Whiteboard
-            </span>
+            <span className="truncate text-sm font-semibold">Whiteboard</span>
           </p>
-          <Separator orientation="vertical" className="mx-1 h-4" />
-          <p className="text-foreground flex min-w-0 items-center gap-2 text-sm">
-            <span
-              aria-hidden="true"
-              className="bg-primary/10 text-primary flex size-7 shrink-0 items-center justify-center rounded-lg"
-            >
-              <Building2 className="size-4" />
-            </span>
-            <span className="truncate">{workspaceName}</span>
-          </p>
-          {workspaces.length > 1 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              render={<Link href="/select-workspace" />}
-            >
-              Switch Workspace
-            </Button>
-          )}
-          <div className="ml-auto flex items-center gap-1">
-            {/* Only Teachers receive Notifications for now (ADR-0041 §1). */}
-            {role === "teacher" ? <NotificationBell /> : null}
-            {/* On desktop the account menu lives in the sidebar (ADR-0049). */}
-            <div className="md:hidden">
-              <UserMenu />
+          {role === "teacher" ? (
+            <div className="ml-auto">
+              <NotificationBell />
             </div>
-          </div>
-        </header>
-        <div className="px-4 pt-4 sm:px-6 print:hidden">
+          ) : null}
+        </SidebarPhoneBar>
+        <div className="px-4 pt-5 sm:px-6 print:hidden">
           <AppBreadcrumbs />
         </div>
         {/* tabIndex -1: Skip to content can move focus here without adding a Tab stop. */}
