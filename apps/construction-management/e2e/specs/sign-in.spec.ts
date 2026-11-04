@@ -64,6 +64,8 @@ signInPageTest.describe("Sign in", () => {
 
       const projectsPage = new ProjectsPage(page);
       await expect(page).toHaveURL(projectsPage.url);
+      // On the phone the switcher is in the sidebar sheet (ADR-0050).
+      await projectsPage.openSidebar();
       await expect(projectsPage.companySwitcher).toContainText(
         account.company.name,
       );

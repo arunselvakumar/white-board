@@ -22,6 +22,16 @@ export abstract class AppShellPage extends BasePage {
     return this.page.getByRole("button", { name: /^Notifications/ }).first();
   }
 
+  /**
+   * On a phone the sidebar is a sheet behind "Toggle Sidebar" (ADR-0050),
+   * so the switcher, the account menu and the sidebar bell exist only once
+   * it is open; on a desktop it is always open and this does nothing.
+   */
+  public async openSidebar() {
+    const trigger = this.page.getByRole("button", { name: "Toggle Sidebar" });
+    if (await trigger.isVisible()) await trigger.click();
+  }
+
   public async switchCompany(name: string) {
     await this.companySwitcher.click();
     await this.menuItem(name).click();
