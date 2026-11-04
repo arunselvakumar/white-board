@@ -5,7 +5,7 @@ import { cn } from "cn";
 import { ChevronsUpDown, SearchIcon } from "lucide-react";
 
 import { Input } from "@repo/ui/components/input";
-import { SidebarTrigger } from "@repo/ui/components/sidebar";
+import { SidebarTrigger, useSidebar } from "@repo/ui/components/sidebar";
 
 /**
  * The parts of the ink sidebar (ADR-0049) that both apps compose around the
@@ -57,6 +57,30 @@ function SidebarSwitcher({
         className="text-sidebar-foreground/50 size-4 shrink-0"
       />
     </button>
+  );
+}
+
+/**
+ * With no top bar from `md` up (ADR-0050), the only way back from a
+ * collapsed sidebar (Cmd/Ctrl+B) would be the shortcut again. This is a
+ * trigger pinned to the page's top-left corner that shows only while the
+ * desktop sidebar is collapsed. Render it first inside `SidebarInset`.
+ */
+function SidebarReopenTrigger({
+  className,
+  ...props
+}: React.ComponentProps<typeof SidebarTrigger>) {
+  const { state, isMobile } = useSidebar();
+  if (isMobile || state !== "collapsed") return null;
+  return (
+    <SidebarTrigger
+      data-slot="sidebar-reopen-trigger"
+      className={cn(
+        "bg-card/85 ring-border/70 fixed top-3 left-3 z-20 hidden rounded-lg shadow-sm ring-1 backdrop-blur md:inline-flex print:hidden",
+        className,
+      )}
+      {...props}
+    />
   );
 }
 
@@ -331,6 +355,7 @@ export {
   SidebarMeter,
   SidebarMeterCard,
   SidebarPhoneBar,
+  SidebarReopenTrigger,
   SidebarSearch,
   SidebarSectionLabel,
   SidebarSwitcher,

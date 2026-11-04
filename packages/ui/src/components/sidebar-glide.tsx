@@ -10,6 +10,13 @@ import { cn } from "cn";
 const ROW =
   "[data-sidebar=menu-button]:not([disabled]):not([aria-disabled=true]),[data-sidebar=menu-sub-button]:not([aria-disabled=true])";
 
+/**
+ * How long the pointer may rest off the rows (a gap between two rows, a
+ * label, a disabled row, empty space) before the pill fades out. Crossing
+ * the gap between two rows takes less, so that move still glides.
+ */
+const OFF_ROW_GRACE_MS = 150;
+
 function rowOf(target: EventTarget | null, box: HTMLElement) {
   if (!(target instanceof Element)) return null;
   const row = target.closest<HTMLElement>(ROW);
@@ -20,8 +27,10 @@ function rowOf(target: EventTarget | null, box: HTMLElement) {
  * Moves the highlight pill under the pointer, as the dropdown menu's and
  * the Select's pills do (React Bits' Glide Select, ADR-0050). Moving from
  * one row to another glides; arriving from outside the rows, or by
- * keyboard, jumps and fades in; leaving the box fades it out where it was,
- * so the row the pointer comes back to is where it starts from.
+ * keyboard, jumps and fades in; resting off the rows, or leaving the box,
+ * fades it out where it was, so the row the pointer comes back to is
+ * where it starts from. When the rows move under a resting pointer (a
+ * submenu above them opens or folds) the pill is measured again.
  */
 function useSidebarGlidePill() {
   return React.useCallback((pill: HTMLSpanElement | null) => {
@@ -29,7 +38,9 @@ function useSidebarGlidePill() {
     if (!pill || !box) return;
 
     let current: HTMLElement | null = null;
+    let offRowTimer: ReturnType<typeof setTimeout> | undefined;
 
+    const shown = () => pill.style.opacity === "1";
     const move = (row: HTMLElement, jump: boolean) => {
       const boxRect = box.getBoundingClientRect();
       const rect = row.getBoundingClientRect();
@@ -42,15 +53,23 @@ function useSidebarGlidePill() {
       current = row;
     };
     const hide = () => {
+      clearTimeout(offRowTimer);
       pill.style.opacity = "0";
+    };
+    const hideSoon = () => {
+      clearTimeout(offRowTimer);
+      offRowTimer = setTimeout(hide, OFF_ROW_GRACE_MS);
     };
 
     const onPointerOver = (event: PointerEvent) => {
       const row = rowOf(event.target, box);
-      if (row == null) return;
-      const shown = pill.style.opacity === "1";
-      if (row === current && shown) return;
-      move(row, !shown);
+      if (row == null) {
+        if (shown()) hideSoon();
+        return;
+      }
+      clearTimeout(offRowTimer);
+      if (row === current && shown()) return;
+      move(row, !shown());
     };
     const onPointerLeave = () => {
       hide();
@@ -66,12 +85,21 @@ function useSidebarGlidePill() {
       )
         hide();
     };
+    // The rows moved (a submenu opened or folded): put the pill back on
+    // the row it rests on, without a glide.
+    const observer = new ResizeObserver(() => {
+      if (current != null && shown() && current.isConnected)
+        move(current, true);
+    });
+    observer.observe(box);
 
     box.addEventListener("pointerover", onPointerOver);
     box.addEventListener("pointerleave", onPointerLeave);
     box.addEventListener("focusin", onFocusIn);
     box.addEventListener("focusout", onFocusOut);
     return () => {
+      clearTimeout(offRowTimer);
+      observer.disconnect();
       box.removeEventListener("pointerover", onPointerOver);
       box.removeEventListener("pointerleave", onPointerLeave);
       box.removeEventListener("focusin", onFocusIn);

@@ -22,6 +22,7 @@ import {
 import {
   SidebarFootnote,
   SidebarPhoneBar,
+  SidebarReopenTrigger,
   SidebarSearch,
   SidebarSectionLabel,
 } from "@repo/ui/components/sidebar-chrome";
@@ -132,6 +133,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </Sidebar>
       <SidebarInset className="min-w-0">
         {/* No top bar from md up: the sidebar carries it (ADR-0050). */}
+        <SidebarReopenTrigger />
         <SidebarPhoneBar>
           <p className="text-foreground flex min-w-0 items-center gap-2">
             <Image

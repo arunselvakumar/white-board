@@ -8,6 +8,7 @@ import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import {
   SidebarFootnote,
   SidebarPhoneBar,
+  SidebarReopenTrigger,
   SidebarSearch,
   SidebarSectionLabel,
 } from "@repo/ui/components/sidebar-chrome";
@@ -152,6 +153,7 @@ export function AppShell({
           itself instead of widening the page past the sidebar. */}
       <SidebarInset className="min-w-0">
         {/* Below md only: from md up the sidebar carries the shell (ADR-0050). */}
+        <SidebarReopenTrigger />
         <SidebarPhoneBar className="top-(--impersonation-bar)">
           <BrandMark className="size-7 rounded-lg" />
           <span className="min-w-0 truncate text-sm font-semibold">
