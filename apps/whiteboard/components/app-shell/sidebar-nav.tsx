@@ -9,6 +9,11 @@ import {
   SidebarMenuItem,
 } from "@repo/ui/components/sidebar";
 import { SidebarMenuCount } from "@repo/ui/components/sidebar-chrome";
+import {
+  labelMatches,
+  menuQuery,
+  noMatchMessage,
+} from "@repo/ui/lib/sidebar-menu-filter";
 
 import {
   isAppNavActive,
@@ -24,14 +29,13 @@ import { useSidebarDashboard } from "./use-sidebar-dashboard";
 export const SIDEBAR_ROW_CLASS =
   "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground data-active:bg-sidebar-primary data-active:text-sidebar-primary-foreground data-active:[&_svg]:text-sidebar-primary-foreground data-active:font-semibold h-10 gap-3 rounded-xl px-3 transition-colors [&_svg]:size-[18px] [&_svg]:text-sidebar-foreground/65 hover:[&_svg]:text-sidebar-foreground";
 
-/** The rows whose label includes the search, ignoring case. */
+/** The rows the menu search keeps (`@repo/ui`'s rule, shared with Construction Management). */
 export function filterMenu<Item extends { label: string }>(
   items: readonly Item[],
   query: string,
 ): Item[] {
-  const needle = query.trim().toLowerCase();
-  if (needle.length === 0) return [...items];
-  return items.filter((item) => item.label.toLowerCase().includes(needle));
+  const needle = menuQuery(query);
+  return items.filter((item) => labelMatches(item.label, needle));
 }
 
 function countFor(
@@ -42,8 +46,7 @@ function countFor(
   if (href === "/students") {
     return (
       <SidebarMenuCount
-        aria-hidden="true"
-        title={`${dashboard.activeStudentCount} active Students`}
+        label={`${dashboard.activeStudentCount} active Students`}
       >
         {dashboard.activeStudentCount}
       </SidebarMenuCount>
@@ -52,8 +55,7 @@ function countFor(
   if (href === "/batches" && dashboard.todayBatches.length > 0) {
     return (
       <SidebarMenuCount
-        aria-hidden="true"
-        title={`${dashboard.todayBatches.length} Batches today`}
+        label={`${dashboard.todayBatches.length} Batches today`}
       >
         {dashboard.todayBatches.length}
       </SidebarMenuCount>
@@ -63,8 +65,7 @@ function countFor(
     return (
       <SidebarMenuCount
         tone="alert"
-        aria-hidden="true"
-        title={`${dashboard.feeFollowUpsDueCount} Fee Follow-ups due`}
+        label={`${dashboard.feeFollowUpsDueCount} Fee Follow-ups due`}
       >
         {dashboard.feeFollowUpsDueCount > 99
           ? "99+"
@@ -94,7 +95,7 @@ export function SidebarMainNav({
     <nav aria-label="Main">
       {shown.length === 0 ? (
         <p className="text-sidebar-foreground/55 px-3 py-2 text-sm">
-          No menu item matches “{query.trim()}”.
+          {noMatchMessage(query)}
         </p>
       ) : (
         <SidebarMenu className="gap-1">

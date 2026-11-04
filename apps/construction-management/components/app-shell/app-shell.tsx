@@ -33,7 +33,6 @@ import { ReadyDownloadToast } from "@/components/notifications/ready-download-to
 import { APP_NAV, isAppNavActive } from "@/lib/app-nav";
 import { MASTERS_GROUPS } from "@/lib/masters-nav";
 import { projectIdFromPath } from "@/lib/project-nav";
-import packageJson from "@/package.json";
 
 import { APP_NAV_ICONS } from "./app-nav-icons";
 import type { AreaNavGroup } from "./area-nav-menu";
@@ -63,7 +62,8 @@ import { WORKSPACE_GROUPS, WorkspaceNavMenu } from "./workspace-nav-menu";
 const NAV_BUTTON_CLASS =
   "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground data-active:bg-sidebar-primary data-active:text-sidebar-primary-foreground data-active:[&_svg]:text-sidebar-primary-foreground data-active:font-semibold h-10 gap-3 rounded-xl px-3 transition-colors [&_svg]:size-[18px] [&_svg]:text-sidebar-foreground/65 hover:[&_svg]:text-sidebar-foreground";
 
-const VERSION = `v${packageJson.version}`;
+/** From package.json at build time (next.config.ts), so the browser never gets the dependency list. */
+const VERSION = `v${process.env["NEXT_PUBLIC_APP_VERSION"] ?? "0.0.0"}`;
 
 /**
  * Authenticated chrome (ADR-0049): the ink sidebar with the User's account
@@ -89,6 +89,14 @@ export function AppShell({
   const pathname = usePathname() || "/app";
   const projectId = projectIdFromPath(pathname);
   const [query, setQuery] = useState("");
+  // Picking a row clears the search, so a query typed on the Main menu
+  // does not hide every module of the Project opened next, and the phone
+  // sheet never reopens cut down (state adjusted in render).
+  const [queryPathname, setQueryPathname] = useState(pathname);
+  if (queryPathname !== pathname) {
+    setQueryPathname(pathname);
+    setQuery("");
+  }
 
   return (
     <SidebarProvider style={{ "--sidebar-width": "17.5rem" } as CSSProperties}>

@@ -104,12 +104,20 @@ function SidebarSectionLabel({
 /**
  * A count at the right end of a menu row. `muted` is a figure (“21”);
  * `alert` is a red pill (“99+”). Inside the row's button, after the label.
+ * The figure is hidden from assistive technology; `label` is what it reads
+ * instead (“21 active Students”), so the row's name carries the meaning.
  */
 function SidebarMenuCount({
   tone = "muted",
+  label,
   className,
+  children,
   ...props
-}: React.ComponentProps<"span"> & { tone?: "muted" | "alert" }) {
+}: React.ComponentProps<"span"> & {
+  tone?: "muted" | "alert";
+  /** What a screen reader hears for the figure. */
+  label: string;
+}) {
   return (
     <span
       data-slot="sidebar-menu-count"
@@ -123,7 +131,10 @@ function SidebarMenuCount({
         className,
       )}
       {...props}
-    />
+    >
+      <span aria-hidden="true">{children}</span>
+      <span className="sr-only">{label}</span>
+    </span>
   );
 }
 

@@ -1,8 +1,16 @@
 import type { NextConfig } from "next";
+import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { PrismaPlugin } from "@prisma/nextjs-monorepo-workaround-plugin";
 
+const { version } = createRequire(import.meta.url)("./package.json") as {
+  version: string;
+};
+
 const nextConfig: NextConfig = {
+  // The sidebar's version line (ADR-0049) reads this instead of importing
+  // package.json into client code, which would ship the dependency list.
+  env: { NEXT_PUBLIC_APP_VERSION: version },
   // Next runs one dev server per build folder; a second one (another port,
   // another checkout tool) sets NEXT_DIST_DIR.
   distDir: process.env["NEXT_DIST_DIR"] ?? ".next",

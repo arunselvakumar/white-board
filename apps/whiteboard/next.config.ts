@@ -1,8 +1,16 @@
 import type { NextConfig } from "next";
+import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { PrismaPlugin } from "@prisma/nextjs-monorepo-workaround-plugin";
 
+const { version } = createRequire(import.meta.url)("./package.json") as {
+  version: string;
+};
+
 const nextConfig: NextConfig = {
+  // The sidebar's version line (ADR-0049) reads this instead of importing
+  // package.json into client code, which would ship the dependency list.
+  env: { NEXT_PUBLIC_APP_VERSION: version },
   transpilePackages: [
     "@repo/ui",
     "@repo/whiteboard-db",

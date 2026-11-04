@@ -10,6 +10,7 @@ import {
 import { Building2, LogOut } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState, type CSSProperties, type ReactNode } from "react";
 import { Separator } from "@repo/ui/components/separator";
 import { SkipLink } from "@repo/ui/components/skip-link";
@@ -37,7 +38,9 @@ import {
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { navForRole } from "@/lib/app-nav";
 
-import packageJson from "../../package.json";
+/** From package.json at build time (next.config.ts), so the browser never gets the dependency list. */
+const VERSION = `v${process.env["NEXT_PUBLIC_APP_VERSION"] ?? "0.0.0"}`;
+
 import { AppBreadcrumbs } from "./app-breadcrumbs";
 import { SIDEBAR_ROW_CLASS, SidebarMainNav } from "./sidebar-nav";
 import { SidebarTodayCard } from "./sidebar-today-card";
@@ -70,7 +73,15 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { workspace } = useWorkspace();
   const { workspaces } = useWorkspaceList();
   const { role } = useAuth();
+  const pathname = usePathname() || "/";
   const [menuQuery, setMenuQuery] = useState("");
+  // Picking a row clears the search, so the next time the menu opens (the
+  // phone sheet, say) nothing looks missing (state adjusted in render).
+  const [queryPathname, setQueryPathname] = useState(pathname);
+  if (queryPathname !== pathname) {
+    setQueryPathname(pathname);
+    setMenuQuery("");
+  }
   const workspaceName = workspace?.name ?? "Workspace";
   const navigation = navForRole(role);
 
@@ -109,7 +120,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </SidebarMenuItem>
             <SidebarSignOut />
           </SidebarMenu>
-          <SidebarFootnote>v{packageJson.version}</SidebarFootnote>
+          <SidebarFootnote>{VERSION}</SidebarFootnote>
         </SidebarFooter>
       </Sidebar>
       <SidebarInset className="min-w-0">

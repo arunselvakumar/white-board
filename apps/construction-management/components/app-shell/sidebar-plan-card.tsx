@@ -31,13 +31,24 @@ export function planPercentLeft(
  * The plan card at the foot of the sidebar (ADR-0049): a ring of the days
  * left, the plan's name, and a link to Your Subscription. A Company with
  * no plan yet sees nothing; so does everyone while the subscription loads
- * or when it cannot (the shell never suspends or blocks on it).
+ * or when it cannot, a failed refetch included (the shell never suspends
+ * or blocks on it). It refetches hourly, so a tab left open keeps the days
+ * left right as they tick down.
  */
 export function SidebarPlanCard() {
-  const { data } = useQuery({ ...subscriptionQuery, retry: false });
+  const { data, isError } = useQuery({
+    ...subscriptionQuery,
+    retry: false,
+    refetchInterval: DAY_MS / 24,
+  });
   // Partial: a story or an old server may answer with something else.
   const view = data as Partial<SubscriptionView> | undefined;
-  if (view?.status == null || view.status === "none" || view.plan == null)
+  if (
+    isError ||
+    view?.status == null ||
+    view.status === "none" ||
+    view.plan == null
+  )
     return null;
 
   const daysLeft = Math.max(0, view.plan.daysLeft);

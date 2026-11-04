@@ -21,14 +21,18 @@ export function SidebarTodayCard() {
   const capacity = batches.reduce((sum, batch) => sum + batch.capacity, 0);
   const percent = capacity > 0 ? (enrolled / capacity) * 100 : 0;
 
+  // The ring and the figure inside it both say how full today's seats are;
+  // the Batch count sits in the caption.
   return (
     <SidebarMeterCard
-      lead={<SidebarMeter percent={percent} label={`${batches.length}`} />}
+      lead={
+        <SidebarMeter percent={percent} label={`${Math.round(percent)}%`} />
+      }
       title="Today's Batches"
       caption={
         batches.length === 0
           ? "No Batches today"
-          : `${enrolled} of ${capacity} seats enrolled`
+          : `${batches.length} ${batches.length === 1 ? "Batch" : "Batches"} · ${enrolled} of ${capacity} seats`
       }
     >
       <Link
