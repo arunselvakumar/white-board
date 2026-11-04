@@ -2,15 +2,89 @@
 
 import * as React from "react";
 import { cn } from "cn";
-import { SearchIcon } from "lucide-react";
+import { ChevronsUpDown, SearchIcon } from "lucide-react";
 
 import { Input } from "@repo/ui/components/input";
+import { SidebarTrigger } from "@repo/ui/components/sidebar";
 
 /**
  * The parts of the ink sidebar (ADR-0049) that both apps compose around the
- * `Sidebar` kit: the account row, the menu search, a section label with
- * its actions, a count on a menu row, the meter card and the footnote.
+ * `Sidebar` kit: the switcher row, the account row, the menu search, a
+ * section label with its actions, a count on a menu row, the meter card,
+ * the footnote, and the phone's top bar (ADR-0050).
  */
+
+/**
+ * The first row of the sidebar (ADR-0050): the product mark, the Active
+ * Workspace or Company, and the product's name under it, with the chevrons
+ * that open the switcher. A `<button>`, so a `DropdownMenuTrigger` can
+ * `render` it.
+ */
+function SidebarSwitcher({
+  mark,
+  name,
+  detail,
+  className,
+  ...props
+}: React.ComponentProps<"button"> & {
+  mark: React.ReactNode;
+  name: React.ReactNode;
+  detail?: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      data-slot="sidebar-switcher"
+      className={cn(
+        "hover:bg-sidebar-accent aria-expanded:bg-sidebar-accent focus-visible:ring-sidebar-ring flex h-14 w-full min-w-0 cursor-pointer items-center gap-3 rounded-xl px-2 text-left transition-colors outline-none focus-visible:ring-2",
+        className,
+      )}
+      {...props}
+    >
+      {mark}
+      <span className="min-w-0 flex-1">
+        <span className="text-sidebar-foreground block truncate text-sm leading-tight font-semibold">
+          {name}
+        </span>
+        {detail != null && (
+          <span className="text-sidebar-foreground/55 block truncate text-xs leading-tight">
+            {detail}
+          </span>
+        )}
+      </span>
+      <ChevronsUpDown
+        aria-hidden="true"
+        className="text-sidebar-foreground/50 size-4 shrink-0"
+      />
+    </button>
+  );
+}
+
+/**
+ * The only top bar left (ADR-0050): on a phone, where the sidebar is a
+ * sheet, a slim bar with the trigger that opens it and whatever the app
+ * puts beside it (its mark and name, the notification bell). From `md`
+ * up nothing renders; the sidebar carries all of it.
+ */
+function SidebarPhoneBar({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<"header">) {
+  return (
+    <header
+      data-slot="sidebar-phone-bar"
+      className={cn(
+        "bg-card/85 border-border/70 sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b px-3 backdrop-blur md:hidden print:hidden",
+        className,
+      )}
+      {...props}
+    >
+      <SidebarTrigger />
+      {children}
+    </header>
+  );
+}
 
 /** The account row at the top: an avatar, a name, a detail line and an action (the account menu). */
 function SidebarAccount({
@@ -256,6 +330,8 @@ export {
   SidebarMenuCount,
   SidebarMeter,
   SidebarMeterCard,
+  SidebarPhoneBar,
   SidebarSearch,
   SidebarSectionLabel,
+  SidebarSwitcher,
 };
