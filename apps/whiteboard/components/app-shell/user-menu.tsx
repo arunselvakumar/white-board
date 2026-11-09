@@ -3,6 +3,7 @@
 import { useSignOut, useUser, type AuthUser } from "@repo/auth/react";
 import { cn } from "@repo/ui/lib/utils";
 import { Ellipsis, LogOut } from "lucide-react";
+import Image from "next/image";
 import type { ReactElement, ReactNode } from "react";
 import {
   Avatar,
@@ -104,14 +105,28 @@ function AccountMenu({
 }
 
 /**
- * The account row, second in the sidebar (ADR-0050): avatar, name, email,
+ * The account row, first in the sidebar (ADR-0051): avatar, name, email,
  * then `before` (the notification bell, where the role has one) and the
- * `…` account menu. Without a User there is no account to show; the
- * switcher row above still carries the Whiteboard mark.
+ * `…` account menu. Without a User there is no account to show: the
+ * Whiteboard mark and name, with no menu.
  */
 export function SidebarUserAccount({ before }: { before?: ReactNode }) {
   const { user } = useUser();
-  if (user == null) return null;
+  if (user == null)
+    return (
+      <SidebarAccount
+        avatar={
+          <Image
+            src="/whiteboard-logo.svg"
+            alt=""
+            width={36}
+            height={36}
+            className="size-9 shrink-0 rounded-xl"
+          />
+        }
+        name="Whiteboard"
+      />
+    );
 
   const displayName = displayNameOf(user);
   return (

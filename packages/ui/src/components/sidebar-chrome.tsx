@@ -2,61 +2,158 @@
 
 import * as React from "react";
 import { cn } from "cn";
-import { ChevronsUpDown, SearchIcon } from "lucide-react";
+import { ArrowLeftRight, Check, SearchIcon } from "lucide-react";
 
+import { Button } from "@repo/ui/components/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
-import { SidebarTrigger, useSidebar } from "@repo/ui/components/sidebar";
+import {
+  SidebarMenuButton,
+  SidebarTrigger,
+  useSidebar,
+} from "@repo/ui/components/sidebar";
+import { Spinner } from "@repo/ui/components/spinner";
 
 /**
  * The parts of the ink sidebar (ADR-0049) that both apps compose around the
- * `Sidebar` kit: the switcher row, the account row, the menu search, a
- * section label with its actions, a count on a menu row, the meter card,
- * the footnote, and the phone's top bar (ADR-0050).
+ * `Sidebar` kit: the account row, the menu search, a section label with its
+ * actions, a count on a menu row, the meter card, the footnote, the switch
+ * row and its modal (ADR-0051), and the phone's top bar (ADR-0050).
  */
 
+/** One Workspace or Company in the `SidebarSwitch` modal. */
+type SidebarSwitchItem = {
+  id: string;
+  name: string;
+  /** The line under the name (the User's role there). */
+  detail?: string;
+};
+
 /**
- * The first row of the sidebar (ADR-0050): the product mark, the Active
- * Workspace or Company, and the product's name under it, with the chevrons
- * that open the switcher. A `<button>`, so a `DropdownMenuTrigger` can
- * `render` it.
+ * The switch row at the foot of the sidebar and the modal it opens
+ * (ADR-0051). `label` is both, in the app's own word: “Switch Workspace”,
+ * “Switch Company”. Picking a row calls `onPick` and leaves the modal open
+ * with a spinner on it, since the app reloads once the switch lands;
+ * `error` says why it did not. Picking the current one just closes.
+ * Below `md` the sidebar is a sheet, so the modal opens nested over it.
  */
-function SidebarSwitcher({
-  mark,
-  name,
-  detail,
-  className,
-  ...props
-}: React.ComponentProps<"button"> & {
-  mark: React.ReactNode;
-  name: React.ReactNode;
-  detail?: React.ReactNode;
+function SidebarSwitch({
+  label,
+  rowLabel,
+  description,
+  rowClassName,
+  items,
+  activeId,
+  pendingId,
+  error,
+  onPick,
+  onOpenChange,
+  footer,
+}: {
+  label: string;
+  /** The row's accessible name: `label`, then which one is active. */
+  rowLabel: string;
+  description: string;
+  /** The app's sidebar row class, so this row matches the ones beside it. */
+  rowClassName?: string;
+  items: readonly SidebarSwitchItem[];
+  activeId: string | null;
+  pendingId: string | null;
+  error?: string | null;
+  onPick: (id: string) => void;
+  /** Runs as the modal opens or closes (clear an old `error` here). */
+  onOpenChange?: (open: boolean) => void;
+  /** Anything under the list (Create a Company). */
+  footer?: React.ReactNode;
 }) {
+  const [open, setOpen] = React.useState(false);
+  const changeOpen = (next: boolean) => {
+    setOpen(next);
+    onOpenChange?.(next);
+  };
+
   return (
-    <button
-      type="button"
-      data-slot="sidebar-switcher"
-      className={cn(
-        "hover:bg-sidebar-accent aria-expanded:bg-sidebar-accent focus-visible:ring-sidebar-ring flex h-14 w-full min-w-0 cursor-pointer items-center gap-3 rounded-xl px-2 text-left transition-colors outline-none focus-visible:ring-2",
-        className,
-      )}
-      {...props}
-    >
-      {mark}
-      <span className="min-w-0 flex-1">
-        <span className="text-sidebar-foreground block truncate text-sm leading-tight font-semibold">
-          {name}
-        </span>
-        {detail != null && (
-          <span className="text-sidebar-foreground/55 block truncate text-xs leading-tight">
-            {detail}
-          </span>
+    <Dialog open={open} onOpenChange={changeOpen}>
+      <DialogTrigger
+        render={
+          <SidebarMenuButton className={rowClassName} aria-label={rowLabel} />
+        }
+      >
+        <ArrowLeftRight />
+        <span className="min-w-0 flex-1 truncate">{label}</span>
+      </DialogTrigger>
+      <DialogContent forceOverlay className="grid-cols-1 sm:max-w-md">
+        <DialogHeader className="pr-8">
+          <DialogTitle>{label}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
+        </DialogHeader>
+        <ul
+          data-slot="sidebar-switch-list"
+          className="-mx-1 flex max-h-[min(22rem,55dvh)] min-w-0 flex-col gap-2 overflow-y-auto px-1 py-0.5"
+        >
+          {items.map((item) => {
+            const active = item.id === activeId;
+            const pending = item.id === pendingId;
+            return (
+              <li key={item.id} className="min-w-0">
+                <Button
+                  type="button"
+                  variant="outline"
+                  aria-current={active ? "true" : undefined}
+                  disabled={pendingId != null}
+                  onClick={() => {
+                    if (active) changeOpen(false);
+                    else onPick(item.id);
+                  }}
+                  className={cn(
+                    "hover:border-primary/60 h-auto w-full min-w-0 justify-start gap-3 rounded-xl p-3 text-left font-normal whitespace-normal",
+                    active &&
+                      "border-primary/60 bg-primary/5 dark:border-primary/70 dark:bg-primary/10",
+                  )}
+                >
+                  <span
+                    aria-hidden="true"
+                    className="bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-lg text-sm font-semibold"
+                  >
+                    {item.name.slice(0, 1).toUpperCase()}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="text-foreground block truncate text-sm font-medium">
+                      {item.name}
+                    </span>
+                    {item.detail != null && (
+                      <span className="text-muted-foreground block truncate text-xs">
+                        {item.detail}
+                      </span>
+                    )}
+                  </span>
+                  {pending && <Spinner className="text-primary shrink-0" />}
+                  {active && (
+                    <span className="text-primary flex shrink-0 items-center gap-1 text-xs font-medium">
+                      <Check aria-hidden="true" className="size-4" />
+                      Current
+                    </span>
+                  )}
+                </Button>
+              </li>
+            );
+          })}
+        </ul>
+        {error != null && (
+          <p role="alert" className="text-destructive text-sm">
+            {error}
+          </p>
         )}
-      </span>
-      <ChevronsUpDown
-        aria-hidden="true"
-        className="text-sidebar-foreground/50 size-4 shrink-0"
-      />
-    </button>
+        {footer}
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -358,5 +455,5 @@ export {
   SidebarReopenTrigger,
   SidebarSearch,
   SidebarSectionLabel,
-  SidebarSwitcher,
+  SidebarSwitch,
 };

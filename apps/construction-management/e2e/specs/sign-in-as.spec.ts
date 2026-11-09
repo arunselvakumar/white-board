@@ -25,9 +25,9 @@ signInAsPageTest.describe("Sign in as a customer", () => {
 
       const projectsPage = new ProjectsPage(page);
       await expect(page).toHaveURL(projectsPage.url);
-      await expect(projectsPage.companySwitcher).toContainText(
-        account.company.name,
-      );
+      await expect(
+        projectsPage.activeCompanyRow(account.company.name),
+      ).toBeVisible();
       await expect(signInAsPage.impersonationBanner).toContainText(
         account.email,
       );

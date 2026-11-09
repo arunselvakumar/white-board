@@ -4,8 +4,12 @@ import { expect, waitFor, within } from "storybook/test";
 import { AppEmptyPage } from "@/components/app-shell/app-empty-page";
 import { AppShell } from "@/components/app-shell/app-shell";
 import { APP_NAV } from "@/lib/app-nav";
-import { expectAppShell, openSidebar } from "../../.storybook/expect-app-shell";
-import { authMocks, signInAs } from "../../.storybook/mocks/auth";
+import {
+  expectAppShell,
+  openSidebar,
+  openSwitchWorkspace,
+} from "../../.storybook/expect-app-shell";
+import { authFailure, authMocks, signInAs } from "../../.storybook/mocks/auth";
 
 const meta = {
   title: "Workspace/AppShell",
@@ -45,25 +49,26 @@ export const Default: Story = {
 };
 
 /**
- * The switcher row opens even with one Workspace, and shows it as the
- * Active one; picking it again switches nothing.
+ * Switch Workspace opens even with one Workspace, and shows it as the
+ * current one; picking it again closes the modal and switches nothing.
  */
 export const OneWorkspace: Story = {
   play: async ({ canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
-    const sidebar = within(await openSidebar(canvasElement, userEvent));
-    await userEvent.click(
-      sidebar.getByRole("button", {
-        name: "Active Workspace: Riverside Centre. Switch Workspace",
-      }),
-    );
-    const menu = within(await body.findByRole("menu"));
-    await expect(menu.getByText("Your Workspaces")).toBeVisible();
-    const items = menu.getAllByRole("menuitem");
-    await expect(items).toHaveLength(1);
-    await expect(items[0]).toHaveAccessibleName("Riverside Centre Active");
-    await userEvent.click(
-      menu.getByRole("menuitem", { name: /^Riverside Centre/ }),
+    const modal = await openSwitchWorkspace(canvasElement, userEvent);
+    await expect(
+      within(modal).getByText("Pick the Workspace you want to work in."),
+    ).toBeVisible();
+    const row = within(modal).getByRole("button", {
+      name: /^Riverside Centre/,
+    });
+    await expect(row).toHaveAccessibleName("Riverside Centre Owner Current");
+    await expect(row).toHaveAttribute("aria-current", "true");
+    await userEvent.click(row);
+    await waitFor(() =>
+      expect(
+        body.queryByRole("dialog", { name: "Switch Workspace" }),
+      ).not.toBeInTheDocument(),
     );
     await expect(authMocks.setActive).not.toHaveBeenCalled();
   },
@@ -94,7 +99,7 @@ export const WithoutUser: Story = {
   },
   play: async ({ canvasElement, userEvent }) => {
     const sidebar = within(await openSidebar(canvasElement, userEvent));
-    await expect(sidebar.getByText("Riverside Centre")).toBeVisible();
+    await expect(sidebar.getByText("Whiteboard")).toBeVisible();
     await expect(
       within(canvasElement.ownerDocument.body).queryByRole("button", {
         name: /Account menu/,
@@ -103,37 +108,87 @@ export const WithoutUser: Story = {
   },
 };
 
+const HARBOR_ACADEMY = {
+  id: "org_harbor",
+  name: "Harbor Academy",
+  role: "teacher",
+  institutionType: "training_institute",
+} as const;
+
 export const MultipleWorkspaces: Story = {
   beforeEach() {
-    authMocks.workspaces = [
-      ...authMocks.workspaces,
-      {
-        id: "org_harbor",
-        name: "Harbor Academy",
-        role: "teacher",
-        institutionType: "training_institute",
-      },
-    ];
+    authMocks.workspaces = [...authMocks.workspaces, HARBOR_ACADEMY];
   },
   play: async ({ canvasElement, userEvent }) => {
-    const body = within(canvasElement.ownerDocument.body);
-    const sidebar = within(await openSidebar(canvasElement, userEvent));
-    await userEvent.click(
-      sidebar.getByRole("button", {
-        name: "Active Workspace: Riverside Centre. Switch Workspace",
-      }),
-    );
-    const menu = within(await body.findByRole("menu"));
-    await expect(menu.getAllByRole("menuitem")).toHaveLength(2);
+    const modal = within(await openSwitchWorkspace(canvasElement, userEvent));
+    await expect(modal.getByRole("list")).toBeVisible();
+    await expect(modal.getAllByRole("listitem")).toHaveLength(2);
     await expect(
-      menu.getByRole("menuitem", { name: "Riverside Centre Active" }),
+      modal.getByRole("button", { name: "Riverside Centre Owner Current" }),
     ).toBeVisible();
     await userEvent.click(
-      menu.getByRole("menuitem", { name: "Harbor Academy" }),
+      modal.getByRole("button", { name: "Harbor Academy Teacher" }),
     );
     await waitFor(() =>
       expect(authMocks.setActive).toHaveBeenCalledWith("org_harbor", "/"),
     );
+  },
+};
+
+/** A switch that fails says so in the modal, and the rows work again. */
+export const SwitchWorkspaceFails: Story = {
+  beforeEach() {
+    authMocks.workspaces = [...authMocks.workspaces, HARBOR_ACADEMY];
+    authMocks.setActive.mockImplementation(() => authFailure("FORBIDDEN", 403));
+  },
+  play: async ({ canvasElement, userEvent }) => {
+    const modal = within(await openSwitchWorkspace(canvasElement, userEvent));
+    const row = modal.getByRole("button", { name: "Harbor Academy Teacher" });
+    await userEvent.click(row);
+    await expect(await modal.findByRole("alert")).toHaveTextContent(
+      "Could not switch to that Workspace. Please try again.",
+    );
+    await expect(row).toBeEnabled();
+  },
+};
+
+/**
+ * The switch answered but the reload never came (a leave-site warning kept
+ * the User on the page): closing the modal and opening it again lets them
+ * pick again.
+ */
+export const SwitchWorkspaceReloadCancelled: Story = {
+  beforeEach() {
+    authMocks.workspaces = [...authMocks.workspaces, HARBOR_ACADEMY];
+  },
+  play: async ({ canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    let modal = within(await openSwitchWorkspace(canvasElement, userEvent));
+    await userEvent.click(
+      modal.getByRole("button", { name: "Harbor Academy Teacher" }),
+    );
+    await waitFor(() =>
+      expect(authMocks.setActive).toHaveBeenCalledWith("org_harbor", "/"),
+    );
+    await expect(
+      modal.getByRole("button", { name: /^Harbor Academy/ }),
+    ).toBeDisabled();
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(
+        body.queryByRole("dialog", { name: "Switch Workspace" }),
+      ).not.toBeInTheDocument(),
+    );
+    // The sidebar (on a phone, its sheet) is still open behind the modal.
+    await userEvent.click(
+      body.getByRole("button", { name: /^Switch Workspace/ }),
+    );
+    const again = await body.findByRole("dialog", { name: "Switch Workspace" });
+    await waitFor(() => expect(again).toBeVisible());
+    modal = within(again);
+    await expect(
+      modal.getByRole("button", { name: "Harbor Academy Teacher" }),
+    ).toBeEnabled();
   },
 };
 

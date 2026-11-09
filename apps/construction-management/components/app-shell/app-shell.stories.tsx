@@ -72,7 +72,25 @@ async function mainMenu(context: PlayContext) {
 }
 
 /**
- * The area's page beside the sidebar, and the sidebar's Company switcher
+ * The Switch Company modal, opened from the foot of the sidebar. A modal
+ * starts transparent, so checks wait until it has finished opening.
+ */
+async function openSwitchCompany(context: PlayContext) {
+  const { canvasElement, userEvent } = context;
+  const sidebar = await openSidebar(context);
+  await userEvent.click(
+    sidebar.getByRole("button", { name: /^Switch Company/ }),
+  );
+  const modal = await within(canvasElement.ownerDocument.body).findByRole(
+    "dialog",
+    { name: "Switch Company" },
+  );
+  await waitFor(() => expect(modal).toBeVisible());
+  return within(modal);
+}
+
+/**
+ * The area's page beside the sidebar, and the sidebar's Switch Company row
  * and main menu (on a phone, inside the sheet, where the phone bar keeps
  * the notification bell).
  */
@@ -93,7 +111,7 @@ async function expectArea(
   const sidebar = await openSidebar(context);
   await expect(
     sidebar.getByRole("button", {
-      name: /Active Company: Anugraha Engineers/,
+      name: "Switch Company. Active Company: Anugraha Engineers",
     }),
   ).toBeVisible();
   await expect(
@@ -481,45 +499,48 @@ export const NoActiveCompany: Story = {
   play: async (context) => {
     const sidebar = await openSidebar(context);
     await expect(
-      sidebar.getByRole("button", { name: /Active Company: none/ }),
-    ).toHaveTextContent("No Company");
+      sidebar.getByRole("button", {
+        name: "Switch Company. Active Company: none",
+      }),
+    ).toHaveTextContent("Switch Company");
   },
 };
+
+const SRI_INFRA = {
+  id: "company_sri",
+  name: "Sri Infra",
+  role: "member",
+} as const;
 
 export const SwitchCompany: Story = {
   ...shellAt("/app/projects"),
   beforeEach() {
     signInAs("owner", { name: "Anugraha Engineers" });
-    authMocks.companies = [
-      ...authMocks.companies,
-      { id: "company_sri", name: "Sri Infra", role: "member" },
-    ];
+    authMocks.companies = [...authMocks.companies, SRI_INFRA];
   },
   play: async (context) => {
-    const { canvasElement, userEvent } = context;
-    const sidebar = await openSidebar(context);
+    const { userEvent } = context;
     const fetchMock = fn(() =>
       Promise.resolve(Response.json({ activeCompanyId: "company_sri" })),
     );
     const original = globalThis.fetch;
     globalThis.fetch = fetchMock;
     try {
-      const switcher = sidebar.getByRole("button", {
-        name: /Active Company: Anugraha Engineers/,
-      });
-      await expect(switcher).toHaveTextContent("Construction Management");
-      await userEvent.click(switcher);
-      const menu = within(
-        await within(canvasElement.ownerDocument.body).findByRole("menu"),
-      );
-      await expect(menu.getByText("Your Companies")).toBeVisible();
+      const modal = await openSwitchCompany(context);
       await expect(
-        menu.getByRole("menuitem", { name: /Anugraha Engineers/ }),
+        modal.getByText("Pick the Company you want to work in."),
       ).toBeVisible();
       await expect(
-        menu.getByRole("menuitem", { name: /Create a Company/ }),
+        modal.getByRole("button", {
+          name: "Anugraha Engineers Owner Current",
+        }),
+      ).toHaveAttribute("aria-current", "true");
+      await expect(
+        modal.getByRole("link", { name: "Create a Company" }),
       ).toHaveAttribute("href", "/create-company");
-      await userEvent.click(menu.getByRole("menuitem", { name: "Sri Infra" }));
+      await userEvent.click(
+        modal.getByRole("button", { name: "Sri Infra Team Member" }),
+      );
       await waitFor(() =>
         expect(authMocks.navigateInApp).toHaveBeenCalledWith("/app/projects"),
       );
@@ -527,6 +548,105 @@ export const SwitchCompany: Story = {
         "/api/construction/organization/companies/company_sri/switch",
         expect.objectContaining({ method: "POST" }),
       );
+    } finally {
+      globalThis.fetch = original;
+    }
+  },
+};
+
+/** Picking the current Company closes the modal and switches nothing. */
+export const SwitchCompanyCurrent: Story = {
+  ...shellAt("/app/projects"),
+  play: async (context) => {
+    const { canvasElement, userEvent } = context;
+    const modal = await openSwitchCompany(context);
+    await userEvent.click(
+      modal.getByRole("button", { name: /^Anugraha Engineers/ }),
+    );
+    await waitFor(() =>
+      expect(
+        within(canvasElement.ownerDocument.body).queryByRole("dialog", {
+          name: "Switch Company",
+        }),
+      ).not.toBeInTheDocument(),
+    );
+    await expect(authMocks.navigateInApp).not.toHaveBeenCalled();
+  },
+};
+
+/** A switch that fails says so in the modal, and the rows work again. */
+export const SwitchCompanyFails: Story = {
+  ...shellAt("/app/projects"),
+  beforeEach() {
+    signInAs("owner", { name: "Anugraha Engineers" });
+    authMocks.companies = [...authMocks.companies, SRI_INFRA];
+  },
+  play: async (context) => {
+    const { userEvent } = context;
+    const original = globalThis.fetch;
+    globalThis.fetch = () =>
+      Promise.resolve(Response.json({ code: "FORBIDDEN" }, { status: 403 }));
+    try {
+      const modal = await openSwitchCompany(context);
+      const row = modal.getByRole("button", { name: "Sri Infra Team Member" });
+      await userEvent.click(row);
+      await expect(await modal.findByRole("alert")).toHaveTextContent(
+        "Could not switch to that Company. Please try again.",
+      );
+      await expect(row).toBeEnabled();
+      await expect(authMocks.navigateInApp).not.toHaveBeenCalled();
+    } finally {
+      globalThis.fetch = original;
+    }
+  },
+};
+
+/**
+ * The switch answered but the reload never came (a leave-site warning kept
+ * the User on the page): closing the modal and opening it again lets them
+ * pick again.
+ */
+export const SwitchCompanyReloadCancelled: Story = {
+  ...shellAt("/app/projects"),
+  beforeEach() {
+    signInAs("owner", { name: "Anugraha Engineers" });
+    authMocks.companies = [...authMocks.companies, SRI_INFRA];
+  },
+  play: async (context) => {
+    const { canvasElement, userEvent } = context;
+    const original = globalThis.fetch;
+    globalThis.fetch = () =>
+      Promise.resolve(Response.json({ activeCompanyId: "company_sri" }));
+    try {
+      let modal = await openSwitchCompany(context);
+      await userEvent.click(
+        modal.getByRole("button", { name: "Sri Infra Team Member" }),
+      );
+      await waitFor(() =>
+        expect(authMocks.navigateInApp).toHaveBeenCalledWith("/app/projects"),
+      );
+      await expect(
+        modal.getByRole("button", { name: /^Sri Infra/ }),
+      ).toBeDisabled();
+      await userEvent.keyboard("{Escape}");
+      await waitFor(() =>
+        expect(
+          within(canvasElement.ownerDocument.body).queryByRole("dialog", {
+            name: "Switch Company",
+          }),
+        ).not.toBeInTheDocument(),
+      );
+      // The sidebar (on a phone, its sheet) is still open behind the modal.
+      const body = within(canvasElement.ownerDocument.body);
+      await userEvent.click(
+        body.getByRole("button", { name: /^Switch Company/ }),
+      );
+      const again = await body.findByRole("dialog", { name: "Switch Company" });
+      await waitFor(() => expect(again).toBeVisible());
+      modal = within(again);
+      await expect(
+        modal.getByRole("button", { name: "Sri Infra Team Member" }),
+      ).toBeEnabled();
     } finally {
       globalThis.fetch = original;
     }

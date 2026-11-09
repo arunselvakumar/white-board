@@ -26,12 +26,12 @@ chooseCompanyPageTest.describe("Choose Company", () => {
 
       const projectsPage = new ProjectsPage(page);
       await expect(page).toHaveURL(projectsPage.url);
-      await expect(projectsPage.companySwitcher).toContainText(first.name);
+      await expect(projectsPage.activeCompanyRow(first.name)).toBeVisible();
       await expect(projectsPage.projectCard(firstProject.name)).toBeVisible();
       await expect(projectsPage.projectCard(secondProject.name)).toHaveCount(0);
 
       await projectsPage.switchCompany(second.name);
-      await expect(projectsPage.companySwitcher).toContainText(second.name);
+      await expect(projectsPage.activeCompanyRow(second.name)).toBeVisible();
       await expect(projectsPage.projectCard(secondProject.name)).toBeVisible();
       await expect(projectsPage.projectCard(firstProject.name)).toHaveCount(0);
     },

@@ -22,7 +22,7 @@ type Canvas = {
 /**
  * Opens the sidebar where it is a sheet (below `md`) and returns it; from
  * `md` up it is already beside the page. The shell's chrome lives in it
- * (ADR-0050): the Workspace switcher, the account row, the menu. The newest
+ * (ADR-0050): the account row, the menu, Switch Workspace. The newest
  * sheet is this story's (the last story's may still be closing), and a sheet
  * starts transparent, so checks wait until it has finished opening.
  */
@@ -45,6 +45,27 @@ export async function openSidebar(
   return sidebar;
 }
 
+/**
+ * Opens the Switch Workspace modal from the foot of the sidebar and returns
+ * it. A modal starts transparent, so checks wait until it has finished
+ * opening.
+ */
+export async function openSwitchWorkspace(
+  canvasElement: HTMLElement,
+  userEvent: UserEvent,
+): Promise<HTMLElement> {
+  const sidebar = within(await openSidebar(canvasElement, userEvent));
+  await userEvent.click(
+    sidebar.getByRole("button", { name: /^Switch Workspace/ }),
+  );
+  const modal = await within(canvasElement.ownerDocument.body).findByRole(
+    "dialog",
+    { name: "Switch Workspace" },
+  );
+  await waitFor(() => expect(modal).toBeVisible());
+  return modal;
+}
+
 export async function expectAppShell(
   canvas: Canvas,
   canvasElement: HTMLElement,
@@ -59,10 +80,9 @@ export async function expectAppShell(
   const scope: Canvas = within(await openSidebar(canvasElement, userEvent));
   await expect(
     scope.getByRole("button", {
-      name: "Active Workspace: Riverside Centre. Switch Workspace",
+      name: "Switch Workspace. Active Workspace: Riverside Centre",
     }),
   ).toBeVisible();
-  await expect(scope.getByText("Riverside Centre")).toBeVisible();
   await expect(
     scope.getByRole("button", { name: "Account menu for Arun" }),
   ).toBeVisible();
