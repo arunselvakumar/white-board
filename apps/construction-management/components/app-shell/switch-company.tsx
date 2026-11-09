@@ -21,7 +21,9 @@ const ROLE_LABEL = { owner: "Owner", member: "Team Member" } as const;
  * Switch Company, a row at the foot of the sidebar (ADR-0051). It opens a
  * modal of the User's Companies to switch to another one (CM-105) or create
  * a new one. In this product the word is Company: Workspace is the main
- * menu's cross-Project area.
+ * menu's cross-Project area. Closing the modal clears an error, and the
+ * spinner too once the switch has answered: if a page's leave-site warning
+ * kept the User here, they can pick again.
  */
 export function SwitchCompany({ rowClassName }: { rowClassName: string }) {
   const { company } = useActiveCompany();
@@ -53,8 +55,8 @@ export function SwitchCompany({ rowClassName }: { rowClassName: string }) {
       onPick={(id) => {
         switching.mutate(id);
       }}
-      onOpenChange={() => {
-        if (switching.isError) switching.reset();
+      onOpenChange={(open) => {
+        if (!open && !switching.isPending) switching.reset();
       }}
       footer={
         <Link

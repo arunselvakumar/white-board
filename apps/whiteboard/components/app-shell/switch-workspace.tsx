@@ -1,7 +1,7 @@
 "use client";
 
 import { useWorkspace, useWorkspaceList } from "@repo/auth/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { SidebarSwitch } from "@repo/ui/components/sidebar-chrome";
 
 import { SIDEBAR_ROW_CLASS } from "./sidebar-nav";
@@ -20,19 +20,24 @@ const ROLE_LABEL = {
  * modal of the User's Workspaces; picking another one makes it the Active
  * Workspace and reloads at the Dashboard. With one Workspace the modal
  * still opens and shows it. A switch that fails says so in the modal, as
- * Workspace Selection does.
+ * Workspace Selection does. Closing the modal clears the error, and the
+ * spinner too once the switch has answered: if a page's leave-site warning
+ * kept the User here, they can pick again.
  */
 export function SwitchWorkspace() {
   const { workspace } = useWorkspace();
   const { workspaces, setActive } = useWorkspaceList();
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
+  const inFlight = useRef(false);
 
   const pick = async (id: string) => {
     setFailed(false);
     setPendingId(id);
+    inFlight.current = true;
     // setActive reloads the app at "/" once the switch lands.
     const { error } = await setActive(id, "/");
+    inFlight.current = false;
     if (error != null) {
       setFailed(true);
       setPendingId(null);
@@ -56,8 +61,10 @@ export function SwitchWorkspace() {
       onPick={(id) => {
         void pick(id);
       }}
-      onOpenChange={() => {
+      onOpenChange={(open) => {
+        if (open) return;
         setFailed(false);
+        if (!inFlight.current) setPendingId(null);
       }}
     />
   );

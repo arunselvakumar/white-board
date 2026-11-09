@@ -152,6 +152,46 @@ export const SwitchWorkspaceFails: Story = {
   },
 };
 
+/**
+ * The switch answered but the reload never came (a leave-site warning kept
+ * the User on the page): closing the modal and opening it again lets them
+ * pick again.
+ */
+export const SwitchWorkspaceReloadCancelled: Story = {
+  beforeEach() {
+    authMocks.workspaces = [...authMocks.workspaces, HARBOR_ACADEMY];
+  },
+  play: async ({ canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    let modal = within(await openSwitchWorkspace(canvasElement, userEvent));
+    await userEvent.click(
+      modal.getByRole("button", { name: "Harbor Academy Teacher" }),
+    );
+    await waitFor(() =>
+      expect(authMocks.setActive).toHaveBeenCalledWith("org_harbor", "/"),
+    );
+    await expect(
+      modal.getByRole("button", { name: /^Harbor Academy/ }),
+    ).toBeDisabled();
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(
+        body.queryByRole("dialog", { name: "Switch Workspace" }),
+      ).not.toBeInTheDocument(),
+    );
+    // The sidebar (on a phone, its sheet) is still open behind the modal.
+    await userEvent.click(
+      body.getByRole("button", { name: /^Switch Workspace/ }),
+    );
+    const again = await body.findByRole("dialog", { name: "Switch Workspace" });
+    await waitFor(() => expect(again).toBeVisible());
+    modal = within(again);
+    await expect(
+      modal.getByRole("button", { name: "Harbor Academy Teacher" }),
+    ).toBeEnabled();
+  },
+};
+
 export const StudentNavigation: Story = {
   beforeEach() {
     signInAs("student", { name: "Riverside Centre" });

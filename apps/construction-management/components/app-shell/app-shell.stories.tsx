@@ -601,6 +601,58 @@ export const SwitchCompanyFails: Story = {
   },
 };
 
+/**
+ * The switch answered but the reload never came (a leave-site warning kept
+ * the User on the page): closing the modal and opening it again lets them
+ * pick again.
+ */
+export const SwitchCompanyReloadCancelled: Story = {
+  ...shellAt("/app/projects"),
+  beforeEach() {
+    signInAs("owner", { name: "Anugraha Engineers" });
+    authMocks.companies = [...authMocks.companies, SRI_INFRA];
+  },
+  play: async (context) => {
+    const { canvasElement, userEvent } = context;
+    const original = globalThis.fetch;
+    globalThis.fetch = () =>
+      Promise.resolve(Response.json({ activeCompanyId: "company_sri" }));
+    try {
+      let modal = await openSwitchCompany(context);
+      await userEvent.click(
+        modal.getByRole("button", { name: "Sri Infra Team Member" }),
+      );
+      await waitFor(() =>
+        expect(authMocks.navigateInApp).toHaveBeenCalledWith("/app/projects"),
+      );
+      await expect(
+        modal.getByRole("button", { name: /^Sri Infra/ }),
+      ).toBeDisabled();
+      await userEvent.keyboard("{Escape}");
+      await waitFor(() =>
+        expect(
+          within(canvasElement.ownerDocument.body).queryByRole("dialog", {
+            name: "Switch Company",
+          }),
+        ).not.toBeInTheDocument(),
+      );
+      // The sidebar (on a phone, its sheet) is still open behind the modal.
+      const body = within(canvasElement.ownerDocument.body);
+      await userEvent.click(
+        body.getByRole("button", { name: /^Switch Company/ }),
+      );
+      const again = await body.findByRole("dialog", { name: "Switch Company" });
+      await waitFor(() => expect(again).toBeVisible());
+      modal = within(again);
+      await expect(
+        modal.getByRole("button", { name: "Sri Infra Team Member" }),
+      ).toBeEnabled();
+    } finally {
+      globalThis.fetch = original;
+    }
+  },
+};
+
 /** The account menu is the sidebar's account row `…` (ADR-0049, ADR-0050). */
 export const AccountMenuSignOut: Story = {
   ...shellAt("/app/projects"),
