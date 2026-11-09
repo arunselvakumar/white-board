@@ -1,12 +1,23 @@
 import { BasePage } from "./BasePage";
 
 /**
- * The signed-in shell around every /app screen: the sidebar (Company
- * switcher, account row, main menu) and, on a phone, its slim top bar.
+ * The signed-in shell around every /app screen: the sidebar (account row,
+ * main menu, Switch Company) and, on a phone, its slim top bar.
  */
 export abstract class AppShellPage extends BasePage {
-  public get companySwitcher() {
-    return this.page.getByRole("button", { name: /^Active Company: / });
+  public get switchCompanyRow() {
+    return this.page.getByRole("button", { name: /^Switch Company\b/ });
+  }
+
+  /**
+   * Switch Company with `name` as the Active Company: the row says so in its
+   * accessible name (ADR-0051), which is what these specs read.
+   */
+  public activeCompanyRow(name: string) {
+    return this.page.getByRole("button", {
+      name: `Switch Company. Active Company: ${name}`,
+      exact: true,
+    });
   }
 
   public get accountMenuButton() {
@@ -24,7 +35,7 @@ export abstract class AppShellPage extends BasePage {
 
   /**
    * On a phone the sidebar is a sheet behind "Toggle Sidebar" (ADR-0050),
-   * so the switcher, the account menu and the sidebar bell exist only once
+   * so Switch Company, the account menu and the sidebar bell exist only once
    * it is open; on a desktop it is always open and this does nothing.
    */
   public async openSidebar() {
@@ -33,8 +44,11 @@ export abstract class AppShellPage extends BasePage {
   }
 
   public async switchCompany(name: string) {
-    await this.companySwitcher.click();
-    await this.menuItem(name).click();
+    await this.switchCompanyRow.click();
+    await this.page
+      .getByRole("dialog", { name: "Switch Company" })
+      .getByRole("button", { name })
+      .click();
   }
 
   public async signOut() {

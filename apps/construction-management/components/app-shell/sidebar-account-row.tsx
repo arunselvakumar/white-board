@@ -14,10 +14,9 @@ import { BrandMark } from "./brand-mark";
 import { AccountAvatar, UserMenuContent, useAccount } from "./user-menu";
 
 /**
- * The sidebar's second row, under the Company switcher (ADR-0049,
- * ADR-0050): the signed-in User's avatar, name and email, the notification
- * bell, and `…` for the account menu. Nobody signed in: the product mark
- * and name, with no menu.
+ * The sidebar's first row (ADR-0049, ADR-0051): the signed-in User's
+ * avatar, name and email, the notification bell, and `…` for the account
+ * menu. Nobody signed in: the product mark and name, with no menu.
  */
 export function SidebarAccountRow() {
   const account = useAccount();

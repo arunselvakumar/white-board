@@ -34,7 +34,7 @@ signUpPageTest.describe("Sign up", () => {
       const projectsPage = new ProjectsPage(page);
       await expect(page).toHaveURL(projectsPage.url, { timeout: 20_000 });
       await expect(projectsPage.pageHeading).toBeVisible();
-      await expect(projectsPage.companySwitcher).toContainText(companyName);
+      await expect(projectsPage.activeCompanyRow(companyName)).toBeVisible();
       await expect(projectsPage.emptyState).toBeVisible();
     },
   );

@@ -38,7 +38,6 @@ import { projectIdFromPath } from "@/lib/project-nav";
 import { APP_NAV_ICONS } from "./app-nav-icons";
 import type { AreaNavGroup } from "./area-nav-menu";
 import { BrandMark } from "./brand-mark";
-import { CompanySwitcher } from "./company-switcher";
 import {
   HumanResourcesNavMenu,
   humanResourcesGroups,
@@ -56,6 +55,7 @@ import { PlanBanner } from "./plan-banner";
 import { ProjectNavMenu } from "./project-nav-menu";
 import { SidebarAccountRow } from "./sidebar-account-row";
 import { SidebarPlanCard } from "./sidebar-plan-card";
+import { SwitchCompany } from "./switch-company";
 import { WORKSPACE_GROUPS, WorkspaceNavMenu } from "./workspace-nav-menu";
 
 /**
@@ -71,10 +71,10 @@ const VERSION = `v${process.env["NEXT_PUBLIC_APP_VERSION"] ?? "0.0.0"}`;
 
 /**
  * Authenticated chrome (ADR-0049, ADR-0050): the ink sidebar carries it
- * all, with no top bar from `md` up: the Company switcher, the User's
- * account row with the notification bell, the menu search, the Company
- * Dashboard, Projects, Human Resources, Workspace, Masters and Settings,
- * then the plan card, My Profile and Sign out. On a phone a slim bar opens
+ * all, with no top bar from `md` up: the User's account row with the
+ * notification bell, the menu search, the Company Dashboard, Projects,
+ * Human Resources, Workspace, Masters and Settings, then the plan card, My
+ * Profile, Switch Company (ADR-0051) and Sign out. On a phone a slim bar opens
  * the sidebar sheet and keeps the bell in reach. Inside a Project the areas give way to the Project's own
  * menu (ADR CM-0020). `canOpenDashboard` is the Dashboard menu's Read flag
  * (CM-902): without it the Dashboard is not in the menu.
@@ -113,7 +113,6 @@ export function AppShell({
         className="[&_[data-slot=sidebar-inner]]:ring-sidebar-border p-3 [&_[data-slot=sidebar-inner]]:rounded-2xl"
       >
         <SidebarHeader className="gap-3 px-3 pt-4 pb-2">
-          <CompanySwitcher />
           <SidebarAccountRow />
           <SidebarSearch
             aria-label="Search menu"
@@ -181,9 +180,9 @@ export function AppShell({
 }
 
 /**
- * The foot of the sidebar, below the plan card: My Profile, then Sign out.
- * Your Subscription is the plan card's link. Outside the Main navigation:
- * Sign out is an action, not a page.
+ * The foot of the sidebar, below the plan card: My Profile, Switch Company,
+ * then Sign out. Your Subscription is the plan card's link. Outside the Main
+ * navigation: the last two are actions, not pages.
  */
 function FooterMenu({ pathname }: { pathname: string }) {
   const { signOut, fetchStatus } = useCompanySignOut();
@@ -204,6 +203,9 @@ function FooterMenu({ pathname }: { pathname: string }) {
             <UserRound />
             <span className="min-w-0 flex-1 truncate">My Profile</span>
           </SidebarMenuButton>
+        </SidebarMenuItem>
+        <SidebarMenuItem>
+          <SwitchCompany rowClassName={NAV_BUTTON_CLASS} />
         </SidebarMenuItem>
         <SidebarMenuItem>
           <SidebarMenuButton

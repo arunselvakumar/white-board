@@ -52,9 +52,9 @@ staffPageTest.describe("Staff", () => {
       await expect(invitee).toHaveURL(joinPath);
       await joinPage.joinButton(owner.company.name).click();
       await expect(invitee).toHaveURL(/\/app\//);
-      await expect(new ProjectsPage(invitee).companySwitcher).toContainText(
-        owner.company.name,
-      );
+      await expect(
+        new ProjectsPage(invitee).activeCompanyRow(owner.company.name),
+      ).toBeVisible();
       await invitee.context().close();
 
       await page.reload();

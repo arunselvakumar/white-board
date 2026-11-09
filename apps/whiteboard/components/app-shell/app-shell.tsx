@@ -37,9 +37,9 @@ const VERSION = `v${process.env["NEXT_PUBLIC_APP_VERSION"] ?? "0.0.0"}`;
 import { AppBreadcrumbs } from "./app-breadcrumbs";
 import { SIDEBAR_ROW_CLASS, SidebarMainNav } from "./sidebar-nav";
 import { SidebarTodayCard } from "./sidebar-today-card";
+import { SwitchWorkspace } from "./switch-workspace";
 import { ThemeToggle } from "./theme-toggle";
 import { SidebarUserAccount } from "./user-menu";
-import { WorkspaceSwitcher } from "./workspace-switcher";
 
 /** The bell on the sidebar's account row, in the sidebar's colours. */
 const SIDEBAR_BELL_CLASS =
@@ -89,7 +89,6 @@ export function AppShell({ children }: { children: ReactNode }) {
         className="[&_[data-slot=sidebar-inner]]:ring-sidebar-border p-3 [&_[data-slot=sidebar-inner]]:rounded-2xl"
       >
         <SidebarHeader className="gap-3 px-3 pt-4 pb-2">
-          <WorkspaceSwitcher />
           <SidebarUserAccount
             before={
               // Only Teachers receive Notifications for now (ADR-0041 §1).
@@ -122,6 +121,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           {role === "owner" ? <SidebarTodayCard /> : null}
           <SidebarGlide>
             <SidebarMenu className="gap-1">
+              <SidebarMenuItem>
+                <SwitchWorkspace />
+              </SidebarMenuItem>
               <SidebarMenuItem>
                 <ThemeToggle />
               </SidebarMenuItem>
