@@ -1,6 +1,9 @@
 import type { ReactNode } from "react";
 
-/** The Payments module of a Project (M2 wages, M7 finance). Its tabs are in the sidebar (ADR CM-0020). */
+/**
+ * The Payments module of a Project: wages and finance. Its tabs are in the
+ * sidebar (ADR CM-0020).
+ */
 export default function PaymentsLayout({
   children,
 }: Readonly<{

@@ -5,8 +5,8 @@ import { homePathFor } from "@/lib/home-path";
 import { PrismaEmployeeDirectory } from "@/src/hrms/infrastructure/prisma-directories";
 
 /**
- * The signed-in Team Member's home (CM-318): Human Resources → HRMS for an HRMS
- * Team Member, the Projects home for everyone else (the Owner included).
+ * The signed-in Team Member's home: HRMS for an HRMS Team Member, the
+ * Projects home for everyone else (the Owner included).
  */
 export async function viewerHomePath(): Promise<string> {
   const auth = await protectCompany();

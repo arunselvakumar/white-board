@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-/** The Bookings module of a Project (M10). Its tabs are in the sidebar (ADR CM-0020). */
+/** Bookings tabs are in the sidebar (ADR CM-0020). */
 export default function BookingsLayout({
   children,
 }: Readonly<{

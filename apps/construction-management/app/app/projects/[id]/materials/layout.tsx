@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-/** The Materials module of a Project (M5). Its tabs are in the sidebar (ADR CM-0020). */
+/** Materials tabs are in the sidebar (ADR CM-0020). */
 export default function MaterialsLayout({
   children,
 }: Readonly<{
