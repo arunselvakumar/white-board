@@ -1,12 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, waitFor, within } from "storybook/test";
 
-import {
-  StoryQueries,
-  mockApi,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
-import { STORY_DEPARTMENTS } from "./masters-story-support";
+import { StoryQueries, mockApi, type ApiCall } from "@/.storybook/mocks/api";
+import { STORY_DEPARTMENTS } from "@/app/app/_components/masters/masters-story-support";
 import { WorkTypeDialog } from "./work-type-dialog";
 import { STORY_WORK_TYPES, workTypesHandler } from "./work-type-fixtures";
 

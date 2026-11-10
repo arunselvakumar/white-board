@@ -13,7 +13,7 @@ import {
 } from "@repo/ui/components/dialog";
 
 import { FormAlert } from "@/components/auth/form-alert";
-import { CheckList } from "@/components/masters/check-list";
+import { CheckList } from "@/app/app/_components/masters/check-list";
 import { fieldForCode } from "@/lib/server-errors";
 import { PROJECT_NAV_GROUPS } from "@/src/projects/domain/project-nav-groups";
 import {

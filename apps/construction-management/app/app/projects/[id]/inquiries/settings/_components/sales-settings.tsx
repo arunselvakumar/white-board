@@ -27,7 +27,7 @@ import {
   ConfirmDeleteDialog,
   MasterEmpty,
   MasterRow,
-} from "@/components/masters/master-list-parts";
+} from "@/app/app/_components/masters/master-list-parts";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   salesSettingsQuery,

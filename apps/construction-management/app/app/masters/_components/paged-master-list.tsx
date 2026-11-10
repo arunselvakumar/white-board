@@ -38,8 +38,8 @@ import {
   MasterEmpty,
   MasterRow,
   MasterSearch,
-} from "./master-list-parts";
-import { MasterRowsSkeleton } from "./masters-skeletons";
+} from "@/app/app/_components/masters/master-list-parts";
+import { MasterRowsSkeleton } from "@/app/app/_components/masters/masters-skeletons";
 
 const STATUS_FILTERS: FilterTab<MaterialMasterFilter["status"]>[] = [
   { value: "all", label: "All", icon: LayoutGrid },

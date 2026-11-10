@@ -1,11 +1,11 @@
-import type { ApiCall } from "../../.storybook/mocks/api";
+import type { ApiCall } from "@/.storybook/mocks/api";
 import {
   materialOptionsHandler,
   MATERIAL_OPTIONS,
 } from "@/app/app/_components/procurement/material-options-fixtures";
 import type { WorkTypeItem } from "@/src/queries/work-types";
 
-import { STORY_DEPARTMENTS } from "./masters-story-support";
+import { STORY_DEPARTMENTS } from "@/app/app/_components/masters/masters-story-support";
 
 /** Story fixtures for Masters → Work Types (CM-601). */
 

@@ -21,7 +21,7 @@ import {
 } from "@repo/ui/components/select";
 
 import { FormAlert } from "@/components/auth/form-alert";
-import { MasterEmpty } from "@/components/masters/master-list-parts";
+import { MasterEmpty } from "@/app/app/_components/masters/master-list-parts";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   leaveOptionsQuery,

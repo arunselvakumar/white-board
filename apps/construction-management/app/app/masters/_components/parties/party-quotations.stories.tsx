@@ -3,12 +3,8 @@ import { expect, fireEvent, waitFor, within } from "storybook/test";
 
 import type { Quotation } from "@/src/queries/quotations";
 
-import {
-  StoryQueries,
-  mockApi,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
-import { mockXhrUploads } from "../../.storybook/mocks/xhr";
+import { StoryQueries, mockApi, type ApiCall } from "@/.storybook/mocks/api";
+import { mockXhrUploads } from "@/.storybook/mocks/xhr";
 import { BALAJI, BALAJI_QUOTATIONS } from "./party-fixtures";
 import { PartyQuotations } from "./party-quotations";
 

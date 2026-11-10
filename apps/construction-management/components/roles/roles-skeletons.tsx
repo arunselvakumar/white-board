@@ -1,6 +1,6 @@
 import { FormSkeleton } from "@repo/ui/components/skeleton-kit";
 
-import { FormPageSkeleton } from "@/components/masters/masters-skeletons";
+import { FormPageSkeleton } from "@/app/app/_components/masters/masters-skeletons";
 import { PermissionMatrixSkeleton } from "@/app/app/staff/roles/[id]/_components/permissions-skeletons";
 import { ROLES_PATH } from "@/lib/staff-nav";
 

@@ -14,8 +14,8 @@ import {
 import {
   LookupNameFields,
   useLookupNameForm,
-} from "@/components/masters/lookup-name-form";
-import { LABOUR_CATEGORIES_SCREEN } from "@/components/masters/lookup-screens";
+} from "@/app/app/_components/masters/lookup-name-form";
+import { LABOUR_CATEGORIES_SCREEN } from "@/app/app/_components/masters/lookup-screens";
 import type { LookupItem } from "@/src/queries/masters";
 
 function AddCategoryForm({

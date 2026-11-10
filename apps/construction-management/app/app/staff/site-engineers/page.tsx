@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { SupervisorsList } from "@/components/masters/supervisors-list";
+import { SupervisorsList } from "@/app/app/staff/site-engineers/_components/supervisors-list";
 
 export const metadata: Metadata = { title: "Site Engineers" };
 

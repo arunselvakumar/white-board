@@ -10,7 +10,7 @@ import {
 import {
   FormPageSkeleton,
   FormSectionSkeleton,
-} from "@/components/masters/masters-skeletons";
+} from "@/app/app/_components/masters/masters-skeletons";
 
 /** The Labours screens while they load (ADR-0047). */
 

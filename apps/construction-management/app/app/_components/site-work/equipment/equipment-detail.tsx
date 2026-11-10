@@ -29,7 +29,7 @@ import {
   type PageHeaderBack,
 } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
-import { ConfirmDeleteDialog } from "@/components/masters/master-list-parts";
+import { ConfirmDeleteDialog } from "@/app/app/_components/masters/master-list-parts";
 import { formatPaise } from "@/components/money/money-input";
 import { formatDate } from "@/app/app/_components/procurement/inventory/inventory-format";
 import {

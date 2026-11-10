@@ -29,7 +29,7 @@ import { FormAlert } from "@/components/auth/form-alert";
 import {
   ConfirmDeleteDialog,
   MasterEmpty,
-} from "@/components/masters/master-list-parts";
+} from "@/app/app/_components/masters/master-list-parts";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   leaveAssignmentsQuery,

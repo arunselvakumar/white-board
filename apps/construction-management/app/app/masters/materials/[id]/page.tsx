@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-import { EditMaterialScreen } from "@/components/masters/material-form";
-import { MaterialFormSkeleton } from "@/components/masters/masters-skeletons";
+import { EditMaterialScreen } from "@/app/app/masters/materials/_components/material-form";
+import { MaterialFormSkeleton } from "@/app/app/_components/masters/masters-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Edit Material" };

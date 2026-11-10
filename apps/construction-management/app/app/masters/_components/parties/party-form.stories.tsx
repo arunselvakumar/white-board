@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { getRouter } from "@storybook/nextjs-vite/navigation.mock";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueryClient } from "@/components/masters/masters-story-support";
+import { StoryQueryClient } from "@/app/app/_components/masters/masters-story-support";
 
-import { mockFetch } from "../../.storybook/mock-fetch";
+import { mockFetch } from "@/.storybook/mock-fetch";
 import { EditPartyScreen, NewPartyScreen } from "./party-form";
 import {
   BALAJI,

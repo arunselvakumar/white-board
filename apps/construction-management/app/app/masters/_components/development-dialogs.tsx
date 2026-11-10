@@ -27,7 +27,10 @@ import {
 } from "@/src/queries/developments";
 import { projectOptionsQuery } from "@/src/queries/projects";
 
-import { CheckList, type CheckListOption } from "./check-list";
+import {
+  CheckList,
+  type CheckListOption,
+} from "@/app/app/_components/masters/check-list";
 import type { DevelopmentScreenConfig } from "./development-screens";
 
 const NAME_MAX = 100;

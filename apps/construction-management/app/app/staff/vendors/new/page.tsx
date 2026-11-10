@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { NewVendorScreen } from "@/components/vendors/vendor-form";
+import { NewVendorScreen } from "@/app/app/staff/vendors/_components/vendor-form";
 
 export const metadata: Metadata = { title: "Add Vendor" };
 

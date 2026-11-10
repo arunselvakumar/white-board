@@ -10,7 +10,7 @@ import {
   ChecklistSkeleton,
   FormPageSkeleton,
   FormSectionSkeleton,
-} from "@/components/masters/masters-skeletons";
+} from "@/app/app/_components/masters/masters-skeletons";
 
 /** Human Resources → Vendors while it loads (ADR-0047). */
 

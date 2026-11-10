@@ -1,12 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import {
-  StoryQueries,
-  mockApi,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
-import { chooseFromMenu } from "./masters-story-support";
+import { StoryQueries, mockApi, type ApiCall } from "@/.storybook/mocks/api";
+import { chooseFromMenu } from "@/app/app/_components/masters/masters-story-support";
 import {
   STORY_ISSUE_CATEGORIES,
   STORY_TAGS,

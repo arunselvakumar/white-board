@@ -21,12 +21,12 @@ import {
   MasterRow,
   MasterSearch,
   byName,
-} from "./master-list-parts";
+} from "@/app/app/_components/masters/master-list-parts";
 import { SupervisorDialog } from "./supervisor-dialog";
 import {
   MasterAddButtonSkeleton,
   MasterListPageSkeleton,
-} from "./masters-skeletons";
+} from "@/app/app/_components/masters/masters-skeletons";
 
 function errorMessage(error: unknown): string {
   return fieldForCode(error, {}).message;

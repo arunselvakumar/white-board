@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { MaterialsList } from "@/components/masters/material-master-lists";
+import { MaterialsList } from "@/app/app/masters/_components/material-master-lists";
 
 export const metadata: Metadata = { title: "Materials" };
 

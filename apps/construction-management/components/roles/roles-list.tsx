@@ -39,7 +39,7 @@ import {
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
-import { MasterListPageSkeleton } from "@/components/masters/masters-skeletons";
+import { MasterListPageSkeleton } from "@/app/app/_components/masters/masters-skeletons";
 import { fieldForCode } from "@/lib/server-errors";
 import { ROLES_PATH, rolePath, staffCount } from "@/lib/staff-nav";
 import { QueryHttpError } from "@/src/queries/http";

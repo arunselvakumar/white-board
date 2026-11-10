@@ -22,9 +22,9 @@ import {
   MasterRow,
   MasterSearch,
   byName,
-} from "./master-list-parts";
+} from "@/app/app/_components/masters/master-list-parts";
 import { TrackingMasterDialog } from "./tracking-master-dialog";
-import { MasterListPageSkeleton } from "./masters-skeletons";
+import { MasterListPageSkeleton } from "@/app/app/_components/masters/masters-skeletons";
 
 type Row = {
   id: string;

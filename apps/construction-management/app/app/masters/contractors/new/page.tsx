@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { NewPartyScreen } from "@/components/parties/party-form";
+import { NewPartyScreen } from "@/app/app/masters/_components/parties/party-form";
 
 export const metadata: Metadata = { title: "Add Contractor" };
 

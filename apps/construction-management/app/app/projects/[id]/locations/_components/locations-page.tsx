@@ -28,7 +28,7 @@ import { Textarea } from "@repo/ui/components/textarea";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { ConfirmDeleteDialog } from "@/components/masters/master-list-parts";
+import { ConfirmDeleteDialog } from "@/app/app/_components/masters/master-list-parts";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   LOCATION_DESCRIPTION_MAX,

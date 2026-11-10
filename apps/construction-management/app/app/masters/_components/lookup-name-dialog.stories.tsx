@@ -4,15 +4,18 @@ import { expect, fn, waitFor, within } from "storybook/test";
 import {
   sentTo,
   StoryQueryClient,
-} from "@/components/masters/masters-story-support";
+} from "@/app/app/_components/masters/masters-story-support";
 
 import { LookupNameDialog } from "./lookup-name-dialog";
-import { DEPARTMENTS_SCREEN, LABOUR_CATEGORIES_SCREEN } from "./lookup-screens";
+import {
+  DEPARTMENTS_SCREEN,
+  LABOUR_CATEGORIES_SCREEN,
+} from "@/app/app/_components/masters/lookup-screens";
 import {
   serveMasters,
   STORY_DEPARTMENTS,
   STORY_LABOUR_CATEGORIES,
-} from "./masters-story-support";
+} from "@/app/app/_components/masters/masters-story-support";
 
 const CATEGORIES = "/api/construction/masters/labour-categories";
 const DEPARTMENTS = "/api/construction/masters/departments";

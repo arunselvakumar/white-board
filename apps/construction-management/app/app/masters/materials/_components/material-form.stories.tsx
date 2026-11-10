@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { getRouter } from "@storybook/nextjs-vite/navigation.mock";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueryClient } from "@/components/masters/masters-story-support";
+import { StoryQueryClient } from "@/app/app/_components/masters/masters-story-support";
 
 import { EditMaterialScreen, NewMaterialScreen } from "./material-form";
 import {
@@ -11,7 +11,7 @@ import {
   STORY_UNITS,
   lastBody,
   serveMaterialMasters,
-} from "./material-masters-story-support";
+} from "@/app/app/masters/_components/material-masters-story-support";
 
 let api: ReturnType<typeof serveMaterialMasters>;
 

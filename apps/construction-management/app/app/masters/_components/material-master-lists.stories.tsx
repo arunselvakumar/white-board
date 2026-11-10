@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueryClient } from "@/components/masters/masters-story-support";
+import { StoryQueryClient } from "@/app/app/_components/masters/masters-story-support";
 
 import {
   MaterialCategoriesList,
@@ -16,7 +16,7 @@ import {
   lastBody,
   serveMaterialMasters,
 } from "./material-masters-story-support";
-import { chooseFromMenu } from "./masters-story-support";
+import { chooseFromMenu } from "@/app/app/_components/masters/masters-story-support";
 
 let api: ReturnType<typeof serveMaterialMasters>;
 

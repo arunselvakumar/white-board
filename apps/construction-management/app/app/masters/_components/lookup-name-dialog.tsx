@@ -12,8 +12,11 @@ import {
 
 import type { LookupItem } from "@/src/queries/masters";
 
-import { LookupNameFields, useLookupNameForm } from "./lookup-name-form";
-import type { LookupScreenConfig } from "./lookup-screens";
+import {
+  LookupNameFields,
+  useLookupNameForm,
+} from "@/app/app/_components/masters/lookup-name-form";
+import type { LookupScreenConfig } from "@/app/app/_components/masters/lookup-screens";
 
 /**
  * Add a row, or rename a Company-made one (with the `updatedAt` it loaded).

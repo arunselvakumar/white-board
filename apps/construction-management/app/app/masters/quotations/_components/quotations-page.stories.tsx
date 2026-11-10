@@ -3,13 +3,13 @@ import { expect, waitFor, within } from "storybook/test";
 
 import type { Quotation } from "@/src/queries/quotations";
 
-import { StoryQueries, mockApi } from "../../.storybook/mocks/api";
+import { StoryQueries, mockApi } from "@/.storybook/mocks/api";
 import {
   BALAJI,
   BALAJI_QUOTATIONS,
   KAVERI,
   KAVERI_QUOTATION,
-} from "./party-fixtures";
+} from "@/app/app/masters/_components/parties/party-fixtures";
 import { QuotationsPage } from "./quotations-page";
 
 const LIST = "/api/construction/masters/quotations";

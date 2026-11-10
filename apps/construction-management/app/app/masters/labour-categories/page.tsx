@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { LabourCategoriesList } from "@/components/masters/lookup-list";
+import { LabourCategoriesList } from "@/app/app/masters/_components/lookup-list";
 
 export const metadata: Metadata = { title: "Labour Categories" };
 
