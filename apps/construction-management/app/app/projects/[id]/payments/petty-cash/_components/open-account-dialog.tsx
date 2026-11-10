@@ -65,7 +65,7 @@ const SERVER_FIELDS: Record<string, keyof Values> = {
 };
 
 /**
- * Open a Team Member's petty-cash account (CM-0017 §2): one each, named
+ * Open a Team Member's petty-cash account (ADR CM-0017 §2): one each, named
  * "Petty cash — <member>" unless a name is typed, with an optional opening
  * balance as of a date. Members who already hold one are not offered.
  */

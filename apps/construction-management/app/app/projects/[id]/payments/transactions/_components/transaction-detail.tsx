@@ -135,7 +135,7 @@ function Fields({ item }: { item: RegisterItem }) {
 }
 
 /**
- * One Transaction or transfer (CM-702): its fields, status and reject
+ * One Transaction or transfer: its fields, status and reject
  * reason, and Approve / Reject / Edit / Delete as the viewer's flags allow.
  */
 export function TransactionDetail({

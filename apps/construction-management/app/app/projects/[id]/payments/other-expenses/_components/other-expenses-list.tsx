@@ -105,7 +105,7 @@ function FilterSelect({
 }
 
 /**
- * A Project's Other Expenses (CM-704, ADR CM-0017 §10): filters by date
+ * A Project's Other Expenses (ADR CM-0017 §10): filters by date
  * range, Payment Category, account and status; the approved and pending
  * totals; bulk approve / reject for members with Approve or Reject.
  */

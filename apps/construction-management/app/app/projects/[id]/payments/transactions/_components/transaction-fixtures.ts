@@ -15,7 +15,7 @@ import type {
   Transfer,
 } from "@/src/queries/finance-transactions";
 
-/** Story fixtures for the Transactions register (CM-702). */
+/** Story fixtures for the Transactions register. */
 
 export const STORY_TODAY = "2026-10-11";
 export const PROJECT_ID = "0199a000-0000-7000-8000-00000000f001";

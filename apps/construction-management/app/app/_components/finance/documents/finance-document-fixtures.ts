@@ -6,7 +6,7 @@ import type {
 import type { FinanceDocumentType } from "@/src/finance/domain/finance-documents";
 
 /**
- * Story fixtures for the finance documents' thread and files (M7). Other
+ * Story fixtures for the finance documents' thread and files. Other
  * finance stories compose the handler into their own `mockApi`:
  *
  * ```ts

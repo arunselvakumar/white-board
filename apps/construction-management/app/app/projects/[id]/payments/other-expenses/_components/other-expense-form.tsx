@@ -46,7 +46,7 @@ function referenceLabel(mode: ExpenseMode): string {
 }
 
 /**
- * The Other Expense form (CM-704, ADR CM-0017 §10): date, Payment
+ * The Other Expense form (ADR CM-0017 §10): date, Payment
  * Category, Paid to, mode with its account and reference, amount,
  * description and, on a new expense, files. Save keeps it pending; Save &
  * Approve (with Approve) posts it at once. Editing an approved expense

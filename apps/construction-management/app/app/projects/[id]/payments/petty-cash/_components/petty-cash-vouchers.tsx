@@ -426,7 +426,7 @@ function VoucherRows({
 }
 
 /**
- * One petty-cash account's vouchers, newest first (CM-703): on this
+ * One petty-cash account's vouchers, newest first: on this
  * Project or on all Projects, by date, type, status and Payment Category;
  * bulk approve / reject (all or none) for approvers.
  */

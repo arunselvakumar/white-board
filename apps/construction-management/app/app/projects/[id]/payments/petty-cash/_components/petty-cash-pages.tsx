@@ -11,7 +11,7 @@ import {
 import { pettyCashPath } from "./petty-cash-parts";
 import { VoucherForm } from "./voucher-form";
 
-/** New voucher (CM-703): `?account=<id>&type=receipt` start it. */
+/** New voucher: `?account=<id>&type=receipt` start it. */
 export function VoucherNew({
   projectId,
   accountId,
@@ -44,7 +44,6 @@ export function VoucherNew({
   );
 }
 
-/** Edit a voucher (CM-703). */
 export function VoucherEdit({
   projectId,
   voucherId,

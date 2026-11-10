@@ -151,7 +151,7 @@ function defaults(transaction: Transaction | null, today: string): Values {
 }
 
 /**
- * New Transaction or Edit (CM-702, ADR CM-0017 §5): date, Payment In or
+ * New Transaction or Edit (ADR CM-0017 §5): date, Payment In or
  * Out, mode, the account (fitting the mode), cheque number or reference,
  * amount, Payment Category, Paid To / Received From and description. Save
  * leaves it pending; Save & Approve (with Approve) posts it. A reference

@@ -38,7 +38,7 @@ export function VoucherStatusBadge({ status }: { status: ApprovalStatus }) {
   );
 }
 
-/** Money with its sign's colour: a negative balance shows red (CM-0017 §2). */
+/** Money with its sign's colour: a negative balance shows red (ADR CM-0017 §2). */
 export function Amount({
   paise,
   signed = false,

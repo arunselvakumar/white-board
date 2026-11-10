@@ -164,7 +164,7 @@ function defaults(
 const orNull = (value: string) => (value.trim() === "" ? null : value.trim());
 
 /**
- * A petty-cash voucher (CM-0017 §9): Payment (cash out), Receipt (cash in)
+ * A petty-cash voucher (ADR CM-0017 §9): Payment (cash out), Receipt (cash in)
  * or Transfer (to another petty-cash or a company account). Date, the
  * Project (this one, none, or the one it already has), Paid To / Received
  * From, amount, Payment Category (Payment and Receipt), Paid For,

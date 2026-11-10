@@ -9,7 +9,7 @@ import type {
 } from "@/src/queries/finance-petty-cash";
 import type { Flag } from "@/src/shared-kernel/access";
 
-/** Story fixtures for Petty Cash (CM-703). */
+/** Story fixtures for Petty Cash. */
 
 export const STORY_PROJECT_ID = "0199a000-0000-7000-8000-00000000b001";
 
