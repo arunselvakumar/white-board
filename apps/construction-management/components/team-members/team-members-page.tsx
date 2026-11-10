@@ -54,7 +54,7 @@ import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
-import { STAFF_PATH, staffCount, staffPath } from "@/lib/staff-roles-nav";
+import { STAFF_PATH, staffCount, staffPath } from "@/lib/staff-nav";
 import { QueryHttpError } from "@/src/queries/http";
 import {
   TEAM_MEMBERS_KEY,
@@ -106,7 +106,7 @@ export function TeamMembersPage({
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
-          title="Staff"
+          title="Office Staff"
           meta="Your team, how they sign in, and the Role that decides what each one may do."
           actions={
             canAdd ? (
@@ -218,7 +218,7 @@ function TeamMemberRows({
           <EmptyDescription>
             {filtered
               ? "Try another name or status."
-              : "Add your site engineers, supervisors and accountants. Invite them by email, or set a password so they sign in with their mobile."}
+              : "Add your site engineers, store keepers and accountants. Invite them by email, or set a password so they sign in with their mobile."}
           </EmptyDescription>
         </EmptyHeader>
         {!filtered && (

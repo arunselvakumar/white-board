@@ -178,7 +178,7 @@ export function EquipmentSheetDetailPage({
         <Fact label="Idle">{hoursText(sheet.idleHours)}</Fact>
         <Fact label="Breakdown">{hoursText(sheet.breakdownHours)}</Fact>
         <Fact label="Operator">{sheet.operatorName ?? "—"}</Fact>
-        <Fact label="Supervisor">{sheet.supervisor?.name ?? "—"}</Fact>
+        <Fact label="Site Engineer">{sheet.supervisor?.name ?? "—"}</Fact>
         <Fact label="Contractor">{sheet.contractor?.name ?? "—"}</Fact>
         <Fact label="Department">{sheet.department?.name ?? "—"}</Fact>
         <Fact label="Work Item">{sheet.workItem ?? "—"}</Fact>

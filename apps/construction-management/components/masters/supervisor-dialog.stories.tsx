@@ -41,7 +41,7 @@ function serve(teamMembers: { id: string; name: string }[] | "forbidden") {
 }
 
 const meta = {
-  title: "Masters/Supervisors/Form",
+  title: "Masters/Site Engineers/Form",
   component: SupervisorDialog,
   args: { supervisor: null, onClose: fn() },
   render: (args) => (
@@ -61,15 +61,15 @@ export const AddValidatesAndSaves: Story = {
     const dialog = within(await body.findByRole("dialog"));
     await waitFor(() =>
       expect(
-        dialog.getByRole("heading", { name: "Add Supervisor" }),
+        dialog.getByRole("heading", { name: "Add Site Engineer" }),
       ).toBeVisible(),
     );
     await userEvent.click(dialog.getByRole("button", { name: "Save" }));
     await expect(
-      await dialog.findByText("Enter the Supervisor name"),
+      await dialog.findByText("Enter the Site Engineer name"),
     ).toBeVisible();
 
-    await userEvent.type(dialog.getByLabelText("Supervisor name"), "Ganesh");
+    await userEvent.type(dialog.getByLabelText("Site Engineer name"), "Ganesh");
     await userEvent.type(dialog.getByLabelText("Mobile (optional)"), "12345");
     await userEvent.click(dialog.getByRole("button", { name: "Save" }));
     await expect(
@@ -102,7 +102,7 @@ export const NameInUse: Story = {
       await within(canvasElement.ownerDocument.body).findByRole("dialog"),
     );
     await userEvent.type(
-      dialog.getByLabelText("Supervisor name"),
+      dialog.getByLabelText("Site Engineer name"),
       "rakesh mirtha",
     );
     await userEvent.click(dialog.getByRole("button", { name: "Save" }));
@@ -148,7 +148,7 @@ export const WithoutTeamMembersRead: Story = {
       await within(canvasElement.ownerDocument.body).findByRole("dialog"),
     );
     await waitFor(() =>
-      expect(dialog.getByLabelText("Supervisor name")).toBeVisible(),
+      expect(dialog.getByLabelText("Site Engineer name")).toBeVisible(),
     );
     await waitFor(() =>
       expect(

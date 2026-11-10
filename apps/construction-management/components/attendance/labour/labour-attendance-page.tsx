@@ -30,7 +30,7 @@ import {
 } from "@repo/ui/components/tabs";
 import { cn } from "@repo/ui/lib/utils";
 
-import { LABOURS_PAGE_PATH } from "@/lib/labour-vendors-nav";
+import { LABOURS_PAGE_PATH } from "@/lib/staff-nav";
 import { labourSheetQuery } from "@/src/queries/labour-attendance";
 
 import { LabourMarkingSheet } from "./labour-marking-sheet";

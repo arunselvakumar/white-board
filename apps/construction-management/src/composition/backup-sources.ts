@@ -786,7 +786,7 @@ const SPECS: Record<string, EntitySpec> = {
       col("shift", "Shift", "t.shift"),
       col(
         "supervisor",
-        "Supervisor",
+        "Site Engineer",
         nameIn(`${MS}.supervisors`, "t.supervisor_id"),
       ),
       col("checkIn", "Check In", "t.check_in"),

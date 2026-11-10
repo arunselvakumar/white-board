@@ -28,7 +28,7 @@ import { PageHeader } from "@/components/app-shell/page-header";
 import { STAFF_SALARY, wageDefaults } from "@/components/wages/wage-schema";
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";
-import { STAFF_PATH } from "@/lib/staff-roles-nav";
+import { STAFF_PATH } from "@/lib/staff-nav";
 import { ROLES_KEY, rolesQuery } from "@/src/queries/roles";
 import {
   TEAM_MEMBERS_KEY,
@@ -153,7 +153,7 @@ export function EditTeamMember({
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
-          back={{ label: "Staff", href: STAFF_PATH }}
+          back={{ label: "Office Staff", href: STAFF_PATH }}
           title={member.name}
           meta={
             <span className="inline-flex flex-wrap items-center gap-2">

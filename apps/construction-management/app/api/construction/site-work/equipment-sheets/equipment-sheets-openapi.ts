@@ -98,7 +98,7 @@ export const equipmentSheetOpenApiOperations: OpenApiOperation[] = [
     method: "get",
     path: `${EQUIPMENT_SHEETS_PATH}/form-options`,
     summary:
-      "What the usage-sheet form offers on a Project: settings, supervisors, Contractors, Departments, units",
+      "What the usage-sheet form offers on a Project: settings, Site Engineers, Contractors, Departments, units",
     tags: TAGS,
     query: GetConstructionSiteWorkEquipmentSheetFormOptionsRequestModel,
     successStatus: StatusCodes.OK,

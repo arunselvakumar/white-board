@@ -5,7 +5,7 @@ import { EditTeamMemberSkeleton } from "@/components/team-members/team-members-s
 import { QuerySuspense } from "@/components/query-suspense";
 import { RolesNoAccess } from "@/components/roles/roles-no-access";
 
-import { viewerFlags } from "../../_lib/viewer-can";
+import { viewerFlags } from "../../../_lib/viewer-can";
 
 export const metadata: Metadata = { title: "Edit Staff" };
 
@@ -19,7 +19,7 @@ export default async function Page({
     "read",
     "financial",
   ]);
-  if (!can.read) return <RolesNoAccess what="Staff" />;
+  if (!can.read) return <RolesNoAccess what="Office Staff" />;
   return (
     <QuerySuspense fallback={<EditTeamMemberSkeleton />}>
       <EditTeamMember id={id} canSeeSalary={can.financial} />

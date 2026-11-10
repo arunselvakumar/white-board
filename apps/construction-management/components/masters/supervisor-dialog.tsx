@@ -40,7 +40,7 @@ const schema = z.object({
   name: z
     .string()
     .trim()
-    .min(1, "Enter the Supervisor name")
+    .min(1, "Enter the Site Engineer name")
     .max(100, "Use at most 100 characters"),
   mobile: z
     .string()
@@ -147,7 +147,7 @@ export function SupervisorDialog({
           <DialogHeader>
             <DialogTitle>
               {supervisor == null
-                ? "Add Supervisor"
+                ? "Add Site Engineer"
                 : `Edit ${supervisor.name}`}
             </DialogTitle>
             <DialogDescription>
@@ -158,7 +158,7 @@ export function SupervisorDialog({
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="supervisor-name" required>
-                Supervisor name
+                Site Engineer name
               </Label>
               <Input
                 id="supervisor-name"

@@ -58,7 +58,7 @@ export const labourAttendanceOpenApiOperations: OpenApiOperation[] = [
     method: "get",
     path: BASE,
     summary:
-      "Marked labour days of a Project, newest date first, by dates, Labour, Supervisor and status (amounts null without Labour Financial)",
+      "Marked labour days of a Project, newest date first, by dates, Labour, Site Engineer and status (amounts null without Labour Financial)",
     tags: LABOUR,
     query: ListConstructionLabourLabourAttendanceRequestModel,
     successStatus: StatusCodes.OK,

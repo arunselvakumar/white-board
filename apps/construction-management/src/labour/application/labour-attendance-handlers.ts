@@ -675,7 +675,7 @@ export class LabourAttendanceHandlers {
       if (mark.supervisorId != null && !supervisors.has(mark.supervisorId))
         throw rowError(
           "SUPERVISOR_NOT_FOUND",
-          "This Supervisor was not found.",
+          "This Site Engineer was not found.",
           "invalid",
           { labourId: mark.labourId, supervisorId: mark.supervisorId },
         );

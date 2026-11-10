@@ -76,7 +76,7 @@ import {
 
 import { ProjectFilterSkeleton, VendorRowsSkeleton } from "./vendors-skeletons";
 
-export const VENDORS_PATH = "/app/vendors";
+export const VENDORS_PATH = "/app/staff/vendors";
 
 const STATUS_FILTERS: FilterTab<VendorListFilter["status"]>[] = [
   { value: "all", label: "All", icon: LayoutGrid },

@@ -7,7 +7,7 @@ import { MasterListPage } from "../pages/MasterListPage";
 
 projectTest.describe("Masters", () => {
   projectTest(
-    "should offer the new Labour Category and Supervisor on a Labour, when the Owner adds them",
+    "should offer the new Labour Category and Site Engineer on a Labour, when the Owner adds them",
     async ({ page }) => {
       const category = unique("Bar Bender");
       const supervisor = unique("Selvam");
@@ -29,24 +29,26 @@ projectTest.describe("Masters", () => {
 
       const supervisors = new MasterListPage(
         page,
-        "/app/supervisors",
-        "Supervisors",
+        "/app/staff/site-engineers",
+        "Site Engineers",
       );
       await supervisors.goto();
-      await supervisors.button("Add Supervisor").first().click();
-      await supervisors.dialog.getByLabel("Supervisor name").fill(supervisor);
+      await supervisors.button("Add Site Engineer").first().click();
+      await supervisors.dialog
+        .getByLabel("Site Engineer name")
+        .fill(supervisor);
       await supervisors.dialog.getByRole("button", { name: "Save" }).click();
       await expect(supervisors.item(supervisor)).toBeVisible();
 
       const addLabourPage = new AddLabourPage(page);
       await addLabourPage.goto();
       await addLabourPage.choose("Labour Category", category);
-      await addLabourPage.choose("Supervisor", supervisor);
+      await addLabourPage.choose("Site Engineer", supervisor);
       await expect(
         page.getByRole("combobox", { name: "Labour Category" }),
       ).toContainText(category);
       await expect(
-        page.getByRole("combobox", { name: "Supervisor" }),
+        page.getByRole("combobox", { name: "Site Engineer" }),
       ).toContainText(supervisor);
     },
   );

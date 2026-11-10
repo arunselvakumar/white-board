@@ -38,7 +38,7 @@ rolesPageTest.describe("Role Management", () => {
       await expect(projectsPage.menuLink(/^Staff$/)).toHaveCount(0);
       await expect(projectsPage.menuLink("Role Management")).toHaveCount(0);
 
-      await page.goto("/app/roles/new");
+      await page.goto("/app/staff/roles/new");
       await expect(
         page.getByText("You don't have access to adding Roles"),
       ).toBeVisible();
@@ -67,7 +67,7 @@ rolesPageTest.describe("Role Management", () => {
       await roleForm.goto();
       await roleForm.permission("View", "Role Management").check();
       await roleForm.saveButton.click();
-      await expect(ownerPage).toHaveURL("/app/roles");
+      await expect(ownerPage).toHaveURL("/app/staff/roles");
 
       await memberPage.reload();
       await memberProjects.mainMenu

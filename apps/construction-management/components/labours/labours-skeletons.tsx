@@ -81,7 +81,10 @@ export function LabourFilesSkeleton() {
 /** Edit Labour while the Labour loads. */
 export function LabourFormSkeleton() {
   return (
-    <FormPageSkeleton back={{ label: "Labours", href: "/app/labours" }} meta>
+    <FormPageSkeleton
+      back={{ label: "Labours", href: "/app/staff/labours" }}
+      meta
+    >
       <div className="space-y-6">
         <FormSectionSkeleton title="Basic">
           <FormSkeleton
@@ -125,7 +128,7 @@ export function LabourFormSkeleton() {
             actions={0}
             fields={[
               { label: "Labour Category", control: "select" },
-              { label: "Supervisor", control: "select" },
+              { label: "Site Engineer", control: "select" },
               { label: "Gender", control: "select" },
             ]}
           />

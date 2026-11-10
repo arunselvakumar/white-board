@@ -89,7 +89,7 @@ export async function labourTemplate(lists: {
   const listColumns: [string, string[]][] = [
     ["Projects", lists.projects],
     ["Labour Categories", lists.labourCategories],
-    ["Supervisors", lists.supervisors],
+    ["Site Engineers", lists.supervisors],
     ["Wage Types", ["Daily", "Monthly"]],
     ["Genders", ["Male", "Female", "Other"]],
     ["Weekdays", WEEKDAY_NAMES],

@@ -374,10 +374,10 @@ export function LabourRecordedList({
           onChange={reset(setLabourId)}
         />
         <FilterSelect
-          label="Supervisor"
+          label="Site Engineer"
           value={supervisorId}
           items={[
-            { value: ALL, label: "Every supervisor" },
+            { value: ALL, label: "Every Site Engineer" },
             ...(options.data?.supervisors ?? []).map((item) => ({
               value: item.id,
               label: item.name,

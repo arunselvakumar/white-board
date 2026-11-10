@@ -82,7 +82,7 @@ export const EQUIPMENT_SHEET_TOGGLE_LABELS: Record<
   string
 > = {
   showOperator: "Operator",
-  showSupervisor: "Supervisor",
+  showSupervisor: "Site Engineer",
   showLocation: "Location",
   showApproxWorkDone: "Approx Work Done",
   showBillableQty: "Billable quantity (rented)",
@@ -737,7 +737,7 @@ export function equipmentSheetContent(
     if (supervisorUserId != null && facts.supervisor == null && !same)
       throw invalid(
         "SUPERVISOR_NOT_FOUND",
-        "Choose a Team Member on this Project as supervisor.",
+        "Choose a Team Member on this Project as Site Engineer.",
         { field: "supervisorUserId" },
       );
   }

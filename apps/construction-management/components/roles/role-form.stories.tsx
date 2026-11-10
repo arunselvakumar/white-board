@@ -87,7 +87,7 @@ export const AddRole: Story = {
     await userEvent.type(canvas.getByLabelText("Role name"), "Store keeper 2");
     await userEvent.click(canvas.getByRole("button", { name: "Add Role" }));
     await waitFor(() =>
-      expect(getRouter().push).toHaveBeenCalledWith("/app/roles"),
+      expect(getRouter().push).toHaveBeenCalledWith("/app/staff/roles"),
     );
     await expect(
       api?.calls.mock.calls
@@ -130,7 +130,7 @@ export const EditRole: Story = {
     );
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await waitFor(() =>
-      expect(getRouter().push).toHaveBeenCalledWith("/app/roles"),
+      expect(getRouter().push).toHaveBeenCalledWith("/app/staff/roles"),
     );
     await expect(bodyOf(`${ONE}/update`)).toEqual({
       name: "Site Engineer",
@@ -194,7 +194,7 @@ export const StaleVersion: Story = {
     ).not.toBeInTheDocument();
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await waitFor(() =>
-      expect(getRouter().push).toHaveBeenCalledWith("/app/roles"),
+      expect(getRouter().push).toHaveBeenCalledWith("/app/staff/roles"),
     );
   },
 };

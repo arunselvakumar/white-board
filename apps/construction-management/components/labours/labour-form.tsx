@@ -57,7 +57,7 @@ import {
 import { projectsLabel } from "./labour-projects";
 import { ReportsToPicker } from "./reports-to-picker";
 
-export const LABOURS_PATH = "/app/labours";
+export const LABOURS_PATH = "/app/staff/labours";
 
 const NONE = "__none";
 
@@ -404,11 +404,11 @@ export function LabourForm({
           />
           <ChoiceField
             id="labour-supervisor"
-            label="Supervisor"
+            label="Site Engineer"
             name="supervisorId"
             control={form.control}
             choices={supervisorChoices}
-            placeholder="Choose a Supervisor"
+            placeholder="Choose a Site Engineer"
             error={errors.supervisorId?.message}
           />
           <div className="space-y-1.5">

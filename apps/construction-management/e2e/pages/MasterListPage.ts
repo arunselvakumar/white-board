@@ -4,7 +4,7 @@ import { AppShellPage } from "./AppShellPage";
 
 /**
  * A list page (`/app/masters/<list>`, or a Human Resources list such as
- * `/app/supervisors`): Add, search and its rows.
+ * `/app/staff/site-engineers`): Add, search and its rows.
  */
 export class MasterListPage extends AppShellPage {
   constructor(

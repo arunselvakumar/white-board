@@ -1,6 +1,6 @@
 /**
  * The main menu (ADR CM-0034): the Company Dashboard (CM-902), Projects,
- * Human Resources (Staff, HRMS and Labour; the area opens on Staff), the
+ * Human Resources (Staff and HRMS; the area opens on Labour), the
  * two cross-project areas Workspace and Masters (`docs/00-overview.md`,
  * "The shape of the product"), then Settings: the Company profile and the
  * Advanced Settings. Each area grows its own screens in later milestones.
@@ -23,13 +23,14 @@ export const APP_NAV = [
       "Your Company's Projects will show here: daily work, materials, labour and payments per site.",
   },
   {
-    // The area opens on Staff; HRMS and the Labour lists sit beside it in
-    // the submenu.
+    // Every Staff page (Labour, Site Engineer, Vendor, Office Staff, Role
+    // Management) lives under /app/staff; the area opens on Labour, and
+    // HRMS sits beside Staff in the submenu.
     href: "/app/staff",
     label: "Human Resources",
     title: "Human Resources",
     description:
-      "Your staff and their Roles, HRMS for their attendance, leave and salary, and your own Labours, their Supervisors and the Vendors you hire gangs from.",
+      "Your own Labours, their Site Engineers and the Vendors you hire gangs from, your Office Staff and their Roles, and HRMS for attendance, leave and salary.",
   },
   {
     href: "/app/workspace",

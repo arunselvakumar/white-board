@@ -52,9 +52,9 @@ export function SupervisorsList() {
       fallback={
         <MasterListPageSkeleton
           back={null}
-          title="Supervisors"
+          title="Site Engineers"
           meta={SUPERVISORS_META}
-          actions={<MasterAddButtonSkeleton label="Add Supervisor" />}
+          actions={<MasterAddButtonSkeleton label="Add Site Engineer" />}
           details
         />
       }
@@ -97,7 +97,7 @@ function SupervisorsListContent() {
       }}
     >
       <Plus aria-hidden="true" />
-      Add Supervisor
+      Add Site Engineer
     </Button>
   );
 
@@ -105,32 +105,32 @@ function SupervisorsListContent() {
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
-          title="Supervisors"
+          title="Site Engineers"
           meta={SUPERVISORS_META}
           actions={addButton}
         />
         {data.items.length === 0 ? (
           <MasterEmpty
             icon={UserCheck}
-            title="No Supervisors yet"
-            description="Add the mukadams and site supervisors your Labours report to. Attendance can then be filtered by Supervisor."
+            title="No Site Engineers yet"
+            description="Add the mukadams and Site Engineers your Labours report to. Attendance can then be filtered by Site Engineer."
             action={addButton}
           />
         ) : (
           <div className="space-y-3">
             <MasterSearch
-              label="Search Supervisors"
+              label="Search Site Engineers"
               value={query}
               onChange={setQuery}
             />
             <FormAlert message={listError} />
             {items.length === 0 ? (
               <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
-                No Supervisor matches “{query.trim()}”.
+                No Site Engineer matches “{query.trim()}”.
               </p>
             ) : (
               <ul
-                aria-label="Supervisors"
+                aria-label="Site Engineers"
                 className="bg-card divide-y rounded-xl border"
               >
                 {items.map((supervisor) => {
@@ -192,7 +192,7 @@ function SupervisorsListContent() {
       ) : null}
       <ConfirmDeleteDialog
         name={pendingDelete?.name ?? null}
-        description="They will no longer be offered anywhere. A Supervisor that Labours or attendance name cannot be deleted; disable them instead."
+        description="They will no longer be offered anywhere. A Site Engineer that Labours or attendance name cannot be deleted; disable them instead."
         error={deleteError}
         pending={command.isPending}
         onClose={() => {

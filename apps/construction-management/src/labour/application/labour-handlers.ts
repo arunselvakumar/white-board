@@ -189,7 +189,7 @@ export class LabourHandlers {
         throw withField(
           notFound(
             "SUPERVISOR_NOT_FOUND",
-            "This Supervisor was not found or is disabled.",
+            "This Site Engineer was not found or is disabled.",
           ),
           "supervisorId",
         );

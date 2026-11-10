@@ -153,7 +153,9 @@ export const HourlyTimeShifts: Story = {
     ).toBeVisible();
     await userEvent.type(form.getByLabelText("Operator"), "Ramesh K");
     const body = within(canvasElement.ownerDocument.body);
-    await userEvent.click(form.getByRole("combobox", { name: "Supervisor" }));
+    await userEvent.click(
+      form.getByRole("combobox", { name: "Site Engineer" }),
+    );
     await userEvent.click(
       await body.findByRole("option", { name: "Senthil Kumar" }),
     );
@@ -451,7 +453,9 @@ export const SaveAndAddNew: Story = {
     const body = within(canvasElement.ownerDocument.body);
     await userEvent.click(form.getByRole("combobox", { name: "Work Shift" }));
     await userEvent.click(await body.findByRole("option", { name: "Shift 2" }));
-    await userEvent.click(form.getByRole("combobox", { name: "Supervisor" }));
+    await userEvent.click(
+      form.getByRole("combobox", { name: "Site Engineer" }),
+    );
     await userEvent.click(
       await body.findByRole("option", { name: "Senthil Kumar" }),
     );
@@ -469,7 +473,7 @@ export const SaveAndAddNew: Story = {
     ).not.toBeChecked();
     await pick(form, userEvent, /^JCB 3DX/);
     await expect(
-      await form.findByRole("combobox", { name: "Supervisor" }),
+      await form.findByRole("combobox", { name: "Site Engineer" }),
     ).toHaveTextContent("Senthil Kumar");
   },
 };

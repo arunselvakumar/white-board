@@ -12,7 +12,9 @@ export class RoleFormPage extends AppShellPage {
   }
 
   public get url() {
-    return this.roleId == null ? "/app/roles/new" : `/app/roles/${this.roleId}`;
+    return this.roleId == null
+      ? "/app/staff/roles/new"
+      : `/app/staff/roles/${this.roleId}`;
   }
 
   public get roleNameField() {

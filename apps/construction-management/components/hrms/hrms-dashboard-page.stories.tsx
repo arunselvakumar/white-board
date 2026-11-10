@@ -138,7 +138,7 @@ export const NoTeamMembersYet: Story = {
     await expect(await canvas.findByText("No Team Members yet")).toBeVisible();
     await expect(
       canvas.getByRole("link", { name: "Add Users" }),
-    ).toHaveAttribute("href", "/app/staff");
+    ).toHaveAttribute("href", "/app/staff/office-staff");
     await expect(
       canvas.getByRole("link", { name: "Configuration" }),
     ).toHaveAttribute("href", "/app/hrms/configuration");

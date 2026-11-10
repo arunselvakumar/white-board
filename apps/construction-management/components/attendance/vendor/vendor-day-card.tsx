@@ -51,7 +51,7 @@ import {
   type VendorDayFormValues,
 } from "./vendor-day-form";
 
-export const VENDORS_PAGE_PATH = "/app/vendors";
+export const VENDORS_PAGE_PATH = "/app/staff/vendors";
 
 function vendorEditPath(id: string): string {
   return `${VENDORS_PAGE_PATH}/${encodeURIComponent(id)}`;

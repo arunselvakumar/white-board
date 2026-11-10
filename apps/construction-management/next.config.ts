@@ -53,7 +53,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/app/masters/team-members/:path*",
-        destination: "/app/staff/:path*",
+        destination: "/app/staff/office-staff/:path*",
         permanent: true,
       },
       // Labour Categories went back to Masters → Labour (ADR CM-0035).

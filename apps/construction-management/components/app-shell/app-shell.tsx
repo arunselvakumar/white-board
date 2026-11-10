@@ -79,8 +79,8 @@ const VERSION = `v${process.env["NEXT_PUBLIC_APP_VERSION"] ?? "0.0.0"}`;
  * menu (ADR CM-0020). `canOpenDashboard` is the Dashboard menu's Read flag
  * (CM-902): without it the Dashboard is not in the menu.
  * `canOpenStaffRoles` is Team Members or Role Management Read (ADR
- * CM-0030): without either, the Staff group of Human Resources is not (ADR
- * CM-0034).
+ * CM-0030): without either, Office Staff and Role Management are not in
+ * the Staff group of Human Resources (ADR CM-0034).
  */
 export function AppShell({
   children,

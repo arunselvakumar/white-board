@@ -17,7 +17,7 @@ import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
 import { FormSection } from "@/components/forms/form-section";
 import { fieldForCode } from "@/lib/server-errors";
-import { STAFF_PATH } from "@/lib/staff-roles-nav";
+import { STAFF_PATH } from "@/lib/staff-nav";
 import { QueryHttpError } from "@/src/queries/http";
 import { ROLES_KEY, rolesQuery } from "@/src/queries/roles";
 import {
@@ -162,7 +162,7 @@ export function AddTeamMember({
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
-          back={{ label: "Staff", href: STAFF_PATH }}
+          back={{ label: "Office Staff", href: STAFF_PATH }}
           title="Add Staff"
         />
 
@@ -281,7 +281,7 @@ function AddedUser({
               href={STAFF_PATH}
               className={buttonVariants({ variant: "outline" })}
             >
-              Back to Staff
+              Back to Office Staff
             </Link>
           </div>
         </div>

@@ -1,6 +1,7 @@
 # CM-0034 — Human Resources is one main-menu item: Staff, Roles, HRMS, Labours, Vendors and Supervisors
 
 - Status: accepted (2026-11-02; the owner chose the label Human Resources over HR)
+- Amended by: [CM-0036](CM-0036-one-staff-group-and-site-engineers.md) (one Staff group, every Staff page under `/app/staff`, Supervisors shown as Site Engineers)
 - Date: 2026-11-02
 - Supersedes (if accepted): the main-menu placement in [CM-0030](CM-0030-users-and-roles.md) §2 and [CM-0032](CM-0032-staff-and-salary.md) §1 (Staff & Roles as its own item), and PR #138 (Labour & Vendors as its own item)
 - Relates to: [CM-0028](CM-0028-settings-main-menu.md) (Settings left Masters the same way), [CM-0020](CM-0020-project-sidebar-menu.md) (submenus, not tab rows), [CM-0033](CM-0033-one-page-staff-no-designations-labours-on-many-projects.md) §3 (a staff salary separate from HRMS), [CM-0012](CM-0012-hrms-product-decisions.md) (Labour and Employee never mix), `modules/08`, `modules/10`

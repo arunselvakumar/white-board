@@ -78,7 +78,7 @@ export const LABOUR_COLUMNS = [
     example: null,
     width: 18,
   },
-  { key: "supervisor", header: "Supervisor", example: null, width: 18 },
+  { key: "supervisor", header: "Site Engineer", example: null, width: 18 },
   {
     key: "contactNumber",
     header: "Contact Number",

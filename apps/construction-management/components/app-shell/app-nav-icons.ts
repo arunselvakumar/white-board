@@ -15,7 +15,7 @@ export const APP_NAV_ICONS: Record<AppNavHref, LucideIcon> = {
   // Workspace moves to a briefcase so the two grids do not look alike.
   "/app/dashboard": LayoutDashboard,
   "/app/projects": Building2,
-  // Human Resources (ADR CM-0034) opens on Staff.
+  // Human Resources (ADR CM-0034): every Staff page lives under /app/staff.
   "/app/staff": UsersRound,
   "/app/workspace": Briefcase,
   "/app/masters": Library,

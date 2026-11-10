@@ -257,8 +257,8 @@ export function LaboursPage() {
             onChange={set(setCategoryId)}
           />
           <FilterSelect
-            label="Supervisor"
-            allLabel="All Supervisors"
+            label="Site Engineer"
+            allLabel="All Site Engineers"
             value={supervisorId}
             items={supervisors.data?.items ?? []}
             onChange={set(setSupervisorId)}
@@ -366,7 +366,7 @@ function LabourRows({
           </EmptyTitle>
           <EmptyDescription>
             {filtered
-              ? "Try another name, status, Project, category or Supervisor."
+              ? "Try another name, status, Project, category or Site Engineer."
               : "Add the Labours on your own roll with their wage and Projects, or import them from Excel."}
           </EmptyDescription>
         </EmptyHeader>

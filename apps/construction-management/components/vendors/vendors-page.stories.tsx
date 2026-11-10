@@ -63,7 +63,10 @@ export const WithVendors: Story = {
     const rows = within(table);
     await expect(
       rows.getByRole("link", { name: "Muthu Gang" }),
-    ).toHaveAttribute("href", `/app/vendors/${VENDOR_SUMMARIES[0]?.id ?? ""}`);
+    ).toHaveAttribute(
+      "href",
+      `/app/staff/vendors/${VENDOR_SUMMARIES[0]?.id ?? ""}`,
+    );
     await expect(rows.getByText("No rate card")).toBeVisible();
     await expect(rows.getByText("Tower A +1")).toBeVisible();
     await expect(rows.getByText("₹25,000.00")).toBeVisible();
@@ -123,6 +126,6 @@ export const Empty: Story = {
     await expect(await canvas.findByText("No Vendors yet")).toBeVisible();
     const links = canvas.getAllByRole("link", { name: "Add Vendor" });
     for (const link of links)
-      await expect(link).toHaveAttribute("href", "/app/vendors/new");
+      await expect(link).toHaveAttribute("href", "/app/staff/vendors/new");
   },
 };

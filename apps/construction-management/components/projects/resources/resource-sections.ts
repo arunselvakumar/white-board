@@ -23,7 +23,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
     singular: "Team Member",
     description:
       "Team Members on a Project see it and work on it. The Owner is on every Project.",
-    addPath: "/app/staff/new",
+    addPath: "/app/staff/office-staff/new",
     area: "Human Resources",
     icon: Users,
   },
@@ -51,7 +51,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
     singular: "Vendor",
     description:
       "Labour gangs on this Project; they appear on its attendance screen.",
-    addPath: "/app/vendors/new",
+    addPath: "/app/staff/vendors/new",
     area: "Human Resources",
     icon: Handshake,
   },

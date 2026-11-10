@@ -5,9 +5,8 @@ import { AppAreaPage } from "@/components/app-shell/app-area-page";
 import { AppShell } from "@/components/app-shell/app-shell";
 import { APP_NAV, appPageByHref, type AppNavHref } from "@/lib/app-nav";
 import { HRMS_PATH, HRMS_SECTIONS } from "@/lib/hrms-nav";
-import { LABOUR_VENDORS_SECTIONS } from "@/lib/labour-vendors-nav";
 import { MASTERS_GROUPS } from "@/lib/masters-nav";
-import { STAFF_ROLES_SECTIONS } from "@/lib/staff-roles-nav";
+import { LABOURS_PAGE_PATH, staffSections } from "@/lib/staff-nav";
 
 import { authMocks, signInAs } from "../../.storybook/mocks/auth";
 
@@ -119,9 +118,10 @@ async function expectArea(
   ).toBeVisible();
   const nav = within(sidebar.getByRole("navigation", { name: "Main" }));
   for (const item of APP_NAV) {
+    // Human Resources is keyed on the Staff area but opens on Labour.
     await expect(nav.getByRole("link", { name: item.label })).toHaveAttribute(
       "href",
-      item.href,
+      item.href === "/app/staff" ? LABOURS_PAGE_PATH : item.href,
     );
   }
   await expect(nav.getByRole("link", { name: current.label })).toHaveAttribute(
@@ -166,9 +166,10 @@ export const WithoutDashboard: Story = {
 };
 
 /**
- * Without Team Members or Role Management Read (a Site Supervisor, say),
- * Human Resources has no Staff group and its link opens HRMS (ADR CM-0030,
- * CM-0034).
+ * Without Team Members or Role Management Read (a Site Supervisor Role,
+ * say), the Staff group of Human Resources keeps Labour, Site Engineer and
+ * Vendor but not Office Staff or Role Management, and the area link opens
+ * HRMS (ADR CM-0030, CM-0034).
  */
 export const WithoutStaffRoles: Story = {
   ...shellAt("/app/projects", true, false),
@@ -183,10 +184,18 @@ export const WithoutStaffRoles: Story = {
     const submenu = within(
       await nav.findByRole("list", { name: "Human Resources" }),
     );
-    await expect(submenu.queryByRole("list", { name: "Staff" })).toBeNull();
-    await expect(submenu.queryByRole("link", { name: "Staff" })).toBeNull();
+    const staff = within(submenu.getByRole("list", { name: "Staff" }));
+    for (const section of staffSections(false))
+      await expect(
+        staff.getByRole("link", { name: section.label }),
+      ).toHaveAttribute("href", section.href);
+    await expect(
+      staff.queryByRole("link", { name: "Office Staff" }),
+    ).toBeNull();
+    await expect(
+      staff.queryByRole("link", { name: "Role Management" }),
+    ).toBeNull();
     await expect(submenu.getByRole("list", { name: "HRMS" })).toBeVisible();
-    await expect(submenu.getByRole("list", { name: "Labour" })).toBeVisible();
     await expect(nav.getByRole("link", { name: "Settings" })).toBeVisible();
   },
 };
@@ -287,15 +296,14 @@ export const MastersSubmenu: Story = {
 };
 
 /**
- * Human Resources (ADR CM-0034) folds out like Masters, in three groups:
- * Staff (Staff, Role Management), HRMS (its five sections) and Labour
- * (Labours, Supervisors, Vendors; ADR CM-0035). On Role Management
- * the area is open and that entry is current; the area link itself opens
- * Staff.
+ * Human Resources (ADR CM-0034) folds out like Masters, in two groups:
+ * Staff (Labour, Site Engineer, Vendor, Office Staff, Role Management) and
+ * HRMS (its five sections). On Role Management the area is open and that
+ * entry is current; the area link itself opens Labour.
  */
 export const HumanResourcesSubmenu: Story = {
   parameters: {
-    nextjs: { navigation: { pathname: "/app/roles/r1" } },
+    nextjs: { navigation: { pathname: "/app/staff/roles/r1" } },
   },
   render: () => (
     <AppShell>
@@ -315,13 +323,25 @@ export const HumanResourcesSubmenu: Story = {
     await expect(nav.queryByRole("link", { name: "HR" })).toBeNull();
     await expect(
       nav.getByRole("link", { name: "Human Resources" }),
-    ).toHaveAttribute("href", "/app/staff");
+    ).toHaveAttribute("href", LABOURS_PAGE_PATH);
     const submenu = within(nav.getByRole("list", { name: "Human Resources" }));
     const groups = [
-      { label: "Staff", sections: STAFF_ROLES_SECTIONS },
+      { label: "Staff", sections: staffSections(true) },
       { label: "HRMS", sections: HRMS_SECTIONS },
-      { label: "Labour", sections: LABOUR_VENDORS_SECTIONS },
     ];
+    await expect(
+      within(submenu.getByRole("list", { name: "Staff" }))
+        .getAllByRole("link")
+        .map((link) => link.textContent),
+    ).toEqual([
+      "Labour",
+      "Site Engineer",
+      "Vendor",
+      "Office Staff",
+      "Role Management",
+    ]);
+    // The Labour group is gone: its lists are in Staff now.
+    await expect(submenu.queryByRole("list", { name: "Labour" })).toBeNull();
     for (const group of groups) {
       const list = within(submenu.getByRole("list", { name: group.label }));
       for (const section of group.sections)
@@ -345,10 +365,10 @@ export const HumanResourcesSubmenu: Story = {
   },
 };
 
-/** On a Vendor the Labour group's Vendors entry is current. */
+/** On a Vendor the Staff group's Vendor entry is current. */
 export const VendorPage: Story = {
   parameters: {
-    nextjs: { navigation: { pathname: "/app/vendors/v1" } },
+    nextjs: { navigation: { pathname: "/app/staff/vendors/v1" } },
   },
   render: () => (
     <AppShell>
@@ -358,32 +378,32 @@ export const VendorPage: Story = {
   play: async (context) => {
     const nav = await mainMenu(context);
     const submenu = within(nav.getByRole("list", { name: "Human Resources" }));
-    await expect(
-      submenu.getByRole("link", { name: "Vendors" }),
-    ).toHaveAttribute("aria-current", "page");
+    await expect(submenu.getByRole("link", { name: "Vendor" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
     await expect(
       nav.getByRole("link", { name: "Human Resources" }),
     ).not.toHaveAttribute("aria-current");
   },
 };
 
-/** On Staff the submenu entry is current, not the area link too. */
+/** On Office Staff the submenu entry is current, not the area link too. */
 export const StaffPage: Story = {
   parameters: {
-    nextjs: { navigation: { pathname: "/app/staff" } },
+    nextjs: { navigation: { pathname: "/app/staff/office-staff" } },
   },
   render: () => (
     <AppShell>
-      <p>Staff</p>
+      <p>Office Staff</p>
     </AppShell>
   ),
   play: async (context) => {
     const nav = await mainMenu(context);
     const submenu = within(nav.getByRole("list", { name: "Human Resources" }));
-    await expect(submenu.getByRole("link", { name: "Staff" })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
+    await expect(
+      submenu.getByRole("link", { name: "Office Staff" }),
+    ).toHaveAttribute("aria-current", "page");
     await expect(
       nav.getByRole("link", { name: "Human Resources" }),
     ).not.toHaveAttribute("aria-current");

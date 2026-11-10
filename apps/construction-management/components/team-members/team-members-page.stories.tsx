@@ -133,7 +133,9 @@ export const WithMembers: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     await expect(await canvas.findByText("3 Staff")).toBeVisible();
-    await expect(canvas.getByRole("heading", { name: "Staff" })).toBeVisible();
+    await expect(
+      canvas.getByRole("heading", { name: "Office Staff" }),
+    ).toBeVisible();
     const rows = within(canvas.getByRole("list", { name: "Staff" }));
     await expect(rows.getByText("Joining Pending")).toBeVisible();
     await expect(rows.getByText("HRMS")).toBeVisible();
@@ -270,7 +272,10 @@ export const Empty: Story = {
   play: async ({ canvas }) => {
     await expect(await canvas.findByText("No Staff yet")).toBeVisible();
     const add = canvas.getAllByRole("link", { name: "Add Staff" });
-    await expect(add.at(-1)).toHaveAttribute("href", "/app/staff/new");
+    await expect(add.at(-1)).toHaveAttribute(
+      "href",
+      "/app/staff/office-staff/new",
+    );
   },
 };
 

@@ -2,11 +2,11 @@ import { AppShellPage } from "./AppShellPage";
 
 export class StaffPage extends AppShellPage {
   public get url() {
-    return "/app/staff";
+    return "/app/staff/office-staff";
   }
 
   public get pageHeading() {
-    return this.heading("Staff", { level: 1 });
+    return this.heading("Office Staff", { level: 1 });
   }
 
   public get addUserLink() {

@@ -24,7 +24,7 @@ import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { PermissionMatrix } from "@/components/permissions/permission-matrix";
 import { fieldForCode } from "@/lib/server-errors";
-import { ROLES_PATH, staffCount } from "@/lib/staff-roles-nav";
+import { ROLES_PATH, staffCount } from "@/lib/staff-nav";
 import { QueryHttpError } from "@/src/queries/http";
 import {
   roleQuery,
