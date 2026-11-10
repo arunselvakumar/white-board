@@ -1,17 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import {
-  StoryQueries,
-  mockApi,
-  type ApiCall,
-} from "../../../.storybook/mocks/api";
+import { StoryQueries, mockApi, type ApiCall } from "@/.storybook/mocks/api";
 import {
   STORY_PROJECT_ID,
   STORY_VOUCHERS,
   pettyCashHandler,
   type PettyCashApiOptions,
-} from "./petty-cash-fixtures";
+} from "@/app/app/projects/[id]/payments/petty-cash/_components/petty-cash-fixtures";
 import { VoucherDetail } from "./voucher-detail";
 
 let api: ReturnType<typeof mockApi>;

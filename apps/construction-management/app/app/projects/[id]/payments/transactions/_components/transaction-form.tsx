@@ -25,8 +25,8 @@ import {
   CounterpartyField,
   EMPTY_COUNTERPARTY,
 } from "@/app/app/projects/[id]/payments/_components/counterparty-field";
-import { FinancePendingFilesField } from "@/components/finance/documents/pending-files-field";
-import { useUploadPendingFinanceFiles } from "@/components/finance/documents/use-upload-pending-files";
+import { FinancePendingFilesField } from "@/app/app/projects/[id]/payments/_components/pending-files-field";
+import { useUploadPendingFinanceFiles } from "@/app/app/projects/[id]/payments/_components/use-upload-pending-files";
 import { PaymentCategoryPicker } from "@/app/app/projects/[id]/payments/_components/payment-category-picker";
 import {
   isRupees,

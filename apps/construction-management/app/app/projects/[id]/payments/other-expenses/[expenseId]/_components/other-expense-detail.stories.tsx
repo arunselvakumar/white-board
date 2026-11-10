@@ -1,20 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../../.storybook/mocks/api";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import type { OtherExpense } from "@/src/queries/finance-other-expenses";
 
-import { mockFinanceDocumentApi } from "../documents/finance-document-fixtures";
+import { mockFinanceDocumentApi } from "@/app/app/_components/finance/documents/finance-document-fixtures";
 import {
   AUTO_EXPENSE,
   financeAccessHandler,
   PROJECT_ID,
   TEA_EXPENSE,
-} from "./other-expense-fixtures";
+} from "@/app/app/projects/[id]/payments/other-expenses/_components/other-expense-fixtures";
 import { OtherExpenseDetail } from "./other-expense-detail";
 
 const API = "/api/construction/finance/other-expenses";

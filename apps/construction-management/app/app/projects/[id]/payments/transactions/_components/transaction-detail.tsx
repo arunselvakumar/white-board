@@ -7,7 +7,7 @@ import { useState, type ReactNode } from "react";
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
 import { COUNTERPARTY_KIND_LABELS } from "@/app/app/projects/[id]/payments/_components/counterparty-field";
-import { FinanceDocumentActivity } from "@/components/finance/documents/finance-document-activity";
+import { FinanceDocumentActivity } from "@/app/app/projects/[id]/payments/_components/finance-document-activity";
 import { formatPaise } from "@/components/money/money-input";
 import { formatDate, localToday } from "@/components/payments/payment-format";
 import { canInFinance, financeAccessQuery } from "@/src/queries/finance-access";

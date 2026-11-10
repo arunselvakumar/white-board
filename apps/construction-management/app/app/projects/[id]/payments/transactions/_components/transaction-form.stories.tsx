@@ -1,14 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, waitFor, within } from "storybook/test";
 
-import { mockFinanceDocumentApi } from "@/components/finance/documents/finance-document-fixtures";
+import { mockFinanceDocumentApi } from "@/app/app/_components/finance/documents/finance-document-fixtures";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../../.storybook/mocks/api";
-import { mockXhrUploads } from "../../../.storybook/mocks/xhr";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
+import { mockXhrUploads } from "@/.storybook/mocks/xhr";
 import { TransactionDialog } from "./transaction-form";
 import {
   PENDING_OUT,

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
-import { VoucherNew } from "@/components/finance/petty-cash/petty-cash-pages";
+import { VoucherNew } from "@/app/app/projects/[id]/payments/petty-cash/_components/petty-cash-pages";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
 import {
   VOUCHER_TYPES,

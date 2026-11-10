@@ -18,7 +18,7 @@ import { Button, buttonVariants } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
-import { FinanceDocumentActivity } from "@/components/finance/documents/finance-document-activity";
+import { FinanceDocumentActivity } from "@/app/app/projects/[id]/payments/_components/finance-document-activity";
 import { COUNTERPARTY_KIND_LABELS } from "@/app/app/projects/[id]/payments/_components/counterparty-field";
 import { formatDate } from "@/components/payments/payment-format";
 import { ReasonDialog } from "@/components/procurement/purchase-requests/reason-dialog";
@@ -37,7 +37,7 @@ import {
   VoucherStatusBadge,
   pettyCashPath,
   voucherSign,
-} from "./petty-cash-parts";
+} from "@/app/app/projects/[id]/payments/petty-cash/_components/petty-cash-parts";
 
 function Fact({
   label,

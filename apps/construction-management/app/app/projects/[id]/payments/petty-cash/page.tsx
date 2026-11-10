@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
-import { PettyCashScreen } from "@/components/finance/petty-cash/petty-cash-screen";
+import { PettyCashScreen } from "@/app/app/projects/[id]/payments/petty-cash/_components/petty-cash-screen";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
 
 export const metadata: Metadata = { title: "Petty Cash" };

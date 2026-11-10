@@ -25,7 +25,7 @@ import { Textarea } from "@repo/ui/components/textarea";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { FinanceDocumentActivity } from "@/components/finance/documents/finance-document-activity";
+import { FinanceDocumentActivity } from "@/app/app/projects/[id]/payments/_components/finance-document-activity";
 import { fieldForCode } from "@/lib/server-errors";
 import { canInFinance, financeAccessQuery } from "@/src/queries/finance-access";
 import {

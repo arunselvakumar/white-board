@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
-import { TransactionsPage } from "@/components/finance/transactions/transactions-page";
+import { TransactionsPage } from "@/app/app/projects/[id]/payments/transactions/_components/transactions-page";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
 
 export const metadata: Metadata = { title: "Transactions" };
