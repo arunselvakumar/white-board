@@ -55,17 +55,20 @@ for (const file of files) {
   const visit = (node) => {
     check(node.getFullStart());
     check(node.getEnd());
+    // A JSX comment, `{/* ... */}`, is an expression container with no
+    // expression; its comment sits inside the braces, where the walk above
+    // does not look. Strings that merely look like one are not matched.
+    if (ts.isJsxExpression(node) && node.expression == null) {
+      const inner = text.slice(node.getStart(source) + 1, node.getEnd() - 1);
+      const match = TICKET.exec(inner);
+      if (match) {
+        const line = text.slice(0, node.getStart(source)).split("\n").length;
+        problems.push(`${file}:${line}  ${match[0]}`);
+      }
+    }
     node.forEachChild(visit);
   };
   visit(source);
-  // JSX comments: `{/* ... */}` is an empty expression the walk above misses.
-  for (const jsx of text.matchAll(/\{\s*\/\*[\s\S]*?\*\/\s*\}/g)) {
-    const match = TICKET.exec(jsx[0]);
-    if (match && !seen.has(jsx.index + jsx[0].indexOf("/*"))) {
-      const line = text.slice(0, jsx.index).split("\n").length;
-      problems.push(`${file}:${line}  ${match[0]}`);
-    }
-  }
 }
 
 if (problems.length > 0) {
