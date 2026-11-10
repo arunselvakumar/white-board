@@ -63,7 +63,7 @@ A **Student** remains a Workspace record, distinct from a User. Add Student invi
 - In-app chrome: `AppShell` with nav from `lib/app-nav.ts`. Page reads: `useSuspenseQuery` + `queryOptions` in `src/queries` (ADR-0026).
 - Patterns: [`.grok/skills/frontend-patterns/SKILL.md`](./.grok/skills/frontend-patterns/SKILL.md), [`.grok/skills/tanstack-query/SKILL.md`](./.grok/skills/tanstack-query/SKILL.md).
 - Storybook play functions for every P0 form and empty state. Select options portal to `document.body`.
-- Student photos and initials use `components/students/student-avatar.tsx`; see [`docs/ui/student-avatar.md`](./docs/ui/student-avatar.md) for the color rule. Do not choose avatar colors in individual screens.
+- Student photos and initials use `app/(app)/_components/students/student-avatar.tsx`; see [`docs/ui/student-avatar.md`](./docs/ui/student-avatar.md) for the color rule. Do not choose avatar colors in individual screens.
 - Add and edit forms use the Add Student page content width: `w-full p-6` outside and `w-full max-w-4xl` inside. Keep Add Course, Edit Course, Add Batch, and Edit Batch at the same width; apply it to Enroll Student and future add flows too. Use responsive field layouts so the forms make use of that width, and keep Storybook previews aligned with the pages.
 
 ## Where components go
