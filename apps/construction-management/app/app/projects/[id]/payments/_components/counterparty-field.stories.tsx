@@ -3,8 +3,8 @@ import { useState } from "react";
 import { expect, fn, waitFor, within } from "storybook/test";
 import { Label } from "@repo/ui/components/label";
 
-import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
-import { financeLookupsHandler } from "./account-fixtures";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
+import { financeLookupsHandler } from "@/app/app/_components/finance/account-fixtures";
 import {
   CounterpartyField,
   EMPTY_COUNTERPARTY,

@@ -35,7 +35,7 @@ import {
 import {
   COUNTERPARTY_OPTIONS,
   financeLookupsHandler,
-} from "../finance/account-fixtures";
+} from "@/app/app/_components/finance/account-fixtures";
 import { ReportsPage } from "./reports-page";
 
 const API = "/api/construction/reporting/reports";

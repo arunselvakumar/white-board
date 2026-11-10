@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
-import { mockApi, StoryQueries } from "../../../.storybook/mocks/api";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import { PartyBalanceWorkspace } from "./party-balance-workspace";
-import { partyMoneyHandler } from "./party-fixtures";
+import { partyMoneyHandler } from "@/app/app/_components/finance/parties/party-fixtures";
 
 const meta = {
   title: "Finance/Parties/Party Balance",

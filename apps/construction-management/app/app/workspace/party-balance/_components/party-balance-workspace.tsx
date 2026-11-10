@@ -26,12 +26,12 @@ import {
   type PartyType,
 } from "@/src/queries/finance-parties";
 
-import { PartyStatementTable } from "./party-lists";
-import { money } from "./party-money";
+import { PartyStatementTable } from "@/app/app/_components/finance/parties/party-lists";
+import { money } from "@/app/app/_components/finance/parties/party-money";
 import {
   PartyBalancesWorkspaceSkeleton,
   PartyStatementSkeleton,
-} from "./parties-skeletons";
+} from "@/app/app/_components/finance/parties/parties-skeletons";
 
 type StatementTarget = {
   partyId: string;

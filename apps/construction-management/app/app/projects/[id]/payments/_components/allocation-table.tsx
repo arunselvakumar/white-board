@@ -10,8 +10,11 @@ import {
 } from "@/components/money/money-input";
 import type { Invoice } from "@/src/queries/finance-parties";
 
-import { formatDate, money } from "./party-money";
-import { InvoiceStatusChips } from "./party-status";
+import {
+  formatDate,
+  money,
+} from "@/app/app/_components/finance/parties/party-money";
+import { InvoiceStatusChips } from "@/app/app/_components/finance/parties/party-status";
 
 /** Rupees typed per invoice id. */
 export type AllocationValues = Record<string, string>;

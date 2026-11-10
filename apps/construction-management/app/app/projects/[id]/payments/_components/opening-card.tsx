@@ -42,7 +42,10 @@ import {
   type PartyType,
 } from "@/src/queries/finance-parties";
 
-import { formatDate, money } from "./party-money";
+import {
+  formatDate,
+  money,
+} from "@/app/app/_components/finance/parties/party-money";
 
 /**
  * A party's opening balance on the Project (CM-0017 §7): what was owed to

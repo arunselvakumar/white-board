@@ -2,13 +2,9 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { getRouter } from "@storybook/nextjs-vite/navigation.mock";
 import { expect, waitFor, within } from "storybook/test";
 
-import { ACCOUNT_OPTIONS } from "@/components/finance/account-fixtures";
+import { ACCOUNT_OPTIONS } from "@/app/app/_components/finance/account-fixtures";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../../.storybook/mocks/api";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import {
   CONTRACTOR_ID,
   OTHER_PARTY_ID,
@@ -21,7 +17,7 @@ import {
   suggestionFor,
   SUPPLIER_ID,
   TODAY,
-} from "./party-fixtures";
+} from "@/app/app/_components/finance/parties/party-fixtures";
 import { PartyPaymentScreen } from "./party-payment-form";
 
 const PAYMENTS = "/api/construction/finance/party-payments";

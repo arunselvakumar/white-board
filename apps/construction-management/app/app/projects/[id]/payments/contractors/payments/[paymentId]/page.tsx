@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
-import { PartyPaymentDetail } from "@/components/finance/parties/party-payment-detail";
-import { PartyPaymentDetailSkeleton } from "@/components/finance/parties/parties-skeletons";
+import { PartyPaymentDetail } from "@/app/app/projects/[id]/payments/_components/party-payment-detail";
+import { PartyPaymentDetailSkeleton } from "@/app/app/_components/finance/parties/parties-skeletons";
 
 export const metadata: Metadata = { title: "Contractor payment" };
 

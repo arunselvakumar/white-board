@@ -1,7 +1,7 @@
 import type { ApiCall } from "../../../.storybook/mocks/api";
-import { financeLookupsHandler } from "@/components/finance/account-fixtures";
+import { financeLookupsHandler } from "@/app/app/_components/finance/account-fixtures";
 import { mockFinanceDocumentApi } from "@/components/finance/documents/finance-document-fixtures";
-import { financeAccessHandler } from "@/components/finance/payment-categories/payment-category-fixtures";
+import { financeAccessHandler } from "@/app/app/_components/finance/payment-categories/payment-category-fixtures";
 import type {
   AccountStatement,
   PettyCashAccount,

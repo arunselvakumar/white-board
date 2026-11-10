@@ -3,7 +3,7 @@ import { useState } from "react";
 import { expect, fn, waitFor, within } from "storybook/test";
 import { Label } from "@repo/ui/components/label";
 
-import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import { ACCOUNT_OPTIONS, accountOptionsHandler } from "./account-fixtures";
 import { AccountPicker, type AccountPickerMode } from "./account-picker";
 

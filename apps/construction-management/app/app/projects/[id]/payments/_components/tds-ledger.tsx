@@ -38,10 +38,13 @@ import {
   formatDate,
   localToday,
   money,
-} from "./party-money";
-import { SelectControlSkeleton } from "@/components/finance/finance-skeletons";
+} from "@/app/app/_components/finance/parties/party-money";
+import { SelectControlSkeleton } from "@/app/app/_components/finance/finance-skeletons";
 
-import { TDS_COLUMNS, TdsLedgerSkeleton } from "./parties-skeletons";
+import {
+  TDS_COLUMNS,
+  TdsLedgerSkeleton,
+} from "@/app/app/_components/finance/parties/parties-skeletons";
 
 const PAYEE_LABELS = {
   individual_huf: "Individual / HUF — 1%",

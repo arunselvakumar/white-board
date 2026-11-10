@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@repo/ui/components/select";
 
-import { SelectControlSkeleton } from "@/components/finance/finance-skeletons";
+import { SelectControlSkeleton } from "@/app/app/_components/finance/finance-skeletons";
 import type { CounterpartyKindModel } from "@/app/api/construction/finance/lookup-models";
 import { counterpartyOptionsQuery } from "@/src/queries/finance-lookups";
 

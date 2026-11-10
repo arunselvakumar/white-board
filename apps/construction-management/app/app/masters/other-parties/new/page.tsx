@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { NewOtherPartyScreen } from "@/components/finance/other-parties/other-party-form";
+import { NewOtherPartyScreen } from "@/app/app/masters/other-parties/_components/other-party-form";
 
 export const metadata: Metadata = { title: "Add Other Party" };
 

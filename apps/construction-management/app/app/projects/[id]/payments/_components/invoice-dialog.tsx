@@ -50,7 +50,7 @@ import {
   money,
   paiseToRupees,
   PARTY_SCREENS,
-} from "./party-money";
+} from "@/app/app/_components/finance/parties/party-money";
 
 const NONE = "__none__";
 

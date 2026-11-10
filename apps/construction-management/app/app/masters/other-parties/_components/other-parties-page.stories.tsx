@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { mockApi, StoryQueries } from "../../../.storybook/mocks/api";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import { OtherPartiesPage } from "./other-parties-page";
 import { LAKSHMI, MURUGAN, otherPartyPage } from "./other-party-fixtures";
 

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { financeAccess } from "@/components/finance/accounts/account-list-fixtures";
+import { financeAccess } from "@/app/app/_components/finance/accounts/account-list-fixtures";
 
 import {
   mockApi,

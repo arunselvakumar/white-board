@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { PartyBalanceWorkspace } from "@/components/finance/parties/party-balance-workspace";
+import { PartyBalanceWorkspace } from "@/app/app/workspace/party-balance/_components/party-balance-workspace";
 
 export const metadata: Metadata = { title: "Party Balance" };
 

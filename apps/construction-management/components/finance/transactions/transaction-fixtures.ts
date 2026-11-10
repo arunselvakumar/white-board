@@ -2,11 +2,11 @@ import type { ApiCall } from "../../../.storybook/mocks/api";
 import {
   financeLookupsHandler,
   ACCOUNT_OPTIONS,
-} from "@/components/finance/account-fixtures";
+} from "@/app/app/_components/finance/account-fixtures";
 import {
   financeAccess,
   financeAccessHandler,
-} from "@/components/finance/accounts/account-list-fixtures";
+} from "@/app/app/_components/finance/accounts/account-list-fixtures";
 import type { FinanceAccess } from "@/src/queries/finance-access";
 import type {
   RegisterItem,

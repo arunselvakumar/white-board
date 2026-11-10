@@ -23,7 +23,7 @@ import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/tabs";
 import {
   FilterBarSkeleton,
   ResponsiveListSkeleton,
-} from "@/components/finance/finance-skeletons";
+} from "@/app/app/_components/finance/finance-skeletons";
 import {
   FieldGridSkeleton,
   FormActionsSkeleton,

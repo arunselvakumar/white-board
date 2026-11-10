@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { PartyMoneyTab } from "@/components/finance/parties/party-money-tab";
+import { PartyMoneyTab } from "@/app/app/projects/[id]/payments/_components/party-money-tab";
 
 export const metadata: Metadata = { title: "Supplier payments" };
 

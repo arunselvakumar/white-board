@@ -8,7 +8,7 @@ import {
 import {
   ResponsiveListSkeleton,
   srOnly,
-} from "@/components/finance/finance-skeletons";
+} from "@/app/app/_components/finance/finance-skeletons";
 
 export const OTHER_PARTY_COLUMNS: SkeletonColumn[] = [
   { header: "Name" },

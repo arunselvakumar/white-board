@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { AccountLedger } from "@/components/finance/accounts/account-ledger";
+import { AccountLedger } from "@/app/app/masters/bank-accounts/[accountId]/_components/account-ledger";
 
 export const metadata: Metadata = { title: "Account Ledger" };
 

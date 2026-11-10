@@ -9,7 +9,7 @@ import {
   ResponsiveListSkeleton,
   SummaryTilesSkeleton,
   srOnly,
-} from "@/components/finance/finance-skeletons";
+} from "@/app/app/_components/finance/finance-skeletons";
 
 /** The Transactions register's columns, without bulk approval's tick column. */
 export const TRANSACTION_COLUMNS: SkeletonColumn[] = [

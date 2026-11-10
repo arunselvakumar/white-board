@@ -1,5 +1,5 @@
 import { formatPaise, paiseToRupees } from "@/components/money/money-input";
-import { paymentsPath } from "@/components/finance/payments-hub/payments-tabs";
+import { paymentsPath } from "@/app/app/_components/finance/payments-hub/payments-tabs";
 import type { Invoice, PartyType } from "@/src/queries/finance-parties";
 
 /**

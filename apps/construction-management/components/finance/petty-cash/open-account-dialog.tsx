@@ -39,7 +39,7 @@ import {
   useOpenPettyCashAccount,
   type PettyCashAccount,
 } from "@/src/queries/finance-petty-cash";
-import { SelectControlSkeleton } from "@/components/finance/finance-skeletons";
+import { SelectControlSkeleton } from "@/app/app/_components/finance/finance-skeletons";
 
 const schema = z.object({
   holderMemberId: z.string().min(1, "Choose the Team Member"),

@@ -3,7 +3,7 @@ import { expect, waitFor, within } from "storybook/test";
 
 import { AppShell } from "@/components/app-shell/app-shell";
 import { PagePlaceholder } from "@/components/app-shell/page-placeholder";
-import { financeAccess } from "@/components/finance/accounts/account-list-fixtures";
+import { financeAccess } from "@/app/app/_components/finance/accounts/account-list-fixtures";
 import {
   KUMARI,
   STORY_LOGO_URL,

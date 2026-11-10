@@ -9,7 +9,7 @@ import { PageHeaderSkeleton } from "@/components/app-shell/page-header-skeleton"
 import {
   ResponsiveListSkeleton,
   SummaryTilesSkeleton,
-} from "@/components/finance/finance-skeletons";
+} from "@/app/app/_components/finance/finance-skeletons";
 
 export const LEDGER_COLUMNS: SkeletonColumn[] = [
   { header: "Date", kind: "muted" },

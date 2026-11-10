@@ -6,7 +6,10 @@ import type {
 } from "@/src/queries/finance-other-expenses";
 import { FLAGS } from "@/src/shared-kernel/access";
 
-import { ACCOUNT_OPTIONS, PAYMENT_CATEGORY_OPTIONS } from "../account-fixtures";
+import {
+  ACCOUNT_OPTIONS,
+  PAYMENT_CATEGORY_OPTIONS,
+} from "@/app/app/_components/finance/account-fixtures";
 
 /** Story data for a Project's Other Expenses (CM-704). Amounts are paise. */
 

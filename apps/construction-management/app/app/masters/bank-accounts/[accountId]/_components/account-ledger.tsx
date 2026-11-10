@@ -29,7 +29,10 @@ import {
 
 import { addDays, daysBetween } from "@/src/shared-kernel/calendar-date";
 
-import { ACCOUNT_KIND_LABELS, SignedAmount } from "./account-format";
+import {
+  ACCOUNT_KIND_LABELS,
+  SignedAmount,
+} from "@/app/app/masters/bank-accounts/_components/account-format";
 import { LEDGER_COLUMNS, LedgerSkeleton } from "./accounts-skeletons";
 
 /** The server's limit (`statementPeriod`): at most 366 days, from ≤ to. */

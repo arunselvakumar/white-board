@@ -1,6 +1,6 @@
 import type { SkeletonColumn } from "@repo/ui/components/skeleton-kit";
 
-import { ResponsiveListSkeleton } from "@/components/finance/finance-skeletons";
+import { ResponsiveListSkeleton } from "@/app/app/_components/finance/finance-skeletons";
 
 /** Other Expenses' columns, without bulk approval's tick column. */
 export const OTHER_EXPENSE_COLUMNS: SkeletonColumn[] = [

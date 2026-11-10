@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { PartyPaymentScreen } from "@/components/finance/parties/party-payment-form";
+import { PartyPaymentScreen } from "@/app/app/projects/[id]/payments/_components/party-payment-form";
 
 export const metadata: Metadata = { title: "Pay Supplier" };
 

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, waitFor, within } from "storybook/test";
 
 import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
-import { financeLookupsHandler } from "../finance/account-fixtures";
+import { financeLookupsHandler } from "@/app/app/_components/finance/account-fixtures";
 import { PayDialog } from "./pay-dialog";
 import {
   BANK_ACCOUNT,

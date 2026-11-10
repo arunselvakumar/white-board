@@ -45,8 +45,12 @@ import {
 } from "@/src/queries/finance-parties";
 import { QueryHttpError } from "@/src/queries/http";
 
-import { formatDate, money, PARTY_SCREENS } from "./party-money";
-import { SettlementsSkeleton } from "./parties-skeletons";
+import {
+  formatDate,
+  money,
+  PARTY_SCREENS,
+} from "@/app/app/_components/finance/parties/party-money";
+import { SettlementsSkeleton } from "@/app/app/_components/finance/parties/parties-skeletons";
 
 type Status = "pending" | "approved" | "rejected";
 
