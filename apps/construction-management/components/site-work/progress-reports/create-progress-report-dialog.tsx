@@ -31,7 +31,7 @@ import {
   type CreateProgressReportInput,
   type ProgressReportFormOptions,
 } from "@/src/queries/progress-reports";
-import { ProgressReportFormSkeleton } from "@/components/site-work/site-work-skeletons";
+import { ProgressReportFormSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
 
 const EVERYONE = "everyone";
 

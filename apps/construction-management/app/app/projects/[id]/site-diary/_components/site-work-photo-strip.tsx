@@ -12,7 +12,10 @@ import {
 } from "@/src/queries/site-work-documents";
 import type { SiteWorkDocumentType } from "@/src/site-work/domain/site-work-documents";
 
-import { siteWorkFileLine, siteWorkViewable } from "./site-work-file-parts";
+import {
+  siteWorkFileLine,
+  siteWorkViewable,
+} from "@/app/app/projects/[id]/_components/site-work/documents/site-work-file-parts";
 
 const IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
 

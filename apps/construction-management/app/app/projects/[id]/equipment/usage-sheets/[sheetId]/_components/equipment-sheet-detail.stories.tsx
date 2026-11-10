@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
+import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 
 import { EquipmentSheetDetailPage } from "./equipment-sheet-detail";
 import {
@@ -10,7 +10,7 @@ import {
   PROJECT_ID,
   rentedSheet,
   type EquipmentSheetApiOptions,
-} from "./equipment-sheet-fixtures";
+} from "@/app/app/projects/[id]/equipment/usage-sheets/_components/equipment-sheet-fixtures";
 
 let api: ReturnType<typeof mockEquipmentSheetApi>;
 

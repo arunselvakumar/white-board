@@ -30,8 +30,8 @@ import { useMaterialsNavLinks } from "@/app/app/_components/procurement/material
 import { MATERIALS_TABS } from "@/app/app/_components/procurement/materials-hub/materials-tabs";
 import { ProjectAvatar } from "@/app/app/_components/projects/project-avatar";
 import { PROJECT_MODULE_ICONS } from "@/app/app/_components/projects/project-module-icons";
-import { useEquipmentNavLinks } from "@/components/site-work/equipment/equipment-nav";
-import { EQUIPMENT_TABS } from "@/components/site-work/equipment/equipment-tabs";
+import { useEquipmentNavLinks } from "@/app/app/_components/site-work/equipment/equipment-nav";
+import { EQUIPMENT_TABS } from "@/app/app/_components/site-work/equipment/equipment-tabs";
 import { bookingsNavLinks } from "@/components/sales/bookings/bookings-nav";
 import { useInquiryNavLinks } from "@/components/sales/inquiries/inquiry-nav";
 import { INQUIRY_TABS } from "@/components/sales/inquiries/inquiry-tabs";

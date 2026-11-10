@@ -42,7 +42,7 @@ import {
 } from "@/src/queries/site-work-access";
 
 import { CreateProgressReportDialog } from "./create-progress-report-dialog";
-import { ProgressReportRowsSkeleton } from "@/components/site-work/site-work-skeletons";
+import { ProgressReportRowsSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
 
 const MENU = "site_work.progress_reports";
 

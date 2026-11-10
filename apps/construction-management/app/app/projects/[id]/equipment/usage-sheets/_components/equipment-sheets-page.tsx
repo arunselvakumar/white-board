@@ -71,7 +71,7 @@ import {
 } from "./equipment-sheet-format";
 import { trimDecimal } from "./equipment-sheet-live";
 import { EquipmentSheetSettingsDialog } from "./equipment-sheet-settings-dialog";
-import { EquipmentSheetRowsSkeleton } from "@/components/site-work/site-work-skeletons";
+import { EquipmentSheetRowsSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
 
 type Filters = {
   date: DateFilterValue;

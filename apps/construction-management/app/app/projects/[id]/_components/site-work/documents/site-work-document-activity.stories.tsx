@@ -1,12 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fireEvent, waitFor, within } from "storybook/test";
 
-import {
-  StoryQueries,
-  mockApi,
-  type ApiCall,
-} from "../../../.storybook/mocks/api";
-import { mockXhrUploads } from "../../../.storybook/mocks/xhr";
+import { StoryQueries, mockApi, type ApiCall } from "@/.storybook/mocks/api";
+import { mockXhrUploads } from "@/.storybook/mocks/xhr";
 import { SiteWorkDocumentActivity } from "./site-work-document-activity";
 import {
   SITE_WORK_DOCUMENTS_API,

@@ -7,7 +7,7 @@ import { NewWorksheetPage } from "@/components/site-work/worksheets/worksheet-fo
 import {
   TitledFormSkeleton,
   WorksheetFormSkeleton,
-} from "@/components/site-work/site-work-skeletons";
+} from "@/app/app/_components/site-work/site-work-skeletons";
 
 export const metadata: Metadata = { title: "Add Worksheet" };
 

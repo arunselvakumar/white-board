@@ -49,7 +49,7 @@ import {
   equipmentPath,
   projectEquipmentPath,
 } from "./equipment-tabs";
-import { EquipmentRowsSkeleton } from "@/components/site-work/site-work-skeletons";
+import { EquipmentRowsSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
 
 const ALL = "all";
 

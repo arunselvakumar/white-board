@@ -1,13 +1,13 @@
-import { mockApi, type ApiCall } from "../../../.storybook/mocks/api";
+import { mockApi, type ApiCall } from "@/.storybook/mocks/api";
 import { materialOptionsHandler } from "@/app/app/_components/procurement/material-options-fixtures";
 import {
   mockSiteWorkDocumentApi,
   type SiteWorkDocumentApiOptions,
-} from "@/components/site-work/documents/site-work-document-fixtures";
+} from "@/app/app/projects/[id]/_components/site-work/documents/site-work-document-fixtures";
 import {
   equipmentDetail,
   rentedDetail,
-} from "@/components/site-work/equipment/equipment-fixtures";
+} from "@/app/app/_components/site-work/equipment/equipment-fixtures";
 import {
   CEMENT,
   CONTRACTOR_ID,

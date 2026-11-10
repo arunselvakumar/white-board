@@ -3,11 +3,11 @@
 import { Suspense } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-import { SiteRecordHeader } from "@/components/site-work/site-record-header";
+import { SiteRecordHeader } from "@/app/app/projects/[id]/_components/site-work/site-record-header";
 import { hindranceQuery, hindrancesPath } from "@/src/queries/hindrances";
 
 import { HindranceForm, type HindrancePrefill } from "./hindrance-form";
-import { HindranceFormFieldsSkeleton } from "@/components/site-work/site-work-skeletons";
+import { HindranceFormFieldsSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
 
 /** Record a hindrance; a usage sheet's link prefills it (CM-607). */
 export function HindranceNew({

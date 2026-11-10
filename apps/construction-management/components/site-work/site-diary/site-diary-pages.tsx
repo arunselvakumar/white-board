@@ -2,7 +2,7 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-import { SiteRecordHeader } from "@/components/site-work/site-record-header";
+import { SiteRecordHeader } from "@/app/app/projects/[id]/_components/site-work/site-record-header";
 import { siteDiaryPath, siteDiaryQuery } from "@/src/queries/site-diary";
 
 import { SiteDiaryForm } from "./site-diary-form";

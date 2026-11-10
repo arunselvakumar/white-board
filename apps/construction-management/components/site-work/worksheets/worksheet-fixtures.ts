@@ -6,7 +6,7 @@ import {
 import {
   mockSiteWorkDocumentApi,
   type SiteWorkDocumentApiOptions,
-} from "@/components/site-work/documents/site-work-document-fixtures";
+} from "@/app/app/projects/[id]/_components/site-work/documents/site-work-document-fixtures";
 import { SITE_WORK_ACCESS_MENUS } from "@/app/api/construction/site-work/access/access-models";
 import type { LocationOptions } from "@/src/queries/location-options";
 import type { SiteWorkAccess } from "@/src/queries/site-work-access";

@@ -4,7 +4,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense } from "react";
 
 import { PageHeader } from "@/components/app-shell/page-header";
-import { EquipmentFormSkeleton } from "@/components/site-work/site-work-skeletons";
+import { EquipmentFormSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
 import { equipmentQuery } from "@/src/queries/equipment";
 
 import { EquipmentDetailScreen } from "./equipment-detail";

@@ -22,7 +22,7 @@ import { FinanceDocumentActivity } from "@/app/app/projects/[id]/payments/_compo
 import { COUNTERPARTY_KIND_LABELS } from "@/app/app/projects/[id]/payments/_components/counterparty-field";
 import { formatDate } from "@/components/payments/payment-format";
 import { ReasonDialog } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/reason-dialog";
-import { SiteRecordHeader } from "@/components/site-work/site-record-header";
+import { SiteRecordHeader } from "@/app/app/projects/[id]/_components/site-work/site-record-header";
 import { fieldForCode } from "@/lib/server-errors";
 import { canInFinance, financeAccessQuery } from "@/src/queries/finance-access";
 import {

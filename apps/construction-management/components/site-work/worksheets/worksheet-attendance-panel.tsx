@@ -8,7 +8,7 @@ import {
   worksheetAttendanceQuery,
   type WorksheetAttendance,
 } from "@/src/queries/worksheets";
-import { AttendancePanelSkeleton } from "@/components/site-work/site-work-skeletons";
+import { AttendancePanelSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
 
 /**
  * "Attendance on <date>" beside the headcounts (CM-0016 §6): the

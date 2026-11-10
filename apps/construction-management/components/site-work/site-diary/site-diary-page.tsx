@@ -44,7 +44,7 @@ import { SiteDiaryView } from "./site-diary-view";
 import {
   DiaryDaySkeleton,
   DiaryMonthSkeleton,
-} from "@/components/site-work/site-work-skeletons";
+} from "@/app/app/_components/site-work/site-work-skeletons";
 
 function DiaryForDate({
   projectId,

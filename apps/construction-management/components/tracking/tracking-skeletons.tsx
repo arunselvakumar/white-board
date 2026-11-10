@@ -13,7 +13,7 @@ import {
   FilterBarSkeleton,
   ResponsiveListSkeleton,
 } from "@/app/app/_components/procurement/procurement-skeletons";
-import { SiteRecordHeaderSkeleton } from "@/components/site-work/site-work-skeletons";
+import { SiteRecordHeaderSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
 
 /*
  * Tracking while it loads (ADR-0047): Issues & Snags, Inspection

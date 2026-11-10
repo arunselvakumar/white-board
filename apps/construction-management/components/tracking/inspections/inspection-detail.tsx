@@ -27,7 +27,7 @@ import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { LocationLabel } from "@/app/app/_components/locations/location-picker";
-import { SiteRecordHeader } from "@/components/site-work/site-record-header";
+import { SiteRecordHeader } from "@/app/app/projects/[id]/_components/site-work/site-record-header";
 import { TrackingDocumentFiles } from "@/components/tracking/documents/tracking-document-files";
 import { fieldForCode } from "@/lib/server-errors";
 import {
