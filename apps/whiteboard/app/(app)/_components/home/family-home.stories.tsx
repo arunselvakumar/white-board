@@ -194,7 +194,6 @@ export const StudentHome: Story = {
   },
 };
 
-/** Homework due today, seen on Home the day it is due. */
 export const StudentHomeDueToday: Story = {
   render: () => (
     <AppShell>

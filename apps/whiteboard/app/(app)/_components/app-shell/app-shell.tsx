@@ -91,7 +91,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <SidebarHeader className="gap-3 px-3 pt-4 pb-2">
           <SidebarUserAccount
             before={
-              // Only Teachers receive Notifications for now (ADR-0041 §1).
+              // Only Teachers receive Notifications (ADR-0041 §1).
               role === "teacher" ? (
                 <NotificationBell className={SIDEBAR_BELL_CLASS} />
               ) : null
