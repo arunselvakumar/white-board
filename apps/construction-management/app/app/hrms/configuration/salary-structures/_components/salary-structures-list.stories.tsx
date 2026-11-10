@@ -3,12 +3,12 @@ import { expect, waitFor, within } from "storybook/test";
 
 import type { SalaryStructureModel } from "@/src/queries/hrms-salary-setup";
 
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
-import { OFFICE, SITE_STAFF, STRUCTURES_PATH } from "./salary-setup-fixtures";
+  OFFICE,
+  SITE_STAFF,
+  STRUCTURES_PATH,
+} from "@/app/app/hrms/configuration/_components/salary-setup-fixtures";
 import { SalaryStructuresList } from "./salary-structures-list";
 
 let structures: SalaryStructureModel[] = [];

@@ -3,7 +3,7 @@ import { expect, within } from "storybook/test";
 
 import type { HrmsDashboardModel } from "@/src/queries/hrms-dashboard";
 
-import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import {
   EMPTY_DASHBOARD,
   MEMBER_DASHBOARD,

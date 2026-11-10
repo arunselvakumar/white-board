@@ -27,7 +27,10 @@ import {
   type HrmsAttendanceEntry,
 } from "@/src/queries/hrms-attendance";
 
-import { formatClock, formatWeekdayDate } from "./attendance-parts";
+import {
+  formatClock,
+  formatWeekdayDate,
+} from "@/app/app/hrms/_components/attendance-parts";
 
 const schema = z.object({
   checkOutDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Choose the date"),

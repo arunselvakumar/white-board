@@ -2,19 +2,19 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import type { ReactNode } from "react";
 import { expect, within } from "storybook/test";
 
-import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import { HRMS_PATH } from "@/lib/hrms-nav";
 
-import { BranchesPage } from "./branches-page";
-import { EmployeeSalaryGrid } from "./employee-salary-grid";
-import { HolidaysPage } from "./holidays-page";
-import { HrmsSettingsForm } from "./hrms-settings-form";
+import { BranchesPage } from "../configuration/branches/_components/branches-page";
+import { EmployeeSalaryGrid } from "../configuration/employees/_components/employee-salary-grid";
+import { HolidaysPage } from "../configuration/holidays/_components/holidays-page";
+import { HrmsSettingsForm } from "../configuration/settings/_components/hrms-settings-form";
 import { HrmsShell } from "./hrms-shell";
-import { LeaveConfigurationPage } from "./leave/leave-configuration-page";
-import { SalaryStructuresList } from "./salary-structures-list";
-import { NewSalaryStructureScreen } from "./salary-structure-form";
-import { ShiftManagementPage } from "./shift-management-page";
-import { ShiftsPage } from "./shifts-page";
+import { LeaveConfigurationPage } from "../configuration/leave-types/_components/leave-configuration-page";
+import { SalaryStructuresList } from "../configuration/salary-structures/_components/salary-structures-list";
+import { NewSalaryStructureScreen } from "../configuration/_components/salary-structure-form";
+import { ShiftManagementPage } from "../configuration/shift-management/_components/shift-management-page";
+import { ShiftsPage } from "../configuration/shifts/_components/shifts-page";
 
 /**
  * HRMS Configuration opened by a member whose Permission Matrix lacks the

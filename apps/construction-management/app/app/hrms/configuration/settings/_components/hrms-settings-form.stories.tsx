@@ -3,11 +3,7 @@ import { expect, waitFor, within } from "storybook/test";
 
 import type { HrmsSettingsModel } from "@/src/queries/hrms-settings";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { HrmsSettingsForm } from "./hrms-settings-form";
 
 const SETTINGS_PATH = "/api/construction/hrms/settings";

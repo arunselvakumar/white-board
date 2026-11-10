@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { MonthlyAttendancePage } from "@/components/hrms/monthly-attendance-page";
+import { MonthlyAttendancePage } from "@/app/app/hrms/attendance/monthly/_components/monthly-attendance-page";
 import { HRMS_PATH, hrmsPage } from "@/lib/hrms-nav";
 
 const HREF = `${HRMS_PATH}/attendance/monthly`;

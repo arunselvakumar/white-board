@@ -6,11 +6,7 @@ import type {
   HrmsHolidayImportPreview,
 } from "@/src/queries/hrms-holidays";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { HolidaysPage } from "./holidays-page";
 
 const HOLIDAYS = "/api/construction/hrms/holidays";

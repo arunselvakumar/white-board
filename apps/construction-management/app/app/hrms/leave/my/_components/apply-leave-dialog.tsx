@@ -42,7 +42,7 @@ import {
 } from "@/src/queries/hrms-leave";
 import { QueryHttpError } from "@/src/queries/http";
 
-import { formatDay, formatDays } from "./leave-format";
+import { formatDay, formatDays } from "@/app/app/hrms/_components/leave-format";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 

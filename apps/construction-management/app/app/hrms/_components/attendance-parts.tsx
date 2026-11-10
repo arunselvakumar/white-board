@@ -9,7 +9,7 @@ import type { LiveState } from "@/src/hrms/domain/attendance";
 import type { HrmsAttendanceEntry } from "@/src/queries/hrms-attendance";
 
 import { HrmsAccessBoundary } from "./hrms-parts";
-import { AttendanceReadSkeleton } from "@/components/hrms/hrms-skeletons";
+import { AttendanceReadSkeleton } from "@/app/app/hrms/_components/hrms-skeletons";
 
 /**
  * Shared pieces of the attendance screens (CM-309): labels and tones for

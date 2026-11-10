@@ -37,7 +37,7 @@ import {
   type HrmsHolidayImportPreview,
 } from "@/src/queries/hrms-holidays";
 
-import { formatDate } from "./hrms-parts";
+import { formatDate } from "@/app/app/hrms/_components/hrms-parts";
 
 const MAX_BYTES = 2 * 1024 * 1024;
 

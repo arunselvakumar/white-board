@@ -36,8 +36,11 @@ import {
   AdjustBalanceDialog,
   CreditHistorySheet,
   InitialiseBalancesDialog,
-} from "./leave-balance-dialogs";
-import { formatDays, leaveYearChoices } from "./leave-format";
+} from "@/app/app/hrms/_components/leave-balance-dialogs";
+import {
+  formatDays,
+  leaveYearChoices,
+} from "@/app/app/hrms/_components/leave-format";
 
 /**
  * Configuration → Leave Balances (CM-311): every Team Member's balances

@@ -21,7 +21,12 @@ import {
 
 import { BranchDialog } from "./branch-dialog";
 import { BranchMembersDialog } from "./branch-members-dialog";
-import { ConfirmDialog, HrmsEmpty, HrmsPage, RowMenu } from "./hrms-parts";
+import {
+  ConfirmDialog,
+  HrmsEmpty,
+  HrmsPage,
+  RowMenu,
+} from "@/app/app/hrms/_components/hrms-parts";
 
 function where(branch: HrmsBranch): string {
   const point = `${branch.latitude.toFixed(5)}, ${branch.longitude.toFixed(5)}`;

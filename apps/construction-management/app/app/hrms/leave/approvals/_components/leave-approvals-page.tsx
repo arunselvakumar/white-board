@@ -37,7 +37,7 @@ import {
   LeaveDetailSheet,
   LeaveRequestRow,
   type Decision,
-} from "./leave-request-parts";
+} from "@/app/app/hrms/leave/_components/leave-request-parts";
 
 const TABS: {
   value: LeaveApprovalTab;

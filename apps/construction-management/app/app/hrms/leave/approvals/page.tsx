@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { LeaveApprovalsPage } from "@/components/hrms/leave/leave-approvals-page";
+import { LeaveApprovalsPage } from "@/app/app/hrms/leave/approvals/_components/leave-approvals-page";
 import { HRMS_PATH, hrmsPage } from "@/lib/hrms-nav";
 
 export const metadata: Metadata = {

@@ -40,7 +40,7 @@ import {
   formatRange,
   STATUS_LABELS,
   statusVariant,
-} from "./leave-format";
+} from "@/app/app/hrms/_components/leave-format";
 
 function decisionText(
   decision: LeaveRequestModel["decisions"][number],

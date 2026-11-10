@@ -27,8 +27,8 @@ import {
   formatClock,
   formatWeekdayDate,
   hoursText,
-} from "./attendance-parts";
-import { HrmsEmpty, HrmsPage } from "./hrms-parts";
+} from "@/app/app/hrms/_components/attendance-parts";
+import { HrmsEmpty, HrmsPage } from "@/app/app/hrms/_components/hrms-parts";
 
 type Filter =
   | "all"

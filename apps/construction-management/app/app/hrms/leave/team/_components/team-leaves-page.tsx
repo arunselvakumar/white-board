@@ -35,13 +35,17 @@ import {
   type LeaveRequestModel,
 } from "@/src/queries/hrms-leave";
 
-import { formatDay, formatDays, localToday } from "./leave-format";
+import {
+  formatDay,
+  formatDays,
+  localToday,
+} from "@/app/app/hrms/_components/leave-format";
 import {
   LeaveDetailSheet,
   LeaveRequestRow,
   StatusBadge,
-} from "./leave-request-parts";
-import { TeamLeavesSkeleton } from "@/components/hrms/hrms-skeletons";
+} from "@/app/app/hrms/leave/_components/leave-request-parts";
+import { TeamLeavesSkeleton } from "@/app/app/hrms/_components/hrms-skeletons";
 
 function monthRange(month: string): { from: string; to: string } {
   const [year, number] = month.split("-").map(Number) as [number, number];

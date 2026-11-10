@@ -42,7 +42,11 @@ import {
 } from "@/src/queries/hrms-leave";
 
 import { LeaveAssignDialog } from "./leave-assign-dialog";
-import { formatDate, formatDays, localToday } from "./leave-format";
+import {
+  formatDate,
+  formatDays,
+  localToday,
+} from "@/app/app/hrms/_components/leave-format";
 import { LeaveStructureDialog } from "./leave-structure-dialog";
 import { LeaveTypeDialog } from "./leave-type-dialog";
 

@@ -6,11 +6,7 @@ import type {
   HrmsShiftTemplate,
 } from "@/src/queries/hrms-shifts";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { ShiftsPage } from "./shifts-page";
 
 const SHIFTS = "/api/construction/hrms/shift-templates";
