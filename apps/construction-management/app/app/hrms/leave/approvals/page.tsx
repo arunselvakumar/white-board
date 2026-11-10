@@ -7,7 +7,6 @@ export const metadata: Metadata = {
   title: hrmsPage(`${HRMS_PATH}/leave/approvals`).title,
 };
 
-/** Leave Approvals (CM-313). */
 export default function LeaveApprovalsRoute() {
   return <LeaveApprovalsPage />;
 }

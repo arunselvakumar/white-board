@@ -7,7 +7,6 @@ const HREF = `${HRMS_PATH}/configuration/holidays`;
 
 export const metadata: Metadata = { title: hrmsPage(HREF).title };
 
-/** Configuration → Holidays (CM-305). */
 export default function HolidaysRoute() {
   return <HolidaysPage />;
 }

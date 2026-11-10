@@ -7,7 +7,6 @@ export const metadata: Metadata = {
   title: hrmsPage(`${HRMS_PATH}/leave/my`).title,
 };
 
-/** My Leaves (CM-313). */
 export default function MyLeavesRoute() {
   return <MyLeavesPage />;
 }

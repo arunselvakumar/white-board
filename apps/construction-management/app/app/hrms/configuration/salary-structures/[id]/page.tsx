@@ -4,7 +4,6 @@ import { EditSalaryStructureScreen } from "@/app/app/hrms/configuration/_compone
 
 export const metadata: Metadata = { title: "Edit salary structure" };
 
-/** Configuration → Salary Structures → Edit (CM-314). */
 export default async function EditSalaryStructurePage({
   params,
 }: {

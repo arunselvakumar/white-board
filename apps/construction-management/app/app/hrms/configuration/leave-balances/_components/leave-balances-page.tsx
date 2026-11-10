@@ -43,9 +43,8 @@ import {
 } from "@/app/app/hrms/_components/leave-format";
 
 /**
- * Configuration → Leave Balances (CM-311): every Team Member's balances
- * for a leave year, with Initialise, Accrue now and Adjust (Comp Off) for
- * those who manage leave structures.
+ * Every Team Member's balances for a leave year, with Initialise, Accrue now
+ * and Adjust (Comp Off) for those who manage leave structures.
  */
 export function LeaveBalancesPage() {
   const { data: options } = useSuspenseQuery(leaveOptionsQuery);

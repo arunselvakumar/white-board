@@ -123,8 +123,8 @@ const initialiseSchema = z
 type InitialiseValues = z.infer<typeof initialiseSchema>;
 
 /**
- * Initialise balances for a leave year (CM-311): for chosen Team Members
- * or everyone on a structure. Running it again opens nothing twice.
+ * Initialise balances for a leave year: for chosen Team Members or everyone on
+ * a structure. Running it again opens nothing twice.
  */
 export function InitialiseBalancesDialog({
   open,
@@ -323,9 +323,8 @@ const adjustSchema = z.object({
 type AdjustValues = z.infer<typeof adjustSchema>;
 
 /**
- * Adjust a balance with a reason (CM-311): credit Compensatory Off for a
- * worked holiday (ADR CM-0012 §9), or correct a balance with a negative
- * number.
+ * Adjust a balance with a reason: credit Compensatory Off for a worked holiday
+ * (ADR CM-0012 §9), or correct a balance with a negative number.
  */
 export function AdjustBalanceDialog({
   open,

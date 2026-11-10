@@ -81,9 +81,8 @@ function toValues(
 }
 
 /**
- * Add or edit a leave structure (CM-311): a name and the leave types it
- * gives, each at its yearly limit unless a different number of days is
- * entered.
+ * Add or edit a leave structure: a name and the leave types it gives, each at
+ * its yearly limit unless a different number of days is entered.
  */
 export function LeaveStructureDialog({
   structure,

@@ -109,9 +109,9 @@ function resize(slots: string[], length: number, fill: string): string[] {
 }
 
 /**
- * Add or edit a rotation (CM-306): Week (Monday to Sunday), Month (day 1
- * to 31) or a Custom Cycle of 2–12 days counted from the day it is
- * assigned; each day a shift or a Week Off.
+ * Add or edit a rotation: Week (Monday to Sunday), Month (day 1 to 31) or a
+ * Custom Cycle of 2–12 days counted from the day it is assigned; each day a
+ * shift or a Week Off.
  */
 export function RotationDialog({
   rotation,

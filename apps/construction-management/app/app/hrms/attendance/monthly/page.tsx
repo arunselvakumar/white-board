@@ -7,7 +7,6 @@ const HREF = `${HRMS_PATH}/attendance/monthly`;
 
 export const metadata: Metadata = { title: hrmsPage(HREF).title };
 
-/** Attendance → Monthly (CM-309). */
 export default function MonthlyAttendanceRoute() {
   return <MonthlyAttendancePage />;
 }

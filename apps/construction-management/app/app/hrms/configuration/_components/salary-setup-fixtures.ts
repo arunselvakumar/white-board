@@ -4,7 +4,7 @@ import type {
   SalaryStructureModel,
 } from "@/src/queries/hrms-salary-setup";
 
-/** Story data for Salary Structures (CM-314) and Employees (CM-315). */
+/** Story data for Salary Structures and Employees. */
 
 export const STRUCTURES_PATH = "/api/construction/hrms/salary-structures";
 export const EMPLOYEES_PATH = "/api/construction/hrms/employees/salary";

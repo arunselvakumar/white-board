@@ -44,8 +44,8 @@ const MAX_BYTES = 2 * 1024 * 1024;
 const plural = (count: number) => (count === 1 ? "holiday" : "holidays");
 
 /**
- * Import Holidays (CM-305): download the sample, upload it filled in,
- * check every row, then add all rows at once. `.xlsx` only.
+ * Import Holidays: download the sample, upload it filled in, check every row,
+ * then add all rows at once. `.xlsx` only.
  */
 export function HolidayImportDialog({
   year,

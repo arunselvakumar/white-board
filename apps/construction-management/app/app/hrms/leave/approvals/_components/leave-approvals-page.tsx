@@ -92,9 +92,9 @@ function Nothing({
 }
 
 /**
- * Leave Approvals (CM-313): Pending / Approved / Rejected / Cancel
- * Requests. Approve with remarks, reject with a reason, decide
- * cancellations. Your own requests wait for another approver.
+ * Leave Approvals: Pending / Approved / Rejected / Cancel Requests. Approve
+ * with remarks, reject with a reason, decide cancellations. Your own requests
+ * wait for another approver.
  */
 export function LeaveApprovalsPage({
   initialTab = "pending",

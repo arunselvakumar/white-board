@@ -137,7 +137,7 @@ export const MarksApprovedSalariesPaid: Story = {
     const dialog = await screen.findByRole("dialog", {
       name: "Mark Salaries as Paid",
     });
-    // Bank moves "Paid from" to the bank account (CM-707).
+    // Bank moves "Paid from" to the bank account.
     const paidFrom = await within(dialog).findByRole("combobox", {
       name: "Paid from",
     });
@@ -167,7 +167,7 @@ export const MarksApprovedSalariesPaid: Story = {
   },
 };
 
-/** A refusal about the account lands under "Paid from" (CM-707). */
+/** A refusal about the account lands under "Paid from". */
 export const MarkPaidAccountRefused: Story = {
   beforeEach: serve({
     write: (call) =>

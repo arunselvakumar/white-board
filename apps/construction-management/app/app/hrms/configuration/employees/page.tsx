@@ -7,7 +7,7 @@ const HREF = `${HRMS_PATH}/configuration/employees`;
 
 export const metadata: Metadata = { title: hrmsPage(HREF).title };
 
-/** Configuration → Employees: each member's salary set-up (CM-315). */
+/** Each member's salary set-up. */
 export default function EmployeesPage() {
   return <EmployeeSalaryGrid />;
 }

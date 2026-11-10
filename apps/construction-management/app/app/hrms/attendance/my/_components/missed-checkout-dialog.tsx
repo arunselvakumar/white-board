@@ -56,9 +56,9 @@ const SERVER_FIELDS: Record<string, keyof Values> = {
 };
 
 /**
- * Add Missed Checkout (CM-309): when a check-in was left open on an
- * earlier day, the member says when they left and why. It goes to
- * Attendance Approvals; the hours count once approved.
+ * Add Missed Checkout: when a check-in was left open on an earlier day, the
+ * member says when they left and why. It goes to Attendance Approvals; the
+ * hours count once approved.
  */
 export function MissedCheckoutDialog({
   entry,

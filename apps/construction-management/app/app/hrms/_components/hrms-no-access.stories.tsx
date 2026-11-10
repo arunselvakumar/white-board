@@ -17,9 +17,9 @@ import { ShiftManagementPage } from "../configuration/shift-management/_componen
 import { ShiftsPage } from "../configuration/shifts/_components/shifts-page";
 
 /**
- * HRMS Configuration opened by a member whose Permission Matrix lacks the
- * menu (CM-320): every read answers 403, and the page shows "You don't
- * have access to …" under the HRMS tabs instead of a generic error.
+ * HRMS Configuration opened by a member whose Permission Matrix lacks the menu:
+ * every read answers 403, and the page shows "You don't have access to …" under
+ * the HRMS tabs instead of a generic error.
  */
 
 function forbidden() {

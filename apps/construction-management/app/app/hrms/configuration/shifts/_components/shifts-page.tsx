@@ -94,9 +94,8 @@ type Pending =
   | { kind: "rotation"; item: HrmsRotationTemplate };
 
 /**
- * Configuration → Shifts (CM-306): shift templates and rotations, each
- * with add and edit dialogs. A template in use cannot be deleted; mark it
- * inactive instead. Menu `hrms.shifts`.
+ * Shift templates and rotations, each with add and edit dialogs. A template in
+ * use cannot be deleted; mark it inactive instead. Menu `hrms.shifts`.
  */
 export function ShiftsPage({
   initialTab = "shifts",

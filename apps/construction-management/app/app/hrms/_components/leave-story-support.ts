@@ -13,7 +13,7 @@ import type {
   TeamLeaveReport,
 } from "@/src/queries/hrms-leave";
 
-/** Fixtures and a mock leave API for the leave stories (CM-310 … CM-313). */
+/** Fixtures and a mock leave API for the leave stories. */
 
 const AT = "2026-10-10T06:00:00.000Z";
 

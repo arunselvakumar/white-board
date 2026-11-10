@@ -245,9 +245,9 @@ function AdvanceSlip({ slip }: { slip: SalarySlipModel }) {
 }
 
 /**
- * One salary slip in a side sheet (CM-317): Attendance Details, Earnings,
- * Deductions and Net Payable; the payment once paid; Recalculate while
- * Calculated, and the payslip PDF once approved.
+ * One salary slip in a side sheet: Attendance Details, Earnings, Deductions and
+ * Net Payable; the payment once paid; Recalculate while Calculated, and the
+ * payslip PDF once approved.
  */
 export function SalarySlipSheet({
   slip,

@@ -458,10 +458,10 @@ function MyAttendance() {
 }
 
 /**
- * My Attendance (CM-309): the check-in card (state, live timer, Check In /
- * Check Out with the device location), today's entries, an entry left
- * open on an earlier day with Add Missed Checkout, requests waiting for
- * approval, and Add Back-dated Attendance. Menu `hrms.attendance`.
+ * My Attendance: the check-in card (state, live timer, Check In / Check Out
+ * with the device location), today's entries, an entry left open on an earlier
+ * day with Add Missed Checkout, requests waiting for approval, and Add
+ * Back-dated Attendance. Menu `hrms.attendance`.
  */
 export function MyAttendancePage() {
   return (

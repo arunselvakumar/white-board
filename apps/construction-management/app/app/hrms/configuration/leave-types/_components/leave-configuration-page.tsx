@@ -93,8 +93,7 @@ function RowMenu({
 }
 
 /**
- * Configuration → Leave Types & Structures (CM-310, CM-311): the
- * Company's leave types (six seeds plus its own), the structures that
+ * The Company's leave types (six seeds plus its own), the structures that
  * bundle them with entitlements, and who is on which structure from when.
  */
 export function LeaveConfigurationPage({ today }: { today?: string }) {

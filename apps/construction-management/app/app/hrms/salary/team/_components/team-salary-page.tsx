@@ -56,10 +56,10 @@ import {
 import { TeamSalaryMonthSkeleton } from "@/app/app/hrms/_components/hrms-skeletons";
 
 /**
- * Team Salary (CM-317): a month's salaries for everyone. Calculate the
- * month, read each member's slip, approve the Calculated ones you select
- * (approving closes the member's month for attendance and leave), mark
- * Approved ones paid, pay an advance, and download the team report.
+ * Team Salary: a month's salaries for everyone. Calculate the month, read each
+ * member's slip, approve the Calculated ones you select (approving closes the
+ * member's month for attendance and leave), mark Approved ones paid, pay an
+ * advance, and download the team report.
  */
 export function TeamSalaryPage({ today }: { today?: string }) {
   const now = today ?? localToday();
@@ -461,9 +461,8 @@ function MonthSalaries({
 }
 
 /**
- * Export: the team salary workbook (report or export) and, with export
- * and Financial, the PF ECR and ESI contribution files of an approved
- * month (CM-320).
+ * Export: the team salary workbook (report or export) and, with export and
+ * Financial, the PF ECR and ESI contribution files of an approved month.
  */
 function ExportMenu({
   month,

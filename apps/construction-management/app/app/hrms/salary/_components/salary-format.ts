@@ -1,7 +1,7 @@
 import { formatMinor } from "@/src/shared-kernel/money";
 import type { SalarySlipModel } from "@/src/queries/hrms-salary";
 
-/** Words and formats shared by the salary screens (CM-317). */
+/** Words and formats shared by the salary screens. */
 
 export const SALARY_STATUS_LABELS: Record<SalarySlipModel["status"], string> = {
   calculated: "Calculated",

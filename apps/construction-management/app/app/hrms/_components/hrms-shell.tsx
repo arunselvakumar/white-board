@@ -16,14 +16,13 @@ import {
 import { HrmsPageFallback } from "@/app/app/hrms/_components/hrms-skeletons";
 
 /**
- * The HRMS area (M3; under Human Resources since ADR CM-0034, so no back
- * link): title, the five sections as tabs, and the current
- * section's pages as sub-tabs. Both rows scroll sideways on a phone. Pages
- * render below and keep their own padding and width. The tab rows are
- * `contain: inline-size` so nine Configuration tabs scroll inside their row
- * instead of widening the page. A page whose read answers 403 shows
- * "You don't have access to …" under the tabs, and a loading page shows a
- * skeleton there, so the tabs stay put.
+ * The HRMS area (under Human Resources, ADR CM-0034, so no back link): title,
+ * the five sections as tabs, and the current section's pages as sub-tabs. Both
+ * rows scroll sideways on a phone. Pages render below and keep their own
+ * padding and width. The tab rows are `contain: inline-size` so nine
+ * Configuration tabs scroll inside their row instead of widening the page. A
+ * page whose read answers 403 shows "You don't have access to …" under the
+ * tabs, and a loading page shows a skeleton there, so the tabs stay put.
  */
 export function HrmsShell({ children }: { children: ReactNode }) {
   const pathname = usePathname() || HRMS_PATH;

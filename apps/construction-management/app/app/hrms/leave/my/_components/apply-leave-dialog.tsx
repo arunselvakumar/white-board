@@ -132,10 +132,10 @@ function ChoiceSelect({
 }
 
 /**
- * Apply Leave (CM-313): the leave type, the first and last day, each
- * working day as a Full day, Morning or Afternoon (holidays and week offs
- * are left out), the total and the live balance, and a reason. A manager
- * with View All may apply for another Team Member.
+ * Apply Leave: the leave type, the first and last day, each working day as a
+ * Full day, Morning or Afternoon (holidays and week offs are left out), the
+ * total and the live balance, and a reason. A manager with View All may apply
+ * for another Team Member.
  */
 export function ApplyLeaveDialog({
   open,

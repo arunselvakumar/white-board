@@ -849,11 +849,11 @@ function Dashboard() {
 }
 
 /**
- * The HRMS Dashboard (CM-319, `modules/11` "HRMS dashboard"): quick
- * actions, today's snapshot, the present/absent breakdown and the 14-day
- * trend for those with View All on attendance; what waits for the
- * caller's decision; team leave and holidays ahead; and the caller's own
- * day, balances and requests. Each part shows only with its permission.
+ * The HRMS Dashboard (`modules/11` "HRMS dashboard"): quick actions, today's
+ * snapshot, the present/absent breakdown and the 14-day trend for those with
+ * View All on attendance; what waits for the caller's decision; team leave and
+ * holidays ahead; and the caller's own day, balances and requests. Each part
+ * shows only with its permission.
  */
 export function HrmsDashboardPage() {
   return (

@@ -128,9 +128,9 @@ function Breakdown({ slip }: { slip: SalaryBreakdown }) {
 }
 
 /**
- * The structure's sample calculation (CM-314): a full month present for a
- * base salary the admin types, worked out by the same calculator the
- * salary run uses, with this month's statutory figures.
+ * The structure's sample calculation: a full month present for a base salary
+ * the admin types, worked out by the same calculator the salary run uses, with
+ * this month's statutory figures.
  */
 export function SalarySample({
   structure,

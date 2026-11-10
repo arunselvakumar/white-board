@@ -4,7 +4,6 @@ import { HrmsSettingsForm } from "@/app/app/hrms/configuration/settings/_compone
 
 export const metadata: Metadata = { title: "HRMS Settings" };
 
-/** Configuration → Settings (CM-303). */
 export default function HrmsSettingsPage() {
   return <HrmsSettingsForm />;
 }

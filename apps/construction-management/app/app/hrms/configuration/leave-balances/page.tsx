@@ -7,7 +7,6 @@ export const metadata: Metadata = {
   title: hrmsPage(`${HRMS_PATH}/configuration/leave-balances`).title,
 };
 
-/** Leave Balances (CM-311). */
 export default function LeaveBalancesRoute() {
   return <LeaveBalancesPage />;
 }

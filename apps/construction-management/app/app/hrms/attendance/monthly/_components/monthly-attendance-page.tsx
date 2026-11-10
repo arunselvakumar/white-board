@@ -172,10 +172,10 @@ function thisMonth(): string {
 }
 
 /**
- * Monthly Attendance (CM-309): each Team Member × day of the month with a
- * status letter, and the month's counts and hours; a month picker and the
- * Excel report. Menu `hrms.attendance` Report (Export for Excel); View All
- * shows everyone, otherwise one's own row.
+ * Monthly Attendance: each Team Member × day of the month with a status letter,
+ * and the month's counts and hours; a month picker and the Excel report. Menu
+ * `hrms.attendance` Report (Export for Excel); View All shows everyone,
+ * otherwise one's own row.
  */
 export function MonthlyAttendancePage({
   initialMonth,
