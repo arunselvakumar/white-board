@@ -7,7 +7,6 @@ import { ProjectDocumentsSkeleton } from "@/app/app/projects/[id]/documents/_com
 
 export const metadata: Metadata = { title: "Documents" };
 
-/** The Project's Documents tab (CM-414). */
 export default async function ProjectDocumentsRoute({
   params,
 }: {

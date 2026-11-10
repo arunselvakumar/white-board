@@ -129,8 +129,8 @@ function AlbumForm({
 }
 
 /**
- * Drawings → Add album, or an album → Rename: one name, at most 80
- * characters, not already used on the Project.
+ * Add an album or rename one: one name, at most 80 characters, not
+ * already used on the Project.
  */
 export function AlbumFormDialog({
   projectId,

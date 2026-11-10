@@ -110,7 +110,7 @@ function RenameDrawingForm({
   );
 }
 
-/** A drawing → Rename. Someone else's change in between shows its message. */
+/** Renames a drawing. Someone else's change in between shows its message. */
 export function RenameDrawingDialog({
   projectId,
   drawing,

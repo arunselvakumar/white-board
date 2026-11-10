@@ -219,7 +219,7 @@ function DrawingRow({
 }
 
 /**
- * An album of the Project's Drawings (CM-408): each drawing with its
+ * An album of the Project's Drawings: each drawing with its
  * latest revision (R3), to view, download or look back through its
  * history. Upload drawings follows the Drawings menu's Create flag; a new
  * revision, Rename and Move follow Update; Delete follows Delete.

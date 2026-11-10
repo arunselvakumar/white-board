@@ -137,9 +137,9 @@ function UploadRow({
 }
 
 /**
- * Documents tab → Upload: choose the paper, then pick or drop files; each
- * file shows its own progress. Closing lets running uploads finish; they
- * show again on reopening.
+ * Choose the paper, then pick or drop files; each file shows its own
+ * progress. Closing lets running uploads finish; they show again on
+ * reopening.
  */
 export function UploadDocumentsDialog({
   open,

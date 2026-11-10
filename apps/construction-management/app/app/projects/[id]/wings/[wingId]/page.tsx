@@ -9,7 +9,7 @@ import { WingChartSkeleton } from "@/app/app/projects/[id]/_components/structure
 
 export const metadata: Metadata = { title: "Wing" };
 
-/** One Wing's chart: floors × units (CM-402). */
+/** One Wing's chart: floors × units. */
 export default async function WingRoute({
   params,
 }: {

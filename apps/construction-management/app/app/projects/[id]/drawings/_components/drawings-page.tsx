@@ -121,7 +121,7 @@ function AlbumCard({
 }
 
 /**
- * The Project's Drawings (CM-408): its albums — Architect, Electrical,
+ * The Project's Drawings: its albums — Architect, Electrical,
  * Plumbing, Structural Drawing and any the Company added — each with how
  * many drawings it holds. Add, Rename and Delete follow the Drawings
  * menu's Create, Update and Delete flags.

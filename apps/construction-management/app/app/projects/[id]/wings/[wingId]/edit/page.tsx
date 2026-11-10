@@ -9,7 +9,7 @@ import { EditWingSkeleton } from "@/app/app/projects/[id]/_components/structure/
 
 export const metadata: Metadata = { title: "Edit Wing" };
 
-/** Edit Wing: the floor and unit editor on the saved Wing (CM-402). */
+/** Edit Wing: the floor and unit editor on the saved Wing. */
 export default async function EditWingRoute({
   params,
 }: {

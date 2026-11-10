@@ -205,7 +205,7 @@ function EditWingForm({
 }
 
 /**
- * Edit Wing (CM-402): name, Phase and the same floor and unit editor as
+ * Edit Wing: name, Phase and the same floor and unit editor as
  * Add Wing, loaded with the saved floors and units. Save keeps their ids;
  * a save after someone else's is refused (409 `WING_CHANGED`).
  */

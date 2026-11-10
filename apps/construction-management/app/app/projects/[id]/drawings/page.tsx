@@ -8,7 +8,7 @@ import { DrawingsSkeleton } from "@/app/app/projects/[id]/drawings/_components/d
 
 export const metadata: Metadata = { title: "Drawings" };
 
-/** The Project's Drawings: its albums (CM-408). */
+/** The Project's Drawings: its albums. */
 export default async function ProjectDrawingsRoute({
   params,
 }: {

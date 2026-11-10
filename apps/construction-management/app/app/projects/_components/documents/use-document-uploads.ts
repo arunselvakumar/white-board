@@ -15,11 +15,10 @@ import {
 export type DocumentUpload = DirectUploadItem<{ kind: ProjectDocumentKind }>;
 
 /**
- * Files going up to one Project's Documents, on `useDirectUpload`
- * (CM-407): each with its own progress, error and retry. A file the
- * browser can already refuse (a program, over 25 MB) becomes an error row
- * without a request. Uploads still running when the screen goes away are
- * cancelled.
+ * Files going up to one Project's Documents, on `useDirectUpload`: each
+ * with its own progress, error and retry. A file the browser can already
+ * refuse (a program, over 25 MB) becomes an error row without a request.
+ * Uploads still running when the screen goes away are cancelled.
  */
 export function useDocumentUploads(projectId: string) {
   const { mutateAsync } = useUploadProjectDocument(projectId);

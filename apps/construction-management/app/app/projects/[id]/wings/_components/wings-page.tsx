@@ -125,7 +125,7 @@ type PhaseDialogState =
   { kind: "create" } | { kind: "rename"; phase: PhaseWithWings } | null;
 
 /**
- * The Wings screen (CM-402): the Project's Phases in order, each with its
+ * The Wings screen: the Project's Phases in order, each with its
  * Wings and their floor and unit totals, and the Project's totals. Add
  * Phase, rename and delete (only an empty Phase) and Add Wing follow the
  * `projects.wings` flags.

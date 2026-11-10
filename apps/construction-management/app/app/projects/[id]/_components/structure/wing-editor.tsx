@@ -237,7 +237,7 @@ function UnitChip({
 }
 
 /**
- * The floor and unit editor (CM-402): floors top to bottom, each with its
+ * The floor and unit editor: floors top to bottom, each with its
  * units as chips. Rename a floor; rename, remove or "+ Add" a unit; add a
  * named floor at a position. A scheme shows only its one row of plots or
  * bungalows. Changes stay on screen until the screen saves them.

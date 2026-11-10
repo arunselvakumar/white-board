@@ -9,7 +9,7 @@ import { AddWingSkeleton } from "@/app/app/projects/[id]/_components/structure/s
 
 export const metadata: Metadata = { title: "Add Wing" };
 
-/** Add Wing → Continue to Units → Save (CM-402). */
+/** Add Wing: details, then Continue to Units, then Save. */
 export default async function AddWingRoute({
   params,
   searchParams,

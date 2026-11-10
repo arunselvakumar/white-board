@@ -49,7 +49,7 @@ async function fill(
   if (value !== "") await userEvent.type(field, value);
 }
 
-/** Commercial, 5 floors × 4 from 1, 2 basements: the legacy example. */
+/** Commercial, 5 floors × 4 from 1, 2 basements. */
 async function continueWithCommercial(context: PlayContext) {
   const { canvas, userEvent } = context;
   await chooseType(context, "Commercial");
@@ -190,7 +190,7 @@ export const EditUnits: Story = {
     const body = within(canvasElement.ownerDocument.body);
     await continueWithCommercial(context);
 
-    // Rename 101 → Shop 1; a name already in the Wing is refused.
+    // Rename 101 to Shop 1; a name already in the Wing is refused.
     await userEvent.click(
       canvas.getByRole("button", { name: "Rename unit 101" }),
     );

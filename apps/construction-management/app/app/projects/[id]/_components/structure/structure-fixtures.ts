@@ -92,7 +92,7 @@ export function storyWing(
   };
 }
 
-/** Tower A: Commercial, 5 floors × 4, 2 basements (the legacy example). */
+/** Tower A: Commercial, 5 floors × 4, 2 basements. */
 export const TOWER_A = storyWing(
   PHASE_1.id,
   "commercial",

@@ -90,7 +90,7 @@ function Revisions({
 }
 
 /**
- * A drawing's History (CM-408): every revision, newest first, each with
+ * A drawing's History: every revision, newest first, each with
  * its size, uploader and date, to view or download. The newest is the
  * one the album shows.
  */

@@ -86,7 +86,7 @@ export const FIELD_BOUNDS: Record<ConfigNumberField, Bounds> = {
   },
 };
 
-/** The label of a configuration field for a Wing Type, as the legacy form says it. */
+/** The label of a configuration field for a Wing Type. */
 export function fieldLabel(field: ConfigNumberField, type: WingType): string {
   switch (field) {
     case "floors":

@@ -152,7 +152,7 @@ function MoveDrawingForm({
   );
 }
 
-/** A drawing → Move to album: one of the Project's other albums. */
+/** Moves a drawing to one of the Project's other albums. */
 export function MoveDrawingDialog({
   projectId,
   drawing,

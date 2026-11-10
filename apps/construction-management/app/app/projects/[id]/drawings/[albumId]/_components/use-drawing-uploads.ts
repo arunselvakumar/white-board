@@ -22,7 +22,7 @@ function checkDrawingFile(file: File) {
 }
 
 /**
- * Drawing files going up (CM-408) on `useDirectUpload`: each with its own
+ * Drawing files going up on `useDirectUpload`: each with its own
  * progress, cancel and retry. A file the browser can already refuse (a
  * ZIP, over 100 MB) becomes an error row without a request. Uploads still
  * running when the screen goes away are cancelled.
