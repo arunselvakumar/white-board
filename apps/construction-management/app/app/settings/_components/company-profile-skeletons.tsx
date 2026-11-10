@@ -5,7 +5,7 @@ import {
   SkeletonText,
 } from "@repo/ui/components/skeleton-kit";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { AdvancedSettings } from "@/components/settings/advanced-settings";
 
 /**

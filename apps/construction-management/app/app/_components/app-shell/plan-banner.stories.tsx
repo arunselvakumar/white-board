@@ -9,7 +9,7 @@ import {
   noPlanView,
 } from "@/components/subscription/subscription-story-fixtures";
 
-import { signInAs } from "../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 import { PlanBanner } from "./plan-banner";
 
 const meta = {

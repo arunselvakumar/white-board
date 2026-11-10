@@ -6,7 +6,7 @@ import {
   SkeletonText,
 } from "@repo/ui/components/skeleton-kit";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 
 /** My Profile and its account sections while they load (ADR-0047). */
 

@@ -18,7 +18,7 @@ import {
 import {
   PageHeader,
   type PageHeaderBack,
-} from "@/components/app-shell/page-header";
+} from "@/app/app/_components/app-shell/page-header";
 import { FieldError } from "@/components/auth/field-error";
 import { formatPaise } from "@/components/money/money-input";
 import { formatDate } from "@/components/payments/payment-format";

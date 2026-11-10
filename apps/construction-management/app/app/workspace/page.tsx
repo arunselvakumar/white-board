@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
-import { WorkspaceIndex } from "@/components/app-shell/workspace-index";
+import { WorkspaceIndex } from "@/app/app/workspace/_components/workspace-index";
 
 export const metadata: Metadata = { title: "Workspace" };
 

@@ -8,8 +8,8 @@ import {
 } from "@repo/ui/components/skeleton-kit";
 import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/tabs";
 
-import { PageHeader } from "@/components/app-shell/page-header";
-import { PageHeaderSkeleton } from "@/components/app-shell/page-header-skeleton";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
+import { PageHeaderSkeleton } from "@/app/app/_components/app-shell/page-header-skeleton";
 import { STAFF_PATH } from "@/lib/staff-nav";
 
 /** Human Resources → Staff while it loads (ADR-0047). */

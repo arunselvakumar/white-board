@@ -3,7 +3,7 @@
 import { useActiveCompany } from "@repo/auth/construction/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { NotificationSettings } from "@/components/profile/notification-settings";
 import { myProfileQuery } from "@/src/queries/my-profile";
 

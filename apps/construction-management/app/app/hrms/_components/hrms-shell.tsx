@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import { cn } from "@repo/ui/lib/utils";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { HrmsAccessBoundary } from "@/app/app/hrms/_components/hrms-parts";
 import {
   HRMS_PATH,

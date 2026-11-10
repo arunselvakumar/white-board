@@ -23,8 +23,8 @@ import { cn } from "@repo/ui/lib/utils";
 import {
   PageHeader,
   type PageHeaderBack,
-} from "@/components/app-shell/page-header";
-import { PageHeaderSkeleton } from "@/components/app-shell/page-header-skeleton";
+} from "@/app/app/_components/app-shell/page-header";
+import { PageHeaderSkeleton } from "@/app/app/_components/app-shell/page-header-skeleton";
 import {
   STOCK_REGISTER_COLUMNS,
   STOCK_REGISTER_LABELS,

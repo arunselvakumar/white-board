@@ -2,7 +2,7 @@ import { protectCompany } from "@repo/auth/construction/server";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { AppShell } from "@/components/app-shell/app-shell";
+import { AppShell } from "@/app/app/_components/app-shell/app-shell";
 import { QuerySuspense } from "@/components/query-suspense";
 import {
   CHANGE_PASSWORD_PATH,

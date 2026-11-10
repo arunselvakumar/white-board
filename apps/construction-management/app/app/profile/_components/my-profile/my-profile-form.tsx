@@ -16,7 +16,7 @@ import {
   needsRevealCode,
   RevealCodeDialog,
 } from "@/components/account/reveal-code-dialog";
-import { initials } from "@/components/app-shell/user-menu";
+import { initials } from "@/app/app/_components/app-shell/user-menu";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MobileField } from "@/components/auth/mobile-field";

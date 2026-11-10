@@ -27,7 +27,7 @@ import {
 import {
   PageHeader,
   type PageHeaderBack,
-} from "@/components/app-shell/page-header";
+} from "@/app/app/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
 import { ConfirmDeleteDialog } from "@/app/app/_components/masters/master-list-parts";
 import { formatPaise } from "@/components/money/money-input";

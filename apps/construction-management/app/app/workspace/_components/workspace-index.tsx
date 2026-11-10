@@ -1,6 +1,6 @@
 import { ItemGroup } from "@repo/ui/components/item";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { CentralPaymentWorkspaceTile } from "@/app/app/workspace/_components/central-payment-workspace-tile";
 import { PartyBalanceWorkspaceTile } from "@/app/app/workspace/_components/party-balance-workspace-tile";
 import { CentralReportsWorkspaceTile } from "@/app/app/workspace/_components/central-reports-workspace-tile";

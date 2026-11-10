@@ -25,7 +25,7 @@ import {
   TableRow,
 } from "@repo/ui/components/table";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
 import {
   DocumentActivity,

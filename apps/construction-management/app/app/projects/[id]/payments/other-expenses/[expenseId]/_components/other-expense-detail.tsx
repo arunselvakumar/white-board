@@ -15,7 +15,7 @@ import {
 } from "@repo/ui/components/alert-dialog";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
 import { FinanceDocumentActivity } from "@/app/app/projects/[id]/payments/_components/finance-document-activity";
 import { formatDate, money } from "@/components/payments/payment-format";

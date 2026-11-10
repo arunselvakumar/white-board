@@ -37,7 +37,7 @@ import { projectIdFromPath } from "@/lib/project-nav";
 
 import { APP_NAV_ICONS } from "./app-nav-icons";
 import type { AreaNavGroup } from "./area-nav-menu";
-import { BrandMark } from "./brand-mark";
+import { BrandMark } from "@/components/app-shell/brand-mark";
 import {
   HumanResourcesNavMenu,
   humanResourcesGroups,

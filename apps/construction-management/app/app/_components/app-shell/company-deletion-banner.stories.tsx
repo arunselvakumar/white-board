@@ -1,12 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor } from "storybook/test";
 
-import { signInAs } from "../../.storybook/mocks/auth";
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
+import { signInAs } from "@/.storybook/mocks/auth";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { CompanyDeletionBanner } from "./company-deletion-banner";
 
 const PATH = "/api/construction/organization/company-deletion";

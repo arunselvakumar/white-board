@@ -12,7 +12,7 @@ import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import { Textarea } from "@repo/ui/components/textarea";
 
-import { initials } from "@/components/app-shell/user-menu";
+import { initials } from "@/app/app/_components/app-shell/user-menu";
 import { FormAlert } from "@/components/auth/form-alert";
 import { FileViewer } from "@/app/app/_components/projects/files/file-viewer";
 import { useDirectUpload } from "@/app/app/_components/uploads/use-direct-upload";

@@ -1,6 +1,6 @@
 import { HardHat, Wrench, type LucideIcon } from "lucide-react";
 
-import type { PageHeaderBack } from "@/components/app-shell/page-header";
+import type { PageHeaderBack } from "@/app/app/_components/app-shell/page-header";
 import type { LookupList } from "@/src/queries/masters";
 
 /** The words and icon of a name-only masters list screen. */

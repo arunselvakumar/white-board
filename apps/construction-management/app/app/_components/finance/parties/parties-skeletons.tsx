@@ -9,7 +9,7 @@ import {
 } from "@repo/ui/components/skeleton-kit";
 import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/tabs";
 
-import { PageHeaderSkeleton } from "@/components/app-shell/page-header-skeleton";
+import { PageHeaderSkeleton } from "@/app/app/_components/app-shell/page-header-skeleton";
 import {
   ResponsiveListSkeleton,
   SummaryTilesSkeleton,
