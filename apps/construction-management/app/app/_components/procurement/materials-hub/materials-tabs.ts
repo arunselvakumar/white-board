@@ -1,7 +1,7 @@
 import type { ProcurementAccessMenu } from "@/app/api/construction/procurement/access/access-models";
 
 /**
- * The tabs of a Project's Materials module (M5), in order. `segment` is
+ * The tabs of a Project's Materials module, in order. `segment` is
  * the path under `/app/projects/<id>/materials/`; a tab shows when the
  * viewer has Read on its menu.
  */

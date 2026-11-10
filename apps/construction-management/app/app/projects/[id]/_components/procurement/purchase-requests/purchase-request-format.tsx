@@ -5,7 +5,7 @@ import {
   type LocationRef,
 } from "@/src/shared-kernel/location-ref";
 
-/** Words and badges the Purchase Request screens share (CM-503). */
+/** Words and badges the Purchase Request screens share. */
 
 export const APPROVAL_LABELS = {
   pending: "Pending",

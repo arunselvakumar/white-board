@@ -133,9 +133,9 @@ function itemsLine(pr: PurchaseRequest): string {
 }
 
 /**
- * A Project's Purchase Requests (CM-503): filters by date, status chip,
- * category, material, creator and location type; bulk approval mode;
- * row actions. Add Purchase Request opens the three-step wizard.
+ * A Project's Purchase Requests: filters by date, status chip, category,
+ * material, creator and location type; bulk approval mode; row actions.
+ * Add Purchase Request opens the three-step wizard.
  */
 export function PurchaseRequestsPage({
   projectId,

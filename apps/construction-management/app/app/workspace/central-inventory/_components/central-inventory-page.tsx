@@ -260,10 +260,10 @@ function Ledger({ filter }: { filter: StockLedgerFilter }) {
 }
 
 /**
- * Workspace → Central Inventory (CM-509): stock per material at every
- * Project and Store with what is in transit, filtered by location,
- * category and stock state; and the Stock Ledger for a period, on screen
- * and as an Excel file (Central Inventory print).
+ * Central Inventory: stock per material at every Project and Store with
+ * what is in transit, filtered by location, category and stock state; and
+ * the Stock Ledger for a period, on screen and as an Excel file (Central
+ * Inventory print).
  */
 export function CentralInventoryPage() {
   // Filter changes keep the current list on screen, dimmed, while the next

@@ -6,7 +6,7 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Material Transfer" };
 
-/** One Material Transfer seen from a Central Store (CM-507). */
+/** One Material Transfer seen from a Central Store. */
 export default async function StoreTransferRoute({
   params,
 }: {

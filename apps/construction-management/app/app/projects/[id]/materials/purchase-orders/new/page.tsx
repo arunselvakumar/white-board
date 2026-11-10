@@ -6,7 +6,7 @@ import { PurchaseOrderFormSkeleton } from "@/app/app/_components/procurement/pro
 
 export const metadata: Metadata = { title: "Add Purchase Order" };
 
-/** Add Purchase Order; Generate PO passes `?purchaseRequestId=` (CM-504). */
+/** Add Purchase Order; Generate PO passes `?purchaseRequestId=`. */
 export default async function Page({
   params,
   searchParams,

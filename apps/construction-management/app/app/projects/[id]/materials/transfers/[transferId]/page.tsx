@@ -6,7 +6,7 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Material Transfer" };
 
-/** One Material Transfer (CM-507); the route checks Read on either side. */
+/** One Material Transfer; the route checks Read on either side. */
 export default async function ProjectTransferRoute({
   params,
 }: {

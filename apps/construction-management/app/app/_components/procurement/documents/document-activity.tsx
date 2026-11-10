@@ -6,8 +6,8 @@ import { DocumentFilesView } from "./document-files-view";
 import { DocumentThreadView } from "./document-thread-view";
 
 /**
- * The contract every procurement detail page renders (M5). Pages only
- * place these and pass these props; each section loads its own data
+ * The contract every procurement detail page renders. Pages only place
+ * these and pass these props; each section loads its own data
  * (`src/queries/procurement-documents.ts`), shows a skeleton while it
  * does, and a "Try again" in place when it fails.
  */

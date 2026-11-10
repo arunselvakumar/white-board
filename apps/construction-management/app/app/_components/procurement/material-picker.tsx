@@ -25,7 +25,7 @@ import { CreateMaterialDialog } from "./material-picker-create-dialog";
 import { PickerOptionsSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 /**
- * Picks one Material for a procurement line (M5). Contract shared by every
+ * Picks one Material for a procurement line. Contract shared by every
  * procurement form: keep these props.
  */
 export type MaterialPickerProps = {
@@ -105,9 +105,9 @@ function useDebounced<T>(value: T, delay: number): T {
 }
 
 /**
- * A searchable Material combobox (CM-501). Typing searches the server by
- * name or specification (the first 50 matches); the chosen Material always
- * shows by name, loaded by id when it is not on the page. With
+ * A searchable Material combobox. Typing searches the server by name or
+ * specification (the first 50 matches); the chosen Material always shows
+ * by name, loaded by id when it is not on the page. With
  * `allowCreate`, "Create New" adds a Material to the master and picks it.
  */
 export function MaterialPicker({

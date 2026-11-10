@@ -163,13 +163,12 @@ function toInput(values: PurchaseRequestFormValues, approve: boolean) {
 }
 
 /**
- * Add or edit a Purchase Request in three steps (CM-503): **Materials**
- * (pick with Create New, View Selected), **Quantity** (with Available
- * Stock and Balanced estimated qty; one Common Remark or a remark per
- * item), **Details** (date, location, Required Date, remark, the
- * "Upload Required Materials List" attachment). Save, or Save & Approve
- * for approvers. Mode B preloads `initialMaterialIds` from Current
- * Inventory.
+ * Add or edit a Purchase Request in three steps: **Materials** (pick with
+ * Create New, View Selected), **Quantity** (with Available Stock and
+ * Balanced estimated qty; one Common Remark or a remark per item),
+ * **Details** (date, location, Required Date, remark, the "Upload Required
+ * Materials List" attachment). Save, or Save & Approve for approvers. Mode
+ * B preloads `initialMaterialIds` from Current Inventory.
  */
 export function PurchaseRequestWizard({
   projectId,

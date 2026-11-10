@@ -87,9 +87,9 @@ function messageOf(error: unknown): string | undefined {
 }
 
 /**
- * The material picker's Create New (CM-501): adds a Material to the master
- * with a name, its Measurement Unit and an optional Material Category, then
- * hands it back for the line. Rate Details stay on the Materials screen.
+ * The material picker's Create New: adds a Material to the master with a
+ * name, its Measurement Unit and an optional Material Category, then hands
+ * it back for the line. Rate Details stay on the Materials screen.
  */
 export function CreateMaterialDialog({
   name,

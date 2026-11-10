@@ -10,7 +10,7 @@ import {
 import { MATERIALS_TABS, materialsPath } from "./materials-tabs";
 
 /**
- * The Materials module's tabs as sidebar submenu links (M5, ADR CM-0020).
+ * The Materials module's tabs as sidebar submenu links (ADR CM-0020).
  * Access loads only while `enabled` (the submenu is open); until it does
  * every tab shows, then only those whose menu the viewer may read.
  */

@@ -39,9 +39,9 @@ export function generatePurchaseOrderPath(projectId: string, prId: string) {
 }
 
 /**
- * What can be done with one Purchase Request (CM-503), from its
- * `actions`: View, Edit, Approve, Reject, Mark as Ordered, Generate PO,
- * PDF and Delete — a menu on list rows, buttons on the detail page.
+ * What can be done with one Purchase Request, from its `actions`: View,
+ * Edit, Approve, Reject, Mark as Ordered, Generate PO, PDF and Delete — a
+ * menu on list rows, buttons on the detail page.
  */
 export function PurchaseRequestActions({
   pr,
