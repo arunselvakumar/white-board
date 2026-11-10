@@ -17,7 +17,7 @@ import {
   PROJECT_ID,
   SQM_ID,
   TODAY,
-} from "@/components/site-work/worksheets/worksheet-fixtures";
+} from "@/app/app/projects/[id]/equipment/usage-sheets/_components/worksheet-fixtures";
 import {
   SITE_WORK_ACCESS_MENUS,
   type SiteWorkAccessMenu,

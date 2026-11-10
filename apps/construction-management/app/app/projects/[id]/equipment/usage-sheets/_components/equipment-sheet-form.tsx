@@ -51,7 +51,7 @@ import { PendingFilesField } from "@/app/app/projects/[id]/_components/site-work
 import { useUploadPendingFiles } from "@/app/app/projects/[id]/_components/site-work/documents/use-upload-pending-files";
 import { equipmentModulePath } from "@/app/app/_components/site-work/equipment/equipment-tabs";
 import { RadioCard } from "@/app/app/_components/site-work/equipment/radio-card";
-import { quantityText } from "@/components/site-work/worksheets/worksheet-format";
+import { quantityText } from "@/app/app/projects/[id]/_components/site-work/worksheets/worksheet-format";
 import {
   equipmentSheetFormOptionsQuery,
   equipmentSheetStockQuery,

@@ -58,7 +58,7 @@ import {
   SheetApprovalBadge,
   shiftLabel,
   worksheetsPath,
-} from "./worksheet-format";
+} from "@/app/app/projects/[id]/_components/site-work/worksheets/worksheet-format";
 import { WorksheetSettingsDialog } from "./worksheet-settings-dialog";
 import { WorksheetRowsSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
 

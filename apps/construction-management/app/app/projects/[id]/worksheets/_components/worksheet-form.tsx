@@ -73,7 +73,7 @@ import {
 
 import { BulkSelectDialog } from "./bulk-select-dialog";
 import { WorksheetAttendancePanel } from "./worksheet-attendance-panel";
-import { quantityText } from "./worksheet-format";
+import { quantityText } from "@/app/app/projects/[id]/_components/site-work/worksheets/worksheet-format";
 import {
   WorksheetTaskPicker,
   type WorksheetTaskChoice,

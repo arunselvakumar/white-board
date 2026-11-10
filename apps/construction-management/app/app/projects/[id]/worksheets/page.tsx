@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
-import { WorksheetsPage } from "@/components/site-work/worksheets/worksheets-page";
+import { WorksheetsPage } from "@/app/app/projects/[id]/worksheets/_components/worksheets-page";
 
 export const metadata: Metadata = { title: "Daily Worksheet" };
 

@@ -36,7 +36,7 @@ import { ReasonDialog } from "@/app/app/projects/[id]/_components/procurement/pu
 import {
   SheetApprovalBadge,
   shiftLabel,
-} from "@/components/site-work/worksheets/worksheet-format";
+} from "@/app/app/projects/[id]/_components/site-work/worksheets/worksheet-format";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   equipmentSheetSettingsQuery,

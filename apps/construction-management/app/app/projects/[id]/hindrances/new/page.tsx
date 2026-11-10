@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
-import { HindranceNew } from "@/components/site-work/hindrances/hindrance-pages";
+import { HindranceNew } from "@/app/app/projects/[id]/hindrances/_components/hindrance-pages";
 
 export const metadata: Metadata = { title: "Record hindrance" };
 

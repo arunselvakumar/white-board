@@ -1,12 +1,12 @@
 import type { SiteWorkAccessMenu } from "@/app/api/construction/site-work/access/access-models";
-import { siteWorkAccess } from "@/components/site-work/site-diary/site-diary-fixtures";
+import { siteWorkAccess } from "@/app/app/projects/[id]/_components/site-work/site-diary/site-diary-fixtures";
 import type {
   ProgressReport,
   ProgressReportFormOptions,
 } from "@/src/queries/progress-reports";
 import type { Flag } from "@/src/shared-kernel/access";
 
-import type { ApiCall } from "../../../.storybook/mocks/api";
+import type { ApiCall } from "@/.storybook/mocks/api";
 
 export const PROGRESS_PROJECT_ID = "0199c4a0-0000-7000-8000-0000000d0001";
 export const PROGRESS_TODAY = "2026-10-11";

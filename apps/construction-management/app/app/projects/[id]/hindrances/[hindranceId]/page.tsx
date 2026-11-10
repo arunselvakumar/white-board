@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
-import { HindranceDetail } from "@/components/site-work/hindrances/hindrance-detail";
+import { HindranceDetail } from "@/app/app/projects/[id]/hindrances/[hindranceId]/_components/hindrance-detail";
 import { HindranceDetailSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 

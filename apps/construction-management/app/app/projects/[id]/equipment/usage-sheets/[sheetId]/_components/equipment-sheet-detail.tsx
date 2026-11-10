@@ -23,7 +23,7 @@ import {
   quantityText,
   SheetApprovalBadge,
   shiftLabel,
-} from "@/components/site-work/worksheets/worksheet-format";
+} from "@/app/app/projects/[id]/_components/site-work/worksheets/worksheet-format";
 import {
   equipmentSheetQuery,
   equipmentSheetsPath,
