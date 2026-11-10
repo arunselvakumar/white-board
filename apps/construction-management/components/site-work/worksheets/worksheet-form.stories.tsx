@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
 import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
-import { pickMaterial } from "@/components/procurement/material-options-fixtures";
+import { pickMaterial } from "@/app/app/_components/procurement/material-options-fixtures";
 import { WORKSHEETS_API } from "@/src/queries/worksheets";
 
 import {

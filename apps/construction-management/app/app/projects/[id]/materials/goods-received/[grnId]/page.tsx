@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { GoodsReceiptDetail } from "@/components/procurement/goods-receipts/goods-receipt-detail";
-import { GoodsReceiptDetailSkeleton } from "@/components/procurement/procurement-skeletons";
+import { GoodsReceiptDetailSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Goods Receipt" };

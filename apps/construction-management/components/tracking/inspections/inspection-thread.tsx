@@ -9,7 +9,7 @@ import { Textarea } from "@repo/ui/components/textarea";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { DocumentSection } from "@/components/procurement/documents/document-section";
+import { DocumentSection } from "@/app/app/_components/procurement/documents/document-section";
 import { TrackingEntryFilesField } from "@/components/tracking/documents/tracking-entry-files-field";
 import { TrackingFileStrip } from "@/components/tracking/documents/tracking-file-strip";
 import { fieldForCode } from "@/lib/server-errors";

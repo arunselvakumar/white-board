@@ -17,12 +17,12 @@ import { FormAlert } from "@/components/auth/form-alert";
 import { FileViewer } from "@/app/app/_components/projects/files/file-viewer";
 import { useDirectUpload } from "@/app/app/_components/uploads/use-direct-upload";
 import { formatBytes } from "@/lib/project-documents";
-import { FileChip } from "@/components/procurement/documents/document-file-parts";
-import { DocumentSection } from "@/components/procurement/documents/document-section";
+import { FileChip } from "@/app/app/_components/procurement/documents/document-file-parts";
+import { DocumentSection } from "@/app/app/_components/procurement/documents/document-section";
 import {
   remarkFullTime,
   remarkTime,
-} from "@/components/procurement/documents/document-time";
+} from "@/app/app/_components/procurement/documents/document-time";
 import { APPROVAL_LIMITS } from "@/src/shared-kernel/approval";
 import { uploadErrorMessage } from "@/src/queries/direct-upload";
 import {

@@ -12,7 +12,7 @@ import { cn } from "@repo/ui/lib/utils";
 import {
   FilterBarSkeleton,
   ResponsiveListSkeleton,
-} from "@/components/procurement/procurement-skeletons";
+} from "@/app/app/_components/procurement/procurement-skeletons";
 import { SiteRecordHeaderSkeleton } from "@/components/site-work/site-work-skeletons";
 
 /*

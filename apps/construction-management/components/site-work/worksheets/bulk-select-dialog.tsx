@@ -15,7 +15,7 @@ import {
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 
-import { materialDetail } from "@/components/procurement/material-picker";
+import { materialDetail } from "@/app/app/_components/procurement/material-picker";
 import {
   materialOptionsQuery,
   type MaterialOption,

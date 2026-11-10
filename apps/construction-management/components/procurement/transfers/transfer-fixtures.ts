@@ -1,8 +1,8 @@
 import { mockApi, type ApiCall } from "../../../.storybook/mocks/api";
 import type { ProcurementAccessMenu } from "@/app/api/construction/procurement/access/access-models";
-import { documentsHandler } from "@/components/procurement/documents/document-fixtures";
+import { documentsHandler } from "@/app/app/_components/procurement/documents/document-fixtures";
 import { procurementAccess } from "@/components/procurement/inventory/inventory-fixtures";
-import { materialOptionsHandler } from "@/components/procurement/material-options-fixtures";
+import { materialOptionsHandler } from "@/app/app/_components/procurement/material-options-fixtures";
 import type { Flag } from "@/src/shared-kernel/access";
 import type {
   MaterialTransfer,

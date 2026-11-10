@@ -28,7 +28,7 @@ import {
   QUANTITY_PATTERN,
 } from "@/components/procurement/inventory/inventory-format";
 import { StockErrorAlert } from "@/components/procurement/inventory/stock-error-alert";
-import { MaterialPicker } from "@/components/procurement/material-picker";
+import { MaterialPicker } from "@/app/app/_components/procurement/material-picker";
 import type { StockLocation } from "@/src/procurement/domain/stock-location";
 import { QueryHttpError } from "@/src/queries/http";
 import { materialOptionsQuery } from "@/src/queries/material-options";

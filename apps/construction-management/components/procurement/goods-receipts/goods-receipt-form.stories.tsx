@@ -23,7 +23,7 @@ import {
   EditGoodsReceiptScreen,
   NewGoodsReceiptScreen,
 } from "./goods-receipt-form";
-import { pickMaterial } from "../material-options-fixtures";
+import { pickMaterial } from "@/app/app/_components/procurement/material-options-fixtures";
 
 let api: ReturnType<typeof mockApi>;
 

@@ -10,7 +10,7 @@ import {
 } from "@/components/procurement/stores/central-store-fixtures";
 
 import { MaterialRequestForm } from "./material-request-form";
-import { pickMaterial } from "../material-options-fixtures";
+import { pickMaterial } from "@/app/app/_components/procurement/material-options-fixtures";
 
 let api: ReturnType<typeof mockCentralStoreApi>;
 

@@ -41,8 +41,8 @@ import {
   DateFilter,
   NO_DATE_FILTER,
   type DateFilterValue,
-} from "@/components/procurement/purchase-requests/date-filter";
-import { FilterSelect } from "@/components/procurement/purchase-requests/filter-select";
+} from "@/app/app/projects/[id]/_components/procurement/purchase-requests/date-filter";
+import { FilterSelect } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/filter-select";
 import { QueryHttpError } from "@/src/queries/http";
 import { locationOptionsQuery } from "@/src/queries/location-options";
 import {

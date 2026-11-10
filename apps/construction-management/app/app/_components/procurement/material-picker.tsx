@@ -22,7 +22,7 @@ import {
 } from "@/src/queries/material-options";
 
 import { CreateMaterialDialog } from "./material-picker-create-dialog";
-import { PickerOptionsSkeleton } from "@/components/procurement/procurement-skeletons";
+import { PickerOptionsSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 /**
  * Picks one Material for a procurement line (M5). Contract shared by every

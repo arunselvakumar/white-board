@@ -56,7 +56,7 @@ import {
   lostSummary,
   partyLabel,
 } from "./hindrance-parts";
-import { FactValueSkeleton } from "@/components/procurement/procurement-skeletons";
+import { FactValueSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 function Fact({
   label,

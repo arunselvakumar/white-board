@@ -28,7 +28,7 @@ import {
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { MaterialPicker } from "@/components/procurement/material-picker";
+import { MaterialPicker } from "@/app/app/_components/procurement/material-picker";
 import { fieldForCode } from "@/lib/server-errors";
 import { lookupListQuery } from "@/src/queries/masters";
 import {

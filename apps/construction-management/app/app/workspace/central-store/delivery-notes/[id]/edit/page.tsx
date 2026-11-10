@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { EditDeliveryNotePage } from "@/components/procurement/delivery-notes/edit-delivery-note-page";
-import { DeliveryNoteFormSkeleton } from "@/components/procurement/procurement-skeletons";
+import { DeliveryNoteFormSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Edit Delivery Note" };

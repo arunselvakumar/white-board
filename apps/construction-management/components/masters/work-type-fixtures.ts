@@ -2,7 +2,7 @@ import type { ApiCall } from "../../.storybook/mocks/api";
 import {
   materialOptionsHandler,
   MATERIAL_OPTIONS,
-} from "@/components/procurement/material-options-fixtures";
+} from "@/app/app/_components/procurement/material-options-fixtures";
 import type { WorkTypeItem } from "@/src/queries/work-types";
 
 import { STORY_DEPARTMENTS } from "./masters-story-support";

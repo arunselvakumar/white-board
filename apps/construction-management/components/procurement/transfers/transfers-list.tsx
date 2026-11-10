@@ -51,7 +51,7 @@ import {
 } from "@/src/queries/material-transfers";
 
 import { TransferStatusBadge, useTransferSideCan } from "./transfer-parts";
-import { TransferRowsSkeleton } from "@/components/procurement/procurement-skeletons";
+import { TransferRowsSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 const DIRECTIONS = [
   { value: "all", label: "All", icon: LayoutGrid },

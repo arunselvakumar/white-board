@@ -5,7 +5,7 @@ import { QuerySuspense } from "@/components/query-suspense";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
 import { EditWorksheetPage } from "@/components/site-work/worksheets/worksheet-form-pages";
 import { WorksheetFormSkeleton } from "@/components/site-work/site-work-skeletons";
-import { EditDocumentSkeleton } from "@/components/procurement/procurement-skeletons";
+import { EditDocumentSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 export const metadata: Metadata = { title: "Edit Worksheet" };
 

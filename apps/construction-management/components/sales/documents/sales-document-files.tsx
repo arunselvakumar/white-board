@@ -18,7 +18,7 @@ import { Input } from "@repo/ui/components/input";
 import { Progress } from "@repo/ui/components/progress";
 
 import { FormAlert } from "@/components/auth/form-alert";
-import { DocumentSection } from "@/components/procurement/documents/document-section";
+import { DocumentSection } from "@/app/app/_components/procurement/documents/document-section";
 import { DocumentFileIcon } from "@/app/app/_components/projects/documents/document-file-icon";
 import { FileThumbnail } from "@/app/app/_components/projects/files/file-thumbnail";
 import {

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { PurchaseRequestWizard } from "@/components/procurement/purchase-requests/purchase-request-wizard";
+import { PurchaseRequestWizard } from "@/app/app/projects/[id]/materials/purchase-requests/_components/purchase-request-wizard";
 
 export const metadata: Metadata = { title: "Add Purchase Request" };
 

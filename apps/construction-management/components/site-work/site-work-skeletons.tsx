@@ -17,7 +17,7 @@ import { PageHeaderSkeleton } from "@/components/app-shell/page-header-skeleton"
 import {
   DocumentDetailSkeleton,
   ResponsiveListSkeleton,
-} from "@/components/procurement/procurement-skeletons";
+} from "@/app/app/_components/procurement/procurement-skeletons";
 
 /*
  * Site work while it loads (ADR-0047): worksheets, equipment, hindrances,

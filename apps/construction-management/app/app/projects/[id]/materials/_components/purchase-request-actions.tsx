@@ -28,7 +28,7 @@ import {
   type PurchaseRequest,
 } from "@/src/queries/purchase-requests";
 
-import { ReasonDialog } from "./reason-dialog";
+import { ReasonDialog } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/reason-dialog";
 
 export function purchaseRequestsPath(projectId: string, rest = ""): string {
   return `/app/projects/${encodeURIComponent(projectId)}/materials/purchase-requests${rest}`;

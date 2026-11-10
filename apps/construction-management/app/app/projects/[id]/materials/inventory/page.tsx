@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { InventoryPage } from "@/components/procurement/inventory/inventory-page";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
-import { InventorySkeleton } from "@/components/procurement/procurement-skeletons";
+import { InventorySkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Current Inventory" };

@@ -1,5 +1,5 @@
 import { mockApi, type ApiCall } from "../../../.storybook/mocks/api";
-import { materialOptionsHandler } from "@/components/procurement/material-options-fixtures";
+import { materialOptionsHandler } from "@/app/app/_components/procurement/material-options-fixtures";
 import {
   mockSiteWorkDocumentApi,
   type SiteWorkDocumentApiOptions,

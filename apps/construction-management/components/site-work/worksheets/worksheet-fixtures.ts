@@ -2,7 +2,7 @@ import { mockApi, type ApiCall } from "../../../.storybook/mocks/api";
 import {
   MATERIAL_OPTIONS,
   materialOptionsHandler,
-} from "@/components/procurement/material-options-fixtures";
+} from "@/app/app/_components/procurement/material-options-fixtures";
 import {
   mockSiteWorkDocumentApi,
   type SiteWorkDocumentApiOptions,

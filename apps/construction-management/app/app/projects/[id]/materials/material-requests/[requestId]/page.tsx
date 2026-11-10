@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { MaterialRequestDetail } from "@/components/procurement/material-requests/material-request-detail";
-import { MaterialRequestDetailSkeleton } from "@/components/procurement/procurement-skeletons";
+import { MaterialRequestDetailSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Material Request" };

@@ -1,12 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../../.storybook/mocks/api";
-import { PurchaseRequestDetailPage } from "./purchase-request-detail";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
+import { PurchaseRequestDetailPage } from "../[prId]/_components/purchase-request-detail";
 import {
   CEMENT,
   PARTLY_ORDERED_PR,
@@ -18,10 +14,10 @@ import {
   STEEL,
   TODAY,
   type PrApiOptions,
-} from "./purchase-request-fixtures";
+} from "@/app/app/projects/[id]/materials/_components/purchase-request-fixtures";
 import { PurchaseRequestWizard } from "./purchase-request-wizard";
 import { PurchaseRequestsPage } from "./purchase-requests-page";
-import { pickMaterial } from "../material-options-fixtures";
+import { pickMaterial } from "@/app/app/_components/procurement/material-options-fixtures";
 
 let api: ReturnType<typeof mockApi>;
 

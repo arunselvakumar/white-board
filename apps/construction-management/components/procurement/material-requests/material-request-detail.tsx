@@ -32,7 +32,7 @@ import { DeliveryNotesList } from "@/components/procurement/delivery-notes/deliv
 import {
   DocumentActivity,
   DocumentFiles,
-} from "@/components/procurement/documents/document-activity";
+} from "@/app/app/_components/procurement/documents/document-activity";
 import {
   centralStoreHref,
   formatDate,
@@ -58,7 +58,7 @@ import type { LocationRef } from "@/src/shared-kernel/location-ref";
 import {
   FactValueSkeleton,
   RequestRowsSkeleton,
-} from "@/components/procurement/procurement-skeletons";
+} from "@/app/app/_components/procurement/procurement-skeletons";
 
 class Quiet extends Component<
   { children: ReactNode; fallback: ReactNode },

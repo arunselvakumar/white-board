@@ -1,10 +1,10 @@
-import type { ApiCall } from "../../../.storybook/mocks/api";
+import type { ApiCall } from "@/.storybook/mocks/api";
 import { PROCUREMENT_ACCESS_MENUS } from "@/app/api/construction/procurement/access/access-models";
-import { documentsHandler } from "@/components/procurement/documents/document-fixtures";
+import { documentsHandler } from "@/app/app/_components/procurement/documents/document-fixtures";
 import {
   MATERIAL_OPTIONS,
   materialOptionsHandler,
-} from "@/components/procurement/material-options-fixtures";
+} from "@/app/app/_components/procurement/material-options-fixtures";
 import type { LocationOptions } from "@/src/queries/location-options";
 import type { ProcurementAccess } from "@/src/queries/procurement-access";
 import type {

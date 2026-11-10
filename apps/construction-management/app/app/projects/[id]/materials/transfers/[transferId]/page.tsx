@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { ProjectTransferDetail } from "@/components/procurement/transfers/project-transfer-pages";
-import { TransferDetailSkeleton } from "@/components/procurement/procurement-skeletons";
+import { TransferDetailSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Material Transfer" };

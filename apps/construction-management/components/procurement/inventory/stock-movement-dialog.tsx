@@ -19,7 +19,7 @@ import { Label } from "@repo/ui/components/label";
 
 import { FieldError } from "@/components/auth/field-error";
 import { LocationPicker } from "@/app/app/_components/locations/location-picker";
-import { MaterialPicker } from "@/components/procurement/material-picker";
+import { MaterialPicker } from "@/app/app/_components/procurement/material-picker";
 import type { StockLocation } from "@/src/procurement/domain/stock-location";
 import { useRecordMovements } from "@/src/queries/inventory";
 import type { LocationRef } from "@/src/shared-kernel/location-ref";

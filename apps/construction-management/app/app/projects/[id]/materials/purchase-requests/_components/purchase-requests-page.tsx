@@ -56,12 +56,12 @@ import {
   DateFilter,
   NO_DATE_FILTER,
   type DateFilterValue,
-} from "./date-filter";
-import { FilterSelect } from "./filter-select";
+} from "@/app/app/projects/[id]/_components/procurement/purchase-requests/date-filter";
+import { FilterSelect } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/filter-select";
 import {
   purchaseRequestsPath,
   PurchaseRequestActions,
-} from "./purchase-request-actions";
+} from "@/app/app/projects/[id]/materials/_components/purchase-request-actions";
 import {
   ApprovalBadge,
   chipFilter,
@@ -69,9 +69,9 @@ import {
   quantityText,
   STATUS_CHIPS,
   type StatusChip,
-} from "./purchase-request-format";
-import { ReasonDialog } from "./reason-dialog";
-import { PurchaseRequestRowsSkeleton } from "@/components/procurement/procurement-skeletons";
+} from "@/app/app/projects/[id]/_components/procurement/purchase-requests/purchase-request-format";
+import { ReasonDialog } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/reason-dialog";
+import { PurchaseRequestRowsSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 const STATUS_ICONS: Record<StatusChip, LucideIcon> = {
   all: LayoutGrid,

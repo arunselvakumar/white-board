@@ -47,7 +47,7 @@ import {
   goodsReceivedPath,
   money,
 } from "./goods-receipt-parts";
-import { GoodsReceiptRowsSkeleton } from "@/components/procurement/procurement-skeletons";
+import { GoodsReceiptRowsSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 const PO_FILTERS = [
   { value: "all", label: "All", icon: LayoutGrid },

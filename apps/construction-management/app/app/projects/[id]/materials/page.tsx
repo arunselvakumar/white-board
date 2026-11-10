@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { materialsPath } from "@/components/procurement/materials-hub/materials-tabs";
+import { materialsPath } from "@/app/app/_components/procurement/materials-hub/materials-tabs";
 
 /** The Materials module opens on Current Inventory. */
 export default async function MaterialsPage({

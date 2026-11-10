@@ -42,7 +42,7 @@ import {
 } from "@/src/queries/project-dashboard";
 import { procurementDashboardQuery } from "@/src/queries/procurement-dashboard";
 
-import { materialsPath } from "@/components/procurement/materials-hub/materials-tabs";
+import { materialsPath } from "@/app/app/_components/procurement/materials-hub/materials-tabs";
 
 import { AttendanceTrend } from "./attendance-trend";
 import { Fact, Rupees, Section, Unit, denied } from "./dashboard-parts";

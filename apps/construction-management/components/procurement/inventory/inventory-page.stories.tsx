@@ -13,7 +13,10 @@ import {
   type InventoryApiOptions,
 } from "./inventory-fixtures";
 import { InventoryPage } from "./inventory-page";
-import { materialNameOf, pickMaterial } from "../material-options-fixtures";
+import {
+  materialNameOf,
+  pickMaterial,
+} from "@/app/app/_components/procurement/material-options-fixtures";
 
 let api: ReturnType<typeof mockInventoryApi>;
 

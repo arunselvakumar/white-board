@@ -24,7 +24,7 @@ import { PageHeader } from "@/components/app-shell/page-header";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { LocationPicker } from "@/app/app/_components/locations/location-picker";
-import { MaterialPicker } from "@/components/procurement/material-picker";
+import { MaterialPicker } from "@/app/app/_components/procurement/material-picker";
 import { projectRequestHref } from "@/components/procurement/stores/central-store-parts";
 import { fieldForCode } from "@/lib/server-errors";
 import {
