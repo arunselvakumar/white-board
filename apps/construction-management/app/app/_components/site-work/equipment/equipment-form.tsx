@@ -981,7 +981,6 @@ export function EquipmentForm({
   );
 }
 
-/** The add / edit page around the form. */
 export function EquipmentFormScreen({
   equipment,
   fixedProjectId,

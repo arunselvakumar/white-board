@@ -74,7 +74,10 @@ const MODULE_LABELS = new Map<string, string>(
   BACKDATED_MODULES.map((item) => [item.key, item.label]),
 );
 
-/** Back-dated Entry settings (CM-113): default limits, module overrides, Financial Closing Date. */
+/**
+ * Back-dated Entry settings: default limits, module overrides, Financial
+ * Closing Date.
+ */
 export function BackdatedEntryForm() {
   const [{ data: policy }, { data: roles }] = useSuspenseQueries({
     queries: [backdatedEntryPolicyQuery, roleOptionsQuery],

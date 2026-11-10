@@ -92,9 +92,9 @@ export function OwnerMustHandOver({
 }
 
 /**
- * Delete My Account (CM-907): a reason, DELETE typed and a code. An Owner
- * is sent to Transfer ownership or Delete Company first. Afterwards the
- * User is signed out.
+ * Delete My Account: a reason, DELETE typed and a code. An Owner is sent to
+ * Transfer ownership or Delete Company first. Afterwards the User is signed
+ * out.
  */
 export function DeleteAccountDialog({
   ownedCompanies,

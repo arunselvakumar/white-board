@@ -132,7 +132,6 @@ export const DeleteCompany: Story = {
     await expect(
       dialog.getByText(/Take a full Company backup first/),
     ).toBeVisible();
-    // CM-906: the backup is a link to Settings → Backup & export.
     await expect(
       dialog.getByRole("link", { name: "Settings → Backup & export" }),
     ).toHaveAttribute("href", "/app/settings/backup");

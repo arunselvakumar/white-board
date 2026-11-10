@@ -39,7 +39,7 @@ function toValues(setting: GrnFieldSettingData): Values {
   };
 }
 
-/** Settings → GRN fields (CM-501): which optional Goods Receipt fields are shown and printed. */
+/** Which optional Goods Receipt fields are shown and printed. */
 export function GrnFieldsForm() {
   const { data } = useSuspenseQuery(grnFieldSettingQuery);
   const queryClient = useQueryClient();

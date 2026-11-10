@@ -50,9 +50,9 @@ const SERVER_FIELDS: Record<string, keyof Values> = {
 };
 
 /**
- * Transfer ownership (CM-907): the Owner chooses an active Team Member and
- * enters a code. They become the Owner; you stay as an Admin. Afterwards
- * the app reloads, since what you may do has changed.
+ * Transfer ownership: the Owner chooses an active Team Member and enters a
+ * code. They become the Owner; you stay as an Admin. Afterwards the app
+ * reloads, since what you may do has changed.
  */
 export function TransferOwnershipDialog({
   companyName,

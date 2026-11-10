@@ -53,7 +53,7 @@ function messageOf(cause: unknown): string {
     : "Something went wrong. Please try again.";
 }
 
-/** Settings → Billing addresses (CM-501): the addresses Purchase Orders bill from. */
+/** The addresses Purchase Orders bill from. */
 export function BillingAddressesManager() {
   const { data } = useSuspenseQuery(billingAddressesQuery);
   const queryClient = useQueryClient();

@@ -271,7 +271,7 @@ function PlanCard({
   );
 }
 
-/** "Your Subscription" (CM-116): plan, expiry, usage bars, Owner actions. */
+/** "Your Subscription": plan, expiry, usage bars, Owner actions. */
 export function SubscriptionOverview() {
   const { data: view } = useSuspenseQuery(subscriptionQuery);
 

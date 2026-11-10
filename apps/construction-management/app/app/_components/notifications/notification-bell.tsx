@@ -27,11 +27,11 @@ import { BellListSkeleton } from "./notifications-skeletons";
 export const NOTIFICATIONS_PAGE = "/app/notifications";
 
 /**
- * The bell (CM-904): the unread count, polled in the background, and a
- * popover of the latest ten. The shell puts it in the sidebar's account row
- * and, on a phone, in the top bar (ADR-0050); `className` styles the button
- * for where it sits. It never suspends; a failed read shows a bell with no
- * count rather than breaking the shell.
+ * The bell: the unread count, polled in the background, and a popover of
+ * the latest ten. The shell puts it in the sidebar's account row and, on a
+ * phone, in the top bar (ADR-0050); `className` styles the button for where
+ * it sits. It never suspends; a failed read shows a bell with no count
+ * rather than breaking the shell.
  */
 export function NotificationBell({ className }: { className?: string } = {}) {
   const { workspaceId } = useCompanyAuth();

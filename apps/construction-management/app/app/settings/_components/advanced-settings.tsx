@@ -12,7 +12,7 @@ import {
 
 import { SETTINGS_SECTIONS } from "@/lib/settings-nav";
 
-/** Settings → Advanced Settings: a card per Company rule, below the profile. */
+/** A card per Company rule, below the Company profile. */
 export function AdvancedSettings() {
   return (
     <section aria-labelledby="advanced-settings-heading" className="space-y-3">

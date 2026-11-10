@@ -58,9 +58,8 @@ function deviceName(device: DeviceItem): string {
 type Confirm = { kind: "one"; device: DeviceItem } | { kind: "others" };
 
 /**
- * My Profile → Devices (CM-907, ADR CM-0021 §9): where the User is signed
- * in, this device first. Signing a device out also stops its push
- * notifications.
+ * Where the User is signed in, this device first (ADR CM-0021 §9). Signing a
+ * device out also stops its push notifications.
  */
 export function DevicesSection() {
   const queryClient = useQueryClient();

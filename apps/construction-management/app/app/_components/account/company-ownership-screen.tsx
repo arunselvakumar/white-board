@@ -160,8 +160,7 @@ function OwnerActions({ companyName }: { companyName: string }) {
 }
 
 /**
- * Masters → Settings → Company (CM-907): Transfer ownership and Delete
- * Company, the Owner's alone.
+ * Transfer ownership and Delete Company, the Owner's alone.
  */
 export function CompanyOwnershipScreen() {
   const { role } = useCompanyAuth();

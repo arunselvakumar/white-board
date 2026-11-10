@@ -176,7 +176,7 @@ function Centered({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** The checkout wizard (CM-117): plan → duration → add-ons → buyer → review and pay. */
+/** Steps: plan, duration, add-ons, buyer, then review and pay. */
 export function CheckoutWizard({ kind: requested }: { kind?: string | null }) {
   const { data: subscription } = useSuspenseQuery(subscriptionQuery);
 

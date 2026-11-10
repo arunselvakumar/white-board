@@ -1,6 +1,6 @@
 /**
- * The browser's push APIs behind one small seam, so My Profile →
- * Notifications can be shown in every state in Storybook (CM-904).
+ * The browser's push APIs behind one small seam, so the notification
+ * settings can be shown in every state in Storybook.
  */
 import { base64UrlToBytes } from "@/lib/notification-format";
 
@@ -50,7 +50,6 @@ function subscriptionInput(
   return { endpoint: json.endpoint, keys: { p256dh, auth } };
 }
 
-/** The real browser. */
 export const browserPushDevice: PushDevice = {
   isSupported: () =>
     typeof window !== "undefined" &&
