@@ -57,7 +57,7 @@ function serverErrors(caught: unknown): Errors {
 }
 
 /**
- * **Update Task Progress** (CM-0019 §4), or edit an update: a quantity
+ * **Update Task Progress** (ADR CM-0019 §4), or edit an update: a quantity
  * task takes the work done in this update (an increment in its unit), a
  * percent task the new percentage. Not after today. A remark and photos
  * go with it; photos join the Gallery.
@@ -223,8 +223,9 @@ export function ProgressDialog({
 }
 
 /**
- * **Mark As Completed** (CM-0019 §4): records the update that brings the
- * task to 100 % — the remaining quantity, or 100 % — on the date chosen.
+ * **Mark As Completed** (ADR CM-0019 §4): records the update that brings
+ * the task to 100 % — the remaining quantity, or 100 % — on the date
+ * chosen.
  */
 export function CompleteDialog({
   task,
@@ -341,8 +342,8 @@ export function CompleteDialog({
 }
 
 /**
- * **Re-baseline** (CM-0019 §3): the planned dates become the next baseline
- * version; the reason is kept with it in the history.
+ * **Re-baseline** (ADR CM-0019 §3): the planned dates become the next
+ * baseline version; the reason is kept with it in the history.
  */
 export function RebaselineDialog({
   task,

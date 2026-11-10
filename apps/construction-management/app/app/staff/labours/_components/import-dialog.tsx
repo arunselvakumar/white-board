@@ -47,8 +47,8 @@ function wageText(values: LabourImportPreview["rows"][number]["values"]) {
 }
 
 /**
- * Import labourers from the sample sheet (CM-207): download the sample,
- * upload it, check every row, then import all rows at once.
+ * Import labourers from the sample sheet: download the sample, upload it,
+ * check every row, then import all rows at once.
  */
 export function ImportDialog({
   open,

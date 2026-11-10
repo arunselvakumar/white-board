@@ -4,7 +4,7 @@ import type {
   LabourResponse,
 } from "@/src/queries/labours";
 
-/** Story data for the Labour screens (CM-207). */
+/** Story data for the Labour screens. */
 
 const AT = "2026-10-08T06:30:00.000Z";
 

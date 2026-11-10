@@ -22,7 +22,7 @@ export type TrackingFileStripProps = {
 
 /**
  * A row of small thumbnails under a feed entry — a progress update, an
- * issue update, an observation (CM-0019 §11). Tapping a tile opens the
+ * issue update, an observation (ADR CM-0019 §11). Tapping a tile opens the
  * image or PDF; "+N" says how many more there are. It wraps instead of
  * scrolling sideways, and renders nothing without files.
  */

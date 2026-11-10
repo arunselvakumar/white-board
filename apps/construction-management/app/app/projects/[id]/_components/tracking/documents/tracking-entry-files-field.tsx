@@ -49,12 +49,12 @@ export type TrackingEntryFilesFieldProps = {
 
 /**
  * Photos or files for a new **entry** on an existing document — a task's
- * progress update, an issue's update, an inspection's observation (CM-0019
- * §4, §7, §9). Picked files upload at once with progress (retry, cancel)
- * and join `value` when done; × removes an uploaded one from the document.
- * Post the entry with `value.map((file) => file.id)` (the server attaches
- * them with `attachEntryFiles`), then reset `value` to `[]`. At most 10.
- * Use it through react-hook-form's `Controller`:
+ * progress update, an issue's update, an inspection's observation (ADR
+ * CM-0019 §4, §7, §9). Picked files upload at once with progress (retry,
+ * cancel) and join `value` when done; × removes an uploaded one from the
+ * document. Post the entry with `value.map((file) => file.id)` (the server
+ * attaches them with `attachEntryFiles`), then reset `value` to `[]`. At
+ * most 10. Use it through react-hook-form's `Controller`:
  *
  * ```tsx
  * <Controller control={form.control} name="photos" render={({ field }) => (

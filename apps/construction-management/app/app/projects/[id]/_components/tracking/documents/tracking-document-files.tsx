@@ -40,8 +40,8 @@ export type TrackingDocumentFilesProps = {
 };
 
 /**
- * A task's, issue's or inspection's own photos and files (CM-0019 §11) as
- * a section of thumbnails; files posted with an entry (a progress update,
+ * A task's, issue's or inspection's own photos and files (ADR CM-0019 §11)
+ * as a section of thumbnails; files posted with an entry (a progress update,
  * an issue update, an observation) stay with their entry. With `canEdit`
  * (and the upload right, which the server reports), files upload at once
  * with progress, and × removes one the viewer may remove. Tasks take

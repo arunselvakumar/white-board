@@ -103,8 +103,8 @@ function PendingTile({
 
 /**
  * Photos or files picked on a **new** task, issue or inspection form,
- * before the document has an id (CM-0019 §11). It only holds `File`s, with
- * thumbnails: nothing goes up until the form is saved, then
+ * before the document has an id (ADR CM-0019 §11). It only holds `File`s,
+ * with thumbnails: nothing goes up until the form is saved, then
  * `useUploadPendingTrackingFiles(type)` uploads them to the new document.
  * Files the document would refuse (a PDF on a task, over 25 MB) are not
  * added, and say why. At most 10. Use it through react-hook-form's

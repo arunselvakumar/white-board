@@ -112,7 +112,7 @@ function OvertimeTable({
   );
 }
 
-/** Overtime view (CM-213): vendor lines with overtime between two dates. */
+/** Vendor lines with overtime between two dates. */
 export function VendorOvertimeView({
   projectId,
   initialFrom,

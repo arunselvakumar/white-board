@@ -12,7 +12,7 @@ import {
   FormSectionSkeleton,
 } from "@/components/masters/masters-skeletons";
 
-/** Human Resources → Labours while it loads (ADR-0047). */
+/** The Labours screens while they load (ADR-0047). */
 
 /** The Labours table; Balance shows only with the Financial flag. */
 const LABOUR_COLUMNS: SkeletonColumn[] = [
@@ -46,7 +46,7 @@ export function LabourRowsSkeleton() {
   );
 }
 
-/** Transfer history in its sheet: date, from → to, remark. */
+/** Transfer history in its sheet: date, from, to, remark. */
 export function TransferHistorySkeleton() {
   return (
     <SkeletonGroup label="Loading transfers" className="block space-y-3">

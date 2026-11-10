@@ -24,7 +24,7 @@ import { menuByKey } from "@/src/shared-kernel/access/menus";
 import type { Flag } from "@/src/shared-kernel/access";
 import { addDays } from "@/src/shared-kernel/calendar-date";
 
-/** Story fixtures for Inspection Requests (CM-804). */
+/** Story fixtures for Inspection Requests. */
 
 export const INSPECTIONS_API = "/api/construction/tracking/inspections";
 export const INSPECTION_PROJECT_ID = "0199c4a0-0000-7000-8000-0000000d0001";

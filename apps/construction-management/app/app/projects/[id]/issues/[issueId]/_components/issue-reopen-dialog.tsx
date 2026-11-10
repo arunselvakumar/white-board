@@ -5,8 +5,8 @@ import { QueryHttpError } from "@/src/queries/http";
 import { useIssueTransition, type Issue } from "@/src/queries/tracking-issues";
 
 /**
- * **Reopen** a solved or closed issue (Reject, CM-0019 §8): a reason is
- * required; Solved / Closed are cleared and the reason stays in the
+ * **Reopen** a solved or closed issue (Reject, ADR CM-0019 §8): a reason
+ * is required; Solved / Closed are cleared and the reason stays in the
  * history.
  */
 export function IssueReopenDialog({

@@ -84,8 +84,8 @@ function useLocationChoices(projectId: string) {
 }
 
 /**
- * The task list's filters (CM-802): search by Task No. or name and status
- * always; assignee, priority, tag, department, contractor, location and a
+ * The task list's filters: search by Task No. or name and status always;
+ * assignee, priority, tag, department, contractor, location and a
  * planned-date range behind **Filters**.
  */
 export function TaskFilterBar({

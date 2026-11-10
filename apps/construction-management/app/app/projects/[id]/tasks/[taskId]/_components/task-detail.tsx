@@ -352,9 +352,9 @@ function ActivityFeed({ task }: { task: Detail }) {
 }
 
 /**
- * One task (CM-802): Task No., status and progress; planned, baseline and
- * actual dates with durations and variance; completed work and earned
- * value (Financial); its sub-tasks rolled up; the baseline history with
+ * One task: Task No., status and progress; planned, baseline and actual
+ * dates with durations and variance; completed work and earned value
+ * (Financial); its sub-tasks rolled up; the baseline history with
  * **Re-baseline**; progress updates with photos; the activity feed. Actions
  * follow the viewer's flags: Update Task Progress, Mark As Completed, Edit,
  * Add Sub-Task, Copy task, Delete.

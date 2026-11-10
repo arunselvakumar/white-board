@@ -132,13 +132,12 @@ function plural(n: number, word: string): string {
 }
 
 /**
- * A Project's Issues & Snags (CM-803): status tabs All / Pending /
- * Delayed / Solved / Closed (Delayed is open past the Due Date), filters by
- * priority, category, assignee, Department, Contractor, location, Issue
- * Date and a search; select issues to **Mark As Solved** (Update) or
- * **Verify** (Approve) them together, the rest skipped and counted.
- * Without View all the server lists only the viewer's own and assigned
- * issues.
+ * A Project's Issues & Snags: status tabs All / Pending / Delayed / Solved
+ * / Closed (Delayed is open past the Due Date), filters by priority,
+ * category, assignee, Department, Contractor, location, Issue Date and a
+ * search; select issues to **Mark As Solved** (Update) or **Verify**
+ * (Approve) them together, the rest skipped and counted. Without View all
+ * the server lists only the viewer's own and assigned issues.
  */
 export function IssuesList({
   projectId,

@@ -27,10 +27,10 @@ import {
 
 type Totals = LabourAttendanceMonth["totals"];
 
-/** One focusable scroll area around the wide grid. */
 const MONTH_LEGEND =
   "P Present · H Half Day · A Absent · L Leave · PL Paid Leave · HO Holiday · a number under the code is overtime hours.";
 
+/** One focusable scroll area around the wide grid. */
 const SCROLL =
   "bg-card focus-visible:ring-ring/50 overflow-x-auto rounded-lg border outline-none focus-visible:ring-3 [&>[data-slot=table-container]]:overflow-visible";
 
@@ -184,7 +184,7 @@ function Grid({ projectId, month }: { projectId: string; month: string }) {
   );
 }
 
-/** Month grid (CM-211): labourer × day codes with totals per labourer. */
+/** Labourer × day codes with totals per labourer. */
 export function LabourMonthGrid({
   projectId,
   initialMonth,

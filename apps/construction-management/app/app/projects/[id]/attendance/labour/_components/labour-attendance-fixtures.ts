@@ -6,7 +6,7 @@ import type {
   LabourSheetRow,
 } from "@/src/queries/labour-attendance";
 
-/** Story data for labour attendance (CM-211, times CM-220). */
+/** Story data for labour attendance. */
 
 export const PROJECT_ID = "019a0000-0000-7000-8000-000000000001";
 export const DATE = "2026-10-08";

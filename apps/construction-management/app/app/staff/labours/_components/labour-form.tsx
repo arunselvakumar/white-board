@@ -153,9 +153,9 @@ function ChoiceField({
 }
 
 /**
- * Add and Edit Labour (CM-207): Basic, Wage, Statutory, Category & contact,
- * and Projects (none, one or many, ADR CM-0033). Amounts are typed in
- * rupees and sent as paise.
+ * Add and Edit Labour: Basic, Wage, Statutory, Category & contact, and
+ * Projects (none, one or many, ADR CM-0033). Amounts are typed in rupees
+ * and sent as paise.
  */
 export function LabourForm({
   labour,

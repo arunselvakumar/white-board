@@ -13,7 +13,6 @@ import {
 
 import { InspectionForm } from "./inspection-form";
 
-/** Add Inspection Request (CM-804). */
 export function InspectionNew({ projectId }: { projectId: string }) {
   return (
     <div className="w-full p-6">
@@ -32,8 +31,9 @@ export function InspectionNew({ projectId }: { projectId: string }) {
 }
 
 /**
- * **Raise re-inspection** (CM-0019 §10): Add Inspection Request prefilled
- * from a rejected request (`?reinspect=<id>`); the new request links back.
+ * **Raise re-inspection** (ADR CM-0019 §10): Add Inspection Request
+ * prefilled from a rejected request (`?reinspect=<id>`); the new request
+ * links back.
  */
 export function InspectionReinspect({
   projectId,
@@ -66,7 +66,7 @@ export function InspectionReinspect({
   );
 }
 
-/** Edit a pending Inspection Request (CM-804); a decided one is final. */
+/** Edit a pending Inspection Request; a decided one is final. */
 export function InspectionEdit({
   projectId,
   inspectionId,

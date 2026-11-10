@@ -30,8 +30,8 @@ import {
 } from "@/app/app/projects/[id]/_components/tracking/tracking-skeletons";
 
 /**
- * The Project's Tasks (CM-802): the task tree with filters, the Gantt, Add
- * Task and Import. Actions follow the viewer's Task flags.
+ * The Project's Tasks: the task tree with filters, the Gantt, Add Task and
+ * Import. Actions follow the viewer's Task flags.
  */
 export function TasksPage({
   projectId,

@@ -101,8 +101,8 @@ function SelectField({
 }
 
 /**
- * Transfer one or many labourers from one Project to another from a date
- * (CM-206). The date is their first day on the new Project; their other
+ * Transfer one or many labourers from one Project to another from a
+ * date. The date is their first day on the new Project; their other
  * Projects stay (ADR CM-0033). `fromProjectId` picks the Project they
  * leave when they share it, e.g. the list's Project filter.
  */

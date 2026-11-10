@@ -32,7 +32,7 @@ function NewSubTask({
   );
 }
 
-/** Add a task, or with `parentId` a Sub-Task (CM-802). */
+/** Add a task, or with `parentId` a Sub-Task. */
 export function TaskNew({
   projectId,
   parentId,
@@ -59,7 +59,6 @@ export function TaskNew({
   );
 }
 
-/** Edit a task (CM-802). */
 export function TaskEdit({
   projectId,
   taskId,

@@ -175,13 +175,13 @@ function withCurrent(
 }
 
 /**
- * Raise or edit an Issue & Snag (CM-803, ADR CM-0019 §7): Issue Date
- * (back-dated control), Details, Priority (colour and label), Category,
- * Department, Contractor, Assign To, Due Date (on or after the Issue
- * Date) and Location; on a new issue its images and attachments, uploaded
- * once it is saved. **Save** raises it Pending; **Save & Mark As Solved**
- * (Create and Update) records one fixed on the spot. The form stays busy
- * after a save until the issue's page opens.
+ * Raise or edit an Issue & Snag (ADR CM-0019 §7): Issue Date (back-dated
+ * control), Details, Priority (colour and label), Category, Department,
+ * Contractor, Assign To, Due Date (on or after the Issue Date) and
+ * Location; on a new issue its images and attachments, uploaded once it is
+ * saved. **Save** raises it Pending; **Save & Mark As Solved** (Create and
+ * Update) records one fixed on the spot. The form stays busy after a save
+ * until the issue's page opens.
  */
 export function IssueForm({
   projectId,

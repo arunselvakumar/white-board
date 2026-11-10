@@ -10,7 +10,7 @@ import {
 import type { TrackingDocumentType } from "@/src/tracking/domain/tracking-documents";
 
 /**
- * Files going up to an **existing** task, issue or inspection (CM-0019
+ * Files going up to an **existing** task, issue or inspection (ADR CM-0019
  * §11), each with progress, error, retry and cancel. `accept` may be
  * stricter than the document's policy (`images` for an issue update's
  * photos). Each finished upload is a file of the document with no entry

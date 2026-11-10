@@ -90,7 +90,7 @@ export function InspectionStatusBadge({
 const MAX = 500;
 
 /**
- * Reject one or more Inspection Requests (CM-0019 §9, §10): a reason is
+ * Reject one or more Inspection Requests (ADR CM-0019 §9, §10): a reason is
  * required; **Also raise a snag** is offered when the member holds Issues &
  * Snags Create (the server checks again). `onSubmit` rejects with a message
  * to show, or resolves to close.

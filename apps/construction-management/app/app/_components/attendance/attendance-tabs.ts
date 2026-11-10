@@ -1,4 +1,4 @@
-/** Labour and Vendor attendance of a Project (CM-211, CM-213). */
+/** Labour and Vendor attendance of a Project. */
 export const ATTENDANCE_TABS = [
   { segment: "labour", label: "Labour" },
   { segment: "vendors", label: "Vendor" },

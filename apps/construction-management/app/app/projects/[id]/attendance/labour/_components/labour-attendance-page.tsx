@@ -175,8 +175,8 @@ function MarkTab({
 }
 
 /**
- * Labour attendance for a Project (CM-211): mark a day (Mark), the recorded
- * days with filters (Recorded), and the labourer × day month grid (Month).
+ * Labour attendance for a Project: mark a day (Mark), the recorded days
+ * with filters (Recorded), and the labourer × day month grid (Month).
  */
 export function LabourAttendancePage({
   projectId,
