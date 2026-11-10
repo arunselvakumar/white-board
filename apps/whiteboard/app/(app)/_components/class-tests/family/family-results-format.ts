@@ -12,7 +12,6 @@ export const NO_RESULTS_TEXT = "No published results yet.";
 
 export type FamilyResultsStudent = FamilyTestResultsView["students"][number];
 
-/** Where a Student's or Parent's Results page lives. */
 export function resultsPagePath(role: FamilyHomeRole): string {
   return role === "parent" ? "/parent/results" : "/student/results";
 }

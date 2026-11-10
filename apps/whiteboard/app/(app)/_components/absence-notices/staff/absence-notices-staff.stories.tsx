@@ -279,7 +279,6 @@ export const TeacherEmpty: Story = {
   },
 };
 
-/** The API's list read through the screen, as a Teacher opens it. */
 export const TeacherFromApi: Story = {
   parameters: {
     nextjs: { navigation: { pathname: "/teacher/absence-notices" } },
