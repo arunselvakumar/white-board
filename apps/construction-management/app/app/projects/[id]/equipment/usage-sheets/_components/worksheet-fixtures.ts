@@ -22,7 +22,7 @@ import {
 } from "@/src/queries/worksheets";
 import type { Flag } from "@/src/shared-kernel/access";
 
-/** Daily Worksheet story fixtures (CM-602): a Chennai tower's site day. */
+/** Daily Worksheet story fixtures: a Chennai tower's site day. */
 
 export const PROJECT_ID = "0199c4a0-0000-7000-8000-0000000b0001";
 export const TODAY = "2026-10-10";
@@ -122,7 +122,7 @@ export function formOptions(
 export const CUM_ID = "0199c4a0-0000-7000-8000-0000000f0002";
 export const SLAB_TASK_ID = "0199c4a0-0000-7000-8000-0000000f7001";
 
-/** Leaf tasks the Task picker offers (CM-806). */
+/** Leaf tasks the Task picker offers. */
 export const WORKSHEET_TASKS: WorksheetTaskOption[] = [
   {
     id: SLAB_TASK_ID,

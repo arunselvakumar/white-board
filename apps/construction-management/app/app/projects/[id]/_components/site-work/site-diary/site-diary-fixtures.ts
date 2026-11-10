@@ -10,7 +10,7 @@ import { fromMask } from "@/src/shared-kernel/access/flags";
 import { addDays } from "@/src/shared-kernel/calendar-date";
 import type { SiteDiary, SiteDiaryDays } from "@/src/queries/site-diary";
 
-/** Story fixtures for the Site Diary (CM-607). */
+/** Story fixtures for the Site Diary. */
 
 export const SITE_DIARY_API = "/api/construction/site-work/site-diary";
 export const DIARY_PROJECT_ID = "0199c4a0-0000-7000-8000-0000000e0001";

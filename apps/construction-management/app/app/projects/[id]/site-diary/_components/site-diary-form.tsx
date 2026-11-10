@@ -167,10 +167,10 @@ function WeatherSelect({
 }
 
 /**
- * Write or edit a day's Site Diary (CM-607): the date, weather in the
- * morning and the afternoon, rainfall, site condition, visitor and
- * instruction rows, notes and, on a new diary, photos that upload once it
- * is saved (an existing diary's photos are kept on its page).
+ * Write or edit a day's Site Diary: the date, weather in the morning and
+ * the afternoon, rainfall, site condition, visitor and instruction rows,
+ * notes and, on a new diary, photos that upload once it is saved (an
+ * existing diary's photos are kept on its page).
  */
 export function SiteDiaryForm({
   projectId,

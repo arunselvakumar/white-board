@@ -12,7 +12,7 @@ import type {
 } from "@/src/queries/hindrances";
 import type { LocationOptions } from "@/src/queries/location-options";
 
-/** Story fixtures for the Hindrance register (CM-607). */
+/** Story fixtures for the Hindrance register. */
 
 export const HINDRANCES_API = "/api/construction/site-work/hindrances";
 export const HINDRANCE_PROJECT_ID = "0199c4a0-0000-7000-8000-0000000f0001";

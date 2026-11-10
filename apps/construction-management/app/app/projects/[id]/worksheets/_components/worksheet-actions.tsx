@@ -28,8 +28,8 @@ import { useWorksheetCommand, type Worksheet } from "@/src/queries/worksheets";
 import { worksheetsPath } from "@/app/app/projects/[id]/_components/site-work/worksheets/worksheet-format";
 
 /**
- * What can be done with one Daily Worksheet (CM-602), from its `actions`:
- * View, Approve, Reject, Edit, Duplicate and Delete — a menu on list rows,
+ * What can be done with one Daily Worksheet, from its `actions`: View,
+ * Approve, Reject, Edit, Duplicate and Delete — a menu on list rows,
  * buttons on the detail page.
  */
 export function WorksheetActions({

@@ -7,7 +7,7 @@ import {
   type WorkShift,
 } from "@/src/site-work/domain/shift";
 
-/** Words, paths and badges the Daily Worksheet screens share (CM-602). */
+/** Words, paths and badges the Daily Worksheet screens share. */
 
 export function worksheetsPath(projectId: string, rest = ""): string {
   return `/app/projects/${encodeURIComponent(projectId)}/worksheets${rest}`;

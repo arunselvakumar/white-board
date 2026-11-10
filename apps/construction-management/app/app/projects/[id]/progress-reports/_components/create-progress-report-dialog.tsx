@@ -35,7 +35,7 @@ import { ProgressReportFormSkeleton } from "@/app/app/_components/site-work/site
 
 const EVERYONE = "everyone";
 
-/** A Task Progress Report covers at most a year (CM-805). */
+/** A Task Progress Report covers at most a year. */
 const MAX_DAYS = 366;
 
 function dayNumber(date: string): number {
@@ -320,10 +320,10 @@ function LoadedForm({
 }
 
 /**
- * **Create new** (CM-606, CM-805): Report type; for a Daily Progress
- * Report the Date (not after today), Report filled by (optional) and
- * Include images; for a Task Progress Report the period, From and To (To
- * not after today, at most a year).
+ * **Create new**: Report type; for a Daily Progress Report the Date (not
+ * after today), Report filled by (optional) and Include images; for a Task
+ * Progress Report the period, From and To (To not after today, at most a
+ * year).
  */
 export function CreateProgressReportDialog({
   projectId,

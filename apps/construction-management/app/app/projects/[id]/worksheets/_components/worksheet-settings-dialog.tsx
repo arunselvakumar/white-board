@@ -55,7 +55,7 @@ const schema = z.object({
 type Values = z.infer<typeof schema>;
 
 /**
- * "Setting for the work item form" (CM-0016 §2): which sections and
+ * "Setting for the work item form" (ADR CM-0016 §2): which sections and
  * fields the Project's worksheet form shows, the order of its four
  * sections, and whether sheets need approval. Saved sheets do not change.
  */

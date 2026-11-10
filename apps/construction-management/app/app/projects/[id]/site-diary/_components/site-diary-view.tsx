@@ -54,9 +54,9 @@ function time(value: string | null): string {
 }
 
 /**
- * One day's Site Diary (CM-607): weather in the morning and the
- * afternoon, rainfall, site condition, visitors, instructions, notes and
- * photos, with Edit and Delete for members who may.
+ * One day's Site Diary: weather in the morning and the afternoon,
+ * rainfall, site condition, visitors, instructions, notes and photos, with
+ * Edit and Delete for members who may.
  */
 export function SiteDiaryView({
   diary,

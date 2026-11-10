@@ -217,8 +217,8 @@ function FilterSelect<Value extends string>({
 }
 
 /**
- * The Project's Hindrance register (CM-607, ADR CM-0016 §14), newest first:
- * each with its period, days and hours lost, cause and responsible party.
+ * The Project's Hindrance register (ADR CM-0016 §14), newest first: each
+ * with its period, days and hours lost, cause and responsible party.
  * Filters by open / closed, cause, party, Contractor, a date range it
  * overlaps, and the number or activity.
  */

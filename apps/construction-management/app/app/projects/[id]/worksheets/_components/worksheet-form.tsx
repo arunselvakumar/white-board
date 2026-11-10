@@ -92,7 +92,7 @@ type Values = {
   unskilledCount: string;
   approxWorkQty: string;
   approxWorkUnitId: string;
-  /** The Task the work is for (CM-806). */
+  /** The Task the work is for. */
   task: WorksheetTaskChoice | null;
   materials: { materialId: string; quantity: string }[];
   remark: string;
@@ -238,7 +238,7 @@ function valuesFrom(sheet: Worksheet, sheetDate: string): Values {
       quantity: quantityText(line.quantity),
     })),
     remark: sheet.remark ?? "",
-    // Duplicate copies no photos (CM-0016 §9).
+    // Duplicate copies no photos (ADR CM-0016 §9).
     photos: [],
     placesOffered: true,
   };
@@ -363,10 +363,10 @@ function SelectField({
 }
 
 /**
- * New, edit or duplicated Daily Worksheet (CM-602): a date stepper under
- * the back-dated rules, the Project's sections in their configured order —
- * Location, Basic (Contractor → Department → Work Type, Work Shift,
- * headcounts with the attendance panel, Approx Work Done), Material
+ * New, edit or duplicated Daily Worksheet: a date stepper under the
+ * back-dated rules, the Project's sections in their configured order —
+ * Location, Basic (Contractor, then its Department, then Work Type; Work
+ * Shift, headcounts with the attendance panel, Approx Work Done), Material
  * consumption with the stock on that date and Bulk Select, and Other
  * (remark, photos). **Save**, **Save & Add New** (keeps the date,
  * location, contractor and shift) and **Save & Approve** for approvers.
@@ -416,7 +416,7 @@ export function WorksheetForm({
     source?.id ?? null,
   );
   const editing = worksheet != null;
-  // Whether the member picked or cleared the Task (CM-806). Not the field's
+  // Whether the member picked or cleared the Task. Not the field's
   // dirtiness: clearing back to an empty default must still clear the link.
   const [taskTouched, setTaskTouched] = useState(false);
   const form = useForm<Values>({

@@ -124,7 +124,7 @@ export const Validation: Story = {
 };
 
 /**
- * Contractor → Department → Work Type cascade, the attendance panel's
+ * The Contractor, Department and Work Type cascade, the attendance panel's
  * **Use remaining**, Bulk Select (the Work Type's materials first) with
  * the stock on the date, then Save.
  */
@@ -396,7 +396,7 @@ export const Edit: Story = {
 
 /**
  * A Task in the sheet's unit: the form says the work will post. Saving
- * without touching the Task leaves `taskId` out, which keeps the link (CM-806).
+ * without touching the Task leaves `taskId` out, which keeps the link.
  */
 export const WithTask: Story = {
   args: {
@@ -439,8 +439,8 @@ export const WithTask: Story = {
 };
 
 /**
- * The sheet's task can no longer be picked (deleted, or now a summary), so the
- * picker starts empty; saving other changes still keeps the link (CM-806).
+ * The sheet's task can no longer be picked (deleted, or now a summary), so
+ * the picker starts empty; saving other changes still keeps the link.
  */
 export const UnavailableTaskKept: Story = {
   args: {
@@ -479,7 +479,7 @@ export const UnavailableTaskKept: Story = {
 
 /**
  * Picking a task and clearing it again is a change: the save sends
- * `taskId: null`, even though the field ends where it started (CM-806).
+ * `taskId: null`, even though the field ends where it started.
  */
 export const UnavailableTaskCleared: Story = {
   args: {
