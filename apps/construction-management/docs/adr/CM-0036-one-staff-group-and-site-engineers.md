@@ -32,7 +32,7 @@ The sidebar entries are singular (Labour, Site Engineer, Vendor) as the owner wr
 
 ### 2. Site Engineer on screen; `supervisor` in code and data
 
-Labels, headings, filters, placeholders, empty states, error messages, report and Excel column headers, and the OpenAPI descriptions say Site Engineer. That includes the Equipment Usage sheet's supervisor and its column setting.
+Labels, headings, filters, placeholders, empty states, error messages, report and Excel column headers, and the OpenAPI descriptions say Site Engineer. That includes the Equipment Usage sheet's supervisor and its column setting. The labour Excel import reads columns by header, so it still accepts a **Supervisor** column from templates downloaded before this change.
 
 The code, the API paths (`/api/construction/masters/supervisors`), the Prisma model `ConstructionMastersSupervisor`, the `supervisors` table and `supervisor_id` columns, and audit actions (`supervisor.created`, …) keep **supervisor**. Renaming them needs a migration and touches about 550 references for no change a user sees. A later ADR can do it on its own.
 

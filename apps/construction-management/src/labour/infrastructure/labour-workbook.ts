@@ -223,6 +223,8 @@ const KEYS_BY_HEADER = new Map<string, LabourColumnKey>([
   ),
   // Sheets from the template before ADR CM-0033 had one "Project*".
   ["project", "projects"],
+  // Sheets from the template before ADR CM-0036 say "Supervisor".
+  ["supervisor", "supervisor"],
 ]);
 
 function fileInvalid(message: string): DomainError {

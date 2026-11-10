@@ -31,9 +31,10 @@ import {
 import { cn } from "@repo/ui/lib/utils";
 
 import { formatPaise } from "@/components/money/money-input";
+import { VENDORS_PATH } from "@/lib/staff-nav";
 import { vendorAttendanceDayQuery } from "@/src/queries/vendor-attendance";
 
-import { VENDORS_PAGE_PATH, VendorDayCard } from "./vendor-day-card";
+import { VendorDayCard } from "./vendor-day-card";
 import { VendorMonthView } from "./vendor-month-view";
 import { VendorOvertimeView } from "./vendor-overtime-view";
 import { VendorDayGridSkeleton } from "@/components/attendance/attendance-skeletons";
@@ -64,7 +65,7 @@ function NoVendors() {
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
-        <Link href={VENDORS_PAGE_PATH} className={buttonVariants()}>
+        <Link href={VENDORS_PATH} className={buttonVariants()}>
           Go to Vendors
         </Link>
       </EmptyContent>
