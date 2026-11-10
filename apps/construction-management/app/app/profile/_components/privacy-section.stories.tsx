@@ -1,12 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { authMocks, signInAs } from "../../.storybook/mocks/auth";
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
+import { authMocks, signInAs } from "@/.storybook/mocks/auth";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { PrivacySection } from "./privacy-section";
 
 const ORG = "/api/construction/organization";

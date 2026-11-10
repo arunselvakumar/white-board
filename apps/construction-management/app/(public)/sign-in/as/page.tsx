@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { SignInAsForm } from "@/components/auth/sign-in-as-form";
+import { SignInAsForm } from "@/app/(public)/sign-in/as/_components/sign-in-as-form";
 
 export const metadata: Metadata = { title: "Sign in as a customer" };
 

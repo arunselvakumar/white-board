@@ -7,7 +7,7 @@ import {
   expiredView,
   mockSubscriptionApi,
   noPlanView,
-} from "@/components/subscription/subscription-story-fixtures";
+} from "@/app/app/subscription/_components/subscription-story-fixtures";
 
 import { signInAs } from "@/.storybook/mocks/auth";
 import { PlanBanner } from "./plan-banner";

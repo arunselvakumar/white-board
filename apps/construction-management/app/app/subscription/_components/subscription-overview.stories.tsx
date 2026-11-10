@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Suspense } from "react";
 import { expect } from "storybook/test";
 
-import { signInAs } from "../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 import { SubscriptionOverview } from "./subscription-overview";
 import {
   activeView,

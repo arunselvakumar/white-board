@@ -4,11 +4,7 @@ import { expect, waitFor, within } from "storybook/test";
 import type { BillingAddressItem } from "@/src/queries/billing-addresses";
 import { gstStateName } from "@/src/shared-kernel/gst-states";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { BillingAddressesManager } from "./billing-addresses-manager";
 
 const BASE = "/api/construction/organization/settings/billing-addresses";

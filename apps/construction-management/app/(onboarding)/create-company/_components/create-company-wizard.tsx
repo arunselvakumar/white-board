@@ -25,7 +25,7 @@ import { AuthHeading } from "@/components/auth/auth-heading";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MobileField } from "@/components/auth/mobile-field";
-import { CompanySetupLoader } from "@/components/onboarding/company-setup-loader";
+import { CompanySetupLoader } from "@/app/(onboarding)/create-company/_components/company-setup-loader";
 import { fieldForCode } from "@/lib/server-errors";
 import { createCompany } from "@/src/queries/companies";
 import {

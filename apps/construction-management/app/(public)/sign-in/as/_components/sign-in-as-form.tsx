@@ -17,10 +17,10 @@ import { Label } from "@repo/ui/components/label";
 
 import { authErrorMessage } from "@/lib/auth-errors";
 
-import { AuthHeading } from "./auth-heading";
-import { CodeForm } from "./code-form";
-import { FieldError } from "./field-error";
-import { FormAlert } from "./form-alert";
+import { AuthHeading } from "@/components/auth/auth-heading";
+import { CodeForm } from "@/components/auth/code-form";
+import { FieldError } from "@/components/auth/field-error";
+import { FormAlert } from "@/components/auth/form-alert";
 
 const schema = z.object({
   customerEmail: z.email("Enter the customer's email address"),

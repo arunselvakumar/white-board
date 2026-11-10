@@ -5,8 +5,8 @@ import { expect, fn, waitFor, within } from "storybook/test";
 
 import { REPORTS_KEY } from "@/src/queries/reports";
 
-import { StoryQueries } from "../../.storybook/mocks/api";
-import { signInAs } from "../../.storybook/mocks/auth";
+import { StoryQueries } from "@/.storybook/mocks/api";
+import { signInAs } from "@/.storybook/mocks/auth";
 
 import {
   callsTo,

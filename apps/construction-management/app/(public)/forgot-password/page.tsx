@@ -2,7 +2,7 @@ import { getCompanyAuth } from "@repo/auth/construction/server";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
+import { ForgotPasswordForm } from "@/app/(public)/forgot-password/_components/forgot-password-form";
 import { continuePath } from "@/lib/safe-redirect";
 
 export const metadata: Metadata = { title: "Reset password" };

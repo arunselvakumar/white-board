@@ -26,7 +26,7 @@ import { fieldForCode } from "@/lib/server-errors";
 import { deleteMyAccount, type MyAccountModel } from "@/src/queries/account";
 import { QueryHttpError } from "@/src/queries/http";
 
-import { ActionCodeStep } from "./action-code-step";
+import { ActionCodeStep } from "@/app/app/_components/account/action-code-step";
 
 /** Where an Owner hands over or deletes their Company. */
 export const COMPANY_SETTINGS_HREF = "/app/settings/company";

@@ -22,7 +22,7 @@ import { Textarea } from "@repo/ui/components/textarea";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MobileField } from "@/components/auth/mobile-field";
-import { ImageUploader } from "@/components/profile/image-uploader";
+import { ImageUploader } from "@/app/app/_components/profile/image-uploader";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   CURRENCIES,

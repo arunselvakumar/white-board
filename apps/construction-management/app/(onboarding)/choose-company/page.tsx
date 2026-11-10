@@ -2,9 +2,9 @@ import { companies, protectCompany } from "@repo/auth/construction/server";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import { ChooseCompanyForm } from "@/components/onboarding/choose-company-form";
-import { JoinRequestsList } from "@/components/onboarding/join-requests-list";
-import { OnboardingShell } from "@/components/onboarding/onboarding-shell";
+import { ChooseCompanyForm } from "@/app/(onboarding)/choose-company/_components/choose-company-form";
+import { JoinRequestsList } from "@/app/(onboarding)/_components/join-requests-list";
+import { OnboardingShell } from "@/app/(onboarding)/_components/onboarding-shell";
 import { QuerySuspense } from "@/components/query-suspense";
 import {
   CHANGE_PASSWORD_PATH,

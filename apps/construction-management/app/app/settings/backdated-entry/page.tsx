@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-import { BackdatedEntryForm } from "@/components/settings/backdated-entry-form";
-import { BackdatedEntrySkeleton } from "@/components/settings/settings-skeletons";
+import { BackdatedEntryForm } from "@/app/app/settings/backdated-entry/_components/backdated-entry-form";
+import { BackdatedEntrySkeleton } from "@/app/app/settings/_components/settings-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Back-dated Entry" };

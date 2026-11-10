@@ -3,11 +3,7 @@ import { expect, waitFor, within } from "storybook/test";
 
 import type { SequenceRuleItem } from "@/src/queries/settings";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { SequenceIdsManager } from "./sequence-ids-manager";
 
 const BASE = "/api/construction/organization/settings/sequence-rules";

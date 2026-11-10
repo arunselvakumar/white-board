@@ -16,7 +16,7 @@ import { fieldForCode } from "@/lib/server-errors";
 import { verifyRevealCode } from "@/src/queries/account";
 import { QueryHttpError } from "@/src/queries/http";
 
-import { ActionCodeStep } from "./action-code-step";
+import { ActionCodeStep } from "@/app/app/_components/account/action-code-step";
 
 /** Whether a reveal was refused for want of a code (ADR CM-0021 §11). */
 export function needsRevealCode(error: unknown): boolean {

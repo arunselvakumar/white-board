@@ -4,7 +4,7 @@ import { useActiveCompany } from "@repo/auth/construction/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
-import { NotificationSettings } from "@/components/profile/notification-settings";
+import { NotificationSettings } from "@/app/app/profile/_components/notification-settings";
 import { myProfileQuery } from "@/src/queries/my-profile";
 
 import { MyProfileForm } from "./my-profile-form";

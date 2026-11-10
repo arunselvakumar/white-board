@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor } from "storybook/test";
 
-import { authFailure, authMocks } from "../../.storybook/mocks/auth";
+import { authFailure, authMocks } from "@/.storybook/mocks/auth";
 import { ForgotPasswordForm } from "./forgot-password-form";
-import { PublicShell } from "./public-shell";
+import { PublicShell } from "@/components/auth/public-shell";
 
 const meta = {
   title: "Auth/ForgotPasswordForm",

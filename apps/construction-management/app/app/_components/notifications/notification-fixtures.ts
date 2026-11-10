@@ -2,7 +2,7 @@
  * Storybook data and a stateful `fetch` stand-in for the messaging API
  * (CM-904). Never imported by the app.
  */
-import { mockApi, type ApiCall } from "../../.storybook/mocks/api";
+import { mockApi, type ApiCall } from "@/.storybook/mocks/api";
 
 import type {
   Notification,

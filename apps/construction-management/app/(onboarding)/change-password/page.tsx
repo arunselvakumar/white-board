@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { pickAuthPhoto } from "@/components/auth/auth-photos";
-import { ChangePasswordForm } from "@/components/auth/change-password-form";
-import { OnboardingSplitShell } from "@/components/onboarding/onboarding-shell";
+import { ChangePasswordForm } from "@/app/(onboarding)/change-password/_components/change-password-form";
+import { OnboardingSplitShell } from "@/app/(onboarding)/_components/onboarding-shell";
 import { mustChangePassword } from "@/lib/must-change-password";
 import { continuePath } from "@/lib/safe-redirect";
 

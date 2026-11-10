@@ -29,8 +29,8 @@ import {
   useSidebar,
 } from "@repo/ui/components/sidebar";
 
-import { NotificationBell } from "@/components/notifications/notification-bell";
-import { ReadyDownloadToast } from "@/components/notifications/ready-download-toast";
+import { NotificationBell } from "@/app/app/_components/notifications/notification-bell";
+import { ReadyDownloadToast } from "@/app/app/_components/notifications/ready-download-toast";
 import { APP_NAV, isAppNavActive } from "@/lib/app-nav";
 import { MASTERS_GROUPS } from "@/lib/masters-nav";
 import { projectIdFromPath } from "@/lib/project-nav";

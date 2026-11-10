@@ -7,7 +7,7 @@ import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 
 import { FormAlert } from "@/components/auth/form-alert";
-import { ImageUploader } from "@/components/profile/image-uploader";
+import { ImageUploader } from "@/app/app/_components/profile/image-uploader";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   LABOURS_KEY,

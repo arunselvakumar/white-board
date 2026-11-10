@@ -4,9 +4,9 @@ import { expect, waitFor } from "storybook/test";
 import { AuthDivider } from "@/components/auth/auth-divider";
 import { QuerySuspense } from "@/components/query-suspense";
 
-import { mockFetch } from "../../.storybook/mock-fetch";
-import { authMocks, signInAs } from "../../.storybook/mocks/auth";
-import { CreateCompanyWizard } from "./create-company-wizard";
+import { mockFetch } from "@/.storybook/mock-fetch";
+import { authMocks, signInAs } from "@/.storybook/mocks/auth";
+import { CreateCompanyWizard } from "../create-company/_components/create-company-wizard";
 import { JoinRequestsList } from "./join-requests-list";
 import { OnboardingSplitShell } from "./onboarding-shell";
 

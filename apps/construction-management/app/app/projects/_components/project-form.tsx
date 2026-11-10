@@ -42,7 +42,7 @@ import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MobileField } from "@/components/auth/mobile-field";
 import { MoneyInput, rupeesToPaise } from "@/components/money/money-input";
-import { ImageUploader } from "@/components/profile/image-uploader";
+import { ImageUploader } from "@/app/app/_components/profile/image-uploader";
 import {
   useUploadHeldFiles,
   type HeldFile,

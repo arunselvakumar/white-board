@@ -13,13 +13,13 @@ import {
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 
-import { NotificationRow } from "./notification-item";
+import { NotificationRow } from "@/app/app/_components/notifications/notification-item";
 import {
   notificationsQuery,
   unreadCountQuery,
   useNotificationActions,
   type Notification,
-} from "./notification-queries";
+} from "@/app/app/_components/notifications/notification-queries";
 
 /**
  * Notifications (CM-904): the member's list in the Active Company, newest

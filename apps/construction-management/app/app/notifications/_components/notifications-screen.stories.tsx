@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueries } from "../../.storybook/mocks/api";
-import { signInAs } from "../../.storybook/mocks/auth";
+import { StoryQueries } from "@/.storybook/mocks/api";
+import { signInAs } from "@/.storybook/mocks/auth";
 
 import {
   callsTo,
@@ -13,8 +13,8 @@ import {
   PR_WAITING,
   REPORT_READY,
   type NotificationApiOptions,
-} from "./notification-fixtures";
-import { MESSAGING_API } from "./notification-queries";
+} from "@/app/app/_components/notifications/notification-fixtures";
+import { MESSAGING_API } from "@/app/app/_components/notifications/notification-queries";
 import { NotificationsScreen } from "./notifications-screen";
 
 const BASE = `${MESSAGING_API}/notifications`;

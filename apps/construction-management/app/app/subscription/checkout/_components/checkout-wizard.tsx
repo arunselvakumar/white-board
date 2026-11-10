@@ -61,7 +61,10 @@ import { formatMinor } from "@/src/shared-kernel/money";
 import { PLAN_GRANTS, type PlanGrant } from "@/src/shared-kernel/plan";
 import { isValidGstin } from "@/src/shared-kernel/tax-ids";
 
-import { daysLeftText, longDate } from "./subscription-text";
+import {
+  daysLeftText,
+  longDate,
+} from "@/app/app/subscription/_components/subscription-text";
 
 export type CheckoutKind = "new" | "extend" | "upgrade" | "add_ons";
 type StepKey = "plan" | "duration" | "addons" | "buyer" | "review";

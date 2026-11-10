@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 
-import { AuthHeading } from "./auth-heading";
+import { AuthHeading } from "@/components/auth/auth-heading";
 import { AuthTabs } from "./auth-tabs";
 import { EmailSignUpForm } from "./email-sign-up-form";
-import { MobileOtpFlow } from "./mobile-otp-flow";
+import { MobileOtpFlow } from "@/app/(public)/_components/mobile-otp-flow";
 
 /**
  * Email and password while SMS is off (ADR CM-0009); with `mobileOtp` the
