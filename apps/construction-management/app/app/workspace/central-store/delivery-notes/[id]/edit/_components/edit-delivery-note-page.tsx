@@ -4,7 +4,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { deliveryNoteQuery } from "@/src/queries/delivery-notes";
 
-import { DeliveryNoteForm } from "./delivery-note-form";
+import { DeliveryNoteForm } from "@/app/app/workspace/central-store/_components/delivery-note-form";
 
 /** Edit a pending Delivery Note: the form over the note as loaded. */
 export function EditDeliveryNotePage({ noteId }: { noteId: string }) {

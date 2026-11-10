@@ -28,7 +28,7 @@ import { Textarea } from "@repo/ui/components/textarea";
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FieldError } from "@/components/auth/field-error";
 import { LocationLabel } from "@/app/app/_components/locations/location-picker";
-import { DeliveryNotesList } from "@/components/procurement/delivery-notes/delivery-notes-list";
+import { DeliveryNotesList } from "@/app/app/_components/procurement/delivery-notes/delivery-notes-list";
 import {
   DocumentActivity,
   DocumentFiles,
@@ -40,8 +40,8 @@ import {
   ScrollRegion,
   MaterialRequestStatusBadge,
   projectRequestHref,
-} from "@/components/procurement/stores/central-store-parts";
-import { StoreConfirmDialog } from "@/components/procurement/stores/store-confirm-dialog";
+} from "@/app/app/_components/procurement/stores/central-store-parts";
+import { StoreConfirmDialog } from "@/app/app/_components/procurement/stores/store-confirm-dialog";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   materialRequestPdfUrl,

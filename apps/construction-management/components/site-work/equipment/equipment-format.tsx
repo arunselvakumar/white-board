@@ -1,7 +1,7 @@
 import { Badge } from "@repo/ui/components/badge";
 
 import { formatPaise } from "@/components/money/money-input";
-import { formatDate } from "@/components/procurement/inventory/inventory-format";
+import { formatDate } from "@/app/app/_components/procurement/inventory/inventory-format";
 import type { Equipment } from "@/src/queries/equipment";
 import {
   EQUIPMENT_STATE_LABELS,

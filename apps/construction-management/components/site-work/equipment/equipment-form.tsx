@@ -42,7 +42,7 @@ import {
   paiseToRupees,
   rupeesToPaise,
 } from "@/components/money/money-input";
-import { localToday } from "@/components/procurement/inventory/inventory-format";
+import { localToday } from "@/app/app/_components/procurement/inventory/inventory-format";
 import { ImageUploader } from "@/components/profile/image-uploader";
 import { FormCard } from "@/app/app/_components/projects/form-card";
 import {

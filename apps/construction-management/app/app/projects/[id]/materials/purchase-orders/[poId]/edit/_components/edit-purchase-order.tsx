@@ -10,7 +10,7 @@ import {
 
 import { purchaseOrderQuery } from "@/src/queries/purchase-orders";
 
-import { PurchaseOrderForm } from "./purchase-order-form";
+import { PurchaseOrderForm } from "@/app/app/projects/[id]/materials/purchase-orders/_components/purchase-order-form";
 
 /** Edit Purchase Order: not yet ordered or closed (CM-0015 §2). */
 export function EditPurchaseOrder({

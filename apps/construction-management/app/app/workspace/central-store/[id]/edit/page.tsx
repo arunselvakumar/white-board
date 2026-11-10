@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { EditStorePage } from "@/components/procurement/stores/edit-store-page";
+import { EditStorePage } from "@/app/app/workspace/central-store/[id]/edit/_components/edit-store-page";
 import { StoreFormSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 

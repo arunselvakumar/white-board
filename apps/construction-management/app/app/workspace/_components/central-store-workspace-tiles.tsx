@@ -12,7 +12,7 @@ import {
 import {
   CENTRAL_INVENTORY_PATH,
   CENTRAL_STORE_PATH,
-} from "./central-store-parts";
+} from "@/app/app/_components/procurement/stores/central-store-parts";
 
 /** The Workspace page's Central Store tile (CM-508). */
 export function CentralStoreWorkspaceTile() {

@@ -2,8 +2,13 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { getRouter } from "@storybook/nextjs-vite/navigation.mock";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
-import { API, IDS, mockCentralStoreApi, STORE } from "./central-store-fixtures";
+import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
+import {
+  API,
+  IDS,
+  mockCentralStoreApi,
+  STORE,
+} from "@/app/app/_components/procurement/stores/central-store-fixtures";
 import { StoreForm } from "./store-form";
 
 let api: ReturnType<typeof mockCentralStoreApi>;

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { DeliveryNoteForm } from "@/components/procurement/delivery-notes/delivery-note-form";
+import { DeliveryNoteForm } from "@/app/app/workspace/central-store/_components/delivery-note-form";
 import { DeliveryNoteFormSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 

@@ -35,7 +35,7 @@ import { SiteWorkDocumentActivity } from "@/components/site-work/documents/site-
 import {
   formatDate,
   localToday,
-} from "@/components/procurement/inventory/inventory-format";
+} from "@/app/app/_components/procurement/inventory/inventory-format";
 import { HINDRANCE_CAUSE_LABELS } from "@/src/site-work/domain/hindrance";
 import { QueryHttpError } from "@/src/queries/http";
 import {

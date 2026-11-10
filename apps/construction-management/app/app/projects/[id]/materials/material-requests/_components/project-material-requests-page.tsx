@@ -1,9 +1,9 @@
 "use client";
 
 import { Suspense } from "react";
-import { projectRequestHref } from "@/components/procurement/stores/central-store-parts";
+import { projectRequestHref } from "@/app/app/_components/procurement/stores/central-store-parts";
 
-import { MaterialRequestsList } from "./material-requests-list";
+import { MaterialRequestsList } from "@/app/app/_components/procurement/material-requests/material-requests-list";
 import { RequestRowsSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 /** A Project's Materials → Material Requests tab (CM-508). */

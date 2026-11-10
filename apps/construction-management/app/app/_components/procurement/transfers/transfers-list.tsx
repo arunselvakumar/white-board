@@ -34,7 +34,7 @@ import { cn } from "@repo/ui/lib/utils";
 import {
   formatDate,
   formatQuantity,
-} from "@/components/procurement/inventory/inventory-format";
+} from "@/app/app/_components/procurement/inventory/inventory-format";
 import {
   TRANSFER_STATUS_LABELS,
   TRANSFER_STATUSES,

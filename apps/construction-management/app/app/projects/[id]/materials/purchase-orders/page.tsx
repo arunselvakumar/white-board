@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { PurchaseOrdersPage } from "@/components/procurement/purchase-orders/purchase-orders-page";
+import { PurchaseOrdersPage } from "@/app/app/projects/[id]/materials/purchase-orders/_components/purchase-orders-page";
 
 export const metadata: Metadata = { title: "Purchase Orders" };
 

@@ -1,4 +1,4 @@
-import { mockApi, type ApiCall } from "../../../.storybook/mocks/api";
+import { mockApi, type ApiCall } from "@/.storybook/mocks/api";
 import {
   PROCUREMENT_ACCESS_MENUS,
   type ProcurementAccessMenu,

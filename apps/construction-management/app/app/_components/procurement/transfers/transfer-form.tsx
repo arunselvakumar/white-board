@@ -26,8 +26,8 @@ import {
   formatQuantity,
   localToday,
   QUANTITY_PATTERN,
-} from "@/components/procurement/inventory/inventory-format";
-import { StockErrorAlert } from "@/components/procurement/inventory/stock-error-alert";
+} from "@/app/app/_components/procurement/inventory/inventory-format";
+import { StockErrorAlert } from "@/app/app/_components/procurement/inventory/stock-error-alert";
 import { MaterialPicker } from "@/app/app/_components/procurement/material-picker";
 import type { StockLocation } from "@/src/procurement/domain/stock-location";
 import { QueryHttpError } from "@/src/queries/http";

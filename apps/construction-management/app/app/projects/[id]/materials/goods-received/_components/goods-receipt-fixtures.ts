@@ -1,4 +1,4 @@
-import type { ApiCall } from "../../../.storybook/mocks/api";
+import type { ApiCall } from "@/.storybook/mocks/api";
 import { PROCUREMENT_ACCESS_MENUS } from "@/app/api/construction/procurement/access/access-models";
 import {
   documentsHandler,

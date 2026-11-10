@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { QuerySuspense } from "@/components/query-suspense";
-import { PurchaseOrderForm } from "@/components/procurement/purchase-orders/purchase-order-form";
+import { PurchaseOrderForm } from "@/app/app/projects/[id]/materials/purchase-orders/_components/purchase-order-form";
 import { PurchaseOrderFormSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 export const metadata: Metadata = { title: "Add Purchase Order" };

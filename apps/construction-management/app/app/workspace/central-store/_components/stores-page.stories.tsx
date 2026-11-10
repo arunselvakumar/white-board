@@ -1,8 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
-import { StoryQueries } from "../../../.storybook/mocks/api";
-import { access, IDS, mockCentralStoreApi } from "./central-store-fixtures";
+import { StoryQueries } from "@/.storybook/mocks/api";
+import {
+  access,
+  IDS,
+  mockCentralStoreApi,
+} from "@/app/app/_components/procurement/stores/central-store-fixtures";
 import { StoresPage } from "./stores-page";
 
 const meta = {

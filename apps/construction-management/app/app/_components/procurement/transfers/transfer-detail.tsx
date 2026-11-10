@@ -43,8 +43,8 @@ import {
   formatDate,
   formatQuantity,
   localToday,
-} from "@/components/procurement/inventory/inventory-format";
-import { StockErrorAlert } from "@/components/procurement/inventory/stock-error-alert";
+} from "@/app/app/_components/procurement/inventory/inventory-format";
+import { StockErrorAlert } from "@/app/app/_components/procurement/inventory/stock-error-alert";
 import { TRANSFER_TYPE_LABELS } from "@/src/procurement/domain/material-transfer";
 import { QueryHttpError } from "@/src/queries/http";
 import {

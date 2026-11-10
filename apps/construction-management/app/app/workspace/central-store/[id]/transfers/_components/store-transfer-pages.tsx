@@ -2,11 +2,11 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-import { centralStoreHref } from "@/components/procurement/stores/central-store-parts";
+import { centralStoreHref } from "@/app/app/_components/procurement/stores/central-store-parts";
 import { transferQuery } from "@/src/queries/material-transfers";
 
-import { TransferDetail } from "./transfer-detail";
-import { TransferForm } from "./transfer-form";
+import { TransferDetail } from "@/app/app/_components/procurement/transfers/transfer-detail";
+import { TransferForm } from "@/app/app/_components/procurement/transfers/transfer-form";
 
 /** A Material Transfer from a Central Store (CM-507, CM-508). */
 export function StoreTransferNew({ storeId }: { storeId: string }) {

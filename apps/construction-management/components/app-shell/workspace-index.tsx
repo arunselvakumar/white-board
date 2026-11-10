@@ -7,7 +7,7 @@ import { CentralReportsWorkspaceTile } from "@/components/reports/central-report
 import {
   CentralInventoryWorkspaceTile,
   CentralStoreWorkspaceTile,
-} from "@/components/procurement/stores/central-store-workspace-tiles";
+} from "@/app/app/workspace/_components/central-store-workspace-tiles";
 
 /**
  * Work across all Projects (`docs/00-overview.md`): Central Store (CM-508),

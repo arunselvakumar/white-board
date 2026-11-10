@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { GoodsReceiptDetail } from "@/components/procurement/goods-receipts/goods-receipt-detail";
+import { GoodsReceiptDetail } from "@/app/app/projects/[id]/materials/goods-received/[grnId]/_components/goods-receipt-detail";
 import { GoodsReceiptDetailSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 

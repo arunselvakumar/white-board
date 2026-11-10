@@ -7,9 +7,9 @@ import {
   transferQuery,
 } from "@/src/queries/material-transfers";
 
-import { TransferDetail } from "./transfer-detail";
-import { TransferForm } from "./transfer-form";
-import { TransfersList } from "./transfers-list";
+import { TransferDetail } from "@/app/app/_components/procurement/transfers/transfer-detail";
+import { TransferForm } from "@/app/app/_components/procurement/transfers/transfer-form";
+import { TransfersList } from "@/app/app/_components/procurement/transfers/transfers-list";
 
 /** A Project's Material Transfers tab (CM-507). */
 export function ProjectTransfersList({ projectId }: { projectId: string }) {

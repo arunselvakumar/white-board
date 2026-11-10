@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
-import { ProjectTransfersList } from "@/components/procurement/transfers/project-transfer-pages";
+import { ProjectTransfersList } from "@/app/app/projects/[id]/materials/transfers/_components/project-transfer-pages";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
 
 export const metadata: Metadata = { title: "Material Transfers" };

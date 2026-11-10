@@ -25,7 +25,7 @@ import {
 import { Spinner } from "@repo/ui/components/spinner";
 
 import { FormAlert } from "@/components/auth/form-alert";
-import { formatDate } from "@/components/procurement/inventory/inventory-format";
+import { formatDate } from "@/app/app/_components/procurement/inventory/inventory-format";
 import { QueryHttpError } from "@/src/queries/http";
 import {
   isPreparing,

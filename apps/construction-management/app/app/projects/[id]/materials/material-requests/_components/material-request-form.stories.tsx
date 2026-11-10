@@ -2,12 +2,12 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { getRouter } from "@storybook/nextjs-vite/navigation.mock";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
+import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import {
   API,
   IDS,
   mockCentralStoreApi,
-} from "@/components/procurement/stores/central-store-fixtures";
+} from "@/app/app/_components/procurement/stores/central-store-fixtures";
 
 import { MaterialRequestForm } from "./material-request-form";
 import { pickMaterial } from "@/app/app/_components/procurement/material-options-fixtures";

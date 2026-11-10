@@ -23,7 +23,7 @@ import { storesQuery, type Store } from "@/src/queries/stores";
 import {
   CENTRAL_INVENTORY_PATH,
   centralStoreHref,
-} from "./central-store-parts";
+} from "@/app/app/_components/procurement/stores/central-store-parts";
 
 function count(n: number, one: string, many: string): string {
   return `${String(n)} ${n === 1 ? one : many}`;

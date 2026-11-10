@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
 import { StoryQueries } from "@/.storybook/mocks/api";
-import { mockCentralStoreApi } from "@/components/procurement/stores/central-store-fixtures";
+import { mockCentralStoreApi } from "@/app/app/_components/procurement/stores/central-store-fixtures";
 
 import { CentralInventoryPage } from "./central-inventory-page";
 

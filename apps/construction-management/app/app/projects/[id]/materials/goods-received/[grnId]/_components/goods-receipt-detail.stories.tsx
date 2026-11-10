@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { getRouter } from "@storybook/nextjs-vite/navigation.mock";
 import { expect, waitFor, within } from "storybook/test";
 
-import { mockApi, StoryQueries } from "../../../.storybook/mocks/api";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import { goodsReceiptPdfUrl } from "@/src/queries/goods-receipts";
 
 import {
@@ -12,7 +12,7 @@ import {
   PROJECT_ID,
   RECEIPT,
   RECEIPT_NO_FINANCIAL,
-} from "./goods-receipt-fixtures";
+} from "@/app/app/projects/[id]/materials/goods-received/_components/goods-receipt-fixtures";
 import { GoodsReceiptDetail } from "./goods-receipt-detail";
 
 let api: ReturnType<typeof mockApi>;

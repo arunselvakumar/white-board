@@ -31,14 +31,14 @@ import {
 import { purchaseOrderQuery } from "@/src/queries/purchase-orders";
 import { gstStateName } from "@/src/shared-kernel/gst-states";
 
-import { PurchaseOrderActions } from "./purchase-order-actions";
+import { PurchaseOrderActions } from "@/app/app/projects/[id]/materials/purchase-orders/_components/purchase-order-actions";
 import {
   purchaseOrdersPath,
   RECEIPT_LABELS,
   ReceiptBadge,
   StageBadge,
   STAGE_LABELS,
-} from "./purchase-order-format";
+} from "@/app/app/projects/[id]/materials/purchase-orders/_components/purchase-order-format";
 import { FactValueSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {

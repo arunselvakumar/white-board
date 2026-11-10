@@ -43,7 +43,10 @@ import {
   procurementAccessQuery,
 } from "@/src/queries/procurement-access";
 
-import { StockShortfallAlert, stockShortfalls } from "./goods-receipt-errors";
+import {
+  StockShortfallAlert,
+  stockShortfalls,
+} from "@/app/app/projects/[id]/materials/goods-received/_components/goods-receipt-errors";
 import {
   DELIVERY_FIELDS,
   formatDate,
@@ -54,7 +57,7 @@ import {
   SUPPLIER_FIELDS,
   SUPPLY_TYPE_LABELS,
   type GrnField,
-} from "./goods-receipt-parts";
+} from "@/app/app/projects/[id]/materials/goods-received/_components/goods-receipt-parts";
 
 function Fact({ label, value }: { label: string; value: string }) {
   return (

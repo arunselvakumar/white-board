@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { QuerySuspense } from "@/components/query-suspense";
-import { EditPurchaseOrder } from "@/components/procurement/purchase-orders/edit-purchase-order";
+import { EditPurchaseOrder } from "@/app/app/projects/[id]/materials/purchase-orders/[poId]/edit/_components/edit-purchase-order";
 import {
   EditDocumentSkeleton,
   PurchaseOrderFormSkeleton,

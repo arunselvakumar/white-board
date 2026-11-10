@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
-import { MaterialRequestForm } from "@/components/procurement/material-requests/material-request-form";
+import { MaterialRequestForm } from "@/app/app/projects/[id]/materials/material-requests/_components/material-request-form";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
 import { MaterialRequestFormSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
