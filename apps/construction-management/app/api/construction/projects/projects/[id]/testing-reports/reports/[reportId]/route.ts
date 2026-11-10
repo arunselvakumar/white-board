@@ -8,7 +8,7 @@ import { toTestingReportResponse } from "../../testing-report-responses";
 
 export const dynamic = "force-dynamic";
 
-/** One testing report (CM-409). */
+/** One testing report. */
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string; reportId: string }> },

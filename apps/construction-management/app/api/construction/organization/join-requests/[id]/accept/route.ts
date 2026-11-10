@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createJoinRequestHandlers();
 
-/** Accepts a Join Request and makes that Company active (CM-109). */
+/** Accepts a Join Request and makes that Company active. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

@@ -9,7 +9,7 @@ import { HrmsTemplateIdParamsModel } from "../../shift-models";
 
 export const dynamic = "force-dynamic";
 
-/** Deletes a shift template nobody uses; 409 `SHIFT_TEMPLATE_IN_USE` otherwise (CM-306). */
+/** Deletes a shift template nobody uses; 409 `SHIFT_TEMPLATE_IN_USE` otherwise. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

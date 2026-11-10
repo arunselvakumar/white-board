@@ -12,7 +12,7 @@ import { projectDrawings } from "../../handlers";
 export const dynamic = "force-dynamic";
 
 /**
- * Moves a drawing to another album of the Project (CM-408). 404
+ * Moves a drawing to another album of the Project. 404
  * `ALBUM_NOT_FOUND` for an album that is not the Project's; 409
  * `DRAWING_CHANGED` on a stale `updatedAt`.
  */

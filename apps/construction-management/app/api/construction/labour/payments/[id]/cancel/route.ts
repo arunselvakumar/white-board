@@ -15,7 +15,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Cancels a payment (CM-215): the row is tombstoned and its ledger entry
+ * Cancels a payment: the row is tombstoned and its ledger entry
  * reversed, so the balance is restored. Needs Labour or Vendor delete on
  * the payment's Project; the back-dated edit limit applies to its date.
  * There is no edit: cancel and record again.

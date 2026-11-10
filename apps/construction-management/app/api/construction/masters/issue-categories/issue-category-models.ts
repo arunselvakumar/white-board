@@ -4,7 +4,7 @@ import { issueCategoryModels } from "../_lib/tracking-master-models";
 
 const models = issueCategoryModels();
 
-/** Issue Categories' models (CM-801, ADR CM-0019 §1). */
+/** Issue Categories' models (ADR CM-0019 §1). */
 export const ConstructionMastersIssueCategoryResponseModel = models.response;
 export type ConstructionMastersIssueCategoryResponseModel = z.infer<
   typeof ConstructionMastersIssueCategoryResponseModel

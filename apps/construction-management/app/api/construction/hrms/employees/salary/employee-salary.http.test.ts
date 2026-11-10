@@ -263,7 +263,7 @@ describe("Employee salary configuration HTTP (CM-315)", () => {
       }),
     ).toBe(2);
 
-    // The run reads the row in force for a date (CM-316).
+    // The run reads the row in force for a date.
     const source = createSalaryConfigSource();
     const march = await source.inForce(
       owner.workspaceId,

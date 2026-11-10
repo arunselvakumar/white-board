@@ -36,7 +36,7 @@ const quantity = z.string().trim().min(1).max(20);
 const text = z.string().max(APPROVAL_LIMITS.maxTextLength);
 
 /**
- * A place on the Project (CM-403 `LocationRef`): a Wing with any Floors
+ * A place on the Project (`LocationRef`): a Wing with any Floors
  * and Units, an Amenity, a Common Development, or a Location. Checked
  * against the Project on save.
  */

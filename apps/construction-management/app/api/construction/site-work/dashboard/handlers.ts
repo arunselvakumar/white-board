@@ -7,7 +7,7 @@ import {
 import { SiteWorkDashboard } from "@/src/site-work/application/site-work-dashboard";
 import { prismaSiteWorkDashboardStore } from "@/src/site-work/infrastructure/prisma-site-work-dashboard-store";
 
-/** The Project Dashboard's site-work sections (CM-608). */
+/** The Project Dashboard's site-work sections. */
 export const siteWorkDashboard = new SiteWorkDashboard({
   db: prisma,
   store: prismaSiteWorkDashboardStore,

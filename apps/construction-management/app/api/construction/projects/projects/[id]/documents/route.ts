@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 type Context = { params: Promise<{ id: string }> };
 
-/** The Project's documents, newest first, with the bytes they take (CM-414). */
+/** The Project's documents, newest first, with the bytes they take. */
 export async function GET(
   request: Request,
   context: Context,

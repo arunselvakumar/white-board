@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createBackdatedPolicyHandlers();
 
-/** The Active Company's Back-dated Entry policy (CM-113). */
+/** The Active Company's Back-dated Entry policy. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(

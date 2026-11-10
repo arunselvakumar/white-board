@@ -17,7 +17,7 @@ const download = z.object({
   href: z.string(),
 });
 
-/** One notification in the member's list (CM-904). */
+/** One notification in the member's list. */
 export const ConstructionMessagingNotificationResponseModel = z.object({
   id: z.uuid(),
   /** e.g. `task.assigned`, `approval.requested`, `report.ready`. */

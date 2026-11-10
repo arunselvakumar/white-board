@@ -29,7 +29,7 @@ export function toWorkTypeResponse(
 /** Work Types' handlers; delete asks site work whether a worksheet uses one. */
 const handlers = createWorkTypeHandlers({ usage: siteWorkWorkTypeUsage() });
 
-/** Work Types under the `masters.work_types` Menu (CM-601). */
+/** Work Types under the `masters.work_types` Menu. */
 export const workTypeRoutes = masterRoutes({
   menu: "masters.work_types",
   createModel: CreateConstructionMastersWorkTypeRequestModel,

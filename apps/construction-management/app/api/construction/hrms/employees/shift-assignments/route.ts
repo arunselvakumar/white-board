@@ -18,7 +18,7 @@ export const dynamic = "force-dynamic";
 
 const assignments = createShiftAssignmentHandlers();
 
-/** Every Team Member's shift or rotation today, what is planned, and history (CM-307). */
+/** Every Team Member's shift or rotation today, what is planned, and history. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(request, "hrms.shifts", "read");
@@ -44,7 +44,7 @@ export async function GET(request: Request): Promise<Response> {
 
 /**
  * Assigns a shift or a rotation to many Team Members from a date, until
- * changed; the assignment in force closes the day before (CM-307).
+ * changed; the assignment in force closes the day before.
  */
 export async function POST(request: Request): Promise<Response> {
   try {

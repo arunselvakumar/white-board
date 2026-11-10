@@ -15,7 +15,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Reopens a Converted or Lost inquiry at the stage it had (CM-1007; Inquiry update). 409 `INQUIRY_BOOKING_ACTIVE` while a Converted inquiry's booking is On Hold or Booked.
+ * Reopens a Converted or Lost inquiry at the stage it had (Inquiry update). 409 `INQUIRY_BOOKING_ACTIVE` while a Converted inquiry's booking is On Hold or Booked.
  */
 export async function POST(
   request: Request,

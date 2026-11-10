@@ -45,7 +45,7 @@ const locationQuery = {
   locationId: z.uuid(),
 };
 
-/** A place inside a Project (CM-403): a Wing with Floors and Units, an Amenity, a Common Development or a Location. */
+/** A place inside a Project: a Wing with Floors and Units, an Amenity, a Common Development or a Location. */
 export const ConstructionProcurementSiteLocationModel = z.discriminatedUnion(
   "type",
   [

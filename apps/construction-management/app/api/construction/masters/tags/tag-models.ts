@@ -4,7 +4,7 @@ import { tagModels } from "../_lib/tracking-master-models";
 
 const models = tagModels();
 
-/** Tags' models (CM-801, ADR CM-0019 §1). */
+/** Tags' models (ADR CM-0019 §1). */
 export const ConstructionMastersTagResponseModel = models.response;
 export type ConstructionMastersTagResponseModel = z.infer<
   typeof ConstructionMastersTagResponseModel

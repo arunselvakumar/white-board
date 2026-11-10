@@ -23,7 +23,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * A Project's inquiries, newest first (CM-1003): by status, Funnel Stage,
+ * A Project's inquiries, newest first: by status, Funnel Stage,
  * Interest Type, Lead Source, Assignee, Due (Overdue / Today / Upcoming /
  * None on the Company's clock) and a search on the name, mobile or email.
  * Without View all, only those the caller created, is the Assignee or Lead
@@ -75,7 +75,7 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * Adds an inquiry (CM-1003): the full form and quick add are this one
+ * Adds an inquiry: the full form and quick add are this one
  * command. Open at the first Funnel Stage unless another is picked;
  * Assignee and Lead Owner default to the caller when on the Project. 409
  * `INQUIRY_DUPLICATE` (with `details.matches`) when another live inquiry

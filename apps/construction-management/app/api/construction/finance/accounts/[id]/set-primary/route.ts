@@ -8,7 +8,7 @@ import { accountHandlers as handlers, toAccountResponse } from "../../handlers";
 export const dynamic = "force-dynamic";
 
 /**
- * Set As Primary (CM-701): the account becomes the default "paid from";
+ * Set As Primary: the account becomes the default "paid from";
  * the flag moves in one transaction. Company accounts only. Needs
  * Company's Bank A/C update.
  */

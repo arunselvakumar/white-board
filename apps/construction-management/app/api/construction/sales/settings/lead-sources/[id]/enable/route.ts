@@ -2,5 +2,5 @@ import { salesPickToggleRoute } from "../../../settings-routes";
 
 export const dynamic = "force-dynamic";
 
-/** Puts it back in the inquiry pickers. Needs Inquiry update (CM-1002). */
+/** Puts it back in the inquiry pickers. Needs Inquiry update. */
 export const POST = salesPickToggleRoute("lead_source", true);

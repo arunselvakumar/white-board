@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 const MAX_BYTES = 2 * 1024 * 1024;
 
 /**
- * Imports Transactions from the sample (CM-702): the body is the .xlsx
+ * Imports Transactions from the sample: the body is the .xlsx
  * itself (as Import Inventory Stock). Every row becomes a pending
  * Transaction on the Project, or none does: 400 `IMPORT_HAS_ERRORS` with
  * `details.errors` = [{ row, field, message }]. Transactions create on

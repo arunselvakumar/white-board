@@ -12,7 +12,7 @@ import { projectDrawings } from "../../../../handlers";
 export const dynamic = "force-dynamic";
 
 /**
- * Streams one revision (CM-408): a PDF or an image is shown, a DWG or DXF
+ * Streams one revision: a PDF or an image is shown, a DWG or DXF
  * downloads; `?download=1` always downloads. The Gallery links here, so a
  * member without `projects.drawings` read gets 403.
  */

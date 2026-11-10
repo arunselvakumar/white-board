@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 /**
- * What a Team Member may change about themself (CM-115). An omitted field
+ * What a Team Member may change about themself. An omitted field
  * stays as it is; null clears it.
  */
 export const UpdateConstructionOrganizationMyProfileRequestModel = z.object({

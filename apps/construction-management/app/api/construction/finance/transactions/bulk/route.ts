@@ -8,7 +8,7 @@ import { BulkDecideConstructionFinanceTransactionsRequestModel } from "../transa
 export const dynamic = "force-dynamic";
 
 /**
- * Bulk approve or reject Transactions and transfers (CM-702), all or none.
+ * Bulk approve or reject Transactions and transfers, all or none.
  * Each one is checked for approve / reject on its own Project; any
  * refusal is 409 `BULK_DECISION_REFUSED` listing them, and nothing
  * changes.

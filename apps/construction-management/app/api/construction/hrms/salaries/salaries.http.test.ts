@@ -351,7 +351,7 @@ describe("Salary HTTP (CM-316, CM-317)", () => {
     expect(await json<{ details: unknown }>(bad)).toMatchObject({
       details: { field: "mode" },
     });
-    // CM-707: the account it was paid from is required and fits the mode.
+    // The account it was paid from is required and fits the mode.
     const { cashId, bankId } = await seededAccounts(owner.workspaceId);
     const noAccount = await markPaid(owner.cookie, [approved]);
     expect(noAccount.status).toBe(StatusCodes.BAD_REQUEST);
@@ -485,7 +485,7 @@ describe("Salary HTTP (CM-316, CM-317)", () => {
       advance: { amount: 900_000, instalments: 3, firstRecoveryMonth: MONTH },
       payment: { accountId: body.accountId },
     });
-    // The advance left the cash account (CM-707).
+    // The advance left the cash account.
     expect(await accountBalance(owner.workspaceId, body.accountId)).toBe(
       -900_000n,
     );

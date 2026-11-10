@@ -43,7 +43,7 @@ export const equipmentSheetSettingsHandlers =
       null,
   });
 
-/** One set of Equipment Usage sheet handlers for every route (CM-604). */
+/** One set of Equipment Usage sheet handlers for every route. */
 export const equipmentSheetHandlers = new EquipmentSheetHandlers({
   db: prisma,
   store: new PrismaEquipmentSheetStore(),

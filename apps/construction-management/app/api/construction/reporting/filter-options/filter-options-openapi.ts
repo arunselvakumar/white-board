@@ -11,7 +11,7 @@ import {
   REPORT_FILTER_OPTIONS_PATH,
 } from "./filter-options-models";
 
-/** The report cards' picker choices (CM-903). */
+/** The report cards' picker choices. */
 export const reportingFilterOptionsOpenApiComponents: OpenApiComponents = {
   ListConstructionReportingFilterOptionsResponseModel,
 };

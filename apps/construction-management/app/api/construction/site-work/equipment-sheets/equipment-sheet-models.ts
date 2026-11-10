@@ -359,7 +359,7 @@ export type ListConstructionSiteWorkEquipmentSheetsResponseModel = z.infer<
 export const BulkDecideConstructionSiteWorkEquipmentSheetsResponseModel =
   z.object({ decided: z.int().nonnegative() });
 
-/** A Project's equipment-sheet settings (CM-0016 §2). */
+/** A Project's equipment-sheet settings (ADR CM-0016 §2). */
 export const ConstructionSiteWorkEquipmentSheetSettingsResponseModel = z.object(
   {
     projectId: z.uuid(),

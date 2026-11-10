@@ -28,7 +28,7 @@ import {
   salesUnitOpenApiOperations,
 } from "./units/units-openapi";
 
-/** Every sales model (M10); each area owns its own file. */
+/** Every sales model; each area owns its own file. */
 export const salesOpenApiComponents: OpenApiComponents = {
   ...salesAccessOpenApiComponents,
   ...salesSettingsOpenApiComponents,
@@ -38,7 +38,7 @@ export const salesOpenApiComponents: OpenApiComponents = {
   ...salesDashboardOpenApiComponents,
 };
 
-/** Every sales operation (M10). */
+/** Every sales operation. */
 export const salesOpenApiOperations: OpenApiOperation[] = [
   ...salesAccessOpenApiOperations,
   ...salesSettingsOpenApiOperations,

@@ -26,7 +26,7 @@ export const dynamic = "force-dynamic";
 type Context = { params: Promise<{ id: string; itemId: string }> };
 
 /**
- * A page of a testing item's reports (CM-409), newest report date first,
+ * A page of a testing item's reports, newest report date first,
  * searched by name, with cursors both ways and the total. The cursor is
  * the report date (as `createdAt` of the kernel's cursor) and the id.
  */
@@ -84,7 +84,7 @@ export async function GET(
 }
 
 /**
- * Finishes adding a report (CM-409): its details and the uploaded file at
+ * Finishes adding a report: its details and the uploaded file at
  * `key`. 201 for a new report, 200 when the key was already recorded.
  * 403 under the back-dated policy for Material Testing Report.
  */

@@ -45,7 +45,7 @@ const PresignConstructionProjectsTestingReportUploadRequestModel =
 const PresignConstructionProjectsTestingReportUploadResponseModel =
   presignUploadResponseModel();
 
-/** Testing Reports' models (CM-409). */
+/** Testing Reports' models. */
 export const testingReportOpenApiComponents: OpenApiComponents = {
   ConstructionProjectsTestingItemResponseModel,
   ListConstructionProjectsTestingItemsResponseModel,
@@ -61,7 +61,7 @@ export const testingReportOpenApiComponents: OpenApiComponents = {
   PresignConstructionProjectsTestingReportUploadResponseModel,
 };
 
-/** Testing Reports' routes (CM-409), under `projects.testing_reports`. */
+/** Testing Reports' routes, under `projects.testing_reports`. */
 export const testingReportOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

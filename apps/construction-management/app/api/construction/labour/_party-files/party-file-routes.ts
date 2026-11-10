@@ -26,8 +26,8 @@ import {
 } from "./party-file-models";
 
 /**
- * Photo and "Other Documents" routes for a labourer or a vendor (CM-205,
- * CM-208). A route file binds one of these to its owner type, its Menu
+ * Photo and "Other Documents" routes for a labourer or a vendor. A route
+ * file binds one of these to its owner type, its Menu
  * (read for downloads, update for changes) and its base path:
  *
  *   export const { GET, POST } = partyPhotoRoutes(LABOUR_FILES);

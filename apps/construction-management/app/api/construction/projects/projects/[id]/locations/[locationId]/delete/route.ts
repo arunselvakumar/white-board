@@ -9,7 +9,7 @@ import { ConstructionProjectsLocationParamsModel } from "../../location-models";
 
 export const dynamic = "force-dynamic";
 
-/** Deletes a Location (CM-405): a tombstone; 409 `LOCATION_IN_USE` when used. */
+/** Deletes a Location: a tombstone; 409 `LOCATION_IN_USE` when used. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string; locationId: string }> },

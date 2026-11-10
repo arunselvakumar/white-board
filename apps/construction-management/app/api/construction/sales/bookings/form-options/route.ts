@@ -15,7 +15,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The booking form's unit picker (CM-1006): each Wing with the units that
+ * The booking form's unit picker: each Wing with the units that
  * can be booked now — live, not Unavailable, no active booking (a hold
  * past its Hold until date does not count). Needs Booking create.
  */

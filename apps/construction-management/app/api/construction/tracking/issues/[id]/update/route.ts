@@ -12,7 +12,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Edits an open (Pending or Delayed) issue (CM-803). Needs update on its
+ * Edits an open (Pending or Delayed) issue. Needs update on its
  * Project; 409 `ISSUE_NOT_OPEN` once solved or closed, 409 `ISSUE_CHANGED`
  * when `expectedUpdatedAt` is stale. The back-dated edit limit applies to
  * the old Issue Date and, when it changes, the new one.

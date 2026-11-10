@@ -13,7 +13,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Ask to cancel approved leave with a reason (CM-312); the balance is restored once an approver agrees. */
+/** Ask to cancel approved leave with a reason; the balance is restored once an approver agrees. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

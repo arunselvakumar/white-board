@@ -11,7 +11,7 @@ import { SampleConstructionHrmsHolidaysRequestModel } from "../holiday-models";
 
 export const dynamic = "force-dynamic";
 
-/** The sample Excel sheet for the holiday import (CM-305). */
+/** The sample Excel sheet for the holiday import. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(request, "hrms.holidays", "read");

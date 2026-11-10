@@ -12,7 +12,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Save on Edit Wing (CM-402): name, Phase and every floor the Wing keeps.
+ * Save on Edit Wing: name, Phase and every floor the Wing keeps.
  * Rows keep their ids; 409 `WING_CHANGED` when `expectedUpdatedAt` is stale.
  */
 export async function POST(

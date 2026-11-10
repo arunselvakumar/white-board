@@ -10,7 +10,7 @@ import { toLeaveStructureResponse } from "../leave-structure-models";
 
 export const dynamic = "force-dynamic";
 
-/** One leave structure (CM-311). */
+/** One leave structure. */
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> },

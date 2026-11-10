@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 const dashboard = createDashboardQueries();
 
 /**
- * The HRMS Dashboard (CM-319): today's snapshot, breakdown and trend,
+ * The HRMS Dashboard: today's snapshot, breakdown and trend,
  * pending approvals, upcoming leave and holidays, and the caller's own day.
  * Needs `hrms.hrms` read; each section needs its own flag.
  */

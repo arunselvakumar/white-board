@@ -14,8 +14,8 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Active labourers on a Project on a date, for attendance pickers
- * (CM-210). Needs `read` on Attendance for that Project; rates need
+ * Active labourers on a Project on a date, for attendance pickers. Needs
+ * `read` on Attendance for that Project; rates need
  * `financial` on Labour.
  */
 export async function GET(request: Request): Promise<Response> {

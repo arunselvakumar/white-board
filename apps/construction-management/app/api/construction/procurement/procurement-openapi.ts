@@ -52,7 +52,7 @@ import {
   materialTransferOpenApiOperations,
 } from "./transfers/transfers-openapi";
 
-/** Every procurement model (M5); each area owns its own file. */
+/** Every procurement model; each area owns its own file. */
 export const procurementOpenApiComponents: OpenApiComponents = {
   ...accessOpenApiComponents,
   ...purchaseRequestOpenApiComponents,
@@ -68,7 +68,7 @@ export const procurementOpenApiComponents: OpenApiComponents = {
   ...procurementDashboardOpenApiComponents,
 };
 
-/** Every procurement operation (M5). */
+/** Every procurement operation. */
 export const procurementOpenApiOperations: OpenApiOperation[] = [
   ...accessOpenApiOperations,
   ...purchaseRequestOpenApiOperations,

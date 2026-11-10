@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createJoinRequestHandlers();
 
-/** Declines a Join Request (CM-109). The Owner can send a new link later. */
+/** Declines a Join Request. The Owner can send a new link later. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

@@ -37,7 +37,7 @@ function decodeCursor(value: string | undefined): Cursor | undefined {
   throw new DomainError("CURSOR_INVALID", "This page link is not valid.");
 }
 
-/** Paid subscription orders, newest first (CM-117). Owner only. */
+/** Paid subscription orders, newest first. Owner only. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireOwnerSession(request);

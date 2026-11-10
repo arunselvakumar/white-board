@@ -27,8 +27,8 @@ export function toPaymentCategoryResponse(
 const categories = new PaymentCategories();
 
 /**
- * Payment Categories under the `masters.payment_categories` menu (CM-704,
- * ADR CM-0017 §1): the masters' seven routes, served from finance.
+ * Payment Categories under the `masters.payment_categories` menu (ADR
+ * CM-0017 §1): the masters' seven routes, served from finance.
  */
 export const paymentCategoryRoutes = masterRoutes({
   menu: "masters.payment_categories",

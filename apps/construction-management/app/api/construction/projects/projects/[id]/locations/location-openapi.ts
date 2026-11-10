@@ -26,7 +26,7 @@ const ERRORS = [
   StatusCodes.NOT_FOUND,
 ] as const;
 
-/** Locations' models (CM-405). */
+/** Locations' models. */
 export const locationOpenApiComponents: OpenApiComponents = {
   ConstructionProjectsLocationResponseModel,
   ListConstructionProjectsLocationsResponseModel,
@@ -35,7 +35,7 @@ export const locationOpenApiComponents: OpenApiComponents = {
   MoveConstructionProjectsLocationRequestModel,
 };
 
-/** Locations' routes (CM-405), under the `projects.locations` menu. */
+/** Locations' routes, under the `projects.locations` menu. */
 export const locationOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

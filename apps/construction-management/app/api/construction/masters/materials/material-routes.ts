@@ -43,7 +43,7 @@ function rateOf(body: {
   };
 }
 
-/** Materials under the `masters.materials` Menu (CM-501). */
+/** Materials under the `masters.materials` Menu. */
 export const materialRoutes = pagedMasterRoutes({
   menu: "masters.materials",
   listQuery: ListConstructionMastersMaterialsQueryModel,
@@ -80,7 +80,7 @@ export const materialRoutes = pagedMasterRoutes({
 });
 
 /**
- * Who may read the picker (CM-501): Materials Read, or Read on any menu
+ * Who may read the picker: Materials Read, or Read on any menu
  * whose forms pick a Material. Project-level menus are checked without a
  * Project here: the options are Company masters, not Project data.
  */
@@ -96,9 +96,9 @@ export const MATERIAL_PICKER_MENUS: readonly MenuKey[] = [
   "procurement.central_store",
   "procurement.material_requests",
   "procurement.delivery_notes",
-  // Work Types assign Materials (CM-601).
+  // Work Types assign Materials.
   "masters.work_types",
-  // Daily Worksheets and Equipment Usage sheets consume Materials (CM-602, CM-604).
+  // Daily Worksheets and Equipment Usage sheets consume Materials.
   "site_work.daily_worksheet",
   "site_work.equipment_usage",
 ];

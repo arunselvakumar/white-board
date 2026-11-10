@@ -24,7 +24,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * Invoices on a Project (or a Store), newest first: by party, direction,
- * status, outstanding or overdue (CM-705, CM-706, CM-708). Needs Parties
+ * status, outstanding or overdue. Needs Parties
  * read on the Project; a Store is the Owner's.
  */
 export async function GET(request: Request): Promise<Response> {
@@ -64,7 +64,7 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * Records an invoice (CM-705, CM-706, CM-708): a bill from a Contractor,
+ * Records an invoice: a bill from a Contractor,
  * Supplier or Other Party (typed number, unique per party), or a sales
  * invoice to an Other Party (INV number). A Supplier's invoice may gather
  * GRNs awaiting an invoice. Posts the party entry. Needs Parties create.

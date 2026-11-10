@@ -13,7 +13,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The Project Dashboard's Inquiry section (CM-1008, ADR CM-0022 §11):
+ * The Project Dashboard's Inquiry section (ADR CM-0022 §11):
  * Total, Converted, Lost and Conv. Rate by Inquiry Date in the duration;
  * Open and Overdue now; the funnel; lead source and sales team
  * performance; Call Activity in its own period. Behind Dashboard Read on

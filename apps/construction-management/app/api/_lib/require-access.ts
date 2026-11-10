@@ -25,8 +25,8 @@ export type AccessSession = CompanySession & { access: MemberAccess };
  * `NO_ACTIVE_COMPANY` as `requireCompanySession`, then 403
  * `PERMISSION_DENIED` unless `can(member, menu, flag, { projectId })`,
  * then 402 `PLAN_EXPIRED` for a write flag (create, update, delete,
- * approve, reject, transfer, import) once the Company's plan has ended
- * (CM-118). Reads and `export` stay open on an ended plan.
+ * approve, reject, transfer, import) once the Company's plan has ended.
+ * Reads and `export` stay open on an ended plan.
  */
 export async function requireAccess(
   request: Request,

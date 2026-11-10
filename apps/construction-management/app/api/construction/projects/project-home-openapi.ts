@@ -37,8 +37,8 @@ const SESSION_ERRORS = [
 ] as const;
 
 /**
- * Models of a Project's Amenities and Common Developments (CM-404), its
- * home and preferences (CM-411) and its dashboard (CM-412).
+ * Models of a Project's Amenities and Common Developments, its
+ * home and preferences and its dashboard.
  */
 export const projectHomeOpenApiComponents: OpenApiComponents = {
   ConstructionProjectsProjectDevelopmentsResponseModel,
@@ -54,7 +54,7 @@ export const projectHomeOpenApiComponents: OpenApiComponents = {
   ConstructionProjectsProjectSummaryResponseModel,
 };
 
-/** Routes of CM-404 (Project side), CM-411 and CM-412. */
+/** Routes of a Project's developments, home and hidden modules. */
 export const projectHomeOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

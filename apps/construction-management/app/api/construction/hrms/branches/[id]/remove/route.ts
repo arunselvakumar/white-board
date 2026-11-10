@@ -9,7 +9,7 @@ import { branches } from "../../handlers";
 
 export const dynamic = "force-dynamic";
 
-/** Removes a fence ("Remove Fence"); its member links go with it (CM-304). */
+/** Removes a fence ("Remove Fence"); its member links go with it. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

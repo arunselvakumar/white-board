@@ -10,7 +10,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** One Project (CM-204); 404 for a Member not assigned to it. */
+/** One Project; 404 for a Member not assigned to it. */
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> },

@@ -15,7 +15,7 @@ import { ImportConstructionFinanceTransactionsRequestModel } from "../transactio
 export const dynamic = "force-dynamic";
 
 /**
- * The Transactions import sample (CM-702): the headers and one example
+ * The Transactions import sample: the headers and one example
  * row naming one of the Company's Bank accounts. Transactions read on the
  * Project.
  */

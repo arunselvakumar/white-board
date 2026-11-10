@@ -12,7 +12,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** The Company's leave types, inactive ones included, by name (CM-310). */
+/** The Company's leave types, inactive ones included, by name. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await leaveAccess(request, {
@@ -30,7 +30,7 @@ export async function GET(request: Request): Promise<Response> {
   }
 }
 
-/** Adds a leave type (CM-310), audited. */
+/** Adds a leave type, audited. */
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await leaveAccess(request, {

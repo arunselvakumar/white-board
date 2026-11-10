@@ -66,7 +66,7 @@ describe("the report catalogue HTTP (ADR CM-0021 §2)", () => {
     expect(kinds).toContain("task_report");
     expect(kinds).toContain("due_payments");
     expect(kinds).toContain("daily_progress_report");
-    // Central-only reports are left out; the procurement ones are in (CM-903).
+    // Central-only reports are left out; the procurement ones are in.
     expect(kinds).not.toContain("tds_194c");
     expect(kinds).not.toContain("labour_attendance_central");
     expect(kinds).toEqual(

@@ -9,7 +9,7 @@ import { BulkDeleteConstructionTrackingTasksRequestModel } from "../task-models"
 export const dynamic = "force-dynamic";
 
 /**
- * Deletes the chosen tasks and their sub-tasks (CM-802), all or none: 404
+ * Deletes the chosen tasks and their sub-tasks, all or none: 404
  * `TASK_NOT_FOUND` with `details.ids`; 409 `TASK_IN_USE` listing every
  * task a live Daily Worksheet names, with `details.worksheetCount`. Needs
  * Task delete on the Project.

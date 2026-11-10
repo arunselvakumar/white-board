@@ -38,7 +38,7 @@ const WRITE_ERRORS = [
 
 const ITEM = `${OTHER_EXPENSES_PATH}/{id}`;
 
-/** Other Expense models (CM-704). */
+/** Other Expense models. */
 export const financeOtherExpenseOpenApiComponents: OpenApiComponents = {
   CreateConstructionFinanceOtherExpenseRequestModel,
   UpdateConstructionFinanceOtherExpenseRequestModel,

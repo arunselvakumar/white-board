@@ -29,7 +29,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * Goods Receipts of a Project or Store, newest first, by GR Date, supplier,
- * PO (or without one) and number / invoice / challan search (CM-505).
+ * PO (or without one) and number / invoice / challan search.
  * Material Received read on the location; without View All only the
  * caller's own; values need Financial.
  */

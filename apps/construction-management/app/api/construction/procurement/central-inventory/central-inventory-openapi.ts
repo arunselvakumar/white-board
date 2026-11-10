@@ -14,13 +14,13 @@ import {
   GetConstructionProcurementStockLedgerResponseModel,
 } from "./central-inventory-models";
 
-/** Request and Response models of `/api/construction/procurement/central-inventory` (M5). */
+/** Request and Response models of `/api/construction/procurement/central-inventory`. */
 export const centralInventoryOpenApiComponents: OpenApiComponents = {
   GetConstructionProcurementCentralInventoryResponseModel,
   GetConstructionProcurementStockLedgerResponseModel,
 };
 
-/** Operations of `/api/construction/procurement/central-inventory` (CM-509; menu `procurement.central_inventory`). */
+/** Operations of `/api/construction/procurement/central-inventory` (menu `procurement.central_inventory`). */
 export const centralInventoryOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

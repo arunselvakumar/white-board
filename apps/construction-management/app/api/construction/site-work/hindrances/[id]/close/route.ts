@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * **Close** an open hindrance: its end date and, when given, the hours
- * lost (CM-607). Needs update on its Project; 409 `HINDRANCE_CLOSED` when
+ * lost. Needs update on its Project; 409 `HINDRANCE_CLOSED` when
  * it already has an end date.
  */
 export async function POST(

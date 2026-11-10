@@ -7,7 +7,7 @@ import { LabourIdParamsModel, toLabourResponse } from "../labour-models";
 
 export const dynamic = "force-dynamic";
 
-/** One labourer of the Active Company (CM-207). */
+/** One labourer of the Active Company. */
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> },

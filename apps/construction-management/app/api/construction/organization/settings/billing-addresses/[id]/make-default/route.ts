@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createBillingAddressHandlers();
 
-/** Makes this the Company's default billing address (CM-501). */
+/** Makes this the Company's default billing address. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

@@ -10,7 +10,7 @@ import {
 
 const handlers = createMaterialCategoryHandlers();
 
-/** Material Categories under the `masters.material_categories` Menu (CM-501). */
+/** Material Categories under the `masters.material_categories` Menu. */
 export const materialCategoryRoutes = pagedMasterRoutes({
   menu: "masters.material_categories",
   listQuery: ListConstructionMastersMaterialCategoriesQueryModel,

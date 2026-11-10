@@ -26,8 +26,8 @@ export const dynamic = "force-dynamic";
 
 /**
  * A Project's Other Expenses, newest recorded first, by date range,
- * Payment Category, account and status, with the totals of every match
- * (CM-704). Needs Other Expenses read on the Project.
+ * Payment Category, account and status, with the totals of every match.
+ * Needs Other Expenses read on the Project.
  */
 export async function GET(request: Request): Promise<Response> {
   try {
@@ -71,7 +71,7 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * Records an Other Expense (CM-704): numbered EXP on its date, pending, or
+ * Records an Other Expense: numbered EXP on its date, pending, or
  * approved with Save & Approve (needs Approve), which posts its account
  * entry at once. Needs Other Expenses create on the Project.
  */

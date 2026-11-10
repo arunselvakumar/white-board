@@ -8,7 +8,7 @@ import type { ListConstructionProjectsCustomFieldLabelsResponseModel } from "./c
 export const dynamic = "force-dynamic";
 
 /**
- * Labels for the custom-field name picker (CM-413): the ones already used
+ * Labels for the custom-field name picker: the ones already used
  * on the Company's live Projects, most used first, so a new field reuses
  * "Site engineer" rather than starting "Site Engg.".
  */

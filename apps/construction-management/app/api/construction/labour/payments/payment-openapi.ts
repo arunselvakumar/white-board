@@ -45,7 +45,7 @@ const WRITE_ERRORS = [
 
 const ITEM = `${PAYMENTS_PATH}/{id}`;
 
-/** Wage payment and balance models (CM-214, CM-215). */
+/** Wage payment and balance models. */
 export const paymentOpenApiComponents: OpenApiComponents = {
   RecordConstructionLabourWagePaymentRequestModel,
   CancelConstructionLabourWagePaymentRequestModel,

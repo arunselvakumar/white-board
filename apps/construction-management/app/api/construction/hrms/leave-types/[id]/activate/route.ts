@@ -11,7 +11,7 @@ import { toLeaveTypeResponse } from "../../leave-type-models";
 
 export const dynamic = "force-dynamic";
 
-/** Offers the leave type again (CM-310). */
+/** Offers the leave type again. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

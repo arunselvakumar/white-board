@@ -9,7 +9,7 @@ import { ConstructionTrackingTaskParamsModel } from "../../task-models";
 export const dynamic = "force-dynamic";
 
 /**
- * **Copy task** (CM-802): a copy of the task and its sub-tasks right after
+ * **Copy task**: a copy of the task and its sub-tasks right after
  * it, without progress, activity, actuals or baseline. Needs Task create.
  */
 export async function POST(

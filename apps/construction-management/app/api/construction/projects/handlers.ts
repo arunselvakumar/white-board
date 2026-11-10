@@ -10,7 +10,7 @@ import { can, isMenuKey, type MemberAccess } from "@/src/shared-kernel/access";
 import { InProcessEventDispatcher } from "@/src/shared-kernel/events";
 
 /**
- * One composition for every projects route. The plan limits (CM-118) are
+ * One composition for every projects route. The plan limits are
  * the organization context's and `ProjectCreated` reaches the other
  * contexts' seeds (CM-0022 §2); the routes are where contexts meet.
  */
@@ -19,11 +19,11 @@ export const projectHandlers = createProjectHandlers({
   events: new InProcessEventDispatcher(projectCreatedListeners()),
 });
 
-/** The Project logo (CM-401); its storage counts against the plan. */
+/** The Project logo; its storage counts against the plan. */
 export const projectLogos = createProjectLogos({ plan: createPlanGate() });
 
 /**
- * The order value (CM-413) and the budget (CM-401) need the Project menu's
+ * The order value and the budget need the Project menu's
  * Financial flag: to see them in a response and to set them on the form.
  * The Owner has every flag.
  */
@@ -31,7 +31,7 @@ export function projectFinancial(access: MemberAccess): boolean {
   return can(access, "projects.project", "financial");
 }
 
-/** The Project home and member preferences (CM-411, CM-412). */
+/** The Project home and member preferences. */
 export const projectHome = createProjectHomeHandlers();
 
 /**

@@ -36,7 +36,7 @@ async function open(request: Request, context: TaskContext) {
   return { id, taskId, session };
 }
 
-/** One Inquiry Task's commands (CM-1004), each needing Inquiry update. */
+/** One Inquiry Task's commands, each needing Inquiry update. */
 export const inquiryTaskRoutes = {
   /** Edits the title, Due date and assignee. 409 `INQUIRY_TASK_CHANGED`. */
   update: async (request: Request, context: TaskContext) => {

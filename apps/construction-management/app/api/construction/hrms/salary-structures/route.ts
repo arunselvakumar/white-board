@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createSalaryStructureHandlers();
 
-/** The Company's salary structures, by name (CM-314). */
+/** The Company's salary structures, by name. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(
@@ -34,7 +34,7 @@ export async function GET(request: Request): Promise<Response> {
   }
 }
 
-/** Adds a salary structure, audited (CM-314). */
+/** Adds a salary structure, audited. */
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(

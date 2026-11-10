@@ -24,7 +24,7 @@ const inUse = z
   .boolean()
   .describe("A live tracking record names it, so it cannot be deleted.");
 
-/** Issue Categories' models (CM-801). */
+/** Issue Categories' models. */
 export function issueCategoryModels() {
   const response = z.object({
     id: z.uuid(),
@@ -56,7 +56,7 @@ export function issueCategoryModels() {
   };
 }
 
-/** Tags' models (CM-801). */
+/** Tags' models. */
 export function tagModels() {
   const response = z.object({
     id: z.uuid(),

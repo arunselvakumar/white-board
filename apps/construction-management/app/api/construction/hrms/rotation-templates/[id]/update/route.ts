@@ -11,7 +11,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Edits (or deactivates) a rotation template; 409 when stale (CM-306). */
+/** Edits (or deactivates) a rotation template; 409 when stale. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

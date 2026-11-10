@@ -4,5 +4,5 @@ import { VENDOR_FILES } from "../../../handlers";
 
 export const dynamic = "force-dynamic";
 
-/** Removes the vendor's photo (CM-208). */
+/** Removes the vendor's photo. */
 export const POST = partyPhotoRemoveRoute(VENDOR_FILES);

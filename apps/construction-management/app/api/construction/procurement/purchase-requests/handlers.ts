@@ -29,7 +29,7 @@ import { procurementEvents } from "@/src/composition/procurement-events";
 export const PURCHASE_REQUEST_MENU =
   PROCUREMENT_DOCUMENTS.purchase_request.menu;
 
-/** One set of Purchase Request handlers for every route (CM-503). */
+/** One set of Purchase Request handlers for every route. */
 export const purchaseRequestHandlers = new PurchaseRequestHandlers({
   db: prisma,
   store: new PrismaPurchaseRequestStore(),

@@ -10,7 +10,7 @@ import { attendance } from "../handlers";
 
 export const dynamic = "force-dynamic";
 
-/** Check Out: closes today's open entry (or last night's shift) (CM-308). */
+/** Check Out: closes today's open entry (or last night's shift). */
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(request, "hrms.attendance", "create");

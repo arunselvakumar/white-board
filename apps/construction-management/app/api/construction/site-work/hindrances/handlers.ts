@@ -11,7 +11,7 @@ import type { Flag } from "@/src/shared-kernel/access";
 
 export const HINDRANCE_MENU = SITE_WORK_DOCUMENTS.hindrance.menu;
 
-/** One set of Hindrance register handlers for every route (CM-607). */
+/** One set of Hindrance register handlers for every route. */
 export const hindranceHandlers = createHindranceHandlers();
 
 /**

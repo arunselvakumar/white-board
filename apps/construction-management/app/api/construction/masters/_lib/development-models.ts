@@ -13,8 +13,8 @@ const projectIds = z
   );
 
 /**
- * Request and Response models of an Amenities or Common Developments list
- * (CM-404): a name-only list whose rows are assigned to Projects. Each call
+ * Request and Response models of an Amenities or Common Developments
+ * list: a name-only list whose rows are assigned to Projects. Each call
  * makes new schema objects, because OpenAPI component names are per schema
  * object.
  */

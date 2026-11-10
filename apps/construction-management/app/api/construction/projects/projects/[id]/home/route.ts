@@ -9,7 +9,7 @@ import { toProjectHomeResponse } from "./home-models";
 export const dynamic = "force-dynamic";
 
 /**
- * A Project's home (CM-411): the modules the caller may read, in their
+ * A Project's home: the modules the caller may read, in their
  * tile order, Wings and Locations by the Project's structure, hidden
  * modules left out (or marked, for the Project menu's Update flag).
  */

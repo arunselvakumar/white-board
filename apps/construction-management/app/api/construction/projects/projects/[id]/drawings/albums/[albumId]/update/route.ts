@@ -12,7 +12,7 @@ import { projectDrawings } from "../../../handlers";
 export const dynamic = "force-dynamic";
 
 /**
- * Renames an album (CM-408). 409 `ALBUM_CHANGED` on a stale `updatedAt`,
+ * Renames an album. 409 `ALBUM_CHANGED` on a stale `updatedAt`,
  * `ALBUM_NAME_IN_USE` for a name already in the Project.
  */
 export async function POST(

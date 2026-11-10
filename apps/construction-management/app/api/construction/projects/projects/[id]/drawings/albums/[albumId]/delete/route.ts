@@ -9,7 +9,7 @@ import { projectDrawings } from "../../../handlers";
 
 export const dynamic = "force-dynamic";
 
-/** Deletes an empty album (CM-408); 409 `ALBUM_NOT_EMPTY` while it has drawings. */
+/** Deletes an empty album; 409 `ALBUM_NOT_EMPTY` while it has drawings. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string; albumId: string }> },

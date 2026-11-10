@@ -15,7 +15,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Closes an Open inquiry as Lost with an enabled Lost Reason and optional remarks (CM-1007; Inquiry update).
+ * Closes an Open inquiry as Lost with an enabled Lost Reason and optional remarks (Inquiry update).
  */
 export async function POST(
   request: Request,

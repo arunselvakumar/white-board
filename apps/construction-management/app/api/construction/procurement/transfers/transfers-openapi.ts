@@ -36,7 +36,7 @@ const ITEM = `${TRANSFERS_PATH}/{id}`;
 const MENU =
   "menu `procurement.material_transfers` on the Project side; a Store side also needs `procurement.central_store`";
 
-/** Request and Response models of `/api/construction/procurement/transfers` (M5). */
+/** Request and Response models of `/api/construction/procurement/transfers`. */
 export const materialTransferOpenApiComponents: OpenApiComponents = {
   CreateConstructionProcurementMaterialTransferRequestModel,
   UpdateConstructionProcurementMaterialTransferRequestModel,
@@ -50,7 +50,7 @@ export const materialTransferOpenApiComponents: OpenApiComponents = {
   ListConstructionProcurementTransferLocationsResponseModel,
 };
 
-/** Operations of `/api/construction/procurement/transfers` (M5). */
+/** Operations of `/api/construction/procurement/transfers`. */
 export const materialTransferOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

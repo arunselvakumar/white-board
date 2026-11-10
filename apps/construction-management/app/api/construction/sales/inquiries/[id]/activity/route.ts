@@ -11,7 +11,7 @@ import { ConstructionSalesInquiryParamsModel } from "../../inquiry-models";
 export const dynamic = "force-dynamic";
 
 /**
- * The inquiry's timeline, newest first (CM-1004): its follow-ups merged
+ * The inquiry's timeline, newest first: its follow-ups merged
  * with its history. Inquiry read; View all as the inquiry.
  */
 export async function GET(

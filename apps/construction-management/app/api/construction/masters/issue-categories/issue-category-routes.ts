@@ -6,7 +6,7 @@ import {
 } from "./issue-category-models";
 
 /**
- * Issue Categories under the `masters.issue_categories` Menu (CM-801):
+ * Issue Categories under the `masters.issue_categories` Menu:
  * renamed and disabled (seeds too), deleted only while no live issue names
  * one.
  */

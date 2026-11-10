@@ -62,7 +62,7 @@ export type DocumentSession = CompanySession & { access: MemberAccess };
  * The Session and the member's access, for routes whose menu and Project
  * come from the document itself (the application checks them after
  * finding it: 404 first, then 403 `PERMISSION_DENIED`). A write also needs
- * an active plan (402 `PLAN_EXPIRED`, CM-118) — posting a remark included.
+ * an active plan (402 `PLAN_EXPIRED`) — posting a remark included.
  */
 export async function requireDocumentSession(
   request: Request,
@@ -114,7 +114,7 @@ function keyOf(request: Request): string {
 }
 
 /**
- * The upload routes under `{type}/{id}/files/uploads` (CM-407): start,
+ * The upload routes under `{type}/{id}/files/uploads`: start,
  * presign (deployed), app (files on disk) and thumbnail. Each needs Create
  * or Update on the document's menu, checked once the document is found.
  */

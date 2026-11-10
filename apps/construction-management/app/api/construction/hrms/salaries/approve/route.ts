@@ -14,7 +14,7 @@ import { salaryHandlers } from "../salary-route";
 export const dynamic = "force-dynamic";
 
 /**
- * Approve salaries (CM-316, `hrms.salaries` approve), all or none: each a
+ * Approve salaries (`hrms.salaries` approve), all or none: each a
  * Calculated slip still as loaded. Nobody approves their own salary
  * except the Owner (403 `SALARY_OWN_SLIP`); an approved slip is 409
  * `SALARY_SLIP_ALREADY_APPROVED`. Approval locks each member's month for

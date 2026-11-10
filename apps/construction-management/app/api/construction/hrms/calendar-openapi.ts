@@ -16,7 +16,7 @@ import {
   shiftOpenApiOperations,
 } from "./shift-templates/shifts-openapi";
 
-/** Branches, holidays, shifts, rotations and assignments (CM-304 – CM-307). */
+/** Branches, holidays, shifts, rotations and assignments. */
 export const calendarOpenApiComponents: OpenApiComponents = {
   ...branchOpenApiComponents,
   ...holidayOpenApiComponents,

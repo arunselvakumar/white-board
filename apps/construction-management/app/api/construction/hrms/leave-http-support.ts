@@ -6,9 +6,9 @@ import { jsonRequest } from "@/test/companies";
 import { TEST_ORIGIN } from "@/test/sessions";
 
 /**
- * Helpers for the leave HTTP tests (CM-310 … CM-313): call a route handler
- * as a signed-in Team Member, read JSON, and set the Company's HRMS
- * Settings straight in the table.
+ * Helpers for the leave HTTP tests: call a route handler as a signed-in
+ * Team Member, read JSON, and set the Company's HRMS Settings straight in
+ * the table.
  */
 
 type Handler = (

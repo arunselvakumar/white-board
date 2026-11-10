@@ -17,7 +17,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The Project Dashboard's Booking section (CM-1008, ADR CM-0022 §11): the
+ * The Project Dashboard's Booking section (ADR CM-0022 §11): the
  * Project's units by sales status, the same per Wing, and the five latest
  * bookings — as on the Company's today, whatever the dashboard duration.
  * Behind Dashboard Read on the Project (404 for one that is not a live

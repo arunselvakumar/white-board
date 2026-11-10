@@ -6,5 +6,5 @@ import { PrismaProjectDirectory } from "@/src/organization/infrastructure/prisma
 /** One composition for every Team Member route. */
 export const teamMemberHandlers = createTeamMemberHandlers();
 
-/** The Company's live Projects, to check assignments against (CM-204). */
+/** The Company's live Projects, to check assignments against. */
 export const projectDirectory = new PrismaProjectDirectory(prisma);

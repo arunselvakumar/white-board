@@ -4,7 +4,7 @@ import { developmentModels } from "../_lib/development-models";
 
 const models = developmentModels("COMMON_DEVELOPMENT", "Common Development");
 
-/** Common Developments' models (CM-404); every route of the list uses these. */
+/** Common Developments' models; every route of the list uses these. */
 export const COMMON_DEVELOPMENT_MODELS = models;
 
 export const ConstructionMastersCommonDevelopmentResponseModel =

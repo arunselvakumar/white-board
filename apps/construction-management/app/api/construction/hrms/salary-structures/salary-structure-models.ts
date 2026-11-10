@@ -4,7 +4,7 @@ import type { StoredSalaryStructure } from "@/src/hrms/application/salary-struct
 import { COMPONENT_BASES } from "@/src/hrms/domain/salary-structure";
 
 /**
- * Salary structure Request and Response models (CM-314). Shapes only: the
+ * Salary structure Request and Response models. Shapes only: the
  * hrms domain checks every rule and answers with a code naming the field
  * (`details.field`, e.g. `components.2.percent`).
  */

@@ -9,7 +9,7 @@ import { ConstructionLabourVendorParamsModel } from "./vendor-params-model";
 
 export const dynamic = "force-dynamic";
 
-/** One Vendor with Projects, rate card, opening balance and balance (CM-209). */
+/** One Vendor with Projects, rate card, opening balance and balance. */
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> },

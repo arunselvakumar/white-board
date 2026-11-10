@@ -52,7 +52,7 @@ import {
   partyFinanceOpenApiOperations,
 } from "./parties/party-finance-openapi";
 
-/** Every finance model (M7); each area owns its own file. */
+/** Every finance model; each area owns its own file. */
 export const financeOpenApiComponents: OpenApiComponents = {
   ...financeAccessOpenApiComponents,
   ...financeAccountOpenApiComponents,

@@ -8,7 +8,7 @@ import { StartConstructionProjectsDrawingUploadRequestModel } from "./drawing-mo
 import { drawingsPath } from "./drawing-responses";
 
 /**
- * One composition for the Project Drawings routes (CM-408). A drawing a
+ * One composition for the Project Drawings routes. A drawing a
  * live Inspection Request links cannot be deleted (M8).
  */
 export const projectDrawings = createProjectDrawings({
@@ -17,7 +17,7 @@ export const projectDrawings = createProjectDrawings({
 });
 
 /**
- * Drawings' upload routes on the attachments service (CM-407): a new
+ * Drawings' upload routes on the attachments service: a new
  * drawing needs Create, a new revision Update, so either flag may upload.
  */
 export const drawingUploadRoutes = projectUploadRoutes({

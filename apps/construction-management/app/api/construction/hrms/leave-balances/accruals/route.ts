@@ -11,7 +11,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Credit history (CM-311): the initial, monthly, carry-forward and
+ * Credit history: the initial, monthly, carry-forward and
  * adjustment entries of a member's leave year, newest first.
  */
 export async function GET(request: Request): Promise<Response> {

@@ -14,7 +14,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The vendor attendance grid for one Project and date (CM-213): every
+ * The vendor attendance grid for one Project and date: every
  * active vendor on the Project with its rate card and that day's lines.
  */
 export async function GET(request: Request): Promise<Response> {

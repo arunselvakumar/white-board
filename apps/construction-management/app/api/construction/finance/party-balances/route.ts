@@ -11,7 +11,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Workspace → Party Balance (CM-708, CM-0017 §11): each Other Party's
+ * Workspace → Party Balance (CM-0017 §11): each Other Party's
  * balance across Projects with the split by Project. The Owner sees every
  * Project; a member the Projects they read Parties on.
  */

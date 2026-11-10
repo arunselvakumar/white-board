@@ -49,7 +49,7 @@ const WRITE = [
   StatusCodes.PAYMENT_REQUIRED,
 ] as const;
 
-/** The procurement masters' models (CM-501). */
+/** The procurement masters' models. */
 export const materialMastersOpenApiComponents: OpenApiComponents = {
   ConstructionMastersMeasurementUnitResponseModel,
   ListConstructionMastersMeasurementUnitsResponseModel,
@@ -169,7 +169,7 @@ function pagedOperations(input: {
 
 const BASE = "/api/construction/masters";
 
-/** The procurement masters' routes (CM-501, root ADR-0012). */
+/** The procurement masters' routes (root ADR-0012). */
 export const materialMastersOpenApiOperations: OpenApiOperation[] = [
   ...pagedOperations({
     path: `${BASE}/measurement-units`,

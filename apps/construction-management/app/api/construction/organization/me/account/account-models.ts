@@ -6,7 +6,7 @@ import { ActionCodeField } from "../../action-codes/action-code-models";
 
 export const ACCOUNT_PATH = "/api/construction/organization/me/account";
 
-/** What My Profile → Privacy needs before offering Delete My Account. */
+/** What the User's privacy settings need before offering Delete My Account. */
 export const GetConstructionOrganizationMyAccountResponseModel = z.object({
   ownedCompanies: z
     .array(z.object({ id: z.string(), name: z.string() }))
@@ -19,7 +19,7 @@ export type GetConstructionOrganizationMyAccountResponseModel = z.infer<
   typeof GetConstructionOrganizationMyAccountResponseModel
 >;
 
-/** Delete My Account (CM-907, ADR CM-0021 §10). */
+/** Delete My Account (ADR CM-0021 §10). */
 export const DeleteConstructionOrganizationMyAccountRequestModel = z.object({
   reason: z.string().trim().max(DELETE_ACCOUNT_REASON_MAX).nullish(),
   confirmation: z.string().describe("The word DELETE, typed by the User"),

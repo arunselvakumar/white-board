@@ -43,7 +43,7 @@ export const projectsOpenApiComponents: OpenApiComponents = {
   ListConstructionProjectsCustomFieldLabelsResponseModel,
 };
 
-/** The projects context's routes (CM-204, CM-413, CM-401). */
+/** The projects context's routes. */
 export const projectsOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

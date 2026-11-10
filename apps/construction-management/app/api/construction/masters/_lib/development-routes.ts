@@ -25,7 +25,7 @@ export function toDevelopmentResponse(
 }
 
 /**
- * The routes of Amenities or Common Developments (CM-404): the seven
+ * The routes of Amenities or Common Developments: the seven
  * masters routes plus `POST {id}/projects`, which assigns the row to
  * Projects (the list's Update flag).
  */

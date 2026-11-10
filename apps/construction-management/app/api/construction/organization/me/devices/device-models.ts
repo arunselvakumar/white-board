@@ -17,7 +17,7 @@ const ConstructionOrganizationDeviceModel = z.object({
   pushOn: z.boolean().describe("Web push notifications are on for it"),
 });
 
-/** My Profile → Devices: the User's signed-in sessions (CM-907). */
+/** The User's Devices: their signed-in sessions. */
 export const ListConstructionOrganizationDevicesResponseModel = z.object({
   items: z.array(ConstructionOrganizationDeviceModel),
 });

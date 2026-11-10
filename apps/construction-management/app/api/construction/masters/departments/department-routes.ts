@@ -8,9 +8,9 @@ import { lookupRoutes } from "../_lib/lookup-routes";
 import { DEPARTMENT_MODELS } from "./department-models";
 
 /**
- * Departments under the `masters.departments` Menu (CM-203). Delete is
+ * Departments under the `masters.departments` Menu. Delete is
  * refused while a Work Type, a live worksheet or usage sheet, or a live
- * task, issue or inspection (CM-801) uses one.
+ * task, issue or inspection uses one.
  */
 export const departmentRoutes = lookupRoutes({
   kind: "department",

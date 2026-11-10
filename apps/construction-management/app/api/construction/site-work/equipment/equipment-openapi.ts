@@ -56,7 +56,7 @@ const ITEM = `${EQUIPMENT_PATH}/{id}`;
 const ENTRY = `${ITEM}/maintenance/{maintenanceId}`;
 const PHOTO = `${ITEM}/photo`;
 
-/** Request and Response models of `/api/construction/site-work/equipment` (CM-603, CM-605). */
+/** Request and Response models of `/api/construction/site-work/equipment`. */
 export const equipmentOpenApiComponents: OpenApiComponents = {
   CreateConstructionSiteWorkEquipmentRequestModel,
   UpdateConstructionSiteWorkEquipmentRequestModel,
@@ -104,7 +104,7 @@ function write(
 }
 
 /**
- * Equipment register routes (CM-603, CM-605). The register is the
+ * Equipment register routes. The register is the
  * Company-level `masters.equipments` menu (C R U D P N T O F); a Project's
  * equipment is also open to `site_work.equipment_usage` on that Project.
  */

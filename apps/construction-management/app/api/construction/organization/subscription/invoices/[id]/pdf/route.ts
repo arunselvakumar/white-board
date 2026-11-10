@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createSubscriptionHandlers();
 
-/** The tax invoice of a paid order as a PDF (CM-117). Owner only. */
+/** The tax invoice of a paid order as a PDF. Owner only. */
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> },

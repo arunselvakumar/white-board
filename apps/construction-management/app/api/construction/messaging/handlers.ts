@@ -3,7 +3,7 @@ import { getCompanyAuthFromHeaders } from "@repo/auth/construction/server";
 import { createNotificationHandlers } from "@/src/composition/messaging";
 import { vapidKeysFromEnv } from "@/src/messaging/infrastructure/web-push-sender";
 
-/** The member's notifications, preferences and push subscriptions (CM-904). */
+/** The member's notifications, preferences and push subscriptions. */
 export const notifications = createNotificationHandlers();
 
 /** The VAPID public key the browser subscribes with; null when unset. */

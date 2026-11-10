@@ -13,7 +13,7 @@ export const GetConstructionHrmsSalaryStatutoryQueryModel = z.object({
 
 /**
  * The statutory figures for a month (ADR CM-0008), for the salary
- * structure screen's sample calculation (CM-314).
+ * structure screen's sample calculation.
  */
 export const GetConstructionHrmsSalaryStatutoryResponseModel = z.object({
   month: z.string().describe("`YYYY-MM`."),

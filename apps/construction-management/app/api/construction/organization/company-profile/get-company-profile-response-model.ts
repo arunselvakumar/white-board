@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 /**
- * The Company profile (CM-115). GSTIN and PAN are the Company's own and
+ * The Company profile. GSTIN and PAN are the Company's own and
  * print on its documents, so they are shown in full to anyone who may read
  * Settings; only Team Members' personal Aadhaar and PAN are masked.
  */

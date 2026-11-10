@@ -12,7 +12,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Removes a follow-up entered by mistake (CM-1004; Inquiry delete): a
+ * Removes a follow-up entered by mistake (Inquiry delete): a
  * tombstone, audited. The inquiry's next follow-up does not change.
  */
 export async function POST(

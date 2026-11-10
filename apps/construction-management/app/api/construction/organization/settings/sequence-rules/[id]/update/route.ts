@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createSequenceRuleHandlers();
 
-/** Changes a rule's number format; later numbers use it, issued ones stay (CM-114). */
+/** Changes a rule's number format; later numbers use it, issued ones stay. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

@@ -11,7 +11,7 @@ import { toLeaveTypeResponse } from "../../leave-type-models";
 
 export const dynamic = "force-dynamic";
 
-/** Stops new requests of the leave type; balances and requests stay (CM-310). */
+/** Stops new requests of the leave type; balances and requests stay. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

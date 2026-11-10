@@ -26,7 +26,7 @@ import {
 
 const ITEM = `${MATERIAL_REQUESTS_PATH}/{id}`;
 
-/** Request and Response models of `/api/construction/procurement/material-requests` (M5). */
+/** Request and Response models of `/api/construction/procurement/material-requests`. */
 export const materialRequestOpenApiComponents: OpenApiComponents = {
   CreateConstructionProcurementMaterialRequestRequestModel,
   UpdateConstructionProcurementMaterialRequestRequestModel,
@@ -38,8 +38,8 @@ export const materialRequestOpenApiComponents: OpenApiComponents = {
 };
 
 /**
- * Operations of `/api/construction/procurement/material-requests` (CM-508;
- * menu `procurement.material_requests`, plus the member on the Project for
+ * Operations of `/api/construction/procurement/material-requests` (menu
+ * `procurement.material_requests`, plus the member on the Project for
  * the Project side, or Central store read for the store side).
  */
 export const materialRequestOpenApiOperations: OpenApiOperation[] = [

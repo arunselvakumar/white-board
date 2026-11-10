@@ -13,7 +13,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Live structure assignments, by member then latest date first (CM-311). */
+/** Live structure assignments, by member then latest date first. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const filter = parseOrThrow(
@@ -39,7 +39,7 @@ export async function GET(request: Request): Promise<Response> {
   }
 }
 
-/** Assigns a structure to Team Members from a date (CM-311). */
+/** Assigns a structure to Team Members from a date. */
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await leaveAccess(request, {

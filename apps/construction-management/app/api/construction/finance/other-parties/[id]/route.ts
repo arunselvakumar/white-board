@@ -10,7 +10,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** One live Other Party (CM-704); 404 for another Company's. */
+/** One live Other Party; 404 for another Company's. */
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> },

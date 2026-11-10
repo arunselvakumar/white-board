@@ -15,7 +15,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Saves the whole Other Party form (CM-704) when it is still as loaded
+ * Saves the whole Other Party form when it is still as loaded
  * (409 OTHER_PARTY_CHANGED); 409 OTHER_PARTY_NAME_TAKEN for a name in use.
  */
 export async function POST(

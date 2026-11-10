@@ -185,7 +185,7 @@ const reference = (paper: string) =>
 /**
  * The Project form. Strings are checked by the domain, so a screen gets
  * `PROJECT_NAME_REQUIRED`, `PROJECT_DATES_INVALID`… under the right field.
- * The contract details and custom fields (CM-413) are optional: omitted
+ * The contract details and custom fields are optional: omitted
  * keeps what is stored, so an older client never wipes them.
  */
 export const projectDetailsFields = {

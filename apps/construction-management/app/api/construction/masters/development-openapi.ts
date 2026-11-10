@@ -23,7 +23,7 @@ import {
 } from "./common-developments/common-development-models";
 import { MASTERS, WRITE, masterOperations } from "./masters-openapi";
 
-/** Amenities' and Common Developments' models (CM-404). */
+/** Amenities' and Common Developments' models. */
 export const developmentOpenApiComponents: OpenApiComponents = {
   ListConstructionMastersAmenitiesResponseModel,
   ConstructionMastersAmenityResponseModel,

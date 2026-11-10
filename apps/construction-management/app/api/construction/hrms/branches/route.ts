@@ -14,7 +14,7 @@ import { branches } from "./handlers";
 
 export const dynamic = "force-dynamic";
 
-/** Office branches and Project site fences, and the Team Members that can be linked (CM-304). */
+/** Office branches and Project site fences, and the Team Members that can be linked. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(request, "hrms.settings", "read");
@@ -30,7 +30,7 @@ export async function GET(request: Request): Promise<Response> {
   }
 }
 
-/** Adds an office branch or a Project's site fence (CM-304). */
+/** Adds an office branch or a Project's site fence. */
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(request, "hrms.settings", "create");

@@ -16,7 +16,7 @@ import {
 
 import { COUNTERPARTY_KINDS } from "../lookup-models";
 
-/** `/api/construction/finance/petty-cash` (CM-703). */
+/** `/api/construction/finance/petty-cash`. */
 export const PETTY_CASH_PATH = "/api/construction/finance/petty-cash";
 
 const paise = z

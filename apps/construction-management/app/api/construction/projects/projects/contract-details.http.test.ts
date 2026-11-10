@@ -67,7 +67,7 @@ async function json<T>(response: Response): Promise<T> {
   return (await response.json()) as T;
 }
 
-/** Add Project; a Project Type is required since CM-401. */
+/** Add Project; a Project Type is required. */
 async function create(
   cookie: string,
   body: Record<string, unknown>,

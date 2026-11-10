@@ -8,7 +8,7 @@ import { ConstructionProjectsDocumentParamsModel } from "../../project-document-
 
 export const dynamic = "force-dynamic";
 
-/** A document's WebP thumbnail (CM-407); 404 `THUMBNAIL_NOT_FOUND` without one. */
+/** A document's WebP thumbnail; 404 `THUMBNAIL_NOT_FOUND` without one. */
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string; docId: string }> },

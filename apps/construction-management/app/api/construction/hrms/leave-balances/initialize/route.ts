@@ -10,7 +10,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Opens a leave year's balances for Team Members (CM-311): upfront types
+ * Opens a leave year's balances for Team Members: upfront types
  * get their entitlement, monthly types start at 0, and unused days carry
  * forward when both switches allow. Running it again opens nothing twice.
  */

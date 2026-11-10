@@ -16,7 +16,7 @@ import {
 export const MATERIAL_REQUESTS_PATH =
   "/api/construction/procurement/material-requests";
 
-/** A `LocationRef` as sent (CM-403); checked against the Project. */
+/** A `LocationRef` as sent; checked against the Project. */
 export const ConstructionProcurementSiteLocationModel = z.object({
   type: z.enum(["wing", "amenity", "common_development", "location"]),
   wingId: z.uuid().nullable().optional(),

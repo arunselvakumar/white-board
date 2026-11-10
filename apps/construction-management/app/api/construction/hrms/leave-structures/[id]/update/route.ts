@@ -14,7 +14,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Replaces a structure's name and lines (CM-311). Balances already
+ * Replaces a structure's name and lines. Balances already
  * initialised keep their opening credit; new entitlements apply to the
  * next initialisation and to monthly credits.
  */

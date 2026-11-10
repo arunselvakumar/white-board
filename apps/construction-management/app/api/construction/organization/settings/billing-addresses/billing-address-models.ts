@@ -6,7 +6,7 @@ import { gstStateName } from "@/src/shared-kernel/gst-states";
 export const BILLING_ADDRESSES_PATH =
   "/api/construction/organization/settings/billing-addresses";
 
-/** Fields of Add and Edit; the domain trims and checks each (CM-501). */
+/** Fields of Add and Edit; the domain trims and checks each. */
 const writeFields = {
   name: z
     .string()

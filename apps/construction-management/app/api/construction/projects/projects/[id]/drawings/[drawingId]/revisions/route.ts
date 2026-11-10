@@ -14,7 +14,7 @@ import { projectDrawings } from "../../handlers";
 export const dynamic = "force-dynamic";
 
 /**
- * Finishes uploading a new revision of a drawing (CM-408): the next R
+ * Finishes uploading a new revision of a drawing: the next R
  * number. 201 for a new revision, 200 when the key was already recorded.
  */
 export async function POST(

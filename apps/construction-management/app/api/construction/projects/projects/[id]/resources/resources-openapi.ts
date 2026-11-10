@@ -28,7 +28,7 @@ const SESSION_ERRORS = [
   StatusCodes.FORBIDDEN,
 ] as const;
 
-/** Project Resources' models (CM-406). */
+/** Project Resources' models. */
 export const projectResourcesOpenApiComponents: OpenApiComponents = {
   ConstructionProjectsProjectResourceResponseModel,
   ConstructionProjectsProjectTeamMemberResourceResponseModel,
@@ -100,7 +100,7 @@ function kindOperations(kind: ResourceKind): OpenApiOperation[] {
   ];
 }
 
-/** Project Resources' routes (CM-406). */
+/** Project Resources' routes. */
 export const projectResourcesOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

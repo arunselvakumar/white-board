@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createHrmsSettingsHandlers();
 
-/** The Active Company's HRMS Settings, or the defaults before the first save (CM-303). */
+/** The Active Company's HRMS Settings, or the defaults before the first save. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(request, "hrms.settings", "read");

@@ -34,7 +34,7 @@ import {
 } from "./document-models";
 
 /**
- * One composition for the sales document files routes (CM-1003): storage
+ * One composition for the sales document files routes: storage
  * limits from the organization context's plan, names and View all
  * scoping from the SalesDirectory. No Gallery: sales files are personal
  * data (ADR CM-0022 §3).
@@ -105,7 +105,7 @@ function keyOf(request: Request): string {
   ).key;
 }
 
-/** The upload routes under `{type}/{id}/files/uploads` (CM-407's flow). */
+/** The upload routes under `{type}/{id}/files/uploads`. */
 export const salesFileUploadRoutes = {
   start: async (request: Request, context: SalesDocumentContext) => {
     try {

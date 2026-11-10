@@ -13,7 +13,7 @@ const handlers = createBillingAddressHandlers();
 
 /**
  * Deletes a billing address (a tombstone; Purchase Orders keep their copy).
- * Deleting the default makes the oldest remaining address the default (CM-501).
+ * Deleting the default makes the oldest remaining address the default.
  */
 export async function POST(
   request: Request,

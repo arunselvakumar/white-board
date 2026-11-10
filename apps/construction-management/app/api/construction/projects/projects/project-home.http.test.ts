@@ -85,14 +85,14 @@ async function list(cookie: string): Promise<ProjectList> {
   return json<ProjectList>(response);
 }
 
-/** Puts the Team Member on Projects, as Masters → Team Members does. */
+/** Puts the Team Member on Projects, as the Team Members master does. */
 async function putOn(memberId: string, projectIds: string[]): Promise<void> {
   await prisma.constructionOrganizationTeamMemberProject.createMany({
     data: projectIds.map((projectId) => ({ memberId, projectId })),
   });
 }
 
-/** A live Wing (with its Phase) or Location, as CM-402 / CM-405 write them. */
+/** A live Wing (with its Phase) or Location, as their routes write them. */
 async function addStructure(
   workspaceId: string,
   projectId: string,

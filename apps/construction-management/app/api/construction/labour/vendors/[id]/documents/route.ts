@@ -6,6 +6,6 @@ export const dynamic = "force-dynamic";
 
 /**
  * `GET` lists the vendor's "Other Documents"; `POST` adds one: the file as
- * the body (PDF, PNG, JPEG or WebP, ≤ 10 MB) and `?fileName=` (CM-208).
+ * the body (PDF, PNG, JPEG or WebP, ≤ 10 MB) and `?fileName=`.
  */
 export const { GET, POST } = partyDocumentsRoutes(VENDOR_FILES);

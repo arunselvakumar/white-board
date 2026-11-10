@@ -3,7 +3,7 @@ import { createLabourHandlers } from "@/src/labour/infrastructure/create-labour-
 
 import { LABOURS_PATH } from "./labour-models";
 
-/** One composition for every Labour route (CM-207). */
+/** One composition for every Labour route. */
 export const labour = createLabourHandlers();
 
 /** Photo and documents of a labourer: the register's Menu, `labour` owner. */

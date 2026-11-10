@@ -41,7 +41,7 @@ const percent = z.string().trim().min(1).max(8);
 const placeFields = {
   /** A Project the caller is on. */
   projectId: z.uuid().optional(),
-  /** A Central Store (CM-508). */
+  /** A Central Store. */
   storeId: z.uuid().optional(),
 };
 
@@ -248,7 +248,7 @@ export const ConstructionProcurementPurchaseOrderItemResponseModel = z.object({
   igst: z.int(),
   total: z.int(),
   remark: z.string().nullable(),
-  /** Σ received on Goods Receipts (CM-505). */
+  /** Σ received on Goods Receipts. */
   receivedQty: z.string(),
 });
 

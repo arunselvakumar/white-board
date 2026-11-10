@@ -15,7 +15,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Edits a hindrance (CM-607). The back-dated edit limit applies to the old
+ * Edits a hindrance. The back-dated edit limit applies to the old
  * start date and a new one. Needs update on its Project; 409
  * `HINDRANCE_CHANGED` when stale.
  */

@@ -20,7 +20,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The Labour register, newest first (CM-207): filter by Project, Active,
+ * The Labour register, newest first: filter by Project, Active,
  * Supervisor and Labour Category, and search name, Labour Id or contact.
  */
 export async function GET(request: Request): Promise<Response> {
@@ -61,7 +61,7 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * Adds a labourer on none, one or many Projects (CM-205, ADR CM-0033). The
+ * Adds a labourer on none, one or many Projects (ADR CM-0033). The
  * opening balance becomes the first ledger entry, dated the joining date
  * (ADR CM-0004).
  */

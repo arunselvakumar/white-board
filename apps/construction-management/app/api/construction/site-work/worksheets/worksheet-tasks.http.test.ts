@@ -28,7 +28,7 @@ vi.mock(import("@repo/auth/construction/server"), async (importOriginal) => ({
   getCompanyAuthFromHeaders: vi.fn(),
 }));
 
-/** Daily Worksheets feed task progress (CM-806, ADR CM-0019 §6). */
+/** Daily Worksheets feed task progress (ADR CM-0019 §6). */
 
 const ORIGIN = "http://localhost";
 const BASE = `${ORIGIN}/api/construction/site-work/worksheets`;

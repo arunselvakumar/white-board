@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 const projectProgress = trackingProjectProgress();
 
 /**
- * One Project's Project Progress % from Tasks (CM-805), for its home; null
+ * One Project's Project Progress % from Tasks, for its home; null
  * without tasks. 404 for a Member not assigned to it, like the Project.
  */
 export async function GET(

@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createGrnFieldSettingHandlers();
 
-/** Replaces the list of hidden GRN fields, audited with before and after (CM-501). */
+/** Replaces the list of hidden GRN fields, audited with before and after. */
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(

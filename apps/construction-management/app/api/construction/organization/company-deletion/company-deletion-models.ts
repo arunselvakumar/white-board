@@ -25,7 +25,7 @@ export type GetConstructionOrganizationCompanyDeletionResponseModel = z.infer<
   typeof GetConstructionOrganizationCompanyDeletionResponseModel
 >;
 
-/** Delete Company (CM-907, ADR CM-0021 §10). */
+/** Delete Company (ADR CM-0021 §10). */
 export const ScheduleConstructionOrganizationCompanyDeletionRequestModel =
   z.object({
     companyName: z

@@ -14,7 +14,7 @@ import { salaryHandlers } from "../salary-route";
 export const dynamic = "force-dynamic";
 
 /**
- * Calculate Salary (CM-316, `hrms.salaries` create) for a month that has
+ * Calculate Salary (`hrms.salaries` create) for a month that has
  * started: every live member, or `memberIds`. Calculated slips are
  * replaced, Approved and Paid ones kept; members not joined or not
  * Configured are listed in `skipped` with the reason.

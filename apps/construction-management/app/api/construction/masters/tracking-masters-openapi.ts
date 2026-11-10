@@ -21,7 +21,7 @@ import {
 
 const BASE = "/api/construction/masters";
 
-/** Issue Categories' and Tags' models (CM-801). */
+/** Issue Categories' and Tags' models. */
 export const trackingMastersOpenApiComponents: OpenApiComponents = {
   ConstructionMastersIssueCategoryResponseModel,
   ListConstructionMastersIssueCategoriesResponseModel,
@@ -61,7 +61,7 @@ const tags = masterOperations({
     !operation.path.endsWith("/disable") && !operation.path.endsWith("/enable"),
 );
 
-/** Issue Categories and Tags (CM-801, ADR CM-0019 §1). */
+/** Issue Categories and Tags (ADR CM-0019 §1). */
 export const trackingMastersOpenApiOperations: OpenApiOperation[] = [
   ...issueCategories,
   ...tags,

@@ -92,7 +92,7 @@ const WRITE_ERRORS = [
 
 const params = ConstructionFinancePartyIdParamsModel;
 
-/** Request and Response models of the party money routes (CM-705, CM-706, CM-708). */
+/** Request and Response models of the party money routes. */
 export const partyFinanceOpenApiComponents: OpenApiComponents = {
   CreateConstructionFinanceInvoiceRequestModel,
   UpdateConstructionFinanceInvoiceRequestModel,

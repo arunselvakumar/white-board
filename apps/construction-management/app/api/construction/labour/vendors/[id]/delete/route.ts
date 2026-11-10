@@ -10,7 +10,7 @@ import { ConstructionLabourVendorParamsModel } from "../vendor-params-model";
 export const dynamic = "force-dynamic";
 
 /**
- * Deletes a Vendor (a tombstone) and reverses its opening entry (CM-209).
+ * Deletes a Vendor (a tombstone) and reverses its opening entry.
  * 409 `VENDOR_HAS_RECORDS` once it has attendance or wage payments.
  */
 export async function POST(

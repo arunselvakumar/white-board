@@ -16,7 +16,7 @@ import type {
   GetConstructionFinanceAccountStatementResponseModel,
 } from "./account-models";
 
-/** One set of Company's Bank A/C handlers for every route (CM-701). */
+/** One set of Company's Bank A/C handlers for every route. */
 export const accountHandlers = new AccountHandlers({
   db: prisma,
   store: prismaAccountStore,

@@ -17,7 +17,7 @@ import {
 import { ConstructionMastersIdParamsModel } from "./master-models";
 
 /**
- * `GET` a procurement master list (CM-501): newest first in cursor pages
+ * `GET` a procurement master list: newest first in cursor pages
  * (root ADR-0020), searched, filtered by state. Lists with more filters
  * extend this shape.
  */
@@ -113,7 +113,7 @@ export type PagedMasterConfig<Item extends Listed, Query, Create, Update> = {
 };
 
 /**
- * The seven routes of a procurement master list (CM-501): `GET` list and
+ * The seven routes of a procurement master list: `GET` list and
  * `POST` create on the collection; `GET {id}` and
  * `POST {id}/update|disable|enable|delete` (named operations, root
  * ADR-0015). Each checks the list's Menu with the matching Flag.

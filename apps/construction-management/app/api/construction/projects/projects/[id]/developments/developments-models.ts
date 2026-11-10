@@ -28,7 +28,7 @@ function kindModel(label: string) {
 }
 
 /**
- * A Project's Amenities and Common Developments (CM-404). The rows are the
+ * A Project's Amenities and Common Developments. The rows are the
  * masters context's; the Project is checked by the projects context.
  */
 export const ConstructionProjectsProjectDevelopmentsResponseModel = z.object({

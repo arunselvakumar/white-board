@@ -16,7 +16,7 @@ const ERRORS = [
   StatusCodes.CONFLICT,
 ] as const;
 
-/** PF ECR and ESI contribution exports (CM-320). */
+/** PF ECR and ESI contribution exports. */
 export const statutoryExportsOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

@@ -12,7 +12,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Edits a labourer (CM-205). A changed opening balance or joining date
+ * Edits a labourer. A changed opening balance or joining date
  * reverses the old opening entry and posts the new one. 409
  * `LABOUR_CHANGED` when someone saved since `expectedUpdatedAt`.
  */

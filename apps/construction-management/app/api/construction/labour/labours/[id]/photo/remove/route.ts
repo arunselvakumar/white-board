@@ -4,5 +4,5 @@ import { LABOUR_FILES } from "../../../handlers";
 
 export const dynamic = "force-dynamic";
 
-/** Removes the labourer's photo (CM-205). */
+/** Removes the labourer's photo. */
 export const POST = partyPhotoRemoveRoute(LABOUR_FILES);

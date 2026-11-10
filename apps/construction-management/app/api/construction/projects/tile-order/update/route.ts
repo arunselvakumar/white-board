@@ -13,7 +13,7 @@ import { UpdateConstructionProjectsTileOrderRequestModel } from "../tile-order-m
 export const dynamic = "force-dynamic";
 
 /**
- * Saves the caller's tile order for every Project's home (CM-411). Any
+ * Saves the caller's tile order for every Project's home. Any
  * Team Member; it changes only their own home.
  */
 export async function POST(request: Request): Promise<Response> {

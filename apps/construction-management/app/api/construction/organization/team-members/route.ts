@@ -21,7 +21,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Team Members, newest first, with search and status chips (CM-110). */
+/** Team Members, newest first, with search and status chips. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(
@@ -65,7 +65,7 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * Add Staff (CM-110, ADR CM-0030 §6): invited, given a password (Active at
+ * Add Staff (ADR CM-0030 §6): invited, given a password (Active at
  * once), or a record only.
  */
 export async function POST(request: Request): Promise<Response> {

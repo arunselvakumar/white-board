@@ -12,7 +12,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * **Mark As Completed** (CM-802): records the update that brings a leaf
+ * **Mark As Completed**: records the update that brings a leaf
  * task to 100 % (the remaining quantity, or 100 %) on the date given,
  * today by default. 409 `TASK_ALREADY_COMPLETED`. Needs Task update.
  */

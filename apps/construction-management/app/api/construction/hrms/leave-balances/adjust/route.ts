@@ -10,7 +10,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * A manager's balance adjustment with a reason (CM-311, ADR CM-0012 §9):
+ * A manager's balance adjustment with a reason (ADR CM-0012 §9):
  * credit Compensatory Off, or correct a balance. A debit may not take it
  * below zero (`LEAVE_ADJUSTMENT_BELOW_ZERO`).
  */

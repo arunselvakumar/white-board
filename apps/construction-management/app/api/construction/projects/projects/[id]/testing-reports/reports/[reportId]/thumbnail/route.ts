@@ -8,7 +8,7 @@ import { ConstructionProjectsTestingReportParamsModel } from "../../../testing-r
 
 export const dynamic = "force-dynamic";
 
-/** A report image's WebP thumbnail (CM-407); 404 `THUMBNAIL_NOT_FOUND` without one. */
+/** A report image's WebP thumbnail; 404 `THUMBNAIL_NOT_FOUND` without one. */
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string; reportId: string }> },

@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createSubscriptionHandlers();
 
-/** The plans and add-ons on sale, for checkout (CM-117). Owner only. */
+/** The plans and add-ons on sale, for checkout. Owner only. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireOwnerSession(request);

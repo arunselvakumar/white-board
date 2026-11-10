@@ -9,7 +9,7 @@ import { toProjectSummaryResponse } from "../dashboard-models";
 export const dynamic = "force-dynamic";
 
 /**
- * The Project Dashboard's Project summary (CM-412): dates, status, type,
+ * The Project Dashboard's Project summary: dates, status, type,
  * budget (Financial) and what the Project holds. The Dashboard menu's
  * Read flag; 404 for another Company's Project or one a Member is not on.
  */

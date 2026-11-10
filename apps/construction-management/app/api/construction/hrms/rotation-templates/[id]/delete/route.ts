@@ -9,7 +9,7 @@ import { HrmsTemplateIdParamsModel } from "../../../shift-templates/shift-models
 
 export const dynamic = "force-dynamic";
 
-/** Deletes a rotation nobody is assigned; 409 `ROTATION_TEMPLATE_IN_USE` otherwise (CM-306). */
+/** Deletes a rotation nobody is assigned; 409 `ROTATION_TEMPLATE_IN_USE` otherwise. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

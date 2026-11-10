@@ -45,7 +45,7 @@ const WRITE_ERRORS = [
 
 const ITEM = `${PURCHASE_ORDERS_PATH}/{id}`;
 
-/** Request and Response models of `/api/construction/procurement/purchase-orders` (M5). */
+/** Request and Response models of `/api/construction/procurement/purchase-orders`. */
 export const purchaseOrderOpenApiComponents: OpenApiComponents = {
   CreateConstructionProcurementPurchaseOrderRequestModel,
   UpdateConstructionProcurementPurchaseOrderRequestModel,
@@ -212,7 +212,7 @@ const operations: Op[] = [
 ];
 
 /**
- * Purchase Order routes (CM-504), menu `procurement.purchase_orders` on
+ * Purchase Order routes, menu `procurement.purchase_orders` on
  * the PO's Project (a Store PO checks the flag without a Project). The
  * menu has no Financial flag: amounts are shown to every PO reader.
  */

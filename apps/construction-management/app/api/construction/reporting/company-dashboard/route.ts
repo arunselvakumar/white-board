@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 const reader = companyDashboardReader();
 
 /**
- * The Company Dashboard (CM-902, ADR CM-0021 §4), behind Dashboard Read
+ * The Company Dashboard (ADR CM-0021 §4), behind Dashboard Read
  * (`reporting.project_dashboard`). Totals and one row per Project the
  * caller can see — every Project for the Owner, the assigned ones for a
  * Member — read from the `construction_reporting` views. Each figure

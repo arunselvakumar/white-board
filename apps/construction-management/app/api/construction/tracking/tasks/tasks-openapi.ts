@@ -56,7 +56,7 @@ const XLSX =
 const ITEM = `${TASKS_PATH}/{id}`;
 const PROGRESS = `${TASKS_PATH}/progress/{progressId}`;
 
-/** Request and Response models of `/api/construction/tracking/tasks` (CM-802). */
+/** Request and Response models of `/api/construction/tracking/tasks`. */
 export const trackingTaskOpenApiComponents: OpenApiComponents = {
   CreateConstructionTrackingTaskRequestModel,
   UpdateConstructionTrackingTaskRequestModel,
@@ -82,7 +82,7 @@ export const trackingTaskOpenApiComponents: OpenApiComponents = {
 };
 
 /**
- * Task routes (CM-802), menu `tracking.tasks` on the task's Project: read
+ * Task routes, menu `tracking.tasks` on the task's Project: read
  * (View all scopes it), create (add, sub-task, copy, import), update
  * (edit, progress, Mark As Completed, Re-baseline), delete.
  */

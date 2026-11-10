@@ -9,7 +9,7 @@ import { ConstructionProjectsWingParamsModel } from "../../wing-models";
 
 export const dynamic = "force-dynamic";
 
-/** Deletes a Wing with its floors and units (CM-402): tombstones. */
+/** Deletes a Wing with its floors and units: tombstones. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string; wingId: string }> },

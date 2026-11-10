@@ -52,7 +52,7 @@ function detailOf(job: ReportJob): string {
 }
 
 /**
- * Report jobs (CM-901): every report the member asked for, on any Project
+ * Report jobs: every report the member asked for, on any Project
  * or central, Progress Reports included. Download, Retry and Delete are
  * offered when the route behind each would allow them: a Progress
  * Report's go to its own module's routes.
@@ -127,7 +127,7 @@ export const reportDownloadSource: DownloadSource = {
 };
 
 /**
- * Backups and data exports (CM-906): the member's own, with the signed
+ * Backups and data exports: the member's own, with the signed
  * ZIP link while done and Delete; a failed one is asked for again rather
  * than retried. A read nudges a stuck one, as for reports.
  */
@@ -185,8 +185,8 @@ export const backupDownloadSource = backupSource("backups");
 export const exportDownloadSource = backupSource("exports");
 
 /**
- * Every source Downloads merges. Append-only: CM-906 adds its backup and
- * data-export sources here.
+ * Every source Downloads merges: report jobs, backups and data exports.
+ * Append-only.
  */
 export function downloadSources(): DownloadSource[] {
   return [reportDownloadSource, backupDownloadSource, exportDownloadSource];

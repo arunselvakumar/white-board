@@ -36,7 +36,7 @@ export type GetConstructionFinanceAccountOptionsResponseModel = z.infer<
 >;
 
 // ---------------------------------------------------------------------------
-// Masters → Company's Bank A/C (CM-701)
+// The Company's bank accounts
 // ---------------------------------------------------------------------------
 
 export const FINANCE_ACCOUNTS_PATH = "/api/construction/finance/accounts";

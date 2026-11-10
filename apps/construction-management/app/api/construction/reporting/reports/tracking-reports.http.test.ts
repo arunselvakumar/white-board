@@ -170,7 +170,7 @@ describe("tracking reports HTTP (CM-805)", () => {
       assigneeIds: [site.memberId],
     });
     await task(ctx, {
-      // Noto fonts: a Tamil name prints in the PDF (CM-805).
+      // Noto fonts: a Tamil name prints in the PDF.
       name: "Slab கான்கிரீட்",
       parentId: tower,
       startDate: TODAY,

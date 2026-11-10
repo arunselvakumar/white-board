@@ -8,7 +8,7 @@ import { projectDrawings } from "../handlers";
 
 export const dynamic = "force-dynamic";
 
-/** A drawing with its revision history, newest first (CM-408). */
+/** A drawing with its revision history, newest first. */
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string; drawingId: string }> },

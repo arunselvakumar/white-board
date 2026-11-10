@@ -10,7 +10,7 @@ import { projectDrawings } from "../../handlers";
 export const dynamic = "force-dynamic";
 
 /**
- * Deletes a drawing with every revision (CM-408): tombstones, out of the
+ * Deletes a drawing with every revision: tombstones, out of the
  * Gallery, then the files go.
  */
 export async function POST(

@@ -27,8 +27,8 @@ const READ_ERRORS = [
 ];
 
 /**
- * Per-Project form settings of site-work sheets (CM-0016 §2). The
- * worksheet settings are CM-602's; the equipment-sheet settings join here.
+ * Per-Project form settings of site-work sheets (ADR CM-0016 §2). The
+ * worksheet settings came first; the equipment-sheet settings join here.
  * The response model is registered by `worksheets-openapi.ts`.
  */
 export const siteWorkSettingsOpenApiComponents: OpenApiComponents = {

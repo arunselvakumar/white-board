@@ -10,7 +10,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * "Accrue now" (CM-311): posts every monthly credit due up to today for
+ * "Accrue now": posts every monthly credit due up to today for
  * the Company's opened balances, capped at each entitlement. A period is
  * credited once, so running it again posts nothing. 409
  * `LEAVE_ACCRUAL_DISABLED` while monthly credit is off in HRMS Settings.

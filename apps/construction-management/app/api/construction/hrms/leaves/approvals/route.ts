@@ -11,7 +11,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Leave Approvals (CM-313): one tab of Pending / Approved / Rejected /
+ * Leave Approvals: one tab of Pending / Approved / Rejected /
  * Cancel Requests, with each tab's count. Needs approve or reject on
  * `hrms.leaves`.
  */

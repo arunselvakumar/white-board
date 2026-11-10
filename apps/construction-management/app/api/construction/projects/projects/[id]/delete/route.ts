@@ -10,7 +10,7 @@ import { ConstructionProjectsProjectParamsModel } from "../../project-models";
 export const dynamic = "force-dynamic";
 
 /**
- * Deletes a Project (CM-204): a tombstone. 409 `PROJECT_IN_USE` while
+ * Deletes a Project: a tombstone. 409 `PROJECT_IN_USE` while
  * labours, vendors, attendance or wage payments point at it.
  */
 export async function POST(

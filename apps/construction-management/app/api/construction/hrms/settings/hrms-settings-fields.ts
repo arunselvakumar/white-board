@@ -7,7 +7,7 @@ import {
 } from "@/src/hrms/domain/hrms-settings";
 
 /**
- * HRMS Settings fields shared by the read and the save (CM-303). Shapes
+ * HRMS Settings fields shared by the read and the save. Shapes
  * only: the hrms domain checks every rule and answers with a code naming
  * the field (`details.field`).
  */

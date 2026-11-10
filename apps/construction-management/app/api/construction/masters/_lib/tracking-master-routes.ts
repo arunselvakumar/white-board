@@ -14,7 +14,7 @@ import { ListConstructionMastersQueryModel } from "./master-models";
 import { masterRoutes } from "./master-routes";
 
 /**
- * The routes of a tracking master (CM-801): Issue Categories or Tags.
+ * The routes of a tracking master: Issue Categories or Tags.
  * Item commands are the masters' usual named operations; the list adds
  * what the caller may do (`can`), so the screen hides the rest, and each
  * row says whether it is `inUse` (no Delete). Delete is refused while a

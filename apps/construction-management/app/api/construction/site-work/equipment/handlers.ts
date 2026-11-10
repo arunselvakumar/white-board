@@ -36,7 +36,7 @@ import {
 
 const store = new PrismaEquipmentStore();
 
-/** One set of Equipment register handlers for every route (CM-603, CM-605). */
+/** One set of Equipment register handlers for every route. */
 export const equipmentHandlers = new EquipmentHandlers({
   db: prisma,
   store,

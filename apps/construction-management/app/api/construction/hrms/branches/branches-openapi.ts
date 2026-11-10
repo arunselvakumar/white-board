@@ -29,7 +29,7 @@ const WRITE = [
 ] as const;
 const ITEM = `${BRANCHES_PATH}/{id}`;
 
-/** Branches & Sites models (CM-304). */
+/** Branches & Sites models. */
 export const branchOpenApiComponents: OpenApiComponents = {
   ConstructionHrmsBranchResponseModel,
   ListConstructionHrmsBranchesResponseModel,
@@ -41,7 +41,7 @@ export const branchOpenApiComponents: OpenApiComponents = {
   ListConstructionHrmsMyFencesResponseModel,
 };
 
-/** Branches & Sites routes (CM-304). */
+/** Branches & Sites routes. */
 export const branchOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

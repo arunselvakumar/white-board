@@ -11,7 +11,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * What the Daily Worksheet form offers on a Project (CM-602): its
+ * What the Daily Worksheet form offers on a Project: its
  * settings, the active Contractors on it with their Departments, those
  * Departments' Work Types (with assigned Materials) and the Measurement
  * Units. Needs Daily Worksheet read on the Project.

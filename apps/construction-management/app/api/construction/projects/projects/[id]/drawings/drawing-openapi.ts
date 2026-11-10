@@ -49,7 +49,7 @@ const PresignConstructionProjectsDrawingUploadRequestModel =
 const PresignConstructionProjectsDrawingUploadResponseModel =
   presignUploadResponseModel();
 
-/** Project Drawings' models (CM-408). */
+/** Project Drawings' models. */
 export const drawingOpenApiComponents: OpenApiComponents = {
   ConstructionProjectsDrawingAlbumResponseModel,
   ListConstructionProjectsDrawingAlbumsResponseModel,
@@ -69,7 +69,7 @@ export const drawingOpenApiComponents: OpenApiComponents = {
   MoveConstructionProjectsDrawingRequestModel,
 };
 
-/** Project Drawings' routes (CM-408), under `projects.drawings`. */
+/** Project Drawings' routes, under `projects.drawings`. */
 export const drawingOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

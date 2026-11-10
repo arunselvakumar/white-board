@@ -31,7 +31,7 @@ export async function GET(
 }
 
 /**
- * **Update Task Progress** (CM-802): a quantity task takes the work done
+ * **Update Task Progress**: a quantity task takes the work done
  * in this update, a percent task the new percentage; not after today;
  * leaf tasks only (409 `TASK_IS_SUMMARY`). Needs Task update.
  */

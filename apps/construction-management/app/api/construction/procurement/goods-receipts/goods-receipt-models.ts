@@ -90,7 +90,7 @@ const receiptFields = {
 
 export const PostConstructionProcurementGoodsReceiptRequestModel = z.object({
   locationKind,
-  /** A Project, or a Store (CM-508). */
+  /** A Project, or a Store. */
   locationId: z.uuid(),
   ...receiptFields,
 });
@@ -203,11 +203,11 @@ export const ConstructionProcurementGoodsReceiptResponseModel = z.object({
   /** Σ line totals including GST: the GRN value. */
   totalValue: z.int().nullable(),
   lines: z.array(ConstructionProcurementGoodsReceiptLineResponseModel),
-  /** The Company's hidden GRN fields (Settings → GRN fields). */
+  /** The GRN fields the Company hides in its settings. */
   hiddenFields: z.array(grnField),
   /** Amounts are visible (Financial on Material Received). */
   financial: z.boolean(),
-  /** A supplier payment points at it: no edit or delete (M7). */
+  /** A supplier payment points at it: no edit or delete. */
   paid: z.boolean(),
   createdBy: z.object({ id: z.string(), name: z.string().nullable() }),
   createdAt: z.iso.datetime(),

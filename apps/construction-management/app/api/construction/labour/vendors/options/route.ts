@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * Active vendors assigned to a Project, by name, with their live shifts and
- * category rates, for vendor attendance (CM-213). Needs Attendance read on
+ * category rates, for vendor attendance. Needs Attendance read on
  * that Project; rates are null without Vendor (`labour.vendor`) Financial.
  */
 export async function GET(request: Request): Promise<Response> {

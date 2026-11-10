@@ -14,7 +14,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Edits a Transaction (CM-702): an approved one is reversed and goes back
+ * Edits a Transaction: an approved one is reversed and goes back
  * to pending (or approved again with `approve`), a rejected one goes back
  * to pending. Needs update on its Project; 409 `TRANSACTION_CHANGED` when
  * stale.

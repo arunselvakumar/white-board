@@ -1,7 +1,7 @@
 import { can, type MemberAccess } from "@/src/shared-kernel/access";
 import { createLabourAttendanceHandlers } from "@/src/labour/infrastructure/labour-attendance-factory";
 
-/** One set of labour attendance handlers for every route (CM-210, CM-211). */
+/** One set of labour attendance handlers for every route. */
 export const labourAttendanceHandlers = createLabourAttendanceHandlers();
 
 /** Wages and earned amounts need Labour (`labour.labour`) Financial on the Project. */

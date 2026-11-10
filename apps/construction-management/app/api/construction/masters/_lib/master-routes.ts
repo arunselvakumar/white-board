@@ -57,7 +57,7 @@ export type MasterRouteConfig<Item, Create, Update> = {
 type IdContext = { params: Promise<{ id: string }> };
 
 /**
- * The seven routes every masters list has (CM-203): `GET` list and `POST`
+ * The seven routes every masters list has: `GET` list and `POST`
  * create on the collection; `GET {id}` and `POST {id}/update|disable|enable|delete`
  * (named operations, root ADR-0015). Each checks the list's Menu with the
  * matching Flag through `requireAccess`.

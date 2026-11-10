@@ -13,7 +13,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Rejects a pending Transaction with a reason (CM-702). Needs reject on its Project. */
+/** Rejects a pending Transaction with a reason. Needs reject on its Project. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

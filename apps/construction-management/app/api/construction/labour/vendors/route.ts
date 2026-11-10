@@ -19,7 +19,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * The Vendor register, newest first, with search, Project and active
- * filters (CM-209). Balances are null without the Financial flag.
+ * filters. Balances are null without the Financial flag.
  */
 export async function GET(request: Request): Promise<Response> {
   try {
@@ -59,7 +59,7 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * Add Vendor with Projects, rate card and opening balance (CM-208). The
+ * Add Vendor with Projects, rate card and opening balance. The
  * opening balance is posted to the ledger in the same transaction.
  */
 export async function POST(request: Request): Promise<Response> {

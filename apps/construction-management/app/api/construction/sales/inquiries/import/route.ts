@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 const MAX_BYTES = 2 * 1024 * 1024;
 
 /**
- * Imports inquiries from the sample (CM-1007, ADR CM-0022 §9): the body is
+ * Imports inquiries from the sample (ADR CM-0022 §9): the body is
  * the .xlsx itself. Every row becomes an inquiry of the Project or none
  * does: 400 `IMPORT_HAS_ERRORS` with `details.errors` = [{ row, field,
  * message }], `IMPORT_EMPTY`, `IMPORT_TOO_MANY` (over 1,000 rows),

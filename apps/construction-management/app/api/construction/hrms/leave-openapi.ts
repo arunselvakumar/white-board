@@ -74,7 +74,7 @@ const READ = [
 
 const WRITE = [...READ, StatusCodes.CONFLICT, StatusCodes.PAYMENT_REQUIRED];
 
-/** Leave models (CM-310 … CM-313). */
+/** Leave models. */
 export const leaveOpenApiComponents: OpenApiComponents = {
   ConstructionHrmsLeaveIdParamsModel,
   ConstructionHrmsLeaveExpectedUpdatedAtRequestModel,
@@ -132,7 +132,7 @@ const LEAVE = `${LEAVES_PATH}/{id}`;
  * approve / reject).
  */
 export const leaveOpenApiOperations: OpenApiOperation[] = [
-  // Leave types (CM-310)
+  // Leave types
   {
     method: "get",
     path: LEAVE_TYPES_PATH,
@@ -216,7 +216,7 @@ export const leaveOpenApiOperations: OpenApiOperation[] = [
     errors: WRITE,
   },
 
-  // Structures and assignments (CM-311)
+  // Structures and assignments
   {
     method: "get",
     path: LEAVE_STRUCTURES_PATH,
@@ -307,7 +307,7 @@ export const leaveOpenApiOperations: OpenApiOperation[] = [
     errors: WRITE,
   },
 
-  // Balances (CM-311)
+  // Balances
   {
     method: "get",
     path: LEAVE_BALANCES_PATH,
@@ -404,7 +404,7 @@ export const leaveOpenApiOperations: OpenApiOperation[] = [
     errors: WRITE,
   },
 
-  // Requests (CM-312, CM-313)
+  // Requests
   {
     method: "get",
     path: LEAVES_PATH,

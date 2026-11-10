@@ -807,122 +807,122 @@ openApiOperations.push(
   },
 );
 
-// The projects context (CM-204) lists its own models and routes.
+// The projects context lists its own models and routes.
 Object.assign(openApiComponents, projectsOpenApiComponents);
 openApiOperations.push(...projectsOpenApiOperations);
 
-// Project documents (CM-414) list their own models and routes.
+// Project documents list their own models and routes.
 Object.assign(openApiComponents, projectDocumentOpenApiComponents);
 openApiOperations.push(...projectDocumentOpenApiOperations);
 
-// Phases, Wings (CM-402) and Locations (CM-405) list their own models and routes.
+// Phases, Wings and Locations list their own models and routes.
 Object.assign(openApiComponents, wingOpenApiComponents);
 openApiOperations.push(...wingOpenApiOperations);
 Object.assign(openApiComponents, locationOpenApiComponents);
 openApiOperations.push(...locationOpenApiOperations);
 
-// The location picker's options (CM-403): where Wings, Locations and the
+// The location picker's options: where Wings, Locations and the
 // assigned Amenities and Common Developments meet.
 Object.assign(openApiComponents, locationOptionsOpenApiComponents);
 openApiOperations.push(...locationOptionsOpenApiOperations);
 
-// Project Resources (CM-406): where four contexts' parties meet a Project.
+// Project Resources: where four contexts' parties meet a Project.
 Object.assign(openApiComponents, projectResourcesOpenApiComponents);
 openApiOperations.push(...projectResourcesOpenApiOperations);
 
-// Project Drawings (CM-408) list their own models and routes.
+// Project Drawings list their own models and routes.
 Object.assign(openApiComponents, drawingOpenApiComponents);
 openApiOperations.push(...drawingOpenApiOperations);
 
-// Testing Reports (CM-409) list their own models and routes.
+// Testing Reports list their own models and routes.
 Object.assign(openApiComponents, testingReportOpenApiComponents);
 openApiOperations.push(...testingReportOpenApiOperations);
 
-// The Gallery (CM-410) lists its own models and routes.
+// The Gallery lists its own models and routes.
 Object.assign(openApiComponents, galleryOpenApiComponents);
 openApiOperations.push(...galleryOpenApiOperations);
 
-// The masters context (CM-203) lists its own models and routes.
+// The masters context lists its own models and routes.
 Object.assign(openApiComponents, mastersOpenApiComponents);
 openApiOperations.push(...mastersOpenApiOperations);
 
-// Amenities and Common Developments (CM-404).
+// Amenities and Common Developments.
 Object.assign(openApiComponents, developmentOpenApiComponents);
 openApiOperations.push(...developmentOpenApiOperations);
 
-// Issue Categories and Tags (CM-801).
+// Issue Categories and Tags.
 Object.assign(openApiComponents, trackingMastersOpenApiComponents);
 openApiOperations.push(...trackingMastersOpenApiOperations);
 
-// A Project's Amenities, home, preferences and dashboard (CM-404, CM-411, CM-412).
+// A Project's Amenities, home, preferences and dashboard.
 Object.assign(openApiComponents, projectHomeOpenApiComponents);
 openApiOperations.push(...projectHomeOpenApiOperations);
 
-// Contractors and Suppliers (CM-406) list their own models and routes.
+// Contractors and Suppliers list their own models and routes.
 Object.assign(openApiComponents, partiesOpenApiComponents);
 openApiOperations.push(...partiesOpenApiOperations);
 
-// The Vendor register (CM-208, CM-209) lists its own models and routes.
+// The Vendor register lists its own models and routes.
 Object.assign(openApiComponents, vendorOpenApiComponents);
 openApiOperations.push(...vendorOpenApiOperations);
 
-// The Labour register (CM-205 – CM-207) lists its own models and routes.
+// The Labour register lists its own models and routes.
 Object.assign(openApiComponents, labourOpenApiComponents);
 openApiOperations.push(...labourOpenApiOperations);
 
-// The project labour summary (CM-219) lists its own model and route.
+// The project labour summary lists its own model and route.
 Object.assign(openApiComponents, labourSummaryOpenApiComponents);
 openApiOperations.push(...labourSummaryOpenApiOperations);
 
-// Vendor attendance (CM-212, CM-213) lists its own models and routes.
+// Vendor attendance lists its own models and routes.
 Object.assign(openApiComponents, vendorAttendanceOpenApiComponents);
 openApiOperations.push(...vendorAttendanceOpenApiOperations);
 
-// Labour attendance (CM-210, CM-211) lists its own models and routes.
+// Labour attendance lists its own models and routes.
 Object.assign(openApiComponents, labourAttendanceOpenApiComponents);
 openApiOperations.push(...labourAttendanceOpenApiOperations);
 
-// Wage payments and balances (CM-214, CM-215) list their own models and routes.
+// Wage payments and balances list their own models and routes.
 Object.assign(openApiComponents, paymentOpenApiComponents);
 openApiOperations.push(...paymentOpenApiOperations);
 
-// Report jobs (CM-217, CM-218) list their own models and routes.
+// Report jobs list their own models and routes.
 Object.assign(openApiComponents, reportingOpenApiComponents);
 openApiOperations.push(...reportingOpenApiOperations);
 
-// The hrms context (M3) lists its own models and routes.
+// The hrms context lists its own models and routes.
 Object.assign(openApiComponents, hrmsOpenApiComponents);
 openApiOperations.push(...hrmsOpenApiOperations);
 
-// The procurement context (M5) lists its own models and routes, one file per area.
+// The procurement context lists its own models and routes, one file per area.
 Object.assign(openApiComponents, procurementOpenApiComponents);
 openApiOperations.push(...procurementOpenApiOperations);
 
-// The site-work context (M6) lists its own models and routes, one file per area.
+// The site-work context lists its own models and routes, one file per area.
 Object.assign(openApiComponents, siteWorkOpenApiComponents);
 openApiOperations.push(...siteWorkOpenApiOperations);
 
-// The finance context (M7) lists its own models and routes, one file per area.
+// The finance context lists its own models and routes, one file per area.
 Object.assign(openApiComponents, financeOpenApiComponents);
 openApiOperations.push(...financeOpenApiOperations);
 
-// The tracking context (M8) lists its own models and routes, one file per area.
+// The tracking context lists its own models and routes, one file per area.
 Object.assign(openApiComponents, trackingOpenApiComponents);
 openApiOperations.push(...trackingOpenApiOperations);
 
-// The sales context (M10) lists its own models and routes, one file per area.
+// The sales context lists its own models and routes, one file per area.
 Object.assign(openApiComponents, salesOpenApiComponents);
 openApiOperations.push(...salesOpenApiOperations);
 
-// The kernel's job queue (M9, ADR CM-0021 §1).
+// The kernel's job queue (ADR CM-0021 §1).
 Object.assign(openApiComponents, queueOpenApiComponents);
 openApiOperations.push(...queueOpenApiOperations);
 
-// Notifications (CM-904, ADR CM-0021 §6).
+// Notifications (ADR CM-0021 §6).
 Object.assign(openApiComponents, messagingOpenApiComponents);
 openApiOperations.push(...messagingOpenApiOperations);
 
-// Billing addresses and GRN fields (CM-501) are Company settings.
+// Billing addresses and GRN fields are Company settings.
 Object.assign(openApiComponents, billingAddressOpenApiComponents);
 openApiOperations.push(...billingAddressOpenApiOperations);
 Object.assign(openApiComponents, roleOpenApiComponents);
@@ -930,19 +930,19 @@ openApiOperations.push(...roleOpenApiOperations);
 Object.assign(openApiComponents, grnFieldOpenApiComponents);
 openApiOperations.push(...grnFieldOpenApiOperations);
 
-// The report catalogue and Downloads (CM-901, ADR CM-0021 §2).
+// The report catalogue and Downloads (ADR CM-0021 §2).
 Object.assign(openApiComponents, reportingDownloadsOpenApiComponents);
 openApiOperations.push(...reportingDownloadsOpenApiOperations);
-// The Company Dashboard (CM-902) over the reporting views.
+// The Company Dashboard over the reporting views.
 Object.assign(openApiComponents, companyDashboardOpenApiComponents);
 openApiOperations.push(...companyDashboardOpenApiOperations);
-// The report cards' picker choices (CM-903).
+// The report cards' picker choices.
 Object.assign(openApiComponents, reportingFilterOptionsOpenApiComponents);
 openApiOperations.push(...reportingFilterOptionsOpenApiOperations);
-// Action codes, Devices, ownership and deletion (M9, CM-907).
+// Action codes, Devices, ownership and deletion.
 Object.assign(openApiComponents, accountOpenApiComponents);
 openApiOperations.push(...accountOpenApiOperations);
-// Backups and Download My Data (M9, CM-906).
+// Backups and Download My Data.
 Object.assign(openApiComponents, reportingBackupsOpenApiComponents);
 openApiOperations.push(...reportingBackupsOpenApiOperations);
 

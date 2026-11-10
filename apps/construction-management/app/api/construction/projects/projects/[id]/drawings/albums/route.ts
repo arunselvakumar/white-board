@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 type Context = { params: Promise<{ id: string }> };
 
-/** The Project's drawing albums by name, with drawing counts (CM-408). */
+/** The Project's drawing albums by name, with drawing counts. */
 export async function GET(
   request: Request,
   context: Context,

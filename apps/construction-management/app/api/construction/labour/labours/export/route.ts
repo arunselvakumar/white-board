@@ -16,7 +16,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The filtered register as an Excel sheet (CM-206), with the import's
+ * The filtered register as an Excel sheet, with the import's
  * columns plus Status and Balance. Amounts only with `financial`; Aadhaar
  * masked.
  */

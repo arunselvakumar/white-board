@@ -9,7 +9,7 @@ import {
   UpdateConstructionMastersSupplierRequestModel,
 } from "./supplier-models";
 
-/** Suppliers under the `masters.suppliers` Menu (CM-406). */
+/** Suppliers under the `masters.suppliers` Menu. */
 export const supplierRoutes = partyRoutes({
   menu: "masters.suppliers",
   handlers: createPartyHandlers("supplier", {

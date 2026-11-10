@@ -18,7 +18,7 @@ import { loadBackdatedCheck } from "@/src/tracking/infrastructure/tracking-guard
 
 export const ISSUE_MENU = TRACKING_DOCUMENTS.issue.menu;
 
-/** Issues & Snags handlers (CM-803) wired to Prisma and the TrackingDirectory. */
+/** Issues & Snags handlers wired to Prisma and the TrackingDirectory. */
 export function createIssueHandlers(): IssueHandlers {
   return new IssueHandlers({
     db: prisma,

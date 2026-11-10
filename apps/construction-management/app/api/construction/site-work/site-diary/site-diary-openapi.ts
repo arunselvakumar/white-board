@@ -36,7 +36,7 @@ const WRITE_ERRORS = [
 
 const ITEM = `${SITE_DIARY_PATH}/{id}`;
 
-/** Request and Response models of `/api/construction/site-work/site-diary` (CM-607). */
+/** Request and Response models of `/api/construction/site-work/site-diary`. */
 export const siteDiaryOpenApiComponents: OpenApiComponents = {
   CreateConstructionSiteWorkSiteDiaryRequestModel,
   UpdateConstructionSiteWorkSiteDiaryRequestModel,
@@ -48,7 +48,7 @@ export const siteDiaryOpenApiComponents: OpenApiComponents = {
 };
 
 /**
- * Site Diary routes (CM-607), menu `site_work.site_diary` on the diary's
+ * Site Diary routes, menu `site_work.site_diary` on the diary's
  * Project: read, create, update, delete. One diary per Project per date.
  */
 export const siteDiaryOpenApiOperations: OpenApiOperation[] = [

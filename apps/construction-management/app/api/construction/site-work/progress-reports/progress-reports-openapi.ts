@@ -35,7 +35,7 @@ const WRITE_ERRORS = [
 
 const ITEM = `${PROGRESS_REPORTS_PATH}/{id}`;
 
-/** Request and Response models of `/api/construction/site-work/progress-reports` (CM-606). */
+/** Request and Response models of `/api/construction/site-work/progress-reports`. */
 export const progressReportOpenApiComponents: OpenApiComponents = {
   CreateConstructionSiteWorkProgressReportRequestModel,
   ConstructionSiteWorkProgressReportActionsResponseModel,
@@ -45,7 +45,7 @@ export const progressReportOpenApiComponents: OpenApiComponents = {
 };
 
 /**
- * Progress Reports routes (CM-606), menu `site_work.progress_reports` on
+ * Progress Reports routes, menu `site_work.progress_reports` on
  * the report's Project: create (generate, retry), read (list, download),
  * delete.
  */

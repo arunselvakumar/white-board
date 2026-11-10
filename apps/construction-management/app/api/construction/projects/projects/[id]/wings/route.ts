@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 
 type Context = { params: Promise<{ id: string }> };
 
-/** The Wings screen (CM-402): Phases in order with their Wings and totals. */
+/** The Wings screen: Phases in order with their Wings and totals. */
 export async function GET(
   request: Request,
   context: Context,
@@ -36,7 +36,7 @@ export async function GET(
 }
 
 /**
- * Save on Add Wing (CM-402): the configuration and the floors and units
+ * Save on Add Wing: the configuration and the floors and units
  * the editor made from it, in one request.
  */
 export async function POST(

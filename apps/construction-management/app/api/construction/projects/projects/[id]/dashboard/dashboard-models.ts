@@ -15,7 +15,7 @@ const calendarDate = z
   .regex(/^\d{4}-\d{2}-\d{2}$/)
   .describe("YYYY-MM-DD in the Company time zone.");
 
-/** The Project Dashboard's Project summary (CM-412). */
+/** The Project Dashboard's Project summary. */
 export const ConstructionProjectsProjectSummaryResponseModel = z.object({
   project: z.object({
     id: z.uuid(),

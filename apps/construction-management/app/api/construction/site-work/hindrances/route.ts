@@ -23,7 +23,7 @@ export const dynamic = "force-dynamic";
 /**
  * A Project's Hindrance register, newest first, by status, cause,
  * responsible party, Contractor, a date range it overlaps and a search on
- * the number or activity (CM-607). Needs Hindrance Register read on the
+ * the number or activity. Needs Hindrance Register read on the
  * Project.
  */
 export async function GET(request: Request): Promise<Response> {
@@ -70,7 +70,7 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * Records a hindrance (CM-607): numbered from the Hindrance numbering rule
+ * Records a hindrance: numbered from the Hindrance numbering rule
  * on its start date, which the back-dated limit applies to. Needs
  * Hindrance Register create on the Project.
  */

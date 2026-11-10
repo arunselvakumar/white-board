@@ -10,7 +10,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The Apply Leave form's live view (CM-313): day breakdown, total and
+ * The Apply Leave form's live view: day breakdown, total and
  * balance, and why applying would be refused. Writes nothing.
  */
 export async function POST(request: Request): Promise<Response> {

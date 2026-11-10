@@ -17,7 +17,7 @@ export const dynamic = "force-dynamic";
 /**
  * Each Contractor's, Supplier's or Other Party's money on a Project (or a
  * Store): opening, invoiced, paid, TDS, written off, balance, overdue and
- * advance, with totals (CM-705, CM-706). Needs Parties read.
+ * advance, with totals. Needs Parties read.
  */
 export async function GET(request: Request): Promise<Response> {
   try {

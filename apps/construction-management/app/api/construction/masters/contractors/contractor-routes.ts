@@ -13,7 +13,7 @@ import {
   UpdateConstructionMastersContractorRequestModel,
 } from "./contractor-models";
 
-/** Contractors under the `masters.contractors` Menu (CM-406). */
+/** Contractors under the `masters.contractors` Menu. */
 export const contractorRoutes = partyRoutes({
   menu: "masters.contractors",
   handlers: createPartyHandlers("contractor", {

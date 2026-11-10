@@ -32,7 +32,7 @@ const COMPANY_ERRORS = [
 
 const USER_ERRORS = [StatusCodes.BAD_REQUEST, StatusCodes.UNAUTHORIZED];
 
-/** Request and Response models of `/api/construction/messaging` (CM-904). */
+/** Request and Response models of `/api/construction/messaging`. */
 export const messagingOpenApiComponents: OpenApiComponents = {
   ConstructionMessagingNotificationResponseModel,
   ListConstructionMessagingNotificationsResponseModel,

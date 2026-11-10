@@ -12,7 +12,7 @@ import type { Flag } from "@/src/shared-kernel/access";
 export { PROGRESS_REPORT_MENU };
 
 /**
- * One set of Progress Reports handlers for every route (CM-606). The
+ * One set of Progress Reports handlers for every route. The
  * DPR is a reporting job, but its routes live here: it is numbered by site
  * work and guarded by the Progress Report menu (C / R / D), not by the
  * Reports page's Report flag.

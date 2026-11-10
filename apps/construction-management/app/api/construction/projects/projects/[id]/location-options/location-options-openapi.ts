@@ -8,12 +8,12 @@ import type {
 import { ConstructionProjectsProjectParamsModel } from "../../project-models";
 import { ConstructionProjectsLocationOptionsResponseModel } from "./location-options-models";
 
-/** The location picker's model (CM-403). */
+/** The location picker's model. */
 export const locationOptionsOpenApiComponents: OpenApiComponents = {
   ConstructionProjectsLocationOptionsResponseModel,
 };
 
-/** The location picker's read (CM-403), under the `projects.project` menu. */
+/** The location picker's read, under the `projects.project` menu. */
 export const locationOptionsOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

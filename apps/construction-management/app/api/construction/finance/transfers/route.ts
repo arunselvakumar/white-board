@@ -18,7 +18,7 @@ export const dynamic = "force-dynamic";
 const Scope = z.object({ projectId: z.uuid().nullable().optional() });
 
 /**
- * Records a transfer between two accounts (CM-702): pending, or approved
+ * Records a transfer between two accounts: pending, or approved
  * with Save & Approve, numbered TXN. The mode must fit the from account,
  * which the caller must be able to use. Transactions create on its
  * Project (the flag alone without one).

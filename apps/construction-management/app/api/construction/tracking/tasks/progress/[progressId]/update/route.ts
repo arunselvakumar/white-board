@@ -13,7 +13,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Edits a manual progress update (CM-802): its author, or a member with
+ * Edits a manual progress update: its author, or a member with
  * Task update. Worksheet updates are read-only here (409
  * `PROGRESS_FROM_WORKSHEET`); 409 `TASK_PROGRESS_CHANGED` when stale.
  */

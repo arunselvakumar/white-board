@@ -11,7 +11,7 @@ import { attendance } from "../handlers";
 export const dynamic = "force-dynamic";
 
 /**
- * Each member's month: day statuses and counts (CM-309; `report`). Every
+ * Each member's month: day statuses and counts (`report`). Every
  * active member with `view_all`, else the viewer's own row.
  */
 export async function GET(request: Request): Promise<Response> {

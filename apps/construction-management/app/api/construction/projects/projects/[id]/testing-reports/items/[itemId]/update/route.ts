@@ -12,7 +12,7 @@ import { toTestingItemResponse } from "../../../testing-report-responses";
 export const dynamic = "force-dynamic";
 
 /**
- * Renames a testing item (CM-409). 409 `TESTING_ITEM_CHANGED` on a stale
+ * Renames a testing item. 409 `TESTING_ITEM_CHANGED` on a stale
  * `updatedAt`, `TESTING_ITEM_NAME_IN_USE`.
  */
 export async function POST(

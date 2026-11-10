@@ -15,7 +15,7 @@ const ORGANIZATION = ["Construction · Organization"];
 
 const SESSION_ERRORS = [StatusCodes.UNAUTHORIZED, StatusCodes.FORBIDDEN];
 
-/** GRN field visibility (CM-501, ADR CM-0015 §9), under `organization.settings`. */
+/** GRN field visibility (ADR CM-0015 §9), under `organization.settings`. */
 export const grnFieldOpenApiComponents: OpenApiComponents = {
   GetConstructionOrganizationGrnFieldSettingResponseModel,
   UpdateConstructionOrganizationGrnFieldSettingRequestModel,

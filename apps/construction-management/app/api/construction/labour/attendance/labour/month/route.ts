@@ -14,7 +14,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The month grid (CM-211): labourer × day codes (P/H/A/L/PL/HO) with
+ * The month grid: labourer × day codes (P/H/A/L/PL/HO) with
  * overtime hours, and totals per labourer. Needs Attendance read; earned
  * amounts need Labour Financial.
  */

@@ -13,7 +13,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** My Leaves: the caller's own requests, newest first (CM-313). */
+/** My Leaves: the caller's own requests, newest first. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const query = parseOrThrow(
@@ -38,7 +38,7 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * Apply for leave (CM-312), for yourself or, with View All, for another
+ * Apply for leave, for yourself or, with View All, for another
  * Team Member. Pending with the days reserved, or approved at once when
  * the type needs no approval.
  */

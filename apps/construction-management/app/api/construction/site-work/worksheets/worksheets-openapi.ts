@@ -52,7 +52,7 @@ const WRITE_ERRORS = [
 
 const ITEM = `${WORKSHEETS_PATH}/{id}`;
 
-/** Request and Response models of `/api/construction/site-work/worksheets` (CM-602). */
+/** Request and Response models of `/api/construction/site-work/worksheets`. */
 export const worksheetOpenApiComponents: OpenApiComponents = {
   ConstructionSiteWorkWorksheetTaskResponseModel,
   GetConstructionSiteWorkWorksheetTaskOptionsResponseModel,
@@ -77,7 +77,7 @@ export const worksheetOpenApiComponents: OpenApiComponents = {
 };
 
 /**
- * Daily Worksheet routes (CM-602), menu `site_work.daily_worksheet` on the
+ * Daily Worksheet routes, menu `site_work.daily_worksheet` on the
  * sheet's Project: read, create, update, delete, approve, reject.
  */
 export const worksheetOpenApiOperations: OpenApiOperation[] = [

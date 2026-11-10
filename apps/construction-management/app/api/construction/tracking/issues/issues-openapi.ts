@@ -45,7 +45,7 @@ const WRITE_ERRORS = [
 
 const ITEM = `${ISSUES_PATH}/{id}`;
 
-/** Request and Response models of `/api/construction/tracking/issues` (CM-803). */
+/** Request and Response models of `/api/construction/tracking/issues`. */
 export const trackingIssueOpenApiComponents: OpenApiComponents = {
   CreateConstructionTrackingIssueRequestModel,
   UpdateConstructionTrackingIssueRequestModel,
@@ -85,7 +85,7 @@ function issueCommand(
 }
 
 /**
- * Issues & Snags routes (CM-803), menu `tracking.issues` on the issue's
+ * Issues & Snags routes, menu `tracking.issues` on the issue's
  * Project: read, create, update (edit, Mark As Solved, Progress updates),
  * approve (Verify), reject (Reopen), delete; View all scopes every read.
  */

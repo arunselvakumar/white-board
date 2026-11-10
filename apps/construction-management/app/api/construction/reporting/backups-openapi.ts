@@ -20,7 +20,7 @@ import {
 
 const REPORTING = ["Construction · Reporting"];
 
-/** Backups and Download My Data (CM-906, ADR CM-0021 §8). */
+/** Backups and Download My Data (ADR CM-0021 §8). */
 export const reportingBackupsOpenApiComponents: OpenApiComponents = {
   CreateConstructionReportingBackupRequestModel,
   ConstructionReportingBackupResponseModel,

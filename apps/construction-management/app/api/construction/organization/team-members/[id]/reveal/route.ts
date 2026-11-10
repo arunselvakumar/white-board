@@ -11,8 +11,8 @@ import { TeamMemberIdParamsModel } from "../../team-member-models";
 export const dynamic = "force-dynamic";
 
 /**
- * The full Aadhaar and PAN of a Team Member, Owner only and logged
- * (CM-108). Needs a `reveal_identifiers` code verified in this session in
+ * The full Aadhaar and PAN of a Team Member, Owner only and logged.
+ * Needs a `reveal_identifiers` code verified in this session in
  * the last 10 minutes (409 `REVEAL_CODE_REQUIRED`, ADR CM-0021 §11).
  */
 export async function POST(

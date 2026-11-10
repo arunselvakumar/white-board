@@ -12,10 +12,10 @@ import { salaryHandlers } from "../salary-route";
 export const dynamic = "force-dynamic";
 
 /**
- * Mark Salaries as Paid (CM-316, `hrms.salaries` update), all or none:
+ * Mark Salaries as Paid (`hrms.salaries` update), all or none:
  * Approved slips still as loaded, with the mode (Cash / Bank), the date,
  * a reference and the finance account it was paid from. Each slip posts
- * its net payable on that account (CM-707, ADR CM-0017 §12). Before
+ * its net payable on that account (ADR CM-0017 §12). Before
  * approval it is 409 `SALARY_NOT_APPROVED`.
  */
 export async function POST(request: Request): Promise<Response> {

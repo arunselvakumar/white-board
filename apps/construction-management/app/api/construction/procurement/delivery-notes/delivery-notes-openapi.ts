@@ -25,7 +25,7 @@ import {
 
 const ITEM = `${DELIVERY_NOTES_PATH}/{id}`;
 
-/** Request and Response models of `/api/construction/procurement/delivery-notes` (M5). */
+/** Request and Response models of `/api/construction/procurement/delivery-notes`. */
 export const deliveryNoteOpenApiComponents: OpenApiComponents = {
   CreateConstructionProcurementDeliveryNoteRequestModel,
   UpdateConstructionProcurementDeliveryNoteRequestModel,
@@ -36,7 +36,7 @@ export const deliveryNoteOpenApiComponents: OpenApiComponents = {
   ListConstructionProcurementDeliveryNotesResponseModel,
 };
 
-/** Operations of `/api/construction/procurement/delivery-notes` (CM-508; menu `procurement.delivery_notes`). */
+/** Operations of `/api/construction/procurement/delivery-notes` (menu `procurement.delivery_notes`). */
 export const deliveryNoteOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

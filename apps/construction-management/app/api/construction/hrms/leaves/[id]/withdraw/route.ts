@@ -13,7 +13,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Withdraw a pending request (CM-312, ADR CM-0012 §8): the reserved days are released. */
+/** Withdraw a pending request (ADR CM-0012 §8): the reserved days are released. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

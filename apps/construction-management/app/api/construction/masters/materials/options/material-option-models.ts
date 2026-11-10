@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 /**
- * The material picker's read (M5): live, enabled Materials by name, for
- * every procurement form. Contract shared by CM-501 (which serves it) and
- * the PR, PO, GRN, inventory, transfer and MR forms (which pick from it).
+ * The material picker's read: live, enabled Materials by name, for every
+ * procurement form. Contract shared by the masters route that serves it
+ * and the PR, PO, GRN, inventory, transfer and MR forms that pick from it.
  */
 export const ListConstructionMastersMaterialOptionsRequestModel = z.object({
   /** Name or specification contains, ignoring case. */

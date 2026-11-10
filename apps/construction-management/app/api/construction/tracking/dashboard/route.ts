@@ -18,10 +18,10 @@ const kpis = projectDashboardKpis();
 /**
  * The Project Dashboard's Task, Issue & Snag and Inspection Request
  * sections and the Pending Issues & Snags and Pending Inspections tiles
- * (CM-805, ADR CM-0019 §14), behind Dashboard Read on the Project (ADR
+ * (ADR CM-0019 §14), behind Dashboard Read on the Project (ADR
  * CM-0013 §12). Each section also needs its menu's Read on the Project
  * (null without it); Value Earned By Task needs Task Financial. The two
- * tiles read `construction_reporting.project_pending_tracking` (CM-902).
+ * tiles read `construction_reporting.project_pending_tracking`.
  */
 export async function GET(request: Request): Promise<Response> {
   try {

@@ -46,7 +46,7 @@ const WRITE_ERRORS = [
 
 const ITEM = `${PURCHASE_REQUESTS_PATH}/{id}`;
 
-/** Request and Response models of `/api/construction/procurement/purchase-requests` (M5). */
+/** Request and Response models of `/api/construction/procurement/purchase-requests`. */
 export const purchaseRequestOpenApiComponents: OpenApiComponents = {
   ConstructionProcurementSiteLocationModel,
   ConstructionProcurementSiteLocationResponseModel,
@@ -67,7 +67,7 @@ export const purchaseRequestOpenApiComponents: OpenApiComponents = {
 };
 
 /**
- * Purchase Request routes (CM-503), menu `procurement.purchase_requests`
+ * Purchase Request routes, menu `procurement.purchase_requests`
  * on the request's Project: read, create, update (edit; Mark as Ordered
  * with update or Approve), delete, approve, reject, print (PDF).
  */

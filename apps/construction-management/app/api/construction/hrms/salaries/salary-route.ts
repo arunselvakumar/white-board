@@ -3,8 +3,8 @@ import { messagingEvents } from "@/src/composition/messaging";
 import { createSalaryRunHandlers } from "@/src/hrms/infrastructure/create-salary-run-handlers";
 
 /**
- * Salary run handlers (CM-316, CM-317), wired once for every salary route.
- * Paid slips post to finance's account ledger (CM-707).
+ * Salary run handlers, wired once for every salary route.
+ * Paid slips post to finance's account ledger.
  */
 export const salaryHandlers = createSalaryRunHandlers({
   accounts: accountPosting,

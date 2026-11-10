@@ -13,7 +13,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Reject a pending request with a reason (CM-312); the reserved days are released. */
+/** Reject a pending request with a reason; the reserved days are released. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

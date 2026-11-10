@@ -14,7 +14,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The marking sheet for a Project and date (CM-211): active labourers on the
+ * The marking sheet for a Project and date: active labourers on the
  * Project that day with their category, Supervisor, weekly holidays, wage
  * type, the day's row and a pre-fill hint. Needs Attendance read.
  */

@@ -24,14 +24,14 @@ const FILTER_KEYS = [
   "material",
   "filled_by",
   "include_images",
-  // The procurement reports' filters (CM-903).
+  // The procurement reports' filters.
   "status",
   "material_category",
   "created_by",
   "transfer_type",
-  // The Booking Report's Wing (CM-1008).
+  // The Booking Report's Wing.
   "wing",
-  // The Inquiry Report's filters (CM-1008).
+  // The Inquiry Report's filters.
   "interest_type",
   "lead_source",
   "funnel_stage",

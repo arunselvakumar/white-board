@@ -10,7 +10,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Active rotation templates, for pickers (CM-306). */
+/** Active rotation templates, for pickers. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(request, "hrms.shifts", "read");

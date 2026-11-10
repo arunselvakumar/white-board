@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 const handlers = createSubscriptionHandlers();
 
 /**
- * Razorpay webhook (CM-117), the source of truth for payments. No Session:
+ * Razorpay webhook, the source of truth for payments. No Session:
  * `X-Razorpay-Signature` (HMAC-SHA256 of the raw body with
  * `RAZORPAY_WEBHOOK_SECRET`) must match, or 401. `payment.captured` and
  * `order.paid` settle the order once; replays change nothing and get 200.

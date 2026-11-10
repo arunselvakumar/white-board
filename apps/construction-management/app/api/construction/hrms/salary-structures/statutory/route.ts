@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createSalaryStructureHandlers();
 
-/** PF and ESI rows and the PT slabs in force for a month (CM-314 preview). */
+/** PF and ESI rows and the PT slabs in force for a month, for the preview. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(

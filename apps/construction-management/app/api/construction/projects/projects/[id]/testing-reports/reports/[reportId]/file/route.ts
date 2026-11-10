@@ -12,7 +12,7 @@ import { ConstructionProjectsTestingReportParamsModel } from "../../../testing-r
 export const dynamic = "force-dynamic";
 
 /**
- * Streams a report's file (CM-409), shown in the browser; `?download=1`
+ * Streams a report's file, shown in the browser; `?download=1`
  * saves it. The Gallery links here, so a member without
  * `projects.testing_reports` read gets 403.
  */

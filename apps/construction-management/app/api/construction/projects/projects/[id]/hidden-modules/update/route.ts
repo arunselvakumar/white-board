@@ -12,7 +12,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Hide / Show Modules (CM-411): the full set of hidden modules on the
+ * Hide / Show Modules: the full set of hidden modules on the
  * Project, for everyone on it. The Project menu's Update flag; answers
  * with the caller's home.
  */

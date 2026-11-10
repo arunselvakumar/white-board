@@ -12,7 +12,7 @@ import { DASHBOARD_MENU, siteWorkDashboard } from "../handlers";
 export const dynamic = "force-dynamic";
 
 /**
- * The Project Dashboard's Equipment Usage section (CM-608): top hourly
+ * The Project Dashboard's Equipment Usage section: top hourly
  * equipment by work hours, owned against rented hours and the KPI
  * figures, from live usage sheets that are not rejected. Needs Dashboard
  * Read on the Project; the rented hire cost also needs Financial on

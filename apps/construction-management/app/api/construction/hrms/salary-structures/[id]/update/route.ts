@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 const handlers = createSalaryStructureHandlers();
 
 /**
- * Replaces a salary structure (CM-314). Components sent with their id
+ * Replaces a salary structure. Components sent with their id
  * keep it, so members' overrides stay attached. 409
  * `SALARY_STRUCTURE_CHANGED` when someone saved after `expectedUpdatedAt`.
  */

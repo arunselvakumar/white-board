@@ -9,7 +9,7 @@ import { ConstructionProjectsPhaseParamsModel } from "../../../wings/wing-models
 
 export const dynamic = "force-dynamic";
 
-/** Deletes an empty Phase (CM-402); 409 `PHASE_NOT_EMPTY` while it holds Wings. */
+/** Deletes an empty Phase; 409 `PHASE_NOT_EMPTY` while it holds Wings. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string; phaseId: string }> },

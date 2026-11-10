@@ -21,7 +21,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * A material's history at a location (CM-506): every ledger entry, newest
+ * A material's history at a location: every ledger entry, newest
  * date first, with its source, counterparty, site location, who, and the
  * running balance; reversals are entries of their own (Read).
  */

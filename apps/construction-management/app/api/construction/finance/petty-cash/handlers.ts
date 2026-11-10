@@ -27,7 +27,7 @@ import {
   type CreateConstructionFinancePettyCashVoucherRequestModel,
 } from "./petty-cash-models";
 
-/** One composition for the Petty Cash routes (CM-703). */
+/** One composition for the Petty Cash routes. */
 export { PETTY_CASH_MENU };
 
 export const pettyCashAccounts = new PettyCashAccounts(financeDirectory);

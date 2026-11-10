@@ -42,7 +42,7 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * Generates a Daily Progress Report (CM-606): takes the date's DPR number
+ * Generates a Daily Progress Report: takes the date's DPR number
  * the first time (reused after), then runs the job inline with a
  * 60-second limit, so it usually comes back done or failed. Hire cost
  * prints only when the requester holds Financial on Equipment Usage.

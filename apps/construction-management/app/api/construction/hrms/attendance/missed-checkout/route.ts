@@ -10,7 +10,7 @@ import { attendance } from "../handlers";
 
 export const dynamic = "force-dynamic";
 
-/** Add Missed Checkout for an entry left open on an earlier day; it goes to approvals (CM-308). */
+/** Add Missed Checkout for an entry left open on an earlier day; it goes to approvals. */
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(request, "hrms.attendance", "create");

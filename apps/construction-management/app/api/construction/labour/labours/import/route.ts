@@ -17,7 +17,7 @@ export const dynamic = "force-dynamic";
 const MAX_BYTES = 5 * 1024 * 1024;
 
 /**
- * Imports labourers from the sample sheet (CM-206). The body is the .xlsx
+ * Imports labourers from the sample sheet. The body is the .xlsx
  * file itself. `?dryRun=true` (default) previews every row with its
  * errors; `?dryRun=false` adds all rows in one transaction, or none: 400
  * `IMPORT_HAS_ERRORS` with the preview in `details`. Needs `create` on

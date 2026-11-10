@@ -14,7 +14,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The Units chart (CM-1005, ADR CM-0022 §8): every Wing of the Project
+ * The Units chart (ADR CM-0022 §8): every Wing of the Project
  * with its units counted by sales status — Available, On Hold, Booked,
  * Unavailable (a hold past its Hold until date counts Available) — and the
  * chosen Wing's floors × units grid. Needs Booking read on the Project.

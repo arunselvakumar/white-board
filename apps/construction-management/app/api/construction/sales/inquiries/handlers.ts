@@ -24,5 +24,5 @@ export function requireInquiryAccess(
   );
 }
 
-// CM-1004: follow-ups and Inquiry Tasks.
+// Follow-ups and Inquiry Tasks.
 export { inquiryActivityHandlers } from "@/src/composition/sales-inquiries";

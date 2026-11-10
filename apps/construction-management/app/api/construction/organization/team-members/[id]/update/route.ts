@@ -12,7 +12,7 @@ import { UpdateConstructionOrganizationTeamMemberRequestModel } from "./update-t
 
 export const dynamic = "force-dynamic";
 
-/** Edit details, salary and Member Type (CM-110, ADR CM-0032, CM-0033). */
+/** Edit details, salary and Member Type (ADR CM-0032, CM-0033). */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

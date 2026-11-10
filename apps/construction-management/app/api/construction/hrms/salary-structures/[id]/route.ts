@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createSalaryStructureHandlers();
 
-/** One salary structure of the Active Company (CM-314). */
+/** One salary structure of the Active Company. */
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> },

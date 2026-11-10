@@ -10,7 +10,7 @@ import { toLeaveRequestResponse } from "../leave-models";
 
 export const dynamic = "force-dynamic";
 
-/** Leave Details (CM-313): your own request, or any with View All or as an approver. */
+/** Leave Details: your own request, or any with View All or as an approver. */
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> },

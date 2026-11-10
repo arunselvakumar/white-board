@@ -111,7 +111,7 @@ export const DeleteConstructionSalesInquiryRequestModel = z.object({
 
 export const ConstructionSalesInquiryParamsModel = z.object({ id: z.uuid() });
 
-/** Close as Converted (CM-1007). */
+/** Close as Converted. */
 export const ConvertConstructionSalesInquiryRequestModel = z.object({
   /** A bookable unit of the Project (not Unavailable, no active booking). */
   unitId: z.uuid(),
@@ -120,7 +120,7 @@ export const ConvertConstructionSalesInquiryRequestModel = z.object({
   expectedUpdatedAt: z.iso.datetime(),
 });
 
-/** Close as Lost (CM-1007). */
+/** Close as Lost. */
 export const LoseConstructionSalesInquiryRequestModel = z.object({
   /** An enabled Lost Reason of the Project. */
   lostReasonId: z.uuid(),
@@ -146,7 +146,7 @@ export const ImportConstructionSalesInquiriesResponseModel = z.object({
   imported: z.int(),
 });
 
-/** Reopen (CM-1007). */
+/** Reopen. */
 export const ReopenConstructionSalesInquiryRequestModel = z.object({
   expectedUpdatedAt: z.iso.datetime(),
 });
@@ -235,12 +235,12 @@ export const ConstructionSalesInquiryResponseModel = z.object({
   assignee: named.nullable(),
   leadOwner: named.nullable(),
   remarks: z.string().nullable(),
-  /** Set while Converted (CM-1007). */
+  /** Set while Converted. */
   convertedUnitId: z.uuid().nullable(),
   convertedBookingId: z.uuid().nullable(),
   /** The converted unit, as "A Wing 101". */
   convertedUnit: named.nullable(),
-  /** Set while Lost (CM-1007). */
+  /** Set while Lost. */
   lostReason: named.nullable(),
   lostRemarks: z.string().nullable(),
   closedAt: z.iso.datetime().nullable(),

@@ -14,7 +14,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The month view (CM-213): vendor × day matrix of full, half and overtime
+ * The month view: vendor × day matrix of full, half and overtime
  * with pay per day, and totals per vendor, per Labour Category and per day.
  */
 export async function GET(request: Request): Promise<Response> {

@@ -9,7 +9,7 @@ import { DeleteConstructionOrganizationMyAccountRequestModel } from "../account-
 export const dynamic = "force-dynamic";
 
 /**
- * Delete My Account (CM-907). Refused with 409 `OWNER_MUST_HAND_OVER`
+ * Delete My Account. Refused with 409 `OWNER_MUST_HAND_OVER`
  * while the User owns a Company. Otherwise they leave every Company (each
  * Team Member is kept, marked Left and unlinked), their push
  * subscriptions, notifications, preferences and sessions are deleted, and

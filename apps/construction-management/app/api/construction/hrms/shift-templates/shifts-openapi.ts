@@ -38,7 +38,7 @@ const WRITE = [
   StatusCodes.PAYMENT_REQUIRED,
 ] as const;
 
-/** Shift, rotation and assignment models (CM-306, CM-307). */
+/** Shift, rotation and assignment models. */
 export const shiftOpenApiComponents: OpenApiComponents = {
   ConstructionHrmsShiftTemplateResponseModel,
   ListConstructionHrmsShiftTemplatesResponseModel,
@@ -123,7 +123,7 @@ function templateOperations(
   ];
 }
 
-/** Shift, rotation and assignment routes (CM-306, CM-307). */
+/** Shift, rotation and assignment routes. */
 export const shiftOpenApiOperations: OpenApiOperation[] = [
   ...templateOperations(
     SHIFT_TEMPLATES_PATH,

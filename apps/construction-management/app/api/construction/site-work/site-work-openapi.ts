@@ -44,7 +44,7 @@ import {
   siteWorkDashboardOpenApiOperations,
 } from "./dashboard/dashboard-openapi";
 
-/** Every site-work model (M6); each area owns its own file. */
+/** Every site-work model; each area owns its own file. */
 export const siteWorkOpenApiComponents: OpenApiComponents = {
   ...siteWorkAccessOpenApiComponents,
   ...siteWorkSettingsOpenApiComponents,
@@ -58,7 +58,7 @@ export const siteWorkOpenApiComponents: OpenApiComponents = {
   ...siteWorkDashboardOpenApiComponents,
 };
 
-/** Every site-work operation (M6). */
+/** Every site-work operation. */
 export const siteWorkOpenApiOperations: OpenApiOperation[] = [
   ...siteWorkAccessOpenApiOperations,
   ...siteWorkSettingsOpenApiOperations,

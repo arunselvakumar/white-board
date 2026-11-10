@@ -13,7 +13,7 @@ import { GetConstructionSalesInquiryImportSampleRequestModel } from "../inquiry-
 export const dynamic = "force-dynamic";
 
 /**
- * The inquiry import sample (CM-1007): the headers, and a Lists sheet with
+ * The inquiry import sample: the headers, and a Lists sheet with
  * the Project's live Lead Sources, Funnel Stages, Wings and Team Members.
  * Needs Inquiry create on the Project.
  */

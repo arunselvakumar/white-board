@@ -12,7 +12,7 @@ const LOCATION_TYPE_KEYS = LOCATION_TYPES.map((item) => item.key);
 const named = z.object({ id: z.uuid(), name: z.string() });
 
 /**
- * What the location picker offers on a Project (CM-403): the Location
+ * What the location picker offers on a Project: the Location
  * Types it has rows for, its live Wings with Floors and Units, its
  * enabled Amenities and Common Developments, and its Locations.
  */

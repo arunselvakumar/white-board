@@ -12,7 +12,7 @@ import { toTestingReportResponse } from "../../../testing-report-responses";
 export const dynamic = "force-dynamic";
 
 /**
- * Edits a report and, with `file`, replaces its file (CM-409). 409
+ * Edits a report and, with `file`, replaces its file. 409
  * `TESTING_REPORT_CHANGED` on a stale `updatedAt`; 403 under the
  * back-dated policy for the stored or the new date.
  */

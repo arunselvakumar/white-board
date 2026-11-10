@@ -21,7 +21,7 @@ export const dynamic = "force-dynamic";
 const projects = prismaProjectLookup(prisma);
 
 /**
- * The choices for the report cards' pickers (CM-903): Projects, Stores,
+ * The choices for the report cards' pickers: Projects, Stores,
  * vendors, Labour Categories, Suppliers, Material Categories, Materials
  * and who raised Purchase Requests, each read only when a report the
  * viewer may request in the scope takes that filter (the catalogue,

@@ -39,7 +39,7 @@ const WRITE_ERRORS = [
 
 const BASE = VENDOR_ATTENDANCE_PATH;
 
-/** Vendor attendance models (CM-212, CM-213). */
+/** Vendor attendance models. */
 export const vendorAttendanceOpenApiComponents: OpenApiComponents = {
   ConstructionLabourVendorAttendanceLineResponseModel,
   ConstructionLabourVendorAttendanceDayResponseModel,
@@ -51,7 +51,7 @@ export const vendorAttendanceOpenApiComponents: OpenApiComponents = {
   ClearConstructionLabourVendorAttendanceRequestModel,
 };
 
-/** Vendor attendance routes (CM-212, CM-213). Menu `labour.attendance` on the Project. */
+/** Vendor attendance routes. Menu `labour.attendance` on the Project. */
 export const vendorAttendanceOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

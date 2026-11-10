@@ -39,7 +39,7 @@ const WRITE_ERRORS = [
 
 const BASE = LABOUR_ATTENDANCE_PATH;
 
-/** Labour attendance models (CM-210, CM-211). */
+/** Labour attendance models. */
 export const labourAttendanceOpenApiComponents: OpenApiComponents = {
   ConstructionLabourLabourAttendanceOvertimeResponseModel,
   ConstructionLabourLabourAttendanceDayResponseModel,
@@ -52,7 +52,7 @@ export const labourAttendanceOpenApiComponents: OpenApiComponents = {
   GetConstructionLabourLabourAttendanceMonthResponseModel,
 };
 
-/** Labour attendance routes (CM-210, CM-211). Menu `labour.attendance` on the Project. */
+/** Labour attendance routes. Menu `labour.attendance` on the Project. */
 export const labourAttendanceOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

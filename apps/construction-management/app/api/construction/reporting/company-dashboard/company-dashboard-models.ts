@@ -6,7 +6,7 @@ import { DASHBOARD_PROJECT_STATUSES } from "@/src/reporting/domain/company-dashb
 export const COMPANY_DASHBOARD_PATH =
   "/api/construction/reporting/company-dashboard";
 
-/** The Company Dashboard's duration (CM-902); both or neither. */
+/** The Company Dashboard's duration; both or neither. */
 export const GetConstructionReportingCompanyDashboardRequestModel = z
   .object({
     from: z.iso

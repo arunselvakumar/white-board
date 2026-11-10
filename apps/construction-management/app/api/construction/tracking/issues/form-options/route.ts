@@ -11,7 +11,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The issue form's and filters' pickers on a Project (CM-803): active Team
+ * The issue form's and filters' pickers on a Project: active Team
  * Members on it ("Assign To"), enabled Departments and Issue Categories,
  * and active Contractors assigned to it. Needs Issues and snags read on
  * the Project.
