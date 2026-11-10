@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-/** The Equipment module of a Project (M6). Its tabs are in the sidebar (ADR CM-0020). */
+/** Equipment tabs are in the sidebar (ADR CM-0020). */
 export default function EquipmentLayout({
   children,
 }: Readonly<{

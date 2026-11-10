@@ -19,9 +19,9 @@ export type MultiSelectOption = { id: string; name: string };
 /**
  * Pick any number of records from a searchable list: a tick per chosen
  * row in the list and a chip per chosen record in the field (`Combobox
- * multiple`). Escape never clears it; chips are removed one by one. Stores ids; ids missing from `options` are dropped on the
- * next change, so pass a saved record that is no longer live in `options`
- * to keep it.
+ * multiple`). Escape never clears it; chips are removed one by one. Stores
+ * ids; ids missing from `options` are dropped on the next change, so pass a
+ * saved record that is no longer live in `options` to keep it.
  */
 export function MultiSelect({
   id,

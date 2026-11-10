@@ -182,8 +182,8 @@ export function ScrambledText({
     };
 
     // Plain variables, not a `{ x, y }` object written by destructuring: the
-    // production minifier folded `[pointer.x, pointer.y] = …` into `[0, 0] = …`,
-    // a SyntaxError that took down every public page.
+    // production minifier folds `[pointer.x, pointer.y] = …` into
+    // `[0, 0] = …`, a SyntaxError that breaks every public page.
     let pointerX = 0;
     let pointerY = 0;
     let moveFrame = 0;
