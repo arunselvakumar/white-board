@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
-import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
+import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
 import { TestingReportsPage } from "@/app/app/projects/[id]/testing-reports/_components/testing-reports-page";
 import { QuerySuspense } from "@/components/query-suspense";
 import { TestingReportsSkeleton } from "@/app/app/projects/[id]/testing-reports/_components/testing-reports-skeletons";

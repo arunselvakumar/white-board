@@ -3,7 +3,7 @@ import { expect, waitFor, within } from "storybook/test";
 
 import type { DownloadItem } from "@/src/queries/downloads";
 
-import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import {
   BACKUP_EXPIRED,
   BACKUP_FAILED,

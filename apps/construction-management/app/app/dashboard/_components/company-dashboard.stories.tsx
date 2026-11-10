@@ -8,7 +8,7 @@ import type {
   CompanyDashboardProject,
 } from "@/src/queries/company-dashboard";
 
-import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import { CompanyDashboard } from "./company-dashboard";
 
 const PATH = "/api/construction/reporting/company-dashboard";

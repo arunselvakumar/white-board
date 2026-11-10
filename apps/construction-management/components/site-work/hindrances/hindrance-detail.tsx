@@ -30,7 +30,7 @@ import { cn } from "@repo/ui/lib/utils";
 import { SiteRecordHeader } from "@/components/site-work/site-record-header";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { LocationLabel } from "@/components/locations/location-picker";
+import { LocationLabel } from "@/app/app/_components/locations/location-picker";
 import { SiteWorkDocumentActivity } from "@/components/site-work/documents/site-work-document-activity";
 import {
   formatDate,

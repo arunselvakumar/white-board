@@ -9,9 +9,9 @@ import { Progress } from "@repo/ui/components/progress";
 
 import { DocumentSection } from "@/components/procurement/documents/document-section";
 import { DocumentFileIcon } from "@/app/app/_components/projects/documents/document-file-icon";
-import { FileThumbnail } from "@/components/projects/files/file-thumbnail";
-import { FileViewer } from "@/components/projects/files/file-viewer";
-import { useDirectUpload } from "@/components/uploads/use-direct-upload";
+import { FileThumbnail } from "@/app/app/_components/projects/files/file-thumbnail";
+import { FileViewer } from "@/app/app/_components/projects/files/file-viewer";
+import { useDirectUpload } from "@/app/app/_components/uploads/use-direct-upload";
 import {
   SITE_WORK_DOCUMENT_FILES_MAX,
   checkSiteWorkFile,

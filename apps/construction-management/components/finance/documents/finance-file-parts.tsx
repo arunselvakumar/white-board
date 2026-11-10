@@ -13,7 +13,7 @@ import {
 } from "@repo/ui/components/alert-dialog";
 
 import { FormAlert } from "@/components/auth/form-alert";
-import { downloadUrl } from "@/components/projects/files/file-viewer";
+import { downloadUrl } from "@/app/app/_components/projects/files/file-viewer";
 import { formatBytes } from "@/lib/project-documents";
 import { uploadErrorMessage } from "@/src/queries/direct-upload";
 import {

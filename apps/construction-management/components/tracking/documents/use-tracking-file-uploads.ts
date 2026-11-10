@@ -1,6 +1,6 @@
 "use client";
 
-import { useDirectUpload } from "@/components/uploads/use-direct-upload";
+import { useDirectUpload } from "@/app/app/_components/uploads/use-direct-upload";
 import {
   checkTrackingFile,
   uploadTrackingFile,

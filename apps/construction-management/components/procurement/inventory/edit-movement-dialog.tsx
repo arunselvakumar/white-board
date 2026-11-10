@@ -17,14 +17,14 @@ import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 
 import { FieldError } from "@/components/auth/field-error";
-import { LocationPicker } from "@/components/locations/location-picker";
+import { LocationPicker } from "@/app/app/_components/locations/location-picker";
 import type { StockLocation } from "@/src/procurement/domain/stock-location";
 import { useEditMovement, type StockEntry } from "@/src/queries/inventory";
 import type { LocationRef } from "@/src/shared-kernel/location-ref";
 
 import { localToday, QUANTITY_PATTERN } from "./inventory-format";
 import { StockErrorAlert } from "./stock-error-alert";
-import { LocationPickerSkeleton } from "@/components/locations/locations-skeletons";
+import { LocationPickerSkeleton } from "@/app/app/_components/locations/locations-skeletons";
 
 const schema = z.object({
   date: z.string().min(1, "Choose the date."),

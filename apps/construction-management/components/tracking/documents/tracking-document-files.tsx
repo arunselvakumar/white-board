@@ -7,7 +7,7 @@ import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 
 import { DocumentSection } from "@/components/procurement/documents/document-section";
-import { FileViewer } from "@/components/projects/files/file-viewer";
+import { FileViewer } from "@/app/app/_components/projects/files/file-viewer";
 import {
   TRACKING_DOCUMENT_FILES_MAX,
   trackingDocumentKey,

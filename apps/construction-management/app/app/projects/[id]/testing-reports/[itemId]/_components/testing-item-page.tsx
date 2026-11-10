@@ -54,8 +54,8 @@ import {
   type TestingReportFilter,
 } from "@/src/queries/project-testing-reports";
 
-import { FileThumbnail } from "@/components/projects/files/file-thumbnail";
-import { FileViewer } from "@/components/projects/files/file-viewer";
+import { FileThumbnail } from "@/app/app/_components/projects/files/file-thumbnail";
+import { FileViewer } from "@/app/app/_components/projects/files/file-viewer";
 import { TestingReportSheet } from "./testing-report-sheet";
 import { reportCountLabel } from "@/app/app/projects/[id]/testing-reports/_components/testing-reports-page";
 

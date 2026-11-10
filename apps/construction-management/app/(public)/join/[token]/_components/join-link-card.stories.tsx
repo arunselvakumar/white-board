@@ -3,8 +3,8 @@ import { expect, waitFor } from "storybook/test";
 
 import { PublicShell } from "@/components/auth/public-shell";
 
-import { mockFetch } from "../../.storybook/mock-fetch";
-import { authMocks, signInAs } from "../../.storybook/mocks/auth";
+import { mockFetch } from "@/.storybook/mock-fetch";
+import { authMocks, signInAs } from "@/.storybook/mocks/auth";
 import { JoinLinkCard, type JoinLinkPreview } from "./join-link-card";
 
 const TOKEN = "Zt0kenZt0kenZt0kenZt0kenZt0ken12";

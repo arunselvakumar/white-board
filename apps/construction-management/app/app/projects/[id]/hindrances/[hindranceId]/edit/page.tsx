@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
-import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
+import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
 import { HindranceEdit } from "@/components/site-work/hindrances/hindrance-pages";
 import { HindranceFormSkeleton } from "@/components/site-work/site-work-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";

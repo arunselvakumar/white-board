@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
-import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
+import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
 import { SiteDiaryEdit } from "@/components/site-work/site-diary/site-diary-pages";
 import { SiteDiaryFormSkeleton } from "@/components/site-work/site-work-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";

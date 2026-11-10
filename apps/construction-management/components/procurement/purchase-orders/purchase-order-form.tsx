@@ -31,7 +31,7 @@ import { Textarea } from "@repo/ui/components/textarea";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { LocationPicker } from "@/components/locations/location-picker";
+import { LocationPicker } from "@/app/app/_components/locations/location-picker";
 import { MoneyInput } from "@/components/money/money-input";
 import {
   formatDate,
@@ -68,7 +68,7 @@ import {
 } from "./purchase-order-form-schema";
 import { purchaseOrdersPath } from "./purchase-order-format";
 import { PurchaseOrderLineSheet } from "./purchase-order-line-sheet";
-import { LocationPickerSkeleton } from "@/components/locations/locations-skeletons";
+import { LocationPickerSkeleton } from "@/app/app/_components/locations/locations-skeletons";
 
 const NONE = "__none";
 

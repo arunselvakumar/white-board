@@ -37,7 +37,7 @@ import {
 } from "@repo/ui/components/sheet";
 import { cn } from "@repo/ui/lib/utils";
 
-import { LocationLabel } from "@/components/locations/location-picker";
+import { LocationLabel } from "@/app/app/_components/locations/location-picker";
 import type { StockLocation } from "@/src/procurement/domain/stock-location";
 import {
   inventoryHistoryQuery,

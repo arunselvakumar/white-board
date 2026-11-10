@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
-import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
+import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
 import { SiteDiaryNew } from "@/components/site-work/site-diary/site-diary-pages";
 import { isCalendarDate } from "@/src/shared-kernel/calendar-date";
 

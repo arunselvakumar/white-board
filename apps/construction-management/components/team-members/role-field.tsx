@@ -15,7 +15,7 @@ import {
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormSection } from "@/components/forms/form-section";
-import { PermissionMatrix } from "@/components/permissions/permission-matrix";
+import { PermissionMatrix } from "@/app/app/staff/_components/permission-matrix";
 import { ROLES_PATH } from "@/lib/staff-nav";
 import type { Role } from "@/src/queries/roles";
 

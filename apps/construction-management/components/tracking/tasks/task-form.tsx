@@ -27,7 +27,7 @@ import { Textarea } from "@repo/ui/components/textarea";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { LocationPicker } from "@/components/locations/location-picker";
+import { LocationPicker } from "@/app/app/_components/locations/location-picker";
 import {
   isRupees,
   MoneyInput,
@@ -53,7 +53,7 @@ import { TASK_LIMITS } from "@/src/tracking/domain/task";
 import { TRACKING_PRIORITIES } from "@/src/tracking/domain/tracking-documents";
 
 import { ChipsSelect } from "./chips-select";
-import { LocationPickerSkeleton } from "@/components/locations/locations-skeletons";
+import { LocationPickerSkeleton } from "@/app/app/_components/locations/locations-skeletons";
 
 const NONE = "none";
 const QUANTITY = /^\d{1,11}(\.\d{1,3})?$/;

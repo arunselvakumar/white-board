@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { MyProfileScreen } from "@/components/my-profile/my-profile-screen";
+import { MyProfileScreen } from "@/app/app/profile/_components/my-profile/my-profile-screen";
 import { DevicesSection } from "@/components/profile/devices-section";
 import { PrivacySection } from "@/components/profile/privacy-section";
 import {

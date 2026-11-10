@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { QuerySuspense } from "@/components/query-suspense";
-import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
+import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
 import { WorksheetDetailPage } from "@/components/site-work/worksheets/worksheet-detail";
 import { WorksheetDetailSkeleton } from "@/components/site-work/site-work-skeletons";
 

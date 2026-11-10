@@ -36,7 +36,7 @@ import {
 import { Textarea } from "@repo/ui/components/textarea";
 
 import { FieldError } from "@/components/auth/field-error";
-import { LocationPicker } from "@/components/locations/location-picker";
+import { LocationPicker } from "@/app/app/_components/locations/location-picker";
 import {
   formatQuantity,
   localToday,

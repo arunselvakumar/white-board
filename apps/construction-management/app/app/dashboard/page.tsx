@@ -9,7 +9,7 @@ import {
 } from "@repo/ui/components/empty";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
-import { CompanyDashboard } from "@/components/dashboard/company-dashboard";
+import { CompanyDashboard } from "@/app/app/dashboard/_components/company-dashboard";
 
 export const metadata: Metadata = { title: "Dashboard" };
 

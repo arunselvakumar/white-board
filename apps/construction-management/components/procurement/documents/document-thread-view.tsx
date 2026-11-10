@@ -14,8 +14,8 @@ import { Textarea } from "@repo/ui/components/textarea";
 
 import { initials } from "@/components/app-shell/user-menu";
 import { FormAlert } from "@/components/auth/form-alert";
-import { FileViewer } from "@/components/projects/files/file-viewer";
-import { useDirectUpload } from "@/components/uploads/use-direct-upload";
+import { FileViewer } from "@/app/app/_components/projects/files/file-viewer";
+import { useDirectUpload } from "@/app/app/_components/uploads/use-direct-upload";
 import { formatBytes } from "@/lib/project-documents";
 import type { ProcurementDocumentType } from "@/src/procurement/domain/documents";
 import { APPROVAL_LIMITS } from "@/src/shared-kernel/approval";
