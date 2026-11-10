@@ -3,7 +3,7 @@ import { expect, waitFor, within } from "storybook/test";
 
 import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
 import { mockXhrUploads } from "../../../.storybook/mocks/xhr";
-import { ProjectShell } from "../project-shell";
+import { ProjectShell } from "@/app/app/projects/[id]/_components/project-shell";
 import { ANUGRAHA, DOCUMENTS_API, mockDocumentsApi } from "./document-fixtures";
 import { ProjectDocumentsPage } from "./project-documents-page";
 

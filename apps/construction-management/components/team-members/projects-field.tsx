@@ -20,7 +20,7 @@ import {
 } from "@repo/ui/components/empty";
 
 import { FormAlert } from "@/components/auth/form-alert";
-import { ProjectStatusBadge } from "@/components/projects/project-status";
+import { ProjectStatusBadge } from "@/app/app/_components/projects/project-status";
 import { fieldForCode } from "@/lib/server-errors";
 import { projectOptionsQuery } from "@/src/queries/projects";
 import {

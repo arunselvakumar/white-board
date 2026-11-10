@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { QuerySuspense } from "@/components/query-suspense";
-import { ProjectsHome } from "@/components/projects/projects-home";
-import { ProjectsHomeSkeleton } from "@/components/projects/projects-skeletons";
+import { ProjectsHome } from "@/app/app/projects/_components/projects-home";
+import { ProjectsHomeSkeleton } from "@/app/app/projects/_components/projects-skeletons";
 import { APP_HOME } from "@/lib/safe-redirect";
 
 import { viewerHomePath } from "../_lib/viewer-home";

@@ -19,7 +19,7 @@ import { Label } from "@repo/ui/components/label";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { ProjectStatusBadge } from "@/components/projects/project-status";
+import { ProjectStatusBadge } from "@/app/app/_components/projects/project-status";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   useDevelopmentCommand,

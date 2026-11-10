@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
-import { ProjectAmenities } from "@/components/projects/project-amenities";
+import { ProjectAmenities } from "@/app/app/projects/_components/project-amenities";
 import { QuerySuspense } from "@/components/query-suspense";
-import { ProjectAmenitiesSkeleton } from "@/components/projects/projects-skeletons";
+import { ProjectAmenitiesSkeleton } from "@/app/app/projects/_components/projects-skeletons";
 
 export const metadata: Metadata = { title: "Amenities" };
 

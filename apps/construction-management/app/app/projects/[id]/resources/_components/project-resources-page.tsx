@@ -21,7 +21,7 @@ import {
   EmptyTitle,
 } from "@repo/ui/components/empty";
 
-import { projectPath } from "@/components/projects/projects-home";
+import { projectPath } from "@/app/app/projects/_components/projects-home";
 import {
   projectResourcesQuery,
   type ProjectResources,

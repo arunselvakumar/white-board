@@ -11,7 +11,7 @@ import type {
 } from "@/src/queries/project-structure";
 
 import { mockApi } from "../../../.storybook/mocks/api";
-import { project } from "../project-fixtures";
+import { project } from "@/app/app/_components/projects/project-fixtures";
 
 /** Story fixtures for Phases, Wings (CM-402) and Locations (CM-405). */
 export const KUMARI_HEIGHTS = project({

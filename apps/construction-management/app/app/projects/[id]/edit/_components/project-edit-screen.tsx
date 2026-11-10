@@ -4,7 +4,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { projectQuery, projectsQuery } from "@/src/queries/projects";
 
-import { EditProjectForm } from "./project-form";
+import { EditProjectForm } from "@/app/app/projects/_components/project-form";
 
 /**
  * `/app/projects/[id]/edit`, inside the project shell. The Projects list

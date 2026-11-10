@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { ProjectLanding } from "@/components/projects/project-landing";
+import { ProjectLanding } from "@/app/app/projects/[id]/_components/project-landing";
 import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Project" };

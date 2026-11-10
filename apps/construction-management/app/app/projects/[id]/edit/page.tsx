@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
-import { EditProjectSkeleton } from "@/components/projects/projects-skeletons";
+import { EditProjectSkeleton } from "@/app/app/projects/_components/projects-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
-import { ProjectEditScreen } from "@/components/projects/project-edit-screen";
+import { ProjectEditScreen } from "@/app/app/projects/[id]/edit/_components/project-edit-screen";
 
 export const metadata: Metadata = { title: "Edit Project" };
 

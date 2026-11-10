@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
 import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
-import { ProjectShell } from "../project-shell";
+import { ProjectShell } from "@/app/app/projects/[id]/_components/project-shell";
 import { LocationsPage } from "./locations-page";
 import {
   CULVERT,

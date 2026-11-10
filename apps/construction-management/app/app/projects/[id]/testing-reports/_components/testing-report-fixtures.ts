@@ -3,7 +3,7 @@ import type {
   TestingReport,
 } from "@/src/queries/project-testing-reports";
 
-import { mockApi } from "../../../.storybook/mocks/api";
+import { mockApi } from "@/.storybook/mocks/api";
 
 /** Story fixtures for Testing Reports (CM-409). */
 export const TESTING_PROJECT_ID = "0199c4a0-0000-7000-8000-0000000000b2";

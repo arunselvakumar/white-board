@@ -3,8 +3,8 @@ import { expect, waitFor, within } from "storybook/test";
 
 import type { ProjectDevelopments } from "@/src/queries/developments";
 
-import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
-import { KUMARI } from "./project-fixtures";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
+import { KUMARI } from "@/app/app/_components/projects/project-fixtures";
 import { ProjectAmenities } from "./project-amenities";
 
 const PATH = `/api/construction/projects/projects/${KUMARI.id}/developments`;

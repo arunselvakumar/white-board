@@ -4,9 +4,9 @@ import { expect, waitFor } from "storybook/test";
 
 import type { ProjectHome } from "@/src/queries/project-home";
 
-import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
-import { KUMARI } from "./project-fixtures";
-import { storyHome } from "./project-home-fixtures";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
+import { KUMARI } from "@/app/app/_components/projects/project-fixtures";
+import { storyHome } from "@/app/app/_components/projects/project-home-fixtures";
 import { ProjectLanding } from "./project-landing";
 
 const BASE = "/api/construction/projects/projects";

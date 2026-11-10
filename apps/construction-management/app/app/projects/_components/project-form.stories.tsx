@@ -4,18 +4,14 @@ import { useState } from "react";
 import { Button } from "@repo/ui/components/button";
 import { expect, fn, mocked, waitFor, within } from "storybook/test";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import {
   DocumentAttachments,
   useUploadHeldFiles,
   type DocumentAttachmentsProps,
   type HeldFile,
   type HeldUploadStatus,
-} from "./documents/document-attachments";
+} from "@/components/projects/documents/document-attachments";
 import {
   ANUGRAHA,
   KUMARI,
@@ -23,10 +19,10 @@ import {
   projectList,
   STORY_LOGO_URL,
   STORY_PROJECTS,
-} from "./project-fixtures";
+} from "@/app/app/_components/projects/project-fixtures";
 import { clearProjectFlash, peekProjectFlash } from "./project-flash";
 import { NewProjectScreen } from "./project-form";
-import { ProjectEditScreen } from "./project-edit-screen";
+import { ProjectEditScreen } from "../[id]/edit/_components/project-edit-screen";
 
 const BASE = "/api/construction/projects/projects";
 const LABELS = `${BASE}/custom-field-labels`;

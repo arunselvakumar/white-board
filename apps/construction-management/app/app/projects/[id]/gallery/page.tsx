@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
-import { GalleryPage } from "@/components/projects/gallery/gallery-page";
+import { GalleryPage } from "@/app/app/projects/[id]/gallery/_components/gallery-page";
 import { QuerySuspense } from "@/components/query-suspense";
-import { GallerySkeleton } from "@/components/projects/gallery/gallery-skeletons";
+import { GallerySkeleton } from "@/app/app/projects/[id]/gallery/_components/gallery-skeletons";
 
 export const metadata: Metadata = { title: "Gallery" };
 

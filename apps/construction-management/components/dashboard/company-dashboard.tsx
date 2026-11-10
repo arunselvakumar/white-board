@@ -32,12 +32,12 @@ import {
   CompanyDashboardSkeleton,
 } from "@/components/dashboard/dashboard-skeletons";
 import { formatPaise } from "@/components/money/money-input";
-import { DurationFilter } from "@/components/projects/dashboard/duration-filter";
-import { ProjectProgressBar } from "@/components/projects/project-progress";
+import { DurationFilter } from "@/app/app/_components/projects/dashboard/duration-filter";
+import { ProjectProgressBar } from "@/app/app/_components/projects/project-progress";
 import {
   ProjectStatusBadge,
   formatCalendarDate,
-} from "@/components/projects/project-status";
+} from "@/app/app/_components/projects/project-status";
 import {
   browserToday,
   durationProblem,

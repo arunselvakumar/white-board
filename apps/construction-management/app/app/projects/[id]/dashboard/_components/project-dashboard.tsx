@@ -25,7 +25,7 @@ import { MetricCard } from "@repo/ui/components/metric-card";
 import {
   ProjectStatusBadge,
   formatCalendarDate,
-} from "@/components/projects/project-status";
+} from "@/app/app/_components/projects/project-status";
 import {
   browserToday,
   durationProblem,
@@ -52,7 +52,7 @@ import {
   MetricFigureSkeleton,
   SectionSkeleton,
 } from "./dashboard-skeletons";
-import { DurationFilter } from "./duration-filter";
+import { DurationFilter } from "@/app/app/_components/projects/dashboard/duration-filter";
 import { PaymentApprovalsTile, PaymentsSection } from "./finance-sections";
 import { ManageDashboardDialog } from "./manage-dashboard-dialog";
 import { PoValueChart } from "./po-value-chart";
