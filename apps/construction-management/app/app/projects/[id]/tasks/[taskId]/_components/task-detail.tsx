@@ -28,7 +28,7 @@ import { FormAlert } from "@/components/auth/form-alert";
 import { LocationLabel } from "@/app/app/_components/locations/location-picker";
 import { formatDate } from "@/components/payments/payment-format";
 import { SiteRecordHeader } from "@/app/app/projects/[id]/_components/site-work/site-record-header";
-import { TrackingFileStrip } from "@/components/tracking/documents/tracking-file-strip";
+import { TrackingFileStrip } from "@/app/app/projects/[id]/_components/tracking/documents/tracking-file-strip";
 import { QueryHttpError } from "@/src/queries/http";
 import {
   taskActivityQuery,
@@ -61,12 +61,12 @@ import {
   TaskProgressBar,
   TaskStatusBadge,
   varianceText,
-} from "./task-parts";
+} from "@/app/app/projects/[id]/_components/tracking/tasks/task-parts";
 import { FactValueSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import {
   FeedSkeleton,
   UpdatesSkeleton,
-} from "@/components/tracking/tracking-skeletons";
+} from "@/app/app/projects/[id]/_components/tracking/tracking-skeletons";
 
 function problemOf(caught: unknown): string {
   return caught instanceof QueryHttpError

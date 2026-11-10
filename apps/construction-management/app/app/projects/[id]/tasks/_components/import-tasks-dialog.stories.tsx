@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, within } from "storybook/test";
 
-import { mockApi, StoryQueries } from "../../../.storybook/mocks/api";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import { ImportTasksDialog } from "./import-tasks-dialog";
 import { TASK_PROJECT_ID, taskHandler } from "./task-fixtures";
 

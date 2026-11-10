@@ -1,4 +1,4 @@
-import type { ApiCall } from "../../../.storybook/mocks/api";
+import type { ApiCall } from "@/.storybook/mocks/api";
 import type { TrackingDocumentFile } from "@/src/queries/tracking-documents";
 import type { TrackingDocumentType } from "@/src/tracking/domain/tracking-documents";
 

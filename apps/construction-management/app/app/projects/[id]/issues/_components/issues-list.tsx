@@ -67,11 +67,14 @@ import {
   type TrackingPriority,
 } from "@/src/tracking/domain/tracking-documents";
 
-import { IssueStatusBadge, PriorityChip } from "./issue-parts";
+import {
+  IssueStatusBadge,
+  PriorityChip,
+} from "@/app/app/projects/[id]/_components/tracking/issues/issue-parts";
 import {
   IssueFiltersSkeleton,
   IssueRowsSkeleton,
-} from "@/components/tracking/tracking-skeletons";
+} from "@/app/app/projects/[id]/_components/tracking/tracking-skeletons";
 
 type Filters = {
   statuses: IssueStatus[];

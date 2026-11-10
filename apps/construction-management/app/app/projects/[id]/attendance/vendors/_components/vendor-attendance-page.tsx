@@ -37,7 +37,7 @@ import { vendorAttendanceDayQuery } from "@/src/queries/vendor-attendance";
 import { VendorDayCard } from "./vendor-day-card";
 import { VendorMonthView } from "./vendor-month-view";
 import { VendorOvertimeView } from "./vendor-overtime-view";
-import { VendorDayGridSkeleton } from "@/components/attendance/attendance-skeletons";
+import { VendorDayGridSkeleton } from "@/app/app/projects/[id]/attendance/_components/attendance-skeletons";
 
 /** Today on this device, `YYYY-MM-DD`. */
 export function localToday(now: Date = new Date()): string {

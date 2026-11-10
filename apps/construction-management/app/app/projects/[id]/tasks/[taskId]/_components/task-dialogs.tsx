@@ -17,7 +17,7 @@ import { Textarea } from "@repo/ui/components/textarea";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { localToday } from "@/components/payments/payment-format";
-import { TrackingEntryFilesField } from "@/components/tracking/documents/tracking-entry-files-field";
+import { TrackingEntryFilesField } from "@/app/app/projects/[id]/_components/tracking/documents/tracking-entry-files-field";
 import { QueryHttpError } from "@/src/queries/http";
 import type { TrackingDocumentFile } from "@/src/queries/tracking-documents";
 import {
@@ -30,7 +30,11 @@ import {
 } from "@/src/queries/tracking-tasks";
 import { TASK_LIMITS } from "@/src/tracking/domain/task";
 
-import { dateRange, days, quantity } from "./task-parts";
+import {
+  dateRange,
+  days,
+  quantity,
+} from "@/app/app/projects/[id]/_components/tracking/tasks/task-parts";
 
 type Errors = Partial<
   Record<"progressDate" | "amount" | "remark" | "reason" | "form", string>

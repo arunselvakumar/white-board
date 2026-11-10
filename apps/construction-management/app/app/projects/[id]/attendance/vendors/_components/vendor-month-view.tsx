@@ -23,7 +23,7 @@ import {
 import {
   MonthGridSkeleton,
   VENDOR_MONTH_TOTALS,
-} from "@/components/attendance/attendance-skeletons";
+} from "@/app/app/projects/[id]/attendance/_components/attendance-skeletons";
 
 type Counts = VendorAttendanceMonth["totals"];
 

@@ -21,7 +21,7 @@ import { FormAlert } from "@/components/auth/form-alert";
 import { formatDate, localToday } from "@/components/payments/payment-format";
 import { SalesDocumentFiles } from "@/app/app/projects/[id]/_components/sales/documents/sales-document-files";
 import { SiteRecordHeader } from "@/app/app/projects/[id]/_components/site-work/site-record-header";
-import { formatDateTime } from "@/components/tracking/issues/issue-parts";
+import { formatDateTime } from "@/app/app/projects/[id]/_components/tracking/issues/issue-parts";
 import { QueryHttpError } from "@/src/queries/http";
 import { canInSales, salesAccessQuery } from "@/src/queries/sales-access";
 import { bookingsPath } from "@/src/queries/sales-bookings";

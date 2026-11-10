@@ -20,7 +20,7 @@ import { vendorAttendanceOvertimeQuery } from "@/src/queries/vendor-attendance";
 import {
   VENDOR_OVERTIME_COLUMNS,
   VendorOvertimeSkeleton,
-} from "@/components/attendance/attendance-skeletons";
+} from "@/app/app/projects/[id]/attendance/_components/attendance-skeletons";
 
 /**
  * One focusable scroll area around a wide table (keyboard users can scroll

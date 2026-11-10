@@ -23,7 +23,7 @@ import {
 import {
   ATTENDANCE_TABS,
   attendanceNavLinks,
-} from "@/components/attendance/attendance-tabs";
+} from "@/app/app/_components/attendance/attendance-tabs";
 import { usePaymentsNavLinks } from "@/app/app/_components/finance/payments-hub/payments-nav";
 import { PAYMENTS_TABS } from "@/app/app/_components/finance/payments-hub/payments-tabs";
 import { useMaterialsNavLinks } from "@/app/app/_components/procurement/materials-hub/materials-nav";

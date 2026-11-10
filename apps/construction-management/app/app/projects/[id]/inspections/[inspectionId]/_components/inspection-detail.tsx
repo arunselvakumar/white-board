@@ -28,7 +28,7 @@ import { cn } from "@repo/ui/lib/utils";
 import { FormAlert } from "@/components/auth/form-alert";
 import { LocationLabel } from "@/app/app/_components/locations/location-picker";
 import { SiteRecordHeader } from "@/app/app/projects/[id]/_components/site-work/site-record-header";
-import { TrackingDocumentFiles } from "@/components/tracking/documents/tracking-document-files";
+import { TrackingDocumentFiles } from "@/app/app/projects/[id]/_components/tracking/documents/tracking-document-files";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   canInTracking,
@@ -50,7 +50,7 @@ import {
   InspectionStatusBadge,
   inspectionWhen,
   instantText,
-} from "./inspection-format";
+} from "@/app/app/projects/[id]/inspections/_components/inspection-format";
 import { InspectionObservations, InspectionRemarks } from "./inspection-thread";
 import { FactValueSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 

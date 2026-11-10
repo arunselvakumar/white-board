@@ -39,7 +39,7 @@ import { STATUS_LABELS } from "./labour-sheet-form";
 import {
   LABOUR_RECORDED_COLUMNS,
   LabourRecordedSkeleton,
-} from "@/components/attendance/attendance-skeletons";
+} from "@/app/app/projects/[id]/attendance/_components/attendance-skeletons";
 
 const ALL = "all";
 

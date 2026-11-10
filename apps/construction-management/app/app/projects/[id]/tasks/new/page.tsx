@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
-import { TaskNew } from "@/components/tracking/tasks/task-pages";
-import { TrackingFormSkeleton } from "@/components/tracking/tracking-skeletons";
+import { TaskNew } from "@/app/app/projects/[id]/tasks/_components/task-pages";
+import { TrackingFormSkeleton } from "@/app/app/projects/[id]/_components/tracking/tracking-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Add Task" };

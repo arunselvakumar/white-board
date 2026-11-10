@@ -22,8 +22,8 @@ import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { LocationPicker } from "@/app/app/_components/locations/location-picker";
 import { localToday } from "@/components/payments/payment-format";
-import { TrackingPendingFilesField } from "@/components/tracking/documents/tracking-pending-files-field";
-import { useUploadPendingTrackingFiles } from "@/components/tracking/documents/use-upload-pending-tracking-files";
+import { TrackingPendingFilesField } from "@/app/app/projects/[id]/_components/tracking/documents/tracking-pending-files-field";
+import { useUploadPendingTrackingFiles } from "@/app/app/projects/[id]/_components/tracking/documents/use-upload-pending-tracking-files";
 import { QueryHttpError } from "@/src/queries/http";
 import {
   issueFormOptionsQuery,
@@ -40,7 +40,7 @@ import {
   type TrackingPriority,
 } from "@/src/tracking/domain/tracking-documents";
 
-import { PriorityChip } from "./issue-parts";
+import { PriorityChip } from "@/app/app/projects/[id]/_components/tracking/issues/issue-parts";
 import { LocationPickerSkeleton } from "@/app/app/_components/locations/locations-skeletons";
 
 const NONE = "none";

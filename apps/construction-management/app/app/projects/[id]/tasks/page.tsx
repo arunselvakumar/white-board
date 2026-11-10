@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
-import { TasksPage } from "@/components/tracking/tasks/tasks-page";
-import { TasksPageSkeleton } from "@/components/tracking/tracking-skeletons";
+import { TasksPage } from "@/app/app/projects/[id]/tasks/_components/tasks-page";
+import { TasksPageSkeleton } from "@/app/app/projects/[id]/_components/tracking/tracking-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Tasks" };

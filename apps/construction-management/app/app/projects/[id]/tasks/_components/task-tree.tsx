@@ -49,7 +49,7 @@ import {
   PriorityChip,
   TaskProgressBar,
   TaskStatusBadge,
-} from "./task-parts";
+} from "@/app/app/projects/[id]/_components/tracking/tasks/task-parts";
 
 type InUse = {
   worksheetCount: number;

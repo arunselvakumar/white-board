@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
+import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 
 import {
   COLUMNS_ID,
@@ -11,7 +11,7 @@ import {
   TASKS_API,
   taskDetail,
   type TaskApiOptions,
-} from "./task-fixtures";
+} from "@/app/app/projects/[id]/tasks/_components/task-fixtures";
 import { TaskDetail } from "./task-detail";
 
 let api: ReturnType<typeof mockTaskApi>;

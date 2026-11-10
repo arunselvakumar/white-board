@@ -32,7 +32,7 @@ import {
   BookingStatusBadge,
 } from "@/app/app/projects/[id]/_components/sales/units/sales-status";
 import { SiteRecordHeader } from "@/app/app/projects/[id]/_components/site-work/site-record-header";
-import { formatDateTime } from "@/components/tracking/issues/issue-parts";
+import { formatDateTime } from "@/app/app/projects/[id]/_components/tracking/issues/issue-parts";
 import { QueryHttpError } from "@/src/queries/http";
 import { canInSales, salesAccessQuery } from "@/src/queries/sales-access";
 import {
