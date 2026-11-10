@@ -10,7 +10,7 @@ import type { AttendanceHistory } from "@/src/queries/attendance";
 import type { BatchListResponse } from "@/src/queries/batches";
 import type { CourseListResponse } from "@/src/queries/courses";
 import type { StudentResponse } from "@/src/queries/students";
-import { signInAs } from "../../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 
 import {
   absentTest,
@@ -30,7 +30,7 @@ import {
   TEST_HISTORY_EMPTY_MESSAGE,
   TEST_HISTORY_FORBIDDEN_MESSAGE,
 } from "./student-test-history";
-import { StudentTestHistoryScreen } from "./student-test-history-screen";
+import { StudentTestHistoryScreen } from "@/app/(app)/teacher/batches/[id]/students/[studentId]/_components/student-test-history-screen";
 
 /* ------------------------------------------------------------------ */
 /* API mock: answers /api/training-institute/* from story routes   */

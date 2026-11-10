@@ -6,14 +6,14 @@ import {
   ashaResults,
   COMPARISON_WORDS,
   tallyExempt,
-} from "@/components/class-tests/family/family-results.fixtures";
+} from "@/app/(app)/_components/class-tests/family/family-results.fixtures";
 import {
   ASHA_ID,
   CLASS_WORK_NOW,
   ashaClassWork,
   dueTodayHomework,
   overdueHomework,
-} from "@/components/class-work/family/family-class-work.fixtures";
+} from "@/app/(app)/_components/class-work/family/family-class-work.fixtures";
 import { FamilyHome } from "@/app/(app)/_components/home/family-home";
 import type { FamilyHomeStudent } from "@/src/queries/family-home";
 import { signInAs } from "@/.storybook/mocks/auth";

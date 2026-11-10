@@ -15,12 +15,12 @@ import type {
   EnquiryResponse,
   PhoneMatchesResponse,
 } from "@/src/queries/enquiries";
-import { signInAs } from "../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 
 import { EnquiriesScreen } from "./enquiries-screen";
-import { EnquiryCreateScreen } from "./enquiry-create-screen";
-import { EnquiryDetailScreen } from "./enquiry-detail-screen";
-import { EnquiryEditScreen } from "./enquiry-edit-screen";
+import { EnquiryCreateScreen } from "../new/_components/enquiry-create-screen";
+import { EnquiryDetailScreen } from "../[id]/_components/enquiry-detail-screen";
+import { EnquiryEditScreen } from "../[id]/edit/_components/enquiry-edit-screen";
 import { todayInKolkata } from "./enquiry-format";
 
 /* ------------------------------------------------------------------ */

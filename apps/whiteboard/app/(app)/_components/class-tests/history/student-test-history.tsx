@@ -10,7 +10,10 @@ import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
 import { Skeleton } from "@repo/ui/components/skeleton";
 
-import { passText, resultText } from "@/components/class-tests/result-format";
+import {
+  passText,
+  resultText,
+} from "@/app/(app)/_components/class-tests/result-format";
 import {
   classTestQueries,
   type StudentTestHistoryItemView,

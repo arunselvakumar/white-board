@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { HomeworkSubmissionsScreen } from "@/components/class-work/staff/homework-submissions-screen";
+import { HomeworkSubmissionsScreen } from "@/app/(app)/_components/class-work/staff/homework-submissions-screen";
 
 export const metadata: Metadata = { title: "Submissions" };
 

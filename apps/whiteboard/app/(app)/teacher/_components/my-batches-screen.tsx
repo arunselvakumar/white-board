@@ -4,7 +4,7 @@ import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useAuth } from "@repo/auth/react";
 import Link from "next/link";
 
-import { UpcomingDemosCard } from "@/components/enquiries/upcoming-demos-card";
+import { UpcomingDemosCard } from "@/app/(app)/teacher/_components/upcoming-demos-card";
 import { myBatchQueries } from "@/src/queries/teachers";
 
 export function MyBatchesScreen() {

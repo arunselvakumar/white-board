@@ -13,7 +13,7 @@ import {
   type EnquiryInput,
 } from "@/src/queries/enquiries";
 
-import { EnquiryForm } from "./enquiry-form";
+import { EnquiryForm } from "@/app/(app)/enquiries/_components/enquiry-form";
 
 export function EnquiryEditScreen({ enquiryId }: { enquiryId: string }) {
   const router = useRouter();

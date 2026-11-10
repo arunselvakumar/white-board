@@ -18,7 +18,11 @@ import { formatPaiseAsRupees } from "@/lib/money";
 import type { DemoResponse } from "@/src/queries/enquiries";
 
 import { errorMessage } from "./enquiry-errors";
-import { demoHasStarted, demoTitle, demoWhen } from "./enquiry-format";
+import {
+  demoHasStarted,
+  demoTitle,
+  demoWhen,
+} from "@/app/(app)/enquiries/_components/enquiry-format";
 
 export type DemoActions = {
   onMarkAttendance: (demoId: string, attended: boolean) => Promise<void>;

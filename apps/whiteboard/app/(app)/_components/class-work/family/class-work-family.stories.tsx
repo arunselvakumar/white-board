@@ -10,7 +10,7 @@ import type {
   FamilyClassWorkView,
   FamilyHomeworkView,
 } from "@/src/queries/class-work";
-import { signInAs } from "../../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 
 import {
   ASHA_ID,

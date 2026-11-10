@@ -6,7 +6,7 @@ import {
   passText,
   RESULT_STATUS_LABEL,
   resultText,
-} from "@/components/class-tests/result-format";
+} from "@/app/(app)/_components/class-tests/result-format";
 import {
   formatMarks,
   type FamilyTestResultView,

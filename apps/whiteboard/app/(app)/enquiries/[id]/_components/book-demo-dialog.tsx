@@ -43,7 +43,10 @@ import {
   type EnquiryOptionsResponse,
 } from "@/src/queries/enquiries";
 
-import { dayDate, todayInKolkata } from "./enquiry-format";
+import {
+  dayDate,
+  todayInKolkata,
+} from "@/app/(app)/enquiries/_components/enquiry-format";
 
 const MIN_FEE_PAISE = 100;
 const MAX_FEE_PAISE = 10_000_000;

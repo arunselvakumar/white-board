@@ -20,7 +20,7 @@ import {
   type PickableClassView,
 } from "@/src/queries/absence-notices";
 import type { FamilyHomeStudent } from "@/src/queries/family-home";
-import { signInAs } from "../../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 
 import {
   ASHA_ID,

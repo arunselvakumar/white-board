@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { EnquiriesScreen } from "@/components/enquiries/enquiries-screen";
+import { EnquiriesScreen } from "@/app/(app)/enquiries/_components/enquiries-screen";
 
 export const metadata: Metadata = { title: "Enquiries" };
 

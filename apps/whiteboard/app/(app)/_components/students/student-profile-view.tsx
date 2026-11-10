@@ -7,7 +7,7 @@ import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
 
 import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
-import { StudentTestHistorySection } from "@/components/class-tests/history/student-test-history";
+import { StudentTestHistorySection } from "@/app/(app)/_components/class-tests/history/student-test-history";
 import { StudentAvatar } from "@/app/(app)/_components/students/student-avatar";
 import { formatPaiseAsRupees } from "@/lib/money";
 import { batchQueries } from "@/src/queries/batches";
@@ -15,7 +15,7 @@ import { courseQueries } from "@/src/queries/courses";
 import { studentQueries, type StudentResponse } from "@/src/queries/students";
 import { attendanceQueries } from "@/src/queries/attendance";
 import { ATTENDANCE_STATUS_LABELS } from "@/src/training-institute/domain/attendance-register";
-import { summaryLine } from "@/components/attendance/attendance-summary";
+import { summaryLine } from "@/app/(app)/_components/attendance/attendance-summary";
 import { useAuth } from "@repo/auth/react";
 import { useState } from "react";
 

@@ -13,13 +13,13 @@ import {
 } from "@/src/queries/enquiries";
 import { getQueryClient } from "@/src/queries/query-client";
 
-import { ConvertEnquiryScreen } from "./convert-enquiry-screen";
-import { EnquirySourcesScreen } from "./enquiry-sources-screen";
+import { ConvertEnquiryScreen } from "@/app/(app)/enquiries/[id]/convert/_components/convert-enquiry-screen";
+import { EnquirySourcesScreen } from "@/app/(app)/enquiries/sources/_components/enquiry-sources-screen";
 import {
   currentEnquiryMonth,
   EnquirySummaryScreen,
-} from "./enquiry-summary-screen";
-import { UpcomingDemosCard } from "./upcoming-demos-card";
+} from "@/app/(app)/enquiries/summary/_components/enquiry-summary-screen";
+import { UpcomingDemosCard } from "@/app/(app)/teacher/_components/upcoming-demos-card";
 
 /* ------------------------------------------------------------------ */
 /* API mock: answers /api/training-institute/* from story handlers */

@@ -22,7 +22,7 @@ import { Card, CardContent, CardHeader } from "@repo/ui/components/card";
 
 import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
-import { PUBLISHED_EDIT_NOTE } from "@/components/class-tests/result-format";
+import { PUBLISHED_EDIT_NOTE } from "@/app/(app)/_components/class-tests/result-format";
 import {
   classTestQueries,
   deleteClassTest,

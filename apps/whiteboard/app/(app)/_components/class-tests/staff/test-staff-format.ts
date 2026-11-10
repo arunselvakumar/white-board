@@ -8,7 +8,7 @@ export {
   errorMessage,
   postedByLabel,
   timestampLabel,
-} from "@/components/class-work/staff/class-work-format";
+} from "@/app/(app)/_components/class-work/staff/class-work-format";
 
 /** "Single-student test · Asha Menon". */
 export function singleStudentLabel(name: string): string {

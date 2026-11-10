@@ -7,7 +7,7 @@ import {
   PYTHON_BATCH_ID,
   RAVI_ID,
   TALLY_BATCH_ID,
-} from "@/components/class-work/family/family-class-work.fixtures";
+} from "@/app/(app)/_components/class-work/family/family-class-work.fixtures";
 import type {
   FamilyTestResultView,
   FamilyTestResultsView,

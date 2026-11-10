@@ -20,9 +20,9 @@ import {
   AbsenceNoticesHomeCard,
   NO_ABSENCE_NOTICES,
   type FamilyAbsenceNoticesView,
-} from "@/components/absence-notices/family/absence-notices-home-card";
-import { ResultsHomeCard } from "@/components/class-tests/family/results-home-card";
-import { HomeworkHomeCards } from "@/components/class-work/family/homework-home-cards";
+} from "@/app/(app)/_components/absence-notices/family/absence-notices-home-card";
+import { ResultsHomeCard } from "@/app/(app)/_components/class-tests/family/results-home-card";
+import { HomeworkHomeCards } from "@/app/(app)/_components/class-work/family/homework-home-cards";
 import { formatPaiseAsRupees } from "@/lib/money";
 import type { FamilyTestResultsView } from "@/src/queries/class-tests";
 import type {

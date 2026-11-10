@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { ConvertEnquiryScreen } from "@/components/enquiries/convert-enquiry-screen";
+import { ConvertEnquiryScreen } from "@/app/(app)/enquiries/[id]/convert/_components/convert-enquiry-screen";
 
 export const metadata: Metadata = { title: "Convert to Student" };
 
