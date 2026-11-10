@@ -10,7 +10,6 @@ import {
   studentInitials,
 } from "@/lib/student-avatar-style";
 
-/** The shared avatar for a Student in lists, profiles, and forms. */
 export function StudentAvatar({
   studentId,
   name,
