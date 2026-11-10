@@ -13,7 +13,6 @@ import {
   localNow,
 } from "@/src/training-institute/domain/class-schedule";
 
-/** Where a Student's or Parent's Homework page lives. */
 export function homeworkPagePath(role: FamilyHomeRole): string {
   return role === "parent" ? "/parent/homework" : "/student/homework";
 }
