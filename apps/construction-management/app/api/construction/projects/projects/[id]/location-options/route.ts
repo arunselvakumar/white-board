@@ -10,7 +10,7 @@ import { toLocationOptionsResponse } from "./location-options-models";
 export const dynamic = "force-dynamic";
 
 /**
- * What a site entry's location picker offers on a Project (CM-403).
+ * What a site entry's location picker offers on a Project.
  * `projects.project` Read; 404 for another Company's Project or one a
  * Member is not on.
  */

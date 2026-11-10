@@ -37,7 +37,7 @@ const WRITE_ERRORS = [
 
 const ITEM = `${HINDRANCES_PATH}/{id}`;
 
-/** Request and Response models of `/api/construction/site-work/hindrances` (CM-607). */
+/** Request and Response models of `/api/construction/site-work/hindrances`. */
 export const hindranceOpenApiComponents: OpenApiComponents = {
   CreateConstructionSiteWorkHindranceRequestModel,
   UpdateConstructionSiteWorkHindranceRequestModel,
@@ -50,7 +50,7 @@ export const hindranceOpenApiComponents: OpenApiComponents = {
 };
 
 /**
- * Hindrance register routes (CM-607), menu `site_work.hindrances` on the
+ * Hindrance register routes, menu `site_work.hindrances` on the
  * hindrance's Project: read, create, update (edit, Close), delete.
  */
 export const hindranceOpenApiOperations: OpenApiOperation[] = [

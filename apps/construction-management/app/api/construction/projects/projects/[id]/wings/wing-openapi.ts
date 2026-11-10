@@ -30,7 +30,7 @@ const ERRORS = [
   StatusCodes.NOT_FOUND,
 ] as const;
 
-/** Phases' and Wings' models (CM-402). */
+/** Phases' and Wings' models. */
 export const wingOpenApiComponents: OpenApiComponents = {
   ConstructionProjectsPhaseResponseModel,
   ListConstructionProjectsPhasesResponseModel,
@@ -42,7 +42,7 @@ export const wingOpenApiComponents: OpenApiComponents = {
   UpdateConstructionProjectsWingRequestModel,
 };
 
-/** Phases' and Wings' routes (CM-402), under the `projects.wings` menu. */
+/** Phases' and Wings' routes, under the `projects.wings` menu. */
 export const wingOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

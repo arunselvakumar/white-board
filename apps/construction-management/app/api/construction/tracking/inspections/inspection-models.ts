@@ -35,7 +35,7 @@ type SiteLocation = z.infer<
 >;
 
 const InspectionBody = z.object({
-  /** `YYYY-MM-DD`; the back-dated limit (Site → Inspection Request) applies. It may be a later day. */
+  /** `YYYY-MM-DD`; the Inspection Request back-dated limit applies. It may be a later day. */
   inspectionDate: z.iso.date(),
   /** `HH:MM`, 24-hour, local time on site. */
   inspectionTime: z.string().max(5).nullable().optional(),

@@ -65,7 +65,7 @@ const ITEM = `${INQUIRIES_PATH}/{id}`;
 const XLSX =
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
-/** Sales inquiries models (CM-1003, CM-1004, CM-1007). */
+/** Sales inquiries models. */
 export const salesInquiryOpenApiComponents: OpenApiComponents = {
   CreateConstructionSalesInquiryRequestModel,
   UpdateConstructionSalesInquiryRequestModel,
@@ -78,12 +78,12 @@ export const salesInquiryOpenApiComponents: OpenApiComponents = {
   ConstructionSalesInquiryDuplicateDetailsModel,
   ListConstructionSalesInquiriesResponseModel,
   GetConstructionSalesInquiryFormOptionsResponseModel,
-  // CM-1007: close, reopen, import.
+  // Close, reopen, import.
   ConvertConstructionSalesInquiryRequestModel,
   LoseConstructionSalesInquiryRequestModel,
   ReopenConstructionSalesInquiryRequestModel,
   ImportConstructionSalesInquiriesResponseModel,
-  // CM-1004: follow-ups and Inquiry Tasks.
+  // Follow-ups and Inquiry Tasks.
   AddConstructionSalesFollowUpRequestModel,
   ConstructionSalesFollowUpResponseModel,
   ConstructionSalesInquiryActivityItemResponseModel,
@@ -92,12 +92,12 @@ export const salesInquiryOpenApiComponents: OpenApiComponents = {
   UpdateConstructionSalesInquiryTaskRequestModel,
   ConstructionSalesInquiryTaskResponseModel,
   ListConstructionSalesInquiryTasksResponseModel,
-  // The files of inquiries (and bookings, CM-1006) live under /documents.
+  // The files of inquiries (and bookings) live under /documents.
   ...salesDocumentOpenApiComponents,
 };
 
 /**
- * Sales inquiries operations (CM-1003, CM-1004, CM-1007), menu
+ * Sales inquiries operations, menu
  * `sales.inquiries` on the inquiry's Project; View all scopes every read
  * and write.
  */
@@ -171,7 +171,7 @@ export const salesInquiryOpenApiOperations: OpenApiOperation[] = [
     successDescription: "Deleted",
     errors: SALES_WRITE_ERRORS,
   },
-  // CM-1004: follow-ups and Inquiry Tasks.
+  // Follow-ups and Inquiry Tasks.
   {
     method: "get",
     path: `${ITEM}/activity`,
@@ -265,7 +265,7 @@ export const salesInquiryOpenApiOperations: OpenApiOperation[] = [
     successDescription: "Deleted",
     errors: SALES_WRITE_ERRORS,
   },
-  // CM-1007: close, reopen, import.
+  // Close, reopen, import.
   ...(
     [
       [

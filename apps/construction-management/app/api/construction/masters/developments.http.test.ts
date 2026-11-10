@@ -111,7 +111,7 @@ function setOnProject(
   );
 }
 
-/** Puts the Team Member on Projects, as Masters → Team Members does. */
+/** Puts the Team Member on Projects, as the Team Members screen does. */
 async function putOn(memberId: string, projectIds: string[]): Promise<void> {
   await prisma.constructionOrganizationTeamMemberProject.createMany({
     data: projectIds.map((projectId) => ({ memberId, projectId })),

@@ -17,7 +17,7 @@ const MAX_BYTES = 2 * 1024 * 1024;
 const deps = createTaskImportDeps();
 
 /**
- * Imports tasks from the sample (CM-802, ADR CM-0019 §13): the body is the
+ * Imports tasks from the sample (ADR CM-0019 §13): the body is the
  * .xlsx itself. Every row becomes a task on the Project, or none does: 400
  * `IMPORT_HAS_ERRORS` with `details.errors` = [{ row, field, message }].
  * Needs Task create on the Project (the menu has no Import flag).

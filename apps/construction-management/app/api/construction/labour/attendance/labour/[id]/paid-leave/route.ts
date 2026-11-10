@@ -20,7 +20,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * "Mark Paid Leave" (CM-210): toggles Paid Leave on an On Leave day and
+ * "Mark Paid Leave": toggles Paid Leave on an On Leave day and
  * reposts its ledger entries; the snapshot wage stays. Needs Attendance
  * update on the day's Project; the back-dated edit limit applies.
  */

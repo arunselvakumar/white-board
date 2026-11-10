@@ -6,7 +6,7 @@ import type { GetConstructionHrmsLeaveAccrualOptionsResponseModel } from "../lea
 
 export const dynamic = "force-dynamic";
 
-/** The accrual modes and frequencies a leave type can use (CM-310, ADR CM-0012 §7). */
+/** The accrual modes and frequencies a leave type can use (ADR CM-0012 §7). */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await leaveAccess(request, {

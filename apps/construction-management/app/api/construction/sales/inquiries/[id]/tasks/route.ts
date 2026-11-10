@@ -19,7 +19,7 @@ import { ConstructionSalesInquiryParamsModel } from "../../inquiry-models";
 
 export const dynamic = "force-dynamic";
 
-/** The inquiry's tasks (CM-1004; Inquiry read, View all as the inquiry). */
+/** The inquiry's tasks (Inquiry read, View all as the inquiry). */
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> },
@@ -43,7 +43,7 @@ export async function GET(
   }
 }
 
-/** Adds an Inquiry Task (CM-1004; Inquiry update). */
+/** Adds an Inquiry Task (Inquiry update). */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

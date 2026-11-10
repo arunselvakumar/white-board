@@ -35,7 +35,7 @@ const quantity = z.string().trim().max(20);
 const count = z.int().min(0).max(WORKSHEET_LIMITS.maxCount);
 
 /**
- * Where on the Project the work was done (CM-403 `LocationRef`): a Wing
+ * Where on the Project the work was done (`LocationRef`): a Wing
  * with any Floors and Units, an Amenity, a Common Development, or a
  * Location. Checked against the Project on save.
  */
@@ -97,7 +97,7 @@ const WorksheetBody = z.object({
   /** Save & Approve: needs Approve; only with the Project's approval on. */
   approve: z.boolean().default(false),
   /**
-   * The Task the work is for (CM-806): a live leaf task of the Project.
+   * The Task the work is for: a live leaf task of the Project.
    * Its Approx Work Done posts as the task's progress when the units
    * match. Null clears it; left out keeps the sheet's.
    */
@@ -275,7 +275,7 @@ export const ConstructionSiteWorkWorksheetResponseModel = z.object({
   unskilledCount: z.int().nullable(),
   approxWorkQty: z.string().nullable(),
   approxWorkUnit: named.nullable(),
-  /** The Task the work is for (CM-806), and whether it posts progress. */
+  /** The Task the work is for, and whether it posts progress. */
   task: ConstructionSiteWorkWorksheetTaskResponseModel.nullable(),
   siteLocation: ConstructionSiteWorkWorksheetLocationResponseModel.nullable(),
   remark: z.string().nullable(),
@@ -319,7 +319,7 @@ export const BulkDecideConstructionSiteWorkWorksheetsResponseModel = z.object({
   decided: z.int().nonnegative(),
 });
 
-/** A Project's worksheet settings (CM-0016 §2). */
+/** A Project's worksheet settings (ADR CM-0016 §2). */
 export const ConstructionSiteWorkWorksheetSettingsResponseModel = z.object({
   projectId: z.uuid(),
   showLocation: z.boolean(),

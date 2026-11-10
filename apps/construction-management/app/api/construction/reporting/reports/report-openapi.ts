@@ -28,14 +28,14 @@ const ERRORS = [
   StatusCodes.NOT_FOUND,
 ];
 
-/** Report job models (CM-217, CM-218). */
+/** Report job models. */
 export const reportingOpenApiComponents: OpenApiComponents = {
   RequestConstructionReportingReportRequestModel,
   ConstructionReportingReportJobResponseModel,
   ListConstructionReportingReportsResponseModel,
 };
 
-/** Report job routes (CM-217, CM-218). */
+/** Report job routes. */
 export const reportingOpenApiOperations: OpenApiOperation[] = [
   {
     method: "post",

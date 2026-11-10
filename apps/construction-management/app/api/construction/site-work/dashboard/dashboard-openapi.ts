@@ -20,7 +20,7 @@ const ERRORS = [
   StatusCodes.FORBIDDEN,
 ];
 
-/** Response models of the Project Dashboard's site-work sections (CM-608). */
+/** Response models of the Project Dashboard's site-work sections. */
 export const siteWorkDashboardOpenApiComponents: OpenApiComponents = {
   GetConstructionSiteWorkDailyWorkDashboardResponseModel,
   GetConstructionSiteWorkEquipmentUsageDashboardResponseModel,

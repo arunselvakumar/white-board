@@ -11,7 +11,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Edits a holiday; 409 `HOLIDAY_CHANGED` when stale (CM-305). */
+/** Edits a holiday; 409 `HOLIDAY_CHANGED` when stale. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

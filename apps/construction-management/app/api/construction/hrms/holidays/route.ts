@@ -14,7 +14,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** The Company's holidays in a year, by date (CM-305). */
+/** The Company's holidays in a year, by date. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(request, "hrms.holidays", "read");
@@ -38,7 +38,7 @@ export async function GET(request: Request): Promise<Response> {
   }
 }
 
-/** Adds a holiday; a past date passes the Back-dated Entry policy (CM-305). */
+/** Adds a holiday; a past date passes the Back-dated Entry policy. */
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(request, "hrms.holidays", "create");

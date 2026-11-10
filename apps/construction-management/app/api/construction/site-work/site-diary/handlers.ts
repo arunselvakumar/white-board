@@ -11,7 +11,7 @@ import type { Flag } from "@/src/shared-kernel/access";
 
 export const SITE_DIARY_MENU = SITE_WORK_DOCUMENTS.site_diary.menu;
 
-/** One set of Site Diary handlers for every route (CM-607). */
+/** One set of Site Diary handlers for every route. */
 export const siteDiaryHandlers = createSiteDiaryHandlers();
 
 /**

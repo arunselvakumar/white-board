@@ -11,7 +11,7 @@ import { TeamMemberIdParamsModel } from "../../team-member-models";
 export const dynamic = "force-dynamic";
 
 /**
- * Removes a Team Member (CM-110): tombstones the record (their name stays on
+ * Removes a Team Member: tombstones the record (their name stays on
  * old entries) and ends their membership, so access stops on their next
  * request. A pending invitation is simply cancelled.
  */

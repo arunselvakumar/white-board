@@ -13,7 +13,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Replaces a leave type's settings (CM-310); its active state is kept. */
+/** Replaces a leave type's settings; its active state is kept. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

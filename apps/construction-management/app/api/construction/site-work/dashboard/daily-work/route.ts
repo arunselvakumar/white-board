@@ -11,7 +11,7 @@ import { DASHBOARD_MENU, siteWorkDashboard } from "../handlers";
 export const dynamic = "force-dynamic";
 
 /**
- * The Project Dashboard's Daily Work section (CM-608): worksheet labour
+ * The Project Dashboard's Daily Work section: worksheet labour
  * per day against attendance heads, contractor-wise labour and the KPI
  * figures, from live worksheets that are not rejected. Needs Dashboard
  * Read on the Project.

@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 const MAX_BYTES = 2 * 1024 * 1024;
 
 /**
- * Imports unit sales details from the sample (CM-1005, ADR CM-0022 §8):
+ * Imports unit sales details from the sample (ADR CM-0022 §8):
  * the body is the .xlsx itself. Each row replaces an existing unit's
  * profile, matched by Wing name and Unit No ignoring case; Wings, Floors
  * and Units are never created. All rows or none: 400

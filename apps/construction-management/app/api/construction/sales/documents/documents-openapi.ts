@@ -34,7 +34,7 @@ const WRITE_ERRORS = [...READ_ERRORS, StatusCodes.PAYMENT_REQUIRED];
 const FILES = `${SALES_DOCUMENTS_PATH}/{type}/{id}/files`;
 const FILE = `${FILES}/{fileId}`;
 
-/** Sales document files models (CM-1003). */
+/** Sales document files models. */
 export const salesDocumentOpenApiComponents: OpenApiComponents = {
   ConstructionSalesDocumentFileResponseModel,
   ListConstructionSalesDocumentFilesResponseModel,
@@ -46,7 +46,7 @@ export const salesDocumentOpenApiComponents: OpenApiComponents = {
 };
 
 /**
- * Files of inquiries and bookings (CM-1003, ADR CM-0022 §3, §7): Read on
+ * Files of inquiries and bookings (ADR CM-0022 §3, §7): Read on
  * the document's menu sees them (an inquiry outside View all is 404);
  * Create or Update uploads; Update removes any file, an uploader their
  * own. They never join the Project Gallery.

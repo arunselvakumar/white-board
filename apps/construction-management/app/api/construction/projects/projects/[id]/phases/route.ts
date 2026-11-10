@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 type Context = { params: Promise<{ id: string }> };
 
-/** The Project's Phases in order, with their Wing counts (CM-402). */
+/** The Project's Phases in order, with their Wing counts. */
 export async function GET(
   request: Request,
   context: Context,
@@ -33,7 +33,7 @@ export async function GET(
   }
 }
 
-/** Add Phase, after the last one (CM-402). */
+/** Add Phase, after the last one. */
 export async function POST(
   request: Request,
   context: Context,

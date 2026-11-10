@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/** Fields a Company is created with (CM-104/105); validation lives in the domain. */
+/** Fields a Company is created with; validation lives in the domain. */
 export const companyWriteFields = {
   name: z.string().trim().min(1).max(120),
   mobile: z.string().trim().max(20).nullish(),

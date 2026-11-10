@@ -40,7 +40,7 @@ export const worksheetSettingsHandlers = new WorksheetSettingsHandlers({
     null,
 });
 
-/** One set of Daily Worksheet handlers for every route (CM-602). */
+/** One set of Daily Worksheet handlers for every route. */
 export const worksheetHandlers = new WorksheetHandlers({
   db: prisma,
   store: new PrismaWorksheetStore(),

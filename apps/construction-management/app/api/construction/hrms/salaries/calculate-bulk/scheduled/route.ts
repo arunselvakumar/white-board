@@ -17,7 +17,7 @@ function sameSecret(given: string, expected: string): boolean {
 }
 
 /**
- * Automatic salary calculation (CM-316): for every Company with “Calculate
+ * Automatic salary calculation: for every Company with “Calculate
  * salary automatically” on whose salary day has come, calculates last
  * month for every member, as `system`. No Session: the caller sends
  * `Authorization: Bearer <CRON_SECRET>` (what Vercel Cron sends when

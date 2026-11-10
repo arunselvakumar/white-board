@@ -13,7 +13,7 @@ import { projectDevelopments } from "../handlers";
 export const dynamic = "force-dynamic";
 
 /**
- * Sets a Project's Amenities and Common Developments (CM-404): the full
+ * Sets a Project's Amenities and Common Developments: the full
  * set per kind sent; a kind left out keeps its rows. `projects.project`
  * Update; 404 for another Company's Project or one a Member is not on.
  */

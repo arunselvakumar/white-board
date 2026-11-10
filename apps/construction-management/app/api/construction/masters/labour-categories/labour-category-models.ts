@@ -4,7 +4,7 @@ import { labourCategoryModels } from "../_lib/master-models";
 
 const models = labourCategoryModels();
 
-/** Labour Categories' models (CM-203); every route of the list uses these. */
+/** Labour Categories' models; every route of the list uses these. */
 export const LABOUR_CATEGORY_MODELS = models;
 
 export const ConstructionMastersLabourCategoryResponseModel = models.response;

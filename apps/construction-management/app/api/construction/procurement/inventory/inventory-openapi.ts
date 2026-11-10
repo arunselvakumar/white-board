@@ -46,7 +46,7 @@ const WRITE = [...READ, StatusCodes.CONFLICT, StatusCodes.PAYMENT_REQUIRED];
 const MENU =
   "Current Inventory (`procurement.current_inventory`) on a Project; Central store (`procurement.central_store`) for a Store";
 
-/** Request and Response models of `/api/construction/procurement/inventory` (M5). */
+/** Request and Response models of `/api/construction/procurement/inventory`. */
 export const inventoryOpenApiComponents: OpenApiComponents = {
   ConstructionProcurementStockLocationModel,
   ConstructionProcurementSiteLocationModel,
@@ -66,7 +66,7 @@ export const inventoryOpenApiComponents: OpenApiComponents = {
   ImportConstructionProcurementInventoryResponseModel,
 };
 
-/** Operations of `/api/construction/procurement/inventory` (M5). */
+/** Operations of `/api/construction/procurement/inventory`. */
 export const inventoryOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

@@ -14,7 +14,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Saves an Other Expense still as loaded (CM-704): an approved one has its
+ * Saves an Other Expense still as loaded: an approved one has its
  * account entry reversed and goes back to pending, a rejected one goes
  * back to pending; Save & Approve (needs Approve) approves it again.
  */

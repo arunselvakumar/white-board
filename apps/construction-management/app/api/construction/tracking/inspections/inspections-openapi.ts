@@ -49,7 +49,7 @@ const WRITE_ERRORS = [
 
 const ITEM = `${INSPECTIONS_PATH}/{id}`;
 
-/** Request and Response models of `/api/construction/tracking/inspections` (CM-804). */
+/** Request and Response models of `/api/construction/tracking/inspections`. */
 export const trackingInspectionOpenApiComponents: OpenApiComponents = {
   CreateConstructionTrackingInspectionRequestModel,
   UpdateConstructionTrackingInspectionRequestModel,
@@ -73,7 +73,7 @@ export const trackingInspectionOpenApiComponents: OpenApiComponents = {
 };
 
 /**
- * Inspection Request routes (CM-804), menu `tracking.inspection_requests`
+ * Inspection Request routes, menu `tracking.inspection_requests`
  * on the request's Project: read, create, update, delete, approve, reject;
  * observations by the inspector or Update; remarks by any reader.
  */

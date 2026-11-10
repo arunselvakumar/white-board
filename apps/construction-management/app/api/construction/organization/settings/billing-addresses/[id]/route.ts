@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createBillingAddressHandlers();
 
-/** One live billing address; 404 BILLING_ADDRESS_NOT_FOUND otherwise (CM-501). */
+/** One live billing address; 404 BILLING_ADDRESS_NOT_FOUND otherwise. */
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> },

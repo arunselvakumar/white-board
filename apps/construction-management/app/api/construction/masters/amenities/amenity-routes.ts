@@ -1,7 +1,7 @@
 import { developmentRoutes } from "../_lib/development-routes";
 import { AMENITY_MODELS } from "./amenity-models";
 
-/** Amenities under the `masters.amenities` Menu (CM-404). */
+/** Amenities under the `masters.amenities` Menu. */
 export const amenityRoutes = developmentRoutes({
   kind: "amenity",
   menu: "masters.amenities",

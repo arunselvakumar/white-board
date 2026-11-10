@@ -10,7 +10,7 @@ import type { ListMyConstructionOrganizationCompaniesResponseModel } from "./lis
 
 export const dynamic = "force-dynamic";
 
-/** The signed-in User's Companies and which one is active (CM-105). */
+/** The signed-in User's Companies and which one is active. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireUserSession(request);

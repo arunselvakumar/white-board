@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 /**
- * The signed-in User's own Team Member record in the Active Company
- * (CM-115). Aadhaar and PAN are masked; the full values come only from
+ * The signed-in User's own Team Member record in the Active Company.
+ * Aadhaar and PAN are masked; the full values come only from
  * `reveal-identifiers`.
  */
 export const GetConstructionOrganizationMyProfileResponseModel = z.object({

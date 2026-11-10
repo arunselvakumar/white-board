@@ -7,7 +7,7 @@ import { LabourIdParamsModel, toLabourResponse } from "../../labour-models";
 
 export const dynamic = "force-dynamic";
 
-/** Marks a labourer Active again: they return to attendance pickers (CM-206). */
+/** Marks a labourer Active again: they return to attendance pickers. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { PARTY_TYPES } from "@/src/finance/domain/party";
 
-/** Shared pieces of the party money models (CM-705, CM-706, CM-708). */
+/** Shared pieces of the party money models. */
 
 export const PartyTypeModel = z.enum(PARTY_TYPES);
 export const PaymentModeModel = z.enum(["cash", "cheque", "online", "upi"]);

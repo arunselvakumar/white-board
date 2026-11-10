@@ -18,7 +18,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 /**
- * Streams a done report's Excel or PDF from private storage (CM-217),
+ * Streams a done report's Excel or PDF from private storage,
  * after checking access again: `report` on the menu and Project, and
  * Financial when the file carries amounts. 409 `REPORT_NOT_READY` until
  * the job is done.

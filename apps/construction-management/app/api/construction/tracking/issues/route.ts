@@ -22,7 +22,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * A Project's Issues & Snags, newest first (CM-803): by status (Pending /
+ * A Project's Issues & Snags, newest first: by status (Pending /
  * Delayed / Solved / Closed, Delayed derived on the Company's today),
  * priority, category, assignee, Department, Contractor, location, an Issue
  * Date range and a search on the number or details. Without View all, only
@@ -79,7 +79,7 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * Raises an issue (CM-803): **Save** creates it open; **Save & Mark As
+ * Raises an issue: **Save** creates it open; **Save & Mark As
  * Solved** (`markSolved`, needs Create and Update) creates it solved.
  * Numbered from the Issue & Snag rule on its Issue Date, which the
  * back-dated limit applies to. Needs Issues and snags create on the

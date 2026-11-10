@@ -10,7 +10,7 @@ import type { SwitchConstructionOrganizationCompanyResponseModel } from "./switc
 
 export const dynamic = "force-dynamic";
 
-/** Makes one of the caller's Companies the Active Company (CM-105). */
+/** Makes one of the caller's Companies the Active Company. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

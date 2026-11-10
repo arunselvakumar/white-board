@@ -10,7 +10,7 @@ import { branches } from "../handlers";
 
 export const dynamic = "force-dynamic";
 
-/** Every live Project with its site fence, or null (CM-304). */
+/** Every live Project with its site fence, or null. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(request, "hrms.settings", "read");

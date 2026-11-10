@@ -6,7 +6,7 @@ import { projectMediaDispatcher } from "@/src/composition/project-media-listener
 import { MaterialTransferCommands } from "@/src/procurement/infrastructure/material-transfer-store";
 import { procurementEvents } from "@/src/composition/procurement-events";
 
-/** Material Transfers (CM-507). */
+/** Material Transfers. */
 export const materialTransfers = new MaterialTransferCommands({
   db: prisma,
   directory: procurementDirectory,

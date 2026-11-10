@@ -11,11 +11,11 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The caller's Project Dashboard layout (CM-412): every section in their
+ * The caller's Project Dashboard layout: every section in their
  * order; the default (all shown) until they save one. Needs the
  * Dashboard menu's Read flag. With `projectId` (Dashboard Read on that
  * Project; 404 for one the caller is not on) the sections whose module is
- * hidden there are marked, and the dashboard leaves them out (CM-902).
+ * hidden there are marked, and the dashboard leaves them out.
  */
 export async function GET(request: Request): Promise<Response> {
   try {

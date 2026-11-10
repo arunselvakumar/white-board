@@ -10,7 +10,7 @@ import { queryOf, salaryHandlers } from "../../salary-route";
 export const dynamic = "force-dynamic";
 
 /**
- * The team salary report (CM-317, `hrms.salaries` report or export): an
+ * The team salary report (`hrms.salaries` report or export): an
  * Excel workbook of the month's slips with totals, the advances paid and
  * the members without a slip. Amounts are blank without financial.
  */

@@ -13,7 +13,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The Project logo (CM-401), streamed from storage to those who may see
+ * The Project logo, streamed from storage to those who may see
  * the Project (`projects.project` read; a Member only on their Projects).
  * There is no public URL.
  */

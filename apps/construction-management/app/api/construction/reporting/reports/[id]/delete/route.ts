@@ -9,7 +9,7 @@ import { ConstructionReportingReportParamsModel } from "../../report-models";
 export const dynamic = "force-dynamic";
 
 /**
- * Deletes a report and its files (CM-901): its stored bytes stop counting
+ * Deletes a report and its files: its stored bytes stop counting
  * and an audit event is written. Only its requester or the Owner. A
  * Progress Report is deleted from its own module.
  */

@@ -10,7 +10,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** The labourer's Project history, oldest first (CM-206). */
+/** The labourer's Project history, oldest first. */
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> },

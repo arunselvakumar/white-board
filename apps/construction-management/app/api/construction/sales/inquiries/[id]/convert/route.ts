@@ -15,7 +15,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Closes an Open inquiry as Converted (CM-1007): one transaction books the unit (a Booked booking with the inquiry's name, mobile, email and address, linked to it) and closes the inquiry. Needs Inquiry update and Booking create (403 otherwise); the booking date is inside the back-dated `booking` window; 404 `UNIT_NOT_FOUND`, 409 `UNIT_UNAVAILABLE` / `UNIT_BOOKED` / `INQUIRY_NOT_OPEN` / `INQUIRY_CHANGED`.
+ * Closes an Open inquiry as Converted: one transaction books the unit (a Booked booking with the inquiry's name, mobile, email and address, linked to it) and closes the inquiry. Needs Inquiry update and Booking create (403 otherwise); the booking date is inside the back-dated `booking` window; 404 `UNIT_NOT_FOUND`, 409 `UNIT_UNAVAILABLE` / `UNIT_BOOKED` / `INQUIRY_NOT_OPEN` / `INQUIRY_CHANGED`.
  */
 export async function POST(
   request: Request,

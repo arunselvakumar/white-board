@@ -38,7 +38,7 @@ const WRITE_ERRORS = [
 
 const ITEM = `${GOODS_RECEIPTS_PATH}/{id}`;
 
-/** Request and Response models of `/api/construction/procurement/goods-receipts` (M5). */
+/** Request and Response models of `/api/construction/procurement/goods-receipts`. */
 export const goodsReceiptOpenApiComponents: OpenApiComponents = {
   PostConstructionProcurementGoodsReceiptRequestModel,
   UpdateConstructionProcurementGoodsReceiptRequestModel,
@@ -52,7 +52,7 @@ export const goodsReceiptOpenApiComponents: OpenApiComponents = {
 };
 
 /**
- * Operations of `/api/construction/procurement/goods-receipts` (CM-505).
+ * Operations of `/api/construction/procurement/goods-receipts`.
  * Menu `procurement.material_received` on the Project (a Store at Company
  * level): list and detail = read, post = create, edit = update, delete =
  * delete, PDF = print; View All shows other members' GRNs; Financial shows

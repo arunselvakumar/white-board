@@ -30,7 +30,7 @@ const WRITE = [
 ] as const;
 const ITEM = `${HOLIDAYS_PATH}/{id}`;
 
-/** Holiday models (CM-305). */
+/** Holiday models. */
 export const holidayOpenApiComponents: OpenApiComponents = {
   ConstructionHrmsHolidayResponseModel,
   ListConstructionHrmsHolidaysResponseModel,
@@ -39,7 +39,7 @@ export const holidayOpenApiComponents: OpenApiComponents = {
   ImportConstructionHrmsHolidaysResponseModel,
 };
 
-/** Holiday routes (CM-305). */
+/** Holiday routes. */
 export const holidayOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

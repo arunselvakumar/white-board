@@ -27,9 +27,8 @@ function newestFirst(
 }
 
 /**
- * Downloads (CM-901): the signed-in member's own report jobs (and, from
- * CM-906, backups and data exports) across every Project and central,
- * newest first, `limit` at a time. Only their own: the Owner sees theirs
+ * Downloads: the signed-in member's own report jobs, backups and data
+ * exports across every Project and central, newest first, `limit` at a time. Only their own: the Owner sees theirs
  * too, not everyone's. Each row says what may be done with it now.
  */
 export async function GET(request: Request): Promise<Response> {

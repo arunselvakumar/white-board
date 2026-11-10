@@ -11,7 +11,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Manage Dashboard (CM-412): the caller's sections in order with what
+ * Manage Dashboard: the caller's sections in order with what
  * shows, for every Project. A preference, so the Dashboard menu's Read
  * flag is enough.
  */

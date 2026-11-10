@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 /**
- * PF and ESI export models (CM-320), menu `hrms.salaries` export and
+ * PF and ESI export models, menu `hrms.salaries` export and
  * financial. The files are built from an approved month's slips.
  */
 

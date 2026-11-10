@@ -38,7 +38,7 @@ export function passwordChangeRequired(user: CompanyAuthUser): Response | null {
  * `PASSWORD_CHANGE_REQUIRED`, no Active Company → 403 `NO_ACTIVE_COMPANY`. The role
  * is read from the member row on every request. A write to a Company that
  * waits to be deleted answers 409 `COMPANY_DELETION_SCHEDULED` unless it
- * is one of the writes left open (CM-907, `company-deletion-guard.ts`).
+ * is one of the writes left open (`company-deletion-guard.ts`).
  */
 export async function requireCompanySession(
   request: Request,

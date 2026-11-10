@@ -18,7 +18,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * The dates in `from`–`to` (at most a year) that have a Site Diary on the
- * Project, newest first, with their weather and row counts (CM-607). Needs
+ * Project, newest first, with their weather and row counts. Needs
  * Site Diary read on the Project.
  */
 export async function GET(request: Request): Promise<Response> {
@@ -44,7 +44,7 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * Writes the Project's Site Diary for a date (CM-607): one per date (409
+ * Writes the Project's Site Diary for a date: one per date (409
  * `SITE_DIARY_EXISTS`), the date not after today and within the
  * back-dated limit. Needs Site Diary create on the Project.
  */

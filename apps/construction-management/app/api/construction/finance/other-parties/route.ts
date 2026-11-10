@@ -19,7 +19,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Masters → Other Party (CM-704): newest first, with a search on the
+ * Masters → Other Party: newest first, with a search on the
  * name, email, GSTIN or mobile and a Project filter. Needs Other Party
  * read.
  */
@@ -56,7 +56,7 @@ export async function GET(request: Request): Promise<Response> {
   }
 }
 
-/** Adds an Other Party (CM-704); 409 when a live one has the name. */
+/** Adds an Other Party; 409 when a live one has the name. */
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(request, OTHER_PARTY_MENU, "create");

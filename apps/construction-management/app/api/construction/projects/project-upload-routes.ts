@@ -50,7 +50,7 @@ export type ProjectUploadOwner = {
 
 /**
  * The four upload routes every Project file owner has under
- * `<base>/uploads` (CM-407): start, presign (deployed), app (files on
+ * `<base>/uploads`: start, presign (deployed), app (files on
  * disk) and thumbnail. Each checks the Session and `flags` on `menu`
  * (any of them), then the owner applies Project visibility and its policy.
  */

@@ -61,7 +61,7 @@ async function requireReadAccess(request: Request, kind: PartyKind) {
 }
 
 /**
- * A Contractor's or Supplier's quotation routes (CM-501), on the kernel's
+ * A Contractor's or Supplier's quotation routes, on the kernel's
  * attachments service like a Project's documents: list and finish
  * (`quotations`), start / presign / app / thumbnail (`quotations/uploads`),
  * and stream / thumbnail / delete one file. Uploading and removing need

@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createHrmsSettingsHandlers();
 
-/** Replaces the Active Company's HRMS Settings, audited with before and after (CM-303). */
+/** Replaces the Active Company's HRMS Settings, audited with before and after. */
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(request, "hrms.settings", "update");

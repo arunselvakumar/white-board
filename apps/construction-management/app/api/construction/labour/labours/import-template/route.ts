@@ -11,7 +11,7 @@ import { labour } from "../handlers";
 export const dynamic = "force-dynamic";
 
 /**
- * The sample Excel sheet for the labour import (CM-206): headers, one
+ * The sample Excel sheet for the labour import: headers, one
  * example row, and a Lists sheet with the Company's Projects, Labour
  * Categories and Supervisors.
  */

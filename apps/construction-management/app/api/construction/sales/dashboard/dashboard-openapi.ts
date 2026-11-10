@@ -5,30 +5,30 @@ import type {
   OpenApiOperation,
 } from "@/app/api/_lib/openapi";
 
-// Booking section (CM-1008)
+// Booking section
 import {
   BOOKING_DASHBOARD_PATH,
   GetConstructionSalesBookingDashboardRequestModel,
   GetConstructionSalesBookingDashboardResponseModel,
 } from "./booking-dashboard-models";
-// Inquiry section (CM-1008)
+// Inquiry section
 import {
   GetConstructionSalesInquiryDashboardRequestModel,
   GetConstructionSalesInquiryDashboardResponseModel,
   INQUIRY_DASHBOARD_PATH,
 } from "./inquiry-dashboard-models";
 
-/** Sales dashboard models (CM-1008). */
+/** Sales dashboard models. */
 export const salesDashboardOpenApiComponents: OpenApiComponents = {
-  // Booking section (CM-1008)
+  // Booking section
   GetConstructionSalesBookingDashboardResponseModel,
-  // Inquiry section (CM-1008)
+  // Inquiry section
   GetConstructionSalesInquiryDashboardResponseModel,
 };
 
-/** Sales dashboard operations (CM-1008). */
+/** Sales dashboard operations. */
 export const salesDashboardOpenApiOperations: OpenApiOperation[] = [
-  // Booking section (CM-1008)
+  // Booking section
   {
     method: "get",
     path: BOOKING_DASHBOARD_PATH,
@@ -46,7 +46,7 @@ export const salesDashboardOpenApiOperations: OpenApiOperation[] = [
       StatusCodes.NOT_FOUND,
     ],
   },
-  // Inquiry section (CM-1008)
+  // Inquiry section
   {
     method: "get",
     path: INQUIRY_DASHBOARD_PATH,

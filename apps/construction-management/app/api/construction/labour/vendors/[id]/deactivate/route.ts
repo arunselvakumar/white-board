@@ -9,7 +9,7 @@ import { ConstructionLabourVendorParamsModel } from "../vendor-params-model";
 
 export const dynamic = "force-dynamic";
 
-/** Deactivates a Vendor: it leaves the attendance pickers; its records stay (CM-209). */
+/** Deactivates a Vendor: it leaves the attendance pickers; its records stay. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

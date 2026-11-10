@@ -16,7 +16,7 @@ const handlers = createBalanceHandlers();
 /**
  * Previous Balance, To Pay, Advance, Paid and Final Amount for a period,
  * per labourer (Labour read on the Project) or vendor (Vendor read) of a
- * Project (CM-214, ADR CM-0004). Figures are party-wide: a balance
+ * Project (ADR CM-0004). Figures are party-wide: a balance
  * belongs to the party across Projects. Amounts need Financial.
  */
 export async function GET(request: Request): Promise<Response> {

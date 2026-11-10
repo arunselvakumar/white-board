@@ -13,7 +13,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Clears labourers' marked day on a Project (CM-210): rows tombstoned and
+ * Clears labourers' marked day on a Project: rows tombstoned and
  * ledger entries reversed, all or none. Needs Attendance delete; the
  * back-dated edit limit applies.
  */

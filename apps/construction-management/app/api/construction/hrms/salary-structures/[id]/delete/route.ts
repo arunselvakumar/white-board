@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 const handlers = createSalaryStructureHandlers();
 
 /**
- * Deletes a salary structure (CM-314). 409 `SALARY_STRUCTURE_IN_USE`
+ * Deletes a salary structure. 409 `SALARY_STRUCTURE_IN_USE`
  * while a member's salary configuration uses it.
  */
 export async function POST(

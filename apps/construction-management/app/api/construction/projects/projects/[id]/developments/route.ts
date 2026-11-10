@@ -10,7 +10,7 @@ import { projectDevelopments } from "./handlers";
 export const dynamic = "force-dynamic";
 
 /**
- * A Project's Amenities and Common Developments (CM-404), with what can be
+ * A Project's Amenities and Common Developments, with what can be
  * added. `projects.project` Read; 404 for another Company's Project or one
  * a Member is not on.
  */

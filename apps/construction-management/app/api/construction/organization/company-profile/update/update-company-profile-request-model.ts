@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 /**
- * Changes to the Company profile (CM-115). The country is fixed when the
+ * Changes to the Company profile. The country is fixed when the
  * Company is created and is not accepted here. An omitted optional field
  * stays as it is; null clears it. Validation lives in the domain
  * (`CompanyDetails`).

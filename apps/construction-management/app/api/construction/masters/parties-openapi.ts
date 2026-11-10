@@ -33,7 +33,7 @@ import {
 
 const MASTERS = ["Construction · Masters"];
 
-/** The Contractor and Supplier masters' models (CM-406). */
+/** The Contractor and Supplier masters' models. */
 export const partiesOpenApiComponents: OpenApiComponents = {
   ConstructionMastersContractorResponseModel,
   ListConstructionMastersContractorsResponseModel,
@@ -273,7 +273,7 @@ function partyOperations(input: {
 
 const BASE = "/api/construction/masters";
 
-/** The Contractor and Supplier masters' routes (CM-406, root ADR-0012). */
+/** The Contractor and Supplier masters' routes (root ADR-0012). */
 export const partiesOpenApiOperations: OpenApiOperation[] = [
   ...partyOperations({
     path: `${BASE}/contractors`,

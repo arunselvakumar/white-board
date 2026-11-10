@@ -7,7 +7,7 @@ import { attendance } from "../handlers";
 
 export const dynamic = "force-dynamic";
 
-/** Team Today: where each active Team Member stands now (CM-309; `view_all`). */
+/** Team Today: where each active Team Member stands now (`view_all`). */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(request, "hrms.attendance", "view_all");

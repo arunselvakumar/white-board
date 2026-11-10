@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * "Members who check in here": replaces the Team Members linked to an
- * office branch (CM-304, ADR CM-0012 §4).
+ * office branch (ADR CM-0012 §4).
  */
 export async function POST(
   request: Request,

@@ -91,7 +91,7 @@ async function codeOf(response: Response): Promise<string> {
   return (await json<{ code: string }>(response)).code;
 }
 
-/** The four seed items CM-401 gives every new Project, written directly. */
+/** The four seed items every new Project gets, written directly. */
 async function project(company: Company): Promise<string> {
   const projectId = await addProject(company.workspaceId, company.userId);
   const now = new Date();

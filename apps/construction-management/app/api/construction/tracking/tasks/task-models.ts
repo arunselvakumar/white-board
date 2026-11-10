@@ -328,7 +328,7 @@ export const ConstructionTrackingTaskProgressResponseModel = z.object({
   /** Percent tasks: the percentage it set. */
   progressPct: z.number().nullable(),
   remark: z.string().nullable(),
-  /** `worksheet` rows are read-only here (CM-806). */
+  /** `worksheet` rows are read-only here. */
   source: z.enum(["manual", "worksheet"]),
   worksheet: z
     .object({ id: z.uuid(), number: z.string().nullable() })

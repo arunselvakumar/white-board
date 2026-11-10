@@ -29,7 +29,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * A Project's (or Store's) Purchase Orders, newest first, by PO Date,
- * approval, receipt status, Supplier and Purchase Request (CM-504). Needs
+ * approval, receipt status, Supplier and Purchase Request. Needs
  * Purchase Order read. Amounts are always shown: the menu has no
  * Financial flag.
  */
@@ -86,7 +86,7 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * Raises a Purchase Order (CM-504) for a Project or a Store: Save
+ * Raises a Purchase Order for a Project or a Store: Save
  * (pending) or Save & Approve (needs Approve). The server prices every
  * line and the totals (CM-0015 §6) and keeps the linked Purchase
  * Request's ordered quantities in step.

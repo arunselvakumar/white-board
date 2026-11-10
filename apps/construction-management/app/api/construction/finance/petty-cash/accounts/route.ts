@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * Petty-cash accounts with their holder, balance (approved entries only),
- * pending total and last voucher date (CM-703). Every account with Petty
+ * pending total and last voucher date. Every account with Petty
  * Cash View all (and for the Owner); otherwise only the caller's own.
  */
 export async function GET(request: Request): Promise<Response> {

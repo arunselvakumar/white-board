@@ -17,7 +17,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Records a vendor's day on a Project (CM-212): one line per shift and
+ * Records a vendor's day on a Project: one line per shift and
  * category, priced from the vendor's current rate card and posted to the
  * vendor ledger. A new day needs Attendance create; changing a recorded day
  * (`expectedUpdatedAt`) needs Attendance update, and reverses and reposts

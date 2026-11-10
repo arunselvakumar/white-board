@@ -9,7 +9,7 @@ import { ConstructionProjectsTestingItemParamsModel } from "../../../testing-rep
 
 export const dynamic = "force-dynamic";
 
-/** Deletes a testing item with no reports (CM-409); 409 `TESTING_ITEM_NOT_EMPTY`. */
+/** Deletes a testing item with no reports; 409 `TESTING_ITEM_NOT_EMPTY`. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string; itemId: string }> },

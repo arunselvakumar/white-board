@@ -6,7 +6,7 @@ import { GENDERS } from "@/src/hrms/domain/employee-salary";
 import { COMPONENT_BASES } from "@/src/hrms/domain/salary-structure";
 
 /**
- * Employee salary configuration models (CM-315). Amounts (base salary and
+ * Employee salary configuration models. Amounts (base salary and
  * component overrides) are null in responses without `hrms.employees`
  * financial; entering them needs financial too.
  */

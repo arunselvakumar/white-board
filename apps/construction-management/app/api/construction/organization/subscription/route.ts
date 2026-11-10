@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 const handlers = createSubscriptionHandlers();
 
 /**
- * "Your Subscription" (CM-116): any Team Member of the Active Company sees
+ * "Your Subscription": any Team Member of the Active Company sees
  * the plan, expiry and usage; amounts and billing only the Owner. A Company
  * with no plan yet gets `status: "none"`, `plan: null` and unlimited usage.
  */

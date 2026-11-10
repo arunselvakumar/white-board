@@ -6,7 +6,7 @@ import { ACCRUAL_MODES } from "@/src/hrms/domain/leave-type";
 export const LEAVE_TYPES_PATH = "/api/construction/hrms/leave-types";
 
 /**
- * Leave type fields (CM-310). Shapes only: the hrms domain checks every
+ * Leave type fields. Shapes only: the hrms domain checks every
  * rule and names the field at fault (`details.field`).
  */
 const leaveTypeFields = {

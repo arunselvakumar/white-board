@@ -12,7 +12,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** The Company's leave structures with their lines (CM-311). */
+/** The Company's leave structures with their lines. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await leaveAccess(request, {
@@ -32,7 +32,7 @@ export async function GET(request: Request): Promise<Response> {
   }
 }
 
-/** Adds a leave structure: a name and leave types with entitlements (CM-311). */
+/** Adds a leave structure: a name and leave types with entitlements. */
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await leaveAccess(request, {

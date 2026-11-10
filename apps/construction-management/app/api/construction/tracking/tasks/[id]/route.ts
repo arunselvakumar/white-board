@@ -10,7 +10,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * One task (CM-802): its figures and roll-ups, its sub-tasks, its
+ * One task: its figures and roll-ups, its sub-tasks, its
  * ancestors and its baseline history. Task read on its Project; without
  * View all, only the caller's own and assigned tasks.
  */

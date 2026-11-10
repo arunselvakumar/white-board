@@ -13,7 +13,7 @@ import { toInspectionResponse } from "./inspection-models";
 
 export const INSPECTION_MENU = TRACKING_DOCUMENTS.inspection.menu;
 
-/** One set of Inspection Request handlers for every route (CM-804). */
+/** One set of Inspection Request handlers for every route. */
 export const inspectionHandlers = createInspectionHandlers();
 
 /**

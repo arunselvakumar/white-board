@@ -30,7 +30,7 @@ import {
 } from "@/src/shared-kernel/access";
 import { loadMemberAccess } from "@/src/shared-kernel/access/prisma-access-reader";
 
-/** One set of report handlers for every route (CM-217, CM-218). */
+/** One set of report handlers for every route. */
 export const reports = createReportJobs();
 
 /**
@@ -39,8 +39,8 @@ export const reports = createReportJobs();
  * (`src/reporting/domain/report-catalogue.ts`). Labour reports sit under
  * Labour, the vendor report under Vendor; the Progress Reports under
  * Progress Report, which has no Report flag: they are requested, listed
- * and deleted from the Project's Progress Reports module (C / R / D,
- * CM-606), never from these routes.
+ * and deleted from the Project's Progress Reports module (C / R / D),
+ * never from these routes.
  */
 export const REPORT_MENU = Object.fromEntries(
   REPORT_CATALOGUE.map((entry) => [entry.kind, entry.menu]),
@@ -106,13 +106,13 @@ export function mayOpen(session: AccessSession, job: ReportJob): boolean {
   if (!canReport(session.access, job.kind, job.projectId)) return false;
   if (job.projectId == null)
     return session.role === "owner" || job.requestedBy === session.userId;
-  // A Petty Cash report may hold other holders' accounts (CM-0017 §9).
+  // A Petty Cash report may hold other holders' accounts (ADR CM-0017 §9).
   if (job.kind === "petty_cash")
     return (
       job.requestedBy === session.userId ||
       can(session.access, "finance.petty_cash", "view_all")
     );
-  // A Material Received report may hold others' receipts (View all, CM-903).
+  // A Material Received report may hold others' receipts (View all).
   if (job.kind === "material_received")
     return (
       job.requestedBy === session.userId ||
@@ -120,7 +120,7 @@ export function mayOpen(session: AccessSession, job: ReportJob): boolean {
         projectId: job.projectId,
       })
     );
-  // A Task or Issue & Snag report may hold others' rows (CM-0019 §5, §8).
+  // A Task or Issue & Snag report may hold others' rows (ADR CM-0019 §5, §8).
   if (job.kind === "task_report" || job.kind === "issue_snag_report")
     return (
       job.requestedBy === session.userId ||
@@ -128,7 +128,7 @@ export function mayOpen(session: AccessSession, job: ReportJob): boolean {
         projectId: job.projectId,
       })
     );
-  // An Inquiry Report may hold others' inquiries (CM-0022 §3, CM-1008).
+  // An Inquiry Report may hold others' inquiries (ADR CM-0022 §3).
   if (job.kind === "inquiry_report")
     return (
       job.requestedBy === session.userId ||
@@ -140,7 +140,7 @@ export function mayOpen(session: AccessSession, job: ReportJob): boolean {
 }
 
 /**
- * Who an Inquiry Report covers (CM-1008): every inquiry with Inquiry View
+ * Who an Inquiry Report covers: every inquiry with Inquiry View
  * all on the Project (or as the Owner), else those the requester created,
  * is assigned to or owns as Lead Owner (their Team Member), fixed with
  * the job, as the Inquiries list scopes them.
@@ -163,7 +163,7 @@ export async function inquiryOwnScope(
 }
 
 /**
- * Who a Task or Issue & Snag report covers (CM-805): every row with View
+ * Who a Task or Issue & Snag report covers: every row with View
  * all on its menu (or as the Owner), else the rows the requester created
  * or is assigned to (their Team Member), fixed with the job. The issue
  * check matches the Issues & Snags list's.
@@ -190,8 +190,8 @@ export async function trackingOwnScope(
 }
 
 /**
- * The petty-cash accounts the member may report on (CM-0017 §9): null
- * (every one) with View all or as the Owner, otherwise the account they
+ * The petty-cash accounts the member may report on (ADR CM-0017 §9):
+ * null (every one) with View all or as the Owner, otherwise the account they
  * hold (none when they hold none).
  */
 export async function pettyCashAccountScope(
@@ -220,7 +220,7 @@ export async function pettyCashAccountScope(
 }
 
 /**
- * Whether the member may run the Ledger of this account (CM-709): a
+ * Whether the member may run the Ledger of this account: a
  * company account needs Company's Bank A/C Report; a petty-cash account
  * Petty Cash Report and either View all or holding it. A refusal is the
  * Response to send: 404 for an account that is not the Company's (or a
@@ -252,8 +252,8 @@ export async function ledgerRefusal(
 
 /**
  * The Session and one report job its requester (or the Owner) may retry
- * or delete (CM-901). Another Company's job, and a Progress Report (its
- * own module's routes do that, CM-606), are 404; someone else's is 403.
+ * or delete. Another Company's job, and a Progress Report (its
+ * own module's routes do that), are 404; someone else's is 403.
  */
 export async function requireOwnReport(
   request: Request,

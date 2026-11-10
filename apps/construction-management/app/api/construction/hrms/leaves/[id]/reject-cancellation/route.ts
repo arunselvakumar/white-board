@@ -13,7 +13,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Refuse a cancellation request with a reason (CM-312): the leave stays approved. */
+/** Refuse a cancellation request with a reason: the leave stays approved. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

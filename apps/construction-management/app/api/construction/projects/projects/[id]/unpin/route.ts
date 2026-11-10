@@ -7,7 +7,7 @@ import { ConstructionProjectsProjectParamsModel } from "../../project-models";
 
 export const dynamic = "force-dynamic";
 
-/** Unpins a Project for the caller (CM-411). Fine when not pinned. */
+/** Unpins a Project for the caller. Fine when not pinned. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

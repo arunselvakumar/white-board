@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 type Context = { params: Promise<{ id: string }> };
 
-/** The Project's testing items by name, with report counts (CM-409). */
+/** The Project's testing items by name, with report counts. */
 export async function GET(
   request: Request,
   context: Context,

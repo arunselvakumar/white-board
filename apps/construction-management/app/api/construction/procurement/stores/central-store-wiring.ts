@@ -18,7 +18,7 @@ import { PrismaStoreRepository } from "@/src/procurement/infrastructure/store-re
 import { procurementEvents } from "@/src/composition/procurement-events";
 
 /**
- * The Central Store handlers (CM-508, CM-509) wired over Prisma, the
+ * The Central Store handlers wired over Prisma, the
  * procurement directory, the location resolver and the stock ledger.
  */
 export function createCentralStore(db: PrismaClient = prisma) {

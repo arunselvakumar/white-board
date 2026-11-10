@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * Projects for pickers across the app — Team Member assignment, labour
- * forms, Sequence IDs (CM-204). Any Team Member may ask; the Owner gets
+ * forms, Sequence IDs. Any Team Member may ask; the Owner gets
  * every Project, a Member the ones assigned to them.
  */
 export async function GET(request: Request): Promise<Response> {

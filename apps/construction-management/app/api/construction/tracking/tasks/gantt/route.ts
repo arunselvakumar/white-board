@@ -13,7 +13,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Every row of the task tree for the read-only Gantt (CM-802, ADR CM-0019
+ * Every row of the task tree for the read-only Gantt (ADR CM-0019
  * §12), with the list's filters and View-all scoping, and the Company's
  * today for the Today line. Needs Task read on the Project.
  */

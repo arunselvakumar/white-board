@@ -6,7 +6,7 @@ import { bookingCommand } from "../../booking-route-parts";
 export const dynamic = "force-dynamic";
 
 /**
- * Edits an On Hold or Booked booking's details (CM-1006): the status,
+ * Edits an On Hold or Booked booking's details: the status,
  * unit and Hold until stay. Needs Booking update; 409 `BOOKING_CHANGED`
  * when stale, `BOOKING_CANCELLED` once cancelled. The back-dated window
  * applies to the old Booking Date and, when it changes, the new one.

@@ -4,5 +4,5 @@ import { VENDOR_FILES } from "../../../../handlers";
 
 export const dynamic = "force-dynamic";
 
-/** Deletes one of the vendor's documents (CM-208). */
+/** Deletes one of the vendor's documents. */
 export const POST = partyDocumentDeleteRoute(VENDOR_FILES);

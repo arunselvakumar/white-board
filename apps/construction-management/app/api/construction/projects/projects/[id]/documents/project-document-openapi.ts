@@ -40,7 +40,7 @@ const PresignConstructionProjectsDocumentUploadRequestModel =
 const PresignConstructionProjectsDocumentUploadResponseModel =
   presignUploadResponseModel();
 
-/** Project documents' models (CM-414). */
+/** Project documents' models. */
 export const projectDocumentOpenApiComponents: OpenApiComponents = {
   ConstructionProjectsDocumentResponseModel,
   ListConstructionProjectsDocumentsResponseModel,
@@ -51,7 +51,7 @@ export const projectDocumentOpenApiComponents: OpenApiComponents = {
   PresignConstructionProjectsDocumentUploadResponseModel,
 };
 
-/** Project documents' routes (CM-414). */
+/** Project documents' routes. */
 export const projectDocumentOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

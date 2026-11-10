@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createSequenceRuleHandlers();
 
-/** Deletes a rule that never issued a number; 409 SEQUENCE_RULE_IN_USE otherwise (CM-114). */
+/** Deletes a rule that never issued a number; 409 SEQUENCE_RULE_IN_USE otherwise. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

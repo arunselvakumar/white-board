@@ -42,7 +42,7 @@ const WRITE_ERRORS = [...READ_ERRORS, StatusCodes.PAYMENT_REQUIRED];
 const ACCESS =
   "the document's menu on its Project (a Store side and the store-only documents on the Company-level menu; a Material Transfer from either side). Unknown, deleted or another Company's document: 404 `<DOCUMENT>_NOT_FOUND`";
 
-/** Request and Response models of `/api/construction/procurement/documents` (M5). */
+/** Request and Response models of `/api/construction/procurement/documents`. */
 export const procurementDocumentOpenApiComponents: OpenApiComponents = {
   ConstructionProcurementRemarkResponseModel,
   ListConstructionProcurementRemarksResponseModel,
@@ -57,8 +57,8 @@ export const procurementDocumentOpenApiComponents: OpenApiComponents = {
 };
 
 /**
- * Operations of `/api/construction/procurement/documents` (M5): the
- * remarks / comments thread and the files every procurement document
+ * Operations of `/api/construction/procurement/documents`: the remarks /
+ * comments thread and the files every procurement document
  * shares. Read sees and comments; Create or Update uploads; Update removes
  * any file, Create the caller's own.
  */

@@ -13,7 +13,7 @@ import { accountHandlers as handlers } from "../../handlers";
 export const dynamic = "force-dynamic";
 
 /**
- * Deletes a company account nothing has used (CM-701): 409
+ * Deletes a company account nothing has used: 409
  * `ACCOUNT_PRIMARY` for the primary, `ACCOUNT_IN_USE` when money has moved
  * through it or a document names it. Its opening entry is reversed.
  */

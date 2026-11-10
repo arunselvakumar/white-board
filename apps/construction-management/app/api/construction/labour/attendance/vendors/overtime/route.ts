@@ -13,7 +13,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Vendor attendance lines with overtime in a date range (CM-213). */
+/** Vendor attendance lines with overtime in a date range. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const url = new URL(request.url);

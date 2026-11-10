@@ -148,7 +148,7 @@ describe("Sequence ID rules HTTP (CM-114)", () => {
       projectId,
     });
     expect((await create({ projectId })).status).toBe(StatusCodes.CONFLICT);
-    // Only a live Project of the Company may have a rule (CM-204).
+    // Only a live Project of the Company may have a rule.
     const unknown = await create({ projectId: randomUUID() });
     expect(unknown.status).toBe(StatusCodes.BAD_REQUEST);
     expect(await json(unknown)).toMatchObject({ code: "PROJECT_NOT_FOUND" });

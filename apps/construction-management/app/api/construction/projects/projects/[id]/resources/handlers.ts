@@ -13,7 +13,7 @@ import {
   toResourcesResponse,
 } from "./resources-models";
 
-/** One composition for every Resources route (CM-406). */
+/** One composition for every Resources route. */
 export const projectResources = createProjectResources();
 
 type IdContext = { params: Promise<{ id: string }> };

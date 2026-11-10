@@ -33,7 +33,7 @@ const WRITE_ERRORS = [
 
 const ITEM = `${OTHER_PARTIES_PATH}/{id}`;
 
-/** Other Party master models (CM-704). */
+/** Other Party master models. */
 export const financeOtherPartyOpenApiComponents: OpenApiComponents = {
   CreateConstructionFinanceOtherPartyRequestModel,
   UpdateConstructionFinanceOtherPartyRequestModel,
@@ -42,7 +42,7 @@ export const financeOtherPartyOpenApiComponents: OpenApiComponents = {
   ListConstructionFinanceOtherPartiesResponseModel,
 };
 
-/** Masters → Other Party, menu `masters.other_parties` (C R U D). */
+/** The Other Parties routes, menu `masters.other_parties` (C R U D). */
 export const financeOtherPartyOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

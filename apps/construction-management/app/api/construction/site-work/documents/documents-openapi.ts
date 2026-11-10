@@ -42,7 +42,7 @@ const WRITE_ERRORS = [...READ_ERRORS, StatusCodes.PAYMENT_REQUIRED];
 const ACCESS =
   "the document's menu on its Project (Daily Worksheet, Equipment Usage, Site Diary or Hindrance Register). Unknown, deleted or another Company's document: 404 `<DOCUMENT>_NOT_FOUND` (WORKSHEET, EQUIPMENT_SHEET, SITE_DIARY, HINDRANCE)";
 
-/** Request and Response models of `/api/construction/site-work/documents` (M6). */
+/** Request and Response models of `/api/construction/site-work/documents`. */
 export const siteWorkDocumentOpenApiComponents: OpenApiComponents = {
   ConstructionSiteWorkRemarkResponseModel,
   ListConstructionSiteWorkRemarksResponseModel,
@@ -57,7 +57,7 @@ export const siteWorkDocumentOpenApiComponents: OpenApiComponents = {
 };
 
 /**
- * Operations of `/api/construction/site-work/documents` (M6, CM-0016 §8):
+ * Operations of `/api/construction/site-work/documents` (ADR CM-0016 §8):
  * the remarks thread and the photos and files every site-work document
  * shares. Read sees and comments; Create or Update uploads; Update removes
  * any file, Create the caller's own.

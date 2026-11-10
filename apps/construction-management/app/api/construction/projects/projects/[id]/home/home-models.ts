@@ -11,7 +11,7 @@ export const projectModuleKeyModel = z
   );
 
 /**
- * The modules a member sees on a Project's home (CM-411), in their tile
+ * The modules a member sees on a Project's home, in their tile
  * order, with the Project's pin and whether they may hide modules.
  */
 export const ConstructionProjectsProjectHomeResponseModel = z.object({

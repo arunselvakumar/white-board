@@ -12,7 +12,7 @@ export const PROGRESS_REPORTS_PATH =
 export const CreateConstructionSiteWorkProgressReportRequestModel = z
   .object({
     projectId: z.uuid(),
-    /** The Daily Progress Report when left out (CM-606, CM-805). */
+    /** The Daily Progress Report when left out. */
     kind: z.enum(["daily_progress_report", "task_progress_report"]).optional(),
     /** Daily Progress Report: `YYYY-MM-DD`, not after the Company's today. */
     date: z.iso.date().optional(),
@@ -101,7 +101,7 @@ export const GetConstructionSiteWorkProgressReportFormOptionsResponseModel =
     teamMembers: z.array(
       z.object({ userId: z.string(), name: z.string(), isOwner: z.boolean() }),
     ),
-    /** Report types: the Daily and the Task Progress Report (CM-805). */
+    /** Report types: the Daily and the Task Progress Report. */
     types: z.array(
       z.object({
         key: z.enum(["daily_progress_report", "task_progress_report"]),

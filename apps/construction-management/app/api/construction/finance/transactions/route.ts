@@ -32,7 +32,7 @@ export const dynamic = "force-dynamic";
 const Scope = z.object({ projectId: z.uuid().nullable().optional() });
 
 /**
- * The Transactions register (CM-702): a Project's Transactions and
+ * The Transactions register: a Project's Transactions and
  * transfers (Transactions read on it), or, without `projectId`, every one
  * in the Company (Owner only, for Central Payment). Filters, cursors and
  * the in / out totals of what the filters match.
@@ -99,7 +99,7 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * Records a Transaction (CM-702): pending, or approved with Save &
+ * Records a Transaction: pending, or approved with Save &
  * Approve (Approve needed), numbered TXN by the Project's rule. Needs
  * Transactions create on its Project (the flag alone for a Store or
  * Company-level one).

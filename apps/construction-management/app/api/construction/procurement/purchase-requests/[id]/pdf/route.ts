@@ -22,7 +22,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The Purchase Request as a PDF (CM-503): Company header, details,
+ * The Purchase Request as a PDF: Company header, details,
  * materials and remarks, in Noto fonts so names in Indian scripts print.
  * Needs Purchase Request print on its Project; `inline=1` opens it.
  */

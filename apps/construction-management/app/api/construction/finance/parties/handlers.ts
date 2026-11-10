@@ -23,7 +23,7 @@ import {
 
 export { PARTIES_MENU };
 
-/** One party money engine for every route (CM-705, CM-706, CM-708). */
+/** One party money engine for every route. */
 export const finance = partyFinance();
 
 function storeDenied(): Response {

@@ -20,7 +20,7 @@ const SESSION_ERRORS = [StatusCodes.UNAUTHORIZED, StatusCodes.FORBIDDEN];
 
 const ITEM = `${BILLING_ADDRESSES_PATH}/{id}`;
 
-/** Billing addresses (CM-501), under `organization.settings`. */
+/** Billing addresses, under `organization.settings`. */
 export const billingAddressOpenApiComponents: OpenApiComponents = {
   CreateConstructionOrganizationBillingAddressRequestModel,
   UpdateConstructionOrganizationBillingAddressRequestModel,

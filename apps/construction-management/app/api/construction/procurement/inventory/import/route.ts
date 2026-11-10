@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 const MAX_BYTES = 2 * 1024 * 1024;
 
 /**
- * Import Inventory Stock (CM-506): the body is the .xlsx sample itself.
+ * Import Inventory Stock: the body is the .xlsx sample itself.
  * `?dryRun=true` (default) checks every row; `?dryRun=false` posts
  * Opening entries and Estimated Qty for every row or none — 400
  * `IMPORT_HAS_ERRORS` with the rows in `details`. Create on Current

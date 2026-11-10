@@ -22,7 +22,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The Purchase Order as a PDF (CM-504): Company header, supplier with
+ * The Purchase Order as a PDF: Company header, supplier with
  * GSTIN, billing and delivery addresses, lines with HSN and the CGST +
  * SGST or IGST split, totals, the grand total in words, payment terms,
  * T&C and POCs, in Noto fonts. Needs Purchase Order print.

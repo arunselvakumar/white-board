@@ -241,8 +241,8 @@ describe("Project Dashboard HTTP (CM-412)", () => {
       visible: true,
       hiddenOnProject: false,
     });
-    // Materials has data since M5 (CM-510), Task since M8 (CM-805);
-    // Every section has data since M10 (CM-1008).
+    // Materials has data since M5, Task since M8;
+    // Every section has data since M10.
     expect(
       initial.sections.find((section) => section.key === "materials"),
     ).toMatchObject({ milestone: null });

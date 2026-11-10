@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/** The Project Dashboard's materials read (CM-510): a Project and a duration. */
+/** The Project Dashboard's materials read: a Project and a duration. */
 export const GetConstructionProcurementDashboardRequestModel = z
   .object({
     projectId: z.uuid(),

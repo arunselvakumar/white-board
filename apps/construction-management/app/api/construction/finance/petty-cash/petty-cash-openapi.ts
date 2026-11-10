@@ -31,7 +31,7 @@ const SESSION = [StatusCodes.UNAUTHORIZED, StatusCodes.FORBIDDEN];
 const READ = [StatusCodes.BAD_REQUEST, ...SESSION];
 const WRITE = [...READ, StatusCodes.PAYMENT_REQUIRED, StatusCodes.NOT_FOUND];
 
-/** Petty Cash's Request and Response models (CM-703). */
+/** Petty Cash's Request and Response models. */
 export const pettyCashOpenApiComponents: OpenApiComponents = {
   ListConstructionFinancePettyCashAccountsResponseModel,
   ConstructionFinancePettyCashAccountResponseModel,
@@ -47,7 +47,7 @@ export const pettyCashOpenApiComponents: OpenApiComponents = {
 };
 
 /**
- * `/api/construction/finance/petty-cash` (CM-703, menu `finance.petty_cash`,
+ * `/api/construction/finance/petty-cash` (menu `finance.petty_cash`,
  * ADR CM-0017 §2, §4, §9). The account statement is the accounts'
  * `GET /api/construction/finance/accounts/{id}/statement`.
  */

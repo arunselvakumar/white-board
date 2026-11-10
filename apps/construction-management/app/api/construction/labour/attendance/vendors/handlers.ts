@@ -1,7 +1,7 @@
 import { can, type MemberAccess } from "@/src/shared-kernel/access";
 import { createVendorAttendanceHandlers } from "@/src/labour/infrastructure/vendor-attendance-factory";
 
-/** One set of vendor attendance handlers for every route (CM-212, CM-213). */
+/** One set of vendor attendance handlers for every route. */
 export const vendorAttendanceHandlers = createVendorAttendanceHandlers();
 
 /** Amounts on vendor attendance need Vendor (`labour.vendor`) Financial on the Project. */

@@ -10,7 +10,7 @@ import { ConstructionTrackingTaskProgressParamsModel } from "../../../task-model
 export const dynamic = "force-dynamic";
 
 /**
- * Deletes a manual progress update (CM-802): its author, or a member with
+ * Deletes a manual progress update: its author, or a member with
  * Task update. The task's totals recompute and it reopens below 100 %.
  */
 export async function POST(

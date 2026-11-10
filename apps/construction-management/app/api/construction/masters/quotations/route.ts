@@ -15,7 +15,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * View Quotations (CM-501, menu `masters.quotations` read): every live
+ * View Quotations (menu `masters.quotations` read): every live
  * Contractor's and Supplier's quotation files, newest first, with the
  * party and the date.
  */

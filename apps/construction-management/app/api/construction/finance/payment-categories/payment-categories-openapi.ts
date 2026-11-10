@@ -26,7 +26,7 @@ const WRITE = [
 ];
 const params = ConstructionMastersIdParamsModel;
 
-/** Payment Categories' Request and Response models (CM-704). */
+/** Payment Categories' Request and Response models. */
 export const paymentCategoryOpenApiComponents: OpenApiComponents = {
   ListConstructionFinancePaymentCategoriesResponseModel,
   ConstructionFinancePaymentCategoryResponseModel,
@@ -35,7 +35,7 @@ export const paymentCategoryOpenApiComponents: OpenApiComponents = {
 };
 
 /**
- * `/api/construction/finance/payment-categories` (CM-704, menu
+ * `/api/construction/finance/payment-categories` (menu
  * `masters.payment_categories`). The `options` lookup is in
  * `lookups-openapi.ts`.
  */

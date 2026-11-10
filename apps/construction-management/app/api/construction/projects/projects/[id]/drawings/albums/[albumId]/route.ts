@@ -8,7 +8,7 @@ import { projectDrawings } from "../../handlers";
 
 export const dynamic = "force-dynamic";
 
-/** An album and its drawings, each with its latest revision (CM-408). */
+/** An album and its drawings, each with its latest revision. */
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string; albumId: string }> },

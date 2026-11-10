@@ -8,7 +8,7 @@ export const TRACKING_DASHBOARD_PATH = "/api/construction/tracking/dashboard";
 const paise = z.int();
 const count = z.int().nonnegative();
 
-/** The Project Dashboard's tracking read (CM-805): a Project and a duration. */
+/** The Project Dashboard's tracking read: a Project and a duration. */
 export const GetConstructionTrackingDashboardRequestModel = z
   .object({
     projectId: z.uuid(),
@@ -40,8 +40,8 @@ export const GetConstructionTrackingDashboardResponseModel = z
     tasks: z
       .object({
         /**
-         * Project Progress % (CM-0019 §4) over every live leaf task of the
-         * Project, whatever the duration; null `pct` with no tasks.
+         * Project Progress % (ADR CM-0019 §4) over every live leaf task of
+         * the Project, whatever the duration; null `pct` with no tasks.
          * `weighting` names the weight: Total Price when every leaf task
          * has one, else planned duration.
          */
@@ -132,8 +132,8 @@ export const GetConstructionTrackingDashboardResponseModel = z
       })
       .nullable(),
     /**
-     * The KPI tiles, from `construction_reporting.project_pending_tracking`
-     * (CM-902); a count is null without that menu's Read.
+     * The KPI tiles, from `construction_reporting.project_pending_tracking`;
+     * a count is null without that menu's Read.
      */
     kpis: z.object({
       /** Open issues in the duration, delayed included. */

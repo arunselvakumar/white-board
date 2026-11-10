@@ -33,7 +33,7 @@ function expired(): Response {
 }
 
 /**
- * Streams a finished backup's ZIP through its signed link (CM-906, ADR
+ * Streams a finished backup's ZIP through its signed link (ADR
  * CM-0021 §8). In order: 404 for no such backup; 403
  * `BACKUP_LINK_INVALID` when the signature does not match (tampered, or
  * another backup's), when the signed-in User is not its requester, or no

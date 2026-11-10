@@ -12,7 +12,7 @@ import { attendance } from "../../handlers";
 export const dynamic = "force-dynamic";
 
 /**
- * The monthly attendance report as Excel (CM-309; `export`): a summary
+ * The monthly attendance report as Excel (`export`): a summary
  * sheet and a member × day sheet. Same rows as the monthly summary.
  */
 export async function GET(request: Request): Promise<Response> {

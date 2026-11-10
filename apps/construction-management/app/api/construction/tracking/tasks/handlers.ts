@@ -9,7 +9,7 @@ import type { TaskRow } from "@/src/tracking/application/task-store";
 
 export { TASK_MENU };
 
-/** One set of task handlers for every route (CM-802). */
+/** One set of task handlers for every route. */
 export const taskHandlers = createTaskHandlers();
 
 type Flags = Flag | readonly [Flag, ...Flag[]];

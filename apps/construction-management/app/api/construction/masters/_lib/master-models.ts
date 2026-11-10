@@ -82,7 +82,7 @@ const skill = z
   );
 
 /**
- * Labour Categories' models (CM-203, CM-601): a lookup row with a skill.
+ * Labour Categories' models: a lookup row with a skill.
  * Create defaults it to skilled; update leaves it as is when left out, and
  * a seed row may change it (not its name).
  */

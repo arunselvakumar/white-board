@@ -35,7 +35,7 @@ function scopeOf(raw: unknown): { projectId?: string } {
 
 /**
  * Petty-cash vouchers newest first, by account, Project, date range,
- * type, status and Payment Category (CM-703), with the totals by type.
+ * type, status and Payment Category, with the totals by type.
  * Only accounts the caller sees (their own without View all), and only
  * vouchers on Projects they are on.
  */

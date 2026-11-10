@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createGrnFieldSettingHandlers();
 
-/** Which optional GRN fields the Company hides (CM-501, ADR CM-0015 §9). */
+/** Which optional GRN fields the Company hides (ADR CM-0015 §9). */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(

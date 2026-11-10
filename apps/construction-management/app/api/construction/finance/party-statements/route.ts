@@ -18,7 +18,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * A party's statement on a Project (or Store): opening, every entry with
- * the running balance, closing, and the invoices still open (CM-705).
+ * the running balance, closing, and the invoices still open.
  * Needs Parties read.
  */
 export async function GET(request: Request): Promise<Response> {

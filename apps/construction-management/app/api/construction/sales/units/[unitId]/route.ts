@@ -13,7 +13,7 @@ import { unitBody, type UnitContext } from "../unit-route-parts";
 export const dynamic = "force-dynamic";
 
 /**
- * One unit's sales details (CM-1005): Unit type, areas, Unavailable, its
+ * One unit's sales details: Unit type, areas, Unavailable, its
  * sales status, active booking and every live booking it had, with what
  * the viewer may do. Needs Booking read on the Project; 404
  * `UNIT_NOT_FOUND` for a unit that is not a live unit of it.

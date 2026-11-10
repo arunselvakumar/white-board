@@ -9,7 +9,7 @@ import { ConstructionProjectsDocumentParamsModel } from "../../project-document-
 
 export const dynamic = "force-dynamic";
 
-/** Deletes one of the Project's documents (CM-414): a tombstone, then the file goes. */
+/** Deletes one of the Project's documents: a tombstone, then the file goes. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string; docId: string }> },

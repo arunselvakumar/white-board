@@ -17,7 +17,7 @@ import { projectGallery } from "./handlers";
 export const dynamic = "force-dynamic";
 
 /**
- * The Project's Gallery (CM-410): every image and PDF from the sources the
+ * The Project's Gallery: every image and PDF from the sources the
  * member may read, newest first, filtered by type, source, uploader, upload
  * day and file name, with cursors both ways and the total. Each item links
  * to its source's own file route.

@@ -10,7 +10,7 @@ import { toLeaveTypeResponse } from "../leave-type-models";
 
 export const dynamic = "force-dynamic";
 
-/** One leave type (CM-310). */
+/** One leave type. */
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> },

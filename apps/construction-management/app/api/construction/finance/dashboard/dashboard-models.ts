@@ -5,7 +5,7 @@ export const FINANCE_DASHBOARD_PATH = "/api/construction/finance/dashboard";
 /** Paise as a safe integer (rupees only on screen). */
 const paise = z.int();
 
-/** The Project Dashboard's payments read (CM-709): a Project and a duration. */
+/** The Project Dashboard's payments read: a Project and a duration. */
 export const GetConstructionFinanceDashboardRequestModel = z
   .object({
     projectId: z.uuid(),

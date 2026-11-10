@@ -11,7 +11,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * **Re-baseline** (CM-802): the planned dates become the next baseline
+ * **Re-baseline**: the planned dates become the next baseline
  * version, with a reason. Leaf tasks with both dates (409
  * `TASK_IS_SUMMARY`, 400 `TASK_DATES_REQUIRED`). Needs Task update.
  */

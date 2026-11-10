@@ -11,7 +11,7 @@ import { branches } from "../../handlers";
 
 export const dynamic = "force-dynamic";
 
-/** Edits a branch or site fence; 409 `BRANCH_CHANGED` when stale (CM-304). */
+/** Edits a branch or site fence; 409 `BRANCH_CHANGED` when stale. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

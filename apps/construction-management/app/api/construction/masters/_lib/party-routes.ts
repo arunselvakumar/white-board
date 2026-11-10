@@ -20,7 +20,7 @@ import {
 type IdContext = { params: Promise<{ id: string }> };
 
 /**
- * The routes of a Contractor or Supplier master (CM-406): `GET` list and
+ * The routes of a Contractor or Supplier master: `GET` list and
  * `POST` create on the collection; `GET {id}` and
  * `POST {id}/update|activate|deactivate|delete` (named operations, root
  * ADR-0015). Each checks the master's Menu with the matching Flag.

@@ -16,7 +16,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Deletes an Other Party (CM-704): refused with 409 OTHER_PARTY_IN_USE
+ * Deletes an Other Party: refused with 409 OTHER_PARTY_IN_USE
  * while any invoice, party payment, opening balance or party entry names
  * it. Paid To labels on Transactions and vouchers keep their own copy of
  * the name and do not block.

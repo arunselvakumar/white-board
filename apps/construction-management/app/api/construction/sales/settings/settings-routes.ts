@@ -53,7 +53,7 @@ async function requireItem(
 }
 
 /**
- * The routes of one list (CM-1002): add, rename and delete; Lead Sources
+ * The routes of one list: add, rename and delete; Lead Sources
  * and Lost Reasons also disable and enable. Every one needs Inquiry Update
  * on the Project.
  */

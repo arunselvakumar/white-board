@@ -6,7 +6,7 @@ import type { StoredObject } from "@/src/shared-kernel/files";
 import { contentDisposition } from "./uploads";
 
 /**
- * HTTP pieces every owner of direct uploads shares (CM-407, ADR CM-0014):
+ * HTTP pieces every owner of direct uploads shares (ADR CM-0014):
  * the start response, the presign handshake models, the `?key=` query and
  * how a stored file or thumbnail is streamed back.
  */

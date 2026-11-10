@@ -9,7 +9,7 @@ export const { GET } = constructionAuthRouteHandlers;
 
 /**
  * Better Auth's routes. Signing out also deletes that session's web push
- * subscriptions (CM-907), so a signed-out browser stops getting
+ * subscriptions, so a signed-out browser stops getting
  * notifications.
  */
 export async function POST(request: Request): Promise<Response> {

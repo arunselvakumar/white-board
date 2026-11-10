@@ -23,7 +23,7 @@ import { bookingBody } from "./booking-route-parts";
 export const dynamic = "force-dynamic";
 
 /**
- * A Project's bookings, newest first (CM-1006): by status (On Hold, Hold
+ * A Project's bookings, newest first: by status (On Hold, Hold
  * expired, Booked, Cancelled — Hold expired is On Hold past its Hold until
  * date on the Company's today), Wing, unit and a search on the customer
  * or the Referred By name; cursor pages and the total. Needs Booking read.
@@ -71,7 +71,7 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * **Hold** or **Book** a unit (CM-1006, ADR CM-0022 §7). One active
+ * **Hold** or **Book** a unit (ADR CM-0022 §7). One active
  * booking per unit: 409 `UNIT_BOOKED` while another holds it (a hold past
  * its Hold until date is cancelled instead, "Hold expired"), 409
  * `UNIT_UNAVAILABLE` for a unit not for sale, 404 `UNIT_NOT_FOUND` for a

@@ -19,14 +19,14 @@ import { toProjectResponse } from "./project-models";
 
 export const dynamic = "force-dynamic";
 
-/** Project Progress % on each card, from Tasks (CM-805). */
+/** Project Progress % on each card, from Tasks. */
 const projectProgress = trackingProjectProgress();
 
 /**
- * Projects home (CM-204): the Projects the caller may see — every one for
+ * Projects home: the Projects the caller may see — every one for
  * the Owner, the assigned ones for a Member — the caller's pinned ones
- * first (CM-411), each group by status then name, with counts per status
- * for the filter chips, and each Project's progress from Tasks (CM-805).
+ * first, each group by status then name, with counts per status
+ * for the filter chips, and each Project's progress from Tasks.
  */
 export async function GET(request: Request): Promise<Response> {
   try {
@@ -64,9 +64,9 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * New Project (CM-204). 402 `PLAN_LIMIT_EXCEEDED` beyond the plan (CM-118).
+ * New Project. 402 `PLAN_LIMIT_EXCEEDED` beyond the plan.
  * The creator is not assigned to it; the Owner assigns Team Members. It
- * starts with the seed drawing albums and testing items (CM-401). Without
+ * starts with the seed drawing albums and testing items. Without
  * the Financial flag an `orderValue` or `budgetValue` in the body is
  * ignored.
  */

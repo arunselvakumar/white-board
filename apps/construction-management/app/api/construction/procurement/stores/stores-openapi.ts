@@ -37,7 +37,7 @@ export const WRITE_ERRORS = [
 
 const ITEM = `${STORES_PATH}/{id}`;
 
-/** Request and Response models of `/api/construction/procurement/stores` (M5). */
+/** Request and Response models of `/api/construction/procurement/stores`. */
 export const storeOpenApiComponents: OpenApiComponents = {
   CreateConstructionProcurementStoreRequestModel,
   UpdateConstructionProcurementStoreRequestModel,
@@ -49,7 +49,7 @@ export const storeOpenApiComponents: OpenApiComponents = {
   GetConstructionProcurementStoreFormOptionsResponseModel,
 };
 
-/** Operations of `/api/construction/procurement/stores` (CM-508; menu `procurement.central_store`). */
+/** Operations of `/api/construction/procurement/stores` (menu `procurement.central_store`). */
 export const storeOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

@@ -16,7 +16,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * A Project's task tree (CM-802): a page of top-level tasks in their
+ * A Project's task tree: a page of top-level tasks in their
  * order, each followed by its sub-tasks, with derived status, roll-ups
  * and earned value (null without Financial). Filters match any level and
  * bring the ancestors along. Without View all, only the caller's own and
@@ -47,7 +47,7 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * Adds a task, or with `parentId` a sub-task (CM-802): the next Task No.
+ * Adds a task, or with `parentId` a sub-task: the next Task No.
  * of the Project, the baseline from its dates. Needs Task create on the
  * Project.
  */

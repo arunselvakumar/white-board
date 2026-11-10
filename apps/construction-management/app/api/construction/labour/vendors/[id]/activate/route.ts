@@ -9,7 +9,7 @@ import { ConstructionLabourVendorParamsModel } from "../vendor-params-model";
 
 export const dynamic = "force-dynamic";
 
-/** Activates a Vendor: it is offered for attendance again (CM-209). */
+/** Activates a Vendor: it is offered for attendance again. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

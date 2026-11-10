@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 const handlers = createJoinRequestHandlers();
 
 /**
- * What an invite link shows before sign-in (CM-109): the Company and who the
+ * What an invite link shows before sign-in: the Company and who the
  * request is for, masked. No Session needed; the token is the secret.
  */
 export async function GET(

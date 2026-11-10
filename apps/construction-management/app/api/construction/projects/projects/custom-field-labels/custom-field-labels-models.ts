@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/** Labels for the custom-field name picker (CM-413). */
+/** Labels for the custom-field name picker. */
 export const ListConstructionProjectsCustomFieldLabelsResponseModel = z.object({
   items: z
     .array(z.string())

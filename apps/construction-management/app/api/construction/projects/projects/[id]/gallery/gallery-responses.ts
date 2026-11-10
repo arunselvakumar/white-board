@@ -70,8 +70,8 @@ function routesOf(
         thumbnail: testingReportThumbnailPath(item.projectId, item.sourceId),
       };
     default:
-      // Procurement (M5), site-work (M6) and tracking (M8) documents' files
-      // are served by their own routes.
+      // Procurement, site-work and tracking documents' files are served by
+      // their own routes.
       return (
         procurementGalleryRoutes(item) ??
         siteWorkGalleryRoutes(item) ??

@@ -13,7 +13,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Approve the waiting level with optional remarks (CM-312); the last level moves the days from reserved to used. */
+/** Approve the waiting level with optional remarks; the last level moves the days from reserved to used. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

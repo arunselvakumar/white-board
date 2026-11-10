@@ -6,13 +6,13 @@ import { projectUploadRoutes } from "../../../project-upload-routes";
 import { StartConstructionProjectsTestingReportUploadRequestModel } from "./testing-report-models";
 import { testingReportsPath } from "./testing-report-responses";
 
-/** One composition for the Testing Reports routes (CM-409). */
+/** One composition for the Testing Reports routes. */
 export const projectTestingReports = createProjectTestingReports({
   plan: createPlanGate(),
 });
 
 /**
- * Testing Reports' upload routes on the attachments service (CM-407): a
+ * Testing Reports' upload routes on the attachments service: a
  * new report needs Create, replacing a report's file Update.
  */
 export const testingReportUploadRoutes = projectUploadRoutes({

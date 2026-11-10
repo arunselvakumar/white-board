@@ -17,7 +17,7 @@ function redirectTo(request: Request, path: string, headers?: Headers) {
 }
 
 /**
- * Where a signed-in User goes next (CM-103): no Company → Create Company,
+ * Where a signed-in User goes next: no Company → Create Company,
  * one → straight in, several → Choose Company. An Active Company that is
  * still valid goes straight in.
  */

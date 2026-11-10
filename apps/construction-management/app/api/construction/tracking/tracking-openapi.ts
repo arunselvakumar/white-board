@@ -28,7 +28,7 @@ import {
   trackingDashboardOpenApiOperations,
 } from "./dashboard/dashboard-openapi";
 
-/** Every tracking model (M8); each area owns its own file. */
+/** Every tracking model; each area owns its own file. */
 export const trackingOpenApiComponents: OpenApiComponents = {
   ...trackingAccessOpenApiComponents,
   ...trackingDocumentOpenApiComponents,
@@ -38,7 +38,7 @@ export const trackingOpenApiComponents: OpenApiComponents = {
   ...trackingDashboardOpenApiComponents,
 };
 
-/** Every tracking operation (M8). */
+/** Every tracking operation. */
 export const trackingOpenApiOperations: OpenApiOperation[] = [
   ...trackingAccessOpenApiOperations,
   ...trackingDocumentOpenApiOperations,

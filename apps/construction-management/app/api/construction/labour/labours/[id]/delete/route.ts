@@ -10,7 +10,7 @@ import { LabourIdParamsModel } from "../../labour-models";
 export const dynamic = "force-dynamic";
 
 /**
- * Deletes (hides) a labourer (CM-206). 409 `LABOUR_HAS_RECORDS` once they
+ * Deletes (hides) a labourer. 409 `LABOUR_HAS_RECORDS` once they
  * have attendance or payments; mark them Inactive instead.
  */
 export async function POST(

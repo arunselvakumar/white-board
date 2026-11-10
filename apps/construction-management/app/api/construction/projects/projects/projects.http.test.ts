@@ -48,7 +48,7 @@ async function json<T>(response: Response): Promise<T> {
   return (await response.json()) as T;
 }
 
-/** Add Project; a Project Type is required since CM-401. */
+/** Add Project; a Project Type is required. */
 async function create(
   cookie: string,
   body: Record<string, unknown>,
@@ -66,7 +66,7 @@ async function list(cookie: string, query = ""): Promise<ProjectList> {
   return json<ProjectList>(response);
 }
 
-/** Puts the Team Member on Projects, as Masters → Team Members does. */
+/** Puts the Team Member on Projects, as the Team Members master does. */
 async function assign(memberId: string, projectIds: string[]): Promise<void> {
   await prisma.constructionOrganizationTeamMemberProject.createMany({
     data: projectIds.map((projectId) => ({ memberId, projectId })),

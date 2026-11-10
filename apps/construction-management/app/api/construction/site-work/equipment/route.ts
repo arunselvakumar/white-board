@@ -85,7 +85,7 @@ export async function GET(request: Request): Promise<Response> {
 
 /**
  * Adds equipment at a Project or the warehouse, with its `added`
- * movement (CM-603). Needs Equipments Create, or Equipment Usage Create
+ * movement. Needs Equipments Create, or Equipment Usage Create
  * on that Project; a hire rate needs Financial. 409
  * `EQUIPMENT_NUMBER_TAKEN` for a number already in the register.
  */

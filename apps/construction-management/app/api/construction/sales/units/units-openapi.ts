@@ -33,7 +33,7 @@ const READ_ERRORS = [
 ];
 const WRITE_ERRORS = [...READ_ERRORS, StatusCodes.CONFLICT];
 
-/** Sales units models (CM-1005). */
+/** Sales units models. */
 export const salesUnitOpenApiComponents: OpenApiComponents = {
   SetConstructionSalesUnitDetailsRequestModel,
   MarkConstructionSalesUnitUnavailableRequestModel,
@@ -65,7 +65,7 @@ function unitCommand(
 }
 
 /**
- * Sales units operations (CM-1005), menu `sales.bookings` on the Project:
+ * Sales units operations, menu `sales.bookings` on the Project:
  * read for the chart, a unit and the sample; update for details,
  * Unavailable and the import.
  */

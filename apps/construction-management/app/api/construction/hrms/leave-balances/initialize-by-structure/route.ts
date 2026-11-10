@@ -9,7 +9,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Initialise every Team Member whose structure in force is this one (CM-311). */
+/** Initialise every Team Member whose structure in force is this one. */
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await leaveAccess(request, {

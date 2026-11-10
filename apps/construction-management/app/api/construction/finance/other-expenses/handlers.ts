@@ -18,7 +18,7 @@ import { toOtherExpenseResponse } from "./other-expense-models";
 
 export { OTHER_EXPENSE_MENU };
 
-/** One set of Other Expense handlers for every route (CM-704). */
+/** One set of Other Expense handlers for every route. */
 export const otherExpenseHandlers = createOtherExpenseHandlers({
   directory: financeDirectory,
   authors: financeAuthorNames(),

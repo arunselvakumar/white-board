@@ -178,7 +178,7 @@ describe("Masters HTTP (CM-203)", () => {
         where: { workspaceId: owner.workspaceId },
       }),
     ).toBe(53);
-    // The RCC Work Type (CM-601), once.
+    // The RCC Work Type, once.
     expect(
       await prisma.constructionMastersWorkType.findMany({
         where: { workspaceId: owner.workspaceId },

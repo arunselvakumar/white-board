@@ -6,7 +6,7 @@ import { toPreferencesResponse } from "../messaging-models";
 
 export const dynamic = "force-dynamic";
 
-/** My Profile → Notifications: one push switch per menu group. */
+/** The User's notification preferences: one push switch per menu group. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireUserSession(request);

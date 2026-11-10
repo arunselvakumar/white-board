@@ -15,7 +15,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Current Inventory of a Project or Store (CM-506): every material with a
+ * Current Inventory of a Project or Store: every material with a
  * ledger entry, a stock setting or stock in transit, by name, with its
  * state (Read on Current Inventory, or Central store for a Store).
  */

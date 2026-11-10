@@ -14,7 +14,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Edits a transfer (CM-702): an approved one is reversed on both accounts
+ * Edits a transfer: an approved one is reversed on both accounts
  * and goes back to pending. 409 `TRANSFER_CHANGED` when stale.
  */
 export async function POST(

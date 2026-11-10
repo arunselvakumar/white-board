@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * Deletes one of the User's own backups or data exports with its ZIP and
- * any parts (CM-906); its link stops working. Anyone else's is 404.
+ * any parts; its link stops working. Anyone else's is 404.
  */
 export async function POST(
   request: Request,

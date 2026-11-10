@@ -14,11 +14,11 @@ import { salaryHandlers } from "../salary-route";
 export const dynamic = "force-dynamic";
 
 /**
- * Pay Advance Salary (CM-316, ADR CM-0012 §15; `hrms.salaries` create and
+ * Pay Advance Salary (ADR CM-0012 §15; `hrms.salaries` create and
  * financial): records the advance as a Paid advance slip. Later regular
  * slips recover it in `instalments`, starting the advance's month unless
  * that month is already approved. Not to oneself, except the Owner. The
- * advance posts on the account it was paid from (CM-707).
+ * advance posts on the account it was paid from.
  */
 export async function POST(request: Request): Promise<Response> {
   try {

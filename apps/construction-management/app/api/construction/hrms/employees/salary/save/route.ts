@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 const handlers = createEmployeeSalaryHandlers();
 
 /**
- * Save All (CM-315): the changed rows in one transaction, all or none. A
+ * Save All: the changed rows in one transaction, all or none. A
  * Not Set member needs Employee Management create, a configured one
  * update, and amounts need financial. A row someone else saved meanwhile
  * is 409 `EMPLOYEE_SALARY_CHANGED` with `details.memberIds`; any other

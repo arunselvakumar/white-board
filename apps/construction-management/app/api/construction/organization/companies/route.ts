@@ -14,8 +14,8 @@ export const dynamic = "force-dynamic";
 const handlers = createCompanyHandlers();
 
 /**
- * Creates a Company with the caller as Owner and makes it the Active Company
- * (CM-105). Any signed-in User may create one; no Active Company is needed.
+ * Creates a Company with the caller as Owner and makes it the Active
+ * Company. Any signed-in User may create one; no Active Company is needed.
  */
 export async function POST(request: Request): Promise<Response> {
   try {

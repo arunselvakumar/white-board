@@ -35,7 +35,7 @@ const PARTY_TYPES: PartyType[] = ["labour", "vendor"];
 
 /**
  * Recorded payments of a Project, newest recorded first, by party type,
- * party, kind and payment date (CM-216). Labour payments need Labour read
+ * party, kind and payment date. Labour payments need Labour read
  * on the Project and vendor payments Vendor read; without `partyType` the
  * list holds the types the caller may read. Amounts need Financial.
  */
@@ -99,7 +99,7 @@ export async function GET(request: Request): Promise<Response> {
  * Records a payment or an advance to a labourer (Labour create on the
  * Project) or a vendor (Vendor create), posting one negative ledger entry
  * and one account entry on the account it was paid from in the same
- * transaction (CM-215, CM-707). A payment is never edited: cancel it
+ * transaction. A payment is never edited: cancel it
  * and record it again. The amount may be entered without Financial; it is
  * null in the response.
  */

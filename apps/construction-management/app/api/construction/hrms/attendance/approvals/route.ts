@@ -7,7 +7,7 @@ import { requireApprover } from "./require-approver";
 
 export const dynamic = "force-dynamic";
 
-/** Attendance Approvals: pending entries, oldest first (CM-309). */
+/** Attendance Approvals: pending entries, oldest first. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireApprover(request);

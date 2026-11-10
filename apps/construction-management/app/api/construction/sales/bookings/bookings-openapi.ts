@@ -36,7 +36,7 @@ const WRITE_ERRORS = [...READ_ERRORS, StatusCodes.CONFLICT];
 
 const ITEM = `${BOOKINGS_PATH}/{id}`;
 
-/** Sales bookings models (CM-1006). */
+/** Sales bookings models. */
 export const salesBookingOpenApiComponents: OpenApiComponents = {
   CreateConstructionSalesBookingRequestModel,
   UpdateConstructionSalesBookingRequestModel,
@@ -72,7 +72,7 @@ function bookingCommand(
 }
 
 /**
- * Sales bookings operations (CM-1006), menu `sales.bookings` on the
+ * Sales bookings operations, menu `sales.bookings` on the
  * booking's Project: read, create (hold, book), update (edit, confirm,
  * extend hold, cancel), delete. Files are under
  * `/api/construction/sales/documents/booking/{id}/files`.

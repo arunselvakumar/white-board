@@ -15,7 +15,7 @@ import { ImportConstructionSalesUnitsRequestModel } from "../unit-models";
 export const dynamic = "force-dynamic";
 
 /**
- * The unit import sample (CM-1005): the headers, then every live unit of
+ * The unit import sample: the headers, then every live unit of
  * the Project with its current sales details, ready to edit and upload.
  * Needs Booking read on the Project.
  */

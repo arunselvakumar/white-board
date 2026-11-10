@@ -21,7 +21,7 @@ export async function planHasEnded(
 }
 
 /**
- * 402 `PLAN_EXPIRED` for a command on an ended plan (CM-118), or null.
+ * 402 `PLAN_EXPIRED` for a command on an ended plan, or null.
  * `requireAccess` calls it for every write flag; an Owner-only command
  * route that uses `requireOwnerSession` calls it itself. Subscription,
  * checkout and webhook routes, sign-out, Company switching, reads and

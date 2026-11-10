@@ -16,7 +16,7 @@ const handlers = createBalanceHandlers({ accounts: accountPosting });
 
 /**
  * One party's ledger between two dates with the running balance, the
- * Project and the source of each entry (the balance view, CM-216).
+ * Project and the source of each entry (the balance view).
  * Reversals are listed, so cancelled payments and re-marked days show.
  */
 export async function GET(request: Request): Promise<Response> {

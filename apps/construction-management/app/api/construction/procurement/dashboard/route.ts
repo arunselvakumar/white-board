@@ -26,11 +26,11 @@ function paise(value: bigint): number {
 }
 
 /**
- * Materials on the Project Dashboard (CM-510), behind its Read on the
+ * Materials on the Project Dashboard, behind its Read on the
  * Project. Each part also needs its own menu: Current Inventory read for
  * the stock states, Purchase Order read for PO figures, and each
  * document's Approve flag for its pending count. The pending counts come
- * from `construction_reporting.project_pending_approvals` (CM-902).
+ * from `construction_reporting.project_pending_approvals`.
  */
 export async function GET(request: Request): Promise<Response> {
   try {

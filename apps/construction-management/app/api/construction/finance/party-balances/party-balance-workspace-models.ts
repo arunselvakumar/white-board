@@ -8,7 +8,7 @@ export const PARTY_BALANCES_PATH = "/api/construction/finance/party-balances";
 
 export const ListConstructionFinanceWorkspacePartyBalancesRequestModel =
   z.object({
-    /** Other Parties by default (Workspace → Party Balance, CM-708). */
+    /** Other Parties by default. */
     partyType: PartyTypeModel.optional(),
   });
 

@@ -6,7 +6,7 @@ import type { GetConstructionOrganizationMyAccountResponseModel } from "./accoun
 
 export const dynamic = "force-dynamic";
 
-/** The Companies the signed-in User owns (CM-907). */
+/** The Companies the signed-in User owns. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireUserSession(request);

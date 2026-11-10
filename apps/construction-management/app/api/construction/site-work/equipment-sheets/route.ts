@@ -29,7 +29,7 @@ export const dynamic = "force-dynamic";
 /**
  * A Project's Equipment Usage sheets, newest first, by Sheet Date range,
  * equipment, ownership, Filled By and approval, with the filter options
- * and the totals of hours, km and trips (CM-604). Needs Equipment Usage
+ * and the totals of hours, km and trips. Needs Equipment Usage
  * read on the Project.
  */
 export async function GET(request: Request): Promise<Response> {
@@ -84,7 +84,7 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * Saves an Equipment Usage sheet (CM-604): Save, or Save & Approve (needs
+ * Saves an Equipment Usage sheet: Save, or Save & Approve (needs
  * Approve). Needs Equipment Usage create on the Project. The equipment
  * must be free that date (409 `EQUIPMENT_NOT_ON_PROJECT`,
  * `EQUIPMENT_IN_MAINTENANCE`, `EQUIPMENT_UNAVAILABLE`), with one sheet per

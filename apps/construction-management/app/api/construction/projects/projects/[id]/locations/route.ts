@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 type Context = { params: Promise<{ id: string }> };
 
-/** The Project's Locations in order (CM-405). */
+/** The Project's Locations in order. */
 export async function GET(
   request: Request,
   context: Context,
@@ -33,7 +33,7 @@ export async function GET(
   }
 }
 
-/** Add Location, at the end of the list (CM-405). */
+/** Add Location, at the end of the list. */
 export async function POST(
   request: Request,
   context: Context,

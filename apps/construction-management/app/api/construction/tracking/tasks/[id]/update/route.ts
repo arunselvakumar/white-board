@@ -11,7 +11,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Edits a task (CM-802). A summary task's dates, work and price are not
+ * Edits a task. A summary task's dates, work and price are not
  * taken; a leaf with progress keeps its kind and unit (409
  * `TASK_HAS_PROGRESS`). Needs Task update; 409 `TASK_CHANGED` when stale.
  */

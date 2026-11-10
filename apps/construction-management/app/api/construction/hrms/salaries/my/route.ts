@@ -10,7 +10,7 @@ import { salaryHandlers } from "../salary-route";
 
 export const dynamic = "force-dynamic";
 
-/** My Salary (CM-317, `hrms.salaries` read): the caller's Approved and Paid slips and advances, newest month first, with amounts. */
+/** My Salary (`hrms.salaries` read): the caller's Approved and Paid slips and advances, newest month first, with amounts. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(request, "hrms.salaries", "read");

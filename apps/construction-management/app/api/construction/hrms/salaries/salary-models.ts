@@ -15,7 +15,7 @@ import {
 } from "@/src/hrms/domain/salary-slip";
 
 /**
- * Salary run models (CM-316, CM-317), menu `hrms.salaries`. Money is
+ * Salary run models, menu `hrms.salaries`. Money is
  * integer paise. Amounts are null on others' slips without `financial`;
  * one's own slips always show them.
  */

@@ -12,8 +12,8 @@ import {
 const handlers = createMeasurementUnitHandlers({ usage: trackingUnitUsage() });
 
 /**
- * Measurement Units under the `masters.units` Menu (CM-501). Delete is
- * refused while a Material or a live Task's Total work uses one (CM-801).
+ * Measurement Units under the `masters.units` Menu. Delete is
+ * refused while a Material or a live Task's Total work uses one.
  */
 export const measurementUnitRoutes = pagedMasterRoutes({
   menu: "masters.units",

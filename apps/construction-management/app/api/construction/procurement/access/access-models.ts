@@ -7,7 +7,7 @@ export const GetConstructionProcurementAccessRequestModel = z.object({
   projectId: z.uuid().optional(),
 });
 
-/** The procurement and materials menus a screen hides actions by (M5). */
+/** The procurement and materials menus a screen hides actions by. */
 export const PROCUREMENT_ACCESS_MENUS = [
   "procurement.manage_materials",
   "procurement.current_inventory",

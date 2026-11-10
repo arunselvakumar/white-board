@@ -13,9 +13,9 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Invoice settlements, newest first (CM-0017 §7): by status, on one
+ * Invoice settlements, newest first (ADR CM-0017 §7): by status, on one
  * Project or every Project the caller reads Parties on (the Owner also
- * sees Stores). The approval list of CM-708.
+ * sees Stores). The settlements approval list.
  */
 export async function GET(request: Request): Promise<Response> {
   try {

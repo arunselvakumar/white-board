@@ -31,7 +31,7 @@ function cursorOf(day: { date: string; id: string }): string {
 }
 
 /**
- * Marked labour days of a Project, newest date first (CM-211): filter by
+ * Marked labour days of a Project, newest date first: filter by
  * dates, labourer, Supervisor and status, with bidirectional cursors and a
  * total. Needs Attendance read on the Project.
  */

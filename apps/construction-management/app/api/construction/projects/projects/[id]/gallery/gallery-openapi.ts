@@ -24,14 +24,14 @@ const ERRORS = [
   StatusCodes.NOT_FOUND,
 ] as const;
 
-/** The Gallery's models (CM-410). */
+/** The Gallery's models. */
 export const galleryOpenApiComponents: OpenApiComponents = {
   ConstructionProjectsGalleryItemResponseModel,
   ListConstructionProjectsGalleryResponseModel,
   ListConstructionProjectsGalleryUploadersResponseModel,
 };
 
-/** The Gallery's routes (CM-410), under `projects.gallery` read. */
+/** The Gallery's routes, under `projects.gallery` read. */
 export const galleryOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

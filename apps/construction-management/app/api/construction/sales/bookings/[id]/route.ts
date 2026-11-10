@@ -10,7 +10,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** One booking with its status history (CM-1006). Needs Booking read on its Project. */
+/** One booking with its status history. Needs Booking read on its Project. */
 export async function GET(
   request: Request,
   context: BookingContext,

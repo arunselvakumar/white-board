@@ -12,7 +12,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Streams one of the Project's documents (CM-414): a PDF or an image is
+ * Streams one of the Project's documents: a PDF or an image is
  * shown, anything else downloads; `?download=1` always downloads.
  */
 export async function GET(

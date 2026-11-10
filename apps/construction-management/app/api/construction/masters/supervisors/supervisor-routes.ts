@@ -10,7 +10,7 @@ import {
 const handlers = createSupervisorHandlers();
 
 /**
- * Supervisors under the `masters.labours` Menu (CM-203; there is no Menu of
+ * Supervisors under the `masters.labours` Menu (there is no Menu of
  * their own, `modules/08` "Decisions for the build").
  */
 export const supervisorRoutes = masterRoutes({

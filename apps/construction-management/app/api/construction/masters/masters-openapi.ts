@@ -39,7 +39,7 @@ import {
 
 export const MASTERS = ["Construction · Masters"];
 
-/** The masters context's Request and Response models (CM-203). */
+/** The masters context's Request and Response models. */
 export const mastersOpenApiComponents: OpenApiComponents = {
   ListConstructionMastersLabourCategoriesResponseModel,
   ConstructionMastersLabourCategoryResponseModel,

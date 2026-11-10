@@ -14,7 +14,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Deletes an Other Expense; an approved one has its account entry reversed (CM-704). */
+/** Deletes an Other Expense; an approved one has its account entry reversed. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

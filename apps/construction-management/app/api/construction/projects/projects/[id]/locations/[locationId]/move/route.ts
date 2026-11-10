@@ -11,7 +11,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Moves a Location up or down one place (CM-405); answers the new order. */
+/** Moves a Location up or down one place; answers the new order. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string; locationId: string }> },

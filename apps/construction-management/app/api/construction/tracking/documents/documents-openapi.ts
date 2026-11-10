@@ -39,7 +39,7 @@ const WRITE_ERRORS = [...READ_ERRORS, StatusCodes.PAYMENT_REQUIRED];
 const ACCESS =
   "the document's menu on its Project (Task, Issues and snags or Inspection Request; without View all only tasks and issues the caller created or is assigned to). Unknown, deleted or another Company's document: 404 `<DOCUMENT>_NOT_FOUND` (TASK, ISSUE, INSPECTION)";
 
-/** Request and Response models of `/api/construction/tracking/documents` (M8). */
+/** Request and Response models of `/api/construction/tracking/documents`. */
 export const trackingDocumentOpenApiComponents: OpenApiComponents = {
   ConstructionTrackingDocumentFileResponseModel,
   ListConstructionTrackingDocumentFilesResponseModel,
@@ -51,7 +51,7 @@ export const trackingDocumentOpenApiComponents: OpenApiComponents = {
 };
 
 /**
- * Operations of `/api/construction/tracking/documents` (M8, CM-0019 §11):
+ * Operations of `/api/construction/tracking/documents` (ADR CM-0019 §11):
  * the photos and files of tasks, issues and inspections, with their
  * entries' (progress updates, issue updates, observations). Read sees
  * them; Update uploads task photos, Create or Update issue and inspection

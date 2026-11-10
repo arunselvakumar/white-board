@@ -41,7 +41,7 @@ const CODE_ERRORS = [StatusCodes.BAD_REQUEST, StatusCodes.TOO_MANY_REQUESTS];
 
 /**
  * Action codes, Devices, Transfer ownership, Delete My Account and Delete
- * Company (CM-907, ADR CM-0021 §9–§11).
+ * Company (ADR CM-0021 §9–§11).
  */
 export const accountOpenApiComponents: OpenApiComponents = {
   RequestConstructionOrganizationActionCodeRequestModel,

@@ -7,7 +7,7 @@ import { attendance } from "../handlers";
 
 export const dynamic = "force-dynamic";
 
-/** My Attendance today: state, entries, the open entry and pending requests (CM-309). */
+/** My Attendance today: state, entries, the open entry and pending requests. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(request, "hrms.attendance", "read");

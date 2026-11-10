@@ -21,8 +21,8 @@ import { loadMemberAccess } from "@/src/shared-kernel/access/prisma-access-reade
 import { isWriteFlag } from "@/src/shared-kernel/plan";
 
 /**
- * One set of wage payment handlers for every route (CM-215), posting to
- * finance's account ledger (CM-707).
+ * One set of wage payment handlers for every route, posting to
+ * finance's account ledger.
  */
 export const wagePaymentHandlers = createWagePaymentHandlers({
   accounts: accountPosting,
@@ -59,7 +59,7 @@ export function permissionDenied(): Response {
  * The Session plus the Permission Matrix check for a route about one
  * recorded payment: the menu (Labour or Vendor) and the Project come from
  * the payment itself, so it is loaded first (404 for another Company's).
- * Write flags also need an active plan (CM-118).
+ * Write flags also need an active plan.
  */
 export async function requirePaymentAccess<
   T extends { partyType: PartyType; projectId: string },

@@ -12,7 +12,7 @@ import { expectedUpdatedAt } from "./master-models";
 
 const ref = z.object({ id: z.uuid(), name: z.string() });
 
-/** Fields of Add and Edit; the domain trims and checks each (CM-406). */
+/** Fields of Add and Edit; the domain trims and checks each. */
 function writeFields(kind: PartyKind) {
   const common = {
     name: z.string().max(1000).describe("Required, at most 120 characters."),

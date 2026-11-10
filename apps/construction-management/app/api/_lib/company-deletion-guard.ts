@@ -7,10 +7,10 @@ import { mapError } from "./map-error";
 const READ_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 
 /**
- * Writes that stay open while a Company waits to be deleted (CM-907, ADR
+ * Writes that stay open while a Company waits to be deleted (ADR
  * CM-0021 §10): the Owner's Cancel, codes, the User's own account and
- * devices, reports, backups and exports (CM-118 keeps export open), the
- * member's own notifications, and reveals (a read sent as POST). Every
+ * devices, reports, backups and exports (export stays open), the member's
+ * own notifications, and reveals (a read sent as POST). Every
  * other POST, PUT, PATCH or DELETE under `/api/construction` answers 409
  * `COMPANY_DELETION_SCHEDULED`. Append a path here when a new write must
  * stay open.

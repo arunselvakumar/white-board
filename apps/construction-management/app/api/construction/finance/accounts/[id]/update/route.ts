@@ -11,7 +11,7 @@ import { accountHandlers as handlers, toAccountResponse } from "../../handlers";
 export const dynamic = "force-dynamic";
 
 /**
- * Edits a company account (CM-701): a changed opening balance or date
+ * Edits a company account: a changed opening balance or date
  * posts the reversal of the old opening entry and a new one. Needs
  * Company's Bank A/C update; 409 `ACCOUNT_CHANGED` when stale.
  */

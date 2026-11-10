@@ -28,7 +28,7 @@ import { procurementEvents } from "@/src/composition/procurement-events";
 /** Procurement events after commit (the one shared dispatcher). */
 export { procurementEvents };
 
-/** Consume, Missing, Adjust stock, edits, deletes and Import (CM-506). */
+/** Consume, Missing, Adjust stock, edits, deletes and Import. */
 export const stockMovements = new StockMovementCommands({
   db: prisma,
   directory: procurementDirectory,
@@ -36,7 +36,7 @@ export const stockMovements = new StockMovementCommands({
   dispatcher: procurementEvents,
 });
 
-/** Estimated Qty, the minimum override and the alert toggle (CM-506). */
+/** Estimated Qty, the minimum override and the alert toggle. */
 export const stockSettings = new StockSettingsCommands({
   db: prisma,
   directory: procurementDirectory,
@@ -54,7 +54,7 @@ function permissionDenied(): Response {
 export type InventorySession = CompanySession & { caller: InventoryCaller };
 
 /**
- * The Session plus the stock permission check (CM-506): Current Inventory
+ * The Session plus the stock permission check: Current Inventory
  * on a Project, Central store on a Store (`canAtLocation`); 403
  * `PERMISSION_DENIED`, then 402 `PLAN_EXPIRED` for a write flag. With no
  * location (a route about one movement), only the Session: the command

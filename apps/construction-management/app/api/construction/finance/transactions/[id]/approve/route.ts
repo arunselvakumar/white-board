@@ -14,7 +14,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Approves a pending Transaction and posts its account entry (CM-702).
+ * Approves a pending Transaction and posts its account entry.
  * Refused on or before the Financial Closing Date. Needs approve on its
  * Project.
  */

@@ -9,7 +9,7 @@ import { ConstructionProjectsTestingReportParamsModel } from "../../../testing-r
 
 export const dynamic = "force-dynamic";
 
-/** Deletes a report (CM-409): a tombstone, out of the Gallery, then the file goes. */
+/** Deletes a report: a tombstone, out of the Gallery, then the file goes. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string; reportId: string }> },

@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * Recorded vendor days of a Project, newest first, filtered by vendor,
- * Labour Category and date range, a page at a time (CM-213).
+ * Labour Category and date range, a page at a time.
  */
 export async function GET(request: Request): Promise<Response> {
   try {

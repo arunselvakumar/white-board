@@ -21,7 +21,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Records a follow-up on an Open inquiry (CM-1004; Inquiry update): it
+ * Records a follow-up on an Open inquiry (Inquiry update): it
  * sets the inquiry's next follow-up and, with `toStageId`, its stage.
  * 409 `INQUIRY_NOT_OPEN`; 400 `FOLLOW_UP_IN_FUTURE`,
  * `NEXT_FOLLOW_UP_BEFORE_DONE`; 403 outside the back-dated window

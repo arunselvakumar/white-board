@@ -58,7 +58,7 @@ const TRANSFER_TYPES = [
 ] as const;
 
 /**
- * Central only (CM-903): the Projects to cover, among those you may see;
+ * Central only: the Projects to cover, among those you may see;
  * left out for every one. Chosen Projects leave the Central Stores out.
  */
 const ProjectIdsParam = z.array(z.uuid()).min(1).max(500).optional();
@@ -109,7 +109,7 @@ export const RequestConstructionReportingReportRequestModel =
       projectId: z.uuid(),
       params: MonthParams,
     }),
-    // Site work reports (CM-605, CM-608).
+    // Site work reports.
     z.object({
       kind: z.literal("daily_work"),
       projectId: z.uuid(),
@@ -127,17 +127,17 @@ export const RequestConstructionReportingReportRequestModel =
     }),
     z.object({
       kind: z.literal("equipment_maintenance"),
-      /** Null for the central report of Masters → Equipments (every machine). */
+      /** Null for the central Equipments report (every machine). */
       projectId: z.uuid().nullable(),
       params: DateRangeParams,
     }),
     z.object({
       kind: z.literal("equipment_transfers"),
-      /** Null for the central report of Masters → Equipments (every machine). */
+      /** Null for the central Equipments report (every machine). */
       projectId: z.uuid().nullable(),
       params: DateRangeParams,
     }),
-    // Finance reports (CM-709). Finance menus have no Financial flag:
+    // Finance reports. Finance menus have no Financial flag:
     // Report on the menu is enough (ADR CM-0017 §14).
     z.object({
       kind: z.literal("account_ledger"),
@@ -195,7 +195,7 @@ export const RequestConstructionReportingReportRequestModel =
       projectId: z.uuid().nullable(),
       params: z.object({ asOn: z.iso.date() }),
     }),
-    // Tracking reports (CM-805, ADR CM-0019 §14). Without View all a Task
+    // Tracking reports (ADR CM-0019 §14). Without View all a Task
     // or Issue & Snag report covers your own and assigned rows only.
     z.object({
       kind: z.literal("task_report"),
@@ -215,7 +215,7 @@ export const RequestConstructionReportingReportRequestModel =
       /** Requests with an Inspection Date in the period. */
       params: DateRangeParams,
     }),
-    // Procurement and central labour reports (CM-903, ADR CM-0021 §5).
+    // Procurement and central labour reports (ADR CM-0021 §5).
     // Null `projectId` is the central report (Central Reports), which
     // also needs Central Reports Read.
     z.object({
@@ -278,7 +278,7 @@ export const RequestConstructionReportingReportRequestModel =
       projectId: z.null(),
       params: DateRangeParams.extend({ projectIds: ProjectIdsParam }),
     }),
-    // Sales reports (CM-1008, ADR CM-0022 §11). Without Inquiry View all
+    // Sales reports (ADR CM-0022 §11). Without Inquiry View all
     // an Inquiry Report covers your own, assigned and Lead Owner inquiries.
     z.object({
       kind: z.literal("inquiry_report"),
@@ -341,7 +341,7 @@ export const ConstructionReportingReportJobResponseModel = z.object({
     categoryId: z.string().nullable().optional(),
     contractorId: z.string().nullable().optional(),
     equipmentId: z.string().nullable().optional(),
-    /** Finance reports (CM-709). */
+    /** Finance reports. */
     accountId: z.string().nullable().optional(),
     mode: z.string().nullable().optional(),
     module: z.string().nullable().optional(),
@@ -352,7 +352,7 @@ export const ConstructionReportingReportJobResponseModel = z.object({
     /** Daily Progress Report: its date and number. */
     date: z.string().optional(),
     number: z.string().optional(),
-    /** Procurement reports (CM-903). */
+    /** Procurement reports. */
     status: z.string().nullable().optional(),
     supplierId: z.string().nullable().optional(),
     materialId: z.string().nullable().optional(),
@@ -360,9 +360,9 @@ export const ConstructionReportingReportJobResponseModel = z.object({
     createdBy: z.string().nullable().optional(),
     transferType: z.string().nullable().optional(),
     storeId: z.string().nullable().optional(),
-    /** The Booking Report's Wing (CM-1008). */
+    /** The Booking Report's Wing. */
     wingId: z.string().nullable().optional(),
-    /** The Inquiry Report's filters (CM-1008). */
+    /** The Inquiry Report's filters. */
     interestType: z.string().nullable().optional(),
     leadSourceId: z.string().nullable().optional(),
     funnelStageId: z.string().nullable().optional(),
@@ -427,7 +427,7 @@ function responseParams(
         vendorId: params.vendorId,
         categoryId: params.labourCategoryId,
       };
-    // Site work reports (CM-605, CM-608).
+    // Site work reports.
     case "daily_work":
       return {
         from: params.from,
@@ -443,7 +443,7 @@ function responseParams(
       };
     case "daily_progress_report":
       return { date: params.date, number: params.number };
-    // Finance reports (CM-709).
+    // Finance reports.
     case "account_ledger":
       return {
         from: params.from,
@@ -463,7 +463,7 @@ function responseParams(
       return { fy: params.fy, contractorId: params.contractorId };
     case "due_payments":
       return { asOn: params.asOn };
-    // Procurement and central labour reports (CM-903).
+    // Procurement and central labour reports.
     case "purchase_requests":
       return {
         from: params.from,
@@ -509,7 +509,7 @@ function responseParams(
       };
     case "labour_attendance_central":
       return { from: params.from, to: params.to, ...chosenProjects(params) };
-    // Sales reports (CM-1008).
+    // Sales reports.
     case "inquiry_report":
       return {
         from: params.from,

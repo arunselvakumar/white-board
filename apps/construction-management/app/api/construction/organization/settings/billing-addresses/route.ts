@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createBillingAddressHandlers();
 
-/** The Company's billing addresses, the default first (CM-501). */
+/** The Company's billing addresses, the default first. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(
@@ -36,7 +36,7 @@ export async function GET(request: Request): Promise<Response> {
   }
 }
 
-/** Adds a billing address; the Company's first one becomes the default (CM-501). */
+/** Adds a billing address; the Company's first one becomes the default. */
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(

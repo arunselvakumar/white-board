@@ -26,7 +26,7 @@ export const dynamic = "force-dynamic";
 /**
  * A Project's Purchase Requests, newest first, by Request Date range,
  * approval, fulfilment, Material Category, Material, creator and location
- * type, with the filter options (CM-503). Needs Purchase Request read on
+ * type, with the filter options. Needs Purchase Request read on
  * the Project.
  */
 export async function GET(request: Request): Promise<Response> {
@@ -85,7 +85,7 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * Raises a Purchase Request (CM-503): Save (pending) or Save & Approve
+ * Raises a Purchase Request: Save (pending) or Save & Approve
  * (needs Approve). Needs Purchase Request create on the Project; the
  * number comes from the Purchase Request numbering rule and the Request
  * Date from the back-dated policy.

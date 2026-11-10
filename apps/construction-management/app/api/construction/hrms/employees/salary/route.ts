@@ -16,7 +16,7 @@ const handlers = createEmployeeSalaryHandlers();
 
 /**
  * Every Team Member (Normal and HRMS) with their salary configuration,
- * Configured or Not Set (CM-315). Amounts are null without financial.
+ * Configured or Not Set. Amounts are null without financial.
  */
 export async function GET(request: Request): Promise<Response> {
   try {

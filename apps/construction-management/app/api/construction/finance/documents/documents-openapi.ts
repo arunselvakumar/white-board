@@ -42,7 +42,7 @@ const WRITE_ERRORS = [...READ_ERRORS, StatusCodes.PAYMENT_REQUIRED];
 const ACCESS =
   "the document's menu (Transactions for transaction and account_transfer, Petty Cash for petty_cash_voucher, Other Expenses for other_expense, Parties for invoice, party_payment and settlement), on its Project when it names one; a Store-located invoice or payment is the Owner's alone. Unknown, deleted or another Company's document, or another holder's petty-cash voucher without Petty Cash View all: 404 `<DOCUMENT>_NOT_FOUND` (TRANSACTION, ACCOUNT_TRANSFER, PETTY_CASH_VOUCHER, OTHER_EXPENSE, INVOICE, PARTY_PAYMENT, SETTLEMENT)";
 
-/** Request and Response models of `/api/construction/finance/documents` (M7). */
+/** Request and Response models of `/api/construction/finance/documents`. */
 export const financeDocumentOpenApiComponents: OpenApiComponents = {
   ConstructionFinanceRemarkResponseModel,
   ListConstructionFinanceRemarksResponseModel,
@@ -57,7 +57,7 @@ export const financeDocumentOpenApiComponents: OpenApiComponents = {
 };
 
 /**
- * Operations of `/api/construction/finance/documents` (M7, ADR CM-0017):
+ * Operations of `/api/construction/finance/documents` (ADR CM-0017):
  * the remarks thread and the photos and files every finance document
  * shares. Read sees and comments; Create or Update uploads; Update removes
  * any file, Create the caller's own.

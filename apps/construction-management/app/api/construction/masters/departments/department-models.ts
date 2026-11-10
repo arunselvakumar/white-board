@@ -4,7 +4,7 @@ import { lookupModels } from "../_lib/master-models";
 
 const models = lookupModels("DEPARTMENT");
 
-/** Departments' models (CM-203); every route of the list uses these. */
+/** Departments' models; every route of the list uses these. */
 export const DEPARTMENT_MODELS = models;
 
 export const ConstructionMastersDepartmentResponseModel = models.response;

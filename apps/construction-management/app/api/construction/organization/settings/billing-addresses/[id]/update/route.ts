@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createBillingAddressHandlers();
 
-/** Changes a billing address; Purchase Orders already saved keep their copy (CM-501). */
+/** Changes a billing address; Purchase Orders already saved keep their copy. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

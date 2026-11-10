@@ -4,5 +4,5 @@ import { LABOUR_FILES } from "../../../handlers";
 
 export const dynamic = "force-dynamic";
 
-/** Streams one of the labourer's documents (CM-205). */
+/** Streams one of the labourer's documents. */
 export const GET = partyDocumentRoute(LABOUR_FILES);

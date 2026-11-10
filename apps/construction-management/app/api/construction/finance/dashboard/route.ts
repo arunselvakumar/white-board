@@ -31,12 +31,12 @@ function paise(value: bigint): number {
 }
 
 /**
- * Payments on the Project Dashboard (CM-709), behind Dashboard Read on
+ * Payments on the Project Dashboard, behind Dashboard Read on
  * the Project (ADR CM-0013 §12). The section itself needs Payments
  * (`finance.payments`) Read on the Project (ADR CM-0017 §14); each
  * Payment Approvals count needs its menu's Approve flag. Due Payments and
  * the pending counts come from the reporting views (`party_dues_on`,
- * `project_pending_approvals`, CM-902).
+ * `project_pending_approvals`).
  */
 export async function GET(request: Request): Promise<Response> {
   try {

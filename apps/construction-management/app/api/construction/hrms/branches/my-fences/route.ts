@@ -11,7 +11,7 @@ import { branches } from "../handlers";
 export const dynamic = "force-dynamic";
 
 /**
- * The fences the signed-in member may check in at (CM-304, ADR CM-0012
+ * The fences the signed-in member may check in at (ADR CM-0012
  * §4). Needs `hrms.attendance` read, as check-in does.
  */
 export async function GET(request: Request): Promise<Response> {

@@ -9,7 +9,7 @@ import { salaryHandlers } from "../../salary-route";
 export const dynamic = "force-dynamic";
 
 /**
- * The payslip PDF of an Approved or Paid salary (CM-316): one's own
+ * The payslip PDF of an Approved or Paid salary: one's own
  * (`hrms.salaries` read), or anyone's with view_all and financial. Stored
  * on approval or the first download and never changed after.
  */

@@ -10,7 +10,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** One Wing with its floors and units (CM-402), for Edit Wing and the chart. */
+/** One Wing with its floors and units, for Edit Wing and the chart. */
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string; wingId: string }> },

@@ -36,7 +36,7 @@ const WRITE = [
 const STRUCTURES = "/api/construction/hrms/salary-structures";
 const EMPLOYEES = "/api/construction/hrms/employees/salary";
 
-/** Salary structures (CM-314) and employee salary configuration (CM-315). */
+/** Salary structures and employee salary configuration. */
 export const salarySetupOpenApiComponents: OpenApiComponents = {
   ConstructionHrmsSalaryStructureResponseModel,
   ListConstructionHrmsSalaryStructuresResponseModel,

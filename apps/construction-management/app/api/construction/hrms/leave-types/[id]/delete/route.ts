@@ -13,7 +13,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Deletes a leave type nobody uses (CM-310); one in a structure, a balance
+ * Deletes a leave type nobody uses; one in a structure, a balance
  * or a request is 409 `LEAVE_TYPE_IN_USE` — deactivate it instead.
  */
 export async function POST(

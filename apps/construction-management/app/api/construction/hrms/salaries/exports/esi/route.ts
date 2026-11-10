@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * The ESIC monthly contribution workbook of an approved salary month
- * (CM-320, `hrms.salaries` export and financial): the upload sheet in the
+ * (`hrms.salaries` export and financial): the upload sheet in the
  * ESIC template's columns, the contributions with totals, and the ESI
  * members without an IP number. 409 `SALARY_MONTH_NOT_APPROVED` while any
  * salary of the month is still Calculated.

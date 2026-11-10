@@ -20,7 +20,7 @@ import {
 
 const REPORTING = ["Construction · Reporting"];
 
-/** The report catalogue and Downloads (CM-901, ADR CM-0021 §2). */
+/** The report catalogue and Downloads (ADR CM-0021 §2). */
 export const reportingDownloadsOpenApiComponents: OpenApiComponents = {
   ConstructionReportingCatalogueEntryResponseModel,
   ListConstructionReportingCatalogueResponseModel,

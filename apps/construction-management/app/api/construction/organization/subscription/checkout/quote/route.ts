@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createSubscriptionHandlers();
 
-/** Prices a checkout choice without buying anything (CM-117). Owner only. */
+/** Prices a checkout choice without buying anything. Owner only. */
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await requireOwnerSession(request);

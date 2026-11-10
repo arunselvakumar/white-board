@@ -30,8 +30,8 @@ export const ListConstructionReportingFilterOptionsRequestModel = z
 const Choice = z.object({ id: z.string(), name: z.string() });
 
 /**
- * The choices of each picker on the report cards the viewer may request
- * (CM-903). A picker no card of theirs takes is empty.
+ * The choices of each picker on the report cards the viewer may request.
+ * A picker no card of theirs takes is empty.
  */
 export const ListConstructionReportingFilterOptionsResponseModel = z.object({
   /** Central only: the Projects you may see. */
@@ -46,9 +46,9 @@ export const ListConstructionReportingFilterOptionsResponseModel = z.object({
   materials: z.array(Choice),
   /** Who raised the Purchase Requests in scope; `id` is a User id. */
   creators: z.array(Choice),
-  /** A Project's live Wings (the Booking Report, CM-1008). */
+  /** A Project's live Wings (the Booking Report). */
   wings: z.array(Choice),
-  /** The Inquiry Report's choices on a Project (CM-1008); stages in funnel order. */
+  /** The Inquiry Report's choices on a Project; stages in funnel order. */
   leadSources: z.array(Choice),
   funnelStages: z.array(Choice),
   lostReasons: z.array(Choice),

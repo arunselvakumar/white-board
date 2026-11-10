@@ -25,7 +25,7 @@ import {
   type ConstructionReportingBackupResponseModel,
 } from "./backup-models";
 
-/** One set of backup handlers for every route (CM-906). */
+/** One set of backup handlers for every route. */
 export const backups = createBackupJobs();
 
 const projectNames = prismaProjectNames(prisma);

@@ -8,8 +8,8 @@ import { POST as receiveUpload } from "./[type]/[id]/files/uploads/app/route";
 import { POST as startUpload } from "./[type]/[id]/files/uploads/route";
 
 /**
- * HTTP-test helpers for the sales document files (CM-1003): the browser's
- * upload flow through our routes. Bookings (CM-1006) upload their Booking
+ * HTTP-test helpers for the sales document files: the browser's
+ * upload flow through our routes. Bookings upload their Booking
  * Form with `uploadSalesFile("booking", id, "booking_form", …)`.
  */
 

@@ -11,7 +11,7 @@ import { UpdateConstructionLabourVendorRequestModel } from "./update-vendor-requ
 export const dynamic = "force-dynamic";
 
 /**
- * Edit Vendor (CM-209): details, Projects and the whole rate card in one
+ * Edit Vendor: details, Projects and the whole rate card in one
  * command. Rates are replaced in place (attendance keeps its snapshots);
  * a removed shift is soft-deleted. A changed opening balance or joining
  * date reverses the opening entry and posts the new one.

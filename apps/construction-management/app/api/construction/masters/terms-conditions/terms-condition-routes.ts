@@ -10,7 +10,7 @@ import {
 
 const handlers = createTermsConditionHandlers();
 
-/** Terms & Conditions under the `masters.terms_conditions` Menu (CM-501). */
+/** Terms & Conditions under the `masters.terms_conditions` Menu. */
 export const termsConditionRoutes = pagedMasterRoutes({
   menu: "masters.terms_conditions",
   listQuery: ListConstructionMastersTermsConditionsQueryModel,

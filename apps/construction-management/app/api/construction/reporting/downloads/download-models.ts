@@ -5,10 +5,10 @@ import { REPORT_KINDS } from "@/src/reporting/domain/report-job";
 export const DOWNLOADS_PATH = "/api/construction/reporting/downloads";
 
 /**
- * Downloads (ADR CM-0021 §2, CM-901): the signed-in member's own files
+ * Downloads (ADR CM-0021 §2): the signed-in member's own files
  * waiting to be downloaded, across Projects, newest first.
  *
- * HOW TO ADD A SOURCE (CM-906 adds `backup` and `export`):
+ * HOW TO ADD A SOURCE (`backup` and `export` were added this way):
  * 1. Add `"backup"` to `DOWNLOAD_SOURCES` below and a variant to
  *    `ConstructionReportingDownloadItemModel`: `DownloadItemBase.extend({
  *    source: z.literal("backup"), …its own fields })`. Keep everything a
@@ -79,7 +79,7 @@ export const ConstructionReportingDownloadItemModel = z.discriminatedUnion(
       /** A Daily or Task Progress Report (kept until deleted). */
       progressReport: z.boolean(),
     }),
-    // CM-906: backups (Project, master records, full Company).
+    // Backups (Project, master records, full Company).
     DownloadItemBase.extend({
       source: z.literal("backup"),
       scope: z.enum(["project", "masters", "company"]),
@@ -87,7 +87,7 @@ export const ConstructionReportingDownloadItemModel = z.discriminatedUnion(
       includesMoney: z.boolean(),
       includeMedia: z.boolean(),
     }),
-    // CM-906: Download My Data.
+    // Download My Data.
     DownloadItemBase.extend({
       source: z.literal("export"),
       scope: z.literal("my_data"),

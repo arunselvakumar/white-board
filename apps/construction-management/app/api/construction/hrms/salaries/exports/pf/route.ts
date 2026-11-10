@@ -12,7 +12,7 @@ import { GetConstructionHrmsPfReturnQueryModel } from "../statutory-export-model
 export const dynamic = "force-dynamic";
 
 /**
- * The PF ECR of an approved salary month (CM-320, `hrms.salaries` export
+ * The PF ECR of an approved salary month (`hrms.salaries` export
  * and financial): the EPFO upload text file, or Excel with totals and the
  * PF members without a UAN. 409 `SALARY_MONTH_NOT_APPROVED` while any
  * salary of the month is still Calculated. The text file carries only

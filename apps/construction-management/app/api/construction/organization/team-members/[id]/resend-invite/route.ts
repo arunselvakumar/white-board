@@ -10,7 +10,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** A new invite link, sent again; also reopens a declined request (CM-110). */
+/** A new invite link, sent again; also reopens a declined request. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

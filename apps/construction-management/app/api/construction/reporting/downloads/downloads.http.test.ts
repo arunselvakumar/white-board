@@ -116,7 +116,7 @@ describe("Downloads HTTP (CM-901)", () => {
       {
         "labour.labour": ["read", "report"],
         "labour.vendor": ["read", "report"],
-        // The central vendor report is on Central Reports (CM-903).
+        // The central vendor report is on Central Reports.
         "reporting.central_reports": ["read"],
       },
       [tower, villa],

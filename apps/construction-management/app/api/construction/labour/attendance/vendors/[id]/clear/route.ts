@@ -15,7 +15,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Clears a recorded vendor day (CM-212): the row is tombstoned and its
+ * Clears a recorded vendor day: the row is tombstoned and its
  * ledger entry reversed. Needs Attendance delete on the day's Project; the
  * back-dated edit limit applies.
  */

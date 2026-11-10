@@ -24,7 +24,7 @@ function paise(value: bigint): number {
 }
 
 /**
- * Central Payment (CM-709, ADR CM-0017 §14, §16), behind Central payment
+ * Central Payment (ADR CM-0017 §14, §16), behind Central payment
  * (`finance.central_payment`) Read: party dues across every Project for
  * the Owner (Store suppliers included), across the Projects a member is
  * on otherwise; company accounts with Company's Bank A/C Read; petty-cash

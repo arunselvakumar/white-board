@@ -9,7 +9,7 @@ import { toResourcesResponse } from "./resources-models";
 export const dynamic = "force-dynamic";
 
 /**
- * A Project's Resources (CM-406): its Team Members (the Owner first),
+ * A Project's Resources: its Team Members (the Owner first),
  * Contractors, Suppliers and Vendors, each from the context that owns it.
  * 404 for another Company's Project or one the Member is not on.
  */

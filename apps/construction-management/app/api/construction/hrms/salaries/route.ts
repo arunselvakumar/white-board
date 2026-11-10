@@ -12,7 +12,7 @@ import { queryOf, salaryHandlers } from "./salary-route";
 export const dynamic = "force-dynamic";
 
 /**
- * Team Salary for a month (CM-317, `hrms.salaries` read and view_all):
+ * Team Salary for a month (`hrms.salaries` read and view_all):
  * every slip (regular and advance), the members without a slip and why,
  * the month's totals (64-bit sums; null without financial) and what the
  * caller may do. Amounts of others' slips are null without financial.

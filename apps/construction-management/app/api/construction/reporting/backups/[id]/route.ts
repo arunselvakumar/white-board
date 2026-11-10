@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 /**
- * One of the signed-in User's own backups or data exports (CM-906), with
+ * One of the signed-in User's own backups or data exports, with
  * its signed download link while it is done. Anyone else's is 404.
  */
 export async function GET(

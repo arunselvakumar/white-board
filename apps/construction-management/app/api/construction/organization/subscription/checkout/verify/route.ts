@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 const handlers = createSubscriptionHandlers();
 
 /**
- * Checkout's success callback (CM-117): checks `razorpay_signature` (HMAC
+ * Checkout's success callback: checks `razorpay_signature` (HMAC
  * of `order_id|payment_id` with the key secret) and settles the order for
  * immediate feedback. The webhook settles it too; the second is a no-op.
  */

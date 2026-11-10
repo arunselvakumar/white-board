@@ -11,8 +11,8 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Transfers one or many labourers from a Project to another from a date
- * (CM-206); their other Projects stay (ADR CM-0033). Needs `transfer` on
+ * Transfers one or many labourers from a Project to another from a date;
+ * their other Projects stay (ADR CM-0033). Needs `transfer` on
  * Labour for the destination and for every source Project. All or none.
  */
 export async function POST(request: Request): Promise<Response> {

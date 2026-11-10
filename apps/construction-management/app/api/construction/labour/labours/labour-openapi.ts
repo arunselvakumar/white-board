@@ -45,7 +45,7 @@ const ITEM_ERRORS = [
 
 const ITEM = `${LABOURS_PATH}/{id}`;
 
-/** The Labour register's models (CM-205 – CM-207). */
+/** The Labour register's models. */
 export const labourOpenApiComponents: OpenApiComponents = {
   ConstructionLabourLabourResponseModel,
   ListConstructionLabourLaboursResponseModel,
@@ -61,7 +61,7 @@ export const labourOpenApiComponents: OpenApiComponents = {
   ...partyFileOpenApiComponents,
 };
 
-/** The Labour register's routes (CM-205 – CM-207). */
+/** The Labour register's routes. */
 export const labourOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

@@ -797,7 +797,7 @@ describe("Procurement masters HTTP (CM-501)", () => {
     expect(limited.items).toHaveLength(1);
 
     // A site engineer who only fills worksheets or usage sheets picks
-    // materials too (CM-602, CM-604).
+    // materials too.
     for (const menu of [
       "site_work.daily_worksheet",
       "site_work.equipment_usage",

@@ -10,7 +10,7 @@ import { photoUrl } from "@/app/api/construction/labour/_party-files/party-file-
 
 export const VENDORS_PATH = "/api/construction/labour/vendors";
 
-/** A rate card shift as Add/Edit Vendor sends it (CM-209). Amounts are paise. */
+/** A rate card shift as Add/Edit Vendor sends it. Amounts are paise. */
 export const vendorShiftInputModel = z.object({
   /** An existing shift's id keeps it; leave it out for a new shift. */
   id: z.uuid().nullable().optional(),

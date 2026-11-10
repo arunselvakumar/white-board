@@ -11,7 +11,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The Daily Worksheet form's Task picker (CM-806): live leaf tasks of the
+ * The Daily Worksheet form's Task picker: live leaf tasks of the
  * Project, searched by Task No. or name, at most 50. Needs Daily
  * Worksheet read on the Project (not Task read: the picker names tasks
  * only).

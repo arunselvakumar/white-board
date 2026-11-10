@@ -11,7 +11,7 @@ import { projectDrawings } from "../../handlers";
 
 export const dynamic = "force-dynamic";
 
-/** Renames a drawing (CM-408); 409 `DRAWING_CHANGED` on a stale `updatedAt`. */
+/** Renames a drawing; 409 `DRAWING_CHANGED` on a stale `updatedAt`. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string; drawingId: string }> },

@@ -12,7 +12,7 @@ import { projectDrawings } from "./handlers";
 export const dynamic = "force-dynamic";
 
 /**
- * Finishes uploading a new drawing (CM-408): records the file at `key` as
+ * Finishes uploading a new drawing: records the file at `key` as
  * its R1 in `albumId`. 201 for a new drawing, 200 when the key was
  * already recorded (a retry).
  */

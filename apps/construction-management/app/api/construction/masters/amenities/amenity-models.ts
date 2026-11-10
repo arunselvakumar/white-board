@@ -4,7 +4,7 @@ import { developmentModels } from "../_lib/development-models";
 
 const models = developmentModels("AMENITY", "Amenity");
 
-/** Amenities' models (CM-404); every route of the list uses these. */
+/** Amenities' models; every route of the list uses these. */
 export const AMENITY_MODELS = models;
 
 export const ConstructionMastersAmenityResponseModel = models.response;

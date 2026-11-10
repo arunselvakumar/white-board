@@ -31,7 +31,7 @@ const WRITE = [
 ] as const;
 const SALARIES = "/api/construction/hrms/salaries";
 
-/** Salary runs, payslips and the team salary report (CM-316, CM-317). */
+/** Salary runs, payslips and the team salary report. */
 export const salariesOpenApiComponents: OpenApiComponents = {
   ConstructionHrmsSalarySlipModel,
   ListConstructionHrmsTeamSalariesResponseModel,

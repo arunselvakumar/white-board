@@ -11,7 +11,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The TDS ledger of a Contractor for a financial year (CM-706, CM-0017
+ * The TDS ledger of a Contractor for a financial year (CM-0017
  * §8): each payment's base, rate, TDS and override, and the quarter
  * totals for filing. A member sees the Projects they read Parties on.
  */

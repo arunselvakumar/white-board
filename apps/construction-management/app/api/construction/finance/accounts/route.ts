@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 const MENU = "masters.bank_accounts";
 
 /**
- * Masters → Company's Bank A/C (CM-701): the Company's Cash and Bank
+ * Masters → Company's Bank A/C: the Company's Cash and Bank
  * accounts with today's balance and pending documents. Needs Company's
  * Bank A/C read.
  */

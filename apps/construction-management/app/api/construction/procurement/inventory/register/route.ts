@@ -15,7 +15,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The Stock Register for a date range (CM-506): per material Opening,
+ * The Stock Register for a date range: per material Opening,
  * Received, Transferred in / out, Issued, Received from store, Consumed,
  * Missing, Adjustment and Closing (Report on Current Inventory).
  */

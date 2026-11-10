@@ -9,7 +9,7 @@ import { toTaskFormOptions } from "../task-models";
 export const dynamic = "force-dynamic";
 
 /**
- * What the task form and the list's filters offer (CM-802): Team Members
+ * What the task form and the list's filters offer: Team Members
  * on the Project, enabled Departments and Units, active Contractors on the
  * Project, the Company's Tags. Needs Task read on the Project.
  */

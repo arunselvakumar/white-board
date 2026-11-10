@@ -11,7 +11,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Edits a Location (CM-405); 409 `LOCATION_CHANGED` on a stale `updatedAt`. */
+/** Edits a Location; 409 `LOCATION_CHANGED` on a stale `updatedAt`. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string; locationId: string }> },

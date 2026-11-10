@@ -22,7 +22,7 @@ export const ListConstructionOrganizationOwnershipCandidatesResponseModel =
 export type ListConstructionOrganizationOwnershipCandidatesResponseModel =
   z.infer<typeof ListConstructionOrganizationOwnershipCandidatesResponseModel>;
 
-/** Transfer ownership (CM-907, ADR CM-0021 §10). */
+/** Transfer ownership (ADR CM-0021 §10). */
 export const TransferConstructionOrganizationOwnershipRequestModel = z.object({
   memberId: z
     .string()

@@ -18,7 +18,7 @@ export const dynamic = "force-dynamic";
 const handlers = createSubscriptionHandlers();
 
 /**
- * Creates the order and its Razorpay order (CM-117). The browser then opens
+ * Creates the order and its Razorpay order. The browser then opens
  * Razorpay Checkout; the webhook (or `checkout/verify`) settles it. Owner
  * only, and allowed on an ended plan so the Owner can renew.
  */

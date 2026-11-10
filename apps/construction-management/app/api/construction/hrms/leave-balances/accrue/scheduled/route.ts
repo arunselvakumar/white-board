@@ -17,7 +17,7 @@ function sameSecret(given: string, expected: string): boolean {
 }
 
 /**
- * The scheduled monthly accrual (CM-311): for every Company with “Credit
+ * The scheduled monthly accrual: for every Company with “Credit
  * leave every month” on, posts the credits due up to today, as `system`.
  * No Session: the caller sends `Authorization: Bearer <CRON_SECRET>` (what
  * Vercel Cron sends when `CRON_SECRET` is set). Without `CRON_SECRET` on

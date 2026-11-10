@@ -9,7 +9,7 @@ import { toInquiryFormOptions } from "../inquiry-models";
 export const dynamic = "force-dynamic";
 
 /**
- * The inquiry form's and filters' pickers on a Project (CM-1003): active
+ * The inquiry form's and filters' pickers on a Project: active
  * Team Members on it, its live Wings, Funnel Stages in order and the
  * enabled Lead Sources and Lost Reasons. Needs Inquiry read.
  */

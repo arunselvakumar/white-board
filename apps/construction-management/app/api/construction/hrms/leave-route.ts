@@ -14,7 +14,7 @@ import { createLeaveHandlers } from "@/src/hrms/infrastructure/create-leave-hand
 import type { Flag, MenuKey } from "@/src/shared-kernel/access";
 import { loadMemberAccess } from "@/src/shared-kernel/access/prisma-access-reader";
 
-/** Leave handlers (CM-310 … CM-313), wired once for every leave route. */
+/** Leave handlers, wired once for every leave route. */
 export const leaveHandlers = createLeaveHandlers({
   events: messagingEvents(),
 });

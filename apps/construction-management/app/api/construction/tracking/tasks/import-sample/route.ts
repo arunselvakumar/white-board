@@ -16,7 +16,7 @@ import { ImportConstructionTrackingTasksRequestModel } from "../task-models";
 export const dynamic = "force-dynamic";
 
 /**
- * The task import sample (CM-802): the headers and three example rows (a
+ * The task import sample: the headers and three example rows (a
  * task and two sub-tasks) naming a Team Member and a unit of the Company.
  * Needs Task read on the Project.
  */

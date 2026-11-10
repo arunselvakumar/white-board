@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 const handlers = createBackdatedPolicyHandlers();
 
-/** Replaces the Active Company's Back-dated Entry policy, audited with before and after (CM-113). */
+/** Replaces the Active Company's Back-dated Entry policy, audited with before and after. */
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(

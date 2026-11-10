@@ -10,7 +10,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Team Leaves (CM-313): pending, approved and cancellation-requested leave with a day in the range (View All). */
+/** Team Leaves: pending, approved and cancellation-requested leave with a day in the range (View All). */
 export async function GET(request: Request): Promise<Response> {
   try {
     const query = parseOrThrow(

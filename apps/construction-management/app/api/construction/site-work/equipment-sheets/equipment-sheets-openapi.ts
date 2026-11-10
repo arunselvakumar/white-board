@@ -45,7 +45,7 @@ const WRITE_ERRORS = [
 
 const ITEM = `${EQUIPMENT_SHEETS_PATH}/{id}`;
 
-/** Request and Response models of `/api/construction/site-work/equipment-sheets` (CM-604). */
+/** Request and Response models of `/api/construction/site-work/equipment-sheets`. */
 export const equipmentSheetOpenApiComponents: OpenApiComponents = {
   CreateConstructionSiteWorkEquipmentSheetRequestModel,
   UpdateConstructionSiteWorkEquipmentSheetRequestModel,
@@ -65,7 +65,7 @@ export const equipmentSheetOpenApiComponents: OpenApiComponents = {
 };
 
 /**
- * Equipment Usage sheet routes (CM-604), menu `site_work.equipment_usage`
+ * Equipment Usage sheet routes, menu `site_work.equipment_usage`
  * on the sheet's Project: read, create, update, delete, approve, reject;
  * Financial shows the unit rate, billable quantity and hire cost.
  */

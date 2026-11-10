@@ -13,7 +13,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Every rotation template, by name (CM-306). */
+/** Every rotation template, by name. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(request, "hrms.shifts", "read");
@@ -28,7 +28,7 @@ export async function GET(request: Request): Promise<Response> {
   }
 }
 
-/** Adds a rotation template; each slot an active shift or a Week Off (CM-306). */
+/** Adds a rotation template; each slot an active shift or a Week Off. */
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(request, "hrms.shifts", "create");

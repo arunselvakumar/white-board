@@ -11,7 +11,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Removes a structure assignment (CM-311); balances already posted stay. */
+/** Removes a structure assignment; balances already posted stay. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

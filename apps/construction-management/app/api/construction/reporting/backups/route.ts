@@ -50,7 +50,7 @@ function projectNotFound(): Response {
 }
 
 /**
- * Asks for a backup (CM-906, ADR CM-0021 §8), queued as one part per
+ * Asks for a backup (ADR CM-0021 §8), queued as one part per
  * module and a zip step; the response is the queued backup (201).
  *
  * - `project`: Project View and View on each module (403 names the
@@ -63,7 +63,7 @@ function projectNotFound(): Response {
  *   Financial (not emailed).
  * - `my_data`: any signed-in User, with or without an Active Company.
  *
- * Never refused because the plan has ended (CM-118 keeps export open).
+ * Never refused because the plan has ended: export stays open.
  */
 export async function POST(request: Request): Promise<Response> {
   try {

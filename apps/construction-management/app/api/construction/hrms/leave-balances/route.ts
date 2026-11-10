@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * A member's leave balances for a leave year, per leave type, from the
- * ledger (CM-311): your own with `hrms.leaves` read, anyone's with View All.
+ * ledger: your own with `hrms.leaves` read, anyone's with View All.
  */
 export async function GET(request: Request): Promise<Response> {
   try {

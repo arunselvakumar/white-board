@@ -21,8 +21,8 @@ export const dynamic = "force-dynamic";
 
 /**
  * A Project's Daily Worksheets, newest first, by Sheet Date range, Filled
- * By, Contractor, Department and approval status, with the filter options
- * (CM-602). Needs Daily Worksheet read on the Project.
+ * By, Contractor, Department and approval status, with the filter options.
+ * Needs Daily Worksheet read on the Project.
  */
 export async function GET(request: Request): Promise<Response> {
   try {
@@ -70,7 +70,7 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * Saves a Daily Worksheet (CM-602): Save, or Save & Approve (needs
+ * Saves a Daily Worksheet: Save, or Save & Approve (needs
  * Approve). Needs Daily Worksheet create on the Project. The number comes
  * from the WS rule, the date from the back-dated policy, and each material
  * line posts Consumed stock (409 `STOCK_INSUFFICIENT` refuses the save).

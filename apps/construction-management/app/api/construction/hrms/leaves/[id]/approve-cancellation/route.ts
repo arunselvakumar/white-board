@@ -13,7 +13,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Approve a cancellation request (CM-312): the leave is cancelled and its days restored. */
+/** Approve a cancellation request: the leave is cancelled and its days restored. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

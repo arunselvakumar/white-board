@@ -7,7 +7,7 @@ import type { GetConstructionHrmsLeaveOptionsResponseModel } from "../leave-mode
 export const dynamic = "force-dynamic";
 
 /**
- * What the leave screens may offer (CM-313): your leave permissions, the
+ * What the leave screens may offer: your leave permissions, the
  * active leave types, and the Team Members to pick from when you may act
  * for others. Any member of the Active Company.
  */

@@ -11,7 +11,7 @@ import { attendance } from "../../../handlers";
 
 export const dynamic = "force-dynamic";
 
-/** Approves a pending entry; never one's own unless the Owner (CM-308). */
+/** Approves a pending entry; never one's own unless the Owner. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

@@ -9,7 +9,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** The team leave report (CM-313, `hrms.leaves` report): approved days per member by type, paid and unpaid, and pending days. */
+/** The team leave report (`hrms.leaves` report): approved days per member by type, paid and unpaid, and pending days. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const query = parseOrThrow(

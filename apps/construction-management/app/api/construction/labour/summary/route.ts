@@ -12,9 +12,9 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The labour tiles on a Project's Overview (CM-219): labourers present
+ * The labour tiles on a Project's Overview: labourers present
  * today, vendor headcount, the last two weeks (or `from` to `date` for the
- * Project Dashboard, CM-412), and labour and vendor payment status.
+ * Project Dashboard), and labour and vendor payment status.
  */
 export async function GET(request: Request): Promise<Response> {
   try {

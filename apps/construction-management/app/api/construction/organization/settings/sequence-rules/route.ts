@@ -23,7 +23,7 @@ export const dynamic = "force-dynamic";
 const handlers = createSequenceRuleHandlers();
 const projectDirectory = new PrismaProjectDirectory(prisma);
 
-/** The Company's Sequence ID rules (CM-114). */
+/** The Company's Sequence ID rules. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireAccess(

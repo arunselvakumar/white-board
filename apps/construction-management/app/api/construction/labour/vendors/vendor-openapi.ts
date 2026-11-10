@@ -31,7 +31,7 @@ const SESSION_ERRORS = [
 
 const VENDORS = VENDORS_PATH;
 
-/** The Vendor register's models (CM-208, CM-209). */
+/** The Vendor register's models. */
 export const vendorOpenApiComponents: OpenApiComponents = {
   ConstructionLabourVendorResponseModel,
   ConstructionLabourVendorSummaryResponseModel,
@@ -43,7 +43,7 @@ export const vendorOpenApiComponents: OpenApiComponents = {
   UpdateConstructionLabourVendorRequestModel,
 };
 
-/** The Vendor register's routes (CM-208, CM-209). */
+/** The Vendor register's routes. */
 export const vendorOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

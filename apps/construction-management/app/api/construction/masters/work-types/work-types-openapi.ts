@@ -26,7 +26,7 @@ const WRITE = [
 ];
 const params = ConstructionMastersIdParamsModel;
 
-/** Work Types' Request and Response models (CM-601). */
+/** Work Types' Request and Response models. */
 export const workTypeOpenApiComponents: OpenApiComponents = {
   ListConstructionMastersWorkTypesResponseModel,
   ConstructionMastersWorkTypeResponseModel,
@@ -34,7 +34,7 @@ export const workTypeOpenApiComponents: OpenApiComponents = {
   UpdateConstructionMastersWorkTypeRequestModel,
 };
 
-/** `/api/construction/masters/work-types` (CM-601, menu `masters.work_types`). */
+/** `/api/construction/masters/work-types` (menu `masters.work_types`). */
 export const workTypeOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

@@ -61,7 +61,7 @@ const shared = {
   closing: (workspaceId: string) => loadClosingCheck(prisma, workspaceId),
 };
 
-/** One set of Transactions and transfer handlers for every route (CM-702). */
+/** One set of Transactions and transfer handlers for every route. */
 export const transactionHandlers = new TransactionHandlers({
   ...shared,
   store: prismaTransactionStore,

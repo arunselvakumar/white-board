@@ -10,7 +10,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Deletes a task and its sub-tasks (CM-802). 409 `TASK_IN_USE` when a live
+ * Deletes a task and its sub-tasks. 409 `TASK_IN_USE` when a live
  * Daily Worksheet names it or a sub-task. Needs Task delete.
  */
 export async function POST(

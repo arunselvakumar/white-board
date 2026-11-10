@@ -12,12 +12,12 @@ import {
 
 const HRMS = ["Construction · HRMS"];
 
-/** The HRMS Dashboard model (CM-319). */
+/** The HRMS Dashboard model. */
 export const dashboardOpenApiComponents: OpenApiComponents = {
   GetConstructionHrmsDashboardResponseModel,
 };
 
-/** The HRMS Dashboard route (CM-319). */
+/** The HRMS Dashboard route. */
 export const dashboardOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

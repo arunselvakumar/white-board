@@ -13,7 +13,7 @@ export const ListConstructionProjectsProjectsQueryModel = z.object({
 
 const count = z.int().nonnegative();
 
-/** Project Progress % from Tasks (CM-0019 §4, CM-805). */
+/** Project Progress % from Tasks (CM-0019 §4). */
 export const ConstructionProjectsProgressModel = z.object({
   pct: z.number().describe("0–100, two decimals."),
   weighting: z
@@ -23,7 +23,7 @@ export const ConstructionProjectsProgressModel = z.object({
     ),
 });
 
-/** One Project's progress, for its home (CM-805). */
+/** One Project's progress, for its home. */
 export const ConstructionProjectsProjectProgressResponseModel = z.object({
   progress: ConstructionProjectsProgressModel.nullable().describe(
     "Null when the Project has no tasks; the home shows no bar.",
@@ -33,7 +33,7 @@ export type ConstructionProjectsProjectProgressResponseModel = z.infer<
   typeof ConstructionProjectsProjectProgressResponseModel
 >;
 
-/** A Project on the Projects home: the Project and the caller's pin (CM-411). */
+/** A Project on the Projects home: the Project and the caller's pin. */
 export const ConstructionProjectsProjectListItemModel =
   ConstructionProjectsProjectResponseModel.extend({
     pinned: z

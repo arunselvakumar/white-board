@@ -16,8 +16,8 @@ import { AssignConstructionOrganizationTeamMemberProjectsRequestModel } from "./
 export const dynamic = "force-dynamic";
 
 /**
- * Replaces the Projects a Team Member works on (CM-110); 400
- * `PROJECT_NOT_FOUND` for an id that is not a live Project (CM-204).
+ * Replaces the Projects a Team Member works on; 400
+ * `PROJECT_NOT_FOUND` for an id that is not a live Project.
  */
 export async function POST(
   request: Request,

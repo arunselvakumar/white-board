@@ -10,7 +10,7 @@ import { SALES_SETTINGS_MENU } from "./settings-routes";
 export const dynamic = "force-dynamic";
 
 /**
- * A Project's sales settings (CM-1002): its Funnel Stages in funnel order
+ * A Project's sales settings: its Funnel Stages in funnel order
  * with the Open inquiries in each, and its Lead Sources and Lost Reasons
  * (disabled ones included) with the inquiries using each. Needs Inquiry
  * read on the Project; `canManage` says whether the caller holds Update.

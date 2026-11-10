@@ -11,7 +11,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Renames a Phase (CM-402); 409 `PHASE_CHANGED` on a stale `updatedAt`. */
+/** Renames a Phase; 409 `PHASE_CHANGED` on a stale `updatedAt`. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string; phaseId: string }> },

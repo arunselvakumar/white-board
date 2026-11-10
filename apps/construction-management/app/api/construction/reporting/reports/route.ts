@@ -54,7 +54,7 @@ function unavailableKind(body: unknown): ReportKind | null {
   return known == null || isReportAvailable(known) ? null : known;
 }
 
-/** Where a request reads, fixed with the job (central reports, CM-903). */
+/** Where a request reads, fixed with the job (central reports). */
 type Scope = {
   /** The Projects (null: every Project of the Company). */
   projectIds: string[] | null;
@@ -94,7 +94,7 @@ function paramsOf(
         labourCategoryId: model.params.categoryId ?? null,
         projectIds,
       };
-    // Site work reports (CM-605, CM-608).
+    // Site work reports.
     case "daily_work":
       return {
         kind: model.kind,
@@ -113,7 +113,7 @@ function paramsOf(
     case "equipment_maintenance":
     case "equipment_transfers":
       return { kind: model.kind, from: model.params.from, to: model.params.to };
-    // Finance reports (CM-709).
+    // Finance reports.
     case "account_ledger":
       return {
         kind: model.kind,
@@ -153,7 +153,7 @@ function paramsOf(
       };
     case "due_payments":
       return { kind: model.kind, asOn: model.params.asOn, projectIds };
-    // Tracking reports (CM-805).
+    // Tracking reports.
     case "task_report":
     case "issue_snag_report":
       return {
@@ -164,7 +164,7 @@ function paramsOf(
       };
     case "inspection_request_report":
       return { kind: model.kind, from: model.params.from, to: model.params.to };
-    // Procurement and central labour reports (CM-903).
+    // Procurement and central labour reports.
     case "purchase_requests":
       return {
         kind: model.kind,
@@ -220,7 +220,7 @@ function paramsOf(
         projectIds,
         projectsChosen: scope.projectsChosen,
       };
-    // Sales reports (CM-1008).
+    // Sales reports.
     case "inquiry_report":
       return {
         kind: model.kind,
@@ -257,7 +257,7 @@ function chosenProjectIds(
 /**
  * Whether a central report of this kind reads the Central Stores: Purchase
  * Orders and Material Received on a Store follow their own Company-level
- * menu (CM-0015); a Store's transfers and stock also need Central store
+ * menu (ADR CM-0015); a Store's transfers and stock also need Central store
  * Read (`canOnTransferSide`, `canAtLocation`).
  */
 function readsStores(
@@ -277,7 +277,7 @@ function readsStores(
 }
 
 /**
- * Where the request reads (CM-903). A Project's report reads the Project.
+ * Where the request reads. A Project's report reads the Project.
  * A central one reads the Projects the requester may see now (every one
  * for the Owner) or the chosen ones among them, and, unless Projects were
  * chosen, the Central Stores the kind reads; the Stock Register's Store
@@ -353,19 +353,19 @@ async function sessionFor(
 }
 
 /**
- * Requests a report (CM-217, CM-218, CM-605, CM-608): the job is queued
- * and, until M9's queue, run inline, so the response is usually `done`
+ * Requests a report: the job is queued
+ * and, for now, run inline, so the response is usually `done`
  * with download links (or `failed` with a message). Needs `report` on the
  * kind's menu (`REPORT_MENU`) and Project; the payment report and the
  * muster roll are about money and are refused without Financial. Other
- * reports print amounts only with it. Finance reports (CM-709) need only
+ * reports print amounts only with it. Finance reports need only
  * Report on their finance menu; the Ledger checks its account's menu, and
  * Petty Cash covers only the requester's account without View all.
  */
 export async function POST(request: Request): Promise<Response> {
   try {
     const body: unknown = await request.json();
-    // A catalogued kind whose builder is not there yet (CM-903) is 409,
+    // A catalogued kind whose builder is not there yet is 409,
     // before its params are checked.
     const unavailable = unavailableKind(body);
     if (unavailable != null) throw reportNotAvailable(unavailable);
@@ -375,7 +375,7 @@ export async function POST(request: Request): Promise<Response> {
     const session = await sessionFor(request, model);
     if (isResponse(session)) return session;
     // A central report also needs Central Reports Read unless a module
-    // hosts it (Central Payment, Masters → Equipments; CM-903).
+    // hosts it (Central Payment, the Equipments master).
     if (model.projectId == null && !canReport(session.access, model.kind, null))
       return permissionDenied(
         "Central reports need Central Reports Read. Ask the Owner to change your Permission Matrix.",

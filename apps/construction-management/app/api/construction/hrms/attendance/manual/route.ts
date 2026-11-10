@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * Add Backdated Attendance: a past day's check-in and check-out; the
- * Back-dated Entry policy for HRMS → Attendance; it goes to approvals (CM-308).
+ * Back-dated Entry policy for HRMS → Attendance; it goes to approvals.
  */
 export async function POST(request: Request): Promise<Response> {
   try {

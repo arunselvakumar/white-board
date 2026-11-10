@@ -26,10 +26,10 @@ import { can, type Flag, type MemberAccess } from "@/src/shared-kernel/access";
 import { loadMemberAccess } from "@/src/shared-kernel/access/prisma-access-reader";
 import { isWriteFlag } from "@/src/shared-kernel/plan";
 
-/** One set of Goods Receipt handlers for every route (CM-505). */
+/** One set of Goods Receipt handlers for every route. */
 export const goodsReceiptHandlers = createGoodsReceiptHandlers({
   directory: procurementDirectory,
-  // Events reach `procurementEvents` and finance's supplier invoices (CM-705).
+  // Events reach `procurementEvents` and finance's supplier invoices.
   dispatcher: goodsReceiptDispatcher(),
   payments: financeGoodsReceiptPayments(),
   media: projectMediaDispatcher(),

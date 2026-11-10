@@ -7,7 +7,7 @@ import { ConstructionProjectsProjectParamsModel } from "../../project-models";
 
 export const dynamic = "force-dynamic";
 
-/** Pins a Project to the top of the caller's Projects home (CM-411); only for them. Fine when already pinned. */
+/** Pins a Project to the top of the caller's Projects home; only for them. Fine when already pinned. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

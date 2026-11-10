@@ -108,7 +108,7 @@ async function codeOf(response: Response): Promise<string> {
   return (await json<{ code: string }>(response)).code;
 }
 
-/** The four seed albums CM-401 gives every new Project, written directly. */
+/** The four seed albums every new Project gets, written directly. */
 async function seedAlbums(company: Company, projectId: string) {
   const now = new Date();
   await prisma.constructionProjectsDrawingAlbum.createMany({

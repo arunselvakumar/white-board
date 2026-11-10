@@ -36,7 +36,7 @@ const WRITE = [
 ] as const;
 const ITEM = `${ATTENDANCE_PATH}/approvals/{id}`;
 
-/** Attendance models (CM-308, CM-309). */
+/** Attendance models. */
 export const attendanceOpenApiComponents: OpenApiComponents = {
   ConstructionHrmsAttendanceEntryResponseModel,
   ConstructionHrmsAttendanceDayResponseModel,
@@ -53,7 +53,7 @@ export const attendanceOpenApiComponents: OpenApiComponents = {
   GetConstructionHrmsAttendanceMonthlySummaryResponseModel,
 };
 
-/** Attendance routes (CM-308, CM-309). */
+/** Attendance routes. */
 export const attendanceOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",

@@ -8,7 +8,7 @@ import {
   type DashboardSectionSetting,
 } from "@/src/projects/domain/dashboard-sections";
 
-/** The layout read for one Project's dashboard (CM-902). */
+/** The layout read for one Project's dashboard. */
 export const GetConstructionProjectsDashboardLayoutRequestModel = z.object({
   projectId: z
     .uuid()
@@ -19,9 +19,9 @@ export const GetConstructionProjectsDashboardLayoutRequestModel = z.object({
 });
 
 /**
- * The caller's Project Dashboard layout (CM-412): every section in their
+ * The caller's Project Dashboard layout: every section in their
  * order with whether it shows, for every Project. With a Project, the
- * sections whose module is hidden there are marked (CM-902).
+ * sections whose module is hidden there are marked.
  */
 export const ConstructionProjectsDashboardLayoutResponseModel = z.object({
   sections: z.array(

@@ -9,7 +9,7 @@ import { HrmsHolidayIdParamsModel } from "../../holiday-models";
 
 export const dynamic = "force-dynamic";
 
-/** Deletes (hides) a holiday (CM-305). */
+/** Deletes (hides) a holiday. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

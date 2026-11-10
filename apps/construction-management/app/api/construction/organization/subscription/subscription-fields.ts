@@ -4,7 +4,7 @@ import { ORDER_KINDS, type Quote } from "@/src/organization/domain/checkout";
 import type { BillingAddress } from "@/src/organization/domain/subscription-order";
 import { PLAN_GRANTS } from "@/src/shared-kernel/plan";
 
-/** Shared pieces of the subscription Request and Response models (CM-116, CM-117). */
+/** Shared pieces of the subscription Request and Response models. */
 export const planGrantField = z.enum(PLAN_GRANTS);
 
 const quantity = z.number().int().min(0).max(500).optional();

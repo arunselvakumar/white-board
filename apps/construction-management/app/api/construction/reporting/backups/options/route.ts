@@ -11,7 +11,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * What the backup dialogs offer (CM-906): the Project's modules (or the
+ * What the backup dialogs offer: the Project's modules (or the
  * masters) the member may back up, each saying whether its files would
  * carry amounts and whether it has media. Empty without Project View.
  */

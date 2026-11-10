@@ -12,7 +12,7 @@ import { salaryHandlers } from "../salary-route";
 export const dynamic = "force-dynamic";
 
 /**
- * Recalculate one Calculated salary (CM-316, `hrms.salaries` create) from
+ * Recalculate one Calculated salary (`hrms.salaries` create) from
  * today's attendance, leave and statutory figures. An Approved or Paid
  * slip is 409 `SALARY_SLIP_NOT_CALCULATED`; a stale `expectedUpdatedAt`
  * is 409 `SALARY_SLIP_CHANGED`.

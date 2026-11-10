@@ -33,7 +33,7 @@ const WRITE_ERRORS = [
   StatusCodes.PAYMENT_REQUIRED,
 ];
 
-/** Sales settings models (CM-1002). */
+/** Sales settings models. */
 export const salesSettingsOpenApiComponents: OpenApiComponents = {
   CreateConstructionSalesListItemRequestModel,
   RenameConstructionSalesListItemRequestModel,
@@ -131,7 +131,7 @@ function listOperations(list: ListPath): OpenApiOperation[] {
 }
 
 /**
- * Sales settings operations (CM-1002): a Project's Funnel Stages, Lead
+ * Sales settings operations: a Project's Funnel Stages, Lead
  * Sources and Lost Reasons; reads need Inquiry Read, changes Inquiry
  * Update.
  */

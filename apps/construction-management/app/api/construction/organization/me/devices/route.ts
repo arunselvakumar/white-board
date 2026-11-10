@@ -6,7 +6,7 @@ import { toDevicesResponse } from "./device-models";
 
 export const dynamic = "force-dynamic";
 
-/** The signed-in User's devices, this one first (CM-907). */
+/** The signed-in User's devices, this one first. */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireUserSession(request);
