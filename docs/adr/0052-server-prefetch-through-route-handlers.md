@@ -53,7 +53,7 @@ The first HTML of each trial page now carries its data (before: the shell with a
 ## Known limits
 
 - Fields bound with react-hook-form's `register` (uncontrolled inputs) fill in when the page hydrates, not in the server HTML; the data still arrives with the page, so there is no request or skeleton before them.
-- Every query a page's first view reads must be prefetched. A missed one fails loudly in development ("Not prefetched") and makes React render that boundary on the client in production.
+- Every query a page's first view reads must be prefetched. A missed `useSuspenseQuery` read fails loudly in development ("Not prefetched") and makes React render that boundary on the client in production; a missed `useQuery` read fails nothing and quietly fetches in the browser, so only the page's network requests show it.
 - A Teacher opening an Owner-only page now gets a refused prefetch logged on the server before the Workspace Gate sends them home; the page is never shown.
 
 ## Considered options
