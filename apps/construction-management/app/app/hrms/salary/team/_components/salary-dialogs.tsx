@@ -39,7 +39,7 @@ import {
   type SalarySlipModel,
 } from "@/src/queries/hrms-salary";
 
-import { money } from "./salary-format";
+import { money } from "@/app/app/hrms/salary/_components/salary-format";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 

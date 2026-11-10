@@ -28,9 +28,9 @@ import {
   DAY_STATUS_LETTERS,
   DAY_STATUS_TEXT,
   hoursText,
-} from "./attendance-parts";
-import { HrmsEmpty, HrmsPage } from "./hrms-parts";
-import { MonthlyAttendanceSkeleton } from "@/components/hrms/hrms-skeletons";
+} from "@/app/app/hrms/_components/attendance-parts";
+import { HrmsEmpty, HrmsPage } from "@/app/app/hrms/_components/hrms-parts";
+import { MonthlyAttendanceSkeleton } from "@/app/app/hrms/_components/hrms-skeletons";
 
 /** One focusable scroll area around the wide grid. */
 const SCROLL =

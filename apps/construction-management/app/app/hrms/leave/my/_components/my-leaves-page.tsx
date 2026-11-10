@@ -22,9 +22,15 @@ import {
 } from "@/src/queries/hrms-leave";
 
 import { ApplyLeaveDialog } from "./apply-leave-dialog";
-import { CreditHistorySheet } from "./leave-balance-dialogs";
-import { formatDays, localToday } from "./leave-format";
-import { LeaveDetailSheet, LeaveRequestRow } from "./leave-request-parts";
+import { CreditHistorySheet } from "@/app/app/hrms/_components/leave-balance-dialogs";
+import {
+  formatDays,
+  localToday,
+} from "@/app/app/hrms/_components/leave-format";
+import {
+  LeaveDetailSheet,
+  LeaveRequestRow,
+} from "@/app/app/hrms/leave/_components/leave-request-parts";
 
 function NotShared({
   title,

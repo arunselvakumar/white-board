@@ -5,11 +5,18 @@ import { Download, Receipt } from "lucide-react";
 import { useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 
-import { HrmsEmpty, HrmsPage } from "@/components/hrms/hrms-parts";
+import { HrmsEmpty, HrmsPage } from "@/app/app/hrms/_components/hrms-parts";
 import { mySalariesQuery, payslipUrl } from "@/src/queries/hrms-salary";
 
-import { formatDate, money, monthLabel } from "./salary-format";
-import { SalarySlipSheet, SalaryStatusBadge } from "./salary-slip-sheet";
+import {
+  formatDate,
+  money,
+  monthLabel,
+} from "@/app/app/hrms/salary/_components/salary-format";
+import {
+  SalarySlipSheet,
+  SalaryStatusBadge,
+} from "@/app/app/hrms/salary/_components/salary-slip-sheet";
 
 /**
  * My Salary (CM-317): the caller's salaries once approved, newest month

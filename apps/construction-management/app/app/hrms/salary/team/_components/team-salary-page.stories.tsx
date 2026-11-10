@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, screen, waitFor, within } from "storybook/test";
 
-import { StoryQueries } from "../../../.storybook/mocks/api";
+import { StoryQueries } from "@/.storybook/mocks/api";
 import {
   PRIYA,
   serveSalary,
@@ -9,7 +9,7 @@ import {
   storyTeam,
   withoutAmounts,
   type SalaryApiState,
-} from "./salary-story-support";
+} from "@/app/app/hrms/salary/_components/salary-story-support";
 import { TeamSalaryPage } from "./team-salary-page";
 
 let api: ReturnType<typeof serveSalary>;

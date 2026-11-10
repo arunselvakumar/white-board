@@ -35,7 +35,7 @@ import {
   hoursText,
 } from "./attendance-parts";
 import { HrmsEmpty, HrmsPage } from "./hrms-parts";
-import { formatDay, formatDays, STATUS_LABELS } from "./leave/leave-format";
+import { formatDay, formatDays, STATUS_LABELS } from "./leave-format";
 
 type Team = NonNullable<HrmsDashboardModel["team"]>;
 type Counts = Team["breakdown"];

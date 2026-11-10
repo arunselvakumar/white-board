@@ -39,8 +39,8 @@ import {
   formatClock,
   formatDuration,
   formatWeekdayDate,
-} from "./attendance-parts";
-import { HrmsEmpty, HrmsPage } from "./hrms-parts";
+} from "@/app/app/hrms/_components/attendance-parts";
+import { HrmsEmpty, HrmsPage } from "@/app/app/hrms/_components/hrms-parts";
 
 type Item = HrmsAttendanceApprovals["items"][number];
 

@@ -28,8 +28,13 @@ import {
 
 import { HolidayDialog } from "./holiday-dialog";
 import { HolidayImportDialog } from "./holiday-import-dialog";
-import { ConfirmDialog, HrmsEmpty, HrmsPage, RowMenu } from "./hrms-parts";
-import { HolidayYearSkeleton } from "@/components/hrms/hrms-skeletons";
+import {
+  ConfirmDialog,
+  HrmsEmpty,
+  HrmsPage,
+  RowMenu,
+} from "@/app/app/hrms/_components/hrms-parts";
+import { HolidayYearSkeleton } from "@/app/app/hrms/_components/hrms-skeletons";
 
 const MONTHS = Array.from({ length: 12 }, (_, index) => index);
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];

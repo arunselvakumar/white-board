@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { SalaryStructuresList } from "@/components/hrms/salary-structures-list";
+import { SalaryStructuresList } from "@/app/app/hrms/configuration/salary-structures/_components/salary-structures-list";
 import { HRMS_PATH, hrmsPage } from "@/lib/hrms-nav";
 
 const HREF = `${HRMS_PATH}/configuration/salary-structures`;

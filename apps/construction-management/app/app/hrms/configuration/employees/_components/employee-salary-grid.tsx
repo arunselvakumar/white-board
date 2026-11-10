@@ -62,7 +62,7 @@ import {
 } from "@/src/queries/hrms-salary-setup";
 import { QueryHttpError } from "@/src/queries/http";
 
-import { SALARY_STRUCTURES_PATH } from "./salary-structure-form";
+import { SALARY_STRUCTURES_PATH } from "@/app/app/hrms/configuration/_components/salary-structure-form";
 
 const NO_GENDER = "none";
 const PERCENT_OVERRIDE_RE = /^\d{1,3}(\.\d{1,2})?%$/;

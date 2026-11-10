@@ -3,8 +3,8 @@ import { expect, within } from "storybook/test";
 
 import type { HrmsTeamToday } from "@/src/queries/hrms-attendance";
 
-import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
-import { TEAM_TODAY } from "./attendance-fixtures";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
+import { TEAM_TODAY } from "@/app/app/_components/hrms/attendance-fixtures";
 import { TeamAttendancePage } from "./team-attendance-page";
 
 const TEAM = "/api/construction/hrms/attendance/team-today";

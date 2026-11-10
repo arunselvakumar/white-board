@@ -1,4 +1,4 @@
-import { mockApi, type ApiCall } from "../../../.storybook/mocks/api";
+import { mockApi, type ApiCall } from "@/.storybook/mocks/api";
 import { financeLookupsHandler } from "@/app/app/_components/finance/account-fixtures";
 import type {
   MySalaries,

@@ -45,7 +45,7 @@ import {
 
 import { formatDate, formatDays, LEDGER_KIND_LABELS } from "./leave-format";
 import { MemberChecklist, type PickableMember } from "./member-checklist";
-import { CreditListSkeleton } from "@/components/hrms/hrms-skeletons";
+import { CreditListSkeleton } from "@/app/app/hrms/_components/hrms-skeletons";
 
 type Choice = { value: string; label: string };
 

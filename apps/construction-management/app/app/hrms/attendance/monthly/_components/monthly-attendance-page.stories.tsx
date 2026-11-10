@@ -1,12 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fireEvent, waitFor, within } from "storybook/test";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
-import { OCTOBER } from "./attendance-fixtures";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
+import { OCTOBER } from "@/app/app/_components/hrms/attendance-fixtures";
 import { MonthlyAttendancePage } from "./monthly-attendance-page";
 
 const SUMMARY = "/api/construction/hrms/attendance/monthly-summary";

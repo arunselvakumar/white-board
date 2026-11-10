@@ -30,7 +30,10 @@ import {
   type LeaveStructureModel,
 } from "@/src/queries/hrms-leave";
 
-import { MemberChecklist, type PickableMember } from "./member-checklist";
+import {
+  MemberChecklist,
+  type PickableMember,
+} from "@/app/app/hrms/_components/member-checklist";
 
 const schema = z.object({
   structureId: z.string().min(1, "Choose a structure"),

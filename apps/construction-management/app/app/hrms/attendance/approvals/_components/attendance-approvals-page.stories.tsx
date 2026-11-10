@@ -3,12 +3,8 @@ import { expect, waitFor, within } from "storybook/test";
 
 import type { HrmsAttendanceApprovals } from "@/src/queries/hrms-attendance";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
-import { APPROVALS } from "./attendance-fixtures";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
+import { APPROVALS } from "@/app/app/_components/hrms/attendance-fixtures";
 import { AttendanceApprovalsPage } from "./attendance-approvals-page";
 
 const BASE = "/api/construction/hrms/attendance/approvals";

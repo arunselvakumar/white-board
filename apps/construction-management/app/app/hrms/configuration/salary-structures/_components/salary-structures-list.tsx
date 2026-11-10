@@ -41,7 +41,7 @@ import {
   type SalaryStructureModel,
 } from "@/src/queries/hrms-salary-setup";
 
-import { SALARY_STRUCTURES_PATH } from "./salary-structure-form";
+import { SALARY_STRUCTURES_PATH } from "@/app/app/hrms/configuration/_components/salary-structure-form";
 
 function editPath(id: string): string {
   return `${SALARY_STRUCTURES_PATH}/${encodeURIComponent(id)}`;

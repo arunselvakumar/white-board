@@ -27,7 +27,11 @@ import {
 } from "@/src/queries/hrms-shifts";
 
 import { AssignShiftDialog } from "./assign-shift-dialog";
-import { HrmsEmpty, HrmsPage, formatDate } from "./hrms-parts";
+import {
+  HrmsEmpty,
+  HrmsPage,
+  formatDate,
+} from "@/app/app/hrms/_components/hrms-parts";
 
 function kindLabel(assignment: HrmsShiftAssignment): string {
   return assignment.kind === "shift" ? "shift" : "rotation";

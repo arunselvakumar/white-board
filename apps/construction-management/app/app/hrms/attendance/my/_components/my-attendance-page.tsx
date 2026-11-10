@@ -42,9 +42,9 @@ import {
   getDeviceLocation,
   hoursText,
   sourceLabel,
-} from "./attendance-parts";
+} from "@/app/app/hrms/_components/attendance-parts";
 import { BackdatedAttendanceDialog } from "./backdated-attendance-dialog";
-import { HrmsPage } from "./hrms-parts";
+import { HrmsPage } from "@/app/app/hrms/_components/hrms-parts";
 import { MissedCheckoutDialog } from "./missed-checkout-dialog";
 
 /** The time now, ticking every second (the live timer). */

@@ -3,12 +3,12 @@ import { expect, waitFor } from "storybook/test";
 
 import type { HrmsAttendanceToday } from "@/src/queries/hrms-attendance";
 
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
-import { checkedIn, entry, today } from "./attendance-fixtures";
+  checkedIn,
+  entry,
+  today,
+} from "@/app/app/_components/hrms/attendance-fixtures";
 import { CheckInBanner } from "./check-in-banner";
 
 const TODAY_PATH = "/api/construction/hrms/attendance/today";

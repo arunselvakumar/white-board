@@ -38,7 +38,7 @@ import {
   HrmsPage,
   RowMenu,
   formatHours,
-} from "./hrms-parts";
+} from "@/app/app/hrms/_components/hrms-parts";
 import { RotationDialog } from "./rotation-dialog";
 import { ShiftDialog } from "./shift-dialog";
 

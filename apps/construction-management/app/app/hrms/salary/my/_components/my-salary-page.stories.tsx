@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, screen, within } from "storybook/test";
 
-import { StoryQueries } from "../../../.storybook/mocks/api";
+import { StoryQueries } from "@/.storybook/mocks/api";
 import { MySalaryPage } from "./my-salary-page";
-import { ME, serveSalary, storySlip } from "./salary-story-support";
+import {
+  ME,
+  serveSalary,
+  storySlip,
+} from "@/app/app/hrms/salary/_components/salary-story-support";
 
 const OCTOBER = storySlip({
   id: "0199c6b2-0000-7000-8000-000000000001",

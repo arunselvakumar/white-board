@@ -3,18 +3,14 @@ import { expect, waitFor, within } from "storybook/test";
 
 import type { EmployeeSalariesModel } from "@/src/queries/hrms-salary-setup";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { EmployeeSalaryGrid } from "./employee-salary-grid";
 import {
   EMPLOYEES,
   EMPLOYEES_PATH,
   MEMBER_IDS,
   SITE_STAFF,
-} from "./salary-setup-fixtures";
+} from "@/app/app/hrms/configuration/_components/salary-setup-fixtures";
 
 let listing: EmployeeSalariesModel = EMPLOYEES;
 let lastCalls: ApiCall[] = [];

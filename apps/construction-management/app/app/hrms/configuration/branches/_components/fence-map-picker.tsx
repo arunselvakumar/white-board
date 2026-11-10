@@ -8,7 +8,7 @@ import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 
 import { FieldError } from "@/components/auth/field-error";
-import { FenceMapSkeleton } from "@/components/hrms/hrms-skeletons";
+import { FenceMapSkeleton } from "@/app/app/hrms/_components/hrms-skeletons";
 
 import type { FenceMapProps } from "./fence-map";
 

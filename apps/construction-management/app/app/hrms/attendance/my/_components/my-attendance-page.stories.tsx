@@ -3,13 +3,13 @@ import { expect, fireEvent, waitFor, within } from "storybook/test";
 
 import type { HrmsAttendanceToday } from "@/src/queries/hrms-attendance";
 
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
+import { mockGeolocation } from "@/.storybook/mocks/geolocation";
 import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
-import { mockGeolocation } from "../../.storybook/mocks/geolocation";
-import { checkedIn, entry, today } from "./attendance-fixtures";
+  checkedIn,
+  entry,
+  today,
+} from "@/app/app/_components/hrms/attendance-fixtures";
 import { MyAttendancePage } from "./my-attendance-page";
 
 const ATTENDANCE = "/api/construction/hrms/attendance";

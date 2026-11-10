@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueries } from "../../../.storybook/mocks/api";
+import { StoryQueries } from "@/.storybook/mocks/api";
 import { MyLeavesPage } from "./my-leaves-page";
 import {
   CASUAL_ID,
@@ -12,7 +12,7 @@ import {
   storyLeave,
   storyOptions,
   type LeaveApiState,
-} from "./leave-story-support";
+} from "@/app/app/hrms/_components/leave-story-support";
 
 let api: ReturnType<typeof serveLeave>;
 

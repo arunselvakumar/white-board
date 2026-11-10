@@ -24,7 +24,7 @@ import {
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
-import { HrmsEmpty } from "@/components/hrms/hrms-parts";
+import { HrmsEmpty } from "@/app/app/hrms/_components/hrms-parts";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   esiReturnUrl,
@@ -48,9 +48,12 @@ import {
   money,
   monthLabel,
   shiftMonth,
-} from "./salary-format";
-import { SalarySlipSheet, SalaryStatusBadge } from "./salary-slip-sheet";
-import { TeamSalaryMonthSkeleton } from "@/components/hrms/hrms-skeletons";
+} from "@/app/app/hrms/salary/_components/salary-format";
+import {
+  SalarySlipSheet,
+  SalaryStatusBadge,
+} from "@/app/app/hrms/salary/_components/salary-slip-sheet";
+import { TeamSalaryMonthSkeleton } from "@/app/app/hrms/_components/hrms-skeletons";
 
 /**
  * Team Salary (CM-317): a month's salaries for everyone. Calculate the

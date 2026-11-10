@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { ShiftManagementPage } from "@/components/hrms/shift-management-page";
+import { ShiftManagementPage } from "@/app/app/hrms/configuration/shift-management/_components/shift-management-page";
 import { HRMS_PATH, hrmsPage } from "@/lib/hrms-nav";
 
 const HREF = `${HRMS_PATH}/configuration/shift-management`;

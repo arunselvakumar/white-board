@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { EditSalaryStructureScreen } from "@/components/hrms/salary-structure-form";
+import { EditSalaryStructureScreen } from "@/app/app/hrms/configuration/_components/salary-structure-form";
 
 export const metadata: Metadata = { title: "Edit salary structure" };
 

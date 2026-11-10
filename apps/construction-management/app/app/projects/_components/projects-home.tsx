@@ -48,7 +48,7 @@ import {
 import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
-import { CheckInBanner } from "@/components/hrms/check-in-banner";
+import { CheckInBanner } from "@/app/app/projects/_components/hrms/check-in-banner";
 import { groupByClient } from "@/src/projects/domain/client-groups";
 import {
   PROJECT_COLORS,

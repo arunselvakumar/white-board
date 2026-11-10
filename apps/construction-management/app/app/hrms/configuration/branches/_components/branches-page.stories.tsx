@@ -7,11 +7,7 @@ import type {
   HrmsProjectSites,
 } from "@/src/queries/hrms-branches";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { BranchDialog } from "./branch-dialog";
 import { BranchesPage } from "./branches-page";
 
