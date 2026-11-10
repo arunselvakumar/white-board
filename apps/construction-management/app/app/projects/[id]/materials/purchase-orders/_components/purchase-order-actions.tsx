@@ -40,7 +40,7 @@ type Item = {
 };
 
 /**
- * What can be done with one Purchase Order (CM-504), from its `actions`:
+ * What can be done with one Purchase Order, from its `actions`:
  * View, Approve, Reject, Mark as Ordered, Close, Edit, PDF, Delete.
  */
 export function PurchaseOrderActions({

@@ -11,7 +11,6 @@ import { TransferDetail } from "@/app/app/_components/procurement/transfers/tran
 import { TransferForm } from "@/app/app/_components/procurement/transfers/transfer-form";
 import { TransfersList } from "@/app/app/_components/procurement/transfers/transfers-list";
 
-/** A Project's Material Transfers tab (CM-507). */
 export function ProjectTransfersList({ projectId }: { projectId: string }) {
   return (
     <TransfersList

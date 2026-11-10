@@ -291,8 +291,8 @@ function MovementForm({
 }
 
 /**
- * Consume Material or Missing Materials (CM-506): one or many lines, each
- * with its date (back-dated limits apply), quantity, remark and — for
+ * Consume Material or Missing Materials: one or many lines, each with its
+ * date (back-dated limits apply), quantity, remark and — for
  * consumption at a Project — where on site. A refusal for stock names
  * each material, how much is short and from which date.
  */

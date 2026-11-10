@@ -24,8 +24,8 @@ import {
 import type { LocationRef } from "@/src/shared-kernel/location-ref";
 
 /**
- * The Purchase Order form's values and the browser side of the GST math
- * (CM-504). Totals use the kernel's `lineAmounts` / `documentTotals`, the
+ * The Purchase Order form's values and the browser side of the GST math.
+ * Totals use the kernel's `lineAmounts` / `documentTotals`, the
  * same functions the server runs, so the screen shows what is saved.
  */
 
@@ -256,7 +256,7 @@ export function totalsOf(
   }
 }
 
-/** Place of supply → the supply type the PO will use. */
+/** The supply type the PO will use for its place of supply. */
 export function effectiveSupplyType(
   values: Pick<
     PurchaseOrderFormValues,

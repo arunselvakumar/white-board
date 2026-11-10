@@ -2,7 +2,7 @@ import type { StockLocation } from "@/src/procurement/domain/stock-location";
 
 const QUANTITY = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 3 });
 
-/** `1234.500` → `1,234.5`; null → a dash. */
+/** `1234.500` as `1,234.5`; null as a dash. */
 export function formatQuantity(value: string | null | undefined): string {
   if (value == null) return "—";
   const number = Number(value);
@@ -16,7 +16,7 @@ export function formatSigned(value: string): string {
   return `${number > 0 ? "+" : "−"}${QUANTITY.format(Math.abs(number))}`;
 }
 
-/** `2026-10-04` → `4 Oct 2026`. */
+/** `2026-10-04` as `4 Oct 2026`. */
 export function formatDate(date: string): string {
   return new Intl.DateTimeFormat("en-IN", {
     day: "numeric",

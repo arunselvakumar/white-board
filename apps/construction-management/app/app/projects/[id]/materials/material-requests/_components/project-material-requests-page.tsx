@@ -6,7 +6,6 @@ import { projectRequestHref } from "@/app/app/_components/procurement/stores/cen
 import { MaterialRequestsList } from "@/app/app/_components/procurement/material-requests/material-requests-list";
 import { RequestRowsSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
-/** A Project's Materials → Material Requests tab (CM-508). */
 export function ProjectMaterialRequestsPage({
   projectId,
   canCreate,

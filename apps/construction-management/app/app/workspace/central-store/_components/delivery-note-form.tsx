@@ -50,8 +50,8 @@ function trimmed(decimal: string): string {
 }
 
 /**
- * Create Delivery Note from a Material Request, or edit a pending one
- * (CM-508): per material Requested, Pending and Delivered now (at most
+ * Create Delivery Note from a Material Request, or edit a pending one:
+ * per material Requested, Pending and Delivered now (at most
  * the pending quantity and the store's stock), the delivery date,
  * Delivered To and a remark. Save keeps it pending; Save & Approve
  * dispatches it at once.

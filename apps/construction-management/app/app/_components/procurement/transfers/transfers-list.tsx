@@ -222,8 +222,8 @@ function NewTransferLink({
 }
 
 /**
- * Material Transfers into and out of a Project or Store (CM-507), newest
- * first, by direction, status and transfer date. The Central Store reuses
+ * Material Transfers into and out of a Project or Store, newest first,
+ * by direction, status and transfer date. The Central Store reuses
  * it with a Store's `StockLocation` and its own links.
  */
 export function TransfersList({

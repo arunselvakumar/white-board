@@ -170,7 +170,7 @@ function EditForm({
   );
 }
 
-/** Edit a Consumed, Missing or Opening entry from the history (CM-506). */
+/** Edit a Consumed, Missing or Opening entry from the history. */
 export function EditMovementDialog({
   location,
   entry,

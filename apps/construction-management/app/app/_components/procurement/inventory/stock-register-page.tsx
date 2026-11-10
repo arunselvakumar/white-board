@@ -129,7 +129,7 @@ function Register({
 }
 
 /**
- * The Stock Register of a Project or Store for a date range (CM-506):
+ * The Stock Register of a Project or Store for a date range:
  * per material Opening, Received, Transferred in / out, Issued, Received
  * from store, Consumed, Missing, Adjustment and Closing, with an Excel
  * download.

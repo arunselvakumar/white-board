@@ -26,7 +26,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Pending → Approve (in transit) → Mark as Delivered on a date. */
+/** Pending, then Approve (in transit), then Mark as Delivered on a date. */
 export const ApproveThenDeliver: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);

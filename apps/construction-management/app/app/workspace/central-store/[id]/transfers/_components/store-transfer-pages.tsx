@@ -8,7 +8,7 @@ import { transferQuery } from "@/src/queries/material-transfers";
 import { TransferDetail } from "@/app/app/_components/procurement/transfers/transfer-detail";
 import { TransferForm } from "@/app/app/_components/procurement/transfers/transfer-form";
 
-/** A Material Transfer from a Central Store (CM-507, CM-508). */
+/** A Material Transfer from a Central Store. */
 export function StoreTransferNew({ storeId }: { storeId: string }) {
   return (
     <div className="w-full space-y-4">

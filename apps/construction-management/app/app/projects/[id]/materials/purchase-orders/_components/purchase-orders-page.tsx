@@ -90,8 +90,8 @@ const NO_FILTERS: Filters = {
 };
 
 /**
- * A Project's Purchase Orders (CM-504): filters by date, approval, receipt
- * status and Supplier; both statuses on every row; bulk approval mode.
+ * A Project's Purchase Orders: filters by date, approval, receipt status
+ * and Supplier; both statuses on every row; bulk approval mode.
  * Amounts are always shown (the menu has no Financial flag).
  */
 export function PurchaseOrdersPage({

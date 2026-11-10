@@ -148,7 +148,7 @@ function DeliverDialog({
 }
 
 /**
- * One Delivery Note (CM-508): pending → Approve (Issued at the store) →
+ * One Delivery Note: pending, then Approve (Issued at the store), then
  * Mark as Delivered (Received from store at the Project). A pending note
  * is edited or deleted; there is no reject.
  */

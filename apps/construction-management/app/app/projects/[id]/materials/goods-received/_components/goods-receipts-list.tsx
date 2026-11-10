@@ -58,9 +58,9 @@ const PO_FILTERS = [
 const ALL_SUPPLIERS = "all";
 
 /**
- * A Project's Goods Received tab (CM-505): GRNs newest first with filters
- * by GR Date, supplier, PO / without PO and a search over number, invoice
- * and challan; values only with Financial.
+ * A Project's Goods Received tab: GRNs newest first with filters by GR
+ * Date, supplier, PO / without PO and a search over number, invoice and
+ * challan; values only with Financial.
  */
 export function GoodsReceiptsList({ projectId }: { projectId: string }) {
   const access = useQuery(procurementAccessQuery(projectId)).data;

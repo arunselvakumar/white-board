@@ -15,7 +15,7 @@ import {
 import type { ProcurementAccess } from "@/src/queries/procurement-access";
 import type { Flag } from "@/src/shared-kernel/access";
 
-/** Goods Receipt fixtures for stories (CM-505): a Chennai site. */
+/** Goods Receipt fixtures for stories: a Chennai site. */
 
 export const PROJECT_ID = "0199c4a0-0000-7000-8000-000000000101";
 export const TODAY = "2026-10-10";

@@ -19,7 +19,7 @@ import type {
 } from "@/src/queries/stores";
 import type { Flag } from "@/src/shared-kernel/access";
 
-/** Central Store fixtures for stories (CM-508, CM-509): a Chennai builder. */
+/** Central Store fixtures for stories: a Chennai builder. */
 
 export const API = "/api/construction/procurement";
 

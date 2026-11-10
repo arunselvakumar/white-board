@@ -42,10 +42,10 @@ import { formatQuantity, localToday } from "./inventory-format";
 const MAX_BYTES = 2 * 1024 * 1024;
 
 /**
- * Import Inventory Stock (CM-506): download the sample (Material,
- * Quantity, Unit, Estimated Qty), upload it filled in, check every row,
- * then post. Quantities become Opening stock, only for materials with no
- * stock entries here yet; nothing is posted while any row has an error.
+ * Import Inventory Stock: download the sample (Material, Quantity, Unit,
+ * Estimated Qty), upload it filled in, check every row, then post.
+ * Quantities become Opening stock, only for materials with no stock
+ * entries here yet; nothing is posted while any row has an error.
  */
 export function ImportInventoryDialog({
   location,

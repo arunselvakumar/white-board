@@ -106,8 +106,8 @@ function useAvailable(
 }
 
 /**
- * New or edit Material Transfer (CM-507): Transfer Date, From and To (a
- * Project or a Store; not the same), lines of material, quantity and
+ * New or edit Material Transfer: Transfer Date, From and To (a Project or
+ * a Store; not the same), lines of material, quantity and
  * remark with the stock available at the source, Receiver Name and a
  * remark. **Save** leaves it pending (nothing moves); **Save & Approve**,
  * for members who may approve at the source, dispatches it at once.

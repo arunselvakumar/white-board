@@ -236,7 +236,7 @@ function Totals({ receipt }: { receipt: GoodsReceipt }) {
   );
 }
 
-/** One Goods Receipt (CM-505): lines, totals, details, remarks and files. */
+/** One Goods Receipt: lines, totals, details, remarks and files. */
 export function GoodsReceiptDetail({
   projectId,
   id,

@@ -10,7 +10,7 @@ import type {
   TransferLocations,
 } from "@/src/queries/material-transfers";
 
-/** Story fixtures for Material Transfers (CM-507). */
+/** Story fixtures for Material Transfers. */
 
 export const TRANSFERS_API = "/api/construction/procurement/transfers";
 

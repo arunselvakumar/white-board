@@ -146,8 +146,8 @@ function OptionSelect({
 }
 
 /**
- * Raise / Edit Material Request (CM-508): the Project asks a store that
- * serves it — request date, Request To, contractor, department, site
+ * Raise / Edit Material Request: the Project asks a store that serves
+ * it — request date, Request To, contractor, department, site
  * location, receiver, remark and the materials with their Ask Qty.
  */
 export function MaterialRequestForm({

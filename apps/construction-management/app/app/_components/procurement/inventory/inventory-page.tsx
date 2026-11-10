@@ -113,7 +113,10 @@ function StateBadge({ state }: { state: StockState }) {
 
 const ALL = "all";
 
-/** Where Mode B's documents are raised from the stock list (other tickets' forms). */
+/**
+ * The new Purchase Request, Purchase Order or Transfer page, with the
+ * materials chosen on the stock list preloaded.
+ */
 function materialsLink(
   projectId: string,
   segment: string,
@@ -133,12 +136,12 @@ type Dialogs =
   | { kind: "import" };
 
 /**
- * Current Inventory of a Project or Store (CM-506): stock per material
- * from the ledger with estimate, in transit, minimum and state; Consume,
- * Missing, Adjust stock, Estimation Qty, minimum and alert, history,
- * Import Inventory Stock, Export Data and the Stock Register. On a
- * Project, chosen materials go on to a Purchase Request, Purchase Order or
- * Material Transfer. Works for a Store too (the Central Store reuses it).
+ * Current Inventory of a Project or Store: stock per material from the
+ * ledger with estimate, in transit, minimum and state; Consume, Missing,
+ * Adjust stock, Estimation Qty, minimum and alert, history, Import
+ * Inventory Stock, Export Data and the Stock Register. On a Project,
+ * chosen materials go on to a Purchase Request, Purchase Order or Material
+ * Transfer. The Central Store reuses it for a Store.
  */
 export function InventoryPage({
   location,

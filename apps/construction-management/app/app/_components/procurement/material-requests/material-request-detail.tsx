@@ -162,8 +162,8 @@ function CloseDialog({
 }
 
 /**
- * One Material Request (CM-508): its facts, lines with Ask Qty,
- * delivered and pending quantities, its Delivery Notes, comments and
+ * One Material Request: its facts, lines with Ask Qty, delivered and
+ * pending quantities, its Delivery Notes, comments and
  * files. The Project side edits and deletes it until a Delivery Note
  * exists; the store side creates Delivery Notes and Closes what is left.
  */

@@ -71,8 +71,8 @@ function Assigned({
 }
 
 /**
- * One Central Store (CM-508): its stock, the Projects it serves (with
- * its store keepers and Suppliers), the Material Requests raised to it,
+ * One Central Store: its stock, the Projects it serves (with its store
+ * keepers and Suppliers), the Material Requests raised to it,
  * its Delivery Notes and transfers. Edit and Delete follow Central store
  * update and delete.
  */
