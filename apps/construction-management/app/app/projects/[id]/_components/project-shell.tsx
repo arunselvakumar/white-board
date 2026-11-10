@@ -31,12 +31,18 @@ import { ProjectBackupDialog } from "@/components/backups/backup-dialog";
 
 import { QuerySuspense } from "@/components/query-suspense";
 
-import { ProjectAvatar } from "./project-avatar";
-import { ProjectShellHeaderSkeleton } from "./projects-skeletons";
-import { clearProjectFlash, peekProjectFlash } from "./project-flash";
-import { HideModulesDialog } from "./project-home-dialogs";
-import { projectPath } from "./projects-home";
-import { ProjectStatusBadge, projectDates } from "./project-status";
+import { ProjectAvatar } from "@/app/app/_components/projects/project-avatar";
+import { ProjectShellHeaderSkeleton } from "@/app/app/projects/_components/projects-skeletons";
+import {
+  clearProjectFlash,
+  peekProjectFlash,
+} from "@/app/app/projects/_components/project-flash";
+import { HideModulesDialog } from "@/app/app/projects/_components/project-home-dialogs";
+import { projectPath } from "@/app/app/projects/_components/projects-home";
+import {
+  ProjectStatusBadge,
+  projectDates,
+} from "@/app/app/_components/projects/project-status";
 
 type OptionsDialog = "hide" | "backup" | null;
 

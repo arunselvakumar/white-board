@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { formatCalendarDate } from "@/components/projects/project-status";
+import { formatCalendarDate } from "@/app/app/_components/projects/project-status";
 import { browserToday, presetDuration } from "@/lib/dashboard-duration";
 import type {
   CompanyDashboard as Dashboard,

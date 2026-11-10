@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
-import { ProjectResourcesPage } from "@/components/projects/resources/project-resources-page";
-import { RESOURCES_STEP } from "@/components/projects/resources/resources-step";
+import { ProjectResourcesPage } from "@/app/app/projects/[id]/resources/_components/project-resources-page";
+import { RESOURCES_STEP } from "@/app/app/projects/_components/resources/resources-step";
 import { QuerySuspense } from "@/components/query-suspense";
-import { ProjectResourcesSkeleton } from "@/components/projects/resources/resources-skeletons";
+import { ProjectResourcesSkeleton } from "@/app/app/projects/[id]/resources/_components/resources-skeletons";
 
 export const metadata: Metadata = { title: "Resources" };
 

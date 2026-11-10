@@ -60,8 +60,8 @@ import {
   type GalleryUploader,
 } from "@/src/queries/project-gallery";
 
-import { FileThumbnail } from "../files/file-thumbnail";
-import { FileViewer } from "../files/file-viewer";
+import { FileThumbnail } from "@/components/projects/files/file-thumbnail";
+import { FileViewer } from "@/components/projects/files/file-viewer";
 import { GALLERY_TYPE_TABS } from "./gallery-skeletons";
 
 const SEARCH_DELAY_MS = 300;

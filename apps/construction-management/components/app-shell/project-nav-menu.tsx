@@ -28,8 +28,8 @@ import { usePaymentsNavLinks } from "@/components/finance/payments-hub/payments-
 import { PAYMENTS_TABS } from "@/components/finance/payments-hub/payments-tabs";
 import { useMaterialsNavLinks } from "@/components/procurement/materials-hub/materials-nav";
 import { MATERIALS_TABS } from "@/components/procurement/materials-hub/materials-tabs";
-import { ProjectAvatar } from "@/components/projects/project-avatar";
-import { PROJECT_MODULE_ICONS } from "@/components/projects/project-module-icons";
+import { ProjectAvatar } from "@/app/app/_components/projects/project-avatar";
+import { PROJECT_MODULE_ICONS } from "@/app/app/_components/projects/project-module-icons";
 import { useEquipmentNavLinks } from "@/components/site-work/equipment/equipment-nav";
 import { EQUIPMENT_TABS } from "@/components/site-work/equipment/equipment-tabs";
 // Sales (CM-1006)

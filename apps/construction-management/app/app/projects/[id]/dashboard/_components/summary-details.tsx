@@ -7,8 +7,8 @@ import {
   clientPhoneLabel,
   orderValueLabel,
   PROJECT_PAPERS,
-} from "@/components/projects/project-contract";
-import { formatCalendarDate } from "@/components/projects/project-status";
+} from "@/app/app/projects/_components/project-contract";
+import { formatCalendarDate } from "@/app/app/_components/projects/project-status";
 import { projectQuery, type ProjectResponse } from "@/src/queries/projects";
 
 type TileProps = {

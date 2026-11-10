@@ -13,9 +13,12 @@ import type {
 import type { ProjectResponse } from "@/src/queries/projects";
 import { addDays } from "@/src/shared-kernel/calendar-date";
 
-import { mockApi, StoryQueries } from "../../../.storybook/mocks/api";
-import { signInAs, storyUser } from "../../../.storybook/mocks/auth";
-import { KUMARI, project } from "../project-fixtures";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
+import { signInAs, storyUser } from "@/.storybook/mocks/auth";
+import {
+  KUMARI,
+  project,
+} from "@/app/app/_components/projects/project-fixtures";
 import {
   emptyFinanceDashboard,
   FINANCE_DASHBOARD_PATH,

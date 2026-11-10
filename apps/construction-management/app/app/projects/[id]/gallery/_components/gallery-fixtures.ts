@@ -3,8 +3,8 @@ import type {
   GalleryUploader,
 } from "@/src/queries/project-gallery";
 
-import { mockApi } from "../../../.storybook/mocks/api";
-import { ANUGRAHA } from "../documents/document-fixtures";
+import { mockApi } from "@/.storybook/mocks/api";
+import { ANUGRAHA } from "@/components/projects/documents/document-fixtures";
 
 /** Story fixtures for the Project Gallery (CM-410). */
 export const GALLERY_PROJECT_ID = ANUGRAHA.id;

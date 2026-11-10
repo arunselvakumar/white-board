@@ -36,7 +36,7 @@ import { isCalendarDate } from "@/src/shared-kernel/calendar-date";
 import { isGstStateCode } from "@/src/shared-kernel/gst-states";
 
 import { groupRupees, PROJECT_PAPERS } from "./project-contract";
-import { PROJECT_STATUS_ORDER } from "./project-status";
+import { PROJECT_STATUS_ORDER } from "@/app/app/_components/projects/project-status";
 
 const dateField = z
   .string()

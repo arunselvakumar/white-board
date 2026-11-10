@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import {
   project,
   projectList,
   STORY_LOGO_URL,
   STORY_PROJECTS,
-} from "./project-fixtures";
+} from "@/app/app/_components/projects/project-fixtures";
 import type { ProjectColor } from "@/src/projects/domain/project-color";
 
 import { ProjectsHome } from "./projects-home";

@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
-import { mockXhrUploads } from "../../../.storybook/mocks/xhr";
+import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
+import { mockXhrUploads } from "@/.storybook/mocks/xhr";
 import { TestingItemPage } from "./testing-item-page";
 import {
   BRICKS_ID,
@@ -11,7 +11,7 @@ import {
   TESTING_API,
   TESTING_PROJECT_ID,
   mockTestingReportsApi,
-} from "./testing-report-fixtures";
+} from "@/app/app/projects/[id]/testing-reports/_components/testing-report-fixtures";
 
 let api: ReturnType<typeof mockTestingReportsApi>;
 let xhr: ReturnType<typeof mockXhrUploads>;

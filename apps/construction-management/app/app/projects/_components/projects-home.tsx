@@ -65,7 +65,10 @@ import { HideModulesDialog } from "./project-home-dialogs";
 import { ProjectFolderCard } from "./project-folder-card";
 import { PROJECT_FOLDER_TINTS } from "./project-folder-colors";
 import { PROJECT_FOLDER_GRID } from "./projects-skeletons";
-import { PROJECT_STATUS_LABELS, PROJECT_STATUS_ORDER } from "./project-status";
+import {
+  PROJECT_STATUS_LABELS,
+  PROJECT_STATUS_ORDER,
+} from "@/app/app/_components/projects/project-status";
 
 export const PROJECTS_PATH = "/app/projects";
 

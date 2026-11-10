@@ -54,10 +54,10 @@ import {
   type TestingReportFilter,
 } from "@/src/queries/project-testing-reports";
 
-import { FileThumbnail } from "../files/file-thumbnail";
-import { FileViewer } from "../files/file-viewer";
+import { FileThumbnail } from "@/components/projects/files/file-thumbnail";
+import { FileViewer } from "@/components/projects/files/file-viewer";
 import { TestingReportSheet } from "./testing-report-sheet";
-import { reportCountLabel } from "./testing-reports-page";
+import { reportCountLabel } from "@/app/app/projects/[id]/testing-reports/_components/testing-reports-page";
 
 const SEARCH_DELAY_MS = 300;
 

@@ -5,14 +5,17 @@ import type { ProjectHome } from "@/src/queries/project-home";
 
 import { PagePlaceholder } from "@/components/app-shell/page-placeholder";
 
-import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
-import { KUMARI, STORY_LOGO_URL } from "./project-fixtures";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
+import {
+  KUMARI,
+  STORY_LOGO_URL,
+} from "@/app/app/_components/projects/project-fixtures";
 import {
   clearProjectFlash,
   peekProjectFlash,
   setProjectFlash,
-} from "./project-flash";
-import { storyHome } from "./project-home-fixtures";
+} from "@/app/app/projects/_components/project-flash";
+import { storyHome } from "@/app/app/_components/projects/project-home-fixtures";
 import { ProjectShell } from "./project-shell";
 
 const BASE = "/api/construction/projects/projects";

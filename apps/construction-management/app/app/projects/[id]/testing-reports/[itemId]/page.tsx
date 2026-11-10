@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
-import { TestingItemPage } from "@/components/projects/testing-reports/testing-item-page";
+import { TestingItemPage } from "@/app/app/projects/[id]/testing-reports/[itemId]/_components/testing-item-page";
 import { QuerySuspense } from "@/components/query-suspense";
-import { TestingItemSkeleton } from "@/components/projects/testing-reports/testing-reports-skeletons";
+import { TestingItemSkeleton } from "@/app/app/projects/[id]/testing-reports/_components/testing-reports-skeletons";
 
 export const metadata: Metadata = { title: "Testing reports" };
 

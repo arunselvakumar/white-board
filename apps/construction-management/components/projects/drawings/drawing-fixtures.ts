@@ -6,7 +6,7 @@ import type {
 } from "@/src/queries/project-drawings";
 
 import { mockApi } from "../../../.storybook/mocks/api";
-import { ANUGRAHA } from "../project-fixtures";
+import { ANUGRAHA } from "@/app/app/_components/projects/project-fixtures";
 
 /** Story fixtures for Project Drawings (CM-408), on Anugraha Residency. */
 export { ANUGRAHA };

@@ -6,10 +6,13 @@ import { cn } from "@repo/ui/lib/utils";
 import { projectTypeLabel } from "@/src/projects/domain/project-type";
 import type { ProjectList } from "@/src/queries/projects";
 
-import { ProjectAvatar } from "./project-avatar";
+import { ProjectAvatar } from "@/app/app/_components/projects/project-avatar";
 import { PROJECT_FOLDER_TINTS } from "./project-folder-colors";
-import { ProjectProgressBar } from "./project-progress";
-import { ProjectStatusBadge, projectDates } from "./project-status";
+import { ProjectProgressBar } from "@/app/app/_components/projects/project-progress";
+import {
+  ProjectStatusBadge,
+  projectDates,
+} from "@/app/app/_components/projects/project-status";
 
 type ProjectItem = ProjectList["items"][number];
 

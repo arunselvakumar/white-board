@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { ProjectShell } from "@/components/projects/project-shell";
+import { ProjectShell } from "@/app/app/projects/[id]/_components/project-shell";
 
 /** The project shell around every Project page (CM-204). */
 export default async function ProjectLayout({

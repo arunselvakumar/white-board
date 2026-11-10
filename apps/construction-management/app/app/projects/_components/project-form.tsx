@@ -64,7 +64,10 @@ import { GST_STATES } from "@/src/shared-kernel/gst-states";
 import { ContractPapersField } from "./contract-papers-field";
 import { ProjectColorField } from "./project-color-field";
 import { CustomFieldsField } from "./custom-fields-field";
-import { CollapsibleFormCard, FormCard } from "./form-card";
+import {
+  CollapsibleFormCard,
+  FormCard,
+} from "@/app/app/_components/projects/form-card";
 import {
   clientPhoneLabel,
   groupRupees,
@@ -97,7 +100,7 @@ import {
   PROJECT_STATUS_LABELS,
   PROJECT_STATUS_ORDER,
   projectInitials,
-} from "./project-status";
+} from "@/app/app/_components/projects/project-status";
 
 const STATUS_ITEMS = PROJECT_STATUS_ORDER.map((status) => ({
   value: status,

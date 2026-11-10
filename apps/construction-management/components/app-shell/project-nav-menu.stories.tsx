@@ -4,9 +4,12 @@ import { expect, waitFor, within } from "storybook/test";
 import { AppShell } from "@/components/app-shell/app-shell";
 import { PagePlaceholder } from "@/components/app-shell/page-placeholder";
 import { financeAccess } from "@/components/finance/accounts/account-list-fixtures";
-import { KUMARI, STORY_LOGO_URL } from "@/components/projects/project-fixtures";
-import { storyHome } from "@/components/projects/project-home-fixtures";
-import { ProjectShell } from "@/components/projects/project-shell";
+import {
+  KUMARI,
+  STORY_LOGO_URL,
+} from "@/app/app/_components/projects/project-fixtures";
+import { storyHome } from "@/app/app/_components/projects/project-home-fixtures";
+import { ProjectShell } from "@/app/app/projects/[id]/_components/project-shell";
 import type { ProjectHome } from "@/src/queries/project-home";
 
 import { mockApi, StoryQueries } from "../../.storybook/mocks/api";

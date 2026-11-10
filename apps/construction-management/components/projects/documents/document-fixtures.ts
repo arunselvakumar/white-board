@@ -2,7 +2,7 @@ import type { ProjectDocumentKind } from "@/src/projects/domain/project-document
 import type { ProjectDocument } from "@/src/queries/project-documents";
 
 import { mockApi } from "../../../.storybook/mocks/api";
-import { project } from "../project-fixtures";
+import { project } from "@/app/app/_components/projects/project-fixtures";
 
 /** Story fixtures for Project Documents (CM-414). */
 export const ANUGRAHA = project({

@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 
-import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
-import { mockXhrUploads } from "../../../.storybook/mocks/xhr";
+import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
+import { mockXhrUploads } from "@/.storybook/mocks/xhr";
 import {
   BRICKS_ID,
   TESTING_API,
   TESTING_PROJECT_ID,
   COMPRESSIVE_LOT_1,
   mockTestingReportsApi,
-} from "./testing-report-fixtures";
+} from "@/app/app/projects/[id]/testing-reports/_components/testing-report-fixtures";
 import { TestingReportSheet } from "./testing-report-sheet";
 
 let api: ReturnType<typeof mockTestingReportsApi>;
