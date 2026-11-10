@@ -1,7 +1,7 @@
 import { Skeleton } from "@repo/ui/components/skeleton";
 import { SkeletonGroup, SkeletonText } from "@repo/ui/components/skeleton-kit";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 
 /** Notifications while they load (ADR-0047). */
 

@@ -10,7 +10,7 @@ import { SidebarAccount } from "@repo/ui/components/sidebar-chrome";
 
 import { NotificationBell } from "@/components/notifications/notification-bell";
 
-import { BrandMark } from "./brand-mark";
+import { BrandMark } from "@/components/app-shell/brand-mark";
 import { AccountAvatar, UserMenuContent, useAccount } from "./user-menu";
 
 /**

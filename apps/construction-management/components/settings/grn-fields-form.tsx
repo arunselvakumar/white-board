@@ -14,7 +14,7 @@ import { Label } from "@repo/ui/components/label";
 import { Switch } from "@repo/ui/components/switch";
 
 import { FormAlert } from "@/components/auth/form-alert";
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   grnFieldSettingQuery,

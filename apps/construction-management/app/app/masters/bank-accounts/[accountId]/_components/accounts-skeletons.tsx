@@ -4,8 +4,8 @@ import {
   type SkeletonColumn,
 } from "@repo/ui/components/skeleton-kit";
 
-import type { PageHeaderBack } from "@/components/app-shell/page-header";
-import { PageHeaderSkeleton } from "@/components/app-shell/page-header-skeleton";
+import type { PageHeaderBack } from "@/app/app/_components/app-shell/page-header";
+import { PageHeaderSkeleton } from "@/app/app/_components/app-shell/page-header-skeleton";
 import {
   ResponsiveListSkeleton,
   SummaryTilesSkeleton,

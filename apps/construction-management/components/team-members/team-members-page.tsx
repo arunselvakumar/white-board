@@ -52,7 +52,7 @@ import {
 } from "@repo/ui/components/input-group";
 import { cn } from "@repo/ui/lib/utils";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
 import { STAFF_PATH, staffCount, staffPath } from "@/lib/staff-nav";
 import { QueryHttpError } from "@/src/queries/http";

@@ -45,12 +45,12 @@ import {
 import {
   MenuSkeleton,
   SKELETON_WIDTHS,
-} from "@/components/app-shell/app-shell-skeletons";
+} from "@/app/app/_components/app-shell/app-shell-skeletons";
 import {
   SUBMENU_BUTTON_CLASS,
   SUBMENU_CLASS,
   SubmenuRow,
-} from "@/components/app-shell/submenu-row";
+} from "@/app/app/_components/app-shell/submenu-row";
 import type { ProjectModuleKey } from "@/src/projects/domain/project-modules";
 import { projectTypeLabel } from "@/src/projects/domain/project-type";
 import { BOOKINGS_TABS } from "@/src/queries/sales-units";

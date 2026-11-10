@@ -3,7 +3,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense } from "react";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { EquipmentFormSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
 import { equipmentQuery } from "@/src/queries/equipment";
 

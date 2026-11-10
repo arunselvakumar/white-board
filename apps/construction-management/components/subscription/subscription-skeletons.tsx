@@ -8,8 +8,8 @@ import {
 } from "@repo/ui/components/card";
 import { SkeletonGroup, SkeletonText } from "@repo/ui/components/skeleton-kit";
 
-import { PageHeader } from "@/components/app-shell/page-header";
-import { PageHeaderSkeleton } from "@/components/app-shell/page-header-skeleton";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
+import { PageHeaderSkeleton } from "@/app/app/_components/app-shell/page-header-skeleton";
 
 import { GRANT_LABELS } from "./subscription-text";
 

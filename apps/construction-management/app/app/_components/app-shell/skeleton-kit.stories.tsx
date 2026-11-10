@@ -11,7 +11,7 @@ import {
   TabsSkeleton,
 } from "@repo/ui/components/skeleton-kit";
 
-import { PageFallback } from "../query-suspense";
+import { PageFallback } from "@/components/query-suspense";
 import { PageHeaderSkeleton } from "./page-header-skeleton";
 
 /** The skeleton kit (ADR-0047), each piece as a page would use it. */

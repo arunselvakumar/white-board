@@ -16,7 +16,7 @@ import { Label } from "@repo/ui/components/label";
 import type { GetConstructionOrganizationBackdatedEntryPolicyResponseModel } from "@/app/api/construction/organization/settings/backdated-entry/get-backdated-entry-policy-response-model";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   backdatedEntryPolicyQuery,

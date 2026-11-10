@@ -11,7 +11,7 @@ import {
   ItemTitle,
 } from "@repo/ui/components/item";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { MastersBackupButton } from "@/components/backups/masters-backup-button";
 import { MASTERS_GROUPS } from "@/lib/masters-nav";
 

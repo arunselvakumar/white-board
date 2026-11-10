@@ -37,7 +37,7 @@ import {
   InputGroupInput,
 } from "@repo/ui/components/input-group";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MasterListPageSkeleton } from "@/app/app/_components/masters/masters-skeletons";
 import { fieldForCode } from "@/lib/server-errors";

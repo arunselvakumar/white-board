@@ -4,7 +4,7 @@ import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
 import { COUNTERPARTY_KIND_LABELS } from "@/app/app/projects/[id]/payments/_components/counterparty-field";
 import { FinanceDocumentActivity } from "@/app/app/projects/[id]/payments/_components/finance-document-activity";

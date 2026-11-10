@@ -23,7 +23,7 @@ import {
 } from "@repo/ui/components/empty";
 import { Spinner } from "@repo/ui/components/spinner";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import {
   downloadsQuery,
   useDeleteDownload,

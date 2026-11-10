@@ -24,7 +24,7 @@ import {
   DialogTitle,
 } from "@repo/ui/components/dialog";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FinanceDocumentActivity } from "@/app/app/projects/[id]/payments/_components/finance-document-activity";
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";

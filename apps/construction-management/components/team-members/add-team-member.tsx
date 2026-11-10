@@ -13,7 +13,7 @@ import { useState } from "react";
 import { useForm, useWatch, type FieldPath } from "react-hook-form";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
 import { FormSection } from "@/components/forms/form-section";
 import { fieldForCode } from "@/lib/server-errors";

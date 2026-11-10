@@ -12,7 +12,7 @@ import {
   TabsTrigger,
 } from "@repo/ui/components/tabs";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { canInFinance, financeAccessQuery } from "@/src/queries/finance-access";
 import {
   partyStatementQuery,

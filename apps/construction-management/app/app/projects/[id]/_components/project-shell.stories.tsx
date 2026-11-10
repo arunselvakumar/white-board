@@ -3,7 +3,7 @@ import { expect, within } from "storybook/test";
 
 import type { ProjectHome } from "@/src/queries/project-home";
 
-import { PagePlaceholder } from "@/components/app-shell/page-placeholder";
+import { PagePlaceholder } from "@/app/app/_components/app-shell/page-placeholder";
 
 import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import {

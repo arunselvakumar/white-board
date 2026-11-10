@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { signInAs } from "../../.storybook/mocks/auth";
-import { PIXEL_PNG, mockApi } from "../../.storybook/mocks/profile-api";
+import { signInAs } from "@/.storybook/mocks/auth";
+import { PIXEL_PNG, mockApi } from "@/.storybook/mocks/profile-api";
 import { SidebarAccountRow } from "./sidebar-account-row";
 
 /**

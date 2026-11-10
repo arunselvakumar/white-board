@@ -15,7 +15,7 @@ import {
 } from "@repo/ui/components/tabs";
 import { cn } from "@repo/ui/lib/utils";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { formatPaise } from "@/components/money/money-input";
 import { formatDate } from "@/components/payments/payment-format";
 import { RecentReports } from "@/app/app/_components/reports/recent-reports";

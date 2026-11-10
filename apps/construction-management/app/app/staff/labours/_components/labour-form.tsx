@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "@repo/ui/components/select";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FieldError } from "@/components/auth/field-error";
 import { FormSection } from "@/components/forms/form-section";
 import { FormAlert } from "@/components/auth/form-alert";

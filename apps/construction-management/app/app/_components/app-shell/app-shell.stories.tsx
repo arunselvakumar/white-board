@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, waitFor, within } from "storybook/test";
 
-import { AppAreaPage } from "@/components/app-shell/app-area-page";
-import { AppShell } from "@/components/app-shell/app-shell";
+import { AppAreaPage } from "@/app/app/_components/app-shell/app-area-page";
+import { AppShell } from "@/app/app/_components/app-shell/app-shell";
 import { APP_NAV, appPageByHref, type AppNavHref } from "@/lib/app-nav";
 import { HRMS_PATH, HRMS_SECTIONS } from "@/lib/hrms-nav";
 import { MASTERS_GROUPS } from "@/lib/masters-nav";
 import { LABOURS_PAGE_PATH, staffSections } from "@/lib/staff-nav";
 
-import { authMocks, signInAs } from "../../.storybook/mocks/auth";
+import { authMocks, signInAs } from "@/.storybook/mocks/auth";
 
 function shellAt(
   href: AppNavHref,

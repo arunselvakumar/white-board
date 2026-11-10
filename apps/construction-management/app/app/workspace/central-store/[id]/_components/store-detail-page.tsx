@@ -21,7 +21,7 @@ import {
   TabsTrigger,
 } from "@repo/ui/components/tabs";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { DeliveryNotesList } from "@/app/app/_components/procurement/delivery-notes/delivery-notes-list";
 import { InventoryPage } from "@/app/app/_components/procurement/inventory/inventory-page";
 import { MaterialRequestsList } from "@/app/app/_components/procurement/material-requests/material-requests-list";

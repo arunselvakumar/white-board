@@ -24,7 +24,7 @@ import {
 import { MetricCard } from "@repo/ui/components/metric-card";
 import { cn } from "@repo/ui/lib/utils";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import {
   COMPANY_DASHBOARD_COLUMNS,
   COMPANY_DASHBOARD_HEAD as HEAD,

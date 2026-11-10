@@ -47,7 +47,7 @@ import {
 } from "@repo/ui/components/empty";
 import { cn } from "@repo/ui/lib/utils";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { CheckInBanner } from "@/app/app/projects/_components/hrms/check-in-banner";
 import { groupByClient } from "@/src/projects/domain/client-groups";
 import {

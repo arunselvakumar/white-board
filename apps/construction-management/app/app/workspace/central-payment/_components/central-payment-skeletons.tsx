@@ -5,7 +5,7 @@ import { Skeleton } from "@repo/ui/components/skeleton";
 import { SkeletonGroup, SkeletonText } from "@repo/ui/components/skeleton-kit";
 import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/tabs";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 
 /*
  * Central Payment while it loads (ADR-0047): the real title, the Party

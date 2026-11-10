@@ -5,7 +5,7 @@ import { Hammer, Plus } from "lucide-react";
 import { Suspense, useMemo, useState } from "react";
 import { Button } from "@repo/ui/components/button";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";
 import {

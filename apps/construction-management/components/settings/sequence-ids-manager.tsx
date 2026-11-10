@@ -37,7 +37,7 @@ import {
 } from "@repo/ui/components/select";
 
 import { FormAlert } from "@/components/auth/form-alert";
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { QueryHttpError } from "@/src/queries/http";
 import { projectOptionsQuery } from "@/src/queries/projects";
 import {
