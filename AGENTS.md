@@ -66,6 +66,23 @@ A **Student** remains a Workspace record, distinct from a User. Add Student invi
 - Student photos and initials use `components/students/student-avatar.tsx`; see [`docs/ui/student-avatar.md`](./docs/ui/student-avatar.md) for the color rule. Do not choose avatar colors in individual screens.
 - Add and edit forms use the Add Student page content width: `w-full p-6` outside and `w-full max-w-4xl` inside. Keep Add Course, Edit Course, Add Batch, and Edit Batch at the same width; apply it to Enroll Student and future add flows too. Use responsive field layouts so the forms make use of that width, and keep Storybook previews aligned with the pages.
 
+## Where components go
+
+Both apps (Whiteboard and Construction Management) place a component by the pages that use it:
+
+- **Used by one page:** in `_components/` next to that `page.tsx`. Next.js treats a `_`-prefixed folder as private, so it never becomes a route.
+- **Shared by pages in one subtree:** in `_components/` in the nearest folder that holds every page that imports it (for example `app/(app)/students/_components/` for a form used by Add Student and Edit Student). Where that folder collects pieces from several areas (`app/(app)/_components/`, `app/app/_components/`), keep one subfolder per area.
+- **App-wide:** in `components/`. That is `ui`, `forms`, `money`, `query-provider`, `query-suspense`, `page-transition`, `theme-preference-sync`, and pieces used across route groups (sign-in and onboarding alike).
+- Stories, tests, fixtures and `*-skeletons.tsx` sit beside the component they cover.
+- Move files with `git mv`, in a commit that only renames, so `git log --follow` and blame survive.
+
+## Comments
+
+Write a comment only when the code cannot say it:
+
+- **Write:** invariants, units and ranges (`/** 1–12; the academic year starts on the 1st of this month. */`); a non-obvious reason the code is the way it is; a pointer to an ADR where the code deviates from the obvious (`(ADR-0047)`, `(ADR CM-0011)`).
+- **Do not write:** ticket or milestone IDs (`CM-501`, `P0-002`, `M10`) or menu paths (`Masters → …`) — those belong in the PR and commit message; comments that restate the name of a function, prop or type; history ("used to…", "now…", "for now") instead of what the code does.
+
 ## Testing
 
 - Domain unit tests (no Prisma) for invariants.
