@@ -1,7 +1,7 @@
 import { mockApi, type ApiCall } from "../../../.storybook/mocks/api";
 import type { SiteWorkAccessMenu } from "@/app/api/construction/site-work/access/access-models";
 import { localToday } from "@/app/app/_components/procurement/inventory/inventory-format";
-import { mockSiteWorkDocumentApi } from "@/components/site-work/documents/site-work-document-fixtures";
+import { mockSiteWorkDocumentApi } from "@/app/app/projects/[id]/_components/site-work/documents/site-work-document-fixtures";
 import { siteWorkAccess } from "@/components/site-work/site-diary/site-diary-fixtures";
 import type { Flag } from "@/src/shared-kernel/access";
 import { addDays } from "@/src/shared-kernel/calendar-date";

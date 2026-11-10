@@ -25,7 +25,7 @@ import { FormAlert } from "@/components/auth/form-alert";
 import { localToday } from "@/components/payments/payment-format";
 import { SalesPendingFilesField } from "@/components/sales/documents/sales-pending-files-field";
 import { useUploadPendingSalesFiles } from "@/components/sales/documents/use-upload-pending-sales-files";
-import { RadioCard } from "@/components/site-work/equipment/radio-card";
+import { RadioCard } from "@/app/app/_components/site-work/equipment/radio-card";
 import { QueryHttpError } from "@/src/queries/http";
 import {
   bookingFormOptionsQuery,

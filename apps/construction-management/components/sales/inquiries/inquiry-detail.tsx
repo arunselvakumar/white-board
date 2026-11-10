@@ -20,7 +20,7 @@ import { cn } from "@repo/ui/lib/utils";
 import { FormAlert } from "@/components/auth/form-alert";
 import { formatDate, localToday } from "@/components/payments/payment-format";
 import { SalesDocumentFiles } from "@/components/sales/documents/sales-document-files";
-import { SiteRecordHeader } from "@/components/site-work/site-record-header";
+import { SiteRecordHeader } from "@/app/app/projects/[id]/_components/site-work/site-record-header";
 import { formatDateTime } from "@/components/tracking/issues/issue-parts";
 import { QueryHttpError } from "@/src/queries/http";
 import { canInSales, salesAccessQuery } from "@/src/queries/sales-access";

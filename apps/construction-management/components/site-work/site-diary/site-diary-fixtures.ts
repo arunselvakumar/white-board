@@ -3,7 +3,7 @@ import {
   SITE_WORK_ACCESS_MENUS,
   type SiteWorkAccessMenu,
 } from "@/app/api/construction/site-work/access/access-models";
-import { mockSiteWorkDocumentApi } from "@/components/site-work/documents/site-work-document-fixtures";
+import { mockSiteWorkDocumentApi } from "@/app/app/projects/[id]/_components/site-work/documents/site-work-document-fixtures";
 import { localToday } from "@/app/app/_components/procurement/inventory/inventory-format";
 import { menuByKey, type Flag } from "@/src/shared-kernel/access";
 import { fromMask } from "@/src/shared-kernel/access/flags";

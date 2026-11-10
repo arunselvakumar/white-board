@@ -22,8 +22,8 @@ import { Textarea } from "@repo/ui/components/textarea";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { LocationPicker } from "@/app/app/_components/locations/location-picker";
-import { PendingFilesField } from "@/components/site-work/documents/pending-files-field";
-import { useUploadPendingFiles } from "@/components/site-work/documents/use-upload-pending-files";
+import { PendingFilesField } from "@/app/app/projects/[id]/_components/site-work/documents/pending-files-field";
+import { useUploadPendingFiles } from "@/app/app/projects/[id]/_components/site-work/documents/use-upload-pending-files";
 import { localToday } from "@/app/app/_components/procurement/inventory/inventory-format";
 import { QueryHttpError } from "@/src/queries/http";
 import {

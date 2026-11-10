@@ -3,11 +3,11 @@ import type { Metadata } from "next";
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { QuerySuspense } from "@/components/query-suspense";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
-import { NewEquipmentSheetPage } from "@/components/site-work/equipment-sheets/equipment-sheet-form-pages";
+import { NewEquipmentSheetPage } from "@/app/app/projects/[id]/equipment/usage-sheets/_components/equipment-sheet-form-pages";
 import {
   EquipmentSheetFormSkeleton,
   TitledFormSkeleton,
-} from "@/components/site-work/site-work-skeletons";
+} from "@/app/app/_components/site-work/site-work-skeletons";
 
 export const metadata: Metadata = { title: "Add usage sheet" };
 

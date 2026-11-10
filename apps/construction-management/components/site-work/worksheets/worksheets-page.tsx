@@ -60,7 +60,7 @@ import {
   worksheetsPath,
 } from "./worksheet-format";
 import { WorksheetSettingsDialog } from "./worksheet-settings-dialog";
-import { WorksheetRowsSkeleton } from "@/components/site-work/site-work-skeletons";
+import { WorksheetRowsSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
 
 type Filters = {
   date: DateFilterValue;

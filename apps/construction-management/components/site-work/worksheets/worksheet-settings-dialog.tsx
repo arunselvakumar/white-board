@@ -29,7 +29,7 @@ import {
   WORKSHEET_SECTION_LABELS,
   WORKSHEET_SECTIONS,
 } from "@/src/site-work/domain/worksheet";
-import { SettingsListSkeleton } from "@/components/site-work/site-work-skeletons";
+import { SettingsListSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
 
 const TOGGLES = [
   { key: "showLocation", label: "Location Type" },

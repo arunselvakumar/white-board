@@ -2,7 +2,10 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
 import { SiteWorkPhotoStrip } from "./site-work-photo-strip";
-import { siteWorkFile, swatch } from "./site-work-document-fixtures";
+import {
+  siteWorkFile,
+  swatch,
+} from "@/app/app/projects/[id]/_components/site-work/documents/site-work-document-fixtures";
 
 const COLOURS = [
   "#a8a29e",

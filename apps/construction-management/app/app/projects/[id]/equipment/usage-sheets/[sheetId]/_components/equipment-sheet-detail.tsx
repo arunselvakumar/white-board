@@ -18,7 +18,7 @@ import { FormAlert } from "@/components/auth/form-alert";
 import { LocationLabel } from "@/app/app/_components/locations/location-picker";
 import { formatDate } from "@/components/payments/payment-format";
 import { ScrollTable } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/scroll-table";
-import { SiteWorkDocumentActivity } from "@/components/site-work/documents/site-work-document-activity";
+import { SiteWorkDocumentActivity } from "@/app/app/projects/[id]/_components/site-work/documents/site-work-document-activity";
 import {
   quantityText,
   SheetApprovalBadge,
@@ -41,7 +41,7 @@ import {
 import { FUEL_BORNE_BY_LABELS } from "@/src/site-work/domain/equipment-usage";
 import { SHEET_APPROVAL_LABELS } from "@/src/site-work/domain/shift";
 
-import { EquipmentSheetActions } from "./equipment-sheet-actions";
+import { EquipmentSheetActions } from "@/app/app/projects/[id]/equipment/usage-sheets/_components/equipment-sheet-actions";
 import {
   billableUnit,
   fuelText,
@@ -49,8 +49,8 @@ import {
   moneyText,
   OwnershipBadge,
   usageText,
-} from "./equipment-sheet-format";
-import { trimDecimal } from "./equipment-sheet-live";
+} from "@/app/app/projects/[id]/equipment/usage-sheets/_components/equipment-sheet-format";
+import { trimDecimal } from "@/app/app/projects/[id]/equipment/usage-sheets/_components/equipment-sheet-live";
 import { FactValueSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {

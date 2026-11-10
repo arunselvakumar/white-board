@@ -17,7 +17,7 @@ import { FormAlert } from "@/components/auth/form-alert";
 import { LocationLabel } from "@/app/app/_components/locations/location-picker";
 import { formatDate } from "@/components/payments/payment-format";
 import { ScrollTable } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/scroll-table";
-import { SiteWorkDocumentActivity } from "@/components/site-work/documents/site-work-document-activity";
+import { SiteWorkDocumentActivity } from "@/app/app/projects/[id]/_components/site-work/documents/site-work-document-activity";
 import {
   canInSiteWork,
   siteWorkAccessQuery,

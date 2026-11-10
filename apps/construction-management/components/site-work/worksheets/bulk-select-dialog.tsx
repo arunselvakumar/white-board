@@ -20,7 +20,7 @@ import {
   materialOptionsQuery,
   type MaterialOption,
 } from "@/src/queries/material-options";
-import { MaterialChecklistSkeleton } from "@/components/site-work/site-work-skeletons";
+import { MaterialChecklistSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
 
 function useDebounced<T>(value: T, delay: number): T {
   const [debounced, setDebounced] = useState(value);

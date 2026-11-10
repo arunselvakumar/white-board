@@ -54,7 +54,7 @@ import {
 import {
   HINDRANCE_STATUS_TABS,
   HindranceRowsSkeleton,
-} from "@/components/site-work/site-work-skeletons";
+} from "@/app/app/_components/site-work/site-work-skeletons";
 
 const ALL = "all";
 

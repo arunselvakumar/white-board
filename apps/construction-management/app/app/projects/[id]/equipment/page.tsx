@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { equipmentModulePath } from "@/components/site-work/equipment/equipment-tabs";
+import { equipmentModulePath } from "@/app/app/_components/site-work/equipment/equipment-tabs";
 
 /** The Equipment module opens on its usage sheets. */
 export default async function EquipmentPage({

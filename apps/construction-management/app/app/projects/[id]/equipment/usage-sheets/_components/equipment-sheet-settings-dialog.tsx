@@ -29,7 +29,7 @@ import {
   EQUIPMENT_SHEET_TOGGLE_LABELS,
   type EquipmentSheetFieldToggle,
 } from "@/src/site-work/domain/equipment-usage";
-import { SettingsListSkeleton } from "@/components/site-work/site-work-skeletons";
+import { SettingsListSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
 
 const schema = z.object({
   showOperator: z.boolean(),

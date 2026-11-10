@@ -4,7 +4,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { buttonVariants } from "@repo/ui/components/button";
 
-import { SiteRecordHeader } from "@/components/site-work/site-record-header";
+import { SiteRecordHeader } from "@/app/app/projects/[id]/_components/site-work/site-record-header";
 import {
   inspectionQuery,
   inspectionReinspectionQuery,

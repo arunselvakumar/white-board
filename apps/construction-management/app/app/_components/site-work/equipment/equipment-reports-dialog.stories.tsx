@@ -10,11 +10,7 @@ import {
   TODAY,
 } from "@/components/reports/report-fixtures";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../../.storybook/mocks/api";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import {
   equipmentHandler,
   type EquipmentApiOptions,

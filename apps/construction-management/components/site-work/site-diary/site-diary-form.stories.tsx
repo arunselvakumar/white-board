@@ -3,7 +3,7 @@ import { expect, waitFor, within } from "storybook/test";
 
 import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
 import { mockXhrUploads } from "../../../.storybook/mocks/xhr";
-import { SITE_WORK_DOCUMENTS_API } from "@/components/site-work/documents/site-work-document-fixtures";
+import { SITE_WORK_DOCUMENTS_API } from "@/app/app/projects/[id]/_components/site-work/documents/site-work-document-fixtures";
 
 import {
   DIARY_DATE,

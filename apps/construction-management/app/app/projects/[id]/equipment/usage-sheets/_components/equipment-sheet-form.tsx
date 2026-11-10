@@ -47,10 +47,10 @@ import {
 import { StockErrorAlert } from "@/app/app/_components/procurement/inventory/stock-error-alert";
 import { MaterialPicker } from "@/app/app/_components/procurement/material-picker";
 import { siteLocationInput } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/purchase-request-format";
-import { PendingFilesField } from "@/components/site-work/documents/pending-files-field";
-import { useUploadPendingFiles } from "@/components/site-work/documents/use-upload-pending-files";
-import { equipmentModulePath } from "@/components/site-work/equipment/equipment-tabs";
-import { RadioCard } from "@/components/site-work/equipment/radio-card";
+import { PendingFilesField } from "@/app/app/projects/[id]/_components/site-work/documents/pending-files-field";
+import { useUploadPendingFiles } from "@/app/app/projects/[id]/_components/site-work/documents/use-upload-pending-files";
+import { equipmentModulePath } from "@/app/app/_components/site-work/equipment/equipment-tabs";
+import { RadioCard } from "@/app/app/_components/site-work/equipment/radio-card";
 import { quantityText } from "@/components/site-work/worksheets/worksheet-format";
 import {
   equipmentSheetFormOptionsQuery,
