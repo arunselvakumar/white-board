@@ -105,7 +105,7 @@ function PendingTile({
 
 /**
  * Photos or files picked on a **new** site-work form, before the document
- * has an id (CM-0016 §8). It only holds `File`s, with thumbnails: nothing
+ * has an id (ADR CM-0016 §8). It only holds `File`s, with thumbnails: nothing
  * goes up until the form is saved, then `useUploadPendingFiles(type)`
  * uploads them to the new document. Files the document would refuse (a PDF
  * on a worksheet, over 25 MB) are not added, and say why. Use it through

@@ -185,10 +185,10 @@ function Lines({
 }
 
 /**
- * A petty-cash account's statement for a period: the opening
- * balance, each approved entry with its running balance, money in and out,
- * and the closing balance. Reversals (an approved voucher edited or
- * deleted) show as their own lines.
+ * A petty-cash account's statement for a period: the opening balance, each
+ * approved entry with its running balance, money in and out, and the closing
+ * balance. Reversals (an approved voucher edited or deleted) show as their
+ * own lines.
  */
 export function AccountStatementView({
   projectId,

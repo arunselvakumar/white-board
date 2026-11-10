@@ -34,7 +34,7 @@ import {
 import type { SiteWorkAccess } from "@/src/queries/site-work-access";
 import type { Flag } from "@/src/shared-kernel/access";
 
-/** Equipment Usage sheet story fixtures (CM-604): a Chennai tower's machines. */
+/** Equipment Usage sheet story fixtures: a Chennai tower's machines. */
 
 export { CEMENT, PROJECT_ID, TODAY };
 

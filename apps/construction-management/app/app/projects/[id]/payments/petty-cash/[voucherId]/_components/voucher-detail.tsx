@@ -57,10 +57,9 @@ function Fact({
 }
 
 /**
- * A petty-cash voucher: its figures, its approval with the
- * reason of a rejection, the actions the viewer has (Edit, Approve,
- * Reject, Delete), and its photos, receipts and remarks (the finance
- * document thread).
+ * A petty-cash voucher: its figures, its approval with the reason of a
+ * rejection, the actions the viewer has (Edit, Approve, Reject, Delete), and
+ * its photos, receipts and remarks (the finance document thread).
  */
 export function VoucherDetail({
   projectId,

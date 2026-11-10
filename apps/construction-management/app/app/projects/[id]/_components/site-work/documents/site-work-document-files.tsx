@@ -44,7 +44,7 @@ export type SiteWorkDocumentFilesProps = {
 };
 
 /**
- * A site-work document's own photos and files (CM-0016 §8) as a grid of
+ * A site-work document's own photos and files (ADR CM-0016 §8) as a grid of
  * thumbnails; remarks' photos stay under their remarks. With `canEdit`
  * (and Create or Update on the document, which the server reports), files
  * upload at once with progress, and × removes one the viewer may remove.

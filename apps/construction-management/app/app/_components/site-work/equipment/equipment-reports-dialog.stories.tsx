@@ -106,7 +106,9 @@ export const CentralReports: Story = {
   },
 };
 
-/** Masters → Equipments shows Reports with Equipments Report and opens the dialog. */
+/**
+ * With Equipments Report the register shows Reports, which opens the dialog.
+ */
 export const FromTheRegister: Story = {
   render: () => (
     <StoryQueries>

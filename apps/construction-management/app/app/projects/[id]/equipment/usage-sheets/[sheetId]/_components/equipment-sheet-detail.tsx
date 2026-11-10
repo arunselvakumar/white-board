@@ -69,12 +69,11 @@ const stamp = (iso: string) =>
   }).format(new Date(iso));
 
 /**
- * One Equipment Usage sheet (CM-604): the machine, its working time
- * (shifts, meter with the gap from the previous closing, km or trips),
- * idle and breakdown, the work, fuel with the overrun, the hire (with
- * Financial), materials and approval — with **Record hindrance** when it
- * broke down, Duplicate, Edit, Delete, approve / reject, and the remarks
- * and files.
+ * One Equipment Usage sheet: the machine, its working time (shifts, meter
+ * with the gap from the previous closing, km or trips), idle and breakdown,
+ * the work, fuel with the overrun, the hire (with Financial), materials and
+ * approval — with **Record hindrance** when it broke down, Duplicate, Edit,
+ * Delete, approve / reject, and the remarks and files.
  */
 export function EquipmentSheetDetailPage({
   projectId,

@@ -25,7 +25,7 @@ import {
   ReportCardGridSkeleton,
 } from "@/components/reports/reports-skeletons";
 
-/** The central reports of Masters → Equipments. */
+/** The central reports of the equipment register. */
 const KINDS: readonly ReportDefinition["kind"][] = [
   "equipment_maintenance",
   "equipment_transfers",
@@ -51,9 +51,9 @@ function EquipmentReportCards({ today }: { today: string }) {
 }
 
 /**
- * Masters → Equipments → Reports (CM-605): the central Equipment
- * Maintenance and Equipment Transfers reports, every machine at any
- * Project or the warehouse, and the viewer's recent ones.
+ * The register's central Equipment Maintenance and Equipment Transfers
+ * reports, over every machine at any Project or the warehouse, and the
+ * viewer's recent ones.
  */
 export function EquipmentReportsDialog({
   open,
@@ -100,7 +100,7 @@ export function EquipmentReportsDialog({
   );
 }
 
-/** The Reports button of Masters → Equipments, with its dialog. */
+/** The equipment register's Reports button, with its dialog. */
 export function EquipmentReportsButton() {
   const [open, setOpen] = useState(false);
   return (

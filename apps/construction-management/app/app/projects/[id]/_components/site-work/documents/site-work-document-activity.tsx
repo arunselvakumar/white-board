@@ -6,10 +6,11 @@ import { SiteWorkDocumentFiles } from "./site-work-document-files";
 import { SiteWorkDocumentRemarks } from "./site-work-document-remarks";
 
 /**
- * What every site-work detail page renders under the document (CM-0016
+ * What every site-work detail page renders under the document (ADR CM-0016
  * §8): its photos or files and its remarks thread. Pages pass only these
- * props; each section loads its own data (`src/queries/site-work-documents.ts`),
- * shows a skeleton while it does, and "Try again" in place when it fails.
+ * props; each section loads its own data
+ * (`src/queries/site-work-documents.ts`), shows a skeleton while it does,
+ * and "Try again" in place when it fails.
  */
 export type SiteWorkDocumentActivityProps = {
   documentType: SiteWorkDocumentType;

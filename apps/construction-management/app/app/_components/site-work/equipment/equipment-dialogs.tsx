@@ -101,7 +101,7 @@ const transferSchema = z
 type TransferValues = z.infer<typeof transferSchema>;
 
 /**
- * Transfer to Project / Transfer to Warehouse (CM-0016 §11): a date no
+ * Transfer to Project / Transfer to Warehouse (ADR CM-0016 §11): a date no
  * earlier than its last movement, the destination, a location name and a
  * remark. The movement history is the Transfer Report.
  */

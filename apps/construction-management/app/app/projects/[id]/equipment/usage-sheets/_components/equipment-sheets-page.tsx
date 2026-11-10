@@ -115,10 +115,10 @@ function totalsLine(totals: EquipmentSheetPage["totals"]): string {
 }
 
 /**
- * The Usage sheets tab of a Project's Equipment module (CM-604): filters
- * by date, equipment, ownership, Filled By and approval with the totals;
- * owned / rented badges; bulk approve / reject while approval is on; the
- * gear opens the form settings for members with Update.
+ * The Usage sheets tab of a Project's Equipment module: filters by date,
+ * equipment, ownership, Filled By and approval with the totals; owned /
+ * rented badges; bulk approve / reject while approval is on; the gear opens
+ * the form settings for members with Update.
  */
 export function EquipmentSheetsPage({
   projectId,

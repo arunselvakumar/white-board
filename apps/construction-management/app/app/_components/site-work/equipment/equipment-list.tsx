@@ -250,8 +250,8 @@ function useFilterState() {
 }
 
 /**
- * Masters → Equipments (CM-603): the Company's equipment with where each
- * machine is and its state, filtered by ownership, place and state.
+ * The Company's equipment with where each machine is and its state, filtered
+ * by ownership, place and state.
  */
 export function EquipmentRegister() {
   const filter = useFilterState();

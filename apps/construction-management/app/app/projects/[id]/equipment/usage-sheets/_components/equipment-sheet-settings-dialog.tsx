@@ -48,7 +48,7 @@ const schema = z.object({
 type Values = z.infer<typeof schema>;
 
 /**
- * The usage-sheet form settings (CM-0016 §2): which fields the Project's
+ * The usage-sheet form settings (ADR CM-0016 §2): which fields the Project's
  * Equipment Usage form shows, and whether sheets need approval. Saved
  * sheets do not change.
  */
