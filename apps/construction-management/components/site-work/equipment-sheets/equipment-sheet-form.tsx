@@ -1214,7 +1214,7 @@ export function EquipmentSheetForm({
           {settings.showSupervisor && (
             <SelectField
               id={id("supervisor")}
-              label="Supervisor"
+              label="Site Engineer"
               placeholder="Choose a Team Member"
               value={values.supervisorUserId}
               options={supervisorOptions}

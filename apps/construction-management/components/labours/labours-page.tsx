@@ -75,6 +75,7 @@ import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
 import { formatPaise } from "@/components/money/money-input";
 import { fieldForCode } from "@/lib/server-errors";
+import { LABOURS_PAGE_PATH } from "@/lib/staff-nav";
 import {
   labourExportUrl,
   laboursQuery,
@@ -86,7 +87,6 @@ import { lookupListQuery, supervisorsQuery } from "@/src/queries/masters";
 import { projectOptionsQuery } from "@/src/queries/projects";
 
 import { ImportDialog } from "./import-dialog";
-import { LABOURS_PATH } from "./labour-form";
 import { ProjectChips } from "./labour-projects";
 import { TransferDialog, type TransferTarget } from "./transfer-dialog";
 import { TransferHistorySheet } from "./transfer-history-sheet";
@@ -101,7 +101,7 @@ const STATUS_FILTERS: FilterTab<LabourListFilter["status"]>[] = [
 const ALL = "all";
 
 function editPath(id: string): string {
-  return `${LABOURS_PATH}/${encodeURIComponent(id)}`;
+  return `${LABOURS_PAGE_PATH}/${encodeURIComponent(id)}`;
 }
 
 function FilterSelect({
@@ -180,7 +180,7 @@ export function LaboursPage() {
     };
 
   const addLink = (
-    <Link href={`${LABOURS_PATH}/new`} className={buttonVariants()}>
+    <Link href={`${LABOURS_PAGE_PATH}/new`} className={buttonVariants()}>
       <Plus aria-hidden="true" />
       Add Labour
     </Link>
@@ -257,8 +257,8 @@ export function LaboursPage() {
             onChange={set(setCategoryId)}
           />
           <FilterSelect
-            label="Supervisor"
-            allLabel="All Supervisors"
+            label="Site Engineer"
+            allLabel="All Site Engineers"
             value={supervisorId}
             items={supervisors.data?.items ?? []}
             onChange={set(setSupervisorId)}
@@ -366,7 +366,7 @@ function LabourRows({
           </EmptyTitle>
           <EmptyDescription>
             {filtered
-              ? "Try another name, status, Project, category or Supervisor."
+              ? "Try another name, status, Project, category or Site Engineer."
               : "Add the Labours on your own roll with their wage and Projects, or import them from Excel."}
           </EmptyDescription>
         </EmptyHeader>

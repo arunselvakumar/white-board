@@ -76,8 +76,8 @@ export const MASTER_KINDS: Record<MasterKind, MasterKindInfo> = {
   },
   supervisor: {
     code: "SUPERVISOR",
-    label: "Supervisor",
-    plural: "Supervisors",
+    label: "Site Engineer",
+    plural: "Site Engineers",
   },
   amenity: {
     code: "AMENITY",

@@ -105,7 +105,7 @@ export const LABOUR_RECORDED_COLUMNS: SkeletonColumn[] = [
   { header: "Labour" },
   { header: "Status", kind: "badge" },
   { header: "Shift", kind: "muted" },
-  { header: "Supervisor", kind: "muted" },
+  { header: "Site Engineer", kind: "muted" },
   { header: "In", kind: "muted" },
   { header: "Out", kind: "muted" },
   { header: "Worked h", kind: "number", className: "text-right" },

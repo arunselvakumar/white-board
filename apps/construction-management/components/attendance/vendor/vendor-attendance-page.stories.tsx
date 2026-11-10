@@ -86,7 +86,7 @@ export const DayGrid: Story = {
     // The vendor without a rate card links to Masters instead.
     await expect(
       canvas.getByRole("link", { name: "Add rate card" }),
-    ).toHaveAttribute("href", `/app/vendors/${ANBU_NO_CARD.vendorId}`);
+    ).toHaveAttribute("href", `/app/staff/vendors/${ANBU_NO_CARD.vendorId}`);
     // Nothing recorded yesterday, so there is nothing to copy.
     await expect(
       canvas.queryByRole("button", { name: "Copy yesterday" }),
@@ -254,7 +254,7 @@ export const EmptyProject: Story = {
     ).toBeVisible();
     await expect(
       canvas.getByRole("link", { name: "Go to Vendors" }),
-    ).toHaveAttribute("href", "/app/vendors");
+    ).toHaveAttribute("href", "/app/staff/vendors");
   },
 };
 

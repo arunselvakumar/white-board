@@ -65,6 +65,7 @@ import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
 import { formatPaise } from "@/components/money/money-input";
 import { fieldForCode } from "@/lib/server-errors";
+import { VENDORS_PATH } from "@/lib/staff-nav";
 import { projectOptionsQuery } from "@/src/queries/projects";
 import {
   useVendorCommand,
@@ -75,8 +76,6 @@ import {
 } from "@/src/queries/vendors";
 
 import { ProjectFilterSkeleton, VendorRowsSkeleton } from "./vendors-skeletons";
-
-export const VENDORS_PATH = "/app/vendors";
 
 const STATUS_FILTERS: FilterTab<VendorListFilter["status"]>[] = [
   { value: "all", label: "All", icon: LayoutGrid },

@@ -67,7 +67,7 @@ export const labourOpenApiOperations: OpenApiOperation[] = [
     method: "get",
     path: LABOURS_PATH,
     summary:
-      "Labours, newest first, by Project, Active, Supervisor, Labour Category and search (amounts null without Financial)",
+      "Labours, newest first, by Project, Active, Site Engineer, Labour Category and search (amounts null without Financial)",
     tags: LABOUR,
     query: ListConstructionLabourLaboursRequestModel,
     successStatus: StatusCodes.OK,

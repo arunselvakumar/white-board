@@ -864,11 +864,11 @@ export function LabourMarkingSheet({
         </div>
         {sheet.supervisors.length > 0 ? (
           <SimpleSelect
-            label="Supervisor"
+            label="Site Engineer"
             className="h-10 sm:w-52"
             value={supervisorId}
             items={[
-              { value: ALL, label: "All supervisors" },
+              { value: ALL, label: "All Site Engineers" },
               ...sheet.supervisors.map((item) => ({
                 value: item.id,
                 label: item.name,

@@ -181,7 +181,7 @@ export const AddValidatesAndSaves: Story = {
       aadhaar: null,
     });
     await waitFor(() =>
-      expect(getRouter().push).toHaveBeenCalledWith("/app/labours"),
+      expect(getRouter().push).toHaveBeenCalledWith("/app/staff/labours"),
     );
   },
 };

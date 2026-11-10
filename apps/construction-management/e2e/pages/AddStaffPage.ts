@@ -2,7 +2,7 @@ import { AppShellPage } from "./AppShellPage";
 
 export class AddStaffPage extends AppShellPage {
   public get url() {
-    return "/app/staff/new";
+    return "/app/staff/office-staff/new";
   }
 
   public get pageHeading() {

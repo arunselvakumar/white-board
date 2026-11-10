@@ -1,17 +1,8 @@
-import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import { RolesNoAccess } from "@/components/roles/roles-no-access";
-import { TeamMembersPage } from "@/components/team-members/team-members-page";
+import { LABOURS_PAGE_PATH } from "@/lib/staff-nav";
 
-import { viewerFlags } from "../_lib/viewer-can";
-
-export const metadata: Metadata = { title: "Staff" };
-
-export default async function Page() {
-  const can = await viewerFlags("organization.team_members", [
-    "read",
-    "create",
-  ]);
-  if (!can.read) return <RolesNoAccess what="Staff" />;
-  return <TeamMembersPage canAdd={can.create} />;
+/** Human Resources → Staff opens on Labour. */
+export default function StaffArea() {
+  redirect(LABOURS_PAGE_PATH);
 }

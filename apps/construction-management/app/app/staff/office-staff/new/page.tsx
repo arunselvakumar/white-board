@@ -5,7 +5,7 @@ import { AddTeamMemberSkeleton } from "@/components/team-members/team-members-sk
 import { QuerySuspense } from "@/components/query-suspense";
 import { RolesNoAccess } from "@/components/roles/roles-no-access";
 
-import { viewerFlags } from "../../_lib/viewer-can";
+import { viewerFlags } from "../../../_lib/viewer-can";
 
 export const metadata: Metadata = { title: "Add Staff" };
 

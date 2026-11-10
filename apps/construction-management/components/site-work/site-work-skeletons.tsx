@@ -247,7 +247,7 @@ export function EquipmentSheetDetailSkeleton({
         "Idle",
         "Breakdown",
         "Operator",
-        "Supervisor",
+        "Site Engineer",
         "Contractor",
         "Department",
         "Work Item",

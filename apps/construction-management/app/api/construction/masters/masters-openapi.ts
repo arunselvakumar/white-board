@@ -191,8 +191,8 @@ export const mastersOpenApiOperations: OpenApiOperation[] = [
   }),
   ...masterOperations({
     path: `${BASE}/supervisors`,
-    label: "Supervisor",
-    plural: "Supervisors",
+    label: "Site Engineer",
+    plural: "Site Engineers",
     menu: "masters.labours",
     inUse: "409 SUPERVISOR_IN_USE while Labours or attendance name them.",
     list: ListConstructionMastersSupervisorsResponseModel,

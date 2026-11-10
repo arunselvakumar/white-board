@@ -11,7 +11,7 @@ export class EditStaffPage extends AppShellPage {
   }
 
   public get url() {
-    return `/app/staff/${this.memberId}`;
+    return `/app/staff/office-staff/${this.memberId}`;
   }
 
   public tab(name: "Details" | "Projects" | "Role") {

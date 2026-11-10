@@ -121,7 +121,7 @@ export const InviteByEmail: Story = {
     await expect(canvas.queryByText(/Step \d of/)).not.toBeInTheDocument();
     await expect(canvas.getByRole("link", { name: "Cancel" })).toHaveAttribute(
       "href",
-      "/app/staff",
+      "/app/staff/office-staff",
     );
     await userEvent.click(canvas.getByRole("button", { name: "Add Staff" }));
     await expect(await canvas.findByText("Enter the name")).toBeVisible();
@@ -193,7 +193,7 @@ export const InviteByEmail: Story = {
     ).not.toBeInTheDocument();
     await expect(
       canvas.getByRole("link", { name: "Open in Role Management" }),
-    ).toHaveAttribute("href", `/app/roles/${SITE_ENGINEER_ROLE.id}`);
+    ).toHaveAttribute("href", `/app/staff/roles/${SITE_ENGINEER_ROLE.id}`);
     await userEvent.click(
       canvas.getByRole("button", { name: "Add and invite" }),
     );

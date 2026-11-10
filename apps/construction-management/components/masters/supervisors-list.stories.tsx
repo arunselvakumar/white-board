@@ -29,7 +29,7 @@ function serve(initial = STORY_SUPERVISORS) {
 }
 
 const meta = {
-  title: "Masters/Supervisors/List",
+  title: "Masters/Site Engineers/List",
   component: SupervisorsList,
   render: () => (
     <StoryQueryClient>
@@ -44,7 +44,7 @@ type Story = StoryObj<typeof meta>;
 export const WithSupervisors: Story = {
   beforeEach: serve(),
   play: async ({ canvas, canvasElement, userEvent }) => {
-    const list = await canvas.findByRole("list", { name: "Supervisors" });
+    const list = await canvas.findByRole("list", { name: "Site Engineers" });
     const rows = within(list).getAllByRole("listitem");
     await expect(
       rows.map((row) => row.querySelector("p")?.textContent),
@@ -58,9 +58,12 @@ export const WithSupervisors: Story = {
     ).toBeVisible();
     await expect(within(vignesh).getByText("Disabled")).toBeVisible();
 
-    await userEvent.type(canvas.getByLabelText("Search Supervisors"), "77081");
+    await userEvent.type(
+      canvas.getByLabelText("Search Site Engineers"),
+      "77081",
+    );
     await expect(within(list).getAllByRole("listitem")).toHaveLength(1);
-    await userEvent.clear(canvas.getByLabelText("Search Supervisors"));
+    await userEvent.clear(canvas.getByLabelText("Search Site Engineers"));
 
     const body = within(canvasElement.ownerDocument.body);
     await chooseFromMenu(canvasElement, userEvent, "Vignesh Anand", "Enable");
@@ -74,7 +77,7 @@ export const WithSupervisors: Story = {
 
     await chooseFromMenu(canvasElement, userEvent, "Prabhu Saravanan", "Edit");
     const dialog = within(await body.findByRole("dialog"));
-    await expect(dialog.getByLabelText("Supervisor name")).toHaveValue(
+    await expect(dialog.getByLabelText("Site Engineer name")).toHaveValue(
       "Prabhu Saravanan",
     );
   },
@@ -116,12 +119,14 @@ export const DeleteAsksFirst: Story = {
 export const Empty: Story = {
   beforeEach: serve([]),
   play: async ({ canvas }) => {
-    await expect(await canvas.findByText("No Supervisors yet")).toBeVisible();
     await expect(
-      canvas.getAllByRole("button", { name: "Add Supervisor" }),
+      await canvas.findByText("No Site Engineers yet"),
+    ).toBeVisible();
+    await expect(
+      canvas.getAllByRole("button", { name: "Add Site Engineer" }),
     ).toHaveLength(2);
     await expect(
-      canvas.queryByLabelText("Search Supervisors"),
+      canvas.queryByLabelText("Search Site Engineers"),
     ).not.toBeInTheDocument();
   },
 };

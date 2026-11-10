@@ -28,17 +28,19 @@ rolesPageTest.describe("Role Management", () => {
       await expect(projectsPage.addProjectLink).toHaveCount(0);
       await expect(projectsPage.menuLink("Projects")).toBeVisible();
       await expect(projectsPage.menuLink("Dashboard")).toHaveCount(0);
-      // Human Resources shows for everyone; its Staff group needs Team
-      // Members or Role Management Read (ADR CM-0034).
+      // Human Resources shows for everyone; Office Staff and Role
+      // Management need Team Members or Role Management Read (ADR CM-0036).
       await expect(projectsPage.menuLink("Human Resources")).toBeVisible();
       await projectsPage.mainMenu
         .getByRole("button", { name: "Show Human Resources list" })
         .click();
-      await expect(projectsPage.menuLink("Labours")).toBeVisible();
-      await expect(projectsPage.menuLink(/^Staff$/)).toHaveCount(0);
+      await expect(projectsPage.menuLink(/^Labour$/)).toBeVisible();
+      await expect(projectsPage.menuLink(/^Site Engineer$/)).toBeVisible();
+      await expect(projectsPage.menuLink(/^Vendor$/)).toBeVisible();
+      await expect(projectsPage.menuLink(/^Office Staff$/)).toHaveCount(0);
       await expect(projectsPage.menuLink("Role Management")).toHaveCount(0);
 
-      await page.goto("/app/roles/new");
+      await page.goto("/app/staff/roles/new");
       await expect(
         page.getByText("You don't have access to adding Roles"),
       ).toBeVisible();
@@ -67,7 +69,7 @@ rolesPageTest.describe("Role Management", () => {
       await roleForm.goto();
       await roleForm.permission("View", "Role Management").check();
       await roleForm.saveButton.click();
-      await expect(ownerPage).toHaveURL("/app/roles");
+      await expect(ownerPage).toHaveURL("/app/staff/roles");
 
       await memberPage.reload();
       await memberProjects.mainMenu

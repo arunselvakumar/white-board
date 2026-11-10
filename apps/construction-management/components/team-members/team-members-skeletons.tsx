@@ -10,7 +10,7 @@ import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/tabs";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { PageHeaderSkeleton } from "@/components/app-shell/page-header-skeleton";
-import { STAFF_PATH } from "@/lib/staff-roles-nav";
+import { STAFF_PATH } from "@/lib/staff-nav";
 
 /** Human Resources → Staff while it loads (ADR-0047). */
 
@@ -155,7 +155,7 @@ export function AddTeamMemberSkeleton() {
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
-          back={{ label: "Staff", href: STAFF_PATH }}
+          back={{ label: "Office Staff", href: STAFF_PATH }}
           title="Add Staff"
         />
         <DetailCardsSkeleton
@@ -184,7 +184,9 @@ export function EditTeamMemberSkeleton() {
   return (
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
-        <PageHeaderSkeleton back={{ label: "Staff", href: STAFF_PATH }} />
+        <PageHeaderSkeleton
+          back={{ label: "Office Staff", href: STAFF_PATH }}
+        />
         <Tabs defaultValue="details" className="gap-6">
           <TabsList>
             <TabsTrigger value="details">

@@ -46,7 +46,7 @@ export function ProjectFilterSkeleton() {
 /** Edit Vendor while the Vendor loads: details, Projects, rate card. */
 export function VendorFormSkeleton() {
   return (
-    <FormPageSkeleton back={{ label: "Vendors", href: "/app/vendors" }}>
+    <FormPageSkeleton back={{ label: "Vendors", href: "/app/staff/vendors" }}>
       <div className="space-y-6">
         <FormSectionSkeleton title="Details">
           <FormSkeleton

@@ -19,6 +19,7 @@ import { FormAlert } from "@/components/auth/form-alert";
 import { MobileField } from "@/components/auth/mobile-field";
 import { MoneyInput } from "@/components/money/money-input";
 import { fieldForCode } from "@/lib/server-errors";
+import { VENDORS_PATH } from "@/lib/staff-nav";
 import { lookupListQuery } from "@/src/queries/masters";
 import { projectOptionsQuery } from "@/src/queries/projects";
 import {
@@ -36,7 +37,6 @@ import {
   vendorPayload,
   type VendorFormValues,
 } from "./vendor-form-schema";
-import { VENDORS_PATH } from "./vendors-page";
 
 type Payload = ReturnType<typeof vendorPayload>;
 

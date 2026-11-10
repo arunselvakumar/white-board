@@ -76,7 +76,7 @@ export function buildLabourAttendanceReport(input: {
     column("Labour Id", "text", 10),
     column("Status", "text", 10),
     column("Shift", "text", 9),
-    column("Supervisor", "text", 16),
+    column("Site Engineer", "text", 16),
     column("In", "text", 6),
     column("Out", "text", 10),
     column("Worked", "hours"),

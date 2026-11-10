@@ -158,7 +158,8 @@ describe("Task import (CM-802)", () => {
         "Columns",
         "Ground floor",
         "02/11/2026",
-        "09/11/2026",
+        // Far ahead, so the Task never turns Delayed as the calendar moves on.
+        "09/11/2099",
         "medium",
         "karthik raja",
         "",

@@ -35,6 +35,7 @@ import {
 import { WageFields } from "@/components/wages/wage-fields";
 import { LABOUR_WAGE } from "@/components/wages/wage-schema";
 import { fieldForCode } from "@/lib/server-errors";
+import { LABOURS_PAGE_PATH } from "@/lib/staff-nav";
 import {
   labourQuery,
   useCreateLabour,
@@ -56,8 +57,6 @@ import {
 } from "./labour-form-schema";
 import { projectsLabel } from "./labour-projects";
 import { ReportsToPicker } from "./reports-to-picker";
-
-export const LABOURS_PATH = "/app/labours";
 
 const NONE = "__none";
 
@@ -213,7 +212,7 @@ export function LabourForm({
   const submit = form.handleSubmit(async (values) => {
     try {
       await onSave(values, showAmounts);
-      router.push(LABOURS_PATH);
+      router.push(LABOURS_PAGE_PATH);
     } catch (error) {
       const { field, message } = fieldForCode(error, labourErrorFields(values));
       form.setError(field ?? "root", { message });
@@ -404,11 +403,11 @@ export function LabourForm({
           />
           <ChoiceField
             id="labour-supervisor"
-            label="Supervisor"
+            label="Site Engineer"
             name="supervisorId"
             control={form.control}
             choices={supervisorChoices}
-            placeholder="Choose a Supervisor"
+            placeholder="Choose a Site Engineer"
             error={errors.supervisorId?.message}
           />
           <div className="space-y-1.5">
@@ -513,7 +512,7 @@ export function LabourForm({
           {saving ? "Saving…" : "Save"}
         </Button>
         <Link
-          href={LABOURS_PATH}
+          href={LABOURS_PAGE_PATH}
           className={buttonVariants({ variant: "outline" })}
         >
           Cancel
@@ -547,7 +546,7 @@ function FormPage({
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
-          back={{ label: "Labours", href: LABOURS_PATH }}
+          back={{ label: "Labours", href: LABOURS_PAGE_PATH }}
           title={title}
           meta={meta}
         />

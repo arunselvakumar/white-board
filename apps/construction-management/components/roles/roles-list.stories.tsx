@@ -114,7 +114,7 @@ export const WithRoles: Story = {
     await expect(helper.queryByText("Default")).not.toBeInTheDocument();
     await expect(
       canvas.getByRole("link", { name: "Add Role" }),
-    ).toHaveAttribute("href", "/app/roles/new");
+    ).toHaveAttribute("href", "/app/staff/roles/new");
 
     // Edit opens the Role's page.
     await userEvent.click(
@@ -122,7 +122,7 @@ export const WithRoles: Story = {
     );
     await userEvent.click(await body.findByRole("menuitem", { name: "Edit" }));
     await expect(getRouter().push).toHaveBeenCalledWith(
-      "/app/roles/0199c3a0-0000-7000-8000-000000000301",
+      "/app/staff/roles/0199c3a0-0000-7000-8000-000000000301",
     );
   },
 };
@@ -269,7 +269,7 @@ export const Empty: Story = {
     await expect(await canvas.findByText("No Roles yet")).toBeVisible();
     await expect(
       canvas.getAllByRole("link", { name: "Add Role" }).at(-1),
-    ).toHaveAttribute("href", "/app/roles/new");
+    ).toHaveAttribute("href", "/app/staff/roles/new");
   },
 };
 
