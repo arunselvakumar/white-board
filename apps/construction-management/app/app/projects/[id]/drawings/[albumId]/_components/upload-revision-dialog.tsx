@@ -22,9 +22,9 @@ import { DRAWING_FILES_HINT } from "./upload-drawings-dialog";
 import type { DrawingUploads } from "./use-drawing-uploads";
 
 /**
- * A drawing → Upload new revision: one file becomes the next revision
- * (R3 → R4) and the one shown; older revisions stay in the history.
- * Closing lets a running upload finish.
+ * One file becomes a drawing's next revision (R3 to R4) and the one
+ * shown; older revisions stay in the history. Closing lets a running
+ * upload finish.
  */
 export function UploadRevisionDialog({
   drawing,

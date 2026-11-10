@@ -194,7 +194,7 @@ export function LocationDialog({
 }
 
 /**
- * The Locations screen (CM-405): the named places of a non-building
+ * The Locations screen: the named places of a non-building
  * Project in the Team Member's order. Add, edit, move up / down and delete
  * follow the `projects.locations` flags.
  */

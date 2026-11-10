@@ -318,8 +318,8 @@ type Generated = {
 };
 
 /**
- * Add Wing (CM-402): details and configuration → Continue to Units → the
- * floor and unit editor → Save, which stores the Wing with its floors and
+ * Add Wing: details and configuration, Continue to Units, then the floor
+ * and unit editor and Save, which stores the Wing with its floors and
  * units in one request. The editor shows exactly what the server stores:
  * both run the same generator and checks.
  */

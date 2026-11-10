@@ -18,7 +18,7 @@ import { QueryHttpError } from "@/src/queries/http";
 
 import type { EditorProblem } from "./wing-editor";
 
-/** `/app/projects/{id}/wings` and the screens under it (CM-402). */
+/** `/app/projects/{id}/wings` and the screens under it. */
 export function wingsPath(projectId: string): string {
   return `/app/projects/${encodeURIComponent(projectId)}/wings`;
 }

@@ -10,9 +10,8 @@ import {
 } from "@/src/projects/domain/wing-generator";
 
 /**
- * The floor and unit editor's rows (CM-402). `key` is the row's identity
- * on screen; `id` is set for rows already stored, so Save on Edit Wing
- * keeps them.
+ * The floor and unit editor's rows. `key` is the row's identity on screen;
+ * `id` is set for rows already stored, so Save on Edit Wing keeps them.
  */
 export type EditorUnit = { key: string; id?: string; name: string };
 

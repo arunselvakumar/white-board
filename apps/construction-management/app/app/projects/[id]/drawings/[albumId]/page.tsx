@@ -8,7 +8,6 @@ import { DrawingAlbumSkeleton } from "@/app/app/projects/[id]/drawings/_componen
 
 export const metadata: Metadata = { title: "Drawings" };
 
-/** One album of the Project's Drawings (CM-408). */
 export default async function ProjectDrawingAlbumRoute({
   params,
 }: {

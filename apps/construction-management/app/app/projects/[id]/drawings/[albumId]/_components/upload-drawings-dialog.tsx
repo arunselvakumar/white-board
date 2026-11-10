@@ -45,9 +45,8 @@ type Values = z.infer<typeof schema>;
 export const DRAWING_FILES_HINT = `PDFs, images, DWG and DXF files, up to ${formatBytes(maxBytesOf("drawing"))} each.`;
 
 /**
- * Album → Upload drawings: pick or drop files, then Upload; each file
- * becomes a drawing (R1) named after the file, or after the name typed
- * when there is one file. Each shows its own progress, cancel and retry.
+ * Pick or drop files, then Upload; each file becomes a drawing (R1) named
+ * after the file, or after the name typed when there is one file. Each shows its own progress, cancel and retry.
  * Closing lets running uploads finish; they show again on reopening.
  */
 export function UploadDrawingsDialog({

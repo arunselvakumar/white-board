@@ -9,7 +9,6 @@ import { LocationsSkeleton } from "@/app/app/projects/[id]/_components/structure
 
 export const metadata: Metadata = { title: "Locations" };
 
-/** The Project's Locations (CM-405). */
 export default async function ProjectLocationsRoute({
   params,
 }: {

@@ -9,7 +9,7 @@ import { WingsSkeleton } from "@/app/app/projects/[id]/_components/structure/str
 
 export const metadata: Metadata = { title: "Wings" };
 
-/** The Project's Wings by Phase (CM-402). */
+/** The Project's Wings by Phase. */
 export default async function ProjectWingsRoute({
   params,
 }: {

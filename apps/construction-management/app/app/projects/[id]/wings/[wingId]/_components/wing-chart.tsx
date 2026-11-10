@@ -44,7 +44,7 @@ function UnitCell({ name }: { name: string }) {
 }
 
 /**
- * The wing chart (CM-402): floors top to bottom, each with its units
+ * The wing chart: floors top to bottom, each with its units
  * across. A tall or wide Wing scrolls inside its own frame, never the page;
  * the floor names stay in view. A scheme's plots or bungalows wrap instead.
  */

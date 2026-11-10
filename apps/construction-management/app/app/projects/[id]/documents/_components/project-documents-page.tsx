@@ -183,7 +183,7 @@ function DocumentRow({
 }
 
 /**
- * The Project's Documents tab (CM-414): every file kept on the Project,
+ * The Project's Documents tab: every file kept on the Project,
  * grouped under the paper it is a copy of, with that paper's number and
  * date from Contract Details. Upload and Delete need the Project menu's
  * Update flag; everyone who can see the Project can view and download.
