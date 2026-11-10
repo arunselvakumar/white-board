@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
-import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
-import { PublicShell } from "@/components/auth/public-shell";
+import { ForgotPasswordForm } from "@/app/(public)/forgot-password/_components/forgot-password-form";
+import { PublicShell } from "@/app/(public)/_components/public-shell";
 
 const meta = {
   title: "Pages/Password Reset",

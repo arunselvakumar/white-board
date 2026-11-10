@@ -4,9 +4,9 @@ import { expect, waitFor } from "storybook/test";
 import {
   AcceptInvitationForm,
   type InvitationSummary,
-} from "@/components/auth/accept-invitation-form";
-import { withAuthFormFrame } from "../../.storybook/decorators";
-import { authFailure, authMocks } from "../../.storybook/mocks/auth";
+} from "@/app/(public)/accept-invitation/_components/accept-invitation-form";
+import { withAuthFormFrame } from "@/.storybook/decorators";
+import { authFailure, authMocks } from "@/.storybook/mocks/auth";
 
 type Canvas = Parameters<NonNullable<Story["play"]>>[0]["canvas"];
 type UserEvent = Parameters<NonNullable<Story["play"]>>[0]["userEvent"];

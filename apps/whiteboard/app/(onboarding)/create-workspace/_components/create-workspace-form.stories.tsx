@@ -2,15 +2,15 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { getRouter } from "@storybook/nextjs-vite/navigation.mock";
 import { expect, waitFor } from "storybook/test";
 
-import { CreateWorkspaceForm } from "@/components/onboarding/create-workspace-form";
-import { withAuthFormFrame } from "../../.storybook/decorators";
+import { CreateWorkspaceForm } from "@/app/(onboarding)/create-workspace/_components/create-workspace-form";
+import { withAuthFormFrame } from "@/.storybook/decorators";
 import {
   authFailure,
   authMocks,
   signInAs,
   storyUser,
-} from "../../.storybook/mocks/auth";
-import { createWorkspace } from "../../.storybook/mocks/create-workspace";
+} from "@/.storybook/mocks/auth";
+import { createWorkspace } from "@/.storybook/mocks/create-workspace";
 
 const meta = {
   title: "Onboarding/CreateWorkspaceForm",

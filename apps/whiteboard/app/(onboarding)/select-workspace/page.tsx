@@ -1,4 +1,4 @@
-import { SelectWorkspaceForm } from "@/components/onboarding/select-workspace-form";
+import { SelectWorkspaceForm } from "@/app/(onboarding)/select-workspace/_components/select-workspace-form";
 import { postWorkspacePath } from "@/lib/safe-redirect";
 
 type SelectWorkspacePageProps = {

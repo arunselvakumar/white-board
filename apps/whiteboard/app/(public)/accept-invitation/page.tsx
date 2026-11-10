@@ -1,7 +1,7 @@
 import { getAuth, workspaces } from "@repo/auth/server";
 import type { Metadata } from "next";
 
-import { AcceptInvitationForm } from "@/components/auth/accept-invitation-form";
+import { AcceptInvitationForm } from "@/app/(public)/accept-invitation/_components/accept-invitation-form";
 
 export const metadata: Metadata = { title: "Join Workspace" };
 

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { CalendarScreen } from "@/components/calendar/calendar-screen";
+import { CalendarScreen } from "@/app/(app)/calendar/_components/calendar-screen";
 
 export const metadata: Metadata = { title: "Calendar" };
 

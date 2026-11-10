@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
-import { CreateWorkspaceForm } from "@/components/onboarding/create-workspace-form";
-import { OnboardingShell } from "@/components/onboarding/onboarding-shell";
+import { CreateWorkspaceForm } from "@/app/(onboarding)/create-workspace/_components/create-workspace-form";
+import { OnboardingShell } from "@/app/(onboarding)/_components/onboarding-shell";
 import { createWorkspace } from "../../../.storybook/mocks/create-workspace";
 
 const meta = {

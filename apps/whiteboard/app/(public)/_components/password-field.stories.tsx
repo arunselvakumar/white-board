@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
-import { PasswordField } from "@/components/auth/password-field";
-import { withAuthFormFrame } from "../../.storybook/decorators";
+import { PasswordField } from "@/app/(public)/_components/password-field";
+import { withAuthFormFrame } from "@/.storybook/decorators";
 
 const meta = {
   title: "Auth/PasswordField",

@@ -1,7 +1,7 @@
 import { getAuth } from "@repo/auth/server";
 import { redirect } from "next/navigation";
 
-import { LoginForm } from "@/components/auth/login-form";
+import { LoginForm } from "@/app/(public)/login/_components/login-form";
 import { safeRedirectPath } from "@/lib/safe-redirect";
 import { workspaceEntryPath } from "@/lib/workspace-entry";
 

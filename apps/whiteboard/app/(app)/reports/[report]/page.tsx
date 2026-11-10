@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { ReportScreen } from "@/components/reports/report-screen";
+import { ReportScreen } from "@/app/(app)/reports/[report]/_components/report-screen";
 import {
   isReportKey,
   reportDefinition,

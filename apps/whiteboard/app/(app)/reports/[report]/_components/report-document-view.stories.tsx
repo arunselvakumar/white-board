@@ -8,7 +8,7 @@ import {
   monthlyReviewDocument,
   registerDocument,
   studentAttendanceDocument,
-} from "./reports.fixtures";
+} from "@/app/(app)/reports/_components/reports.fixtures";
 
 const meta = {
   title: "Reports/Report document",

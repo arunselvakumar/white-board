@@ -2,14 +2,14 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { getRouter } from "@storybook/nextjs-vite/navigation.mock";
 import { expect, waitFor } from "storybook/test";
 
-import { SelectWorkspaceForm } from "@/components/onboarding/select-workspace-form";
-import { withAuthFormFrame } from "../../.storybook/decorators";
+import { SelectWorkspaceForm } from "@/app/(onboarding)/select-workspace/_components/select-workspace-form";
+import { withAuthFormFrame } from "@/.storybook/decorators";
 import {
   authFailure,
   authMocks,
   storyUser,
   type WorkspaceSummary,
-} from "../../.storybook/mocks/auth";
+} from "@/.storybook/mocks/auth";
 
 function workspace(
   id: string,
