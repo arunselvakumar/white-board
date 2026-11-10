@@ -11,7 +11,6 @@ import { issueQuery, issuesPath } from "@/src/queries/tracking-issues";
 
 import { IssueForm } from "./issue-form";
 
-/** Add an Issue & Snag (CM-803). */
 export function IssueNew({ projectId }: { projectId: string }) {
   const { data: access } = useSuspenseQuery(trackingAccessQuery(projectId));
   return (
@@ -30,7 +29,7 @@ export function IssueNew({ projectId }: { projectId: string }) {
   );
 }
 
-/** Edit an open Issue & Snag (CM-803). */
+/** Edit an open Issue & Snag. */
 export function IssueEdit({
   projectId,
   issueId,

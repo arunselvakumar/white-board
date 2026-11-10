@@ -26,7 +26,7 @@ export function formatDate(date: string): string {
   }).format(new Date(`${date}T00:00:00Z`));
 }
 
-/** A labourer's Project history, newest first (CM-206). */
+/** A labourer's Project history, newest first. */
 export function TransferHistorySheet({
   labour,
   onOpenChange,

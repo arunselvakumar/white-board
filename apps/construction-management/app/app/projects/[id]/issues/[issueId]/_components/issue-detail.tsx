@@ -317,12 +317,12 @@ function History({ issue }: { issue: Issue }) {
 }
 
 /**
- * One Issue & Snag (CM-803): its fields, who raised it, Solved On / By,
- * Closed On / By, the Inspection Request it was raised from, its images
- * and attachments, the **Progress** thread (comment and images; the author
- * deletes their own within 24 hours) and the lifecycle history. Actions
- * by the viewer's flags: Mark As Solved, Verify, Reopen (with a reason),
- * Edit (while open) and Delete.
+ * One Issue & Snag: its fields, who raised it, Solved On / By, Closed On /
+ * By, the Inspection Request it was raised from, its images and
+ * attachments, the **Progress** thread (comment and images; the author
+ * deletes their own within 24 hours) and the lifecycle history. Actions by
+ * the viewer's flags: Mark As Solved, Verify, Reopen (with a reason), Edit
+ * (while open) and Delete.
  */
 export function IssueDetail({
   projectId,

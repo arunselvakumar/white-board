@@ -197,11 +197,11 @@ function TaskRow({
 }
 
 /**
- * The Project's task tree (CM-802, ADR CM-0019 §2, §5): Task No., name,
- * assignees, planned dates, progress and the derived status; sub-tasks
- * under their parent, expandable; ancestors shown for context greyed and
- * not openable. Members with Task Delete select tasks and delete them with
- * their sub-tasks, all or none.
+ * The Project's task tree (ADR CM-0019 §2, §5): Task No., name, assignees,
+ * planned dates, progress and the derived status; sub-tasks under their
+ * parent, expandable; ancestors shown for context greyed and not openable.
+ * Members with Task Delete select tasks and delete them with their
+ * sub-tasks, all or none.
  */
 export function TaskTree({
   projectId,

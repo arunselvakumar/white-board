@@ -147,7 +147,7 @@ function FilterSelect({
   );
 }
 
-/** Human Resources → Labours (CM-207): the register by Project, with transfer and import. */
+/** The Labours register by Project, with transfer and import. */
 export function LaboursPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<LabourListFilter["status"]>("all");

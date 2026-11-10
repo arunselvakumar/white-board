@@ -181,11 +181,11 @@ function Bars({
 }
 
 /**
- * The read-only Gantt (CM-802, ADR CM-0019 §12): the task tree as rows
- * (expand / collapse), each planned span as a bar coloured by status and
- * shaded to the progress %, the baseline as a thin bar beneath and a Today
- * line; Day, Week and Month scales. A row opens its task. The chart
- * scrolls sideways inside its card; the page does not.
+ * The read-only Gantt (ADR CM-0019 §12): the task tree as rows (expand /
+ * collapse), each planned span as a bar coloured by status and shaded to
+ * the progress %, the baseline as a thin bar beneath and a Today line;
+ * Day, Week and Month scales. A row opens its task. The chart scrolls
+ * sideways inside its card; the page does not.
  */
 export function TaskGanttChart({
   projectId,

@@ -268,7 +268,7 @@ function Drawings({
 }
 
 /**
- * One Inspection Request (CM-804): its fields and status, the decision
+ * One Inspection Request: its fields and status, the decision
  * (approved / rejected by whom, when, why), linked drawings that open in
  * Project Drawings, files, observations and remarks, the re-inspection
  * links both ways and any snag raised from it. Approve, Reject (with

@@ -243,12 +243,12 @@ function withCurrent(
 }
 
 /**
- * Add or edit a task (CM-802, ADR CM-0019 §5): name, description,
- * assignees, planned dates, priority, the location and other locations of
- * its type, Department, Contractor, Tags (created inline with Tags
- * Create), Total work with its unit and Total Price (Financial only). A
- * summary task's dates, work and price roll up from its sub-tasks, so the
- * form leaves them out. With `parent` it adds a Sub-Task.
+ * Add or edit a task (ADR CM-0019 §5): name, description, assignees,
+ * planned dates, priority, the location and other locations of its type,
+ * Department, Contractor, Tags (created inline with Tags Create), Total
+ * work with its unit and Total Price (Financial only). A summary task's
+ * dates, work and price roll up from its sub-tasks, so the form leaves
+ * them out. With `parent` it adds a Sub-Task.
  */
 export function TaskForm({
   projectId,

@@ -144,7 +144,7 @@ function OptionSelect({
   );
 }
 
-/** Pick any number of the Project's Drawings (CM-0019 §9). */
+/** Pick any number of the Project's Drawings (ADR CM-0019 §9). */
 function DrawingsPicker({
   id,
   options,
@@ -305,7 +305,7 @@ function choices(
 }
 
 /**
- * Raise or edit an Inspection Request (CM-804, ADR CM-0019 §9): Inspection
+ * Raise or edit an Inspection Request (ADR CM-0019 §9): Inspection
  * Date (back-dated policy) and time, Department, Contractor, Inspector
  * (optional), Description of work, location, linked Project Drawings and,
  * on a new request, drawings and site photographs as files uploaded once

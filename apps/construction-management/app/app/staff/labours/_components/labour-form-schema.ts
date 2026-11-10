@@ -185,7 +185,7 @@ function amounts(values: LabourFormValues) {
   };
 }
 
-/** The Add Labour request body (rupees → paise). */
+/** The Add Labour request body (rupees to paise). */
 export function createLabourPayload(values: LabourFormValues): LabourInput {
   return {
     ...details(values),
@@ -214,7 +214,7 @@ export function updateLabourPayload(
 type LabourField =
   Exclude<keyof LabourFormValues, "wage"> | `wage.${keyof WageValues}`;
 
-/** Server error codes → the field they belong to. */
+/** Server error codes to the field they belong to. */
 export const LABOUR_ERROR_FIELDS: Record<string, LabourField> = {
   LABOUR_NAME_REQUIRED: "name",
   LABOUR_NAME_TOO_LONG: "name",

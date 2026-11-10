@@ -662,12 +662,12 @@ function timesFieldOf(details: unknown): TimesField | undefined {
 }
 
 /**
- * The marking sheet for one date (CM-211): a row per labourer with status
- * buttons, Paid Leave on Leave, shift and overtime lines; check-in,
- * check-out and break on Present / Half Day with overtime from the times
- * (CM-220, ADR CM-0011); multi-select bulk marks and "Set times", "Mark all
- * present" and "Copy yesterday". Save sends only the rows that changed, each
- * with its loaded `updatedAt`.
+ * The marking sheet for one date: a row per labourer with status buttons,
+ * Paid Leave on Leave, shift and overtime lines; check-in, check-out and
+ * break on Present / Half Day with overtime from the times (ADR CM-0011);
+ * multi-select bulk marks and "Set times", "Mark all present" and "Copy
+ * yesterday". Save sends only the rows that changed, each with its loaded
+ * `updatedAt`.
  */
 export function LabourMarkingSheet({
   projectId,

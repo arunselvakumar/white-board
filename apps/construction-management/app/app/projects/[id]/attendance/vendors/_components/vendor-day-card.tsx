@@ -218,7 +218,7 @@ function LineInputs({
 }
 
 /**
- * One vendor's day (CM-213): per shift, a row per Labour Category on the
+ * One vendor's day: per shift, a row per Labour Category on the
  * rate card with Full day, Half day and OT hours, the pay preview (the
  * server prices it again), Save, Clear day and Copy yesterday.
  */

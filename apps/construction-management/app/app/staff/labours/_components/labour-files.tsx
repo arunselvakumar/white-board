@@ -38,7 +38,7 @@ function size(bytes: number): string {
     : `${String(Math.max(1, Math.round(bytes / 1024)))} KB`;
 }
 
-/** Photo and Other Documents on Edit Labour (CM-207); each change saves at once. */
+/** Photo and Other Documents on Edit Labour; each change saves at once. */
 export function LabourFiles({ labour }: { labour: LabourResponse }) {
   const queryClient = useQueryClient();
   const refresh = () =>

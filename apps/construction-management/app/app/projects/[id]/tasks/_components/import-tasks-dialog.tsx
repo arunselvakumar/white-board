@@ -32,10 +32,10 @@ function rowErrors(error: unknown): ImportRowError[] | null {
 }
 
 /**
- * Import tasks (CM-802, ADR CM-0019 §13): download the sample, fill one
- * task per row (Ref and Parent Ref build sub-tasks), upload it. Every row
- * becomes a task on this Project, or none does and each problem is listed
- * by row and column.
+ * Import tasks (ADR CM-0019 §13): download the sample, fill one task per
+ * row (Ref and Parent Ref build sub-tasks), upload it. Every row becomes a
+ * task on this Project, or none does and each problem is listed by row and
+ * column.
  */
 export function ImportTasksDialog({
   projectId,

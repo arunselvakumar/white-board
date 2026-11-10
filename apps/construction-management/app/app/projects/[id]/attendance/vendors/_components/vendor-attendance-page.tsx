@@ -176,7 +176,7 @@ function DayTab({
 }
 
 /**
- * Vendor attendance for a Project (CM-213): mark a day per vendor (Day),
+ * Vendor attendance for a Project: mark a day per vendor (Day),
  * the vendor × day month matrix (Month), and overtime lines (Overtime).
  */
 export function VendorAttendancePage({

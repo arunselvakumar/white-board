@@ -18,7 +18,7 @@ import type {
   IssueProgress,
 } from "@/src/queries/tracking-issues";
 
-/** Story fixtures for Issues & Snags (CM-803). */
+/** Story fixtures for Issues & Snags. */
 
 export const ISSUES_API = "/api/construction/tracking/issues";
 export const ISSUE_PROJECT_ID = "0199c4a0-0000-7000-8000-0000000e0001";

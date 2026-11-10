@@ -6,7 +6,7 @@ import type {
   VendorAttendanceOvertime,
 } from "@/src/queries/vendor-attendance";
 
-/** Story data for vendor attendance (CM-213). */
+/** Story data for vendor attendance. */
 
 export const PROJECT_ID = "019a0000-0000-7000-8000-000000000001";
 export const DATE = "2026-10-08";

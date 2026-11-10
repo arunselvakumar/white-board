@@ -15,7 +15,7 @@ import {
 } from "@/src/tracking/domain/tracking-documents";
 
 /**
- * Small pieces the task screens share (CM-802): status and priority chips
+ * Small pieces the task screens share: status and priority chips
  * (a colour **and** a label), the progress bar and value formatting.
  */
 
@@ -63,7 +63,7 @@ export function TaskStatusBadge({
   );
 }
 
-/** Priority as a colour dot and its label (CM-0019 §5); never colour alone. */
+/** A colour dot and its label (ADR CM-0019 §5); never colour alone. */
 export function PriorityChip({ priority }: { priority: TrackingPriority }) {
   const item = TRACKING_PRIORITIES.find((p) => p.key === priority);
   if (item == null) return null;

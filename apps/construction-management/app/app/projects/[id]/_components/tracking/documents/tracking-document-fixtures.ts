@@ -3,7 +3,7 @@ import type { TrackingDocumentFile } from "@/src/queries/tracking-documents";
 import type { TrackingDocumentType } from "@/src/tracking/domain/tracking-documents";
 
 /**
- * Story fixtures for the tracking document files (M8). Feature stories
+ * Story fixtures for the tracking document files. Feature stories
  * compose the handler into their own `mockApi`:
  *
  * ```ts

@@ -34,7 +34,7 @@ function Byline({ name, at }: { name: string | null; at: string }) {
 }
 
 /**
- * **Observations** (CM-0019 §9): what the inspector saw, with photos and
+ * **Observations** (ADR CM-0019 §9): what the inspector saw, with photos and
  * files, added while the request is pending by the inspector or anyone
  * with Update; the author may delete their own while it is pending.
  */
@@ -46,7 +46,7 @@ export function InspectionObservations({
   inspectionId: string;
   /** The inspector or Update, while pending. */
   canObserve: boolean;
-  /** Files may come with it: Update, or the request's inspector (CM-804). */
+  /** Files may come with it: Update, or the request's inspector. */
   canUpload: boolean;
 }) {
   const headingId = useId();
@@ -203,7 +203,10 @@ function ObservationsBody({
   );
 }
 
-/** **Remarks** (CM-0019 §9): text, at any time, by anyone who can read the request. */
+/**
+ * **Remarks** (ADR CM-0019 §9): text, at any time, by anyone who can read
+ * the request.
+ */
 export function InspectionRemarks({
   inspectionId,
   canRemark,

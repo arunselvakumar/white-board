@@ -287,8 +287,8 @@ function Results({
 }
 
 /**
- * Recorded labour days of a Project with filters (CM-211), with check-in,
- * check-out and hours worked (CM-220).
+ * Recorded labour days of a Project with filters, with check-in, check-out
+ * and hours worked.
  */
 export function LabourRecordedList({
   projectId,

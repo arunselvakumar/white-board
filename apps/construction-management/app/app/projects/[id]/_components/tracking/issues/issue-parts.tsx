@@ -30,7 +30,7 @@ export function IssueStatusBadge({ status }: { status: IssueStatus }) {
 }
 
 /**
- * The priority as a filled chip with its label (CM-0019 §7): High
+ * The priority as a filled chip with its label (ADR CM-0019 §7): High
  * `#F90B0B`, Medium `#FF9900`, Low `#FCF200`. Black text reads on all
  * three (5:1 on the red, far more on the orange and the yellow); white
  * would fail on the red and the yellow.

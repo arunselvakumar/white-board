@@ -135,7 +135,7 @@ function outcomeText(
 }
 
 /**
- * A Project's Inspection Requests (CM-804): status tabs with counts,
+ * A Project's Inspection Requests: status tabs with counts,
  * filters (Department, Contractor, Inspector, location, date, search),
  * and for approvers a bulk mode that approves or rejects (one reason, and
  * **Also raise a snag**) the selected pending requests, skipping the rest.

@@ -207,7 +207,7 @@ function MonthTable({
   );
 }
 
-/** Month view (CM-213): vendor × day matrix with totals per vendor and category. */
+/** Vendor × day matrix with totals per vendor and category. */
 export function VendorMonthView({
   projectId,
   initialMonth,
