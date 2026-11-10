@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import {
   JoinLinkCard,
   type JoinLinkPreview,
-} from "@/components/join/join-link-card";
+} from "@/app/(public)/join/[token]/_components/join-link-card";
 import { createJoinRequestHandlers } from "@/src/organization/infrastructure/create-team-member-handlers";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 

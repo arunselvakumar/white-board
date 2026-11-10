@@ -5,7 +5,7 @@ import { QuerySuspense } from "@/components/query-suspense";
 import { SETTINGS_SECTIONS } from "@/lib/settings-nav";
 import type { CompanyProfileModel } from "@/src/queries/company-profile";
 
-import { signInAs } from "../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 import {
   PIXEL_PNG,
   apiError,
@@ -13,7 +13,7 @@ import {
   pngFile,
   sentJson,
   type ApiHandler,
-} from "../../.storybook/mocks/profile-api";
+} from "@/.storybook/mocks/profile-api";
 import { CompanyProfileScreen } from "./company-profile-screen";
 
 const BASE = "/api/construction/organization/company-profile";

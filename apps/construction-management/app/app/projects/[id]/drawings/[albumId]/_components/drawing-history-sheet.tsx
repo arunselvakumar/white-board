@@ -21,7 +21,7 @@ import {
 
 import { DrawingRevisionsSkeleton } from "@/app/app/projects/[id]/drawings/_components/drawings-skeletons";
 
-import { downloadUrl } from "@/components/projects/files/file-viewer";
+import { downloadUrl } from "@/app/app/_components/projects/files/file-viewer";
 
 function Revisions({
   projectId,

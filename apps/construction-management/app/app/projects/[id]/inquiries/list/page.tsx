@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
-import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
+import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
 import { InquiriesList } from "@/components/sales/inquiries/inquiries-list";
 import { InquiriesListSkeleton } from "@/components/sales/inquiries/inquiries-skeletons";
 

@@ -7,7 +7,7 @@ import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 
 import { FieldError } from "@/components/auth/field-error";
-import { FileViewer } from "@/components/projects/files/file-viewer";
+import { FileViewer } from "@/app/app/_components/projects/files/file-viewer";
 import {
   TRACKING_ENTRY_FILES_MAX,
   checkTrackingFile,

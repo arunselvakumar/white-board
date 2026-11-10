@@ -18,7 +18,7 @@ import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 
 import { FieldError } from "@/components/auth/field-error";
-import { LocationPicker } from "@/components/locations/location-picker";
+import { LocationPicker } from "@/app/app/_components/locations/location-picker";
 import { MaterialPicker } from "@/components/procurement/material-picker";
 import type { StockLocation } from "@/src/procurement/domain/stock-location";
 import { useRecordMovements } from "@/src/queries/inventory";
@@ -30,7 +30,7 @@ import {
   QUANTITY_PATTERN,
 } from "./inventory-format";
 import { StockErrorAlert } from "./stock-error-alert";
-import { LocationPickerSkeleton } from "@/components/locations/locations-skeletons";
+import { LocationPickerSkeleton } from "@/app/app/_components/locations/locations-skeletons";
 
 export type MovementKind = "consumed" | "missing";
 

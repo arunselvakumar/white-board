@@ -25,7 +25,7 @@ import {
 import { Button, buttonVariants } from "@repo/ui/components/button";
 
 import { FormAlert } from "@/components/auth/form-alert";
-import { LocationLabel } from "@/components/locations/location-picker";
+import { LocationLabel } from "@/app/app/_components/locations/location-picker";
 import { formatDate } from "@/components/payments/payment-format";
 import { SiteRecordHeader } from "@/components/site-work/site-record-header";
 import { TrackingFileStrip } from "@/components/tracking/documents/tracking-file-strip";

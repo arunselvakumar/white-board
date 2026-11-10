@@ -30,7 +30,7 @@ import {
   COMPANY_DASHBOARD_HEAD as HEAD,
   COMPANY_DASHBOARD_NUMBER as NUMBER,
   CompanyDashboardSkeleton,
-} from "@/components/dashboard/dashboard-skeletons";
+} from "@/app/app/dashboard/_components/dashboard-skeletons";
 import { formatPaise } from "@/components/money/money-input";
 import { DurationFilter } from "@/app/app/_components/projects/dashboard/duration-filter";
 import { ProjectProgressBar } from "@/app/app/_components/projects/project-progress";

@@ -4,8 +4,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "@repo/ui/components/button";
 
-import { FileThumbnail } from "@/components/projects/files/file-thumbnail";
-import { FileViewer } from "@/components/projects/files/file-viewer";
+import { FileThumbnail } from "@/app/app/_components/projects/files/file-thumbnail";
+import { FileViewer } from "@/app/app/_components/projects/files/file-viewer";
 import {
   siteWorkFilesQuery,
   type SiteWorkDocumentFile,

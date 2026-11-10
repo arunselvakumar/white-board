@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { FileViewer } from "@/components/projects/files/file-viewer";
+import { FileViewer } from "@/app/app/_components/projects/files/file-viewer";
 import type { TrackingDocumentFile } from "@/src/queries/tracking-documents";
 
 import {

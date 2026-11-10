@@ -22,7 +22,7 @@ import { Textarea } from "@repo/ui/components/textarea";
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { PermissionMatrix } from "@/components/permissions/permission-matrix";
+import { PermissionMatrix } from "@/app/app/staff/_components/permission-matrix";
 import { fieldForCode } from "@/lib/server-errors";
 import { ROLES_PATH, staffCount } from "@/lib/staff-nav";
 import { QueryHttpError } from "@/src/queries/http";

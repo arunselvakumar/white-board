@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
-import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
+import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
 import { DrawingAlbumPage } from "@/app/app/projects/[id]/drawings/[albumId]/_components/drawing-album-page";
 import { QuerySuspense } from "@/components/query-suspense";
 import { DrawingAlbumSkeleton } from "@/app/app/projects/[id]/drawings/_components/drawings-skeletons";

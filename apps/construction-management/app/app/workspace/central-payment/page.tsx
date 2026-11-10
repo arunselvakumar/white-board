@@ -4,7 +4,7 @@ import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { CentralPaymentPage } from "@/components/finance/central-payment/central-payment-page";
 import { CentralPaymentSkeleton } from "@/components/finance/central-payment/central-payment-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
-import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
+import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
 
 export const metadata: Metadata = { title: "Central Payment" };
 

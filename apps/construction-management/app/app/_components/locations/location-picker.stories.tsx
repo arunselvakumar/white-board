@@ -13,7 +13,7 @@ import type {
 } from "@/src/queries/location-options";
 import type { LocationRef } from "@/src/shared-kernel/location-ref";
 
-import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import { LocationLabel, LocationPicker, UNITS_SHOWN } from "./location-picker";
 
 const PROJECT = "0199c0de-0000-7000-8000-00000000a001";

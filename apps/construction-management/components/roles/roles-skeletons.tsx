@@ -1,7 +1,7 @@
 import { FormSkeleton } from "@repo/ui/components/skeleton-kit";
 
 import { FormPageSkeleton } from "@/components/masters/masters-skeletons";
-import { PermissionMatrixSkeleton } from "@/components/permissions/permissions-skeletons";
+import { PermissionMatrixSkeleton } from "@/app/app/staff/roles/[id]/_components/permissions-skeletons";
 import { ROLES_PATH } from "@/lib/staff-nav";
 
 /** Edit Role while it loads: name and description, then its matrix. */

@@ -23,7 +23,7 @@ import { cn } from "@repo/ui/lib/utils";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { localToday } from "@/components/payments/payment-format";
-import { LocationPicker } from "@/components/locations/location-picker";
+import { LocationPicker } from "@/app/app/_components/locations/location-picker";
 import { MaterialPicker } from "@/components/procurement/material-picker";
 import { fieldForCode } from "@/lib/server-errors";
 import { materialOptionsQuery } from "@/src/queries/material-options";
@@ -42,7 +42,7 @@ import type { LocationRef } from "@/src/shared-kernel/location-ref";
 
 import { purchaseRequestsPath } from "./purchase-request-actions";
 import { quantityText, siteLocationInput } from "./purchase-request-format";
-import { LocationPickerSkeleton } from "@/components/locations/locations-skeletons";
+import { LocationPickerSkeleton } from "@/app/app/_components/locations/locations-skeletons";
 import { StockLineSkeleton } from "@/components/procurement/procurement-skeletons";
 
 const QUANTITY_RE = /^\d{1,11}(\.\d{1,3})?$/;

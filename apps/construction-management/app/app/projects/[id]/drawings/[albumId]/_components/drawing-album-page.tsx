@@ -41,11 +41,11 @@ import {
   type DrawingSummary,
 } from "@/src/queries/project-drawings";
 
-import { FileThumbnail } from "@/components/projects/files/file-thumbnail";
+import { FileThumbnail } from "@/app/app/_components/projects/files/file-thumbnail";
 import {
   downloadUrl,
   FileViewer,
-} from "@/components/projects/files/file-viewer";
+} from "@/app/app/_components/projects/files/file-viewer";
 import { DeleteDrawingDialog } from "./delete-drawing-dialog";
 import { DrawingHistorySheet } from "./drawing-history-sheet";
 import {

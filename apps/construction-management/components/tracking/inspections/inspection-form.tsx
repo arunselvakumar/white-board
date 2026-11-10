@@ -33,7 +33,7 @@ import { Textarea } from "@repo/ui/components/textarea";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { LocationPicker } from "@/components/locations/location-picker";
+import { LocationPicker } from "@/app/app/_components/locations/location-picker";
 import { localToday } from "@/components/payments/payment-format";
 import { TrackingPendingFilesField } from "@/components/tracking/documents/tracking-pending-files-field";
 import { useUploadPendingTrackingFiles } from "@/components/tracking/documents/use-upload-pending-tracking-files";
@@ -50,7 +50,7 @@ import {
 } from "@/src/queries/tracking-inspections";
 import type { LocationRef } from "@/src/shared-kernel/location-ref";
 import { INSPECTION_LIMITS } from "@/src/tracking/domain/inspection";
-import { LocationPickerSkeleton } from "@/components/locations/locations-skeletons";
+import { LocationPickerSkeleton } from "@/app/app/_components/locations/locations-skeletons";
 
 const NONE = "none";
 

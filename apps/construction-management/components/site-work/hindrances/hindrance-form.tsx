@@ -21,7 +21,7 @@ import { Textarea } from "@repo/ui/components/textarea";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { LocationPicker } from "@/components/locations/location-picker";
+import { LocationPicker } from "@/app/app/_components/locations/location-picker";
 import { PendingFilesField } from "@/components/site-work/documents/pending-files-field";
 import { useUploadPendingFiles } from "@/components/site-work/documents/use-upload-pending-files";
 import { localToday } from "@/components/procurement/inventory/inventory-format";
@@ -46,7 +46,7 @@ import {
 } from "@/src/site-work/domain/hindrance";
 import { isCalendarDate } from "@/src/shared-kernel/calendar-date";
 import type { LocationRef } from "@/src/shared-kernel/location-ref";
-import { LocationPickerSkeleton } from "@/components/locations/locations-skeletons";
+import { LocationPickerSkeleton } from "@/app/app/_components/locations/locations-skeletons";
 
 const NONE = "none";
 const max = (n: number) =>

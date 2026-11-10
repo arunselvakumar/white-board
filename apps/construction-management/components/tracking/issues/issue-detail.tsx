@@ -30,7 +30,7 @@ import { cn } from "@repo/ui/lib/utils";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { LocationLabel } from "@/components/locations/location-picker";
+import { LocationLabel } from "@/app/app/_components/locations/location-picker";
 import { formatDate } from "@/components/payments/payment-format";
 import { SiteRecordHeader } from "@/components/site-work/site-record-header";
 import { TrackingDocumentFiles } from "@/components/tracking/documents/tracking-document-files";

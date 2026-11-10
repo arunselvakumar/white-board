@@ -20,12 +20,12 @@ import { Progress } from "@repo/ui/components/progress";
 import { FormAlert } from "@/components/auth/form-alert";
 import { DocumentSection } from "@/components/procurement/documents/document-section";
 import { DocumentFileIcon } from "@/app/app/_components/projects/documents/document-file-icon";
-import { FileThumbnail } from "@/components/projects/files/file-thumbnail";
+import { FileThumbnail } from "@/app/app/_components/projects/files/file-thumbnail";
 import {
   downloadUrl,
   FileViewer,
-} from "@/components/projects/files/file-viewer";
-import { useDirectUpload } from "@/components/uploads/use-direct-upload";
+} from "@/app/app/_components/projects/files/file-viewer";
+import { useDirectUpload } from "@/app/app/_components/uploads/use-direct-upload";
 import { formatBytes } from "@/lib/project-documents";
 import { uploadErrorMessage } from "@/src/queries/direct-upload";
 import {

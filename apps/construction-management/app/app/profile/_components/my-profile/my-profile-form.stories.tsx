@@ -4,7 +4,7 @@ import { expect, fireEvent, waitFor, within } from "storybook/test";
 import { QuerySuspense } from "@/components/query-suspense";
 import type { MyProfileModel } from "@/src/queries/my-profile";
 
-import { signInAs } from "../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 import {
   PIXEL_PNG,
   apiError,
@@ -12,7 +12,7 @@ import {
   pngFile,
   sentJson,
   type ApiHandler,
-} from "../../.storybook/mocks/profile-api";
+} from "@/.storybook/mocks/profile-api";
 import { MyProfileScreen } from "./my-profile-screen";
 
 const BASE = "/api/construction/organization/me";
