@@ -82,6 +82,7 @@ Write a comment only when the code cannot say it:
 
 - **Write:** invariants, units and ranges (`/** 1–12; the academic year starts on the 1st of this month. */`); a non-obvious reason the code is the way it is; a pointer to an ADR where the code deviates from the obvious (`(ADR-0047)`, `(ADR CM-0011)`).
 - **Do not write:** ticket or milestone IDs (`CM-501`, `P0-002`, `M10`) or menu paths (`Masters → …`) — those belong in the PR and commit message; comments that restate the name of a function, prop or type; history ("used to…", "now…", "for now") instead of what the code does.
+- `bun run check-comments` (in CI) fails on a ticket ID inside a comment under an app's `app/` or `components/`.
 
 ## Testing
 
