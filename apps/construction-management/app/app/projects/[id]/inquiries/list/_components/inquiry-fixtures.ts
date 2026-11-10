@@ -1,5 +1,5 @@
-import { mockApi, type ApiCall } from "../../../.storybook/mocks/api";
-import { mockSalesDocumentApi } from "@/components/sales/documents/sales-document-fixtures";
+import { mockApi, type ApiCall } from "@/.storybook/mocks/api";
+import { mockSalesDocumentApi } from "@/app/app/projects/[id]/_components/sales/documents/sales-document-fixtures";
 import type { SalesAccess } from "@/src/queries/sales-access";
 import type { SalesDocumentFile } from "@/src/queries/sales-documents";
 import type {

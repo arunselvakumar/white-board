@@ -25,7 +25,10 @@ import {
 } from "@repo/ui/components/tabs";
 
 import { PageHeader } from "@/components/app-shell/page-header";
-import { STAFF_SALARY, wageDefaults } from "@/components/wages/wage-schema";
+import {
+  STAFF_SALARY,
+  wageDefaults,
+} from "@/app/app/staff/_components/wage-schema";
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";
 import { STAFF_PATH } from "@/lib/staff-nav";

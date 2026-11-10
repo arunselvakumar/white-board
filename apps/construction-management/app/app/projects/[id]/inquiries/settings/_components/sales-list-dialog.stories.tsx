@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, waitFor, within } from "storybook/test";
 
-import { StoryQueries, mockApi } from "../../../.storybook/mocks/api";
+import { StoryQueries, mockApi } from "@/.storybook/mocks/api";
 import {
   SETTINGS_PROJECT_ID,
   salesSettingsHandler,

@@ -14,7 +14,7 @@ import {
   wagePayload,
   wageValuesSchema,
   type WageValues,
-} from "@/components/wages/wage-schema";
+} from "@/app/app/staff/_components/wage-schema";
 import type {
   LabourInput,
   LabourResponse,

@@ -21,7 +21,7 @@ import { formatDate } from "@/components/payments/payment-format";
 import {
   BookingStatusBadge,
   UNIT_STATUS_DOTS,
-} from "@/components/sales/units/sales-status";
+} from "@/app/app/projects/[id]/_components/sales/units/sales-status";
 import type { Duration } from "@/lib/dashboard-duration";
 import { bookingsPath } from "@/src/queries/sales-bookings";
 import {

@@ -29,7 +29,7 @@ import {
   FormActionsSkeleton,
   RecordHeaderSkeleton,
   type SalesSkeletonField,
-} from "@/components/sales/sales-form-skeletons";
+} from "@/app/app/projects/[id]/_components/sales/sales-form-skeletons";
 import { inquiriesPath } from "@/src/queries/sales-inquiries";
 import {
   FOLLOW_UP_DUE_LABELS,

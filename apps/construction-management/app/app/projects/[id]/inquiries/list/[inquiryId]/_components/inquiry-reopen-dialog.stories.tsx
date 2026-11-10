@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, waitFor, within } from "storybook/test";
 
-import { StoryQueries } from "../../../.storybook/mocks/api";
+import { StoryQueries } from "@/.storybook/mocks/api";
 
 import { InquiryReopenDialog } from "./inquiry-reopen-dialog";
 import {
@@ -11,7 +11,7 @@ import {
   INQUIRIES,
   mockInquiryApi,
   type InquiryApiOptions,
-} from "./inquiry-fixtures";
+} from "@/app/app/projects/[id]/inquiries/list/_components/inquiry-fixtures";
 
 const LOST = INQUIRIES.find((item) => item.id === DEEPAK_ID) ?? INQUIRIES[0];
 if (LOST == null) throw new Error("fixtures");

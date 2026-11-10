@@ -32,8 +32,8 @@ import {
   MultiSelect,
   type MultiSelectOption,
 } from "@/components/ui/multi-select";
-import { WageFields } from "@/components/wages/wage-fields";
-import { LABOUR_WAGE } from "@/components/wages/wage-schema";
+import { WageFields } from "@/app/app/staff/_components/wage-fields";
+import { LABOUR_WAGE } from "@/app/app/staff/_components/wage-schema";
 import { fieldForCode } from "@/lib/server-errors";
 import { LABOURS_PAGE_PATH } from "@/lib/staff-nav";
 import {

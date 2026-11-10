@@ -5,7 +5,7 @@ import {
   type ReportScope,
 } from "@/src/reporting/domain/report-catalogue";
 
-import type { ApiCall } from "../../.storybook/mocks/api";
+import type { ApiCall } from "@/.storybook/mocks/api";
 
 export const PROJECT_ID = "0190a000-0000-7000-8000-0000000000a1";
 export const TODAY = "2026-10-09";

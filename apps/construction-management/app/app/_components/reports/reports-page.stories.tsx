@@ -3,11 +3,7 @@ import { expect, waitFor, within } from "storybook/test";
 
 import type { ReportJob, ReportKind } from "@/src/queries/reports";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import {
   catalogueHandler,
   CONTRACTOR_ID,
@@ -31,7 +27,7 @@ import {
   MASON_ID,
   PROJECT_FILTER_OPTIONS_PATH,
   VENDOR_ID,
-} from "./report-fixtures";
+} from "@/app/app/workspace/central-payment/_components/report-fixtures";
 import {
   COUNTERPARTY_OPTIONS,
   financeLookupsHandler,

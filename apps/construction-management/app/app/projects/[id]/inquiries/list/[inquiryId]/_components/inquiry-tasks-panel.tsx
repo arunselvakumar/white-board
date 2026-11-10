@@ -25,7 +25,7 @@ import {
 } from "@/src/queries/sales-inquiries";
 
 import { InquiryTaskDialog } from "./inquiry-task-dialog";
-import { InquiryTasksSkeleton } from "./inquiries-skeletons";
+import { InquiryTasksSkeleton } from "@/app/app/projects/[id]/inquiries/list/_components/inquiries-skeletons";
 
 function message(caught: unknown): string {
   return caught instanceof QueryHttpError

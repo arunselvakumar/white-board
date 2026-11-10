@@ -3,11 +3,7 @@ import { expect, waitFor, within } from "storybook/test";
 
 import type { ReportJob } from "@/src/queries/reports";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { CentralReportsPage } from "./central-reports-page";
 import {
   catalogueHandler,
@@ -19,7 +15,7 @@ import {
   STORE_ID,
   TODAY,
   VILLA_ID,
-} from "./report-fixtures";
+} from "@/app/app/workspace/central-payment/_components/report-fixtures";
 
 let api: ReturnType<typeof mockApi>;
 

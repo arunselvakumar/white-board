@@ -19,7 +19,7 @@ import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { formatDate, localToday } from "@/components/payments/payment-format";
-import { SalesDocumentFiles } from "@/components/sales/documents/sales-document-files";
+import { SalesDocumentFiles } from "@/app/app/projects/[id]/_components/sales/documents/sales-document-files";
 import { SiteRecordHeader } from "@/app/app/projects/[id]/_components/site-work/site-record-header";
 import { formatDateTime } from "@/components/tracking/issues/issue-parts";
 import { QueryHttpError } from "@/src/queries/http";
@@ -37,12 +37,12 @@ import {
   InquiryStatusBadge,
   InterestChip,
   NextFollowUp,
-} from "./inquiry-parts";
+} from "@/app/app/projects/[id]/inquiries/list/_components/inquiry-parts";
 import { InquiryActivity } from "./inquiry-activity";
 import { InquiryCloseDialog } from "./inquiry-close-dialog";
 import { InquiryReopenDialog } from "./inquiry-reopen-dialog";
 import { InquiryTasksPanel } from "./inquiry-tasks-panel";
-import { uploadFailedNotice } from "@/components/sales/documents/upload-failed";
+import { uploadFailedNotice } from "@/app/app/projects/[id]/_components/sales/documents/upload-failed";
 
 function Fact({
   label,

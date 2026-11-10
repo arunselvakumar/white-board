@@ -18,15 +18,15 @@ import { cn } from "@repo/ui/lib/utils";
 import { PageHeader } from "@/components/app-shell/page-header";
 import { formatPaise } from "@/components/money/money-input";
 import { formatDate } from "@/components/payments/payment-format";
-import { RecentReports } from "@/components/reports/recent-reports";
+import { RecentReports } from "@/app/app/_components/reports/recent-reports";
 import {
   deviceToday,
   type ReportDefinition,
-} from "@/components/reports/report-catalogue";
+} from "@/app/app/_components/reports/report-catalogue";
 import {
   ReportGroup,
   type FilterOptions,
-} from "@/components/reports/reports-page";
+} from "@/app/app/_components/reports/reports-page";
 import {
   centralPaymentQuery,
   type CentralPartyDue,

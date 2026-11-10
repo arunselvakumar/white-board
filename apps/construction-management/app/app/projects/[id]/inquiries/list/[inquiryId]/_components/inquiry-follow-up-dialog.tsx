@@ -33,7 +33,7 @@ import {
   type FollowUpActivity,
 } from "@/src/sales/domain/sales-terms";
 
-import { InquirySelect } from "./inquiry-select";
+import { InquirySelect } from "@/app/app/projects/[id]/inquiries/list/_components/inquiry-select";
 
 const schema = z
   .object({

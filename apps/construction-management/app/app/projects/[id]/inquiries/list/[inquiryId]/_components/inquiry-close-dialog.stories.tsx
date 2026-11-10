@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, waitFor, within } from "storybook/test";
 
-import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
+import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 
 import { InquiryCloseDialog } from "./inquiry-close-dialog";
 import {
@@ -13,7 +13,7 @@ import {
   inquiry,
   mockInquiryApi,
   type InquiryApiOptions,
-} from "./inquiry-fixtures";
+} from "@/app/app/projects/[id]/inquiries/list/_components/inquiry-fixtures";
 
 let api: ReturnType<typeof mockInquiryApi>;
 

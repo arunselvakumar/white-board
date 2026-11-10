@@ -1,9 +1,9 @@
-import { mockApi, type ApiCall } from "../../../.storybook/mocks/api";
+import { mockApi, type ApiCall } from "@/.storybook/mocks/api";
 import {
   mockSalesDocumentApi,
   salesFile,
-} from "@/components/sales/documents/sales-document-fixtures";
-import { unitsHandler } from "@/components/sales/units/units-fixtures";
+} from "@/app/app/projects/[id]/_components/sales/documents/sales-document-fixtures";
+import { unitsHandler } from "@/app/app/projects/[id]/bookings/_components/units-fixtures";
 import type { SalesAccess } from "@/src/queries/sales-access";
 import type {
   Booking,

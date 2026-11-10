@@ -17,7 +17,7 @@ import { RadioGroup, RadioGroupItem } from "@repo/ui/components/radio-group";
 import { FieldError } from "@/components/auth/field-error";
 import { MobileField } from "@/components/auth/mobile-field";
 import { FormSection } from "@/components/forms/form-section";
-import { WageFields } from "@/components/wages/wage-fields";
+import { WageFields } from "@/app/app/staff/_components/wage-fields";
 import {
   STAFF_SALARY,
   checkWage,
@@ -26,7 +26,7 @@ import {
   wagePayload,
   wageValuesSchema,
   type SavedWage,
-} from "@/components/wages/wage-schema";
+} from "@/app/app/staff/_components/wage-schema";
 import type { TeamMember } from "@/src/queries/team-members";
 import { isValidAadhaar, isValidPan } from "@/src/shared-kernel/tax-ids";
 

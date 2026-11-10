@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
-import { BookingNew } from "@/components/sales/bookings/booking-pages";
+import { BookingNew } from "@/app/app/projects/[id]/bookings/list/_components/booking-pages";
 
 export const metadata: Metadata = { title: "New booking" };
 

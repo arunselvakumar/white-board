@@ -25,12 +25,12 @@ import { Button, buttonVariants } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
-import { SalesDocumentFiles } from "@/components/sales/documents/sales-document-files";
+import { SalesDocumentFiles } from "@/app/app/projects/[id]/_components/sales/documents/sales-document-files";
 import { formatDate, localToday } from "@/components/payments/payment-format";
 import {
   areaLabel,
   BookingStatusBadge,
-} from "@/components/sales/units/sales-status";
+} from "@/app/app/projects/[id]/_components/sales/units/sales-status";
 import { SiteRecordHeader } from "@/app/app/projects/[id]/_components/site-work/site-record-header";
 import { formatDateTime } from "@/components/tracking/issues/issue-parts";
 import { QueryHttpError } from "@/src/queries/http";
@@ -44,7 +44,7 @@ import {
 import { inquiriesPath } from "@/src/queries/sales-inquiries";
 
 import { BookingActionDialog, type BookingDialogKind } from "./booking-dialogs";
-import { uploadFailedNotice } from "@/components/sales/documents/upload-failed";
+import { uploadFailedNotice } from "@/app/app/projects/[id]/_components/sales/documents/upload-failed";
 
 function Fact({
   label,

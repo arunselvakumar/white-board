@@ -3,12 +3,8 @@ import { useState } from "react";
 import { expect, fireEvent, waitFor, within } from "storybook/test";
 import { Button } from "@repo/ui/components/button";
 
-import {
-  StoryQueries,
-  mockApi,
-  type ApiCall,
-} from "../../../.storybook/mocks/api";
-import { mockXhrUploads } from "../../../.storybook/mocks/xhr";
+import { StoryQueries, mockApi, type ApiCall } from "@/.storybook/mocks/api";
+import { mockXhrUploads } from "@/.storybook/mocks/xhr";
 
 import {
   SALES_DOCUMENTS_API,

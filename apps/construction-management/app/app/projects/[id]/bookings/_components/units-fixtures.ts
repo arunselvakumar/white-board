@@ -1,4 +1,4 @@
-import { mockApi, type ApiCall } from "../../../.storybook/mocks/api";
+import { mockApi, type ApiCall } from "@/.storybook/mocks/api";
 import type { SalesUnit, UnitChart } from "@/src/queries/sales-units";
 import type { UnitSalesStatus } from "@/src/sales/domain/sales-terms";
 

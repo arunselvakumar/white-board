@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-import { ReportsPage } from "@/components/reports/reports-page";
-import { ReportGroupsSkeleton } from "@/components/reports/reports-skeletons";
+import { ReportsPage } from "@/app/app/_components/reports/reports-page";
+import { ReportGroupsSkeleton } from "@/app/app/_components/reports/reports-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Reports" };

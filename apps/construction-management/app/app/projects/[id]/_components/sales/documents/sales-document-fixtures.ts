@@ -1,4 +1,4 @@
-import type { ApiCall } from "../../../.storybook/mocks/api";
+import type { ApiCall } from "@/.storybook/mocks/api";
 import type { SalesDocumentFile } from "@/src/queries/sales-documents";
 import type { SalesFileRole } from "@/src/sales/domain/document-files";
 

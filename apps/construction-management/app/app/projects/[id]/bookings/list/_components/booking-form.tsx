@@ -23,8 +23,8 @@ import { SkeletonText } from "@repo/ui/components/skeleton-kit";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { localToday } from "@/components/payments/payment-format";
-import { SalesPendingFilesField } from "@/components/sales/documents/sales-pending-files-field";
-import { useUploadPendingSalesFiles } from "@/components/sales/documents/use-upload-pending-sales-files";
+import { SalesPendingFilesField } from "@/app/app/projects/[id]/_components/sales/documents/sales-pending-files-field";
+import { useUploadPendingSalesFiles } from "@/app/app/projects/[id]/_components/sales/documents/use-upload-pending-sales-files";
 import { RadioCard } from "@/app/app/_components/site-work/equipment/radio-card";
 import { QueryHttpError } from "@/src/queries/http";
 import {
@@ -36,7 +36,7 @@ import {
   type BookingFormOptions,
 } from "@/src/queries/sales-bookings";
 import { SALES_LIMITS } from "@/src/sales/domain/sales-terms";
-import { withUploadFailed } from "@/components/sales/documents/upload-failed";
+import { withUploadFailed } from "@/app/app/projects/[id]/_components/sales/documents/upload-failed";
 
 const limit = (max: number) =>
   z

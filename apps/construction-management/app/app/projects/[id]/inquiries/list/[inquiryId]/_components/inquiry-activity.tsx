@@ -34,8 +34,8 @@ import {
 } from "@/src/sales/domain/sales-terms";
 
 import { InquiryFollowUpDialog } from "./inquiry-follow-up-dialog";
-import { inquiryHistoryLine } from "./inquiry-parts";
-import { TimelineSkeleton } from "./inquiries-skeletons";
+import { inquiryHistoryLine } from "@/app/app/projects/[id]/inquiries/list/_components/inquiry-parts";
+import { TimelineSkeleton } from "@/app/app/projects/[id]/inquiries/list/_components/inquiries-skeletons";
 
 const ACTIVITY_ICONS: Record<FollowUpActivity, LucideIcon> = {
   call: Phone,

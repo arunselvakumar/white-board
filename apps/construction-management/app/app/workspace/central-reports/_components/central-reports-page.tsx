@@ -14,14 +14,17 @@ import {
 import { PageHeader } from "@/components/app-shell/page-header";
 import { reportCatalogueQuery } from "@/src/queries/report-catalogue";
 
-import { RecentReports } from "./recent-reports";
-import { deviceToday, type ReportDefinition } from "./report-catalogue";
-import { useReportPickerOptions } from "./report-pickers";
-import { ReportGroup } from "./reports-page";
+import { RecentReports } from "@/app/app/_components/reports/recent-reports";
+import {
+  deviceToday,
+  type ReportDefinition,
+} from "@/app/app/_components/reports/report-catalogue";
+import { useReportPickerOptions } from "@/app/app/_components/reports/report-pickers";
+import { ReportGroup } from "@/app/app/_components/reports/reports-page";
 import {
   RecentReportsSkeleton,
   ReportGroupsSkeleton,
-} from "./reports-skeletons";
+} from "@/app/app/_components/reports/reports-skeletons";
 
 /** Central Reports' groups, in order, worded for the whole Company. */
 const CENTRAL_GROUPS: {
