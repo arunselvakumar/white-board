@@ -43,9 +43,9 @@ import {
   shortDate,
   timestampDate,
   todayInKolkata,
-} from "./enquiry-format";
+} from "@/app/(app)/enquiries/_components/enquiry-format";
 import { EnquiryHistory } from "./enquiry-history";
-import { EnquiryStageBadge } from "./enquiry-stage-badge";
+import { EnquiryStageBadge } from "@/app/(app)/enquiries/_components/enquiry-stage-badge";
 import { FollowUpDialog, type FollowUpInput } from "./follow-up-dialog";
 import { NotInterestedDialog } from "./not-interested-dialog";
 

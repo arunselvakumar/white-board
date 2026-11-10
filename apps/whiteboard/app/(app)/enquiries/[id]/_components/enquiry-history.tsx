@@ -24,7 +24,7 @@ import {
   demoTitle,
   shortDate,
   timestampLabel,
-} from "./enquiry-format";
+} from "@/app/(app)/enquiries/_components/enquiry-format";
 
 export type TimelineEntry = {
   id: string;

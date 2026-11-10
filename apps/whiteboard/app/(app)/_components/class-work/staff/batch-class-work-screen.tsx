@@ -46,7 +46,7 @@ import {
 
 import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
-import { AttachmentLinks } from "@/components/class-work/attachments";
+import { AttachmentLinks } from "@/app/(app)/_components/class-work/attachments";
 import {
   classWorkQueries,
   removeHomework,

@@ -38,7 +38,7 @@ import {
   RESULT_STATUS_LABEL,
   passText,
   resultText,
-} from "@/components/class-tests/result-format";
+} from "@/app/(app)/_components/class-tests/result-format";
 import {
   TEST_REMARK_MAX,
   classTestQueries,

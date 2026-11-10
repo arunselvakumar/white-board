@@ -10,7 +10,7 @@ import {
   StudentTestHistoryList,
   TestHistoryBoundary,
   TestHistoryFallback,
-} from "./student-test-history";
+} from "@/app/(app)/_components/class-tests/history/student-test-history";
 
 type Back = { label: string; href: string };
 

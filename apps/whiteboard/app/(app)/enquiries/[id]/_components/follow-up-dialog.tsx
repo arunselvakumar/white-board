@@ -20,7 +20,7 @@ import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 
 import { errorMessage } from "./enquiry-errors";
-import { todayInKolkata } from "./enquiry-format";
+import { todayInKolkata } from "@/app/(app)/enquiries/_components/enquiry-format";
 
 const NOTE_LIMIT = 1000;
 

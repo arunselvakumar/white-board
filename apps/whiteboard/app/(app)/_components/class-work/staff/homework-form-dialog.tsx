@@ -27,7 +27,7 @@ import { Textarea } from "@repo/ui/components/textarea";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { AttachmentPicker } from "@/components/class-work/attachments";
+import { AttachmentPicker } from "@/app/(app)/_components/class-work/attachments";
 import {
   classWorkQueries,
   setHomework,

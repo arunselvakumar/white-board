@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { BatchClassWorkScreen } from "@/components/class-work/staff/batch-class-work-screen";
+import { BatchClassWorkScreen } from "@/app/(app)/_components/class-work/staff/batch-class-work-screen";
 
 export const metadata: Metadata = { title: "Homework and Study Material" };
 

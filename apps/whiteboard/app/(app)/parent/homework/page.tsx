@@ -2,7 +2,7 @@ import { getAuth } from "@repo/auth/server";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import { FamilyHomeworkScreen } from "@/components/class-work/family/family-homework-screen";
+import { FamilyHomeworkScreen } from "@/app/(app)/_components/class-work/family/family-homework-screen";
 
 export const metadata: Metadata = { title: "Homework" };
 

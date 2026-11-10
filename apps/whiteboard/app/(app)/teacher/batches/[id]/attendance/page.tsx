@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { BatchAttendanceScreen } from "@/components/attendance/attendance-screens";
+import { BatchAttendanceScreen } from "@/app/(app)/_components/attendance/attendance-screens";
 export const metadata: Metadata = { title: "Batch Attendance" };
 export default async function Page({
   params,

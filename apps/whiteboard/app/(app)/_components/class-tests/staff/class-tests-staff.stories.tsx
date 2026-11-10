@@ -9,14 +9,14 @@ import {
   DRAFT_VISIBILITY_NOTE,
   PUBLISH_CONFIRMATION,
   PUBLISHED_EDIT_NOTE,
-} from "@/components/class-tests/result-format";
+} from "@/app/(app)/_components/class-tests/result-format";
 import { QuerySuspense } from "@/components/query-suspense";
 import type {
   BatchTestsView,
   ClassTestDetailView,
   TestResultInput,
 } from "@/src/queries/class-tests";
-import { signInAs } from "../../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 
 import { BatchTestsScreen } from "./batch-tests-screen";
 import {

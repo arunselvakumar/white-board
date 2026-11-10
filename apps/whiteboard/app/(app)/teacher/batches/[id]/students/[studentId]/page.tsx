@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { StudentTestHistoryScreen } from "@/components/class-tests/history/student-test-history-screen";
+import { StudentTestHistoryScreen } from "@/app/(app)/teacher/batches/[id]/students/[studentId]/_components/student-test-history-screen";
 
 export const metadata: Metadata = { title: "Test history" };
 

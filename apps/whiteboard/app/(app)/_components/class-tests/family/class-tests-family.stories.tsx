@@ -6,7 +6,7 @@ import { expect, within } from "storybook/test";
 import { AppShell } from "@/app/(app)/_components/app-shell/app-shell";
 import { QuerySuspense } from "@/components/query-suspense";
 import type { FamilyTestResultsView } from "@/src/queries/class-tests";
-import { signInAs } from "../../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 
 import {
   ashaResults,

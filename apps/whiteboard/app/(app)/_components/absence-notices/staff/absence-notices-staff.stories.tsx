@@ -9,7 +9,7 @@ import {
   withFreshQueryClient,
 } from "@/app/(app)/_components/notifications/story-api";
 import type { ExpectedAbsencesView } from "@/src/queries/absence-notices";
-import { signInAs } from "../../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 
 import {
   AbsenceNoticesContent,

@@ -13,7 +13,7 @@ import type {
   StudyMaterialView,
   SubmissionView,
 } from "@/src/queries/class-work";
-import { signInAs } from "../../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 
 import { BatchClassWorkScreen } from "./batch-class-work-screen";
 import { STUDY_MATERIAL_EMPTY_MESSAGE } from "./study-material-form-dialog";

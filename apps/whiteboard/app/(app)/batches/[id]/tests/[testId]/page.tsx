@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { TestDetailScreen } from "@/components/class-tests/staff/test-detail-screen";
+import { TestDetailScreen } from "@/app/(app)/_components/class-tests/staff/test-detail-screen";
 
 export const metadata: Metadata = { title: "Test" };
 
