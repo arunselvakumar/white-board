@@ -18,6 +18,8 @@ import {
 } from "@repo/ui/components/empty";
 import { Skeleton } from "@repo/ui/components/skeleton";
 
+import { isServerRendered } from "@/lib/server-rendered-routes";
+
 export function PageFallback() {
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4 p-6" aria-busy="true">
@@ -52,7 +54,8 @@ export function QuerySuspense({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const isClient = useIsClient();
 
-  if (!isClient) return <PageFallback />;
+  // Paths that prefetch on the server render here too (ADR-0052).
+  if (!isClient && !isServerRendered(pathname)) return <PageFallback />;
 
   return (
     <QueryErrorResetBoundary>
