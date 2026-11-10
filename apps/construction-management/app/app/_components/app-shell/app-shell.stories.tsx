@@ -64,7 +64,6 @@ async function openSidebar({ canvas, canvasElement, userEvent }: PlayContext) {
   return within(sheet);
 }
 
-/** The main menu, in the sidebar. */
 async function mainMenu(context: PlayContext) {
   const sidebar = await openSidebar(context);
   return within(await sidebar.findByRole("navigation", { name: "Main" }));
@@ -144,7 +143,7 @@ export const Workspace: Story = {
   },
 };
 
-/** The Company Dashboard leads the main menu (CM-902). */
+/** The Company Dashboard leads the main menu. */
 export const DashboardFirst: Story = {
   ...shellAt("/app/projects"),
   play: async (context) => {
@@ -169,7 +168,7 @@ export const WithoutDashboard: Story = {
  * Without Team Members or Role Management Read (a Site Supervisor Role,
  * say), the Staff group of Human Resources keeps Labour, Site Engineer and
  * Vendor but not Office Staff or Role Management, and the area link opens
- * HRMS (ADR CM-0030, CM-0034).
+ * HRMS (ADR CM-0030, ADR CM-0034).
  */
 export const WithoutStaffRoles: Story = {
   ...shellAt("/app/projects", true, false),
@@ -340,7 +339,7 @@ export const HumanResourcesSubmenu: Story = {
       "Office Staff",
       "Role Management",
     ]);
-    // The Labour group is gone: its lists are in Staff now.
+    // No Labour group: its lists are in Staff.
     await expect(submenu.queryByRole("list", { name: "Labour" })).toBeNull();
     for (const group of groups) {
       const list = within(submenu.getByRole("list", { name: group.label }));
@@ -357,7 +356,7 @@ export const HumanResourcesSubmenu: Story = {
     ).not.toHaveAttribute("aria-current");
     // Team Members live under Human Resources, not Masters.
     await expect(nav.queryByRole("link", { name: "Team Members" })).toBeNull();
-    // Staff & Roles and Labour & Vendors are gone from the main menu.
+    // Neither Staff & Roles nor Labour & Vendors is in the main menu.
     await expect(nav.queryByRole("link", { name: "Staff & Roles" })).toBeNull();
     await expect(
       nav.queryByRole("link", { name: "Labour & Vendors" }),
@@ -412,7 +411,7 @@ export const StaffPage: Story = {
 
 /**
  * An HRMS page opens Human Resources, with the HRMS section current; the
- * Workspace item, where HRMS used to live, is not.
+ * Workspace item is not.
  */
 export const HrmsPage: Story = {
   parameters: {
@@ -477,9 +476,9 @@ export const WorkspaceSubmenu: Story = {
 };
 
 /**
- * The Masters and Workspace fold-out arrows sit on their rows' centre line
- * (#99), open (Masters, on its page) and folded (Workspace). On a phone
- * the menu is in the Sidebar sheet.
+ * The Masters and Workspace fold-out arrows sit on their rows' centre line,
+ * open (Masters, on its page) and folded (Workspace). On a phone the menu
+ * is in the Sidebar sheet.
  */
 export const SubmenuArrowsCentred: Story = {
   parameters: {

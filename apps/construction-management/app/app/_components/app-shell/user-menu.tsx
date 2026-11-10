@@ -77,7 +77,7 @@ export function AccountAvatar({
 
 /**
  * The account menu's items: the User's name and email, My Profile,
- * Downloads (their reports across Projects, CM-901), Your Subscription and
+ * Downloads (their reports across Projects), Your Subscription and
  * Sign out. The sidebar's account row opens it from its `…` button
  * (ADR-0050).
  */

@@ -79,8 +79,8 @@ function ProjectsChecklist({
 }
 
 /**
- * The Other Party form (ADR CM-0017 §11): name, mobile, email, GSTIN (fills the
- * GST state), PAN, GST state, address and the Projects it works on.
+ * Name, mobile, email, GSTIN (fills the GST state), PAN, GST state, address
+ * and the Projects the party works on (ADR CM-0017 §11).
  */
 export function OtherPartyForm({
   party,

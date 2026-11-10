@@ -9,9 +9,9 @@ import { fieldForCode } from "@/lib/server-errors";
 import { accountQueries, formatDay } from "@/src/queries/account";
 
 /**
- * The banner under the shell header while the Company waits to be deleted
- * (CM-907): the date, read-only, and Cancel deletion for the Owner. It
- * never blocks the page: while loading or on error it shows nothing.
+ * The banner above the page while the Company waits to be deleted:
+ * the date, read-only, and Cancel deletion for the Owner. It never blocks
+ * the page: while loading or on error it shows nothing.
  */
 export function CompanyDeletionBanner() {
   const { role } = useCompanyAuth();

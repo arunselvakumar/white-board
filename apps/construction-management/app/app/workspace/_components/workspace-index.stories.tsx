@@ -23,7 +23,7 @@ export const Default: Story = {
     await expect(
       canvas.getByRole("heading", { name: "Workspace" }),
     ).toBeVisible();
-    // HRMS is under Human Resources now (ADR CM-0034).
+    // HRMS is under Human Resources (ADR CM-0034).
     await expect(canvas.queryByRole("link", { name: /^HRMS/ })).toBeNull();
     await expect(
       canvas.getByRole("link", { name: /^Central Store/ }),
@@ -43,7 +43,7 @@ export const Default: Story = {
   },
 };
 
-/** With Parties only, the page still has a tile (Party Balance, CM-708). */
+/** With Parties only, the page still has a tile (Party Balance). */
 export const PartyBalanceOnly: Story = {
   args: {
     centralStore: false,

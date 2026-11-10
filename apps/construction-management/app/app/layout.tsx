@@ -20,13 +20,14 @@ export default async function AppLayout({
   // A Temporary Password is replaced before anything else (ADR CM-0030 §8).
   if (mustChangePassword(auth)) redirect(CHANGE_PASSWORD_PATH);
   if (auth.workspaceId == null) redirect("/continue");
-  // The main menu's Dashboard needs the Dashboard menu's Read (CM-902).
+  // The main menu's Dashboard needs the Dashboard menu's Read.
   const canOpenDashboard = await viewerCan(
     "reporting.project_dashboard",
     "read",
   );
 
-  // The Staff group of Human Resources needs Team Members or Role Management Read (ADR CM-0030, CM-0034).
+  // The Staff group of Human Resources needs Team Members or Role Management
+  // Read (ADR CM-0030, ADR CM-0034).
   const canOpenStaffRoles =
     (await viewerCan("organization.team_members", "read")) ||
     (await viewerCan("organization.roles", "read"));
