@@ -21,8 +21,8 @@ import { Textarea } from "@repo/ui/components/textarea";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { SalesPendingFilesField } from "@/components/sales/documents/sales-pending-files-field";
-import { useUploadPendingSalesFiles } from "@/components/sales/documents/use-upload-pending-sales-files";
+import { SalesPendingFilesField } from "@/app/app/projects/[id]/_components/sales/documents/sales-pending-files-field";
+import { useUploadPendingSalesFiles } from "@/app/app/projects/[id]/_components/sales/documents/use-upload-pending-sales-files";
 import { QueryHttpError } from "@/src/queries/http";
 import {
   duplicateMatches,
@@ -41,7 +41,7 @@ import {
 
 import { InquiryDuplicatePrompt } from "./inquiry-duplicate-prompt";
 import { InquirySelect } from "./inquiry-select";
-import { withUploadFailed } from "@/components/sales/documents/upload-failed";
+import { withUploadFailed } from "@/app/app/projects/[id]/_components/sales/documents/upload-failed";
 
 const schema = z.object({
   name: z

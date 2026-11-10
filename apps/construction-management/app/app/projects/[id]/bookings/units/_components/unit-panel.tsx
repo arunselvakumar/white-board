@@ -14,7 +14,11 @@ import { bookingsPath } from "@/src/queries/sales-bookings";
 import { salesUnitQuery, useUnitCommand } from "@/src/queries/sales-units";
 import { UNAVAILABLE_REASON_LABELS } from "@/src/sales/domain/sales-terms";
 
-import { areaLabel, BookingStatusBadge, UnitStatusBadge } from "./sales-status";
+import {
+  areaLabel,
+  BookingStatusBadge,
+  UnitStatusBadge,
+} from "@/app/app/projects/[id]/_components/sales/units/sales-status";
 import { UnitDetailsDialog, UnitUnavailableDialog } from "./unit-dialogs";
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {

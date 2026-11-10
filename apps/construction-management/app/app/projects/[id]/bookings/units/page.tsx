@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
-import { UnitsTab } from "@/components/sales/units/units-tab";
+import { UnitsTab } from "@/app/app/projects/[id]/bookings/units/_components/units-tab";
 import { QuerySuspense } from "@/components/query-suspense";
-import { UnitsTabSkeleton } from "@/components/sales/units/units-skeletons";
+import { UnitsTabSkeleton } from "@/app/app/projects/[id]/bookings/units/_components/units-skeletons";
 
 export const metadata: Metadata = { title: "Units" };
 

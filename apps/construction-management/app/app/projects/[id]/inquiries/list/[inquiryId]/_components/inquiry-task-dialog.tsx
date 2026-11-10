@@ -25,7 +25,10 @@ import {
 } from "@/src/queries/sales-inquiries";
 import { SALES_LIMITS } from "@/src/sales/domain/sales-terms";
 
-import { InquirySelect, withCurrentOption } from "./inquiry-select";
+import {
+  InquirySelect,
+  withCurrentOption,
+} from "@/app/app/projects/[id]/inquiries/list/_components/inquiry-select";
 
 const schema = z.object({
   title: z

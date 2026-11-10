@@ -1,5 +1,5 @@
 import { PageHeader } from "@/components/app-shell/page-header";
-import { RecentReportsSkeleton } from "@/components/reports/reports-skeletons";
+import { RecentReportsSkeleton } from "@/app/app/_components/reports/reports-skeletons";
 
 /** Downloads while the first page loads: the real header, then rows (ADR-0047). */
 export function DownloadsPageSkeleton() {

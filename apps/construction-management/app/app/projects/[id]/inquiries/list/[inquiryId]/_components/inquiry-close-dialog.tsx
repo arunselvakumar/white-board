@@ -40,7 +40,7 @@ import {
 } from "@/src/queries/sales-inquiries";
 import { SALES_LIMITS } from "@/src/sales/domain/sales-terms";
 
-import { InquirySelect } from "./inquiry-select";
+import { InquirySelect } from "@/app/app/projects/[id]/inquiries/list/_components/inquiry-select";
 import { SelectControlSkeleton } from "@/app/app/_components/finance/finance-skeletons";
 
 const schema = z

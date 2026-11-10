@@ -11,7 +11,7 @@ import { Badge } from "@repo/ui/components/badge";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Spinner } from "@repo/ui/components/spinner";
 
-import { EXPIRED_MESSAGE } from "@/components/reports/recent-reports";
+import { EXPIRED_MESSAGE } from "@/app/app/_components/reports/recent-reports";
 import type { DownloadItem } from "@/src/queries/downloads";
 
 /**

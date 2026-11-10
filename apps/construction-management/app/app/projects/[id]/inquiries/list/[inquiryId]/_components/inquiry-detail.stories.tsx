@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueries } from "../../../.storybook/mocks/api";
-import { salesFile } from "@/components/sales/documents/sales-document-fixtures";
+import { StoryQueries } from "@/.storybook/mocks/api";
+import { salesFile } from "@/app/app/projects/[id]/_components/sales/documents/sales-document-fixtures";
 
 import { InquiryDetail } from "./inquiry-detail";
 import {
@@ -12,7 +12,7 @@ import {
   LAKSHMI_ID,
   mockInquiryApi,
   type InquiryApiOptions,
-} from "./inquiry-fixtures";
+} from "@/app/app/projects/[id]/inquiries/list/_components/inquiry-fixtures";
 
 function inquiryApi(options: InquiryApiOptions = {}) {
   return () => mockInquiryApi(options).restore;

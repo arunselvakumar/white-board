@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
-import { CentralReportsPage } from "@/components/reports/central-reports-page";
+import { CentralReportsPage } from "@/app/app/workspace/central-reports/_components/central-reports-page";
 
 export const metadata: Metadata = { title: "Central Reports" };
 

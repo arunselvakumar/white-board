@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
-import { InquiryNew } from "@/components/sales/inquiries/inquiry-pages";
+import { InquiryNew } from "@/app/app/projects/[id]/inquiries/list/_components/inquiry-pages";
 
 export const metadata: Metadata = { title: "Add Inquiry" };
 

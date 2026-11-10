@@ -39,7 +39,7 @@ import {
 
 import { ImportUnitsDialog } from "./import-units-dialog";
 import { SalesUnitsChart } from "./sales-units-chart";
-import { UNIT_STATUS_DOTS } from "./sales-status";
+import { UNIT_STATUS_DOTS } from "@/app/app/projects/[id]/_components/sales/units/sales-status";
 import { UnitPanel } from "./unit-panel";
 import { UnitPanelSkeleton } from "./units-skeletons";
 

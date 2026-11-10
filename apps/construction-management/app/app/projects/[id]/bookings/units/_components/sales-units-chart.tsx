@@ -12,7 +12,7 @@ import {
   type UnitSalesStatus,
 } from "@/src/sales/domain/sales-terms";
 
-import { UNIT_STATUS_CLASSES } from "./sales-status";
+import { UNIT_STATUS_CLASSES } from "@/app/app/projects/[id]/_components/sales/units/sales-status";
 
 export type ChartUnit = {
   id: string;

@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
-import { uploadFailedNames } from "@/components/sales/documents/upload-failed";
+import { uploadFailedNames } from "@/app/app/projects/[id]/_components/sales/documents/upload-failed";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
-import { BookingDetail } from "@/components/sales/bookings/booking-detail";
+import { BookingDetail } from "@/app/app/projects/[id]/bookings/list/[bookingId]/_components/booking-detail";
 import { QuerySuspense } from "@/components/query-suspense";
-import { BookingDetailSkeleton } from "@/components/sales/bookings/bookings-skeletons";
+import { BookingDetailSkeleton } from "@/app/app/projects/[id]/bookings/list/_components/bookings-skeletons";
 
 export const metadata: Metadata = { title: "Booking" };
 

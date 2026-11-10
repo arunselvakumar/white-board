@@ -11,7 +11,7 @@ import {
   FieldGridSkeleton,
   FormActionsSkeleton,
   RecordHeaderSkeleton,
-} from "@/components/sales/sales-form-skeletons";
+} from "@/app/app/projects/[id]/_components/sales/sales-form-skeletons";
 import { bookingsPath } from "@/src/queries/sales-bookings";
 
 /* Bookings while they load (ADR-0047). */

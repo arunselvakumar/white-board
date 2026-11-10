@@ -8,7 +8,7 @@ import {
   CENTRAL_TRANSFERS,
   CENTRAL_VENDOR,
   TODAY,
-} from "@/components/reports/report-fixtures";
+} from "@/app/app/workspace/central-payment/_components/report-fixtures";
 
 import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import {

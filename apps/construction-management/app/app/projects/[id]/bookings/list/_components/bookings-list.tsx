@@ -37,7 +37,7 @@ import { cn } from "@repo/ui/lib/utils";
 
 import { formatDate } from "@/components/payments/payment-format";
 import { FilterSelect } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/filter-select";
-import { BookingStatusBadge } from "@/components/sales/units/sales-status";
+import { BookingStatusBadge } from "@/app/app/projects/[id]/_components/sales/units/sales-status";
 import { canInSales, salesAccessQuery } from "@/src/queries/sales-access";
 import {
   bookingsPath,

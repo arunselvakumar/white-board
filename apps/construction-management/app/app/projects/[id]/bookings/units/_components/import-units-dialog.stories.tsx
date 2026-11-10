@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, within } from "storybook/test";
 
-import { StoryQueries } from "../../../.storybook/mocks/api";
+import { StoryQueries } from "@/.storybook/mocks/api";
 
 import { ImportUnitsDialog } from "./import-units-dialog";
 import {
@@ -9,7 +9,7 @@ import {
   SALES_PROJECT_ID,
   UNITS_API,
   type UnitsApiOptions,
-} from "./units-fixtures";
+} from "@/app/app/projects/[id]/bookings/_components/units-fixtures";
 
 let api: ReturnType<typeof mockUnitsApi>;
 function unitsApi(options: UnitsApiOptions = {}) {

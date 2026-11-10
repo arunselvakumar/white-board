@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueries } from "../../../.storybook/mocks/api";
+import { StoryQueries } from "@/.storybook/mocks/api";
 
 import { InquiryActivity } from "./inquiry-activity";
 import {
@@ -11,7 +11,7 @@ import {
   inquiry,
   mockInquiryApi,
   type InquiryApiOptions,
-} from "./inquiry-fixtures";
+} from "@/app/app/projects/[id]/inquiries/list/_components/inquiry-fixtures";
 
 function api(options: InquiryApiOptions = {}) {
   return () => mockInquiryApi(options).restore;

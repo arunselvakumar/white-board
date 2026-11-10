@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueries } from "../../../.storybook/mocks/api";
+import { StoryQueries } from "@/.storybook/mocks/api";
 
 import {
   BOOKED_ID,
@@ -12,7 +12,7 @@ import {
   mockBookingApi,
   PROJECT_ID,
   type BookingApiOptions,
-} from "./booking-fixtures";
+} from "@/app/app/projects/[id]/bookings/list/_components/booking-fixtures";
 import { BookingDetail } from "./booking-detail";
 
 let api: ReturnType<typeof mockBookingApi>;

@@ -13,17 +13,17 @@ import {
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-import { RecentReports } from "@/components/reports/recent-reports";
+import { RecentReports } from "@/app/app/_components/reports/recent-reports";
 import {
   deviceToday,
   type ReportDefinition,
-} from "@/components/reports/report-catalogue";
-import { ReportCard } from "@/components/reports/report-card";
+} from "@/app/app/_components/reports/report-catalogue";
+import { ReportCard } from "@/app/app/_components/reports/report-card";
 import { reportCatalogueQuery } from "@/src/queries/report-catalogue";
 import {
   RecentReportsSkeleton,
   ReportCardGridSkeleton,
-} from "@/components/reports/reports-skeletons";
+} from "@/app/app/_components/reports/reports-skeletons";
 
 /** The central reports of the equipment register. */
 const KINDS: readonly ReportDefinition["kind"][] = [
