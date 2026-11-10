@@ -1,4 +1,4 @@
-import type { ApiCall } from "../../.storybook/mocks/api";
+import type { ApiCall } from "@/.storybook/mocks/api";
 import type { AccountOption } from "@/src/queries/finance-accounts";
 
 /** The account picker's options, as `/api/construction/finance/accounts/options` returns them. */

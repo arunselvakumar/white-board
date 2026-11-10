@@ -6,7 +6,7 @@ import {
   StoryQueries,
   type ApiCall,
 } from "../../../.storybook/mocks/api";
-import { financeLookupsHandler } from "../account-fixtures";
+import { financeLookupsHandler } from "@/app/app/_components/finance/account-fixtures";
 import {
   AUTO_EXPENSE,
   DIESEL_EXPENSE,

@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
-import { mockApi, StoryQueries } from "../../../.storybook/mocks/api";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import { AccountLedger } from "./account-ledger";
-import { BANK_ID, STATEMENT, statementHandler } from "./account-list-fixtures";
+import {
+  BANK_ID,
+  STATEMENT,
+  statementHandler,
+} from "@/app/app/_components/finance/accounts/account-list-fixtures";
 
 const meta = {
   title: "Finance/Company's Bank A/C/Ledger",

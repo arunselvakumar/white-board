@@ -1,17 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import {
-  StoryQueries,
-  mockApi,
-  type ApiCall,
-} from "../../../.storybook/mocks/api";
+import { StoryQueries, mockApi, type ApiCall } from "@/.storybook/mocks/api";
 import { chooseFromMenu } from "@/components/masters/masters-story-support";
 import { PaymentCategoriesList } from "./payment-categories-list";
 import {
   financeAccessHandler,
   paymentCategoriesHandler,
-} from "./payment-category-fixtures";
+} from "@/app/app/_components/finance/payment-categories/payment-category-fixtures";
 
 let api: ReturnType<typeof mockApi>;
 

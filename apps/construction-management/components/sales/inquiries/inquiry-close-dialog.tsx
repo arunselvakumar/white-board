@@ -41,7 +41,7 @@ import {
 import { SALES_LIMITS } from "@/src/sales/domain/sales-terms";
 
 import { InquirySelect } from "./inquiry-select";
-import { SelectControlSkeleton } from "@/components/finance/finance-skeletons";
+import { SelectControlSkeleton } from "@/app/app/_components/finance/finance-skeletons";
 
 const schema = z
   .object({

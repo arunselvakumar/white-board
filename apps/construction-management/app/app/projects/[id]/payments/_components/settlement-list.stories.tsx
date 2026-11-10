@@ -1,17 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../../.storybook/mocks/api";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import {
   DECIDED_SETTLEMENTS,
   partyMoneyHandler,
   PENDING_SETTLEMENTS,
   PROJECT_ID,
-} from "./party-fixtures";
+} from "@/app/app/_components/finance/parties/party-fixtures";
 import { SettlementList } from "./settlement-list";
 
 const SETTLEMENTS = "/api/construction/finance/settlements";

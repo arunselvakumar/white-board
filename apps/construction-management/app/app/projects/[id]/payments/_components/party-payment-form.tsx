@@ -24,10 +24,10 @@ import { SkeletonText } from "@repo/ui/components/skeleton-kit";
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { AccountPicker } from "@/components/finance/account-picker";
+import { AccountPicker } from "@/app/app/_components/finance/account-picker";
 import { FinancePendingFilesField } from "@/components/finance/documents/pending-files-field";
 import { useUploadPendingFinanceFiles } from "@/components/finance/documents/use-upload-pending-files";
-import { PaymentCategoryPicker } from "@/components/finance/payment-category-picker";
+import { PaymentCategoryPicker } from "@/app/app/projects/[id]/payments/_components/payment-category-picker";
 import {
   isRupees,
   MoneyInput,
@@ -57,8 +57,8 @@ import {
   money,
   PARTY_SCREENS,
   partyPaths,
-} from "./party-money";
-import { AllocationSkeleton } from "./parties-skeletons";
+} from "@/app/app/_components/finance/parties/party-money";
+import { AllocationSkeleton } from "@/app/app/_components/finance/parties/parties-skeletons";
 
 const MODES = ["cash", "cheque", "online", "upi"] as const;
 type Mode = (typeof MODES)[number];

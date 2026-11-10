@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@repo/ui/components/select";
 
-import { SelectControlSkeleton } from "@/components/finance/finance-skeletons";
+import { SelectControlSkeleton } from "@/app/app/_components/finance/finance-skeletons";
 import { paymentCategoryOptionsQuery } from "@/src/queries/finance-lookups";
 
 const NONE = "__none__";

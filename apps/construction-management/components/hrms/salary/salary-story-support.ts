@@ -1,5 +1,5 @@
 import { mockApi, type ApiCall } from "../../../.storybook/mocks/api";
-import { financeLookupsHandler } from "../../finance/account-fixtures";
+import { financeLookupsHandler } from "@/app/app/_components/finance/account-fixtures";
 import type {
   MySalaries,
   SalarySlipModel,

@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@repo/ui/components/select";
 
-import { SelectControlSkeleton } from "@/components/finance/finance-skeletons";
+import { SelectControlSkeleton } from "@/app/app/_components/finance/finance-skeletons";
 import {
   accountOptionsQuery,
   type AccountOption,

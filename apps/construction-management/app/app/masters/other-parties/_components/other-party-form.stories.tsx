@@ -2,11 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { getRouter } from "@storybook/nextjs-vite/navigation.mock";
 import { expect, waitFor } from "storybook/test";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../../.storybook/mocks/api";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { EditOtherPartyScreen, NewOtherPartyScreen } from "./other-party-form";
 import {
   LAKSHMI,

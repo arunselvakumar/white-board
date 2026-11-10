@@ -9,7 +9,7 @@ import {
 import {
   ResponsiveListSkeleton,
   srOnly,
-} from "@/components/finance/finance-skeletons";
+} from "@/app/app/_components/finance/finance-skeletons";
 
 /*
  * Wages payments while they load (ADR-0047): real column headers and

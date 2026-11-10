@@ -27,7 +27,7 @@ import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { AccountPicker } from "@/components/finance/account-picker";
+import { AccountPicker } from "@/app/app/_components/finance/account-picker";
 import { MoneyInput } from "@/components/money/money-input";
 import { fieldForCode } from "@/lib/server-errors";
 import type { PaymentPartyType } from "@/src/queries/balances";

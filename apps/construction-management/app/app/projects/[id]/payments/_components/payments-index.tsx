@@ -13,7 +13,10 @@ import { Button } from "@repo/ui/components/button";
 
 import { canInFinance, financeAccessQuery } from "@/src/queries/finance-access";
 
-import { PAYMENTS_TABS, paymentsPath } from "./payments-tabs";
+import {
+  PAYMENTS_TABS,
+  paymentsPath,
+} from "@/app/app/_components/finance/payments-hub/payments-tabs";
 import { PaymentsIndexSkeleton } from "./payments-hub-skeletons";
 
 /** `/payments` opens the first tab the viewer may read. */

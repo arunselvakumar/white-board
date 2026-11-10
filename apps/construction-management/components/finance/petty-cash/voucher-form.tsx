@@ -25,10 +25,10 @@ import {
   CounterpartyField,
   EMPTY_COUNTERPARTY,
   type CounterpartyValue,
-} from "@/components/finance/counterparty-field";
+} from "@/app/app/projects/[id]/payments/_components/counterparty-field";
 import { FinancePendingFilesField } from "@/components/finance/documents/pending-files-field";
 import { useUploadPendingFinanceFiles } from "@/components/finance/documents/use-upload-pending-files";
-import { PaymentCategoryPicker } from "@/components/finance/payment-category-picker";
+import { PaymentCategoryPicker } from "@/app/app/projects/[id]/payments/_components/payment-category-picker";
 import {
   MoneyInput,
   isRupees,

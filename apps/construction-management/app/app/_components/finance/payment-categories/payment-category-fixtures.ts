@@ -1,4 +1,4 @@
-import type { ApiCall } from "../../../.storybook/mocks/api";
+import type { ApiCall } from "@/.storybook/mocks/api";
 import { FINANCE_ACCESS_MENUS } from "@/app/api/construction/finance/access/access-models";
 import type { PaymentCategoryItem } from "@/src/queries/finance-payment-categories";
 import type { Flag } from "@/src/shared-kernel/access";

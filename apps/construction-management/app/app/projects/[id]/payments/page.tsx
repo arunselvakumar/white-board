@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { PaymentsIndex } from "@/components/finance/payments-hub/payments-index";
+import { PaymentsIndex } from "@/app/app/projects/[id]/payments/_components/payments-index";
 
 export const metadata: Metadata = { title: "Payments" };
 

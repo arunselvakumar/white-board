@@ -6,7 +6,7 @@ import {
   TableSkeleton,
 } from "@repo/ui/components/skeleton-kit";
 
-import { SummaryTilesSkeleton } from "@/components/finance/finance-skeletons";
+import { SummaryTilesSkeleton } from "@/app/app/_components/finance/finance-skeletons";
 
 /*
  * HRMS pages while they load (ADR-0047), under the real HRMS tabs. The

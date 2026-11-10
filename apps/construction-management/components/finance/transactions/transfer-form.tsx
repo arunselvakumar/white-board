@@ -19,7 +19,7 @@ import { Textarea } from "@repo/ui/components/textarea";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { AccountPicker } from "@/components/finance/account-picker";
+import { AccountPicker } from "@/app/app/_components/finance/account-picker";
 import {
   isRupees,
   MoneyInput,

@@ -11,7 +11,7 @@ import {
   ACCOUNT_OPTIONS,
   financeLookupsHandler,
   PAYMENT_CATEGORY_OPTIONS,
-} from "../account-fixtures";
+} from "@/app/app/_components/finance/account-fixtures";
 import {
   DIESEL_EXPENSE,
   financeAccessHandler,

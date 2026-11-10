@@ -38,9 +38,13 @@ import {
 } from "@/src/queries/finance-parties";
 
 import { InvoiceDialog } from "./invoice-dialog";
-import { formatDate, money, partyPaths } from "./party-money";
-import { InvoiceStatusChips } from "./party-status";
-import { InvoiceDetailSkeleton } from "./parties-skeletons";
+import {
+  formatDate,
+  money,
+  partyPaths,
+} from "@/app/app/_components/finance/parties/party-money";
+import { InvoiceStatusChips } from "@/app/app/_components/finance/parties/party-status";
+import { InvoiceDetailSkeleton } from "@/app/app/_components/finance/parties/parties-skeletons";
 
 /**
  * One invoice (CM-705): its figures, GRNs and variance, the payments that

@@ -14,7 +14,7 @@ import {
   ResponsiveListSkeleton,
   SummaryTilesSkeleton,
   srOnly,
-} from "@/components/finance/finance-skeletons";
+} from "@/app/app/_components/finance/finance-skeletons";
 import type { PartyType } from "@/src/queries/finance-parties";
 
 import { COLUMNS } from "./party-balances";

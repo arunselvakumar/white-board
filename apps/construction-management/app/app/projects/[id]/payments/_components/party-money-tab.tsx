@@ -17,11 +17,14 @@ import type { PartyType } from "@/src/queries/finance-parties";
 
 import { AwaitingGrns } from "./awaiting-grns";
 import { InvoiceDialog, type InvoiceDialogTarget } from "./invoice-dialog";
-import { PartyBalances } from "./party-balances";
-import { PARTY_SCREENS, partyPaths } from "./party-money";
+import { PartyBalances } from "@/app/app/_components/finance/parties/party-balances";
+import {
+  PARTY_SCREENS,
+  partyPaths,
+} from "@/app/app/_components/finance/parties/party-money";
 import { SettlementList } from "./settlement-list";
 import { TdsLedgerView } from "./tds-ledger";
-import { PartyBalancesSkeleton } from "./parties-skeletons";
+import { PartyBalancesSkeleton } from "@/app/app/_components/finance/parties/parties-skeletons";
 
 /**
  * A party type's tab of the Project's Payments (CM-705 Suppliers, CM-706

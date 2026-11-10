@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { mockApi, StoryQueries } from "../../../.storybook/mocks/api";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import {
   AWAITING_GRNS,
   OTHER_PARTY_ID,
@@ -11,7 +11,7 @@ import {
   READ_ONLY_ACCESS,
   SALES_INVOICE,
   TODAY,
-} from "./party-fixtures";
+} from "@/app/app/_components/finance/parties/party-fixtures";
 import { PartyMoneyTab } from "./party-money-tab";
 
 let api: ReturnType<typeof mockApi>;

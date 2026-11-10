@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
-import { CentralPaymentPage } from "@/components/finance/central-payment/central-payment-page";
-import { CentralPaymentSkeleton } from "@/components/finance/central-payment/central-payment-skeletons";
+import { CentralPaymentPage } from "@/app/app/workspace/central-payment/_components/central-payment-page";
+import { CentralPaymentSkeleton } from "@/app/app/workspace/central-payment/_components/central-payment-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
 

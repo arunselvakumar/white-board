@@ -11,7 +11,10 @@ import {
   type AwaitingGoodsReceipt,
 } from "@/src/queries/finance-parties";
 
-import { formatDate, money } from "./party-money";
+import {
+  formatDate,
+  money,
+} from "@/app/app/_components/finance/parties/party-money";
 
 /**
  * GRNs on the Project with no supplier invoice yet (CM-0017 §13): tick

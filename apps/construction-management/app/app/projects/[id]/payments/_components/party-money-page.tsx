@@ -26,13 +26,17 @@ import {
   PartyInvoices,
   PartyPayments,
   PartyStatementTable,
-} from "./party-lists";
-import { money, PARTY_SCREENS, partyPaths } from "./party-money";
+} from "@/app/app/_components/finance/parties/party-lists";
+import {
+  money,
+  PARTY_SCREENS,
+  partyPaths,
+} from "@/app/app/_components/finance/parties/party-money";
 import {
   OpeningCardSkeleton,
   PartyCardsSkeleton,
   PartyStatementSkeleton,
-} from "./parties-skeletons";
+} from "@/app/app/_components/finance/parties/parties-skeletons";
 
 /**
  * One party's money on the Project (CM-705, CM-706; CM-708 reuses it for

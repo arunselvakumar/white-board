@@ -1,5 +1,5 @@
-import type { ApiCall } from "../../../.storybook/mocks/api";
-import { financeLookupsHandler } from "@/components/finance/account-fixtures";
+import type { ApiCall } from "@/.storybook/mocks/api";
+import { financeLookupsHandler } from "@/app/app/_components/finance/account-fixtures";
 import { catalogueHandler } from "@/components/reports/report-fixtures";
 import type { CentralPaymentSummary } from "@/src/queries/finance-central-payment";
 import type { ReportJob } from "@/src/queries/reports";

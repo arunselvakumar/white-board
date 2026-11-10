@@ -15,8 +15,8 @@ import {
 } from "@repo/ui/components/select";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 
-import { SelectControlSkeleton } from "@/components/finance/finance-skeletons";
-import { accountLabel } from "@/components/finance/account-picker";
+import { SelectControlSkeleton } from "@/app/app/_components/finance/finance-skeletons";
+import { accountLabel } from "@/app/app/_components/finance/account-picker";
 import { accountOptionsQuery } from "@/src/queries/finance-accounts";
 
 import {

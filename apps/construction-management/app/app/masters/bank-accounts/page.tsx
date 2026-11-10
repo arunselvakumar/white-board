@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { BankAccountsList } from "@/components/finance/accounts/bank-accounts-list";
+import { BankAccountsList } from "@/app/app/masters/bank-accounts/_components/bank-accounts-list";
 
 export const metadata: Metadata = { title: "Company's Bank A/C" };
 

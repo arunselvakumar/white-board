@@ -8,7 +8,7 @@ import {
   FilterBarSkeleton,
   ResponsiveListSkeleton,
   SummaryTilesSkeleton,
-} from "@/components/finance/finance-skeletons";
+} from "@/app/app/_components/finance/finance-skeletons";
 
 /** The vouchers table's columns, without bulk approval's tick column. */
 export const VOUCHER_COLUMNS: SkeletonColumn[] = [

@@ -3,8 +3,11 @@ import { expect, waitFor, within } from "storybook/test";
 
 import { chooseFromMenu } from "@/components/masters/masters-story-support";
 
-import { mockApi, StoryQueries } from "../../../.storybook/mocks/api";
-import { companyAccountsHandler, financeAccess } from "./account-list-fixtures";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
+import {
+  companyAccountsHandler,
+  financeAccess,
+} from "@/app/app/_components/finance/accounts/account-list-fixtures";
 import { BankAccountsList } from "./bank-accounts-list";
 
 function serve(options: Parameters<typeof companyAccountsHandler>[0] = {}) {

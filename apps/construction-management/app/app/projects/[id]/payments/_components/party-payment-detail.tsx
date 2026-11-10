@@ -51,8 +51,8 @@ import {
   money,
   PARTY_SCREENS,
   partyPaths,
-} from "./party-money";
-import { AllocationSkeleton } from "./parties-skeletons";
+} from "@/app/app/_components/finance/parties/party-money";
+import { AllocationSkeleton } from "@/app/app/_components/finance/parties/parties-skeletons";
 
 /**
  * One party payment (CM-705): what moved and from which account, the TDS,
