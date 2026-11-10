@@ -4,7 +4,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { materialRequestQuery } from "@/src/queries/material-requests";
 
-import { MaterialRequestForm } from "./material-request-form";
+import { MaterialRequestForm } from "@/app/app/projects/[id]/materials/material-requests/_components/material-request-form";
 
 /** Edit Material Request: the form over the request as loaded. */
 export function EditMaterialRequestPage({

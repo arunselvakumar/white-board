@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor } from "storybook/test";
 
-import { mockApi, StoryQueries } from "../../../.storybook/mocks/api";
-import { inventoryHandler } from "../inventory/inventory-fixtures";
-import { transferHandler } from "../transfers/transfer-fixtures";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
+import { inventoryHandler } from "@/app/app/_components/procurement/inventory/inventory-fixtures";
+import { transferHandler } from "@/app/app/_components/procurement/transfers/transfer-fixtures";
 import {
   centralStoreHandler,
   IDS,
   type CentralStoreApiOptions,
-} from "./central-store-fixtures";
+} from "@/app/app/_components/procurement/stores/central-store-fixtures";
 import { StoreDetailPage } from "./store-detail-page";
 
 /** The store's own reads, then Current Inventory and transfers for its tabs. */

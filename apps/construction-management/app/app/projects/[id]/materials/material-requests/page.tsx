@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
-import { ProjectMaterialRequestsPage } from "@/components/procurement/material-requests/project-material-requests-page";
+import { ProjectMaterialRequestsPage } from "@/app/app/projects/[id]/materials/material-requests/_components/project-material-requests-page";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
 
 export const metadata: Metadata = { title: "Material Requests" };

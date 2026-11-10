@@ -24,7 +24,7 @@ import { FormAlert } from "@/components/auth/form-alert";
 import { LocationPicker } from "@/app/app/_components/locations/location-picker";
 import { PendingFilesField } from "@/components/site-work/documents/pending-files-field";
 import { useUploadPendingFiles } from "@/components/site-work/documents/use-upload-pending-files";
-import { localToday } from "@/components/procurement/inventory/inventory-format";
+import { localToday } from "@/app/app/_components/procurement/inventory/inventory-format";
 import { QueryHttpError } from "@/src/queries/http";
 import {
   hindranceFormOptionsQuery,

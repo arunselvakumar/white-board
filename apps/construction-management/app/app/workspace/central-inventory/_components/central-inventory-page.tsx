@@ -37,7 +37,7 @@ import {
   ScrollRegion,
   NamedMultiSelect,
   StockStateBadge,
-} from "@/components/procurement/stores/central-store-parts";
+} from "@/app/app/_components/procurement/stores/central-store-parts";
 import {
   centralInventoryQuery,
   locationKey,

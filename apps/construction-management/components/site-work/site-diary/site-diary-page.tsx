@@ -20,7 +20,7 @@ import { cn } from "@repo/ui/lib/utils";
 import {
   formatDate,
   localToday,
-} from "@/components/procurement/inventory/inventory-format";
+} from "@/app/app/_components/procurement/inventory/inventory-format";
 import { addDays, isCalendarDate } from "@/src/shared-kernel/calendar-date";
 import {
   siteDiaryDaysQuery,

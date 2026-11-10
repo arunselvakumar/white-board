@@ -1,4 +1,4 @@
-import { mockApi, type ApiCall } from "../../../.storybook/mocks/api";
+import { mockApi, type ApiCall } from "@/.storybook/mocks/api";
 import { documentsHandler } from "@/app/app/_components/procurement/documents/document-fixtures";
 import { materialOptionsHandler } from "@/app/app/_components/procurement/material-options-fixtures";
 import { PROCUREMENT_ACCESS_MENUS } from "@/app/api/construction/procurement/access/access-models";

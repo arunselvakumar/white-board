@@ -30,7 +30,10 @@ import {
   type Store,
 } from "@/src/queries/stores";
 
-import { centralStoreHref, NamedMultiSelect } from "./central-store-parts";
+import {
+  centralStoreHref,
+  NamedMultiSelect,
+} from "@/app/app/_components/procurement/stores/central-store-parts";
 
 const NO_STATE = "none";
 

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { ProjectTransferEdit } from "@/components/procurement/transfers/project-transfer-pages";
+import { ProjectTransferEdit } from "@/app/app/projects/[id]/materials/transfers/_components/project-transfer-pages";
 import { TransferFormSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 

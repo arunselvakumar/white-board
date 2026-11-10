@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
-import { StoryQueries } from "../../../.storybook/mocks/api";
+import { StoryQueries } from "@/.storybook/mocks/api";
 import {
   IDS,
   mockCentralStoreApi,
-} from "@/components/procurement/stores/central-store-fixtures";
+} from "@/app/app/_components/procurement/stores/central-store-fixtures";
 
-import { ProjectMaterialRequestsPage } from "./project-material-requests-page";
+import { ProjectMaterialRequestsPage } from "@/app/app/projects/[id]/materials/material-requests/_components/project-material-requests-page";
 
 const meta = {
   title: "Procurement/Central Store/Project Material Requests",

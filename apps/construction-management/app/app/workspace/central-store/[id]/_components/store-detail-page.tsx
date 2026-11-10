@@ -22,18 +22,18 @@ import {
 } from "@repo/ui/components/tabs";
 
 import { PageHeader } from "@/components/app-shell/page-header";
-import { DeliveryNotesList } from "@/components/procurement/delivery-notes/delivery-notes-list";
-import { InventoryPage } from "@/components/procurement/inventory/inventory-page";
-import { MaterialRequestsList } from "@/components/procurement/material-requests/material-requests-list";
-import { TransfersList } from "@/components/procurement/transfers/transfers-list";
+import { DeliveryNotesList } from "@/app/app/_components/procurement/delivery-notes/delivery-notes-list";
+import { InventoryPage } from "@/app/app/_components/procurement/inventory/inventory-page";
+import { MaterialRequestsList } from "@/app/app/_components/procurement/material-requests/material-requests-list";
+import { TransfersList } from "@/app/app/_components/procurement/transfers/transfers-list";
 import {
   canIn,
   procurementAccessQuery,
 } from "@/src/queries/procurement-access";
 import { storeQuery, useDeleteStore, type Store } from "@/src/queries/stores";
 
-import { centralStoreHref } from "./central-store-parts";
-import { StoreConfirmDialog } from "./store-confirm-dialog";
+import { centralStoreHref } from "@/app/app/_components/procurement/stores/central-store-parts";
+import { StoreConfirmDialog } from "@/app/app/_components/procurement/stores/store-confirm-dialog";
 import {
   InventorySkeleton,
   RequestRowsSkeleton,

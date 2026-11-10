@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { GoodsReceiptsList } from "@/components/procurement/goods-receipts/goods-receipts-list";
+import { GoodsReceiptsList } from "@/app/app/projects/[id]/materials/goods-received/_components/goods-receipts-list";
 
 export const metadata: Metadata = { title: "Goods Received" };
 

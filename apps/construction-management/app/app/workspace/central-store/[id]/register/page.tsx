@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-import { StockRegisterPage } from "@/components/procurement/inventory/stock-register-page";
-import { centralStoreHref } from "@/components/procurement/stores/central-store-parts";
+import { StockRegisterPage } from "@/app/app/_components/procurement/inventory/stock-register-page";
+import { centralStoreHref } from "@/app/app/_components/procurement/stores/central-store-parts";
 import { StockRegisterSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 

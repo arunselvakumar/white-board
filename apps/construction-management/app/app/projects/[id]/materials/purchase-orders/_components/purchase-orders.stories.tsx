@@ -1,13 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../../.storybook/mocks/api";
-import { EditPurchaseOrder } from "./edit-purchase-order";
-import { PurchaseOrderDetailPage } from "./purchase-order-detail";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
+import { EditPurchaseOrder } from "../[poId]/edit/_components/edit-purchase-order";
+import { PurchaseOrderDetailPage } from "../[poId]/_components/purchase-order-detail";
 import {
   CEMENT,
   ORDERED_PO,

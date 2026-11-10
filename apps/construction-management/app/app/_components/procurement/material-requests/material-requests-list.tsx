@@ -17,7 +17,7 @@ import {
 import {
   formatDate,
   MaterialRequestStatusBadge,
-} from "@/components/procurement/stores/central-store-parts";
+} from "@/app/app/_components/procurement/stores/central-store-parts";
 import {
   materialRequestsQuery,
   type MaterialRequest,

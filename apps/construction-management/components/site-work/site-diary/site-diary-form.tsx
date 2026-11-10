@@ -27,7 +27,7 @@ import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { PendingFilesField } from "@/components/site-work/documents/pending-files-field";
 import { useUploadPendingFiles } from "@/components/site-work/documents/use-upload-pending-files";
-import { localToday } from "@/components/procurement/inventory/inventory-format";
+import { localToday } from "@/app/app/_components/procurement/inventory/inventory-format";
 import { QueryHttpError } from "@/src/queries/http";
 import {
   siteDiaryPath,

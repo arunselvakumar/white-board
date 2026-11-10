@@ -1,6 +1,6 @@
 import { Badge } from "@repo/ui/components/badge";
 
-import { formatDate } from "@/components/procurement/inventory/inventory-format";
+import { formatDate } from "@/app/app/_components/procurement/inventory/inventory-format";
 import {
   HINDRANCE_STATUS_LABELS,
   RESPONSIBLE_PARTY_LABELS,

@@ -37,8 +37,8 @@ import {
   formatDate,
   formatQuantity,
   ScrollRegion,
-} from "@/components/procurement/stores/central-store-parts";
-import { StoreConfirmDialog } from "@/components/procurement/stores/store-confirm-dialog";
+} from "@/app/app/_components/procurement/stores/central-store-parts";
+import { StoreConfirmDialog } from "@/app/app/_components/procurement/stores/store-confirm-dialog";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   deliveryNoteQuery,

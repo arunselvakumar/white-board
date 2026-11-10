@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
 import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
-import { localToday } from "@/components/procurement/inventory/inventory-format";
+import { localToday } from "@/app/app/_components/procurement/inventory/inventory-format";
 
 import {
   hindrance,

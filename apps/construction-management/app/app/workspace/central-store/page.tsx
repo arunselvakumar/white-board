@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
-import { StoresPage } from "@/components/procurement/stores/stores-page";
+import { StoresPage } from "@/app/app/workspace/central-store/_components/stores-page";
 import { StoresPageSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 

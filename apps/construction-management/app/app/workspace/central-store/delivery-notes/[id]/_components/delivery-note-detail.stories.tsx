@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
-import { StoryQueries } from "../../../.storybook/mocks/api";
+import { StoryQueries } from "@/.storybook/mocks/api";
 import {
   access,
   IDS,
   mockCentralStoreApi,
   NOTE,
-} from "@/components/procurement/stores/central-store-fixtures";
+} from "@/app/app/_components/procurement/stores/central-store-fixtures";
 
 import { DeliveryNoteDetail } from "./delivery-note-detail";
 

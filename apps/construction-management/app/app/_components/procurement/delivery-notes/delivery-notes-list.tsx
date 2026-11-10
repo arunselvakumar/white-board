@@ -17,7 +17,7 @@ import {
   centralStoreHref,
   DeliveryNoteStatusBadge,
   formatDate,
-} from "@/components/procurement/stores/central-store-parts";
+} from "@/app/app/_components/procurement/stores/central-store-parts";
 import { deliveryNotesQuery } from "@/src/queries/delivery-notes";
 
 type Cursor = { after?: string; before?: string };

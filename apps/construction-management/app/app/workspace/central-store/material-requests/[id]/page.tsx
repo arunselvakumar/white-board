@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { MaterialRequestDetail } from "@/components/procurement/material-requests/material-request-detail";
+import { MaterialRequestDetail } from "@/app/app/_components/procurement/material-requests/material-request-detail";
 import { MaterialRequestDetailSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 

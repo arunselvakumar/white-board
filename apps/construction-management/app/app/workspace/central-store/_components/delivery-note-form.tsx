@@ -18,7 +18,7 @@ import { FormAlert } from "@/components/auth/form-alert";
 import {
   centralStoreHref,
   formatQuantity,
-} from "@/components/procurement/stores/central-store-parts";
+} from "@/app/app/_components/procurement/stores/central-store-parts";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   useCreateDeliveryNote,
