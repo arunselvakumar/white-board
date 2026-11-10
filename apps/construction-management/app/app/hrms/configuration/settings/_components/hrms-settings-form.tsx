@@ -258,9 +258,8 @@ function SwitchRow({
 }
 
 /**
- * HRMS Settings (CM-303): how attendance, leave and salary work for the
- * whole Company. Saves the whole form; a save over someone else's is
- * refused (409) rather than overwriting it.
+ * How attendance, leave and salary work for the whole Company. Saves the whole
+ * form; a save over someone else's is refused (409) rather than overwriting it.
  */
 export function HrmsSettingsForm() {
   const { data: settings } = useSuspenseQuery(hrmsSettingsQuery);

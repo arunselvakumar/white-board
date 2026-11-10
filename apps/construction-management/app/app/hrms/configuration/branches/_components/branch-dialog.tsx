@@ -117,8 +117,8 @@ function toValues(branch: HrmsBranch | null): Values {
 }
 
 /**
- * New or edit an office branch or a Project site fence (CM-304): name (or
- * site label), the Project for a site, and where the fence is.
+ * New or edit an office branch or a Project site fence: name (or site label),
+ * the Project for a site, and where the fence is.
  */
 export function BranchDialog({
   kind,

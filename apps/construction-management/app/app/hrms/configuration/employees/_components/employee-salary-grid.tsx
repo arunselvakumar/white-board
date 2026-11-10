@@ -196,11 +196,11 @@ function overridesToRequest(
 }
 
 /**
- * Configuration → Employees (CM-315): every Team Member, Normal and HRMS,
- * with their salary structure and base salary, Configured or Not Set.
- * Save All sends only the members changed here, each with the version it
- * loaded; a member someone else saved meanwhile is named, not overwritten.
- * Without Financial, amounts stay hidden and only the other fields change.
+ * Every Team Member, Normal and HRMS, with their salary structure and base
+ * salary, Configured or Not Set. Save All sends only the members changed here,
+ * each with the version it loaded; a member someone else saved meanwhile is
+ * named, not overwritten. Without Financial, amounts stay hidden and only the
+ * other fields change.
  */
 export function EmployeeSalaryGrid() {
   const { data } = useSuspenseQuery(employeeSalariesQuery);
@@ -721,7 +721,7 @@ function MemberRow({
   );
 }
 
-/** A member's own amount for each component of their structure (CM-315). */
+/** A member's own amount for each component of their structure. */
 function OverridesDialog({
   index,
   item,

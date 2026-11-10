@@ -200,8 +200,8 @@ function SwitchField({
 }
 
 /**
- * Add or edit a leave type (CM-310): the yearly limit, paid or not, how it
- * is approved, how it is credited (ADR CM-0012 §7) and carried forward.
+ * Add or edit a leave type: the yearly limit, paid or not, how it is approved,
+ * how it is credited (ADR CM-0012 §7) and carried forward.
  */
 export function LeaveTypeDialog({
   type,

@@ -9,7 +9,7 @@ import {
 import { hrmsPage } from "@/lib/hrms-nav";
 
 /**
- * An HRMS screen not built yet (M3): its title and what it will do, from
+ * An HRMS screen not built yet: its title and what it will do, from
  * `lib/hrms-nav.ts`. The ticket named there (`ticket`) replaces this in the
  * page with the real screen.
  */

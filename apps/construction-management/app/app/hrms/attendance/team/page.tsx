@@ -7,7 +7,6 @@ const HREF = `${HRMS_PATH}/attendance/team`;
 
 export const metadata: Metadata = { title: hrmsPage(HREF).title };
 
-/** Attendance → Team (CM-309). */
 export default function TeamAttendanceRoute() {
   return <TeamAttendancePage />;
 }

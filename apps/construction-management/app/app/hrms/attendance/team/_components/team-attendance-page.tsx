@@ -168,9 +168,9 @@ function TeamToday() {
 }
 
 /**
- * Team Attendance (CM-309): where each Team Member stands today (checked
- * in, checked out, not checked in, on leave, day off), with late and
- * out-of-fence flags and filter tabs. Menu `hrms.attendance` View All.
+ * Team Attendance: where each Team Member stands today (checked in, checked
+ * out, not checked in, on leave, day off), with late and out-of-fence flags and
+ * filter tabs. Menu `hrms.attendance` View All.
  */
 export function TeamAttendancePage() {
   return (

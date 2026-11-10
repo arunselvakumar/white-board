@@ -44,8 +44,8 @@ const schema = z.object({
 type Values = z.infer<typeof schema>;
 
 /**
- * Assign a leave structure to Team Members from a date (CM-311). The
- * latest assignment on or before a day is the one in force.
+ * Assign a leave structure to Team Members from a date. The latest assignment
+ * on or before a day is the one in force.
  */
 export function LeaveAssignDialog({
   open,

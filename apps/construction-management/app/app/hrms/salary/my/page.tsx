@@ -9,7 +9,6 @@ const HREF = `${HRMS_PATH}/salary/my`;
 
 export const metadata: Metadata = { title: hrmsPage(HREF).title };
 
-/** My Salary (CM-317). */
 export default function MySalaryRoute() {
   return (
     <Suspense fallback={<MySalarySkeleton />}>

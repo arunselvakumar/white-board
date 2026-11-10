@@ -53,8 +53,8 @@ function NotShared({
 }
 
 /**
- * My Leaves (CM-313): your balance of each leave type, Apply Leave, your
- * requests with their details, credit history, and Request Cancellation.
+ * My Leaves: your balance of each leave type, Apply Leave, your requests with
+ * their details, credit history, and Request Cancellation.
  */
 export function MyLeavesPage({ today }: { today?: string }) {
   const { data: options } = useSuspenseQuery(leaveOptionsQuery);

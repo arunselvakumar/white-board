@@ -401,10 +401,10 @@ function PercentInput({
 }
 
 /**
- * Add or edit a salary structure (CM-314): details, earnings components
- * with the one balancing component, PF / ESI / professional tax with their
- * overrides, deduction switches and other deductions, and a live sample
- * calculation beside it. The server checks every rule again.
+ * Add or edit a salary structure: details, earnings components with the one
+ * balancing component, PF / ESI / professional tax with their overrides,
+ * deduction switches and other deductions, and a live sample calculation beside
+ * it. The server checks every rule again.
  */
 function SalaryStructureForm({
   structure,
@@ -1033,7 +1033,6 @@ function FormPage({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-/** Configuration → Salary Structures → Add (CM-314). */
 export function NewSalaryStructureScreen() {
   const create = useCreateSalaryStructure();
   return (
@@ -1047,7 +1046,6 @@ export function NewSalaryStructureScreen() {
   );
 }
 
-/** Configuration → Salary Structures → Edit (CM-314). */
 export function EditSalaryStructureScreen({ id }: { id: string }) {
   const { data } = useSuspenseQuery(salaryStructureQuery(id));
   const update = useUpdateSalaryStructure(id);

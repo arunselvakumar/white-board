@@ -7,7 +7,6 @@ const HREF = `${HRMS_PATH}/configuration/branches`;
 
 export const metadata: Metadata = { title: hrmsPage(HREF).title };
 
-/** Configuration → Branches & Sites (CM-304). */
 export default function BranchesRoute() {
   return <BranchesPage />;
 }

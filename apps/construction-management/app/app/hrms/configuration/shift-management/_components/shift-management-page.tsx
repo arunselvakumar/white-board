@@ -96,10 +96,9 @@ function HistoryDialog({
 }
 
 /**
- * Configuration → Shift Management (CM-307): every Team Member's shift or
- * rotation today, what is planned, and the history; select members and
- * assign a shift or a rotation from a date, until changed. Menu
- * `hrms.shifts`.
+ * Every Team Member's shift or rotation today, what is planned, and the
+ * history; select members and assign a shift or a rotation from a date, until
+ * changed. Menu `hrms.shifts`.
  */
 export function ShiftManagementPage() {
   const { data } = useSuspenseQuery(hrmsShiftAssignmentsQuery);

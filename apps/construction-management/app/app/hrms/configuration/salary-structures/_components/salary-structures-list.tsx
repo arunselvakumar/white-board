@@ -132,9 +132,8 @@ function StructureRow({
 }
 
 /**
- * Configuration → Salary Structures (CM-314): the Company's structures
- * with their components and statutory switches; Add, Edit and Delete (a
- * structure members use cannot be deleted).
+ * The Company's salary structures with their components and statutory switches;
+ * Add, Edit and Delete (a structure members use cannot be deleted).
  */
 export function SalaryStructuresList() {
   const { data } = useSuspenseQuery(salaryStructuresQuery);

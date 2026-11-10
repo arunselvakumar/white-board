@@ -12,9 +12,9 @@ import { HrmsAccessBoundary } from "./hrms-parts";
 import { AttendanceReadSkeleton } from "@/app/app/hrms/_components/hrms-skeletons";
 
 /**
- * Shared pieces of the attendance screens (CM-309): labels and tones for
- * day statuses and live states, Company-time clocks, the device location
- * and a boundary that turns a 403 into a plain "no access" state.
+ * Shared pieces of the attendance screens: labels and tones for day statuses
+ * and live states, Company-time clocks, the device location and a boundary that
+ * turns a 403 into a plain "no access" state.
  */
 
 export const DAY_STATUS_LABELS: Record<HrmsDayStatus, string> = {

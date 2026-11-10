@@ -53,8 +53,8 @@ const SERVER_FIELDS: Record<string, keyof Values> = {
 };
 
 /**
- * Assign a shift or a rotation to the chosen Team Members from a date,
- * until changed (CM-307). Whatever they worked before ends the day before.
+ * Assign a shift or a rotation to the chosen Team Members from a date, until
+ * changed. Whatever they worked before ends the day before.
  */
 export function AssignShiftDialog({
   members,

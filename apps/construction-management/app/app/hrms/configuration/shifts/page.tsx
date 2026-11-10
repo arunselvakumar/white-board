@@ -7,7 +7,7 @@ const HREF = `${HRMS_PATH}/configuration/shifts`;
 
 export const metadata: Metadata = { title: hrmsPage(HREF).title };
 
-/** Configuration → Shifts: shift templates and rotations (CM-306). */
+/** Shift templates and rotations. */
 export default function ShiftsRoute() {
   return <ShiftsPage />;
 }

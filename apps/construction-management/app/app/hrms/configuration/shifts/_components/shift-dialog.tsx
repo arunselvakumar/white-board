@@ -158,9 +158,9 @@ function Field({
 }
 
 /**
- * Add or edit a shift template (CM-306): times (an end at or before the
- * start crosses midnight), working days, working and half-day hours,
- * grace, overtime and whether it is offered.
+ * Add or edit a shift template: times (an end at or before the start crosses
+ * midnight), working days, working and half-day hours, grace, overtime and
+ * whether it is offered.
  */
 export function ShiftDialog({
   shift,

@@ -77,8 +77,8 @@ const SERVER_FIELDS: Record<string, keyof Values> = {
 };
 
 /**
- * Add Holiday or edit one (CM-305): name, date, type, the optional flag
- * and a description. One holiday per date.
+ * Add Holiday or edit one: name, date, type, the optional flag and a
+ * description. One holiday per date.
  */
 export function HolidayDialog({
   holiday,

@@ -43,7 +43,7 @@ import { money } from "@/app/app/hrms/salary/_components/salary-format";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-/** Server refusals about the account, shown under "Paid from" (CM-707). */
+/** Server refusals about the account, shown under "Paid from". */
 const ACCOUNT_CODES = {
   ACCOUNT_REQUIRED: "accountId",
   ACCOUNT_NOT_FOUND: "accountId",
@@ -131,9 +131,8 @@ const markPaidSchema = z.object({
 type MarkPaidValues = z.infer<typeof markPaidSchema>;
 
 /**
- * Mark Salaries as Paid (CM-317): Approved slips, with mode, the account it
- * was paid from (CM-707), date and reference. Each slip's net payable
- * leaves that account.
+ * Mark Salaries as Paid: Approved slips, with mode, the account it was paid
+ * from, date and reference. Each slip's net payable leaves that account.
  */
 export function MarkPaidDialog({
   open,
@@ -329,8 +328,8 @@ const advanceSchema = z.object({
 type AdvanceValues = z.infer<typeof advanceSchema>;
 
 /**
- * Pay Advance Salary (CM-317, ADR CM-0012 §15): paid now, recovered in
- * instalments from the following regular salaries.
+ * Pay Advance Salary (ADR CM-0012 §15): paid now, recovered in instalments from
+ * the following regular salaries.
  */
 export function PayAdvanceDialog({
   open,

@@ -7,7 +7,7 @@ import type {
   HrmsTeamToday,
 } from "@/src/queries/hrms-attendance";
 
-/** Story data for the attendance screens (CM-309). */
+/** Story data for the attendance screens. */
 
 export const TODAY = "2026-10-10";
 export const ZONE = "Asia/Kolkata";

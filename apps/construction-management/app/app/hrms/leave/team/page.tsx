@@ -7,7 +7,6 @@ export const metadata: Metadata = {
   title: hrmsPage(`${HRMS_PATH}/leave/team`).title,
 };
 
-/** Team Leaves (CM-313). */
 export default function TeamLeavesRoute() {
   return <TeamLeavesPage />;
 }

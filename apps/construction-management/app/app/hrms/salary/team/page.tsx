@@ -7,7 +7,6 @@ const HREF = `${HRMS_PATH}/salary/team`;
 
 export const metadata: Metadata = { title: hrmsPage(HREF).title };
 
-/** Team Salary (CM-317). */
 export default function TeamSalaryRoute() {
   return <TeamSalaryPage />;
 }

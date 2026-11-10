@@ -11,12 +11,12 @@ import { hrmsAttendanceTodayQuery } from "@/src/queries/hrms-attendance";
 export const MY_ATTENDANCE_PATH = `${HRMS_PATH}/attendance/my`;
 
 /**
- * The Projects home "Not checked in · Check In" banner (CM-309,
- * `modules/10` "Workspace placement"): shown to a Team Member who may
- * check in (`hrms.attendance` create) and has not checked in today on a
- * working day. It links to My Attendance, where the location is taken.
- * Hidden while loading, without access, once checked in or out today, and
- * on a holiday, week off or full day of leave.
+ * The Projects home "Not checked in · Check In" banner (`modules/10` "Workspace
+ * placement"): shown to a Team Member who may check in (`hrms.attendance`
+ * create) and has not checked in today on a working day. It links to My
+ * Attendance, where the location is taken. Hidden while loading, without
+ * access, once checked in or out today, and on a holiday, week off or full day
+ * of leave.
  */
 export function CheckInBanner() {
   const { data } = useQuery({ ...hrmsAttendanceTodayQuery, retry: false });

@@ -7,7 +7,6 @@ export const metadata: Metadata = {
   title: hrmsPage(`${HRMS_PATH}/configuration/leave-types`).title,
 };
 
-/** Leave Types & Structures (CM-310, CM-311). */
 export default function LeaveTypesRoute() {
   return <LeaveConfigurationPage />;
 }

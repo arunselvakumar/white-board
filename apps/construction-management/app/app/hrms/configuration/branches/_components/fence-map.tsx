@@ -6,11 +6,11 @@ import L from "leaflet";
 import { useEffect, useRef } from "react";
 
 /**
- * The map behind the fence picker (CM-304): OpenStreetMap tiles, a pin at
- * the fence centre and a circle of the fence radius. Tap or click the map
- * (or drag the pin) to move the centre. Loaded only in the browser
- * (`fence-map-picker.tsx` imports it with `next/dynamic`, no SSR); the
- * typed latitude and longitude beside it work without it.
+ * The map behind the fence picker: OpenStreetMap tiles, a pin at the fence
+ * centre and a circle of the fence radius. Tap or click the map (or drag the
+ * pin) to move the centre. Loaded only in the browser (`fence-map-picker.tsx`
+ * imports it with `next/dynamic`, no SSR); the typed latitude and longitude
+ * beside it work without it.
  */
 
 const TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";

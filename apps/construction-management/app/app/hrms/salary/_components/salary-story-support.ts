@@ -6,7 +6,7 @@ import type {
   TeamSalaries,
 } from "@/src/queries/hrms-salary";
 
-/** Fixtures and a mock salary API for the salary stories (CM-317). */
+/** Fixtures and a mock salary API for the salary stories. */
 
 const AT = "2026-11-03T06:00:00.000Z";
 const BASE = "/api/construction/hrms/salaries";
@@ -200,7 +200,7 @@ export function serveSalary(state: SalaryApiState = {}) {
   const api = mockApi((call) => {
     calls.push(call);
     const path = call.path.split("?")[0] ?? "";
-    // The "Paid from" account picker (CM-707).
+    // The "Paid from" account picker.
     const lookup = financeLookupsHandler(call);
     if (lookup != null) return lookup;
     if (call.method === "POST") {

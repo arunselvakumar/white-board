@@ -244,10 +244,9 @@ function ApprovalList() {
 }
 
 /**
- * Attendance Approvals (CM-309): back-dated days, missed checkouts and
- * out-of-fence check-ins waiting for a decision; approve, or reject with
- * a reason. Nobody but the Owner sees their own. Menu `hrms.attendance`
- * Approve / Reject.
+ * Attendance Approvals: back-dated days, missed checkouts and out-of-fence
+ * check-ins waiting for a decision; approve, or reject with a reason. Nobody
+ * but the Owner sees their own. Menu `hrms.attendance` Approve / Reject.
  */
 export function AttendanceApprovalsPage() {
   return (

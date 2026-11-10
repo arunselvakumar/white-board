@@ -19,8 +19,8 @@ import {
 } from "@/app/app/hrms/salary/_components/salary-slip-sheet";
 
 /**
- * My Salary (CM-317): the caller's salaries once approved, newest month
- * first, with the payslip to view or download, and any advance paid.
+ * My Salary: the caller's salaries once approved, newest month first, with the
+ * payslip to view or download, and any advance paid.
  */
 export function MySalaryPage() {
   const { data } = useSuspenseQuery(mySalariesQuery);

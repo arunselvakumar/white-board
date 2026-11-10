@@ -91,8 +91,8 @@ function Nothing({
 }
 
 /**
- * Team Leaves (CM-313): who is on leave in a month, day by day and as a
- * list, and the team leave report for those with Report.
+ * Team Leaves: who is on leave in a month, day by day and as a list, and the
+ * team leave report for those with Report.
  */
 export function TeamLeavesPage({ today }: { today?: string }) {
   const { data: options } = useSuspenseQuery(leaveOptionsQuery);

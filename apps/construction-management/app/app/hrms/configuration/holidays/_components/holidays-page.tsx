@@ -53,7 +53,7 @@ function iso(year: number, month: number, day: number): string {
   return `${String(year)}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 
-/** Twelve small months with the year's holidays marked (CM-305). */
+/** Twelve small months with the year's holidays marked. */
 function YearCalendar({
   year,
   holidays,
@@ -234,8 +234,8 @@ function HolidayYear({
 }
 
 /**
- * Configuration → Holidays (CM-305): the year's holidays as a list and a
- * calendar, Add Holiday, and Import from Excel. Menu `hrms.holidays`.
+ * The year's holidays as a list and a calendar, Add Holiday, and Import from
+ * Excel. Menu `hrms.holidays`.
  */
 export function HolidaysPage({ initialYear }: { initialYear?: number }) {
   const [year, setYear] = useState(

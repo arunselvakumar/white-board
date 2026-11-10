@@ -7,7 +7,7 @@ const HREF = `${HRMS_PATH}/configuration/shift-management`;
 
 export const metadata: Metadata = { title: hrmsPage(HREF).title };
 
-/** Configuration → Shift Management: assignments until changed (CM-307). */
+/** Shift assignments, each in force until changed. */
 export default function ShiftManagementRoute() {
   return <ShiftManagementPage />;
 }

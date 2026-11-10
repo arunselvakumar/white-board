@@ -31,10 +31,10 @@ export type FencePickerValue = {
 };
 
 /**
- * Where a fence is (CM-304): a map with a pin and the radius circle,
- * "Use my location", and typed latitude, longitude and radius. The typed
- * fields are the form's values; the map and the location button fill them
- * in. `showMap` is off in story tests, which have no map tiles.
+ * Where a fence is: a map with a pin and the radius circle, "Use my location",
+ * and typed latitude, longitude and radius. The typed fields are the form's
+ * values; the map and the location button fill them in. `showMap` is off in
+ * story tests, which have no map tiles.
  */
 export function FenceMapPicker({
   value,

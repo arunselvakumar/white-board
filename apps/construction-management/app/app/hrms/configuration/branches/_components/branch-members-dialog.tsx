@@ -26,9 +26,9 @@ import {
 } from "@/src/queries/hrms-branches";
 
 /**
- * "Members who check in here" (CM-304, ADR CM-0012 §4): the Team Members
- * linked to an office branch. A member linked to no branch may check in
- * at any office branch.
+ * "Members who check in here" (ADR CM-0012 §4): the Team Members linked to an
+ * office branch. A member linked to no branch may check in at any office
+ * branch.
  */
 export function BranchMembersDialog({
   branch,

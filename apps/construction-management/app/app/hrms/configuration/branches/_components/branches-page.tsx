@@ -72,9 +72,8 @@ function FenceRow({
 }
 
 /**
- * Configuration → Branches & Sites (CM-304): office branches with the
- * members who check in at each, and one site fence per Project. Menu
- * `hrms.settings`.
+ * Office branches with the members who check in at each, and one site fence per
+ * Project. Menu `hrms.settings`.
  */
 export function BranchesPage({ showMap = true }: { showMap?: boolean }) {
   const { data } = useSuspenseQuery(hrmsBranchesQuery);

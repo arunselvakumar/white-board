@@ -33,9 +33,8 @@ import { FormAlert } from "@/components/auth/form-alert";
 import { QueryHttpError } from "@/src/queries/http";
 
 /**
- * Shared pieces of the HRMS Configuration screens (CM-304 – CM-307): the
- * page frame under the HRMS tabs, empty states, row menus and the confirm
- * dialog.
+ * Shared pieces of the HRMS Configuration screens: the page frame under the
+ * HRMS tabs, empty states, row menus and the confirm dialog.
  */
 
 /** A Configuration page: `w-full p-6`, a 4xl column, an h2 and its actions. */

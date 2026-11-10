@@ -30,7 +30,7 @@ export const Dashboard: Story = {
   ...shellAt(HRMS_PATH),
   play: async ({ canvas }) => {
     await expect(canvas.getByRole("heading", { name: "HRMS" })).toBeVisible();
-    // A main-menu area since ADR CM-0034: no back link.
+    // A main-menu area (ADR CM-0034): no back link.
     await expect(canvas.queryByRole("link", { name: /^Back to/ })).toBeNull();
     const sections = within(
       canvas.getByRole("navigation", { name: "HRMS sections" }),
