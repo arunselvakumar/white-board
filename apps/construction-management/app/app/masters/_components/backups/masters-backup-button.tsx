@@ -6,7 +6,7 @@ import { Button } from "@repo/ui/components/button";
 
 import { MastersBackupDialog } from "@/app/app/_components/backups/backup-dialog";
 
-/** Masters → Backup (CM-906): the master records the member may view. */
+/** Backs up the master records the member may view. */
 export function MastersBackupButton() {
   const [open, setOpen] = useState(false);
   return (

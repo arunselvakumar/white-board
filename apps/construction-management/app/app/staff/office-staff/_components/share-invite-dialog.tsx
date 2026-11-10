@@ -15,7 +15,7 @@ import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 
 /**
- * The invite link for a Joining Pending Team Member (CM-111), to paste into
+ * The invite link for a Joining Pending Team Member, to paste into
  * WhatsApp or SMS. Opening it lets them sign in with the invited email
  * (ADR CM-0009).
  */

@@ -88,7 +88,7 @@ function passwordNotice(outcome: TeamMember & PasswordOutcome): Notice {
 }
 
 /**
- * Edit Staff (CM-111, ADR CM-0030): Details (the Details, Salary and
+ * Edit Staff (ADR CM-0030): Details (the Details, Salary and
  * Sign-in cards, in Add Staff's order, ADR CM-0033 §1), Projects and Role
  * tabs, and from the header Set a new password and the invitation.
  */

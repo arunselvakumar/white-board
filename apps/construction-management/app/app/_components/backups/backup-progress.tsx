@@ -21,7 +21,7 @@ const until = new Intl.DateTimeFormat("en-IN", {
 });
 
 /**
- * Where a requested backup stands (CM-906): being made (modules done of
+ * Where a requested backup stands: being made (modules done of
  * all), ready with its Download, or failed with the reason. It polls
  * every 3 seconds until it is done; it is also in Downloads, and a
  * notification says when it is ready.

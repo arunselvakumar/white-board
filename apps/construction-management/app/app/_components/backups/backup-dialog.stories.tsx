@@ -220,7 +220,7 @@ export const TooLarge: Story = {
   },
 };
 
-/** Masters → Backup: the masters the member may view, no range or media. */
+/** The masters the member may view, with no range or media. */
 export const MastersBackup: Story = {
   render: () => (
     <StoryQueries>

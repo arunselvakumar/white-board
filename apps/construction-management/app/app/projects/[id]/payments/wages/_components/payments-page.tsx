@@ -30,8 +30,8 @@ import { BalancesSkeleton } from "./payments-skeletons";
 export type PaymentsTab = "labour" | "vendor" | "payments";
 
 /**
- * A Project's Payments (CM-216): Labour and Vendor balances for a period
- * with Pay and the statement, and the list of recorded payments.
+ * A Project's Payments: Labour and Vendor balances for a period with Pay
+ * and the statement, and the list of recorded payments.
  */
 export function PaymentsPage({
   projectId,

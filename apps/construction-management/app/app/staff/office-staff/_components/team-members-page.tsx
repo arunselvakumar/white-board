@@ -86,8 +86,8 @@ const STATUS_TABS: FilterTab<TeamMemberListFilter["status"]>[] =
   }));
 
 /**
- * Human Resources → Staff (CM-111, ADR CM-0030): the Company's Team Members,
- * with search, status tabs, their Role and row actions.
+ * The Staff page (ADR CM-0030): the Company's Team Members, with search,
+ * status tabs, their Role and row actions.
  */
 export function TeamMembersPage({
   canAdd = true,

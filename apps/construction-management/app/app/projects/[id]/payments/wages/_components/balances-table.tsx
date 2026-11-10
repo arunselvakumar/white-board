@@ -38,9 +38,8 @@ import { BALANCE_FIGURES } from "./payments-skeletons";
 const FIGURES = BALANCE_FIGURES;
 
 /**
- * The legacy payment figures per party for a period (CM-216): a table on
- * wider screens, cards on phones. A row opens the statement; Pay opens the
- * pay dialog.
+ * The payment figures per party for a period: a table on wider screens,
+ * cards on phones. A row opens the statement; Pay opens the pay dialog.
  */
 export function BalancesTable({
   projectId,

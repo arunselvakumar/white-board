@@ -43,8 +43,8 @@ import { StatementLinesSkeleton } from "./payments-skeletons";
 export type StatementTarget = { id: string; name: string };
 
 /**
- * One party's balance view (CM-216): every entry in the period with its
- * Project and the running balance. A payment can be cancelled from here.
+ * One party's balance view: every entry in the period with its Project
+ * and the running balance. A payment can be cancelled from here.
  */
 export function StatementSheet({
   projectId,

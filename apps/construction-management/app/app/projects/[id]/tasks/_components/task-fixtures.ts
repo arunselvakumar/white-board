@@ -19,8 +19,6 @@ import type {
   TaskProgress,
 } from "@/src/queries/tracking-tasks";
 
-/** Story fixtures for Tasks. */
-
 export const TASKS_API = "/api/construction/tracking/tasks";
 export const TASK_PROJECT_ID = "0199c4a0-0000-7000-8000-0000000d0001";
 export const WING_ID = "0199c4a0-0000-7000-8000-0000000d0101";

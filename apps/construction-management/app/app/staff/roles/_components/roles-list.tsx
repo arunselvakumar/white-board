@@ -176,7 +176,7 @@ function RoleRow({
   );
 }
 
-/** Human Resources → Role Management (ADR CM-0030): the Company's Roles. */
+/** Role Management (ADR CM-0030): the Company's Roles. */
 export function RolesList({ actions }: { actions: RoleActions }) {
   return (
     <Suspense

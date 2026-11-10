@@ -65,7 +65,7 @@ type Created = TeamMember &
   PasswordOutcome & { passwordSet: boolean; invited: boolean };
 
 /**
- * Add Staff (CM-111, ADR CM-0033 §1): one page of cards, Details, Role,
+ * Add Staff (ADR CM-0033 §1): one page of cards, Details, Role,
  * Sign-in, Salary and Projects, with one button. HRMS members have no
  * Projects card and start on HRMS Staff.
  */
