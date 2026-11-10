@@ -6,7 +6,6 @@ import { IssuesList } from "@/components/tracking/issues/issues-list";
 
 export const metadata: Metadata = { title: "Issues & Snags" };
 
-/** The Project's Issues & Snags (CM-803). */
 export default async function IssuesPage({
   params,
 }: {

@@ -17,7 +17,7 @@ const one = (value: string | string[] | undefined): string | undefined =>
   typeof value === "string" && value !== "" ? value : undefined;
 
 /**
- * Record a hindrance (CM-607). A usage sheet's **Record hindrance** link
+ * Record a hindrance. A usage sheet's **Record hindrance** link
  * prefills it: `?cause=equipment_breakdown&date=YYYY-MM-DD
  * &equipmentUsageSheetId=<id>&activity=<text>`.
  */

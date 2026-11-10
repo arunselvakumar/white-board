@@ -8,7 +8,7 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Edit issue" };
 
-/** Edit an open Issue & Snag (CM-803). */
+/** Edit an open Issue & Snag. */
 export default async function IssueEditPage({
   params,
 }: {

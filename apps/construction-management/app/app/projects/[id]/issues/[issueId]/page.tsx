@@ -8,7 +8,6 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Issue" };
 
-/** One Issue & Snag (CM-803). */
 export default async function IssuePage({
   params,
 }: {

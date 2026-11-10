@@ -348,7 +348,7 @@ export const NoIdentityNumbersYet: Story = {
   },
 };
 
-/** CM-907: a reveal first asks for a code sent to the member (ADR CM-0021 §11). */
+/** A reveal first asks for a code sent to the member (ADR CM-0021 §11). */
 export const RevealNeedsACode: Story = {
   beforeEach() {
     let verified = false;

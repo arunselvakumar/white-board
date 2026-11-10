@@ -8,7 +8,6 @@ import { BookingEditSkeleton } from "@/components/sales/bookings/bookings-skelet
 
 export const metadata: Metadata = { title: "Edit booking" };
 
-/** Edit a booking's details (CM-1006). */
 export default async function BookingEditPage({
   params,
 }: {

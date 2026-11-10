@@ -11,7 +11,7 @@ import {
 
 export const metadata: Metadata = { title: "Add Worksheet" };
 
-/** Add Worksheet; `?from=<id>` duplicates a sheet (CM-0016 §9). */
+/** Add Worksheet; `?from=<id>` duplicates a sheet (ADR CM-0016 §9). */
 export default async function NewWorksheetRoute({
   params,
   searchParams,

@@ -6,7 +6,7 @@ import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no
 
 export const metadata: Metadata = { title: "Petty-cash voucher" };
 
-/** One petty-cash voucher with its files and remarks (CM-703). */
+/** One petty-cash voucher with its files and remarks. */
 export default async function VoucherRoute({
   params,
 }: {

@@ -6,7 +6,6 @@ import { BookingsList } from "@/components/sales/bookings/bookings-list";
 
 export const metadata: Metadata = { title: "Bookings" };
 
-/** Bookings → Bookings: the Project's bookings (CM-1006). */
 export default async function BookingsListPage({
   params,
 }: {

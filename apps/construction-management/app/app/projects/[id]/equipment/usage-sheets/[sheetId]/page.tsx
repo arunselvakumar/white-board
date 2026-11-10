@@ -8,7 +8,6 @@ import { EquipmentSheetDetailSkeleton } from "@/components/site-work/site-work-s
 
 export const metadata: Metadata = { title: "Equipment Usage sheet" };
 
-/** One Equipment Usage sheet (CM-604). */
 export default async function EquipmentSheetRoute({
   params,
   searchParams,

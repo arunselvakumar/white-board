@@ -6,7 +6,7 @@ import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no
 
 export const metadata: Metadata = { title: "Transactions" };
 
-/** A Project's Transactions and transfers (CM-702). */
+/** A Project's Transactions and transfers. */
 export default async function ProjectTransactionsPage({
   params,
 }: {

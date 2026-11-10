@@ -36,7 +36,7 @@ function contactNoun(preview: JoinLinkPreview): "email" | "number" {
 }
 
 /**
- * `/join/<token>` (CM-109): sign in with the invited email, then accept.
+ * `/join/<token>`: sign in with the invited email, then accept.
  * While SMS is on (ADR CM-0009) the invited number is listed too.
  */
 export function JoinLinkCard({

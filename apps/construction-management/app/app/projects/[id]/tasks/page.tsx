@@ -8,7 +8,7 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Tasks" };
 
-/** The Project's task tree, Gantt and import (CM-802). */
+/** The Project's task tree, Gantt and import. */
 export default async function TasksRoute({
   params,
   searchParams,

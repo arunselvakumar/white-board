@@ -6,7 +6,7 @@ import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no
 
 export const metadata: Metadata = { title: "Petty-cash statement" };
 
-/** A petty-cash account's statement for a period (CM-703). */
+/** A petty-cash account's statement for a period. */
 export default async function PettyCashStatementRoute({
   params,
 }: {

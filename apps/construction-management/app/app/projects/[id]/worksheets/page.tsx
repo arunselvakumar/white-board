@@ -6,7 +6,6 @@ import { WorksheetsPage } from "@/components/site-work/worksheets/worksheets-pag
 
 export const metadata: Metadata = { title: "Daily Worksheet" };
 
-/** The Project's Daily Worksheets (CM-602). */
 export default async function ProjectWorksheetsRoute({
   params,
 }: {

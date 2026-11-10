@@ -8,7 +8,6 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Task" };
 
-/** One task (CM-802). */
 export default async function TaskRoute({
   params,
 }: {

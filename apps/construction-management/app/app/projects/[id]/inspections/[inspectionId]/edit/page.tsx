@@ -8,7 +8,7 @@ import { TrackingFormSkeleton } from "@/components/tracking/tracking-skeletons";
 
 export const metadata: Metadata = { title: "Edit Inspection Request" };
 
-/** Edit a pending Inspection Request (CM-804). */
+/** Edit a pending Inspection Request. */
 export default async function EditInspectionRoute({
   params,
 }: {

@@ -6,7 +6,7 @@ import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no
 
 export const metadata: Metadata = { title: "Material Requests" };
 
-/** Materials → Material Requests: what the Project asked its stores for (CM-508). */
+/** What the Project asked its stores for. */
 export default async function MaterialRequestsRoute({
   params,
 }: {

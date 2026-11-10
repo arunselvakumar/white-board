@@ -100,7 +100,6 @@ export const MixedStatuses: Story = {
   },
 };
 
-/** No reports yet. */
 export const Empty: Story = {
   beforeEach: serve(() => []),
   play: async ({ canvas }) => {
@@ -111,7 +110,6 @@ export const Empty: Story = {
   },
 };
 
-/** While the first page loads. */
 export const Loading: Story = {
   beforeEach: () => {
     const inner = globalThis.fetch;
@@ -295,7 +293,7 @@ export const Phone: Story = {
   },
 };
 
-/** Backups and data exports (CM-906): status, the signed ZIP and Delete, never Retry. */
+/** Backups and data exports: status, the signed ZIP and Delete, never Retry. */
 export const BackupRows: Story = {
   beforeEach: serve(() => [
     BACKUP_RUNNING,

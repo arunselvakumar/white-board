@@ -9,8 +9,8 @@ import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no
 export const metadata: Metadata = { title: "Central Payment" };
 
 /**
- * Workspace → Central Payment (CM-709): party dues across Projects,
- * account balances, petty cash and the central finance reports.
+ * Party dues across Projects, account balances, petty cash and the central
+ * finance reports.
  */
 export default async function CentralPaymentRoute() {
   if (!(await viewerCan("finance.central_payment", "read")))

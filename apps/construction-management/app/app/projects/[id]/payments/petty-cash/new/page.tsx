@@ -15,7 +15,7 @@ type Query = { account?: string | string[]; type?: string | string[] };
 const one = (value: string | string[] | undefined): string | undefined =>
   typeof value === "string" && value !== "" ? value : undefined;
 
-/** Write a petty-cash voucher (CM-703): `?account=<id>&type=payment`. */
+/** Write a petty-cash voucher: `?account=<id>&type=payment`. */
 export default async function VoucherNewRoute({
   params,
   searchParams,

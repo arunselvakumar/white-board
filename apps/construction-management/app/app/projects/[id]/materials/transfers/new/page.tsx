@@ -8,7 +8,7 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "New Material Transfer" };
 
-/** New Material Transfer from the Project; `?materials=` starts its lines (CM-507). */
+/** New Material Transfer from the Project; `?materials=` starts its lines. */
 export default async function ProjectTransferNewRoute({
   params,
   searchParams,

@@ -489,7 +489,7 @@ const entrySchema = z.object({
 type EntryInput = z.input<typeof entrySchema>;
 type EntryValues = z.output<typeof entrySchema>;
 
-/** A site entry form that requires a location, as M5 / M6 / M8 will. */
+/** A site entry form that requires a location. */
 function EntryForm() {
   const [saved, setSaved] = useState<LocationRef | null>(null);
   const form = useForm<EntryInput, unknown, EntryValues>({

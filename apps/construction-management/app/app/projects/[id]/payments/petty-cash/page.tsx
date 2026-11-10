@@ -6,7 +6,7 @@ import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no
 
 export const metadata: Metadata = { title: "Petty Cash" };
 
-/** Petty Cash of a Project (CM-703): accounts, vouchers, approval. */
+/** Petty Cash of a Project: accounts, vouchers, approval. */
 export default async function ProjectPettyCashPage({
   params,
 }: {

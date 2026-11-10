@@ -12,8 +12,8 @@ import { TrackingFormSkeleton } from "@/components/tracking/tracking-skeletons";
 export const metadata: Metadata = { title: "Add Inspection Request" };
 
 /**
- * Add Inspection Request (CM-804); `?reinspect=<id>` is **Raise
- * re-inspection** of a rejected request, prefilled from it.
+ * Add Inspection Request; `?reinspect=<id>` is **Raise re-inspection** of
+ * a rejected request, prefilled from it.
  */
 export default async function NewInspectionRoute({
   params,

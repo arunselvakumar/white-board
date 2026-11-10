@@ -6,7 +6,7 @@ import { EquipmentRegister } from "@/components/site-work/equipment/equipment-li
 
 export const metadata: Metadata = { title: "Equipments" };
 
-/** Masters → Equipments: the Company's Equipment register (CM-603). */
+/** The Company's Equipment register. */
 export default async function EquipmentsPage() {
   if (!(await viewerCan("masters.equipments", "read")))
     return <ProjectNoAccess what="Equipments" />;

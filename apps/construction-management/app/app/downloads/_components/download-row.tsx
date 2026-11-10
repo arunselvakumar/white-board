@@ -15,9 +15,9 @@ import { EXPIRED_MESSAGE } from "@/components/reports/recent-reports";
 import type { DownloadItem } from "@/src/queries/downloads";
 
 /**
- * What each source is called on a row. CM-906 adds `backup` and `export`
- * here (a source without a label is a type error); everything else a row
- * shows is in the fields every source sends (`download-models.ts`).
+ * What each source is called on a row (a source without a label is a type
+ * error); everything else a row shows is in the fields every source sends
+ * (`download-models.ts`).
  */
 export const SOURCE_LABELS: Record<DownloadItem["source"], string> = {
   report: "Report",

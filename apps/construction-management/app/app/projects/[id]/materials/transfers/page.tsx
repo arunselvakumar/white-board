@@ -6,7 +6,7 @@ import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no
 
 export const metadata: Metadata = { title: "Material Transfers" };
 
-/** The Project's Material Transfers, both directions (CM-507). */
+/** The Project's Material Transfers, both directions. */
 export default async function ProjectTransfersRoute({
   params,
 }: {

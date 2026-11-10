@@ -6,7 +6,7 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Downloads" };
 
-/** The member's reports across Projects (CM-901), from the user menu. */
+/** The member's reports across Projects, from the user menu. */
 export default function Downloads() {
   return (
     <QuerySuspense fallback={<DownloadsPageSkeleton />}>

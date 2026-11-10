@@ -33,7 +33,7 @@ import {
 
 import { DownloadRow } from "./download-row";
 
-/** The user menu's Downloads (CM-901). */
+/** The user menu's Downloads. */
 export const DOWNLOADS_PATH = "/app/downloads";
 
 function messageOf(error: unknown): string {
@@ -43,7 +43,7 @@ function messageOf(error: unknown): string {
 }
 
 /**
- * Downloads (ADR CM-0021 §2, CM-901): every report the signed-in member
+ * Downloads (ADR CM-0021 §2): every report the signed-in member
  * asked for, on any Project or central, newest first, with its status,
  * Excel / PDF downloads, Retry and Delete. It polls while one is being
  * generated. Report files are kept 30 days; Progress Reports until

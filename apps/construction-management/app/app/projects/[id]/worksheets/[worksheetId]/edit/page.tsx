@@ -9,7 +9,6 @@ import { EditDocumentSkeleton } from "@/components/procurement/procurement-skele
 
 export const metadata: Metadata = { title: "Edit Worksheet" };
 
-/** Edit a Daily Worksheet (CM-602). */
 export default async function EditWorksheetRoute({
   params,
 }: {

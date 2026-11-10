@@ -32,7 +32,7 @@ const FINAL_CODES = new Set([
 ]);
 
 /**
- * Files going up through the attachments service (CM-407), each with its
+ * Files going up through the attachments service, each with its
  * own progress, error, retry and cancel. `upload` runs one file (usually
  * `directUpload` with the owner's start and completion routes, which
  * splits large files into parts and sends an image's thumbnail); `check`

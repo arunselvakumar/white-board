@@ -9,7 +9,7 @@ import { BookingDetailSkeleton } from "@/components/sales/bookings/bookings-skel
 
 export const metadata: Metadata = { title: "Booking" };
 
-/** One booking with its history (CM-1006). */
+/** One booking with its history. */
 export default async function BookingPage({
   params,
   searchParams,
