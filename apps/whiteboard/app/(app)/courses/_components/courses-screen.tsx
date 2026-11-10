@@ -18,7 +18,6 @@ import {
 } from "@/src/queries/courses";
 import { calendarQueries } from "@/src/queries/calendar";
 
-
 export function CoursesScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
