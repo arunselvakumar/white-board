@@ -7,7 +7,7 @@ import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
 import { Card, CardContent, CardHeader } from "@repo/ui/components/card";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import { AttachmentLinks } from "@/components/class-work/attachments";
 import { StudentAvatar } from "@/components/students/student-avatar";
 import {

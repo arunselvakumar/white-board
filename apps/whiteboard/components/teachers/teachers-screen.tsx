@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@repo/ui/components/button";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import { teacherQueries } from "@/src/queries/teachers";
 import { TeachersEmptyState } from "./teachers-empty-state";
 import { TeacherAvatar } from "./teacher-avatar";

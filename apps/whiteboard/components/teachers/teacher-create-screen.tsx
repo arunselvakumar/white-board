@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@repo/ui/components/button";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import {
   addTeacherDocument,
   createTeacher,

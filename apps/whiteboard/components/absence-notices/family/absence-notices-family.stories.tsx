@@ -8,9 +8,9 @@ import type { Decorator, Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 
-import { AppShell } from "@/components/app-shell/app-shell";
-import { FamilyHomeScreen } from "@/components/home/family-home-screen";
-import type { FamilyHomeRole } from "@/components/home/family-home";
+import { AppShell } from "@/app/(app)/_components/app-shell/app-shell";
+import { FamilyHomeScreen } from "@/app/(app)/_components/home/family-home-screen";
+import type { FamilyHomeRole } from "@/app/(app)/_components/home/family-home";
 import { QuerySuspense } from "@/components/query-suspense";
 import {
   absenceNoticeQueries,

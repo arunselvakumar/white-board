@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { AppEmptyPage } from "@/components/app-shell/app-empty-page";
-import { AppShell } from "@/components/app-shell/app-shell";
+import { AppEmptyPage } from "@/app/(app)/_components/app-shell/app-empty-page";
+import { AppShell } from "@/app/(app)/_components/app-shell/app-shell";
 import { APP_NAV } from "@/lib/app-nav";
 import {
   expectAppShell,
   openSidebar,
   openSwitchWorkspace,
-} from "../../.storybook/expect-app-shell";
-import { authFailure, authMocks, signInAs } from "../../.storybook/mocks/auth";
+} from "@/.storybook/expect-app-shell";
+import { authFailure, authMocks, signInAs } from "@/.storybook/mocks/auth";
 
 const meta = {
   title: "Workspace/AppShell",

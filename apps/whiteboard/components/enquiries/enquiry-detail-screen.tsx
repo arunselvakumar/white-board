@@ -17,7 +17,7 @@ import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import { Button } from "@repo/ui/components/button";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import { isOwnerRole } from "@/lib/workspace-access";
 import {
   bookDemo,

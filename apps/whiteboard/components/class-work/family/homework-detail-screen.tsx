@@ -41,7 +41,7 @@ import {
   AttachmentLinks,
   AttachmentPicker,
 } from "@/components/class-work/attachments";
-import type { FamilyHomeRole } from "@/components/home/family-home";
+import type { FamilyHomeRole } from "@/app/(app)/_components/home/family-home";
 import {
   classWorkQueries,
   submitHomework,

@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import { EnrollmentForm } from "@/components/enrollments/enrollment-form";
 import { studentFullName } from "@/components/students/student-profile-view";
 import { batchQueries } from "@/src/queries/batches";

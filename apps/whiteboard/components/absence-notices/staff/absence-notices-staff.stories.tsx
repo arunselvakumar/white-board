@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { AppShell } from "@/components/app-shell/app-shell";
+import { AppShell } from "@/app/(app)/_components/app-shell/app-shell";
 import {
   callsTo,
   hasNoHorizontalOverflow,
   mockApi,
   withFreshQueryClient,
-} from "@/components/notifications/story-api";
+} from "@/app/(app)/_components/notifications/story-api";
 import type { ExpectedAbsencesView } from "@/src/queries/absence-notices";
 import { signInAs } from "../../../.storybook/mocks/auth";
 

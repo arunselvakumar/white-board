@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { redirect } from "next/navigation";
 
-import { OwnerDashboardScreen } from "@/components/dashboard/owner-dashboard-screen";
+import { OwnerDashboardScreen } from "@/app/(app)/_components/dashboard/owner-dashboard-screen";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { role } = await getAuth();

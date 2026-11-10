@@ -34,7 +34,7 @@ import {
   CatalogStat,
   CatalogStatus,
   type CatalogPaginationProps,
-} from "@/components/catalog/catalog-chrome";
+} from "@/app/(app)/_components/catalog/catalog-chrome";
 import type { CourseResponse } from "@/src/queries/courses";
 
 export function CourseCatalog({

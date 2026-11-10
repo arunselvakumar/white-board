@@ -12,7 +12,7 @@ import {
   EmptyTitle,
 } from "@repo/ui/components/empty";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import {
   reportHref,
   reportQueries,

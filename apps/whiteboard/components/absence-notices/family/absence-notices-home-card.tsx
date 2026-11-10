@@ -22,7 +22,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
 import { FormAlert } from "@/components/auth/form-alert";
-import type { FamilyHomeRole } from "@/components/home/family-home";
+import type { FamilyHomeRole } from "@/app/(app)/_components/home/family-home";
 import {
   absenceNoticeQueries,
   withdrawAbsenceNotice,

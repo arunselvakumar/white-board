@@ -10,7 +10,7 @@ import {
 } from "@repo/ui/components/card";
 import Link from "next/link";
 
-import type { FamilyHomeRole } from "@/components/home/family-home";
+import type { FamilyHomeRole } from "@/app/(app)/_components/home/family-home";
 import { HOME_RESULT_COUNT } from "@/src/queries/class-tests";
 
 import { ResultRow } from "./family-result-items";

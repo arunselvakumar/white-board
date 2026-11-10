@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { AppShell } from "@/components/app-shell/app-shell";
+import { AppShell } from "@/app/(app)/_components/app-shell/app-shell";
 import type {
   NotificationView,
   NotificationsView,
 } from "@/src/queries/notifications";
-import { openSidebar } from "../../.storybook/expect-app-shell";
-import { signInAs } from "../../.storybook/mocks/auth";
+import { openSidebar } from "@/.storybook/expect-app-shell";
+import { signInAs } from "@/.storybook/mocks/auth";
 
 import {
   ashaGiven,
@@ -23,7 +23,7 @@ import {
   hasNoHorizontalOverflow,
   mockApi,
   withFreshQueryClient,
-} from "./story-api";
+} from "@/app/(app)/_components/notifications/story-api";
 
 /**
  * A Teacher's Notifications that Mark read and Mark all read change, so the

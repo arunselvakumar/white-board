@@ -4,7 +4,7 @@ import { getRouter } from "@storybook/nextjs-vite/navigation.mock";
 import { useState } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 
-import { AppShell } from "@/components/app-shell/app-shell";
+import { AppShell } from "@/app/(app)/_components/app-shell/app-shell";
 import {
   DRAFT_VISIBILITY_NOTE,
   PUBLISH_CONFIRMATION,

@@ -15,7 +15,7 @@ import {
 } from "@repo/ui/components/empty";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-import type { FamilyHomeRole } from "@/components/home/family-home";
+import type { FamilyHomeRole } from "@/app/(app)/_components/home/family-home";
 import {
   classTestQueries,
   type FamilyTestResultsView,
