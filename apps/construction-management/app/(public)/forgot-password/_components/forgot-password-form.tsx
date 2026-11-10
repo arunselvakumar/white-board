@@ -15,11 +15,15 @@ import { Label } from "@repo/ui/components/label";
 
 import { authErrorMessage } from "@/lib/auth-errors";
 
-import { AuthHeading } from "./auth-heading";
-import { ResendCode, SixDigitCodeInput, sixDigitCode } from "./code-form";
-import { FieldError } from "./field-error";
-import { FormAlert } from "./form-alert";
-import { PasswordField } from "./password-field";
+import { AuthHeading } from "@/components/auth/auth-heading";
+import {
+  ResendCode,
+  SixDigitCodeInput,
+  sixDigitCode,
+} from "@/components/auth/code-form";
+import { FieldError } from "@/components/auth/field-error";
+import { FormAlert } from "@/components/auth/form-alert";
+import { PasswordField } from "@/components/auth/password-field";
 
 const emailSchema = z.object({
   email: z.email("Enter a valid email address"),

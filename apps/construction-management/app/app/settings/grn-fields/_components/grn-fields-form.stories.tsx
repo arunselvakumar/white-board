@@ -7,11 +7,7 @@ import {
   GRN_OPTIONAL_FIELDS,
 } from "@/src/shared-kernel/grn-fields";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { GrnFieldsForm } from "./grn-fields-form";
 
 const BASE = "/api/construction/organization/settings/grn-fields";

@@ -10,7 +10,7 @@ import {
   pushConfigQuery,
   savePushSubscription,
   useUpdateNotificationPreferences,
-} from "@/components/notifications/notification-queries";
+} from "@/app/app/_components/notifications/notification-queries";
 
 import {
   browserPushDevice,

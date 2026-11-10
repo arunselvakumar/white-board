@@ -6,14 +6,14 @@ import {
   mockNotificationApi,
   VAPID_PUBLIC_KEY,
   type NotificationApiOptions,
-} from "@/components/notifications/notification-fixtures";
+} from "@/app/app/_components/notifications/notification-fixtures";
 import {
   MESSAGING_API,
   type PushSubscriptionInput,
-} from "@/components/notifications/notification-queries";
+} from "@/app/app/_components/notifications/notification-queries";
 
-import { StoryQueries } from "../../.storybook/mocks/api";
-import { signInAs } from "../../.storybook/mocks/auth";
+import { StoryQueries } from "@/.storybook/mocks/api";
+import { signInAs } from "@/.storybook/mocks/auth";
 
 import { NotificationSettings } from "./notification-settings";
 import {

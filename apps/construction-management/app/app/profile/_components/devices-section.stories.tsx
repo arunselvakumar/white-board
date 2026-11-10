@@ -3,12 +3,8 @@ import { expect, waitFor, within } from "storybook/test";
 
 import type { DeviceItem } from "@/src/queries/account";
 
-import { signInAs } from "../../.storybook/mocks/auth";
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
+import { signInAs } from "@/.storybook/mocks/auth";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { DevicesSection } from "./devices-section";
 
 const BASE = "/api/construction/organization/me/devices";

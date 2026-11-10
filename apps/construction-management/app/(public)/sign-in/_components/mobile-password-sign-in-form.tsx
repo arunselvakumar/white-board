@@ -15,10 +15,10 @@ import { Label } from "@repo/ui/components/label";
 import { authErrorMessage } from "@/lib/auth-errors";
 import { continuePath } from "@/lib/safe-redirect";
 
-import { FieldError } from "./field-error";
-import { FormAlert } from "./form-alert";
-import { MobileField } from "./mobile-field";
-import { PasswordField } from "./password-field";
+import { FieldError } from "@/components/auth/field-error";
+import { FormAlert } from "@/components/auth/form-alert";
+import { MobileField } from "@/components/auth/mobile-field";
+import { PasswordField } from "@/components/auth/password-field";
 
 const schema = z.object({
   mobile: z

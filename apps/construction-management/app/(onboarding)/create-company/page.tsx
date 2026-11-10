@@ -4,9 +4,9 @@ import { redirect } from "next/navigation";
 
 import { AuthDivider } from "@/components/auth/auth-divider";
 import { pickAuthPhoto } from "@/components/auth/auth-photos";
-import { CreateCompanyWizard } from "@/components/onboarding/create-company-wizard";
-import { JoinRequestsList } from "@/components/onboarding/join-requests-list";
-import { OnboardingSplitShell } from "@/components/onboarding/onboarding-shell";
+import { CreateCompanyWizard } from "@/app/(onboarding)/create-company/_components/create-company-wizard";
+import { JoinRequestsList } from "@/app/(onboarding)/_components/join-requests-list";
+import { OnboardingSplitShell } from "@/app/(onboarding)/_components/onboarding-shell";
 import { QuerySuspense } from "@/components/query-suspense";
 import {
   CHANGE_PASSWORD_PATH,

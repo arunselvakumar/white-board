@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor } from "storybook/test";
 
-import { OnboardingSplitShell } from "@/components/onboarding/onboarding-shell";
+import { OnboardingSplitShell } from "@/app/(onboarding)/_components/onboarding-shell";
 
-import { mockApi } from "../../.storybook/mocks/api";
-import { authMocks, signInAs } from "../../.storybook/mocks/auth";
+import { mockApi } from "@/.storybook/mocks/api";
+import { authMocks, signInAs } from "@/.storybook/mocks/auth";
 import { ChangePasswordForm } from "./change-password-form";
 
 const CHANGE = "/api/auth/change-password";

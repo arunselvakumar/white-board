@@ -4,7 +4,7 @@
  */
 import { base64UrlToBytes } from "@/lib/notification-format";
 
-import type { PushSubscriptionInput } from "@/components/notifications/notification-queries";
+import type { PushSubscriptionInput } from "@/app/app/_components/notifications/notification-queries";
 
 export type PushPermission = "default" | "granted" | "denied";
 

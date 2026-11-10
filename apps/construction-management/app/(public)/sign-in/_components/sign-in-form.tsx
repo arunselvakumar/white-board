@@ -10,10 +10,10 @@ import {
   TabsTrigger,
 } from "@repo/ui/components/tabs";
 
-import { AuthDivider } from "./auth-divider";
-import { AuthHeading } from "./auth-heading";
+import { AuthDivider } from "@/components/auth/auth-divider";
+import { AuthHeading } from "@/components/auth/auth-heading";
 import { EmailSignInForm } from "./email-sign-in-form";
-import { MobileOtpFlow } from "./mobile-otp-flow";
+import { MobileOtpFlow } from "@/app/(public)/_components/mobile-otp-flow";
 import { MobilePasswordSignInForm } from "./mobile-password-sign-in-form";
 
 /**

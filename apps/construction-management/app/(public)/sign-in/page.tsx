@@ -5,7 +5,7 @@ import {
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import { SignInForm } from "@/components/auth/sign-in-form";
+import { SignInForm } from "@/app/(public)/sign-in/_components/sign-in-form";
 import { continuePath } from "@/lib/safe-redirect";
 
 export const metadata: Metadata = { title: "Sign in" };

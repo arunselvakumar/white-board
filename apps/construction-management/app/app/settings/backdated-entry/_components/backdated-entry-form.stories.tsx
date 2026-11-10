@@ -4,11 +4,7 @@ import { expect, fireEvent, waitFor, within } from "storybook/test";
 import type { GetConstructionOrganizationBackdatedEntryPolicyResponseModel } from "@/app/api/construction/organization/settings/backdated-entry/get-backdated-entry-policy-response-model";
 import { BACKDATED_MODULES } from "@/src/shared-kernel/backdated-policy";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { BackdatedEntryForm } from "./backdated-entry-form";
 
 const ACCOUNTANT = "0199c0de-0000-7000-8000-000000000001";

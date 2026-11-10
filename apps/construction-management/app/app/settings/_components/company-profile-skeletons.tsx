@@ -6,7 +6,7 @@ import {
 } from "@repo/ui/components/skeleton-kit";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
-import { AdvancedSettings } from "@/components/settings/advanced-settings";
+import { AdvancedSettings } from "@/app/app/settings/_components/advanced-settings";
 
 /**
  * Settings while the Company profile loads (ADR-0047). The Advanced

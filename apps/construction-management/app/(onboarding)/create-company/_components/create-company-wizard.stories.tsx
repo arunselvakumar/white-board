@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, waitFor, within } from "storybook/test";
 
-import { authMocks, signInAs } from "../../.storybook/mocks/auth";
+import { authMocks, signInAs } from "@/.storybook/mocks/auth";
 import { CreateCompanyWizard } from "./create-company-wizard";
-import { OnboardingSplitShell } from "./onboarding-shell";
+import { OnboardingSplitShell } from "@/app/(onboarding)/_components/onboarding-shell";
 
 type FetchArgs = Parameters<typeof fetch>;
 

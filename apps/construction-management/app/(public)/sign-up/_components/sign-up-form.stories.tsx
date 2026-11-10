@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { authMocks } from "../../.storybook/mocks/auth";
-import { PublicShell } from "./public-shell";
+import { authMocks } from "@/.storybook/mocks/auth";
+import { PublicShell } from "@/components/auth/public-shell";
 import { SignUpForm } from "./sign-up-form";
 
 const meta = {

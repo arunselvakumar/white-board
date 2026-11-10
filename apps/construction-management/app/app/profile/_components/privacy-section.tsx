@@ -14,7 +14,7 @@ import {
   ItemTitle,
 } from "@repo/ui/components/item";
 
-import { DeleteAccountDialog } from "@/components/account/delete-account-dialog";
+import { DeleteAccountDialog } from "@/app/app/profile/_components/account/delete-account-dialog";
 import { DownloadMyDataAction } from "@/components/backups/download-my-data";
 import { accountQueries } from "@/src/queries/account";
 

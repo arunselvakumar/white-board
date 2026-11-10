@@ -4,14 +4,14 @@ import { expect, waitFor, within } from "storybook/test";
 
 import { razorpayWindow, type RazorpayOptions } from "@/lib/razorpay-checkout";
 
-import { signInAs } from "../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 import { CheckoutWizard } from "./checkout-wizard";
 import {
   activeView,
   memberView,
   mockSubscriptionApi,
   noPlanView,
-} from "./subscription-story-fixtures";
+} from "@/app/app/subscription/_components/subscription-story-fixtures";
 
 /** Razorpay Checkout stand-in: pays at once and calls the success handler. */
 function installFakeRazorpay(outcome: "pay" | "dismiss" = "pay") {

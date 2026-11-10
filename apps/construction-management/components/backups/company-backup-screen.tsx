@@ -29,7 +29,7 @@ import {
   EmptyTitle,
 } from "@repo/ui/components/empty";
 
-import { ActionCodeStep } from "@/components/account/action-code-step";
+import { ActionCodeStep } from "@/app/app/_components/account/action-code-step";
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";

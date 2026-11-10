@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-import { CheckoutWizard } from "@/components/subscription/checkout-wizard";
-import { CheckoutSkeleton } from "@/components/subscription/subscription-skeletons";
+import { CheckoutWizard } from "@/app/app/subscription/checkout/_components/checkout-wizard";
+import { CheckoutSkeleton } from "@/app/app/subscription/_components/subscription-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Choose a plan" };

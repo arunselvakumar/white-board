@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { mockApi } from "../../.storybook/mocks/api";
-import { authFailure, authMocks } from "../../.storybook/mocks/auth";
-import { PublicShell } from "./public-shell";
+import { mockApi } from "@/.storybook/mocks/api";
+import { authFailure, authMocks } from "@/.storybook/mocks/auth";
+import { PublicShell } from "@/components/auth/public-shell";
 import { SignInForm } from "./sign-in-form";
 
 const PHONE_SIGN_IN = "/api/auth/sign-in/phone-number";

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { CompanyOwnershipScreen } from "@/components/account/company-ownership-screen";
+import { CompanyOwnershipScreen } from "@/app/app/_components/account/company-ownership-screen";
 
 export const metadata: Metadata = { title: "Company" };
 

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, waitFor, within } from "storybook/test";
 
 import { CompanySetupLoader } from "./company-setup-loader";
-import { OnboardingSplitShell } from "./onboarding-shell";
+import { OnboardingSplitShell } from "@/app/(onboarding)/_components/onboarding-shell";
 
 const meta = {
   title: "Onboarding/CompanySetupLoader",

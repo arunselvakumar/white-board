@@ -4,7 +4,7 @@ import { useCompanyAuth } from "@repo/auth/construction/react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@repo/ui/components/button";
 
-import { useCancelCompanyDeletion } from "@/components/account/company-ownership-screen";
+import { useCancelCompanyDeletion } from "@/app/app/_components/account/company-ownership-screen";
 import { fieldForCode } from "@/lib/server-errors";
 import { accountQueries, formatDay } from "@/src/queries/account";
 
