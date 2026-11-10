@@ -4,7 +4,7 @@ import { PartyPaymentScreen } from "@/app/app/projects/[id]/payments/_components
 
 export const metadata: Metadata = { title: "Other Party payment" };
 
-/** Record a Payment Out to, or a Payment In from, an Other Party (CM-708). */
+/** Record a Payment Out to, or a Payment In from, an Other Party. */
 export default async function OtherPartyPaymentFormPage({
   params,
   searchParams,

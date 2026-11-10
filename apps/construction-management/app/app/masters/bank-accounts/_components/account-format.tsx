@@ -18,7 +18,7 @@ export function bankAccountsPath(rest = ""): string {
   return `/app/masters/bank-accounts${rest}`;
 }
 
-/** A signed amount in rupees; a negative one is red (CM-0017 §2). */
+/** A signed amount in rupees; a negative one is red (ADR CM-0017 §2). */
 export function SignedAmount({
   paise,
   className,

@@ -58,10 +58,9 @@ function pendingLine(account: CompanyAccount): string | null {
 }
 
 /**
- * Masters → Company's Bank A/C (CM-701): the Company's Cash and Bank
- * accounts with today's balance (red below zero) and what pending
- * documents would move. Add, edit, Set As Primary, delete (refused while
- * in use), and each account's Ledger.
+ * The Company's Cash and Bank accounts with today's balance (red below zero)
+ * and what pending documents would move. Add, edit, Set As Primary, delete
+ * (refused while in use), and each account's Ledger.
  */
 export function BankAccountsList() {
   const router = useRouter();

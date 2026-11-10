@@ -4,7 +4,7 @@ import type { Invoice } from "@/src/queries/finance-parties";
 
 import { INVOICE_STATUS_LABELS } from "./party-money";
 
-/** Open, Partly paid, Paid or Settled, with Overdue and Variance beside (CM-0017 §7, §13). */
+/** Open, Partly paid, Paid or Settled, with Overdue and Variance beside (ADR CM-0017 §7, §13). */
 export function InvoiceStatusChips({
   invoice,
 }: {

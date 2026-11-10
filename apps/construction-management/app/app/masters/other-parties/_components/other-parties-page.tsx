@@ -66,9 +66,9 @@ import {
 } from "./other-parties-skeletons";
 
 /**
- * Masters → Other Parties (CM-704, ADR CM-0017 §11): parties that are not
- * Contractors, Suppliers, Labours or Vendors — landlords, consultants,
- * buyers of scrap. Search, newest first in pages, edit and delete.
+ * Parties that are not Contractors, Suppliers, Labours or Vendors — landlords,
+ * consultants, buyers of scrap (ADR CM-0017 §11). Search, newest first in
+ * pages, edit and delete.
  */
 export function OtherPartiesPage() {
   const [search, setSearch] = useState("");

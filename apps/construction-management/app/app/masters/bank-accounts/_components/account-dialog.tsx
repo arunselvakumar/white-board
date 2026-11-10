@@ -91,9 +91,9 @@ const SERVER_FIELDS: Record<string, keyof Values> = {
 };
 
 /**
- * Add a company Cash or Bank account, or edit one (CM-701): name, bank
- * details for a Bank account, and the opening balance and date. A changed
- * opening is posted as a reversal plus a new entry by the server.
+ * Add a company Cash or Bank account, or edit one: name, bank details for a
+ * Bank account, and the opening balance and date. A changed opening is posted
+ * as a reversal plus a new entry by the server.
  */
 export function AccountDialog({
   account,

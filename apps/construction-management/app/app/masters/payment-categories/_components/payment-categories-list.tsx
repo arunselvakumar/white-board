@@ -31,11 +31,11 @@ function errorMessage(error: unknown): string {
 }
 
 /**
- * Masters → Payment Categories (CM-704, ADR CM-0017 §1): search, Add, and
- * per row Rename / Disable / Enable / Delete by the viewer's rights on
- * `masters.payment_categories`. Seeds ("Default") are renamed and
- * disabled, never deleted; a category in use cannot be deleted either, so
- * its row offers Disable only. Disabled rows stay listed, muted.
+ * Payment Categories (ADR CM-0017 §1): search, Add, and per row Rename /
+ * Disable / Enable / Delete by the viewer's rights on
+ * `masters.payment_categories`. Seeds ("Default") are renamed and disabled,
+ * never deleted; a category in use cannot be deleted either, so its row offers
+ * Disable only. Disabled rows stay listed, muted.
  */
 export function PaymentCategoriesList() {
   const { data } = useSuspenseQuery(paymentCategoriesQuery());

@@ -47,9 +47,9 @@ import { InvoiceStatusChips } from "@/app/app/_components/finance/parties/party-
 import { InvoiceDetailSkeleton } from "@/app/app/_components/finance/parties/parties-skeletons";
 
 /**
- * One invoice (CM-705): its figures, GRNs and variance, the payments that
- * settle it and its settlements, with Edit, Delete, Settle Invoice, Pay
- * and — for approvers — Approve or Reject a pending settlement.
+ * One invoice: its figures, GRNs and variance, the payments that settle it and
+ * its settlements, with Edit, Delete, Settle Invoice, Pay and — for approvers —
+ * Approve or Reject a pending settlement.
  */
 export function InvoiceSheet({
   projectId,
@@ -402,7 +402,7 @@ function SettlementDecision({
   );
 }
 
-/** **Settle Invoice**: a reason, then the write-off waits for approval (CM-0017 §7). */
+/** **Settle Invoice**: a reason, then the write-off waits for approval (ADR CM-0017 §7). */
 export function SettleDialog({
   invoice,
   onOpenChange,

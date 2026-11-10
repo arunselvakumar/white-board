@@ -9,7 +9,6 @@ import {
   ItemTitle,
 } from "@repo/ui/components/item";
 
-/** The Workspace page's Central Payment tile (CM-709). */
 export function CentralPaymentWorkspaceTile() {
   return (
     <Item

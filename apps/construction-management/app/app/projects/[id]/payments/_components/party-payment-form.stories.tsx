@@ -119,7 +119,7 @@ export const SupplierPaymentFillsOldestFirst: Story = {
   },
 };
 
-/** The TDS suggestion decides what is paid; changing it needs a reason (CM-706). */
+/** The TDS suggestion decides what is paid; changing it needs a reason. */
 export const ContractorTdsOverride: Story = {
   args: { partyType: "contractor", partyId: CONTRACTOR_ID },
   play: async ({ canvas, userEvent }) => {
@@ -255,7 +255,7 @@ export const AdvanceAndRefusal: Story = {
   },
 };
 
-/** Payment In from an Other Party settles its sales invoices (CM-708). */
+/** Payment In from an Other Party settles its sales invoices. */
 export const OtherPartyPaymentIn: Story = {
   args: {
     partyType: "other_party",

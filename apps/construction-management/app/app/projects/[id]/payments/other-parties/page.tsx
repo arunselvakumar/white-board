@@ -4,7 +4,7 @@ import { PartyMoneyTab } from "@/app/app/projects/[id]/payments/_components/part
 
 export const metadata: Metadata = { title: "Other Party payments" };
 
-/** Other Party balances, purchase and sales invoices, payments and settlements on a Project (CM-708). */
+/** Other Party balances, purchase and sales invoices, payments and settlements on a Project. */
 export default async function ProjectOtherPartiesPage({
   params,
 }: {

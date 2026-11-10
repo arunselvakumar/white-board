@@ -27,10 +27,9 @@ import { TdsLedgerView } from "./tds-ledger";
 import { PartyBalancesSkeleton } from "@/app/app/_components/finance/parties/parties-skeletons";
 
 /**
- * A party type's tab of the Project's Payments (CM-705 Suppliers, CM-706
- * Contractors; CM-708 reuses it for Other Parties): balances per party
- * with New invoice and Record payment, and the Settlements waiting for
- * approval (CM-708); Suppliers add the GRNs awaiting an invoice,
+ * A party type's tab of the Project's Payments (Suppliers, Contractors or Other
+ * Parties): balances per party with New invoice and Record payment, and the
+ * Settlements waiting for approval; Suppliers add the GRNs awaiting an invoice,
  * Contractors the TDS ledger.
  */
 export function PartyMoneyTab({

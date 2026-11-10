@@ -5,7 +5,7 @@ import type {
   CompanyAccount,
 } from "@/src/queries/finance-accounts";
 
-/** Story fixtures for Company's Bank A/C (CM-701) and the finance access read. */
+/** Story fixtures for Company's Bank A/C and the finance access read. */
 
 const AT = "2026-10-08T06:30:00.000Z";
 

@@ -1,9 +1,9 @@
 import type { FinanceAccessMenu } from "@/app/api/construction/finance/access/access-models";
 
 /**
- * The tabs of a Project's Payments module (M2's wages, then M7), in order.
- * `segment` is the path under `/app/projects/<id>/payments/`; a tab shows
- * when the viewer has Read on any of its menus (ADR CM-0017 §14).
+ * The tabs of a Project's Payments module, in order. `segment` is the path
+ * under `/app/projects/<id>/payments/`; a tab shows when the viewer has Read on
+ * any of its menus (ADR CM-0017 §14).
  */
 export const PAYMENTS_TABS = [
   {

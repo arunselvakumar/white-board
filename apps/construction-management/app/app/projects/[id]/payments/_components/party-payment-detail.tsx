@@ -55,9 +55,9 @@ import {
 import { AllocationSkeleton } from "@/app/app/_components/finance/parties/parties-skeletons";
 
 /**
- * One party payment (CM-705): what moved and from which account, the TDS,
- * the invoices it settles and the advance left, with the receipt PDF,
- * **Apply advance** and **Cancel** (both ledgers reversed).
+ * One party payment: what moved and from which account, the TDS, the invoices
+ * it settles and the advance left, with the receipt PDF, **Apply advance** and
+ * **Cancel** (both ledgers reversed).
  */
 export function PartyPaymentDetail({
   projectId,

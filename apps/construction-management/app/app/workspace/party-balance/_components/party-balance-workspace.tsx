@@ -48,9 +48,9 @@ export function balanceWords(balance: number): string {
 }
 
 /**
- * Workspace → **Party Balance** (CM-708, ADR CM-0017 §11): each Other
- * Party's balance across the Projects you can see, split by Project; a
- * Project opens the party's statement there.
+ * **Party Balance** (ADR CM-0017 §11): each Other Party's balance across the
+ * Projects you can see, split by Project; a Project opens the party's statement
+ * there.
  */
 export function PartyBalanceWorkspace({
   partyType = "other_party",

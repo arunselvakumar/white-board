@@ -10,9 +10,8 @@ import {
 } from "@repo/ui/components/item";
 
 /**
- * The Workspace page's Party Balance tile (CM-708), for members who may
- * read Parties: the Workspace submenu lists Party Balance, so the page
- * does too.
+ * The Workspace page's Party Balance tile, for members who may read Parties:
+ * the Workspace submenu lists Party Balance, so the page does too.
  */
 export function PartyBalanceWorkspaceTile() {
   return (

@@ -50,9 +50,9 @@ export function fillAllocations(
 }
 
 /**
- * The open invoices a payment settles, oldest due first (CM-0017 §7): one
- * amount per invoice, at most its balance, and **Fill** to spread the
- * settled amount in order. What is left is an advance.
+ * The open invoices a payment settles, oldest due first (ADR CM-0017 §7): one
+ * amount per invoice, at most its balance, and **Fill** to spread the settled
+ * amount in order. What is left is an advance.
  */
 export function AllocationTable({
   invoices,

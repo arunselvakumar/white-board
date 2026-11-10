@@ -4,7 +4,6 @@ import { AccountLedger } from "@/app/app/masters/bank-accounts/[accountId]/_comp
 
 export const metadata: Metadata = { title: "Account Ledger" };
 
-/** One company account's Ledger (CM-701). */
 export default async function BankAccountLedgerPage({
   params,
 }: {

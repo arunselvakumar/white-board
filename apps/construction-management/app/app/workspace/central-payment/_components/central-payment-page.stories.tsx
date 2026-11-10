@@ -102,7 +102,7 @@ export const LedgerFromAccount: Story = {
         "Company's Bank Account",
       ),
     );
-    // The legacy filters: module, mode and Paid To kind.
+    // The filters: module, mode and Paid To kind.
     await userEvent.click(card.getByRole("combobox", { name: "Module" }));
     await userEvent.click(
       await within(canvasElement.ownerDocument.body).findByRole("option", {

@@ -39,10 +39,9 @@ import {
   RecentCentralReportsSkeleton,
 } from "./central-payment-skeletons";
 
-/** Workspace → Central Payment (CM-709). */
 export const CENTRAL_PAYMENT_PATH = "/app/workspace/central-payment";
 
-/** Masters → Company's Bank A/C, where the accounts are kept (CM-701). */
+/** Company's Bank A/C, where the accounts are kept. */
 const BANK_ACCOUNTS_PATH = "/app/masters/bank-accounts";
 
 type PartyTab = (typeof PARTY_TABS)[number]["value"];
@@ -546,12 +545,11 @@ function CentralReportCards({
 }
 
 /**
- * Workspace → Central Payment (CM-709, ADR CM-0017 §16): party dues for
- * Contractors, Suppliers and Other Parties across every Project (the
- * Owner) or the Projects the viewer is on; each company account's balance
- * today with what is pending (Company's Bank A/C Read); the petty-cash
- * accounts with their holders (Petty Cash Read); and the central reports.
- * Ledger on an account starts the Ledger report on it.
+ * Central Payment (ADR CM-0017 §16): party dues for Contractors, Suppliers and
+ * Other Parties across every Project (the Owner) or the Projects the viewer is
+ * on; each company account's balance today with what is pending (Company's Bank
+ * A/C Read); the petty-cash accounts with their holders (Petty Cash Read); and
+ * the central reports. Ledger on an account starts the Ledger report on it.
  */
 export function CentralPaymentPage({
   today = deviceToday(),

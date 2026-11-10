@@ -92,9 +92,9 @@ function problemOf(error: unknown): string {
 }
 
 /**
- * **Settlements** of one party type's invoices on the Project (CM-708,
- * ADR CM-0017 §7): pending first, approve or reject with a reason, one at
- * a time or the ticked ones together (all or none).
+ * **Settlements** of one party type's invoices on the Project (ADR CM-0017 §7):
+ * pending first, approve or reject with a reason, one at a time or the ticked
+ * ones together (all or none).
  */
 export function SettlementList({
   projectId,

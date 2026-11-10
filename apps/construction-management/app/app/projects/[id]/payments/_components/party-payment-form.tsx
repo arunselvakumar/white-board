@@ -179,11 +179,11 @@ const REASON_LABELS: Record<TdsSuggestion["reason"], string> = {
 };
 
 /**
- * **Record payment** (CM-705, CM-706; CM-708 for Other Parties): the party,
- * date, mode with the account it was paid from (or received into), cheque
- * number or reference, the amount, the open invoices it settles (oldest
- * due first, with Fill) and the advance left; for a Contractor the TDS
- * 194C suggestion, which an override with a reason can change.
+ * **Record payment** to or from a Supplier, Contractor or Other Party: the
+ * party, date, mode with the account it was paid from (or received into),
+ * cheque number or reference, the amount, the open invoices it settles (oldest
+ * due first, with Fill) and the advance left; for a Contractor the TDS 194C
+ * suggestion, which an override with a reason can change.
  */
 export function PartyPaymentScreen({
   projectId,

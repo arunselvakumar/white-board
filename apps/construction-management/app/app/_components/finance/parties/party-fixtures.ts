@@ -15,7 +15,7 @@ import type {
   WorkspacePartyBalances,
 } from "@/src/queries/finance-parties";
 
-/** Story data for the party money screens (CM-705, CM-706). */
+/** Story data for the party money screens. */
 
 export const PROJECT_ID = "0199b000-0000-7000-8000-000000000001";
 export const CONTRACTOR_ID = "0199a000-0000-7000-8000-0000000000d1";
