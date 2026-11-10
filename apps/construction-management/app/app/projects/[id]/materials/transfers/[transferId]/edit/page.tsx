@@ -6,7 +6,7 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Edit Material Transfer" };
 
-/** Edit a pending Material Transfer (CM-507). */
+/** Edit a pending Material Transfer. */
 export default async function ProjectTransferEditRoute({
   params,
 }: {

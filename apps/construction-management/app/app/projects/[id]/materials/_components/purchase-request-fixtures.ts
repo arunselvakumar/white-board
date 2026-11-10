@@ -16,7 +16,7 @@ import type {
 import { PURCHASE_REQUESTS_API } from "@/src/queries/purchase-requests";
 import type { Flag } from "@/src/shared-kernel/access";
 
-/** Purchase Request story fixtures (CM-503): a Chennai tower's requests. */
+/** Purchase Request story fixtures: a Chennai tower's requests. */
 
 export const PROJECT_ID = "0199c4a0-0000-7000-8000-0000000p0001";
 export const TODAY = "2026-10-10";

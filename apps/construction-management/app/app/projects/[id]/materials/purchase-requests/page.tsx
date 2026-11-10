@@ -4,7 +4,7 @@ import { PurchaseRequestsPage } from "@/app/app/projects/[id]/materials/purchase
 
 export const metadata: Metadata = { title: "Purchase Requests" };
 
-/** The Project's Purchase Requests (CM-503). */
+/** The Project's Purchase Requests. */
 export default async function Page({
   params,
 }: {

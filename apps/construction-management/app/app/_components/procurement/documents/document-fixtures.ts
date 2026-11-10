@@ -6,7 +6,7 @@ import type {
 } from "@/src/queries/procurement-documents";
 
 /**
- * Story fixtures for the documents' thread and files (M5). Other
+ * Story fixtures for the documents' thread and files. Other
  * procurement stories compose the handler into their own `mockApi`:
  *
  * ```ts

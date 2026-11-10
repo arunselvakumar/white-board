@@ -55,8 +55,8 @@ const stamp = (iso: string) =>
   }).format(new Date(iso));
 
 /**
- * One Purchase Request (CM-503): status, details, materials with ordered
- * and pending quantities, approval, the linked Purchase Orders, the
+ * One Purchase Request: status, details, materials with ordered and
+ * pending quantities, approval, the linked Purchase Orders, the
  * Required Materials List and the remarks thread.
  */
 export function PurchaseRequestDetailPage({

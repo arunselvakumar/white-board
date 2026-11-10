@@ -5,8 +5,8 @@ import { PurchaseRequestWizard } from "@/app/app/projects/[id]/materials/purchas
 export const metadata: Metadata = { title: "Add Purchase Request" };
 
 /**
- * Add Purchase Request (CM-503). From Current Inventory (mode B) the
- * chosen materials come as `?materials=<id>,<id>`.
+ * Add Purchase Request. From Current Inventory (mode B) the chosen
+ * materials come as `?materials=<id>,<id>`.
  */
 export default async function Page({
   params,

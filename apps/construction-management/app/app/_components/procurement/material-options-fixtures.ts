@@ -10,7 +10,7 @@ import type {
 import type { MaterialOption } from "@/src/queries/material-options";
 import { MATERIAL_OPTIONS_API } from "@/src/queries/material-options";
 
-/** Materials a South Indian site buys, for procurement stories (M5). */
+/** Materials a South Indian site buys, for procurement stories. */
 export const MATERIAL_OPTIONS: MaterialOption[] = [
   {
     id: "0199c4a0-0000-7000-8000-00000000a001",

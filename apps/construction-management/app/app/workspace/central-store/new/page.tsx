@@ -8,7 +8,6 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Add store" };
 
-/** Add store (Central store create). */
 export default async function NewStoreRoute() {
   if (!(await viewerCan("procurement.central_store", "create")))
     return <ProjectNoAccess what="adding stores" />;

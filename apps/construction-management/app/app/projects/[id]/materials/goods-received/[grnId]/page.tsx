@@ -6,7 +6,7 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Goods Receipt" };
 
-/** One Goods Receipt (CM-505). */
+/** One Goods Receipt. */
 export default async function Page({
   params,
 }: {

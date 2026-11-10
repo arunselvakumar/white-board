@@ -6,7 +6,7 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Create Delivery Note" };
 
-/** Create Delivery Note from a Material Request (Delivery Note create). */
+/** Create Delivery Note from a Material Request. */
 export default async function NewDeliveryNoteRoute({
   params,
 }: {
