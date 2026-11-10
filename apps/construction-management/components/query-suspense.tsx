@@ -22,6 +22,8 @@ import {
   TableSkeleton,
 } from "@repo/ui/components/skeleton-kit";
 
+import { isServerRendered } from "@/lib/server-rendered-routes";
+
 /**
  * The root fallback for a page that suspends before its own skeleton: the
  * `p-6` frame, a page header and a table, the shape most pages have
@@ -87,13 +89,21 @@ export function QuerySuspense({
   const pathname = usePathname();
   const isClient = useIsClient();
 
-  if (!isClient) return serverFallback;
+  // A path that prefetches on the server renders here too, and its route's
+  // `loading.tsx` is its only Suspense boundary: a second one above it
+  // would reveal the page in two throttled steps (ADR-0052).
+  const serverRendered = isServerRendered(pathname);
+  if (!isClient && !serverRendered) return serverFallback;
 
   return (
     <QueryErrorResetBoundary>
       {({ reset }) => (
         <QueryErrorBoundary onReset={reset} resetKey={pathname}>
-          <Suspense fallback={fallback}>{children}</Suspense>
+          {serverRendered ? (
+            children
+          ) : (
+            <Suspense fallback={fallback}>{children}</Suspense>
+          )}
         </QueryErrorBoundary>
       )}
     </QueryErrorResetBoundary>

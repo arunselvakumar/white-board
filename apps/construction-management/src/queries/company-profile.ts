@@ -5,7 +5,9 @@ import type { UpdateConstructionOrganizationCompanyProfileRequestModel } from "@
 
 import { apiJson, QueryHttpError } from "./http";
 
-const BASE = "/api/construction/organization/company-profile";
+export const COMPANY_PROFILE_API =
+  "/api/construction/organization/company-profile";
+const BASE = COMPANY_PROFILE_API;
 
 export type CompanyProfileModel =
   GetConstructionOrganizationCompanyProfileResponseModel;
@@ -16,9 +18,9 @@ export type CompanyProfileModel =
  */
 export const companyProfileQuery = queryOptions({
   queryKey: ["organization", "company-profile"],
-  queryFn: async (): Promise<CompanyProfileModel | null> => {
+  queryFn: async ({ meta }): Promise<CompanyProfileModel | null> => {
     try {
-      return await apiJson<CompanyProfileModel>(BASE);
+      return await apiJson<CompanyProfileModel>(BASE, undefined, meta);
     } catch (error) {
       if (error instanceof QueryHttpError && error.code === "PERMISSION_DENIED")
         return null;
