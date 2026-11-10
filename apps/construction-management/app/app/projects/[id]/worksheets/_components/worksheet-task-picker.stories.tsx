@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 import { expect, within } from "storybook/test";
 
-import { StoryQueries } from "../../../.storybook/mocks/api";
+import { StoryQueries } from "@/.storybook/mocks/api";
 
 import {
   CUM_ID,
@@ -10,7 +10,7 @@ import {
   PROJECT_ID,
   SQM_ID,
   WORKSHEET_TASKS,
-} from "./worksheet-fixtures";
+} from "@/app/app/projects/[id]/equipment/usage-sheets/_components/worksheet-fixtures";
 import {
   WorksheetTaskPicker,
   type WorksheetTaskChoice,

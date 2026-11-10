@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { QuerySuspense } from "@/components/query-suspense";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
-import { EditWorksheetPage } from "@/components/site-work/worksheets/worksheet-form-pages";
+import { EditWorksheetPage } from "@/app/app/projects/[id]/worksheets/_components/worksheet-form-pages";
 import { WorksheetFormSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
 import { EditDocumentSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 

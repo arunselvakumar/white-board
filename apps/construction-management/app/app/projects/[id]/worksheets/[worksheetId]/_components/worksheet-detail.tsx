@@ -25,15 +25,15 @@ import {
 import { worksheetQuery } from "@/src/queries/worksheets";
 import { SHEET_APPROVAL_LABELS } from "@/src/site-work/domain/shift";
 
-import { WorksheetActions } from "./worksheet-actions";
-import { WorksheetTaskLink } from "./worksheet-task-picker";
+import { WorksheetActions } from "@/app/app/projects/[id]/worksheets/_components/worksheet-actions";
+import { WorksheetTaskLink } from "@/app/app/projects/[id]/worksheets/_components/worksheet-task-picker";
 import {
   headcountText,
   quantityText,
   SheetApprovalBadge,
   shiftLabel,
   worksheetsPath,
-} from "./worksheet-format";
+} from "@/app/app/projects/[id]/_components/site-work/worksheets/worksheet-format";
 import { FactValueSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {

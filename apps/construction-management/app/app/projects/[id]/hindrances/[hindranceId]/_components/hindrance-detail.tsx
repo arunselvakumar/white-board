@@ -55,7 +55,7 @@ import {
   HindranceStatusBadge,
   lostSummary,
   partyLabel,
-} from "./hindrance-parts";
+} from "@/app/app/projects/[id]/hindrances/_components/hindrance-parts";
 import { FactValueSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 function Fact({

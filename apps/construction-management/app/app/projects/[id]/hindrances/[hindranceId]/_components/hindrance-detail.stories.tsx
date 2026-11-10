@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
+import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { localToday } from "@/app/app/_components/procurement/inventory/inventory-format";
 
 import {
@@ -11,7 +11,7 @@ import {
   HINDRANCES_API,
   mockHindranceApi,
   type HindranceApiOptions,
-} from "./hindrance-fixtures";
+} from "@/app/app/projects/[id]/hindrances/_components/hindrance-fixtures";
 import { HindranceDetail } from "./hindrance-detail";
 
 let api: ReturnType<typeof mockHindranceApi>;

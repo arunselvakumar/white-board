@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
-import { ProgressReportsPage } from "@/components/site-work/progress-reports/progress-reports-page";
+import { ProgressReportsPage } from "@/app/app/projects/[id]/progress-reports/_components/progress-reports-page";
 import { ProgressReportsPageSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 

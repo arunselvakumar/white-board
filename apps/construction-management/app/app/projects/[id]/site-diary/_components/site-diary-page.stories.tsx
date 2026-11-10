@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
+import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { addDays } from "@/src/shared-kernel/calendar-date";
 
 import {
@@ -10,7 +10,7 @@ import {
   mockSiteDiaryApi,
   SITE_DIARY_API,
   type SiteDiaryApiOptions,
-} from "./site-diary-fixtures";
+} from "@/app/app/projects/[id]/_components/site-work/site-diary/site-diary-fixtures";
 import { SiteDiaryPage } from "./site-diary-page";
 
 let api: ReturnType<typeof mockSiteDiaryApi>;

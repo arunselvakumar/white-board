@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
-import { mockXhrUploads } from "../../../.storybook/mocks/xhr";
+import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
+import { mockXhrUploads } from "@/.storybook/mocks/xhr";
 import { SITE_WORK_DOCUMENTS_API } from "@/app/app/projects/[id]/_components/site-work/documents/site-work-document-fixtures";
 
 import {
@@ -12,7 +12,7 @@ import {
   SITE_DIARY_API,
   siteDiary,
   type SiteDiaryApiOptions,
-} from "./site-diary-fixtures";
+} from "@/app/app/projects/[id]/_components/site-work/site-diary/site-diary-fixtures";
 import { SiteDiaryForm } from "./site-diary-form";
 
 let api: ReturnType<typeof mockSiteDiaryApi>;

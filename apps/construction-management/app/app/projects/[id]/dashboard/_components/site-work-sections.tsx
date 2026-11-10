@@ -14,7 +14,7 @@ import {
 import Link from "next/link";
 
 import { equipmentModulePath } from "@/app/app/_components/site-work/equipment/equipment-tabs";
-import { worksheetsPath } from "@/components/site-work/worksheets/worksheet-format";
+import { worksheetsPath } from "@/app/app/projects/[id]/_components/site-work/worksheets/worksheet-format";
 import type { Duration } from "@/lib/dashboard-duration";
 import {
   dailyWorkDashboardQuery,

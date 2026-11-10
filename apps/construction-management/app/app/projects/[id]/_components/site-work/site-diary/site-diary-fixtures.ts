@@ -1,4 +1,4 @@
-import { mockApi, type ApiCall } from "../../../.storybook/mocks/api";
+import { mockApi, type ApiCall } from "@/.storybook/mocks/api";
 import {
   SITE_WORK_ACCESS_MENUS,
   type SiteWorkAccessMenu,

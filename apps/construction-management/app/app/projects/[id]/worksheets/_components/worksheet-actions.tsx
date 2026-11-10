@@ -25,7 +25,7 @@ import { ReasonDialog } from "@/app/app/projects/[id]/_components/procurement/pu
 import { fieldForCode } from "@/lib/server-errors";
 import { useWorksheetCommand, type Worksheet } from "@/src/queries/worksheets";
 
-import { worksheetsPath } from "./worksheet-format";
+import { worksheetsPath } from "@/app/app/projects/[id]/_components/site-work/worksheets/worksheet-format";
 
 /**
  * What can be done with one Daily Worksheet (CM-602), from its `actions`:

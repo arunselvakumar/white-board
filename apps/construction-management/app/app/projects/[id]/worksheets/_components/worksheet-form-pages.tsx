@@ -5,7 +5,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { worksheetQuery } from "@/src/queries/worksheets";
 
 import { WorksheetForm } from "./worksheet-form";
-import { worksheetsPath } from "./worksheet-format";
+import { worksheetsPath } from "@/app/app/projects/[id]/_components/site-work/worksheets/worksheet-format";
 
 /** The saved sheet's page; photos that did not upload ride along to warn about. */
 function savedPath(

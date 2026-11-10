@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
+import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import {
   WORKSHEET_SETTINGS_API,
   WORKSHEETS_API,
@@ -13,7 +13,7 @@ import {
   TODAY,
   worksheet,
   type WorksheetApiOptions,
-} from "./worksheet-fixtures";
+} from "@/app/app/projects/[id]/equipment/usage-sheets/_components/worksheet-fixtures";
 import { WorksheetsPage } from "./worksheets-page";
 
 let api: ReturnType<typeof mockWorksheetApi>;
