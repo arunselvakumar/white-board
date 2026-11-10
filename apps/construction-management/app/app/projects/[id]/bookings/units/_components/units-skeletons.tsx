@@ -30,7 +30,7 @@ function CountsSkeleton() {
 }
 
 /**
- * Bookings → Units while the chart loads: the real heading and status
+ * The Units tab while the chart loads: the real heading and status
  * names, the Wing picker and a floors × units grid of bars.
  */
 export function UnitsTabSkeleton() {

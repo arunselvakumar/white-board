@@ -153,7 +153,7 @@ function UnitPicker({
 }
 
 /**
- * **Close** an Open inquiry (CM-1007, ADR CM-0022 §6): as **Converted** —
+ * **Close** an Open inquiry (ADR CM-0022 §6): as **Converted** —
  * a unit that can be booked now (grouped by Wing) and the Booking Date
  * (today unless changed); saving books the unit for this lead in the same
  * save — or as **Lost**, with a Lost Reason and optional remarks.

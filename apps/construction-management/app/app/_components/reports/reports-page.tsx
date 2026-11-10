@@ -127,7 +127,7 @@ export function ReportGroup({
   projectId: string | null;
   today: string;
   filters?: FilterOptions;
-  /** The cards' other pickers and the central Projects (CM-903). */
+  /** The cards' other pickers and the central Projects. */
   pickers?: ReportPickerOptions;
   /**
    * A card's starting filter choice by kind; the card starts again when it
@@ -174,16 +174,15 @@ const PAGE_GROUPS = [
   "tracking",
   "finance",
   "procurement",
-  // Sales (CM-1008).
   "sales",
 ] as const satisfies readonly ReportDefinition["group"][];
 
 /**
- * The Project's Reports tab (CM-217 … CM-805, CM-901, CM-903): a card per report
- * the viewer may request, from the server's catalogue trimmed to their
- * Permission Matrix, grouped into labour, site work, tasks / issues /
- * inspections, payments and materials, then the recent reports with Excel
- * / PDF downloads.
+ * The Project's Reports tab: a card per report the viewer may request,
+ * from the server's catalogue trimmed to their Permission Matrix,
+ * grouped into labour, site work, tasks / issues / inspections, payments,
+ * materials and sales, then the recent reports with Excel / PDF
+ * downloads.
  */
 export function ReportsPage({
   projectId,
@@ -199,7 +198,7 @@ export function ReportsPage({
     offered.filter((item) => item.group === group);
   const siteWork = useSiteWorkFilters(projectId, inGroup("site_work"));
   const finance = useFinanceFilters(projectId, inGroup("finance"));
-  // Vendor, Labour Category and the materials pickers (CM-903).
+  // Vendor, Labour Category and the materials pickers.
   const pickers = useReportPickerOptions(projectId, offered);
   const filters: Partial<Record<ReportDefinition["group"], FilterOptions>> = {
     site_work: siteWork,

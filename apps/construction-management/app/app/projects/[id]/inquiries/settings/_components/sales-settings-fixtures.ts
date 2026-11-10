@@ -5,7 +5,7 @@ import type {
   SalesSettings,
 } from "@/src/queries/sales-settings";
 
-/** Story fixtures for Inquiries → Settings (CM-1002). */
+/** Story fixtures for the Inquiry settings. */
 
 export const SETTINGS_PROJECT_ID = "0199c4a0-0000-7000-8000-0000000f0001";
 const AT = "2026-10-14T06:30:00.000Z";

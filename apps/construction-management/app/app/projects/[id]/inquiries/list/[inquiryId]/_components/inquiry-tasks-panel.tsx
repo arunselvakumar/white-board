@@ -221,7 +221,7 @@ function TaskList({
 }
 
 /**
- * An inquiry's to-dos (CM-1004, ADR CM-0022 §5): Title, Due date and
+ * An inquiry's to-dos (ADR CM-0022 §5): Title, Due date and
  * Assignee, ticked Done with who and when. With Inquiry Update a member
  * adds, edits, ticks and deletes them. They are not the Project's Tasks.
  */

@@ -68,12 +68,12 @@ function line(file: SalesDocumentFile): string {
 }
 
 /**
- * An inquiry's or booking's own files by role (CM-1003): a section with a
- * group per role (a Visiting Card, photos, a Booking Form). With `canEdit`
- * and the upload right the server reports, files upload at once with
- * progress, and × removes one the viewer may remove. These files are
- * personal data and never appear in the Project Gallery. On a **new**
- * form use `SalesPendingFilesField`.
+ * An inquiry's or booking's own files by role: a section with a group per
+ * role (a Visiting Card, photos, a Booking Form). With `canEdit` and the
+ * upload right the server reports, files upload at once with progress,
+ * and × removes one the viewer may remove. These files are personal data
+ * and never appear in the Project Gallery. On a **new** form use
+ * `SalesPendingFilesField`.
  */
 export function SalesDocumentFiles(props: SalesDocumentFilesProps) {
   const headingId = useId();

@@ -52,8 +52,8 @@ const COPY: Record<
 };
 
 /**
- * Confirm (On Hold → Booked, with a date), Extend hold (a new Hold until)
- * and Cancel (a reason ≤ 500 and a date) of one booking (CM-0022 §7).
+ * Confirm (On Hold to Booked, with a date), Extend hold (a new Hold until)
+ * and Cancel (a reason ≤ 500 and a date) of one booking (ADR CM-0022 §7).
  */
 export function BookingActionDialog({
   booking,

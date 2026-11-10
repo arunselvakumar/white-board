@@ -50,7 +50,7 @@ const SERVER_FIELDS: Record<string, FieldPath<Values>> = {
   assigneeMemberId: "assigneeMemberId",
 };
 
-/** Add or edit an Inquiry Task (CM-1004): Title, optional Due date and Assignee. */
+/** Add or edit an Inquiry Task: Title, optional Due date and Assignee. */
 export function InquiryTaskDialog({
   projectId,
   inquiryId,

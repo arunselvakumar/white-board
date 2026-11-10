@@ -68,10 +68,10 @@ function message(caught: unknown): string {
 }
 
 /**
- * One inquiry (CM-1003, CM-1004): its contact and interest, stage and
- * people, the next follow-up, its Visiting Card and photos (never in the
- * Gallery), the follow-ups merged with its history, and its Inquiry
- * Tasks. Edit and Delete by the viewer's flags.
+ * One inquiry: its contact and interest, stage and people, the next
+ * follow-up, its Visiting Card and photos (never in the Gallery), the
+ * follow-ups merged with its history, and its Inquiry Tasks. Edit and
+ * Delete by the viewer's flags.
  */
 export function InquiryDetail({
   projectId,

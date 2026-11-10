@@ -41,10 +41,10 @@ export function newBookingHref(
 }
 
 /**
- * One unit's sales details (CM-1005, CM-1006): its status, Unit type and
- * areas, why it is unavailable, its active booking and the bookings it
- * had, with the actions the member holds — Hold and Book (Create, while
- * Available), Unit details, Mark unavailable and Make available (Update).
+ * One unit's sales details: its status, Unit type and areas, why it is
+ * unavailable, its active booking and the bookings it had, with the
+ * actions the member holds — Hold and Book (Create, while Available),
+ * Unit details, Mark unavailable and Make available (Update).
  */
 export function UnitPanel({
   projectId,

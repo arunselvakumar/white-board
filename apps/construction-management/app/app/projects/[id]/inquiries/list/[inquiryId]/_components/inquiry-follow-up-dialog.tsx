@@ -89,7 +89,7 @@ function nowLocal(now: Date = new Date()): { date: string; time: string } {
 }
 
 /**
- * **Add follow-up** on an Open inquiry (CM-1004, ADR CM-0022 §4): what was
+ * **Add follow-up** on an Open inquiry (ADR CM-0022 §4): what was
  * done (Call, Site visit, Meeting, WhatsApp, Email, Other), Done on (now
  * by default; not in the future), remarks, an optional move to another
  * Funnel Stage and the next follow-up (date and optional time, after Done

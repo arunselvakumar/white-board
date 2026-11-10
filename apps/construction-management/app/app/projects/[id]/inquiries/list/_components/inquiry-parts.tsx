@@ -111,7 +111,7 @@ export function interestedIn(inquiry: {
   return parts.length === 0 ? null : parts.join(" · ");
 }
 
-/** One line of an inquiry's history (CM-0022 §3). */
+/** One line of an inquiry's history (ADR CM-0022 §3). */
 export function inquiryHistoryLine(
   item: InquiryDetail["history"][number],
 ): string {

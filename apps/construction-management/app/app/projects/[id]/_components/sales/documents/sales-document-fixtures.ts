@@ -3,8 +3,8 @@ import type { SalesDocumentFile } from "@/src/queries/sales-documents";
 import type { SalesFileRole } from "@/src/sales/domain/document-files";
 
 /**
- * Story fixtures for the sales document files (CM-1003). Feature stories
- * compose the handler into their own `mockApi`:
+ * Story fixtures for the sales document files. Feature stories compose
+ * the handler into their own `mockApi`:
  *
  * ```ts
  * const files = mockSalesDocumentApi({ files: [] });

@@ -1,6 +1,6 @@
 /**
  * Files a form could not upload after saving ride along to the saved
- * record's page, which names them (as the Daily Worksheet does, CM-602).
+ * record's page, which names them (as the Daily Worksheet does).
  */
 
 const PARAM = "uploadFailed";

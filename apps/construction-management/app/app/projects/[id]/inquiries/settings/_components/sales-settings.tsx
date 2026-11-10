@@ -312,11 +312,10 @@ function PickList({
 }
 
 /**
- * Inquiries → Settings (CM-1002, ADR CM-0022 §2): the Project's Funnel
- * Stages in funnel order (moved with up/down buttons that keep focus),
- * Lead Sources and Lost Reasons. With Inquiry Update a member adds,
- * renames, disables or enables (sources and reasons) and deletes rows
- * nothing uses; others see the lists only.
+ * The Project's Funnel Stages in funnel order (moved with up/down buttons
+ * that keep focus), Lead Sources and Lost Reasons (ADR CM-0022 §2). With
+ * Inquiry Update a member adds, renames, disables or enables (sources and
+ * reasons) and deletes rows nothing uses; others see the lists only.
  */
 export function SalesSettingsPage({ projectId }: { projectId: string }) {
   const { data } = useSuspenseQuery(salesSettingsQuery(projectId));

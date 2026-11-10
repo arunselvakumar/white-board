@@ -20,8 +20,8 @@ import {
 import { InquiryStatusBadge } from "./inquiry-parts";
 
 /**
- * The duplicate-lead prompt (CM-0022 §3): another live inquiry of the
- * Project has the same mobile or email. It lists them (one the viewer
+ * The duplicate-lead prompt (ADR CM-0022 §3): another live inquiry of
+ * the Project has the same mobile or email. It lists them (one the viewer
  * may not see is named as such) and offers **Save anyway**, which resends
  * the save with `allowDuplicate`.
  */

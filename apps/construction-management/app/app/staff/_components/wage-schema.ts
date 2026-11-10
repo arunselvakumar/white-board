@@ -66,7 +66,7 @@ export type WageOptions = {
   overtimeOnlyWithAmount: boolean;
 };
 
-/** A Labour's wage (CM-205): required, Daily by default. */
+/** A Labour's wage: required, Daily by default. */
 export const LABOUR_WAGE: WageOptions = {
   noun: "Wage",
   required: true,
@@ -197,7 +197,7 @@ export type WagePayload = {
 };
 
 /**
- * Rupees → paise. A blank amount is null; then (with an optional amount)
+ * Rupees to paise. A blank amount is null; then (with an optional amount)
  * overtime is 0 too, since it was hidden.
  */
 export function wagePayload(values: WageValues): WagePayload {
@@ -217,8 +217,8 @@ export function wagePayload(values: WageValues): WagePayload {
 }
 
 /**
- * Server error codes → the field under `prefix` they belong to. The amount
- * field depends on the type being saved.
+ * Maps server error codes to the field under `prefix` they belong to. The
+ * amount field depends on the type being saved.
  */
 export function wageErrorFields<Prefix extends string>(
   prefix: Prefix,

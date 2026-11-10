@@ -171,8 +171,8 @@ function Timeline({
 }
 
 /**
- * An inquiry's follow-ups merged with its history, newest first (CM-1004):
- * calls, visits and messages with their remarks, stage moves and next
+ * An inquiry's follow-ups merged with its history, newest first: calls,
+ * visits and messages with their remarks, stage moves and next
  * follow-up; and who assigned, changed the Lead Owner or moved the stage.
  * **Add follow-up** while it is Open (Inquiry Update); an Inquiry Delete
  * holder removes one entered by mistake.

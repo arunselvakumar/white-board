@@ -116,8 +116,8 @@ function inquiries(n: number): string {
 }
 
 /**
- * A Project's inquiries (CM-1003): status tabs All / Open / Converted /
- * Lost, the Due tabs All / Overdue / Today / Upcoming / No follow-up (open with
+ * A Project's inquiries: status tabs All / Open / Converted / Lost, the
+ * Due tabs All / Overdue / Today / Upcoming / No follow-up (open with
  * `?due=overdue` from a notification), filters by Funnel Stage, Interest
  * Type, Lead Source and Assignee, and a search on the name, mobile or
  * email; newest first in pages. **Add Inquiry** opens the full form,

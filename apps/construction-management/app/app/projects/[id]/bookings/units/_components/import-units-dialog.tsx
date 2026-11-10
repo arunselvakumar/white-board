@@ -33,9 +33,9 @@ function rowErrors(error: unknown): UnitImportRowError[] | null {
 }
 
 /**
- * Unit import (CM-1005, ADR CM-0022 §8): download the sample — every unit
- * of the Project with its current details — change it, upload it. Each
- * row updates its unit's Unit type, areas and Unavailable, matched by Wing
+ * Unit import (ADR CM-0022 §8): download the sample — every unit of the
+ * Project with its current details — change it, upload it. Each row
+ * updates its unit's Unit type, areas and Unavailable, matched by Wing
  * and Unit No; Wings and units are never created here. All or none.
  */
 export function ImportUnitsDialog({

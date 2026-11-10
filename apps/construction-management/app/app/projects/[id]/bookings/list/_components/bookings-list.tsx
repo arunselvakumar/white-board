@@ -89,10 +89,10 @@ function plural(n: number, word: string): string {
 }
 
 /**
- * Bookings → **Bookings** (CM-1006): the Project's bookings, newest
- * first, with status tabs (All, On Hold, Hold expired, Booked, Cancelled), a
- * Wing filter and a search on the customer or Referred By; cards at phone
- * width, a table above. Booking Create holders add one.
+ * The Project's bookings, newest first, with status tabs (All, On Hold,
+ * Hold expired, Booked, Cancelled), a Wing filter and a search on the
+ * customer or Referred By; cards at phone width, a table above. Booking
+ * Create holders add one.
  */
 export function BookingsList({ projectId }: { projectId: string }) {
   const access = useQuery(salesAccessQuery(projectId)).data;

@@ -60,7 +60,7 @@ export const SALES_LIST_DIALOG_WORDS: Record<
 };
 
 /**
- * Add a Funnel Stage, Lead Source or Lost Reason, or rename one (CM-1002).
+ * Add a Funnel Stage, Lead Source or Lost Reason, or rename one.
  * A name the Project already has (any case) shows under the field; a
  * stale rename shows the server's message.
  */

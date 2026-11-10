@@ -1,7 +1,7 @@
 /**
- * The tabs of a Project's Inquiries module (M10), in order: `segment` is
- * the path under `/app/projects/<id>/inquiries/`. Both need Inquiry Read;
- * Settings changes need Update (CM-1002).
+ * The tabs of a Project's Inquiries module, in order: `segment` is the
+ * path under `/app/projects/<id>/inquiries/`. Both need Inquiry Read;
+ * Settings changes need Update.
  */
 export const INQUIRY_TABS = [
   { segment: "list", label: "Inquiries" },

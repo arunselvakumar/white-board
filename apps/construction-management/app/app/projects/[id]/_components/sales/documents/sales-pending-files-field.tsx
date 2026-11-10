@@ -98,12 +98,11 @@ function PendingTile({
 
 /**
  * Files of one role picked on a **new** inquiry or booking, before it has
- * an id (CM-1003): it only holds `File`s, with thumbnails; nothing goes up
- * until the form is saved, then `useUploadPendingSalesFiles(type)` uploads
- * them. Built generically, so the Booking form (CM-1006) uses it for its
- * Booking Form and photos. A role that keeps one file (Visiting Card,
- * Booking Form) takes one; files the role would refuse are not added and
- * say why.
+ * an id: it only holds `File`s, with thumbnails; nothing goes up until the
+ * form is saved, then `useUploadPendingSalesFiles(type)` uploads them.
+ * Built generically, so the Booking form uses it for its Booking Form and
+ * photos. A role that keeps one file (Visiting Card, Booking Form) takes
+ * one; files the role would refuse are not added and say why.
  */
 export function SalesPendingFilesField({
   documentType,

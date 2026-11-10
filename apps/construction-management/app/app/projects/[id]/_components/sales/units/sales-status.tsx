@@ -13,10 +13,10 @@ import {
 } from "@/src/sales/domain/sales-terms";
 
 /**
- * The colours of a unit's sales status (CM-0022 §8) on the Units chart,
- * its legend and badges: Available green, On Hold amber, Booked blue,
- * Unavailable grey. Each cell also carries the status as words, so colour
- * is never the only signal.
+ * The colours of a unit's sales status (ADR CM-0022 §8) on the Units
+ * chart, its legend and badges: Available green, On Hold amber, Booked
+ * blue, Unavailable grey. Each cell also carries the status as words, so
+ * colour is never the only signal.
  */
 export const UNIT_STATUS_CLASSES: Record<UnitSalesStatus, string> = {
   available:

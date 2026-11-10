@@ -174,11 +174,11 @@ function Field({
 }
 
 /**
- * Hold or Book a unit, or edit a booking (CM-1006, ADR CM-0022 §7): the
- * unit (its Wing first; only units that can be booked now), On Hold or
- * Booked, Booking Date (not after today; back-dated control), Hold until
- * for a hold, the customer's name, mobile, email and address, Referred By
- * name and contact, remarks; on a new booking its Booking Form and photos,
+ * Hold or Book a unit, or edit a booking (ADR CM-0022 §7): the unit (its
+ * Wing first; only units that can be booked now), On Hold or Booked,
+ * Booking Date (not after today; back-dated control), Hold until for a
+ * hold, the customer's name, mobile, email and address, Referred By name
+ * and contact, remarks; on a new booking its Booking Form and photos,
  * uploaded once it is saved. An edit keeps the unit, status and Hold
  * until (Confirm and Extend hold change those).
  */

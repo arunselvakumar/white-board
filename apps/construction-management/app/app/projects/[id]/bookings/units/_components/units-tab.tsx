@@ -67,11 +67,11 @@ function Counts({
 }
 
 /**
- * Bookings → **Units** (CM-1005, ADR CM-0022 §8): the Project's units by
- * sales status — Available, On Hold, Booked, Unavailable, with counts for
- * the Project and the Wing — a Wing picker, the Wing's floors × units grid
- * and, for the unit chosen, its panel with details, booking and actions.
- * Booking Update holders import unit details from Excel.
+ * The Units tab (ADR CM-0022 §8): the Project's units by sales status —
+ * Available, On Hold, Booked, Unavailable, with counts for the Project
+ * and the Wing — a Wing picker, the Wing's floors × units grid and, for
+ * the unit chosen, its panel with details, booking and actions. Booking
+ * Update holders import unit details from Excel.
  */
 export function UnitsTab({ projectId }: { projectId: string }) {
   const [wingId, setWingId] = useState<string | null>(null);

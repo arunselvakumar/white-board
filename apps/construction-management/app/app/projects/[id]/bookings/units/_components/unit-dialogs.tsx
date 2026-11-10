@@ -89,9 +89,9 @@ const AREA_ITEMS = AREA_UNITS.map((unit) => ({
 }));
 
 /**
- * A unit's sales details (CM-1005, ADR CM-0022 §8): Unit type ("2BHK",
- * "Shop"), Carpet area (the RERA basis), Built-up and Super built-up area,
- * each optional, and the area unit. Needs Booking Update.
+ * A unit's sales details (ADR CM-0022 §8): Unit type ("2BHK", "Shop"),
+ * Carpet area (the RERA basis), Built-up and Super built-up area, each
+ * optional, and the area unit. Needs Booking Update.
  */
 export function UnitDetailsDialog({
   projectId,
@@ -265,8 +265,8 @@ const REASON_ITEMS = UNAVAILABLE_REASONS.map((reason) => ({
 
 /**
  * Marks a unit **Unavailable** — not for sale — with a reason (Landowner
- * share, Reserved, Not for sale, Other) and a note (CM-0022 §8). A unit on
- * hold or booked is refused (`UNIT_HAS_BOOKING`).
+ * share, Reserved, Not for sale, Other) and a note (ADR CM-0022 §8). A
+ * unit on hold or booked is refused (`UNIT_HAS_BOOKING`).
  */
 export function UnitUnavailableDialog({
   projectId,

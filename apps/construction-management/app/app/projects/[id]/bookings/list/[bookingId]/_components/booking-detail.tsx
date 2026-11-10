@@ -82,11 +82,11 @@ export function bookingHistoryLine(item: Booking["history"][number]): string {
 }
 
 /**
- * One booking (CM-1006, ADR CM-0022 §7): the unit and its Wing, status
- * (Hold expired after Hold until), dates, the customer, Referred By,
- * remarks, the inquiry it came from, the Booking Form and photos, and its
- * history of statuses. Actions by the viewer's flags: Confirm and Extend
- * hold (On Hold), Cancel and Edit (On Hold or Booked), Delete.
+ * One booking (ADR CM-0022 §7): the unit and its Wing, status (Hold
+ * expired after Hold until), dates, the customer, Referred By, remarks,
+ * the inquiry it came from, the Booking Form and photos, and its history
+ * of statuses. Actions by the viewer's flags: Confirm and Extend hold (On
+ * Hold), Cancel and Edit (On Hold or Booked), Delete.
  */
 export function BookingDetail({
   projectId,

@@ -7,7 +7,7 @@ import { canInSales, salesAccessQuery } from "@/src/queries/sales-access";
 import { INQUIRY_TABS, inquiryModulePath } from "./inquiry-tabs";
 
 /**
- * The Inquiries module's tabs as sidebar submenu links (M10, ADR CM-0020).
+ * The Inquiries module's tabs as sidebar submenu links (ADR CM-0020).
  * Access loads only while `enabled` (the submenu is open); until it does
  * every tab shows, then only when the viewer may read inquiries.
  */
