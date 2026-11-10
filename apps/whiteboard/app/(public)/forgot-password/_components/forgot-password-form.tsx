@@ -43,8 +43,9 @@ const resetSchema = z.object({
 type ResetValues = z.infer<typeof resetSchema>;
 
 /**
- * The Password Reset Flow: email → emailed code and a new password. A reset
- * signs out every Session, then signs this browser in with the new password.
+ * The Password Reset Flow: an email, then the emailed code and a new password.
+ * A reset signs out every Session, then signs this browser in with the new
+ * password.
  */
 export function ForgotPasswordForm() {
   const { isSignedIn } = useAuth();
