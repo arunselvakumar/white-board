@@ -1,6 +1,6 @@
 import { within } from "storybook/test";
 
-import type { ApiCall } from "../../.storybook/mocks/api";
+import type { ApiCall } from "@/.storybook/mocks/api";
 import type {
   MaterialCategoryItem,
   MaterialInput,

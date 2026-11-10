@@ -19,10 +19,10 @@ import { formatDate, money } from "@/components/payments/payment-format";
 import {
   DocumentActivity,
   DocumentFiles,
-} from "@/components/procurement/documents/document-activity";
-import { quantityText } from "@/components/procurement/purchase-requests/purchase-request-format";
-import { purchaseRequestsPath } from "@/components/procurement/purchase-requests/purchase-request-actions";
-import { ScrollTable } from "@/components/procurement/purchase-requests/scroll-table";
+} from "@/app/app/_components/procurement/documents/document-activity";
+import { quantityText } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/purchase-request-format";
+import { purchaseRequestsPath } from "@/app/app/projects/[id]/materials/_components/purchase-request-actions";
+import { ScrollTable } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/scroll-table";
 import { formatMobile } from "@repo/auth/construction/react";
 import {
   canIn,
@@ -39,7 +39,7 @@ import {
   StageBadge,
   STAGE_LABELS,
 } from "./purchase-order-format";
-import { FactValueSkeleton } from "@/components/procurement/procurement-skeletons";
+import { FactValueSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (

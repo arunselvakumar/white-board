@@ -1,6 +1,6 @@
 "use client";
 
-import { ReasonDialog } from "@/components/procurement/purchase-requests/reason-dialog";
+import { ReasonDialog } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/reason-dialog";
 import { QueryHttpError } from "@/src/queries/http";
 import { useIssueTransition, type Issue } from "@/src/queries/tracking-issues";
 

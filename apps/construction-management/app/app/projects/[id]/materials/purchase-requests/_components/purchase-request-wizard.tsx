@@ -24,7 +24,7 @@ import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { localToday } from "@/components/payments/payment-format";
 import { LocationPicker } from "@/app/app/_components/locations/location-picker";
-import { MaterialPicker } from "@/components/procurement/material-picker";
+import { MaterialPicker } from "@/app/app/_components/procurement/material-picker";
 import { fieldForCode } from "@/lib/server-errors";
 import { materialOptionsQuery } from "@/src/queries/material-options";
 import {
@@ -40,10 +40,13 @@ import {
 } from "@/src/queries/purchase-requests";
 import type { LocationRef } from "@/src/shared-kernel/location-ref";
 
-import { purchaseRequestsPath } from "./purchase-request-actions";
-import { quantityText, siteLocationInput } from "./purchase-request-format";
+import { purchaseRequestsPath } from "@/app/app/projects/[id]/materials/_components/purchase-request-actions";
+import {
+  quantityText,
+  siteLocationInput,
+} from "@/app/app/projects/[id]/_components/procurement/purchase-requests/purchase-request-format";
 import { LocationPickerSkeleton } from "@/app/app/_components/locations/locations-skeletons";
-import { StockLineSkeleton } from "@/components/procurement/procurement-skeletons";
+import { StockLineSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 const QUANTITY_RE = /^\d{1,11}(\.\d{1,3})?$/;
 

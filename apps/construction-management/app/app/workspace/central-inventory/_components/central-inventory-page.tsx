@@ -52,7 +52,7 @@ import {
   canIn,
   procurementAccessQuery,
 } from "@/src/queries/procurement-access";
-import { StockLedgerSkeleton } from "@/components/procurement/procurement-skeletons";
+import { StockLedgerSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 const ALL = "all";
 

@@ -8,9 +8,9 @@ import {
   QUANTITY_INFO,
   SAND,
   STEEL,
-} from "@/components/procurement/purchase-requests/purchase-request-fixtures";
-import { documentsHandler } from "@/components/procurement/documents/document-fixtures";
-import { materialOptionsHandler } from "@/components/procurement/material-options-fixtures";
+} from "@/app/app/projects/[id]/materials/_components/purchase-request-fixtures";
+import { documentsHandler } from "@/app/app/_components/procurement/documents/document-fixtures";
+import { materialOptionsHandler } from "@/app/app/_components/procurement/material-options-fixtures";
 import type { ProcurementAccess } from "@/src/queries/procurement-access";
 import {
   PURCHASE_ORDERS_API,

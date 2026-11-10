@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { QuerySuspense } from "@/components/query-suspense";
 import { PurchaseOrderDetailPage } from "@/components/procurement/purchase-orders/purchase-order-detail";
-import { PurchaseOrderDetailSkeleton } from "@/components/procurement/procurement-skeletons";
+import { PurchaseOrderDetailSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 export const metadata: Metadata = { title: "Purchase Order" };
 

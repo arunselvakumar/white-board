@@ -1,4 +1,4 @@
-import { mockApi, type ApiCall } from "../../../.storybook/mocks/api";
+import { mockApi, type ApiCall } from "@/.storybook/mocks/api";
 import type { ProcurementDocumentType } from "@/src/procurement/domain/documents";
 import type {
   DocumentFile,

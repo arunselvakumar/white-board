@@ -19,7 +19,7 @@ import { formatDate, money } from "@/components/payments/payment-format";
 import {
   DocumentActivity,
   DocumentFiles,
-} from "@/components/procurement/documents/document-activity";
+} from "@/app/app/_components/procurement/documents/document-activity";
 import {
   canIn,
   procurementAccessQuery,
@@ -29,15 +29,15 @@ import { purchaseRequestQuery } from "@/src/queries/purchase-requests";
 import {
   purchaseRequestsPath,
   PurchaseRequestActions,
-} from "./purchase-request-actions";
-import { ScrollTable } from "./scroll-table";
+} from "@/app/app/projects/[id]/materials/_components/purchase-request-actions";
+import { ScrollTable } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/scroll-table";
 import {
   APPROVAL_LABELS,
   ApprovalBadge,
   OrderBadge,
   quantityText,
-} from "./purchase-request-format";
-import { FactValueSkeleton } from "@/components/procurement/procurement-skeletons";
+} from "@/app/app/projects/[id]/_components/procurement/purchase-requests/purchase-request-format";
+import { FactValueSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (

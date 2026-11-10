@@ -36,7 +36,7 @@ import { cn } from "@repo/ui/lib/utils";
 import { FormAlert } from "@/components/auth/form-alert";
 import { accountLabel } from "@/app/app/_components/finance/account-picker";
 import { formatDate, money } from "@/components/payments/payment-format";
-import { ReasonDialog } from "@/components/procurement/purchase-requests/reason-dialog";
+import { ReasonDialog } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/reason-dialog";
 import { fieldForCode } from "@/lib/server-errors";
 import { canInFinance, financeAccessQuery } from "@/src/queries/finance-access";
 import { accountOptionsQuery } from "@/src/queries/finance-accounts";

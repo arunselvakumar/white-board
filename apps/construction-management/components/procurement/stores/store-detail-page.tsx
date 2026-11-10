@@ -38,7 +38,7 @@ import {
   InventorySkeleton,
   RequestRowsSkeleton,
   TransferRowsSkeleton,
-} from "@/components/procurement/procurement-skeletons";
+} from "@/app/app/_components/procurement/procurement-skeletons";
 
 function Assigned({
   title,

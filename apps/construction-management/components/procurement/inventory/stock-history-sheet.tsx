@@ -52,7 +52,7 @@ import { StockErrorAlert } from "./stock-error-alert";
 import {
   SmallLineSkeleton,
   StockHistorySkeleton,
-} from "@/components/procurement/procurement-skeletons";
+} from "@/app/app/_components/procurement/procurement-skeletons";
 
 function Source({ entry }: { entry: StockEntry }) {
   const { source } = entry;

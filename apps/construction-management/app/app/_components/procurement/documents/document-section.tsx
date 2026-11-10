@@ -3,7 +3,7 @@
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
 import { Component, Suspense, type ReactNode } from "react";
 import { Button } from "@repo/ui/components/button";
-import { DocumentSectionSkeleton } from "@/components/procurement/procurement-skeletons";
+import { DocumentSectionSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 /**
  * The frame of a document's Remarks / Attachments section: a heading, an

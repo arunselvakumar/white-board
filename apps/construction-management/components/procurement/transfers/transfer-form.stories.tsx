@@ -13,7 +13,10 @@ import {
   type TransferApiOptions,
 } from "./transfer-fixtures";
 import { TransferForm } from "./transfer-form";
-import { materialNameOf, pickMaterial } from "../material-options-fixtures";
+import {
+  materialNameOf,
+  pickMaterial,
+} from "@/app/app/_components/procurement/material-options-fixtures";
 
 let api: ReturnType<typeof mockTransferApi>;
 

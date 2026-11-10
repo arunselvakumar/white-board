@@ -58,7 +58,7 @@ import { ISSUE_LIMITS } from "@/src/tracking/domain/issue";
 
 import { IssueReopenDialog } from "./issue-reopen-dialog";
 import { formatDateTime, IssueStatusBadge, PriorityChip } from "./issue-parts";
-import { FactValueSkeleton } from "@/components/procurement/procurement-skeletons";
+import { FactValueSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { UpdatesSkeleton } from "@/components/tracking/tracking-skeletons";
 
 function Fact({

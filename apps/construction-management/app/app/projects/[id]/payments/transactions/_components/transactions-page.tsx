@@ -33,9 +33,9 @@ import {
   DateFilter,
   NO_DATE_FILTER,
   type DateFilterValue,
-} from "@/components/procurement/purchase-requests/date-filter";
-import { FilterSelect } from "@/components/procurement/purchase-requests/filter-select";
-import { ReasonDialog } from "@/components/procurement/purchase-requests/reason-dialog";
+} from "@/app/app/projects/[id]/_components/procurement/purchase-requests/date-filter";
+import { FilterSelect } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/filter-select";
+import { ReasonDialog } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/reason-dialog";
 import { fieldForCode } from "@/lib/server-errors";
 import { canInFinance, financeAccessQuery } from "@/src/queries/finance-access";
 import { accountOptionsQuery } from "@/src/queries/finance-accounts";

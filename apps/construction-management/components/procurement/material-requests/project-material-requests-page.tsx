@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { projectRequestHref } from "@/components/procurement/stores/central-store-parts";
 
 import { MaterialRequestsList } from "./material-requests-list";
-import { RequestRowsSkeleton } from "@/components/procurement/procurement-skeletons";
+import { RequestRowsSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 /** A Project's Materials → Material Requests tab (CM-508). */
 export function ProjectMaterialRequestsPage({

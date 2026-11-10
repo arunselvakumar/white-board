@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { StoreTransferEdit } from "@/components/procurement/transfers/store-transfer-pages";
-import { TransferFormSkeleton } from "@/components/procurement/procurement-skeletons";
+import { TransferFormSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Edit Material Transfer" };

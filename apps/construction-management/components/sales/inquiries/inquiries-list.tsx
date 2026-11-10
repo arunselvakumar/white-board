@@ -40,7 +40,7 @@ import {
 import { cn } from "@repo/ui/lib/utils";
 
 import { localToday } from "@/components/payments/payment-format";
-import { FilterSelect } from "@/components/procurement/purchase-requests/filter-select";
+import { FilterSelect } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/filter-select";
 import { canInSales, salesAccessQuery } from "@/src/queries/sales-access";
 import {
   inquiriesPath,

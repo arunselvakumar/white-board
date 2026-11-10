@@ -42,9 +42,9 @@ import {
   DateFilter,
   NO_DATE_FILTER,
   type DateFilterValue,
-} from "@/components/procurement/purchase-requests/date-filter";
-import { FilterSelect } from "@/components/procurement/purchase-requests/filter-select";
-import { ReasonDialog } from "@/components/procurement/purchase-requests/reason-dialog";
+} from "@/app/app/projects/[id]/_components/procurement/purchase-requests/date-filter";
+import { FilterSelect } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/filter-select";
+import { ReasonDialog } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/reason-dialog";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   canIn,
@@ -64,7 +64,7 @@ import {
   ReceiptBadge,
   StageBadge,
 } from "./purchase-order-format";
-import { PurchaseOrderRowsSkeleton } from "@/components/procurement/procurement-skeletons";
+import { PurchaseOrderRowsSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 const APPROVAL_CHIPS = [
   { value: "all", label: "All", icon: LayoutGrid },

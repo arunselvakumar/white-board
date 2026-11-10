@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { MaterialRequestForm } from "@/components/procurement/material-requests/material-request-form";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
-import { MaterialRequestFormSkeleton } from "@/components/procurement/procurement-skeletons";
+import { MaterialRequestFormSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Raise Material Request" };

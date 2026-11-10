@@ -16,7 +16,7 @@ import {
 import { FormAlert } from "@/components/auth/form-alert";
 import { LocationLabel } from "@/app/app/_components/locations/location-picker";
 import { formatDate } from "@/components/payments/payment-format";
-import { ScrollTable } from "@/components/procurement/purchase-requests/scroll-table";
+import { ScrollTable } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/scroll-table";
 import { SiteWorkDocumentActivity } from "@/components/site-work/documents/site-work-document-activity";
 import {
   canInSiteWork,
@@ -34,7 +34,7 @@ import {
   shiftLabel,
   worksheetsPath,
 } from "./worksheet-format";
-import { FactValueSkeleton } from "@/components/procurement/procurement-skeletons";
+import { FactValueSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (

@@ -41,7 +41,7 @@ import {
   inventoryPath,
   localToday,
 } from "./inventory-format";
-import { StockRegisterTableSkeleton } from "@/components/procurement/procurement-skeletons";
+import { StockRegisterTableSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 function monthStart(today: string): string {
   return `${today.slice(0, 8)}01`;

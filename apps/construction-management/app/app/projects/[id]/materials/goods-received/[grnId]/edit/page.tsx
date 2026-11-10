@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { EditGoodsReceiptScreen } from "@/components/procurement/goods-receipts/goods-receipt-form";
-import { GoodsReceiptFormSkeleton } from "@/components/procurement/procurement-skeletons";
+import { GoodsReceiptFormSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Edit Goods Receipt" };

@@ -21,7 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
 
-import { ReasonDialog } from "@/components/procurement/purchase-requests/reason-dialog";
+import { ReasonDialog } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/reason-dialog";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   equipmentSheetsPath,

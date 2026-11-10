@@ -26,7 +26,7 @@ import { cn } from "@repo/ui/lib/utils";
 import { FormAlert } from "@/components/auth/form-alert";
 import { SiteWorkDocumentActivity } from "@/components/site-work/documents/site-work-document-activity";
 import { SiteWorkDocumentPhotoStrip } from "@/components/site-work/documents/site-work-photo-strip";
-import { ScrollTable } from "@/components/procurement/purchase-requests/scroll-table";
+import { ScrollTable } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/scroll-table";
 import { QueryHttpError } from "@/src/queries/http";
 import { useDeleteSiteDiary, type SiteDiary } from "@/src/queries/site-diary";
 

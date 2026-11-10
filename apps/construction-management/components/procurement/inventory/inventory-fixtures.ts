@@ -3,7 +3,7 @@ import {
   PROCUREMENT_ACCESS_MENUS,
   type ProcurementAccessMenu,
 } from "@/app/api/construction/procurement/access/access-models";
-import { materialOptionsHandler } from "@/components/procurement/material-options-fixtures";
+import { materialOptionsHandler } from "@/app/app/_components/procurement/material-options-fixtures";
 import { menuByKey, type Flag } from "@/src/shared-kernel/access";
 import { fromMask } from "@/src/shared-kernel/access/flags";
 import type {

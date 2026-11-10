@@ -5,7 +5,7 @@ import { EditPurchaseOrder } from "@/components/procurement/purchase-orders/edit
 import {
   EditDocumentSkeleton,
   PurchaseOrderFormSkeleton,
-} from "@/components/procurement/procurement-skeletons";
+} from "@/app/app/_components/procurement/procurement-skeletons";
 
 export const metadata: Metadata = { title: "Edit Purchase Order" };
 

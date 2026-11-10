@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { EditStorePage } from "@/components/procurement/stores/edit-store-page";
-import { StoreFormSkeleton } from "@/components/procurement/procurement-skeletons";
+import { StoreFormSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Edit store" };

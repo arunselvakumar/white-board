@@ -10,7 +10,7 @@ import {
 
 import { purchaseRequestQuery } from "@/src/queries/purchase-requests";
 
-import { PurchaseRequestWizard } from "./purchase-request-wizard";
+import { PurchaseRequestWizard } from "@/app/app/projects/[id]/materials/purchase-requests/_components/purchase-request-wizard";
 
 /** Edit Purchase Request: the wizard on a pending or rejected request (CM-503). */
 export function EditPurchaseRequest({

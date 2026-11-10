@@ -52,7 +52,7 @@ import {
   instantText,
 } from "./inspection-format";
 import { InspectionObservations, InspectionRemarks } from "./inspection-thread";
-import { FactValueSkeleton } from "@/components/procurement/procurement-skeletons";
+import { FactValueSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 function Fact({
   label,

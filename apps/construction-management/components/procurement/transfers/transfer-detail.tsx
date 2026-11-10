@@ -38,7 +38,7 @@ import { FieldError } from "@/components/auth/field-error";
 import {
   DocumentActivity,
   DocumentFiles,
-} from "@/components/procurement/documents/document-activity";
+} from "@/app/app/_components/procurement/documents/document-activity";
 import {
   formatDate,
   formatQuantity,

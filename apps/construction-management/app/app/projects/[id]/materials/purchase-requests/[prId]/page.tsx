@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 import { QuerySuspense } from "@/components/query-suspense";
-import { PurchaseRequestDetailPage } from "@/components/procurement/purchase-requests/purchase-request-detail";
-import { PurchaseRequestDetailSkeleton } from "@/components/procurement/procurement-skeletons";
+import { PurchaseRequestDetailPage } from "@/app/app/projects/[id]/materials/purchase-requests/[prId]/_components/purchase-request-detail";
+import { PurchaseRequestDetailSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 export const metadata: Metadata = { title: "Purchase Request" };
 

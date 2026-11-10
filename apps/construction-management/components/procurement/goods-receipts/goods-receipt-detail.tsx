@@ -30,7 +30,7 @@ import { FormAlert } from "@/components/auth/form-alert";
 import {
   DocumentActivity,
   DocumentFiles,
-} from "@/components/procurement/documents/document-activity";
+} from "@/app/app/_components/procurement/documents/document-activity";
 import {
   goodsReceiptPdfUrl,
   goodsReceiptQuery,

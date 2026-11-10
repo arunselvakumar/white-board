@@ -5,7 +5,7 @@ import { Label } from "@repo/ui/components/label";
 
 import type { MaterialOption } from "@/src/queries/material-options";
 
-import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import {
   CATEGORY_OPTIONS,
   CREATED_MATERIAL_ID,

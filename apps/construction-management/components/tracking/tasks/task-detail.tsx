@@ -62,7 +62,7 @@ import {
   TaskStatusBadge,
   varianceText,
 } from "./task-parts";
-import { FactValueSkeleton } from "@/components/procurement/procurement-skeletons";
+import { FactValueSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import {
   FeedSkeleton,
   UpdatesSkeleton,

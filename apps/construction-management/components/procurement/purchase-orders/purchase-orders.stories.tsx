@@ -21,7 +21,7 @@ import {
 } from "./purchase-order-fixtures";
 import { PurchaseOrderForm } from "./purchase-order-form";
 import { PurchaseOrdersPage } from "./purchase-orders-page";
-import { pickMaterial } from "../material-options-fixtures";
+import { pickMaterial } from "@/app/app/_components/procurement/material-options-fixtures";
 
 let api: ReturnType<typeof mockApi>;
 

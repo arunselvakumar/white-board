@@ -43,8 +43,8 @@ import {
   QUANTITY_PATTERN,
 } from "@/components/procurement/inventory/inventory-format";
 import { StockErrorAlert } from "@/components/procurement/inventory/stock-error-alert";
-import { MaterialPicker } from "@/components/procurement/material-picker";
-import { siteLocationInput } from "@/components/procurement/purchase-requests/purchase-request-format";
+import { MaterialPicker } from "@/app/app/_components/procurement/material-picker";
+import { siteLocationInput } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/purchase-request-format";
 import { PendingFilesField } from "@/components/site-work/documents/pending-files-field";
 import { useUploadPendingFiles } from "@/components/site-work/documents/use-upload-pending-files";
 import { QueryHttpError } from "@/src/queries/http";

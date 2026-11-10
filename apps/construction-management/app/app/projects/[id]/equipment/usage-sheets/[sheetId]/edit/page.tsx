@@ -5,7 +5,7 @@ import { QuerySuspense } from "@/components/query-suspense";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
 import { EditEquipmentSheetPage } from "@/components/site-work/equipment-sheets/equipment-sheet-form-pages";
 import { EquipmentSheetFormSkeleton } from "@/components/site-work/site-work-skeletons";
-import { EditDocumentSkeleton } from "@/components/procurement/procurement-skeletons";
+import { EditDocumentSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 
 export const metadata: Metadata = { title: "Edit usage sheet" };
 

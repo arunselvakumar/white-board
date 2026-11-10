@@ -17,8 +17,8 @@ import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 
 import { FieldError } from "@/components/auth/field-error";
 import { money } from "@/components/payments/payment-format";
-import { MaterialPicker } from "@/components/procurement/material-picker";
-import { quantityText } from "@/components/procurement/purchase-requests/purchase-request-format";
+import { MaterialPicker } from "@/app/app/_components/procurement/material-picker";
+import { quantityText } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/purchase-request-format";
 import { purchaseRequestQuantityInfoQuery } from "@/src/queries/purchase-requests";
 import type { SupplyType } from "@/src/shared-kernel/gst-line";
 

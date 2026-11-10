@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { DeliveryNoteDetail } from "@/components/procurement/delivery-notes/delivery-note-detail";
-import { DeliveryNoteDetailSkeleton } from "@/components/procurement/procurement-skeletons";
+import { DeliveryNoteDetailSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Delivery Note" };
