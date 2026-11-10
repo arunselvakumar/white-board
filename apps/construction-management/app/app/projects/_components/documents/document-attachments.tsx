@@ -38,7 +38,7 @@ import {
 } from "@/src/queries/project-documents";
 
 import { DeleteDocumentDialog } from "./delete-document-dialog";
-import { DocumentFileIcon } from "./document-file-icon";
+import { DocumentFileIcon } from "@/app/app/_components/projects/documents/document-file-icon";
 import { canRetry, useDocumentUploads } from "./use-document-uploads";
 
 /** A file picked on Add Project, uploaded once the Project is saved. */

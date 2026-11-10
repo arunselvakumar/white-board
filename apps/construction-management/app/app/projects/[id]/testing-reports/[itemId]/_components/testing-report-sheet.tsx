@@ -30,7 +30,7 @@ import {
   type TestingReport,
 } from "@/src/queries/project-testing-reports";
 
-import { DocumentFileIcon } from "@/components/projects/documents/document-file-icon";
+import { DocumentFileIcon } from "@/app/app/_components/projects/documents/document-file-icon";
 
 const NAME_MAX = 120;
 const REMARK_MAX = 500;

@@ -5,15 +5,19 @@ import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 
-import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
-import { mockXhrUploads } from "../../../.storybook/mocks/xhr";
+import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
+import { mockXhrUploads } from "@/.storybook/mocks/xhr";
 import {
   DocumentAttachments,
   useUploadHeldFiles,
   type DocumentAttachmentsProps,
   type HeldFile,
 } from "./document-attachments";
-import { ANUGRAHA, DOCUMENTS_API, mockDocumentsApi } from "./document-fixtures";
+import {
+  ANUGRAHA,
+  DOCUMENTS_API,
+  mockDocumentsApi,
+} from "@/app/app/projects/[id]/gallery/_components/document-fixtures";
 
 let api: ReturnType<typeof mockDocumentsApi>;
 const onHeldChange = fn<(next: HeldFile[]) => void>();

@@ -19,9 +19,9 @@ import {
   type DrawingRevision,
 } from "@/src/queries/project-drawings";
 
-import { DrawingRevisionsSkeleton } from "./drawings-skeletons";
+import { DrawingRevisionsSkeleton } from "@/app/app/projects/[id]/drawings/_components/drawings-skeletons";
 
-import { downloadUrl } from "../files/file-viewer";
+import { downloadUrl } from "@/components/projects/files/file-viewer";
 
 function Revisions({
   projectId,

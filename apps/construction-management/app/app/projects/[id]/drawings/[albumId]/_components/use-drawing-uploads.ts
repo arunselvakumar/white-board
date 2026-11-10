@@ -9,7 +9,7 @@ import { useUploadDrawingFile } from "@/src/queries/project-drawings";
 import {
   useDirectUpload,
   type DirectUploadItem,
-} from "../../uploads/use-direct-upload";
+} from "@/components/uploads/use-direct-upload";
 
 /** A new drawing in an album, or the next revision of a drawing. */
 export type DrawingUploadTarget =

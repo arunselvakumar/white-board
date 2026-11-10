@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
+import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { ProjectShell } from "@/app/app/projects/[id]/_components/project-shell";
 import {
   KUMARI_HEIGHTS,
@@ -10,7 +10,7 @@ import {
   TOWER_A,
   WINGS_API,
   mockStructureApi,
-} from "./structure-fixtures";
+} from "@/app/app/projects/[id]/_components/structure/structure-fixtures";
 import { WingsPage } from "./wings-page";
 
 let api: ReturnType<typeof mockStructureApi>;

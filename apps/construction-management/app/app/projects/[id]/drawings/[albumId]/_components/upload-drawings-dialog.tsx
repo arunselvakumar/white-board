@@ -25,7 +25,7 @@ import {
   drawingNameFromFile,
 } from "@/src/projects/domain/drawing";
 
-import { DocumentFileIcon } from "../documents/document-file-icon";
+import { DocumentFileIcon } from "@/app/app/_components/projects/documents/document-file-icon";
 import { DrawingUploadRow } from "./drawing-upload-row";
 import type { DrawingUploads } from "./use-drawing-uploads";
 

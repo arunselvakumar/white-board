@@ -11,7 +11,7 @@ import {
   type DocumentAttachmentsProps,
   type HeldFile,
   type HeldUploadStatus,
-} from "@/components/projects/documents/document-attachments";
+} from "@/app/app/projects/_components/documents/document-attachments";
 import {
   ANUGRAHA,
   KUMARI,

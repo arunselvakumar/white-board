@@ -14,7 +14,7 @@ import { resetAuthMocks } from "./mocks/auth";
 
 // Spies that keep the real code; a story may stand in its own (the Project
 // form's held-files story picks files without the real attachments UI).
-sb.mock("../components/projects/documents/document-attachments.tsx", {
+sb.mock("../app/app/projects/_components/documents/document-attachments.tsx", {
   spy: true,
 });
 

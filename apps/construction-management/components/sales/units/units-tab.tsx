@@ -29,7 +29,7 @@ import {
   SheetTitle,
 } from "@repo/ui/components/sheet";
 
-import { wingsPath } from "@/components/projects/structure/structure-parts";
+import { wingsPath } from "@/app/app/projects/[id]/_components/structure/structure-parts";
 import { isWingType } from "@/src/projects/domain/wing-generator";
 import { unitChartQuery, type UnitChart } from "@/src/queries/sales-units";
 import {

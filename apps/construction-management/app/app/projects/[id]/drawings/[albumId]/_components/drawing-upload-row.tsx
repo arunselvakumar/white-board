@@ -6,7 +6,7 @@ import { Progress } from "@repo/ui/components/progress";
 
 import { formatBytes } from "@/lib/project-documents";
 
-import { DocumentFileIcon } from "../documents/document-file-icon";
+import { DocumentFileIcon } from "@/app/app/_components/projects/documents/document-file-icon";
 import type { DrawingUpload, DrawingUploads } from "./use-drawing-uploads";
 
 /** One file going up: its progress, then Done or the reason it failed. */

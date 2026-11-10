@@ -5,7 +5,7 @@ import type {
   DrawingSummary,
 } from "@/src/queries/project-drawings";
 
-import { mockApi } from "../../../.storybook/mocks/api";
+import { mockApi } from "@/.storybook/mocks/api";
 import { ANUGRAHA } from "@/app/app/_components/projects/project-fixtures";
 
 /** Story fixtures for Project Drawings, on Anugraha Residency. */

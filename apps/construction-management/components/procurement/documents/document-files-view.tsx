@@ -8,7 +8,7 @@ import { Input } from "@repo/ui/components/input";
 import { Progress } from "@repo/ui/components/progress";
 
 import { useDirectUpload } from "@/components/uploads/use-direct-upload";
-import { DocumentFileIcon } from "@/components/projects/documents/document-file-icon";
+import { DocumentFileIcon } from "@/app/app/_components/projects/documents/document-file-icon";
 import { FileThumbnail } from "@/components/projects/files/file-thumbnail";
 import { FileViewer } from "@/components/projects/files/file-viewer";
 import { formatBytes } from "@/lib/project-documents";

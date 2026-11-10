@@ -37,7 +37,7 @@ import {
 import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
-import { DocumentFileIcon } from "@/components/projects/documents/document-file-icon";
+import { DocumentFileIcon } from "@/app/app/_components/projects/documents/document-file-icon";
 import { formatBytes } from "@/lib/project-documents";
 import {
   quotationsQuery,

@@ -12,7 +12,7 @@ import {
   DialogTitle,
 } from "@repo/ui/components/dialog";
 
-import { DocumentFileIcon } from "../documents/document-file-icon";
+import { DocumentFileIcon } from "@/app/app/_components/projects/documents/document-file-icon";
 
 /** A stored file as a file route serves it (CM-407). */
 export type ViewableFile = {

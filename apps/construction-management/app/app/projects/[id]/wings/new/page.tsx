@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
-import { AddWingScreen } from "@/components/projects/structure/add-wing-screen";
-import { StructureNoAccess } from "@/components/projects/structure/structure-parts";
+import { AddWingScreen } from "@/app/app/projects/[id]/wings/new/_components/add-wing-screen";
+import { StructureNoAccess } from "@/app/app/projects/[id]/_components/structure/structure-parts";
 
 import { structureAccess } from "../structure-access";
 import { QuerySuspense } from "@/components/query-suspense";
-import { AddWingSkeleton } from "@/components/projects/structure/structure-skeletons";
+import { AddWingSkeleton } from "@/app/app/projects/[id]/_components/structure/structure-skeletons";
 
 export const metadata: Metadata = { title: "Add Wing" };
 

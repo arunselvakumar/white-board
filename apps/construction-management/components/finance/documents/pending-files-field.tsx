@@ -7,7 +7,7 @@ import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 
 import { FieldError } from "@/components/auth/field-error";
-import { DocumentFileIcon } from "@/components/projects/documents/document-file-icon";
+import { DocumentFileIcon } from "@/app/app/_components/projects/documents/document-file-icon";
 import { formatBytes } from "@/lib/project-documents";
 import {
   FINANCE_DOCUMENT_FILES_MAX,

@@ -40,7 +40,11 @@ import {
   type ProjectLocation,
 } from "@/src/queries/project-structure";
 
-import { SectionHeader, StructureEmpty, saveProblem } from "./structure-parts";
+import {
+  SectionHeader,
+  StructureEmpty,
+  saveProblem,
+} from "@/app/app/projects/[id]/_components/structure/structure-parts";
 
 /** What a Team Member may do here; reading is a given on this screen. */
 export type LocationsAccess = {

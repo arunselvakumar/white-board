@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { getRouter } from "@storybook/nextjs-vite/navigation.mock";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
+import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { ProjectShell } from "@/app/app/projects/[id]/_components/project-shell";
 import { AddWingScreen } from "./add-wing-screen";
 import {
@@ -10,7 +10,7 @@ import {
   PHASE_2,
   WINGS_API,
   mockStructureApi,
-} from "./structure-fixtures";
+} from "@/app/app/projects/[id]/_components/structure/structure-fixtures";
 
 let api: ReturnType<typeof mockStructureApi>;
 
