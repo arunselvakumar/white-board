@@ -21,7 +21,7 @@ import {
   TIMING_SOURCE_ITEMS,
   timingSlotSchema,
   TimingSlotsEditor,
-} from "@/components/enrollments/student-timings-fields";
+} from "@/app/(app)/_components/enrollments/student-timings-fields";
 import { applyHttpFormError } from "@/lib/apply-http-form-error";
 import { CLASS_MODE_ITEMS } from "@/lib/class-mode";
 import type { EnrollInput } from "@/src/queries/enrollments";

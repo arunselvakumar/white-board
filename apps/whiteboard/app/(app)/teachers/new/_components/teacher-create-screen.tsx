@@ -11,8 +11,11 @@ import {
   createTeacher,
   teacherQueries,
 } from "@/src/queries/teachers";
-import { TeacherForm, type PendingTeacherDocument } from "./teacher-form";
-import { encodeTeacherDocument } from "./teacher-files";
+import {
+  TeacherForm,
+  type PendingTeacherDocument,
+} from "@/app/(app)/teachers/_components/teacher-form";
+import { encodeTeacherDocument } from "@/app/(app)/teachers/_components/teacher-files";
 
 export function TeacherCreateScreen() {
   const router = useRouter();

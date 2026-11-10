@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { CourseCreateScreen } from "@/components/courses/course-create-screen";
+import { CourseCreateScreen } from "@/app/(app)/courses/new/_components/course-create-screen";
 
 export const metadata: Metadata = { title: "Add Course" };
 

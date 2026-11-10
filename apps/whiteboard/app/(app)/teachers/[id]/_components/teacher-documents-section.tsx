@@ -28,7 +28,7 @@ import type {
   TeacherDocument,
   TeacherDocumentInput,
 } from "@/src/queries/teachers";
-import { encodeTeacherDocument } from "./teacher-files";
+import { encodeTeacherDocument } from "@/app/(app)/teachers/_components/teacher-files";
 
 const documentOptions = [
   { value: "certificate", label: "Certificate" },

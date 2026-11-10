@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader } from "@repo/ui/components/card";
 
 import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import { AttachmentLinks } from "@/components/class-work/attachments";
-import { StudentAvatar } from "@/components/students/student-avatar";
+import { StudentAvatar } from "@/app/(app)/_components/students/student-avatar";
 import {
   classWorkQueries,
   type HomeworkRosterRowView,

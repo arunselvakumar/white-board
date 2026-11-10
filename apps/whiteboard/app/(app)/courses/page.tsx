@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { CoursesScreen } from "@/components/courses/courses-screen";
+import { CoursesScreen } from "@/app/(app)/courses/_components/courses-screen";
 
 export const metadata: Metadata = { title: "Courses" };
 

@@ -32,8 +32,8 @@ import {
   unassignTeacherBatch,
   updateTeacher,
 } from "@/src/queries/teachers";
-import { TeacherForm } from "./teacher-form";
-import { TeacherAvatar } from "./teacher-avatar";
+import { TeacherForm } from "@/app/(app)/teachers/_components/teacher-form";
+import { TeacherAvatar } from "@/app/(app)/teachers/_components/teacher-avatar";
 import { TeacherDocumentsSection } from "./teacher-documents-section";
 
 const assignmentSchema = z.object({ batchId: z.uuid("Choose a Batch") });

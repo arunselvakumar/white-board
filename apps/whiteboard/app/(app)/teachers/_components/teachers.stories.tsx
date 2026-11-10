@@ -4,13 +4,13 @@ import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 import { addDays, dateKeyInZone } from "@/lib/calendar-dates";
 import { enquiryQueries, type DemoResponse } from "@/src/queries/enquiries";
 import { getQueryClient } from "@/src/queries/query-client";
-import { signInAs } from "../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 
-import { MyBatchesScreen } from "./my-batches-screen";
+import { MyBatchesScreen } from "@/app/(app)/teacher/_components/my-batches-screen";
 import { TeacherForm } from "./teacher-form";
 import { TeachersEmptyState } from "./teachers-empty-state";
-import { TeacherDocumentsSection } from "./teacher-documents-section";
-import type { TeacherWriteInput } from "../../src/queries/teachers";
+import { TeacherDocumentsSection } from "../[id]/_components/teacher-documents-section";
+import type { TeacherWriteInput } from "@/src/queries/teachers";
 
 const meta = {
   title: "Pages/Teachers",

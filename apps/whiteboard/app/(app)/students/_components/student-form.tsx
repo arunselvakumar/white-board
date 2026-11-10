@@ -29,7 +29,7 @@ import {
 } from "@/app/(app)/_components/app-shell/page-header";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { StudentAvatar } from "@/components/students/student-avatar";
+import { StudentAvatar } from "@/app/(app)/_components/students/student-avatar";
 import { applyHttpFormError } from "@/lib/apply-http-form-error";
 import type {
   StudentResponse,

@@ -37,7 +37,7 @@ import {
 
 import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import { CatalogStat } from "@/app/(app)/_components/catalog/catalog-chrome";
-import { StudentAvatar } from "@/components/students/student-avatar";
+import { StudentAvatar } from "@/app/(app)/_components/students/student-avatar";
 import { formatPaiseAsRupees } from "@/lib/money";
 import {
   FEE_FOLLOW_UP_CHANNEL_LABELS,

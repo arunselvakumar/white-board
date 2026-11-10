@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { EnrollmentCreateScreen } from "@/components/enrollments/enrollment-create-screen";
+import { EnrollmentCreateScreen } from "@/app/(app)/_components/enrollments/enrollment-create-screen";
 
 export const metadata: Metadata = { title: "Enroll Student" };
 

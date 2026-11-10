@@ -4,11 +4,11 @@ import { expect, within } from "storybook/test";
 
 import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import { AppShell } from "@/app/(app)/_components/app-shell/app-shell";
-import { CollectPaymentForm } from "@/components/enrollments/collect-payment-form";
-import { EnrollmentForm } from "@/components/enrollments/enrollment-form";
+import { CollectPaymentForm } from "@/app/(app)/enrollments/[id]/_components/collect-payment-form";
+import { EnrollmentForm } from "@/app/(app)/_components/enrollments/enrollment-form";
 import { WorkspaceGate } from "@/app/(app)/_components/workspace/workspace-gate";
 import { QueryHttpError } from "@/src/queries/http";
-import { signInAs } from "../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 
 const STUDENT_ID = "880e8400-e29b-41d4-a716-446655440000";
 const BATCH_ID = "660e8400-e29b-41d4-a716-446655440000";

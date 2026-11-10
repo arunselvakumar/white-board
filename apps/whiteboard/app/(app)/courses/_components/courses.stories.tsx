@@ -4,14 +4,14 @@ import { expect, within } from "storybook/test";
 
 import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import { AppShell } from "@/app/(app)/_components/app-shell/app-shell";
-import { CourseCatalog } from "@/components/courses/course-catalog";
+import { CourseCatalog } from "@/app/(app)/courses/_components/course-catalog";
 import {
   CourseForm,
   courseToFormValues,
-} from "@/components/courses/course-form";
+} from "@/app/(app)/courses/_components/course-form";
 import { WorkspaceGate } from "@/app/(app)/_components/workspace/workspace-gate";
 import type { CourseResponse, CourseWriteInput } from "@/src/queries/courses";
-import { signInAs } from "../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 
 const NOW = "2026-09-12T12:00:00.000Z";
 

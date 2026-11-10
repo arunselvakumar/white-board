@@ -34,11 +34,11 @@ import {
 } from "@repo/ui/components/table";
 
 import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
-import { CollectPaymentForm } from "@/components/enrollments/collect-payment-form";
-import { studentFullName } from "@/components/students/student-profile-view";
-import { EnrollmentSettingsForm } from "@/components/enrollments/enrollment-settings-form";
-import { FeePlanForm } from "@/components/enrollments/fee-plan-form";
-import { FeeFollowUpsCard } from "@/components/enrollments/fee-follow-ups/fee-follow-ups-card";
+import { CollectPaymentForm } from "@/app/(app)/enrollments/[id]/_components/collect-payment-form";
+import { studentFullName } from "@/app/(app)/_components/students/student-profile-view";
+import { EnrollmentSettingsForm } from "@/app/(app)/enrollments/[id]/_components/enrollment-settings-form";
+import { FeePlanForm } from "@/app/(app)/enrollments/[id]/_components/fee-plan-form";
+import { FeeFollowUpsCard } from "@/app/(app)/enrollments/[id]/_components/fee-follow-ups-card";
 import { classModeLabel, formatTimingSlots } from "@/lib/class-mode";
 import { formatPaiseAsRupees } from "@/lib/money";
 import { batchQueries } from "@/src/queries/batches";

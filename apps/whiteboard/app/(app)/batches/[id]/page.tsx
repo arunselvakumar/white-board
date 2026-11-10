@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { BatchEditScreen } from "@/components/batches/batch-edit-screen";
+import { BatchEditScreen } from "@/app/(app)/batches/[id]/_components/batch-edit-screen";
 
 export const metadata: Metadata = { title: "Edit Batch" };
 

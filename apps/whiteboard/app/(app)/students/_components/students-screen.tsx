@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-import { StudentCatalog } from "@/components/students/student-catalog";
+import { StudentCatalog } from "@/app/(app)/students/_components/student-catalog";
 import { dashboardQueries } from "@/src/queries/dashboard";
 import {
   dropStudent,
