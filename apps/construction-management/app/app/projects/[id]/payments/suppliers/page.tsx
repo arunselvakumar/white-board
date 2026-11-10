@@ -4,7 +4,7 @@ import { PartyMoneyTab } from "@/app/app/projects/[id]/payments/_components/part
 
 export const metadata: Metadata = { title: "Supplier payments" };
 
-/** Supplier balances, invoices (GRNs awaiting one) and payments on a Project (CM-705). */
+/** Supplier balances, invoices (GRNs awaiting one) and payments on a Project. */
 export default async function ProjectSuppliersPage({
   params,
 }: {

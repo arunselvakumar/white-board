@@ -4,7 +4,7 @@ import { catalogueHandler } from "@/components/reports/report-fixtures";
 import type { CentralPaymentSummary } from "@/src/queries/finance-central-payment";
 import type { ReportJob } from "@/src/queries/reports";
 
-/** Story data for Workspace → Central Payment (CM-709). */
+/** Story data for Central Payment. */
 
 export const CENTRAL_PAYMENT_API = "/api/construction/finance/central-payment";
 export const REPORTS_API = "/api/construction/reporting/reports";

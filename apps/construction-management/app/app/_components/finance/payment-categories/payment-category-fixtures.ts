@@ -3,7 +3,7 @@ import { FINANCE_ACCESS_MENUS } from "@/app/api/construction/finance/access/acce
 import type { PaymentCategoryItem } from "@/src/queries/finance-payment-categories";
 import type { Flag } from "@/src/shared-kernel/access";
 
-/** Story fixtures for Masters → Payment Categories (CM-704). */
+/** Story fixtures for Payment Categories. */
 
 const AT = "2026-10-08T06:30:00.000Z";
 const LATER = "2026-10-08T07:00:00.000Z";

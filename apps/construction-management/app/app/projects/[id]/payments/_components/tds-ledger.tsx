@@ -53,9 +53,9 @@ const PAYEE_LABELS = {
 } as const;
 
 /**
- * The TDS ledger (CM-706, CM-0017 §8): a Contractor's payments in a
- * financial year across the Projects you can see, with base, rate, TDS
- * and overrides, and the totals by quarter for filing.
+ * The TDS ledger (ADR CM-0017 §8): a Contractor's payments in a financial year
+ * across the Projects you can see, with base, rate, TDS and overrides, and the
+ * totals by quarter for filing.
  */
 export function TdsLedgerView({
   projectId,

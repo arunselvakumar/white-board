@@ -4,7 +4,7 @@ import { PartyPaymentScreen } from "@/app/app/projects/[id]/payments/_components
 
 export const metadata: Metadata = { title: "Pay Contractor" };
 
-/** Record a payment to a Contractor on a Project (CM-0017 §6). */
+/** Record a payment to a Contractor on a Project (ADR CM-0017 §6). */
 export default async function PayContractorPage({
   params,
   searchParams,

@@ -48,7 +48,7 @@ import {
 } from "@/app/app/_components/finance/parties/party-money";
 
 /**
- * A party's opening balance on the Project (CM-0017 §7): what was owed to
+ * A party's opening balance on the Project (ADR CM-0017 §7): what was owed to
  * them (or advanced to them) before the app, as of a date. Set, change or
  * remove; each change reverses the old entry and posts the new one.
  */

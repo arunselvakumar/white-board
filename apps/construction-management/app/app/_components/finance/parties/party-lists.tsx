@@ -232,7 +232,7 @@ export function PartyPayments({
   );
 }
 
-/** A party's statement on the Project: each entry with the running balance (CM-705). */
+/** A party's statement on the Project: each entry with the running balance. */
 export function PartyStatementTable({
   projectId,
   partyType,

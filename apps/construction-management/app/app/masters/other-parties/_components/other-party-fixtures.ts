@@ -4,7 +4,7 @@ import type {
 } from "@/src/queries/finance-other-parties";
 import type { ProjectOption } from "@/src/queries/projects";
 
-/** Story data for Masters → Other Parties (CM-704). */
+/** Story data for Other Parties. */
 
 const AT = "2026-10-08T06:30:00.000Z";
 

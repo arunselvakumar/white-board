@@ -4,7 +4,7 @@ import { PartyMoneyTab } from "@/app/app/projects/[id]/payments/_components/part
 
 export const metadata: Metadata = { title: "Contractor payments" };
 
-/** Contractor balances, invoices, payments and TDS on a Project (CM-706). */
+/** Contractor balances, invoices, payments and TDS on a Project. */
 export default async function ProjectContractorsPage({
   params,
 }: {

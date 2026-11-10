@@ -17,7 +17,7 @@ export function otherPartyEditPath(id: string): string {
   return `${OTHER_PARTIES_PATH}/${encodeURIComponent(id)}`;
 }
 
-/** Client checks; the server repeats every rule (CM-704). */
+/** Client checks; the server repeats every rule. */
 export const otherPartyFormSchema = z
   .object({
     name: z

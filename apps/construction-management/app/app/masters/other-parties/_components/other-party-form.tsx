@@ -79,9 +79,8 @@ function ProjectsChecklist({
 }
 
 /**
- * The Other Party form (CM-704, ADR CM-0017 §11): name, mobile, email,
- * GSTIN (fills the GST state), PAN, GST state, address and the Projects it
- * works on.
+ * The Other Party form (ADR CM-0017 §11): name, mobile, email, GSTIN (fills the
+ * GST state), PAN, GST state, address and the Projects it works on.
  */
 export function OtherPartyForm({
   party,
@@ -325,7 +324,6 @@ function FormPage({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-/** Masters → Other Parties → Add. */
 export function NewOtherPartyScreen() {
   const create = useCreateOtherParty();
   return (
@@ -339,7 +337,7 @@ export function NewOtherPartyScreen() {
   );
 }
 
-/** Masters → Other Parties → Edit; 409 when someone saved it since. */
+/** The server answers 409 when someone saved the party since it loaded. */
 export function EditOtherPartyScreen({ id }: { id: string }) {
   const { data } = useSuspenseQuery(otherPartyQuery(id));
   const update = useUpdateOtherParty(id);

@@ -71,9 +71,9 @@ function shown(row: Pick<PartyBalance, Figure>, key: Figure): number {
 }
 
 /**
- * Each party's money on the Project (CM-705, CM-706): a table on wider
- * screens, cards on phones. The name opens the party; Pay records a
- * payment. A positive balance is owed to the party.
+ * Each party's money on the Project: a table on wider screens, cards on phones.
+ * The name opens the party; Pay records a payment. A positive balance is owed
+ * to the party.
  */
 export function PartyBalances({
   projectId,

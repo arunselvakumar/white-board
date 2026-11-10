@@ -17,8 +17,8 @@ import {
 } from "@/app/app/_components/finance/parties/party-money";
 
 /**
- * GRNs on the Project with no supplier invoice yet (CM-0017 §13): tick
- * one or more of the same Supplier and **Create invoice** gathers them.
+ * GRNs on the Project with no supplier invoice yet (ADR CM-0017 §13): tick one
+ * or more of the same Supplier and **Create invoice** gathers them.
  */
 export function AwaitingGrns({
   projectId,

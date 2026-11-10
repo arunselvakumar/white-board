@@ -82,10 +82,10 @@ function Amount({ paise }: { paise: number }) {
 }
 
 /**
- * An account's Ledger (CM-701): a period (this month by default), the
- * opening, every approved entry with its running balance, money in
- * (credit) and out (debit), and the closing. Reversals show as their own
- * lines. Petty Cash's statement uses it too.
+ * An account's Ledger: a period (this month by default), the opening, every
+ * approved entry with its running balance, money in (credit) and out (debit),
+ * and the closing. Reversals show as their own lines. Petty Cash's statement
+ * uses it too.
  */
 export function AccountLedger({
   accountId,

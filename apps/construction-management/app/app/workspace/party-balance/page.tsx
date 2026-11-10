@@ -4,7 +4,7 @@ import { PartyBalanceWorkspace } from "@/app/app/workspace/party-balance/_compon
 
 export const metadata: Metadata = { title: "Party Balance" };
 
-/** Workspace → Party Balance: each Other Party's balance across Projects (CM-708). */
+/** Each Other Party's balance across Projects. */
 export default function PartyBalancePage() {
   return <PartyBalanceWorkspace />;
 }

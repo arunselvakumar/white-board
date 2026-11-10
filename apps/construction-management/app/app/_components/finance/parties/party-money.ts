@@ -3,8 +3,8 @@ import { paymentsPath } from "@/app/app/_components/finance/payments-hub/payment
 import type { Invoice, PartyType } from "@/src/queries/finance-parties";
 
 /**
- * Words, paths and formats the party money screens share (CM-705, CM-706,
- * and CM-708 for Other Parties). Every screen takes a `partyType`.
+ * Words, paths and formats the party money screens share (Suppliers,
+ * Contractors and Other Parties). Every screen takes a `partyType`.
  */
 
 export type PartyScreen = {
@@ -12,7 +12,7 @@ export type PartyScreen = {
   label: string;
   plural: string;
   segment: "contractors" | "suppliers" | "other-parties";
-  /** Contractors deduct TDS (CM-706). */
+  /** Contractors deduct TDS. */
   tds: boolean;
 };
 

@@ -126,11 +126,11 @@ export type InvoiceDialogTarget =
   | { mode: "edit"; invoice: Invoice };
 
 /**
- * **New invoice** / edit an invoice (CM-705, CM-706, CM-708): the party
- * (fixed when opened from one), the party's invoice number (a sales
- * invoice is numbered on save), dates, a Contractor's Department, taxable
- * value and GST, amount and remarks. A Supplier's invoice may gather GRNs
- * awaiting an invoice; its amount starts at their total value.
+ * **New invoice** / edit an invoice: the party (fixed when opened from one),
+ * the party's invoice number (a sales invoice is numbered on save), dates, a
+ * Contractor's Department, taxable value and GST, amount and remarks. A
+ * Supplier's invoice may gather GRNs awaiting an invoice; its amount starts at
+ * their total value.
  */
 export function InvoiceDialog({
   projectId,

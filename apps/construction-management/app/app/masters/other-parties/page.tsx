@@ -4,7 +4,6 @@ import { OtherPartiesPage } from "@/app/app/masters/other-parties/_components/ot
 
 export const metadata: Metadata = { title: "Other Parties" };
 
-/** Masters → Other Parties (CM-704). */
 export default function OtherPartiesMasterPage() {
   return <OtherPartiesPage />;
 }

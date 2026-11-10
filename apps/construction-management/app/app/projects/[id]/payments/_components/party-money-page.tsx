@@ -39,9 +39,9 @@ import {
 } from "@/app/app/_components/finance/parties/parties-skeletons";
 
 /**
- * One party's money on the Project (CM-705, CM-706; CM-708 reuses it for
- * Other Parties): balance, opening, invoices with status chips, payments
- * and the statement, with New invoice and Pay.
+ * One party's money on the Project (Suppliers, Contractors and Other Parties):
+ * balance, opening, invoices with status chips, payments and the statement,
+ * with New invoice and Pay.
  */
 export function PartyMoneyPage({
   projectId,

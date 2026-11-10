@@ -194,8 +194,8 @@ export const ReadOnly: Story = {
 };
 
 /**
- * Other Parties (CM-708): bills and sales per party, a sales invoice
- * numbered on save, and the Settlements view.
+ * Other Parties: bills and sales per party, a sales invoice numbered on save,
+ * and the Settlements view.
  */
 export const OtherPartiesSalesInvoice: Story = {
   args: { partyType: "other_party" },
