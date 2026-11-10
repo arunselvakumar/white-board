@@ -15,7 +15,7 @@ import { Label } from "@repo/ui/components/label";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { localToday } from "@/components/payments/payment-format";
+import { localToday } from "@/app/app/_components/payments/payment-format";
 import {
   receiptsZipUrl,
   type PettyCashAccount,

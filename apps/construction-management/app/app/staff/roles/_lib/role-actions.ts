@@ -1,4 +1,4 @@
-import type { RoleActions } from "@/components/roles/role-actions";
+import type { RoleActions } from "@/app/app/staff/roles/_components/role-actions";
 
 import { viewerCan, viewerFlags } from "../../../_lib/viewer-can";
 

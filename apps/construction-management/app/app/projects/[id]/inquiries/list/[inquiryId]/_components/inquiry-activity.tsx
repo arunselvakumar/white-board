@@ -18,7 +18,7 @@ import { Suspense, useState } from "react";
 import { Button } from "@repo/ui/components/button";
 
 import { FormAlert } from "@/components/auth/form-alert";
-import { formatDate } from "@/components/payments/payment-format";
+import { formatDate } from "@/app/app/_components/payments/payment-format";
 import { formatDateTime } from "@/app/app/projects/[id]/_components/tracking/issues/issue-parts";
 import { QueryHttpError } from "@/src/queries/http";
 import { bookingsPath } from "@/src/queries/sales-bookings";

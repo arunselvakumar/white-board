@@ -26,7 +26,10 @@ import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { SalesDocumentFiles } from "@/app/app/projects/[id]/_components/sales/documents/sales-document-files";
-import { formatDate, localToday } from "@/components/payments/payment-format";
+import {
+  formatDate,
+  localToday,
+} from "@/app/app/_components/payments/payment-format";
 import {
   areaLabel,
   BookingStatusBadge,

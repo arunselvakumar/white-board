@@ -4,14 +4,14 @@ import { expect, waitFor, within } from "storybook/test";
 
 import type { Role } from "@/src/queries/roles";
 
-import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import { ALL_ROLE_ACTIONS } from "./role-actions";
 import {
   ACCOUNTANT_ROLE,
   ROLES,
   ROLES_URL,
   STORE_HELPER_ROLE,
-} from "./role-fixtures";
+} from "@/app/app/staff/_components/role-fixtures";
 import { RolesList } from "./roles-list";
 
 let api: ReturnType<typeof mockApi> | null = null;

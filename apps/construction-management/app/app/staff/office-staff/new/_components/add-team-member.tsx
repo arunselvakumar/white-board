@@ -27,22 +27,25 @@ import {
   type TeamMember,
 } from "@/src/queries/team-members";
 
-import { ProjectsField } from "./projects-field";
-import { RoleField, hrmsStaffRoleId } from "./role-field";
-import { ShareInviteDialog } from "./share-invite-dialog";
+import { ProjectsField } from "@/app/app/staff/office-staff/_components/projects-field";
+import {
+  RoleField,
+  hrmsStaffRoleId,
+} from "@/app/app/staff/office-staff/_components/role-field";
+import { ShareInviteDialog } from "@/app/app/staff/office-staff/_components/share-invite-dialog";
 import {
   SignInOptions,
   addStaffSchema,
   inviteAvailable,
   signInWays,
   type AddStaffValues,
-} from "./sign-in-options";
+} from "@/app/app/staff/office-staff/_components/sign-in-options";
 import {
   EMPTY_DETAILS,
   TeamMemberDetailsFields,
   detailErrorFields,
   detailsInput,
-} from "./team-member-details-fields";
+} from "@/app/app/staff/office-staff/_components/team-member-details-fields";
 
 const EMPTY: AddStaffValues = { ...EMPTY_DETAILS, invite: true, password: "" };
 

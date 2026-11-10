@@ -37,8 +37,8 @@ import {
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
-import { localToday } from "@/components/payments/payment-format";
-import { formatDate } from "@/components/payments/payment-format";
+import { localToday } from "@/app/app/_components/payments/payment-format";
+import { formatDate } from "@/app/app/_components/payments/payment-format";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   canIn,

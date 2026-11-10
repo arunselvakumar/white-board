@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { CompanyBackupScreen } from "@/components/backups/company-backup-screen";
+import { CompanyBackupScreen } from "@/app/app/settings/backup/_components/company-backup-screen";
 
 export const metadata: Metadata = { title: "Backup & export" };
 

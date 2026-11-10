@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-import { RolesList } from "@/components/roles/roles-list";
-import { RolesNoAccess } from "@/components/roles/roles-no-access";
+import { RolesList } from "@/app/app/staff/roles/_components/roles-list";
+import { RolesNoAccess } from "@/app/app/staff/_components/roles-no-access";
 
 import { viewerRoleActions } from "./_lib/role-actions";
 

@@ -3,8 +3,8 @@ import { expect, waitFor, within } from "storybook/test";
 
 import type { TeamMember } from "@/src/queries/team-members";
 
-import { mockFetch } from "../../.storybook/mock-fetch";
-import { signInAs } from "../../.storybook/mocks/auth";
+import { mockFetch } from "@/.storybook/mock-fetch";
+import { signInAs } from "@/.storybook/mocks/auth";
 import { TeamMembersPage } from "./team-members-page";
 
 const LIST = "/api/construction/organization/team-members";

@@ -32,7 +32,12 @@ import {
 } from "@/src/queries/balances";
 import { PAYMENTS_API, useCancelPayment } from "@/src/queries/payments";
 
-import { formatDate, KIND_LABELS, money, sourceLabel } from "./payment-format";
+import {
+  formatDate,
+  KIND_LABELS,
+  money,
+  sourceLabel,
+} from "@/app/app/_components/payments/payment-format";
 import { StatementLinesSkeleton } from "./payments-skeletons";
 
 export type StatementTarget = { id: string; name: string };

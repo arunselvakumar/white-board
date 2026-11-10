@@ -37,7 +37,7 @@ import {
   formatDate,
   localToday,
   money,
-} from "@/components/payments/payment-format";
+} from "@/app/app/_components/payments/payment-format";
 import {
   DateFilter,
   NO_DATE_FILTER,

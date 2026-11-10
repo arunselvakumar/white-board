@@ -18,7 +18,10 @@ import type {
 
 import { BalancesTable } from "./balances-table";
 import { PayDialog, type PayTarget } from "./pay-dialog";
-import { localToday, rangeOf } from "./payment-format";
+import {
+  localToday,
+  rangeOf,
+} from "@/app/app/_components/payments/payment-format";
 import { PaymentsList } from "./payments-list";
 import { PeriodSwitcher } from "./period-switcher";
 import { StatementSheet, type StatementTarget } from "./statement-sheet";

@@ -18,7 +18,10 @@ import { Button, buttonVariants } from "@repo/ui/components/button";
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
 import { FinanceDocumentActivity } from "@/app/app/projects/[id]/payments/_components/finance-document-activity";
-import { formatDate, money } from "@/components/payments/payment-format";
+import {
+  formatDate,
+  money,
+} from "@/app/app/_components/payments/payment-format";
 import { ReasonDialog } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/reason-dialog";
 import { fieldForCode } from "@/lib/server-errors";
 import { canInFinance, financeAccessQuery } from "@/src/queries/finance-access";

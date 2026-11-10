@@ -29,7 +29,10 @@ import {
   type PaymentPartyType,
 } from "@/src/queries/balances";
 
-import { money, PARTY_NOUNS } from "./payment-format";
+import {
+  money,
+  PARTY_NOUNS,
+} from "@/app/app/_components/payments/payment-format";
 import { BALANCE_FIGURES } from "./payments-skeletons";
 
 const FIGURES = BALANCE_FIGURES;

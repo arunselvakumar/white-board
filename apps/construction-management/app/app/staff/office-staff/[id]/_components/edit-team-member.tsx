@@ -43,12 +43,12 @@ import {
   type TeamMember,
 } from "@/src/queries/team-members";
 
-import { MemberStatusBadge } from "./member-status-badge";
-import { TeamMemberProjectsTab } from "./projects-field";
-import { RoleField } from "./role-field";
+import { MemberStatusBadge } from "@/app/app/staff/office-staff/_components/member-status-badge";
+import { TeamMemberProjectsTab } from "@/app/app/staff/office-staff/_components/projects-field";
+import { RoleField } from "@/app/app/staff/office-staff/_components/role-field";
 import { SetPasswordDialog } from "./set-password-dialog";
-import { ShareInviteDialog } from "./share-invite-dialog";
-import { signInWays } from "./sign-in-options";
+import { ShareInviteDialog } from "@/app/app/staff/office-staff/_components/share-invite-dialog";
+import { signInWays } from "@/app/app/staff/office-staff/_components/sign-in-options";
 import {
   TeamMemberDetailsFields,
   detailErrorFields,
@@ -56,7 +56,7 @@ import {
   savedSalary,
   teamMemberDetailsSchema,
   type TeamMemberDetailsValues,
-} from "./team-member-details-fields";
+} from "@/app/app/staff/office-staff/_components/team-member-details-fields";
 
 function valuesOf(member: TeamMember): TeamMemberDetailsValues {
   return {

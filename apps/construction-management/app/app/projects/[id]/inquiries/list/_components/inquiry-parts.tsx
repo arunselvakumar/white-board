@@ -1,7 +1,7 @@
 import { Badge } from "@repo/ui/components/badge";
 import { cn } from "@repo/ui/lib/utils";
 
-import { formatDate } from "@/components/payments/payment-format";
+import { formatDate } from "@/app/app/_components/payments/payment-format";
 import type { InquiryDetail } from "@/src/queries/sales-inquiries";
 import {
   FOLLOW_UP_DUE_LABELS,

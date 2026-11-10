@@ -20,7 +20,7 @@ import { cn } from "@repo/ui/lib/utils";
 import { FormAlert } from "@/components/auth/form-alert";
 import { FinanceDocumentActivity } from "@/app/app/projects/[id]/payments/_components/finance-document-activity";
 import { COUNTERPARTY_KIND_LABELS } from "@/app/app/projects/[id]/payments/_components/counterparty-field";
-import { formatDate } from "@/components/payments/payment-format";
+import { formatDate } from "@/app/app/_components/payments/payment-format";
 import { ReasonDialog } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/reason-dialog";
 import { SiteRecordHeader } from "@/app/app/projects/[id]/_components/site-work/site-record-header";
 import { fieldForCode } from "@/lib/server-errors";

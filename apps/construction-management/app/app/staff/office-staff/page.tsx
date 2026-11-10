@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-import { RolesNoAccess } from "@/components/roles/roles-no-access";
-import { TeamMembersPage } from "@/components/team-members/team-members-page";
+import { RolesNoAccess } from "@/app/app/staff/_components/roles-no-access";
+import { TeamMembersPage } from "@/app/app/staff/office-staff/_components/team-members-page";
 
 import { viewerFlags } from "../../_lib/viewer-can";
 

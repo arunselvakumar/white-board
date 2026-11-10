@@ -4,7 +4,7 @@ import { DatabaseBackup } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@repo/ui/components/button";
 
-import { MastersBackupDialog } from "./backup-dialog";
+import { MastersBackupDialog } from "@/app/app/_components/backups/backup-dialog";
 
 /** Masters → Backup (CM-906): the master records the member may view. */
 export function MastersBackupButton() {

@@ -8,7 +8,7 @@ import { useState, type ReactNode } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 
 import { FormAlert } from "@/components/auth/form-alert";
-import { formatDate } from "@/components/payments/payment-format";
+import { formatDate } from "@/app/app/_components/payments/payment-format";
 import { QueryHttpError } from "@/src/queries/http";
 import { bookingsPath } from "@/src/queries/sales-bookings";
 import { salesUnitQuery, useUnitCommand } from "@/src/queries/sales-units";

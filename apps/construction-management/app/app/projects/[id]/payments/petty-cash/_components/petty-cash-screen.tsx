@@ -17,7 +17,7 @@ import {
 } from "@repo/ui/components/empty";
 import { cn } from "@repo/ui/lib/utils";
 
-import { formatDate } from "@/components/payments/payment-format";
+import { formatDate } from "@/app/app/_components/payments/payment-format";
 import { canInFinance, financeAccessQuery } from "@/src/queries/finance-access";
 import {
   pettyCashAccountsQuery,

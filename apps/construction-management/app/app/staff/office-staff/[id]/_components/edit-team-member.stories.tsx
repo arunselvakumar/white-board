@@ -6,13 +6,13 @@ import {
   ACCOUNTANT_ROLE,
   ROLES,
   ROLES_URL,
-} from "@/components/roles/role-fixtures";
+} from "@/app/app/staff/_components/role-fixtures";
 import type { TeamMember } from "@/src/queries/team-members";
 
-import { mockFetch, type MockRoute } from "../../.storybook/mock-fetch";
-import { signInAs } from "../../.storybook/mocks/auth";
+import { mockFetch, type MockRoute } from "@/.storybook/mock-fetch";
+import { signInAs } from "@/.storybook/mocks/auth";
 import { EditTeamMember } from "./edit-team-member";
-import { teamMember } from "./team-member-fixtures";
+import { teamMember } from "@/app/app/staff/office-staff/_components/team-member-fixtures";
 
 const MEMBER = teamMember({ status: "active", userId: "user_prabhu" });
 const ONE = `/api/construction/organization/team-members/${MEMBER.id}`;

@@ -51,7 +51,10 @@ import {
   type WagePayment,
 } from "@/src/queries/payments";
 
-import { formatDate, money } from "./payment-format";
+import {
+  formatDate,
+  money,
+} from "@/app/app/_components/payments/payment-format";
 import { PAYMENT_COLUMNS, PaymentRowsSkeleton } from "./payments-skeletons";
 
 const TYPES: FilterTab<"all" | "labour" | "vendor">[] = [

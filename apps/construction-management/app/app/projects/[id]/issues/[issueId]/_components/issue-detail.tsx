@@ -31,7 +31,7 @@ import { cn } from "@repo/ui/lib/utils";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { LocationLabel } from "@/app/app/_components/locations/location-picker";
-import { formatDate } from "@/components/payments/payment-format";
+import { formatDate } from "@/app/app/_components/payments/payment-format";
 import { SiteRecordHeader } from "@/app/app/projects/[id]/_components/site-work/site-record-header";
 import { TrackingDocumentFiles } from "@/app/app/projects/[id]/_components/tracking/documents/tracking-document-files";
 import { TrackingEntryFilesField } from "@/app/app/projects/[id]/_components/tracking/documents/tracking-entry-files-field";

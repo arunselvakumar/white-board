@@ -41,9 +41,9 @@ import {
   type Backup,
 } from "@/src/queries/backups";
 
-import { BackupModulePicker } from "./backup-module-picker";
-import { BackupProgress } from "./backup-progress";
-import { BackupModulesSkeleton } from "./backups-skeletons";
+import { BackupModulePicker } from "@/app/app/_components/backups/backup-module-picker";
+import { BackupProgress } from "@/app/app/_components/backups/backup-progress";
+import { BackupModulesSkeleton } from "@/app/app/_components/backups/backups-skeletons";
 
 const schema = z.object({
   code: z.string().regex(/^\d{6}$/, "Enter the 6-digit code"),

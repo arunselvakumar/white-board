@@ -19,7 +19,7 @@ import { FinancePendingFilesField } from "@/app/app/projects/[id]/payments/_comp
 import { useUploadPendingFinanceFiles } from "@/app/app/projects/[id]/payments/_components/use-upload-pending-files";
 import { PaymentCategoryPicker } from "@/app/app/projects/[id]/payments/_components/payment-category-picker";
 import { MoneyInput } from "@/components/money/money-input";
-import { localToday } from "@/components/payments/payment-format";
+import { localToday } from "@/app/app/_components/payments/payment-format";
 import { fieldForCode } from "@/lib/server-errors";
 import { canInFinance, financeAccessQuery } from "@/src/queries/finance-access";
 import {

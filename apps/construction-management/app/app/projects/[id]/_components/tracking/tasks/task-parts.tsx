@@ -3,7 +3,7 @@ import { cn } from "@repo/ui/lib/utils";
 import type { ReactNode } from "react";
 
 import { formatPaise } from "@/components/money/money-input";
-import { formatDate } from "@/components/payments/payment-format";
+import { formatDate } from "@/app/app/_components/payments/payment-format";
 import type { Task } from "@/src/queries/tracking-tasks";
 import {
   TASK_STATUS_LABELS,

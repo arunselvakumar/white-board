@@ -37,7 +37,7 @@ import {
   formatDate,
   localToday,
   money,
-} from "@/components/payments/payment-format";
+} from "@/app/app/_components/payments/payment-format";
 import { quantityText } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/purchase-request-format";
 import { fieldForCode } from "@/lib/server-errors";
 import { materialOptionsQuery } from "@/src/queries/material-options";
