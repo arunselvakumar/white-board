@@ -10,12 +10,11 @@ import {
 } from "@/app/app/workspace/_components/central-store-workspace-tiles";
 
 /**
- * Work across all Projects (`docs/00-overview.md`): Central Store (CM-508),
- * Central Inventory (CM-509), Central Payment (CM-709), Party Balance
- * (CM-708) and Central Reports (CM-903) for members who may read them. The
- * page decides which tiles the viewer may see; the Workspace submenu lists
- * the same five pages. HRMS had a tile here until it moved to Human
- * Resources (ADR CM-0034).
+ * Work across all Projects (`docs/00-overview.md`): Central Store, Central
+ * Inventory, Central Payment, Party Balance and Central Reports for members
+ * who may read them. The page decides which tiles the viewer may see; the
+ * Workspace submenu lists the same five pages. HRMS has no tile: it is under
+ * Human Resources (ADR CM-0034).
  */
 export function WorkspaceIndex({
   centralStore,

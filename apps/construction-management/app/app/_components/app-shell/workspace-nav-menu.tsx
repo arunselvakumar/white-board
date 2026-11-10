@@ -39,13 +39,12 @@ const REPORT_SECTIONS = [
 ] as const;
 
 /**
- * The Workspace submenu, one group per cross-project module. HRMS was the
- * first group until it moved to Human Resources (ADR CM-0034).
+ * The Workspace submenu, one group per cross-project module. HRMS is
+ * under Human Resources (ADR CM-0034).
  */
 export const WORKSPACE_GROUPS: readonly AreaNavGroup[] = [
   { label: "Materials", sections: CENTRAL_STORE_SECTIONS },
   { label: "Payments", sections: PAYMENT_SECTIONS },
-  // Central Reports (CM-903).
   { label: "Reports", sections: REPORT_SECTIONS },
 ];
 

@@ -48,10 +48,10 @@ function bannerFor(view: SubscriptionView): Banner | null {
 }
 
 /**
- * The plan banner under the shell header (CM-118): a plan about to end, or
- * an ended plan (read-only, export still open). A Company with no plan yet
- * sees nothing. It never blocks the page: while loading or on error it
- * shows nothing.
+ * The plan banner above the page: a plan about to end, or an ended
+ * plan (read-only, export still open). A Company with no plan yet sees
+ * nothing. It never blocks the page: while loading or on error it shows
+ * nothing.
  */
 export function PlanBanner() {
   const { data } = useQuery({ ...subscriptionQuery, retry: false });

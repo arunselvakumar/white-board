@@ -33,7 +33,6 @@ import {
 
 import { DownloadRow } from "./download-row";
 
-/** The user menu's Downloads. */
 export const DOWNLOADS_PATH = "/app/downloads";
 
 function messageOf(error: unknown): string {

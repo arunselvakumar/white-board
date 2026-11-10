@@ -941,7 +941,6 @@ function useCanWrite(projectId: string, flag: "create" | "update") {
   return access == null || canIn(access, "procurement.material_received", flag);
 }
 
-/** Record Goods Receipt on a Project. */
 export function NewGoodsReceiptScreen({
   projectId,
   today,
@@ -976,7 +975,7 @@ export function NewGoodsReceiptScreen({
   );
 }
 
-/** Edit Goods Receipt; 409 when someone saved it since. */
+/** 409 when someone saved the Goods Receipt since it loaded. */
 export function EditGoodsReceiptScreen({
   projectId,
   id,

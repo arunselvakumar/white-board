@@ -19,7 +19,7 @@ const ROLE_LABEL = { owner: "Owner", member: "Team Member" } as const;
 
 /**
  * Switch Company, a row at the foot of the sidebar (ADR-0051). It opens a
- * modal of the User's Companies to switch to another one (CM-105) or create
+ * modal of the User's Companies to switch to another one or create
  * a new one. In this product the word is Company: Workspace is the main
  * menu's cross-Project area. Closing the modal clears an error, and the
  * spinner too once the switch has answered: if a page's leave-site warning

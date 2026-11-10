@@ -9,7 +9,6 @@ import { myProfileQuery } from "@/src/queries/my-profile";
 
 import { MyProfileForm } from "./my-profile-form";
 
-/** My Profile, opened from the account menu. */
 export function MyProfileScreen() {
   const { data: profile } = useSuspenseQuery(myProfileQuery);
   const { company } = useActiveCompany();
