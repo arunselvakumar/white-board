@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 import { QuerySuspense } from "@/components/query-suspense";
-import { EditVendorScreen } from "@/components/vendors/vendor-form";
-import { VendorFormSkeleton } from "@/components/vendors/vendors-skeletons";
+import { EditVendorScreen } from "@/app/app/staff/vendors/_components/vendor-form";
+import { VendorFormSkeleton } from "@/app/app/staff/vendors/_components/vendors-skeletons";
 
 export const metadata: Metadata = { title: "Edit Vendor" };
 

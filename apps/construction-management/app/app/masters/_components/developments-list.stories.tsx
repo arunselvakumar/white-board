@@ -3,9 +3,9 @@ import { expect, waitFor, within } from "storybook/test";
 
 import type { DevelopmentItem } from "@/src/queries/developments";
 
-import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import { AmenitiesList, CommonDevelopmentsList } from "./developments-list";
-import { chooseFromMenu } from "./masters-story-support";
+import { chooseFromMenu } from "@/app/app/_components/masters/masters-story-support";
 
 const AMENITIES = "/api/construction/masters/amenities";
 const COMMON = "/api/construction/masters/common-developments";

@@ -11,7 +11,7 @@ import {
   ChecklistSkeleton,
   FormPageSkeleton,
   FormSectionSkeleton,
-} from "@/components/masters/masters-skeletons";
+} from "@/app/app/_components/masters/masters-skeletons";
 
 import type { PartyScreen } from "./party-screens";
 

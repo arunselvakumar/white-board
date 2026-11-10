@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { WorkTypesList } from "@/components/masters/work-types-list";
+import { WorkTypesList } from "@/app/app/masters/work-types/_components/work-types-list";
 
 export const metadata: Metadata = { title: "Work Types" };
 

@@ -16,7 +16,7 @@ import {
 } from "@repo/ui/components/dialog";
 import { Label } from "@repo/ui/components/label";
 
-import { MasterSearch } from "@/components/masters/master-list-parts";
+import { MasterSearch } from "@/app/app/_components/masters/master-list-parts";
 import { HRMS_PATH } from "@/lib/hrms-nav";
 import {
   hrmsRotationTemplatesQuery,

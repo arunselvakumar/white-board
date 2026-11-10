@@ -4,7 +4,7 @@ import { expect, waitFor, within } from "storybook/test";
 import {
   calledPath,
   StoryQueryClient,
-} from "@/components/masters/masters-story-support";
+} from "@/app/app/_components/masters/masters-story-support";
 
 import { DepartmentsList, LabourCategoriesList } from "./lookup-list";
 import {
@@ -12,7 +12,7 @@ import {
   serveMasters,
   STORY_DEPARTMENTS,
   STORY_LABOUR_CATEGORIES,
-} from "./masters-story-support";
+} from "@/app/app/_components/masters/masters-story-support";
 
 const CATEGORIES = "/api/construction/masters/labour-categories";
 const DEPARTMENTS = "/api/construction/masters/departments";

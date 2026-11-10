@@ -18,7 +18,7 @@ import { PageHeader } from "@/components/app-shell/page-header";
 import {
   MasterEmpty,
   MasterSearch,
-} from "@/components/masters/master-list-parts";
+} from "@/app/app/_components/masters/master-list-parts";
 import {
   equipmentFormOptionsQuery,
   equipmentListQuery,

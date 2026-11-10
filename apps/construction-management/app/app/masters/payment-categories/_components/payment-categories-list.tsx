@@ -15,7 +15,7 @@ import {
   MasterRow,
   MasterSearch,
   byName,
-} from "@/components/masters/master-list-parts";
+} from "@/app/app/_components/masters/master-list-parts";
 import { fieldForCode } from "@/lib/server-errors";
 import { canInFinance, financeAccessQuery } from "@/src/queries/finance-access";
 import {

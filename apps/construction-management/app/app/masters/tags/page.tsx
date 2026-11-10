@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { TagsList } from "@/components/masters/tracking-master-lists";
+import { TagsList } from "@/app/app/masters/_components/tracking-master-lists";
 
 export const metadata: Metadata = { title: "Tags" };
 

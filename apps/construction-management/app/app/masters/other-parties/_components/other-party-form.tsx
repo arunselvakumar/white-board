@@ -22,13 +22,13 @@ import { PageHeader } from "@/components/app-shell/page-header";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MobileField } from "@/components/auth/mobile-field";
-import { CheckList } from "@/components/masters/check-list";
+import { CheckList } from "@/app/app/_components/masters/check-list";
 import {
   GST_STATE_ITEMS,
   NO_STATE,
   gstStateLabel,
   gstinState,
-} from "@/components/parties/party-form-schema";
+} from "@/app/app/masters/_components/parties/party-form-schema";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   otherPartyQuery,

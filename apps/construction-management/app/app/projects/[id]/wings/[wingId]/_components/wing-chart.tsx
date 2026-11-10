@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 
-import { ConfirmDeleteDialog } from "@/components/masters/master-list-parts";
+import { ConfirmDeleteDialog } from "@/app/app/_components/masters/master-list-parts";
 import {
   wingLayout,
   wingTypeLabel,

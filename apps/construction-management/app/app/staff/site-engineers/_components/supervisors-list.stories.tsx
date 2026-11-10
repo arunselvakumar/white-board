@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueryClient } from "@/components/masters/masters-story-support";
+import { StoryQueryClient } from "@/app/app/_components/masters/masters-story-support";
 
 import {
   chooseFromMenu,
   serveMasters,
   STORY_SUPERVISORS,
   STORY_TEAM_MEMBER_ID,
-} from "./masters-story-support";
+} from "@/app/app/_components/masters/masters-story-support";
 import { SupervisorsList } from "./supervisors-list";
 
 const BASE = "/api/construction/masters/supervisors";

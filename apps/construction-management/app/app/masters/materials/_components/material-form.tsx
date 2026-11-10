@@ -43,7 +43,7 @@ import {
   type MaterialItem,
 } from "@/src/queries/material-masters";
 
-import { ITEM_TYPE_LABELS } from "./material-master-lists";
+import { ITEM_TYPE_LABELS } from "@/app/app/masters/_components/material-master-lists";
 
 export const MATERIALS_PATH = "/app/masters/materials";
 

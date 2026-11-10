@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { DepartmentsList } from "@/components/masters/lookup-list";
+import { DepartmentsList } from "@/app/app/masters/_components/lookup-list";
 
 export const metadata: Metadata = { title: "Departments" };
 

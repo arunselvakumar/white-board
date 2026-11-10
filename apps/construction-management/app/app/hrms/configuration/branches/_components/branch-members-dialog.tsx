@@ -16,7 +16,7 @@ import {
 import { Label } from "@repo/ui/components/label";
 
 import { FormAlert } from "@/components/auth/form-alert";
-import { MasterSearch } from "@/components/masters/master-list-parts";
+import { MasterSearch } from "@/app/app/_components/masters/master-list-parts";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   HRMS_BRANCHES_KEY,

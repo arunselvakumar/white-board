@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueryClient } from "@/components/masters/masters-story-support";
+import { StoryQueryClient } from "@/app/app/_components/masters/masters-story-support";
 
-import { mockFetch } from "../../.storybook/mock-fetch";
+import { mockFetch } from "@/.storybook/mock-fetch";
 import { PartiesPage } from "./parties-page";
 import { BALAJI, KAVERI, RAMCO, page } from "./party-fixtures";
 

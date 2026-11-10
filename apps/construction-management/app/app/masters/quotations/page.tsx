@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { QuotationsPage } from "@/components/parties/quotations-page";
+import { QuotationsPage } from "@/app/app/masters/quotations/_components/quotations-page";
 
 export const metadata: Metadata = { title: "View Quotations" };
 

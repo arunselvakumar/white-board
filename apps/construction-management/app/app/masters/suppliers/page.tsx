@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { PartiesPage } from "@/components/parties/parties-page";
+import { PartiesPage } from "@/app/app/masters/_components/parties/parties-page";
 
 export const metadata: Metadata = { title: "Suppliers" };
 

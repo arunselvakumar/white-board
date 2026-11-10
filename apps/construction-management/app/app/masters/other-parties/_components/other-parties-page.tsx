@@ -47,7 +47,7 @@ import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
-import { namesText } from "@/components/parties/parties-page";
+import { namesText } from "@/app/app/masters/_components/parties/parties-page";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   otherPartiesQuery,

@@ -45,9 +45,12 @@ import {
   type QuotationsFilter,
 } from "@/src/queries/quotations";
 
-import { quotationOpenUrl } from "./party-quotations";
-import { PARTY_SCREENS, partyEditPath } from "./party-screens";
-import { QuotationRowsSkeleton } from "./parties-skeletons";
+import { quotationOpenUrl } from "@/app/app/masters/_components/parties/party-quotations";
+import {
+  PARTY_SCREENS,
+  partyEditPath,
+} from "@/app/app/masters/_components/parties/party-screens";
+import { QuotationRowsSkeleton } from "@/app/app/masters/_components/parties/parties-skeletons";
 
 const KIND_FILTERS: {
   value: QuotationsFilter["partyKind"];

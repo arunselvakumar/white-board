@@ -1,7 +1,7 @@
 import { normalizeMobile } from "@repo/auth/construction/react";
 import { z } from "zod";
 
-import { gstinState } from "@/components/parties/party-form-schema";
+import { gstinState } from "@/app/app/masters/_components/parties/party-form-schema";
 import { QueryHttpError } from "@/src/queries/http";
 import type {
   OtherParty,

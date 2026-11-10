@@ -4,13 +4,13 @@ import { expect, fn, waitFor, within } from "storybook/test";
 import {
   sentTo,
   StoryQueryClient,
-} from "@/components/masters/masters-story-support";
+} from "@/app/app/_components/masters/masters-story-support";
 
 import {
   serveMasters,
   STORY_SUPERVISORS,
   STORY_TEAM_MEMBER_ID,
-} from "./masters-story-support";
+} from "@/app/app/_components/masters/masters-story-support";
 import { SupervisorDialog } from "./supervisor-dialog";
 
 const BASE = "/api/construction/masters/supervisors";

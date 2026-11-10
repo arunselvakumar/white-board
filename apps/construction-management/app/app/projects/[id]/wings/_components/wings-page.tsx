@@ -15,7 +15,7 @@ import {
 } from "@repo/ui/components/dropdown-menu";
 
 import { FormAlert } from "@/components/auth/form-alert";
-import { ConfirmDeleteDialog } from "@/components/masters/master-list-parts";
+import { ConfirmDeleteDialog } from "@/app/app/_components/masters/master-list-parts";
 import { PHASE_NAME_MAX, nextPhaseName } from "@/src/projects/domain/phase";
 import { wingTypeLabel } from "@/src/projects/domain/wing-generator";
 import {
