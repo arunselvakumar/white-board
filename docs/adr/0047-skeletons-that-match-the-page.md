@@ -23,7 +23,7 @@ The skeleton colour was `bg-muted` (`#eef0f8`), which reads as grey next to the 
 | `CardGridSkeleton`     | a grid of cards (report cards, project tiles)                                                                          |
 | `CalendarGridSkeleton` | a month or attendance grid                                                                                             |
 
-Construction Management adds `PageHeaderSkeleton` and a better root `PageFallback` (a page header and a table) in `components/`. Each product area keeps its skeletons in one `*-skeletons.tsx` file beside its pages.
+Construction Management adds `PageHeaderSkeleton` and a better root `PageFallback` (a page header and a table) in `components/`. Each product area keeps its skeletons in one `*-skeletons.tsx` file beside its pages (in that area's `_components/` folder, AGENTS.md "Where components go").
 
 **One tint for both apps.** `--skeleton` is the primary mixed 16% into transparent (20% in dark mode, where the primary is `#7b82c4`). Because the mix is into transparent, a bar looks right on the page background and on a card. The Whiteboard app's existing skeletons pick it up too; only Construction Management gets the layout work now.
 
