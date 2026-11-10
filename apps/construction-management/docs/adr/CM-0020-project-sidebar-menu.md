@@ -62,5 +62,5 @@ Every Home tile was already an entry in the sidebar, so the Home page repeated t
 
 ## Consequences
 
-- `ProjectShell` no longer renders navigation; `ProjectNavMenu` in the app shell does. Stories for the menu live in `components/app-shell/project-nav-menu.stories.tsx`.
+- `ProjectShell` no longer renders navigation; `ProjectNavMenu` in the app shell does. Stories for the menu live in `app/app/_components/app-shell/project-nav-menu.stories.tsx`.
 - `PaymentsNav`, `MaterialsNav`, `EquipmentNav` and `AttendanceTabs` became link builders (`usePaymentsNavLinks`, `useMaterialsNavLinks`, `useEquipmentNavLinks`, `attendanceNavLinks`) that the submenus use.

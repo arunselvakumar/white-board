@@ -24,7 +24,7 @@ The Projects home listed every Project as a table row: name, Project Type and ad
 | `sand`     | Sand     |
 | `slate`    | Slate    |
 
-The keys and labels live in the domain (`src/projects/domain/project-color.ts`), like the Project Types. The tints live in the UI (`components/projects/project-folder-colors.ts`), because they are presentation. In light mode the folder is the hue's 100 shade (50 for Lemon, which is brighter) with a 200 back panel. In dark mode the hue is mixed into the card colour (14% for the front, 28% for the back), so the folders stay dark and low in saturation, with the usual light text.
+The keys and labels live in the domain (`src/projects/domain/project-color.ts`), like the Project Types. The tints live in the UI (`app/app/projects/_components/project-folder-colors.ts`), because they are presentation. In light mode the folder is the hue's 100 shade (50 for Lemon, which is brighter) with a 200 back panel. In dark mode the hue is mixed into the card colour (14% for the front, 28% for the back), so the folders stay dark and low in saturation, with the usual light text.
 
 - Add Project: `color` is optional. Left out, null or blank, it is Lavender. Every new Project starts as Lavender: the default does **not** rotate to the next unused colour.
 - Edit Project: `color` left out keeps the stored colour. Null or blank sets it back to Lavender, since a Project always has one.
