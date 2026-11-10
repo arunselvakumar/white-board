@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn } from "storybook/test";
 
-import { GoogleButton } from "@/components/auth/google-button";
-import { withAuthFormFrame } from "../../.storybook/decorators";
+import { GoogleButton } from "@/app/(public)/_components/google-button";
+import { withAuthFormFrame } from "@/.storybook/decorators";
 
 const meta = {
   title: "Auth/GoogleButton",

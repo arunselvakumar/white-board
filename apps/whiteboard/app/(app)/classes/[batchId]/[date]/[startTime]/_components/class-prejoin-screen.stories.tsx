@@ -8,7 +8,7 @@ import {
   authMocks,
   signInAs,
   type WorkspaceRole,
-} from "../../.storybook/mocks/auth";
+} from "@/.storybook/mocks/auth";
 
 import { ClassPrejoinScreen } from "./class-prejoin-screen";
 

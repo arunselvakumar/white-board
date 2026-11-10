@@ -1,4 +1,4 @@
-import { CreateWorkspaceForm } from "@/components/onboarding/create-workspace-form";
+import { CreateWorkspaceForm } from "@/app/(onboarding)/create-workspace/_components/create-workspace-form";
 import { createWorkspace } from "@/lib/create-workspace";
 import { postWorkspacePath } from "@/lib/safe-redirect";
 

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor } from "storybook/test";
 
-import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
-import { withAuthFormFrame } from "../../.storybook/decorators";
-import { authFailure, authMocks, signInAs } from "../../.storybook/mocks/auth";
+import { ForgotPasswordForm } from "@/app/(public)/forgot-password/_components/forgot-password-form";
+import { withAuthFormFrame } from "@/.storybook/decorators";
+import { authFailure, authMocks, signInAs } from "@/.storybook/mocks/auth";
 
 type Canvas = Parameters<NonNullable<Story["play"]>>[0]["canvas"];
 type UserEvent = Parameters<NonNullable<Story["play"]>>[0]["userEvent"];

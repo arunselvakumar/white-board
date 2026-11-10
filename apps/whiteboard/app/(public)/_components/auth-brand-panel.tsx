@@ -1,4 +1,4 @@
-import { DottedLogo } from "@/components/auth/dotted-logo";
+import { DottedLogo } from "@/app/(public)/_components/dotted-logo";
 
 export function AuthBrandPanel() {
   return (

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { AuthBrandPanel } from "@/components/auth/auth-brand-panel";
+import { AuthBrandPanel } from "@/app/(public)/_components/auth-brand-panel";
 import { PageTransition } from "@/components/page-transition";
 
 export function PublicShell({ children }: { children: ReactNode }) {

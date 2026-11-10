@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { ClassPrejoinScreen } from "@/components/classes/class-prejoin-screen";
+import { ClassPrejoinScreen } from "@/app/(app)/classes/[batchId]/[date]/[startTime]/_components/class-prejoin-screen";
 
 export const metadata: Metadata = { title: "Join class" };
 

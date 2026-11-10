@@ -3,7 +3,7 @@ import { fn } from "storybook/test";
 import type {
   CreateWorkspaceFn,
   CreateWorkspaceResult,
-} from "@/components/onboarding/create-workspace-form";
+} from "@/app/(onboarding)/create-workspace/_components/create-workspace-form";
 import type { AvailableInstitutionType } from "@/lib/institution-type";
 
 type CreateWorkspaceInput = {

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
 import { AuthHeading } from "@/components/auth/auth-heading";
-import { OnboardingShell } from "@/components/onboarding/onboarding-shell";
+import { OnboardingShell } from "@/app/(onboarding)/_components/onboarding-shell";
 
 const meta = {
   title: "Onboarding/OnboardingShell",

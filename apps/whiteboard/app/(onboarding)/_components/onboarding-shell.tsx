@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 
-import { SignOutButton } from "@/components/auth/sign-out-button";
+import { SignOutButton } from "@/app/(onboarding)/_components/sign-out-button";
 import { PageTransition } from "@/components/page-transition";
 
 export function OnboardingShell({ children }: { children: ReactNode }) {

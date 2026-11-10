@@ -8,9 +8,9 @@ import {
   mockApi,
   withFreshQueryClient,
 } from "@/app/(app)/_components/notifications/story-api";
-import { signInAs } from "../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 
-import { ReportSettingsScreen } from "./report-settings-screen";
+import { ReportSettingsScreen } from "../settings/_components/report-settings-screen";
 import { reportSettings } from "./reports.fixtures";
 
 const meta = {

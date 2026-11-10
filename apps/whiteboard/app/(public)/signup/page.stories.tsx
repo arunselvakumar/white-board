@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
-import { PublicShell } from "@/components/auth/public-shell";
-import { SignupForm } from "@/components/auth/signup-form";
+import { PublicShell } from "@/app/(public)/_components/public-shell";
+import { SignupForm } from "@/app/(public)/signup/_components/signup-form";
 
 const meta = {
   title: "Pages/Sign-up",

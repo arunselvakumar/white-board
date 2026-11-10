@@ -14,10 +14,10 @@ import type {
   ReportKey,
   ReportRole,
 } from "@/src/training-institute/domain/report-catalogue";
-import { signInAs } from "../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 
 import { ReportContent } from "./report-screen";
-import { ReportsCatalogue } from "./reports-catalogue";
+import { ReportsCatalogue } from "@/app/(app)/reports/_components/reports-catalogue";
 import {
   ANITA,
   DCA_MORNING,
@@ -27,7 +27,7 @@ import {
   registerDocument,
   reportOptions,
   studentAttendanceDocument,
-} from "./reports.fixtures";
+} from "@/app/(app)/reports/_components/reports.fixtures";
 
 /** The report screen with its filters in state, as the URL keeps them in the app. */
 function Harness({

@@ -10,14 +10,14 @@ import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 
-import { AuthDivider } from "@/components/auth/auth-divider";
+import { AuthDivider } from "@/app/(public)/_components/auth-divider";
 import { AuthHeading } from "@/components/auth/auth-heading";
-import { EmailCodeForm } from "@/components/auth/email-code-form";
+import { EmailCodeForm } from "@/app/(public)/_components/email-code-form";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { GoogleButton } from "@/components/auth/google-button";
+import { GoogleButton } from "@/app/(public)/_components/google-button";
 import { LoadingScreen } from "@/components/auth/loading-screen";
-import { PasswordField } from "@/components/auth/password-field";
+import { PasswordField } from "@/app/(public)/_components/password-field";
 import { authErrorMessage } from "@/lib/auth-errors";
 import { workspaceEntryPath } from "@/lib/workspace-entry";
 

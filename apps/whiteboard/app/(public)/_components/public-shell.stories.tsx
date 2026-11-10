@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
 import { AuthHeading } from "@/components/auth/auth-heading";
-import { PublicShell } from "@/components/auth/public-shell";
+import { PublicShell } from "@/app/(public)/_components/public-shell";
 
 const meta = {
   title: "Auth/PublicShell",
