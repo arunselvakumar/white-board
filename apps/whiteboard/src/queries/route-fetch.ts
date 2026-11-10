@@ -4,7 +4,19 @@ import type {
   QueryKey,
 } from "@tanstack/react-query";
 
+import { headers } from "next/headers";
+
 import type { QueryTransport } from "./http";
+
+/** Request headers a handler may read the Session or the client from. */
+const FORWARDED_HEADERS = [
+  "cookie",
+  "authorization",
+  "user-agent",
+  "accept-language",
+  "x-forwarded-for",
+  "x-real-ip",
+];
 
 /** A Next route handler: `GET(request)` or `GET(request, { params })`. */
 export type RouteHandler = (
@@ -14,9 +26,11 @@ export type RouteHandler = (
 
 /**
  * A transport that answers a query by calling the app's own route handler in
- * the page's request (ADR-0052): the handler resolves the Session from the
- * request's cookies, so tenancy, validation and the Response model are the
- * ones the browser gets. Keys are Next-style paths (`/api/x/[id]`).
+ * the page's request (ADR-0052). The handler's Request carries the page
+ * request's cookies, so it resolves the same Session whether it reads them
+ * from `request.headers` or `next/headers`; tenancy, validation and the
+ * Response model are the ones the browser gets. Keys are Next-style paths
+ * (`/api/x/[id]`).
  */
 export function routeFetch(
   routes: Record<string, RouteHandler>,
@@ -47,7 +61,13 @@ export function routeFetch(
         return value !== "";
       });
       if (matches) {
-        return handler(new Request(url, init), {
+        const incoming = await headers();
+        const forwarded = new Headers(init?.headers);
+        for (const name of FORWARDED_HEADERS) {
+          const value = incoming.get(name);
+          if (value != null && !forwarded.has(name)) forwarded.set(name, value);
+        }
+        return handler(new Request(url, { ...init, headers: forwarded }), {
           params: Promise.resolve(params),
         });
       }

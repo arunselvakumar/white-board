@@ -11,3 +11,5 @@ Whiteboard already has `QueryClientProvider`. In-app screens that read HTTP APIs
 **Consequences:** loading and error UI live at the boundary, not in every screen. List/detail screens that ship after P0-002 follow the same module shape. Mutations stay `useMutation` and invalidate the resource key.
 
 See [`.grok/skills/tanstack-query/SKILL.md`](../../.grok/skills/tanstack-query/SKILL.md).
+
+> Amended by [ADR-0052](./0052-server-prefetch-through-route-handlers.md): pages prefetch on the server through their route handlers and hand the data to the client in `HydrationBoundary`; the client side below is unchanged.

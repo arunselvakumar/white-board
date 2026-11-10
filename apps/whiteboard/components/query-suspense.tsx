@@ -54,14 +54,21 @@ export function QuerySuspense({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const isClient = useIsClient();
 
-  // Paths that prefetch on the server render here too (ADR-0052).
-  if (!isClient && !isServerRendered(pathname)) return <PageFallback />;
+  // A path that prefetches on the server renders here too, and its route's
+  // `loading.tsx` is its only Suspense boundary: a second one above it
+  // would reveal the page in two throttled steps (ADR-0052).
+  const serverRendered = isServerRendered(pathname);
+  if (!isClient && !serverRendered) return <PageFallback />;
 
   return (
     <QueryErrorResetBoundary>
       {({ reset }) => (
         <QueryErrorBoundary onReset={reset} resetKey={pathname}>
-          <Suspense fallback={<PageFallback />}>{children}</Suspense>
+          {serverRendered ? (
+            children
+          ) : (
+            <Suspense fallback={<PageFallback />}>{children}</Suspense>
+          )}
         </QueryErrorBoundary>
       )}
     </QueryErrorResetBoundary>

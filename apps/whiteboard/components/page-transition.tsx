@@ -5,7 +5,6 @@ import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 import { cn } from "@repo/ui/lib/utils";
 
 import { pageTransitionHref } from "@/lib/page-transition";
-import { isServerRendered } from "@/lib/server-rendered-routes";
 
 import "./page-transition.css";
 
@@ -114,10 +113,6 @@ export function PageTransition({
         canViewTransition: typeof document.startViewTransition === "function",
       });
       if (href == null) return;
-      // A page that renders on the server shows its own `loading.tsx` at
-      // once; holding the old snapshot in a view transition would delay its
-      // streamed content until the animation ends (ADR-0052).
-      if (isServerRendered(destination.pathname)) return;
 
       // Capture runs before Next.js Link. preventDefault makes Link skip its
       // own navigation so the view transition can wait for the new page.

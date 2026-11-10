@@ -1,4 +1,4 @@
-# Pages prefetch on the server; `loading.tsx` and `error.tsx` replace `QuerySuspense`
+# Pages prefetch on the server through their route handlers; `error.tsx` replaces `QuerySuspense`
 
 Amends [ADR-0026](./0026-tanstack-query-suspense-for-client-reads.md) (how page reads reach data) and [ADR-0047](./0047-skeletons-that-match-the-page.md) (what a navigation shows). Issue #148.
 
@@ -12,13 +12,13 @@ The gate exists because all reads run in the browser only. Query functions in `s
 - ADR-0026 says "Server Components prefetch with `queryClient.prefetchQuery`", but `prefetchQuery` and `HydrationBoundary` appear zero times in either app. The ADR and the code have drifted.
 - `loading.tsx` can't replace `QuerySuspense` on its own: it is a Suspense boundary Next renders on the server, and without the gate `useSuspenseQuery` would run during the server render with no base URL and no cookie, and fail.
 
-Every route handler already resolves the Session itself: `requireSession()` / `requireAccess()` read the incoming request's cookies through `next/headers`, then check the role, the Active Workspace or Company, and the plan (ADR-0013, ADR-0014). A Server Component rendering the same request has the same cookies.
+Every route handler already resolves the Session itself from the request's cookies (`requireSession()` in Whiteboard through `next/headers`, `requireAccess(request, …)` in Construction Management from `request.headers`), then checks the role, the Active Workspace or Company, and the plan (ADR-0013, ADR-0014). A Server Component rendering the same request has the same cookies.
 
 ## Decision
 
 **1. A page prefetches its reads on the server and hands them to the client in `HydrationBoundary`.** `page.tsx` becomes an async Server Component. It takes the per-request `QueryClient` (`getQueryClient()` already returns a fresh one on the server), awaits the queries its screen reads first, and renders the screen inside `<HydrationBoundary state={dehydrate(queryClient)}>`. The client screen is unchanged: it still calls `useSuspenseQuery` with the same `queryOptions`, finds the data in the cache, and renders on the server as HTML.
 
-**2. The server reaches data by calling the route handler in-process.** The page imports the route's `GET` and passes it as the query's transport. The handler runs inside the page's request, so `requireSession()` sees the same cookies, and the page gets exactly what the browser would: the same validation, tenancy checks, status codes and Response model. There is no second read path to keep in step with the API, no HTTP call from the server to itself, and no cookie forwarding.
+**2. The server reaches data by calling the route handler in-process.** The page imports the route's `GET` and runs the query through it. The handler gets a `Request` carrying the page request's cookies (and user agent and client IP), so it resolves the same Session whether it reads them from `request.headers` (Construction Management) or `next/headers` (Whiteboard), and the page gets exactly what the browser would: the same validation, tenancy checks, status codes and Response model. There is no second read path to keep in step with the API and no HTTP call from the server to itself.
 
 - `apiJson(input, init, meta)` takes an optional fetch-shaped transport, `meta.fetch`. In the browser there is none and it uses `fetch`.
 - A query module's `queryFn` passes its context through: `queryFn: ({ meta }) => apiJson(url, undefined, meta)`. Modules change as their area migrates; the browser path is untouched.
@@ -26,15 +26,35 @@ Every route handler already resolves the Session itself: `requireSession()` / `r
 - `prefetchRoute` uses `queryClient.query` (it throws, unlike `prefetchQuery`) for the reads the first view needs, so a failure reaches `error.tsx` on the server instead of leaving the client to fetch a URL it can't reach during the server render. A prefetching page is `dynamic = "force-dynamic"`: it reads the request's cookies.
 - On the server, `apiJson` without a transport throws "not prefetched" instead of fetching a relative URL. A screen that reads something the page didn't prefetch fails loudly in development and, in production, React renders that boundary on the client (a recoverable error), so a missed prefetch costs speed, not correctness.
 
-**3. `loading.tsx` holds the page's skeleton; `error.tsx` holds its error state.** The skeleton that a page passed as `QuerySuspense`'s `fallback` moves to the route's `loading.tsx`. A route-group `error.tsx` replaces the hand-written boundary: "Couldn't load this page" with Try again, which resets TanStack's errored queries (`useQueryErrorResetBoundary().reset()`), refreshes the server segment (`router.refresh()`), and resets the boundary, in one transition.
+**3. `error.tsx` holds a page's error state; `loading.tsx` only where a page is slow.** A route-group `error.tsx` replaces the hand-written boundary: "Couldn't load this page" with Try again, which resets TanStack's errored queries (`useQueryErrorResetBoundary().reset()`), refreshes the server segment (`router.refresh()`), and resets the boundary, in one transition. A migrated page gets **no** `loading.tsx` by default. The trial measured why (see Trial): once a streamed boundary has painted its fallback, React holds the content back for at least 300 ms, so a `loading.tsx` on a page whose prefetch takes tens of milliseconds made Construction Management's Projects page _slower_ on a full load (828 ms with it, 343 ms without) and did nothing for navigation (about 120 ms either way). A page whose reads are measured slower than about 300 ms gets a `loading.tsx` with its area's skeleton.
 
-**4. A navigation shows the next page's own skeleton at once.** Next renders the target's `loading.tsx` as soon as a link is clicked, then streams the page when its prefetch finishes. This replaces ADR-0047's amendment, which kept the current page on screen until the next one could show its skeleton. The ADR-0047 rule still holds: the only skeleton a user sees is the page's own, never a generic one first. Whiteboard's page transition (a `document.startViewTransition` around each link click) is skipped for these routes: holding the old snapshot during the transition made React wait for the animation before revealing the streamed page (Home to Courses took 888 ms with it, 130 ms without). The CSS enter animation still plays.
+**4. A navigation keeps the current page until the next one is ready.** Without `loading.tsx`, Next keeps the current page on screen while it fetches the next page's server render, then swaps it in whole. That is ADR-0047's amendment ("the current page stays until the next one can show its own"), now with data instead of a skeleton: about 120 ms on the trial pages. Whiteboard's page transition (a view transition around each link click) keeps working as it is. While a migrated path is open, the layout's `QuerySuspense` adds no `Suspense` of its own above the page: two nested boundaries revealed the page in two throttled steps.
 
 **5. Section boundaries stay.** The ~150 section-level `<Suspense>` boundaries in Construction Management (dashboard sections, tabs, side panels) stay as they are. A section either prefetches with its page (when it is on screen at first) or keeps a client-only boundary: `QuerySuspense` shrinks to `ClientSuspense`, the old gate for one section, with no error boundary of its own.
 
 **6. Storybook doesn't change shape.** Stories render screens, not pages, under the same `QueryClientProvider` and mocked `fetch`; `meta.fetch` is absent there, so `apiJson` uses `fetch` as today. Story wrappers that used `QuerySuspense` use `Suspense` (or `ClientSuspense` for a section).
 
-**7. It rolls out area by area.** While both kinds of page exist, the layout keeps one `QuerySuspense` whose client-only gate is skipped for paths listed in `SERVER_RENDERED_ROUTES` (a prefix list, one line per migrated area). An area is done when its pages prefetch, its skeletons are `loading.tsx` files, and its tests pass; when the list covers every in-app path, the gate and `QuerySuspense` go. The rollout checklist is in issue #148.
+**7. It rolls out area by area.** While both kinds of page exist, the layout keeps one `QuerySuspense` whose client-only gate is skipped for the paths in `SERVER_RENDERED_ROUTES` (`lib/server-rendered-routes.ts`, one entry per migrated page). An area is done when every page in it prefetches what its first view reads and its tests pass; when the list covers every in-app path, the gate and `QuerySuspense` go, and the section-level `ClientSuspense` remains. The rollout checklist is in issue #148.
+
+## Trial
+
+Production builds (`next build --webpack`, `next start`) on a laptop, signed in as an Owner, median of 6 runs after a warm-up, measured with Playwright from navigation start to the page's data being visible:
+
+| Page                                                   | Before | After  | Client requests for the page's data |
+| ------------------------------------------------------ | ------ | ------ | ----------------------------------- |
+| Whiteboard Courses, full load                          | 817 ms | 318 ms | 1 → 0                               |
+| Whiteboard Home → Courses (sidebar)                    | 134 ms | 125 ms | 1 → 0                               |
+| Construction Management Projects, full load            | 822 ms | 343 ms | 1 → 0                               |
+| Construction Management Downloads → Projects (sidebar) | 891 ms | 121 ms | 1 → 0                               |
+| Construction Management Settings, full load            | 622 ms | 376 ms | 1 → 0                               |
+
+The first HTML of each trial page now carries its data (before: the shell with an empty page). Two things the trial changed in this decision: `loading.tsx` is not the default (decision 3), and the route handler's `Request` must carry the page request's cookies, because Construction Management's handlers read the Session from `request.headers` while Whiteboard's read `next/headers`.
+
+## Known limits
+
+- Fields bound with react-hook-form's `register` (uncontrolled inputs) fill in when the page hydrates, not in the server HTML; the data still arrives with the page, so there is no request or skeleton before them.
+- Every query a page's first view reads must be prefetched. A missed one fails loudly in development ("Not prefetched") and makes React render that boundary on the client in production.
+- A Teacher opening an Owner-only page now gets a refused prefetch logged on the server before the Workspace Gate sends them home; the page is never shown.
 
 ## Considered options
 
@@ -42,6 +62,7 @@ Every route handler already resolves the Session itself: `requireSession()` / `r
 - **Server prefetch only on high-traffic pages** (dashboards, lists), client-only elsewhere. It keeps two models for good: every new page asks which one it is, and the gate never goes.
 - **Server prefetch through the application layer** (call the query handlers in `src/` directly). Fastest, but it duplicates every route's Session, tenancy and plan checks and its Response mapping in a second place; a page could show what the API would refuse.
 - **Server prefetch over HTTP** (`fetch` the app's own `/api` with the forwarded cookie). Same Response as the browser, but a network hop from the server to itself on every page, a base URL to configure per environment, and Vercel's preview protection in the way.
+- **`loading.tsx` on every migrated page** (the issue's starting point). Measured slower on full loads, for the reason in decision 3.
 
 ## Consequences
 
@@ -50,3 +71,4 @@ Every route handler already resolves the Session itself: `requireSession()` / `r
 - Query modules gain `({ meta }) => apiJson(url, undefined, meta)` in each `queryFn` they share with a page.
 - Mutations are unchanged: `useMutation` in the browser, invalidating keys as before.
 - A server error now renders `error.tsx` from the server; an error during a later client refetch still reaches the nearest boundary, now `error.tsx`.
+- A page's `*-skeletons.tsx` stays for its sections, its stories and pages not yet migrated; ADR-0047's lint guard is unchanged.
