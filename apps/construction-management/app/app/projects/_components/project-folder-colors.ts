@@ -5,7 +5,8 @@ import type { ProjectColor } from "@/src/projects/domain/project-color";
  * swatch on the Project form (ADR CM-0026). Whole class names, so Tailwind
  * reads them from source. Light mode is a pastel body with a stronger back
  * panel and tab; dark mode mixes a little of the hue into the card colour,
- * so the folder stays deep and low in saturation with readable text. The colours are the folder only: text stays `foreground`.
+ * so the folder stays deep and low in saturation with readable text. The
+ * colours are the folder only: text stays `foreground`.
  */
 export type ProjectFolderTint = {
   /**

@@ -7,7 +7,6 @@ import { ProjectAmenitiesSkeleton } from "@/app/app/projects/_components/project
 
 export const metadata: Metadata = { title: "Amenities" };
 
-/** The Project's Amenities and Common Developments (CM-404). */
 export default async function ProjectAmenitiesRoute({
   params,
 }: {

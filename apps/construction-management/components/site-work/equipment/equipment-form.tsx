@@ -354,7 +354,7 @@ function optional(value: string): string | null {
 }
 
 /**
- * Add or edit equipment (CM-603, CM-0016 §10). Company owned or Rented is
+ * Add or edit equipment (ADR CM-0016 §10). Company owned or Rented is
  * chosen first; then Identity, Fuel, Utilisation, Target & Performance and,
  * for rented equipment, Hire details. A new machine also gets its first
  * place: a Project (fixed when added from a Project) or the warehouse. The

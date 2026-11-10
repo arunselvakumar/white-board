@@ -8,7 +8,7 @@ import type {
 import { mockApi } from "../../../.storybook/mocks/api";
 import { ANUGRAHA } from "@/app/app/_components/projects/project-fixtures";
 
-/** Story fixtures for Project Drawings (CM-408), on Anugraha Residency. */
+/** Story fixtures for Project Drawings, on Anugraha Residency. */
 export { ANUGRAHA };
 
 export const DRAWINGS_API = `/api/construction/projects/projects/${ANUGRAHA.id}/drawings`;

@@ -8,7 +8,7 @@ import { TestingReportsSkeleton } from "@/app/app/projects/[id]/testing-reports/
 
 export const metadata: Metadata = { title: "Testing reports" };
 
-/** The Project's testing materials and their report counts (CM-409). */
+/** The Project's testing materials and their report counts. */
 export default async function ProjectTestingReportsRoute({
   params,
 }: {

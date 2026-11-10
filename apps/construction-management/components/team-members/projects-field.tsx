@@ -115,9 +115,9 @@ function ProjectChecklist({ value, onChange }: Selection) {
 }
 
 /**
- * The Projects card's checklist (CM-204, ADR CM-0033 §1): the Company's
- * Projects from `/projects/options`. Pass `value`/`onChange` to send the
- * choice with the new Team Member.
+ * The Projects card's checklist (ADR CM-0033 §1): the Company's Projects
+ * from `/projects/options`. Pass `value`/`onChange` to send the choice
+ * with the new Team Member.
  */
 export function ProjectsField(props: Selection) {
   return (
@@ -127,7 +127,7 @@ export function ProjectsField(props: Selection) {
   );
 }
 
-/** Edit Team Member → Projects tab: the checklist plus Save. */
+/** The Projects tab of Edit Team Member: the checklist plus Save. */
 export function TeamMemberProjectsTab({ member }: { member: TeamMember }) {
   const queryClient = useQueryClient();
   const [projectIds, setProjectIds] = useState<readonly string[]>(

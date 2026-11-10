@@ -142,9 +142,9 @@ const STATS: readonly {
 type ProjectItem = ProjectList["items"][number];
 
 /**
- * A Project's kebab on the Projects home (CM-411): Pin / Unpin, Edit,
- * Change colour (the palette of the Project form, ADR CM-0026 §5) and
- * Hide modules, in a square tinted with the folder's colour.
+ * A Project's kebab on the Projects home: Pin / Unpin, Edit, Change colour
+ * (the palette of the Project form, ADR CM-0026 §5) and Hide modules, in a
+ * square tinted with the folder's colour.
  */
 function ProjectFolderMenu({
   project,
@@ -300,12 +300,13 @@ function ClientGroupSection({
 }
 
 /**
- * Projects home (CM-204, `modules/03`): status totals (each one filters the list), then every Project
- * as a folder in its colour (ADR CM-0026), grouped by client (ADR CM-0027),
- * with status tabs to filter them (kept in `?status=`), the member's pinned Projects first in
- * each group (CM-411). The Owner sees every Project; a Member those assigned to
- * them. A Company with no Projects sees the same page with every figure at 0
- * and the empty state in place of the list (#108).
+ * Projects home (`modules/03`): status totals (each one filters the list),
+ * then every Project as a folder in its colour (ADR CM-0026), grouped by
+ * client (ADR CM-0027), with status tabs to filter them (kept in
+ * `?status=`), the member's pinned Projects first in each group. The Owner
+ * sees every Project; a Member those assigned to them. A Company with no
+ * Projects sees the same page with every figure at 0 and the empty state in
+ * place of the list.
  */
 export function ProjectsHome() {
   const { data } = useSuspenseQuery(projectsQuery);

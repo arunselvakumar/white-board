@@ -203,10 +203,10 @@ function DeleteItemDialog({
 }
 
 /**
- * The Project's Testing reports (CM-409): the materials sent to the lab
- * (Rcc cube, Steel, Cement, Bricks to start with, and any added), each
- * with how many reports it holds. A material opens its reports. Add,
- * Rename and Delete follow the Testing reports menu's flags.
+ * The Project's Testing reports: the materials sent to the lab (Rcc cube,
+ * Steel, Cement, Bricks to start with, and any added), each with how many
+ * reports it holds. A material opens its reports. Add, Rename and Delete
+ * follow the Testing reports menu's flags.
  */
 export function TestingReportsPage({
   projectId,

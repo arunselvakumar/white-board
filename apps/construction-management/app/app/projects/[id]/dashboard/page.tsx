@@ -13,7 +13,7 @@ import { ProjectDashboard } from "@/app/app/projects/[id]/dashboard/_components/
 
 export const metadata: Metadata = { title: "Dashboard" };
 
-/** The Project Dashboard (CM-412), behind the Dashboard menu's Read flag. */
+/** The Project Dashboard, behind the Dashboard menu's Read flag. */
 export default async function ProjectDashboardRoute({
   params,
 }: {

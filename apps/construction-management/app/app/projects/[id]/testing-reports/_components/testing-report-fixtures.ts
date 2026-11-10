@@ -5,7 +5,6 @@ import type {
 
 import { mockApi } from "@/.storybook/mocks/api";
 
-/** Story fixtures for Testing Reports (CM-409). */
 export const TESTING_PROJECT_ID = "0199c4a0-0000-7000-8000-0000000000b2";
 
 export const TESTING_API = `/api/construction/projects/projects/${TESTING_PROJECT_ID}/testing-reports`;

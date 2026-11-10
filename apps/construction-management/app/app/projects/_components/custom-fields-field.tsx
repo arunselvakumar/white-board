@@ -100,9 +100,9 @@ function FieldNameInput({
 }
 
 /**
- * Additional details (CM-413): fields the Company names itself, text only,
- * at most 20. Names already used on other Projects are offered as the user
- * types, so "Site engineer" stays one spelling.
+ * Additional details: fields the Company names itself, text only, at most
+ * 20. Names already used on other Projects are offered as the user types,
+ * so "Site engineer" stays one spelling.
  */
 export function CustomFieldsField({
   form,

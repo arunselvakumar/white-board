@@ -3,7 +3,7 @@ import type {
   InquiryDashboard,
 } from "@/src/queries/sales-dashboard";
 
-/** Story fixtures for the Project Dashboard's Booking section (CM-1008). */
+/** Story fixtures for the Project Dashboard's Booking section. */
 
 export const BOOKING_DASHBOARD_PATH =
   "/api/construction/sales/dashboard/booking";
@@ -87,7 +87,7 @@ export function noBookingDashboard(projectId: string): BookingDashboard {
 }
 
 // ---------------------------------------------------------------------------
-// The Inquiry section (CM-1008)
+// The Inquiry section
 // ---------------------------------------------------------------------------
 
 export const INQUIRY_DASHBOARD_PATH =

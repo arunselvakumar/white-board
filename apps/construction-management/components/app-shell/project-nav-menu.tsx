@@ -32,9 +32,7 @@ import { ProjectAvatar } from "@/app/app/_components/projects/project-avatar";
 import { PROJECT_MODULE_ICONS } from "@/app/app/_components/projects/project-module-icons";
 import { useEquipmentNavLinks } from "@/components/site-work/equipment/equipment-nav";
 import { EQUIPMENT_TABS } from "@/components/site-work/equipment/equipment-tabs";
-// Sales (CM-1006)
 import { bookingsNavLinks } from "@/components/sales/bookings/bookings-nav";
-// Sales (CM-1002)
 import { useInquiryNavLinks } from "@/components/sales/inquiries/inquiry-nav";
 import { INQUIRY_TABS } from "@/components/sales/inquiries/inquiry-tabs";
 import {
@@ -283,10 +281,8 @@ function ProjectNavEntry(props: EntryProps) {
       return <MaterialsEntry {...props} />;
     case "equipment_usage":
       return <EquipmentEntry {...props} />;
-    // Sales (CM-1006)
     case "bookings":
       return <BookingsEntry {...props} />;
-    // Sales (CM-1002)
     case "inquiries":
       return <InquiriesEntry {...props} />;
     default:
@@ -356,7 +352,6 @@ function EquipmentEntry(props: EntryProps) {
   );
 }
 
-// Sales (CM-1002): the Inquiries module's tabs.
 function InquiriesEntry(props: EntryProps) {
   const [open, setOpen] = useSubmenuOpen(props);
   const links = useInquiryNavLinks(props.projectId, open);
@@ -448,7 +443,7 @@ function ProjectNavItem({
   );
 }
 
-// Sales (CM-1006): Bookings → Units, Bookings.
+// Bookings' tabs: Units and Bookings.
 function BookingsEntry(props: EntryProps) {
   const [open, setOpen] = useSubmenuOpen(props);
   return (

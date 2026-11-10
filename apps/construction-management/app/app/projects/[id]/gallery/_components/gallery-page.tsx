@@ -147,7 +147,7 @@ function viewerMeta(item: GalleryItem): string {
 
 /**
  * The viewer's line under the file name; a tracking record's file also
- * links back to its Task, Issue or Inspection Request (M8).
+ * links back to its Task, Issue or Inspection Request.
  */
 function ViewerDescription({
   projectId,
@@ -342,7 +342,7 @@ function GalleryTile({
 }
 
 /**
- * The Project's Gallery (CM-410): every image and PDF kept on the Project —
+ * The Project's Gallery: every image and PDF kept on the Project —
  * Documents, Drawing Revisions, Testing Reports — in one read-only grid,
  * newest first. Filters narrow it by type, source, uploader, date and file
  * name; a tile opens the file in the viewer. Only files from the sources the

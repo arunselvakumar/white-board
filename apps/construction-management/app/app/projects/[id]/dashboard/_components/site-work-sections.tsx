@@ -113,9 +113,9 @@ function ContractorLabourTable({
 }
 
 /**
- * Daily Work (CM-608): worksheets, labour-days and pending approvals, the
- * labour availability trend against attendance, and contractor-wise
- * labour, from live worksheets that are not rejected.
+ * Daily Work: worksheets, labour-days and pending approvals, the labour
+ * availability trend against attendance, and contractor-wise labour, from
+ * live worksheets that are not rejected.
  */
 export function DailyWorkSection({
   projectId,
@@ -174,9 +174,9 @@ export function DailyWorkSection({
 }
 
 /**
- * Equipment Usage (CM-608): sheets, hours, km, trips, fuel overruns and,
- * with Financial on Equipment Usage, the rented hire cost; the top
- * machines by work hours and owned against rented hours.
+ * Equipment Usage: sheets, hours, km, trips, fuel overruns and, with
+ * Financial on Equipment Usage, the rented hire cost; the top machines by
+ * work hours and owned against rented hours.
  */
 export function EquipmentUsageSection({
   projectId,

@@ -47,9 +47,9 @@ import {
 type OptionsDialog = "hide" | "backup" | null;
 
 /**
- * Project options next to Edit (CM-411): Pin / Unpin for the member, Hide /
- * show modules for the Project (Update flag only), and Backup (CM-906; the
- * dialog offers the modules the member may view).
+ * Project options next to Edit: Pin / Unpin for the member, Hide / show
+ * modules for the Project (Update flag only), and Backup (the dialog offers
+ * the modules the member may view).
  */
 function ProjectOptions({
   id,
@@ -161,12 +161,12 @@ function ProjectFlash({ id }: { id: string }) {
 }
 
 /**
- * The project shell (CM-204, CM-411, ADR CM-0020): a slim header with the
- * Project's name, status, Project Type, dates, a pin mark, Edit and the
- * Project options, and any message from the screen before. The Project's
- * modules are in the sidebar (`ProjectNavMenu`); on a phone, where the
- * sidebar is a sheet, the header also shows the logo. There is no Project
- * home: opening a Project lands on the first module in the menu.
+ * The project shell (ADR CM-0020): a slim header with the Project's name,
+ * status, Project Type, dates, a pin mark, Edit and the Project options,
+ * and any message from the screen before. The Project's modules are in the
+ * sidebar (`ProjectNavMenu`); on a phone, where the sidebar is a sheet, the
+ * header also shows the logo. There is no Project home: opening a Project
+ * lands on the first module in the menu.
  */
 export function ProjectShell({
   id,

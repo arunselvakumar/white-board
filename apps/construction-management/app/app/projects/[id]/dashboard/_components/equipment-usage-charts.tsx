@@ -9,10 +9,10 @@ export function hoursLabel(hours: number): string {
 }
 
 /**
- * Top Equipment by Work Hours (CM-608): the hourly machines with the most
- * hours, one horizontal bar each in the primary hue, the name and number
- * above the bar so it reads at 375 px. Each row is a list item that says
- * its figure, so no hidden table is needed.
+ * Top Equipment by Work Hours: the hourly machines with the most hours, one
+ * horizontal bar each in the primary hue, the name and number above the bar
+ * so it reads at 375 px. Each row is a list item that says its figure, so
+ * no hidden table is needed.
  */
 export function TopEquipmentChart({
   machines,
@@ -66,9 +66,8 @@ export function TopEquipmentChart({
 }
 
 /**
- * Owned vs Rented (CM-608): work hours of hourly machines split by
- * ownership, as one bar in two hues with the figures named beside a
- * swatch each.
+ * Owned vs Rented: work hours of hourly machines split by ownership, as one
+ * bar in two hues with the figures named beside a swatch each.
  */
 export function OwnershipSplit({
   ownership,

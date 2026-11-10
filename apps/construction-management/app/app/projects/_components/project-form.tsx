@@ -226,17 +226,17 @@ const PROGRESS_LABEL = (done: number, total: number) =>
   `Uploading files ${String(Math.min(done + 1, total))} of ${String(total)}…`;
 
 /**
- * Add and Edit Project (CM-204, CM-413) as four cards: Project (always
- * open), then Client, Contract and Additional details, which are optional
- * and fold up to a one-line summary. On Add they start closed; on Edit a
- * card starts open when it has something in it. A card with an error opens
- * and its field takes focus.
+ * Add and Edit Project as four cards: Project (always open), then Client,
+ * Contract and Additional details, which are optional and fold up to a
+ * one-line summary. On Add they start closed; on Edit a card starts open
+ * when it has something in it. A card with an error opens and its field
+ * takes focus.
  *
- * The Project card also holds the colour (ADR CM-0026), the Project Type, the Budget and the logo
- * with "Use Project logo on reports" (CM-401). Budget and Order value show
- * only to a viewer with the Project menu's Financial flag. A picked or
- * removed logo waits until the Project is saved, then goes through its own
- * route.
+ * The Project card also holds the colour (ADR CM-0026), the Project Type,
+ * the Budget and the logo with "Use Project logo on reports". Budget and
+ * Order value show only to a viewer with the Project menu's Financial flag.
+ * A picked or removed logo waits until the Project is saved, then goes
+ * through its own route.
  */
 function ProjectForm({
   project,
@@ -749,8 +749,8 @@ function ProjectForm({
 /**
  * New Project (`/app/projects/new`). The logo and the files picked under
  * Contract wait until the Project exists, then upload; the Project opens
- * either way, on its Resources as step 2 of 2 (CM-406), and its Overview
- * says what did not make it.
+ * either way, on its Resources as step 2 of 2, and its Overview says what
+ * did not make it.
  */
 export function NewProjectScreen() {
   const router = useRouter();

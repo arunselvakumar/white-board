@@ -27,7 +27,7 @@ import {
 
 import type { ProjectModuleKey } from "@/src/projects/domain/project-modules";
 
-/** The icon of each Project module's tile and section link (CM-411). */
+/** The icon of each Project module's tile and section link. */
 export const PROJECT_MODULE_ICONS: Record<ProjectModuleKey, LucideIcon> = {
   dashboard: LayoutDashboard,
   wings: Building2,

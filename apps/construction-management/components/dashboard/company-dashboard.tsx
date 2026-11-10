@@ -354,10 +354,10 @@ function Body({ duration }: { duration: Duration }) {
 }
 
 /**
- * The Company Dashboard (CM-902, ADR CM-0021 §4): totals across the
- * Projects the member can see and one row per Project linking to its
- * Dashboard, over a duration (the last 12 months by default). Amounts due
- * show only with Payments Read. Phones get cards; wider screens a table.
+ * The Company Dashboard (ADR CM-0021 §4): totals across the Projects the
+ * member can see and one row per Project linking to its Dashboard, over a
+ * duration (the last 12 months by default). Amounts due show only with
+ * Payments Read. Phones get cards; wider screens a table.
  */
 export function CompanyDashboard() {
   const [duration, setDuration] = useState<Duration>(() =>

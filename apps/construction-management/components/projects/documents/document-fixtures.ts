@@ -4,7 +4,6 @@ import type { ProjectDocument } from "@/src/queries/project-documents";
 import { mockApi } from "../../../.storybook/mocks/api";
 import { project } from "@/app/app/_components/projects/project-fixtures";
 
-/** Story fixtures for Project Documents (CM-414). */
 export const ANUGRAHA = project({
   id: "0199c4a0-0000-7000-8000-0000000000a1",
   name: "Anugraha Residency",

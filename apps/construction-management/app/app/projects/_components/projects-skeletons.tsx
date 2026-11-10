@@ -19,7 +19,8 @@ const PROJECTS_PATH = "/app/projects";
 
 /*
  * Projects while they load (ADR-0047): the Projects home, the project
- * shell's header, Hide / show modules, Amenities. What is known without fetching renders for real.
+ * shell's header, Hide / show modules, Amenities. What is known without
+ * fetching renders for real.
  */
 
 /**

@@ -79,7 +79,7 @@ function layout(
   sections: { key: string; visible: boolean }[] = DASHBOARD_SECTIONS.map(
     (section) => ({ key: section.key, visible: true }),
   ),
-  /** Sections whose module is hidden on the Project (CM-902). */
+  /** Sections whose module is hidden on the Project. */
   hiddenOnProject: readonly string[] = [],
 ): DashboardLayout {
   return {
@@ -88,7 +88,7 @@ function layout(
       return {
         key,
         label: section?.label ?? key,
-        // Every section has data since M10; a later stub names its milestone.
+        // Only a stub section names the milestone that fills it.
         milestone: (section?.milestone as string | null | undefined) ?? null,
         visible,
         hiddenOnProject: hiddenOnProject.includes(key),
@@ -160,11 +160,11 @@ function serve(
     project?: ProjectResponse;
     labour?: "ok" | "forbidden";
     procurement?: ProcurementDashboard;
-    /** The Daily Work and Equipment Usage sections (CM-608). */
+    /** The Daily Work and Equipment Usage sections. */
     siteWork?: "data" | "empty" | "without_financial" | "forbidden";
-    /** The Payments section and Payment Approvals (CM-709). */
+    /** The Payments section and Payment Approvals. */
     finance?: "data" | "empty" | "no_payments" | "forbidden";
-    /** The Task, Issue & Snag and Inspection Request sections (CM-805). */
+    /** The Task, Issue & Snag and Inspection Request sections. */
     tracking?:
       | "data"
       | "empty"
@@ -227,7 +227,6 @@ function serve(
             : financeDashboard(from, to),
         );
       }
-      // The Booking section (CM-1008).
       if (method === "GET" && path.startsWith(BOOKING_DASHBOARD_PATH))
         return Response.json(bookingDashboard(KUMARI.id));
       if (method === "GET" && path.startsWith(INQUIRY_DASHBOARD_PATH))
@@ -348,7 +347,7 @@ export const WithFinancial: Story = {
     const year = presetDuration("last_12_months", browserToday());
     await expect(labourCalls()[0]).toContain(`from=${year.from}`);
 
-    // Materials has data (CM-510): summary, POs and the month-wise chart.
+    // Materials has data: summary, POs and the month-wise chart.
     const materials = within(canvas.getByRole("region", { name: "Materials" }));
     await expect(
       (await materials.findByText("Purchase order value")).nextElementSibling,
@@ -362,7 +361,7 @@ export const WithFinancial: Story = {
     await expect(
       materials.getByRole("link", { name: "Stock Register" }),
     ).toBeVisible();
-    // Booking and Inquiry have data (CM-1008).
+    // Booking and Inquiry have data.
     await expect(
       await within(canvas.getByRole("region", { name: "Booking" })).findByRole(
         "list",
@@ -385,8 +384,8 @@ export const WithFinancial: Story = {
 };
 
 /**
- * Payments (CM-709): money in and out by month with the balance, Due
- * Payments and Module Wise Payment.
+ * Payments: money in and out by month with the balance, Due Payments and
+ * Module Wise Payment.
  */
 export const PaymentsSection: Story = {
   play: async ({ canvas }) => {
@@ -483,8 +482,8 @@ export const PaymentsRefused: Story = {
 };
 
 /**
- * Task, Issue & Snag and Inspection Request with data and Financial
- * (CM-805): the gauges, the bars and the most delayed tasks.
+ * Task, Issue & Snag and Inspection Request with data and Financial: the
+ * gauges, the bars and the most delayed tasks.
  */
 export const TrackingSections: Story = {
   play: async ({ canvas }) => {
@@ -658,7 +657,7 @@ export const TrackingRefused: Story = {
   },
 };
 
-/** Daily Work and Equipment Usage with data and Financial (CM-608). */
+/** Daily Work and Equipment Usage with data and Financial. */
 export const SiteWorkSections: Story = {
   play: async ({ canvas }) => {
     const daily = within(
@@ -776,8 +775,8 @@ export const WithoutFinancial: Story = {
 };
 
 /**
- * The details that were on Project Home (#99) sit under the summary: the
- * address and State, the Contract and the Additional details.
+ * The address and State, the Contract and the Additional details sit under
+ * the summary.
  */
 export const ContractAndAdditionalDetails: Story = {
   play: async ({ canvas }) => {
@@ -977,9 +976,9 @@ export const EverySectionHidden: Story = {
 };
 
 /**
- * Issues & Snags is hidden on this Project (Hide / Show Modules, CM-902):
- * its section is left out, and Manage Dashboard shows it disabled with
- * the reason. Saving keeps the member's tick for other Projects.
+ * Issues & Snags is hidden on this Project (Hide / Show Modules): its
+ * section is left out, and Manage Dashboard shows it disabled with the
+ * reason. Saving keeps the member's tick for other Projects.
  */
 export const ModuleHiddenOnProject: Story = {
   beforeEach: serve({

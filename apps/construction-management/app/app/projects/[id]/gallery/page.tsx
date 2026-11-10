@@ -9,9 +9,9 @@ import { GallerySkeleton } from "@/app/app/projects/[id]/gallery/_components/gal
 export const metadata: Metadata = { title: "Gallery" };
 
 /**
- * The Project's Gallery (CM-410). Read only: the API lists just the files
- * whose source the Team Member may read, so the page needs only the
- * Gallery's own Read flag.
+ * The Project's Gallery. Read only: the API lists just the files whose
+ * source the Team Member may read, so the page needs only the Gallery's own
+ * Read flag.
  */
 export default async function ProjectGalleryRoute({
   params,

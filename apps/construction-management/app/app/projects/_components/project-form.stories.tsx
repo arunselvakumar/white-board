@@ -426,8 +426,7 @@ export const NewShowsPlanLimit: Story = {
 
 /**
  * Stands in for the attachments UI: one button per paper that holds a
- * file. The real component belongs to the documents work; this story only
- * checks what the form does with held files.
+ * file. This story only checks what the form does with held files.
  */
 function FakeAttachments({
   kind,
@@ -1163,7 +1162,7 @@ export const EditOfProjectWithoutType: Story = {
     await expect(canvas.getByLabelText("Project Type")).toHaveTextContent(
       "Not set",
     );
-    // A Project from before M4 may stay without a type.
+    // An older Project may stay without a type.
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await waitFor(() => expect(posts()).toHaveLength(1));
     await expect(posts()[0]?.body).not.toHaveProperty("projectType");

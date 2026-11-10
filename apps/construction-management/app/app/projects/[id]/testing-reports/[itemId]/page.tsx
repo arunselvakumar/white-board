@@ -8,7 +8,7 @@ import { TestingItemSkeleton } from "@/app/app/projects/[id]/testing-reports/_co
 
 export const metadata: Metadata = { title: "Testing reports" };
 
-/** One testing material's reports (CM-409). */
+/** One testing material's reports. */
 export default async function ProjectTestingItemRoute({
   params,
 }: {

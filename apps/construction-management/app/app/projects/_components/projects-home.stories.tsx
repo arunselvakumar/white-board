@@ -87,8 +87,8 @@ export const WithProjects: Story = {
 };
 
 /**
- * Project Progress % on the card (CM-805): a bar with the figure and the
- * weighting; no bar for a Project without tasks.
+ * Project Progress % on the card: a bar with the figure and the weighting;
+ * no bar for a Project without tasks.
  */
 export const ProgressOnTheCard: Story = {
   play: async ({ canvas }) => {
@@ -234,7 +234,7 @@ export const CardsWithAndWithoutLogo: Story = {
     await expect(
       kumari.querySelector("[data-slot=avatar-fallback]"),
     ).toHaveTextContent("KH");
-    // A Project from before M4 says its type is not set.
+    // A Project without a type says it is not set.
     await expect(
       cards.getByRole("link", { name: /Parvathipuram Row Houses/ }),
     ).toHaveTextContent("Project Type not set");

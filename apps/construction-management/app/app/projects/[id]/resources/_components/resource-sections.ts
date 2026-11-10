@@ -15,7 +15,7 @@ export type ResourceSectionInfo = {
   icon: LucideIcon;
 };
 
-/** The four sections of a Project's Resources, in screen order (CM-406). */
+/** The four sections of a Project's Resources, in screen order. */
 export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
   {
     key: "teamMembers",
