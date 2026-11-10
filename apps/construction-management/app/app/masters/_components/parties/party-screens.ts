@@ -16,7 +16,7 @@ export type PartyScreen = {
   departments: boolean;
 };
 
-/** The words and paths of the two party masters (CM-406). */
+/** The words and paths of the two party masters. */
 export const PARTY_SCREENS: Record<PartyList, PartyScreen> = {
   contractors: {
     list: "contractors",

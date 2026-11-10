@@ -229,9 +229,9 @@ type UploadState =
   | { state: "refused"; fileName: string; message: string };
 
 /**
- * The Quotations section of Edit Contractor / Edit Supplier (CM-501): the
- * party's quotation files, newest first, with upload (a PDF or an image,
- * up to 10 MB) and remove. Files upload at once; there is nothing to Save.
+ * The Quotations section of Edit Contractor / Edit Supplier: the party's
+ * quotation files, newest first, with upload (a PDF or an image, up to
+ * 10 MB) and remove. Files upload at once; there is nothing to Save.
  */
 export function PartyQuotations({
   list,

@@ -19,8 +19,9 @@ export type LookupScreenConfig = {
   /** Back to Masters, or null on a main-menu page. */
   back: PageHeaderBack | null;
   /**
-   * Labour Categories: each row has a skill (CM-0016 §6), shown on the row
-   * and set in the dialog; a Default row can be edited for its skill only.
+   * Labour Categories: each row has a skill (ADR CM-0016 §6), shown on the
+   * row and set in the dialog; a Default row can be edited for its skill
+   * only.
    */
   withSkill?: boolean;
 };

@@ -12,7 +12,7 @@ import {
   FormSectionSkeleton,
 } from "@/app/app/_components/masters/masters-skeletons";
 
-/** Human Resources → Vendors while it loads (ADR-0047). */
+/** The Vendors screens while they load (ADR-0047). */
 
 /** The Vendors table's columns; Balance shows only with the Financial flag. */
 const VENDOR_COLUMNS: SkeletonColumn[] = [

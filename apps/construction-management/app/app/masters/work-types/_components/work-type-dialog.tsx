@@ -69,9 +69,9 @@ const SERVER_FIELDS: Record<string, keyof Values> = {
 };
 
 /**
- * Add a Work Type or change one (CM-601): its name, Department and the
- * Materials a worksheet offers first. The Default Work Type (RCC) keeps
- * its name and Department; its Materials can change.
+ * Add a Work Type or change one: its name, Department and the Materials a
+ * worksheet offers first. The Default Work Type (RCC) keeps its name and
+ * Department; its Materials can change.
  */
 export function WorkTypeDialog({
   item,

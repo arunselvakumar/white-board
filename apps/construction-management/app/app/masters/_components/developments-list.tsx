@@ -50,10 +50,10 @@ type Dialog =
   { kind: "add" } | { kind: "rename" | "assign"; item: DevelopmentItem } | null;
 
 /**
- * Amenities or Common Developments (CM-404): search, Add (with Projects),
- * and per row Rename / Assign Projects / Disable / Enable / Delete. Default
- * (seed) rows can only be disabled, enabled and assigned; each row says
- * which Projects have it.
+ * Amenities or Common Developments: search, Add (with Projects), and per
+ * row Rename / Assign Projects / Disable / Enable / Delete. Default (seed)
+ * rows can only be disabled, enabled and assigned; each row says which
+ * Projects have it.
  */
 export function DevelopmentListScreen({
   config,
@@ -263,12 +263,10 @@ function DevelopmentListContent({
   );
 }
 
-/** Masters → Amenities (CM-404). */
 export function AmenitiesList() {
   return <DevelopmentListScreen config={AMENITIES_SCREEN} />;
 }
 
-/** Masters → Common Developments (CM-404). */
 export function CommonDevelopmentsList() {
   return <DevelopmentListScreen config={COMMON_DEVELOPMENTS_SCREEN} />;
 }

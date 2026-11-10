@@ -31,7 +31,6 @@ export const ITEM_TYPE_LABELS: Record<MaterialItem["itemType"], string> = {
   asset: "Asset",
 };
 
-/** Masters → Measurement Units (CM-501). */
 export function MeasurementUnitsList() {
   return (
     <PagedMasterListScreen
@@ -55,7 +54,6 @@ export function MeasurementUnitsList() {
   );
 }
 
-/** Masters → Material Categories (CM-501). */
 export function MaterialCategoriesList() {
   return (
     <PagedMasterListScreen
@@ -91,7 +89,6 @@ export function MaterialCategoriesList() {
   );
 }
 
-/** Masters → Terms & Conditions (CM-501, menu `masters.terms_conditions`). */
 export function TermsConditionsList() {
   return (
     <PagedMasterListScreen
@@ -135,7 +132,7 @@ function materialDetails(item: MaterialItem): string {
   return parts.filter(Boolean).join(" · ");
 }
 
-/** Masters → Materials (CM-501): filters by category and Item Type. */
+/** Filters by category and Item Type. */
 export function MaterialsList() {
   const [categoryId, setCategoryId] = useState(ALL);
   const [itemType, setItemType] = useState(ALL);

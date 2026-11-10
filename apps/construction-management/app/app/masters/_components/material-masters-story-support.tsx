@@ -7,7 +7,7 @@ import type {
   TermsConditionItem,
 } from "@/src/queries/material-masters";
 
-/** Story-only fixtures and an in-memory procurement masters API (CM-501). */
+/** Story-only fixtures and an in-memory procurement masters API. */
 
 const AT = "2026-10-08T06:30:00.000Z";
 const LATER = "2026-10-08T07:00:00.000Z";

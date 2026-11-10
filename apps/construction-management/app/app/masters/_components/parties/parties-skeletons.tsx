@@ -50,7 +50,7 @@ const QUOTATION_COLUMNS: SkeletonColumn[] = [
   ACTIONS,
 ];
 
-/** Masters → View Quotations. */
+/** The View Quotations table. */
 export function QuotationRowsSkeleton() {
   return (
     <TableSkeleton

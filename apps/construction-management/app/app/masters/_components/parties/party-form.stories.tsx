@@ -366,8 +366,8 @@ export const EditContractor: Story = {
 };
 
 /**
- * TDS settings (CM-706): the payee kind follows the PAN as typed, a
- * certificate's rate is checked, and the settings go with the form.
+ * TDS settings: the payee kind follows the PAN as typed, a certificate's
+ * rate is checked, and the settings go with the form.
  */
 export const ContractorTdsSettings: Story = {
   render: () => (

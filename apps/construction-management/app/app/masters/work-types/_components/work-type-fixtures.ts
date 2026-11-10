@@ -7,8 +7,6 @@ import type { WorkTypeItem } from "@/src/queries/work-types";
 
 import { STORY_DEPARTMENTS } from "@/app/app/_components/masters/masters-story-support";
 
-/** Story fixtures for Masters → Work Types (CM-601). */
-
 const AT = "2026-10-08T06:30:00.000Z";
 const LATER = "2026-10-08T07:00:00.000Z";
 
