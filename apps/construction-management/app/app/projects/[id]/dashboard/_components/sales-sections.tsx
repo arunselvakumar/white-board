@@ -167,10 +167,10 @@ export function BookingSectionBody({
 }
 
 /**
- * Booking (CM-1008, ADR CM-0022 §11): the Project's units by sales status
- * — Available, On Hold, Booked, Unavailable — for the Project and per
- * Wing, and the five latest bookings. A snapshot as on today: the
- * dashboard duration does not change it. Needs Booking Read.
+ * Booking (ADR CM-0022 §11): the Project's units by sales status —
+ * Available, On Hold, Booked, Unavailable — for the Project and per Wing,
+ * and the five latest bookings. A snapshot as on today: the dashboard
+ * duration does not change it. Needs Booking Read.
  */
 export function BookingSection({ projectId }: { projectId: string }) {
   const { data, isPending, error } = useQuery(bookingDashboardQuery(projectId));
@@ -375,10 +375,10 @@ export function InquirySectionBody({
 }
 
 /**
- * Inquiry (CM-1008, ADR CM-0022 §11): Total, Open, Converted, Lost, Conv.
- * Rate and Overdue; the funnel; lead source and sales team performance;
- * Call Activity with its own period. Needs Inquiry Read; without View all
- * it counts the viewer's own, assigned and Lead Owner inquiries.
+ * Inquiry (ADR CM-0022 §11): Total, Open, Converted, Lost, Conv. Rate and
+ * Overdue; the funnel; lead source and sales team performance; Call
+ * Activity with its own period. Needs Inquiry Read; without View all it
+ * counts the viewer's own, assigned and Lead Owner inquiries.
  */
 export function InquirySection({
   projectId,

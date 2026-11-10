@@ -79,7 +79,7 @@ export const Header: Story = {
   },
 };
 
-/** Pin, Hide / show modules and Backup; no Arrange tiles (#99). */
+/** Pin, Hide / show modules and Backup. */
 export const OptionsWithUpdateFlag: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     await userEvent.click(
@@ -239,7 +239,7 @@ export const WithoutLogo: Story = {
   },
 };
 
-/** Project options → Backup… opens the Project backup dialog (CM-906). */
+/** Backup… in the Project options opens the Project backup dialog. */
 export const BackupFromOptions: Story = {
   beforeEach: () => {
     const restore = serve()();

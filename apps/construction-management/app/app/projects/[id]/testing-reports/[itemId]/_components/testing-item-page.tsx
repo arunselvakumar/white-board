@@ -276,9 +276,9 @@ function DeleteReportDialog({
 }
 
 /**
- * One testing material's reports (CM-409), newest report date first:
- * search by name, page with Previous and Next, view a report's file, and
- * add, edit or delete reports as the Testing reports menu's flags allow.
+ * One testing material's reports, newest report date first: search by
+ * name, page with Previous and Next, view a report's file, and add, edit or
+ * delete reports as the Testing reports menu's flags allow.
  */
 export function TestingItemPage({
   projectId,

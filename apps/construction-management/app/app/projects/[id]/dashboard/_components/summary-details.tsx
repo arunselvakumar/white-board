@@ -77,8 +77,8 @@ function siteTiles(project: ProjectResponse): TileProps[] {
 }
 
 /**
- * The Client, the papers and the Order value (CM-413). Order value is null
- * without the Financial flag, so it hides too.
+ * The Client, the papers and the Order value. Order value is null without
+ * the Financial flag, so it hides too.
  */
 function contractTiles(project: ProjectResponse): TileProps[] {
   const tiles: TileProps[] = [];

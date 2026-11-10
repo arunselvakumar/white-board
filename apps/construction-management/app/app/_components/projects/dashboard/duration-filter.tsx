@@ -17,10 +17,7 @@ import {
   type Duration,
 } from "@/lib/dashboard-duration";
 
-/**
- * Filter duration (CM-412): presets ending today, or a custom range of at
- * most a year.
- */
+/** Presets ending today, or a custom range of at most a year. */
 export function DurationFilter({
   value,
   onChange,

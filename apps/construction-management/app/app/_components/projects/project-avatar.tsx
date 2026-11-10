@@ -7,10 +7,7 @@ import { cn } from "@repo/ui/lib/utils";
 
 import { projectInitials } from "./project-status";
 
-/**
- * A Project's logo, or its initials when it has none (CM-401): on the
- * Projects home and in the project shell header.
- */
+/** A Project's logo, or its initials when it has none. */
 export function ProjectAvatar({
   name,
   logoUrl,

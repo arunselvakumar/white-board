@@ -149,10 +149,10 @@ function KindSection({
 }
 
 /**
- * A Project's Amenities and Common Developments (CM-404): tick what the
- * Project has and Save; site entries can then be located at them. A
- * disabled row it already has stays ticked and can be unticked, but not
- * ticked again. Read-only without the Project menu's Update flag.
+ * A Project's Amenities and Common Developments: tick what the Project has
+ * and Save; site entries can then be located at them. A disabled row it
+ * already has stays ticked and can be unticked, but not ticked again.
+ * Read-only without the Project menu's Update flag.
  */
 export function ProjectAmenities({
   projectId,

@@ -4,8 +4,8 @@ import { useId, type CSSProperties } from "react";
 import { cn } from "@repo/ui/lib/utils";
 
 /**
- * Small charts of the Project Dashboard's tracking sections (CM-805), in
- * the style of the M6 / M7 sections: plain HTML and SVG, no chart library,
+ * Small charts of the Project Dashboard's tracking sections, in the style
+ * of the dashboard's other sections: plain HTML and SVG, no chart library,
  * every colour paired with its label and figure.
  */
 
@@ -92,9 +92,8 @@ function swatchStyle(item: BarItem): CSSProperties | undefined {
 }
 
 /**
- * One horizontal bar per item with its label, count and share, like M7's
- * Module wise payment. Each row says its figure, so no hidden table is
- * needed.
+ * One horizontal bar per item with its label, count and share, like Module
+ * Wise Payment. Each row says its figure, so no hidden table is needed.
  */
 export function CountBars({
   title,

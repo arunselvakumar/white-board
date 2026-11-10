@@ -60,7 +60,6 @@ import {
   SectionCollapseProvider,
   useSectionCollapse,
 } from "./section-collapse";
-// Sales (CM-1008)
 import { BookingSection, InquirySection } from "./sales-sections";
 import { DailyWorkSection, EquipmentUsageSection } from "./site-work-sections";
 import { SummaryDetails } from "./summary-details";
@@ -74,8 +73,8 @@ import {
 
 /**
  * What each stub section will show once its milestone lands, and the
- * milestones' names. Empty since M10 filled the last stubs; a later
- * section waiting for its milestone adds its words here.
+ * milestones' names. Empty while no section waits for a milestone; one that
+ * does adds its words here.
  */
 const STUB_TEXT: Record<string, string> = {};
 
@@ -87,7 +86,7 @@ function milestoneName(milestone: string): string {
 
 /**
  * Dates, status, type, budget (Financial) and what the Project holds, then
- * its address, Contract and Additional details (from Project Home, #99).
+ * its address, Contract and Additional details.
  */
 function SummarySection({ projectId }: { projectId: string }) {
   const { data, isPending, error } = useQuery(projectSummaryQuery(projectId));
@@ -172,7 +171,7 @@ function SummarySection({ projectId }: { projectId: string }) {
   );
 }
 
-/** Labour on the duration's last day and the day-wise trend (M2 data). */
+/** Labour on the duration's last day and the day-wise trend. */
 function AttendanceSection({
   projectId,
   duration,
@@ -260,8 +259,8 @@ function StubSection({ section }: { section: DashboardSection }) {
 
 /**
  * Pending Purchase Requests, Purchase Orders and Material Transfers the
- * viewer may approve on this Project (CM-510); "—" when they may approve
- * none of them.
+ * viewer may approve on this Project; "—" when they may approve none of
+ * them.
  */
 function MaterialApprovalsTile({
   projectId,
@@ -356,8 +355,8 @@ function KpiTiles({
 }
 
 /**
- * Material Summary, purchase orders and their month-wise value (CM-510).
- * Each part shows only with its permission on the Project.
+ * Material Summary, purchase orders and their month-wise value. Each part
+ * shows only with its permission on the Project.
  */
 function MaterialsSection({
   projectId,
@@ -449,7 +448,7 @@ const DURATION_SECTIONS: ReadonlySet<string> = new Set([
 
 /** The sections the member sees on this Project, in their order. */
 function shownSections(layout: { sections: DashboardSection[] }) {
-  // A module hidden on the Project takes its section with it (CM-902).
+  // A module hidden on the Project takes its section with it.
   return layout.sections.filter(
     (section) => section.visible && !section.hiddenOnProject,
   );
@@ -556,7 +555,6 @@ function DashboardSections({
               duration={duration}
             />
           );
-        // Sales (CM-1008).
         if (section.key === "inquiry")
           return (
             <InquirySection
@@ -617,15 +615,12 @@ function ManageDashboard({
 }
 
 /**
- * The Project Dashboard (CM-412, ADR CM-0013 §12): the duration filter
- * (last 12 months by default), the four KPI tiles, and the member's
- * sections in their order. Project summary, Attendance, Task, Payments,
- * Daily Work, Equipment Usage, Materials, Issue & Snag and Inspection
- * Request have data (CM-805); Booking and Inquiry name the milestone that
- * fills them. Manage Dashboard shows,
- * hides and reorders sections for the member on every Project; sections
- * whose module is hidden on this Project are left out (CM-902). Each
- * section collapses to its header, remembered in this browser (CM-0025).
+ * The Project Dashboard (ADR CM-0013 §12): the duration filter (last 12
+ * months by default), the four KPI tiles, and the member's sections in
+ * their order. Manage Dashboard shows, hides and reorders sections for the
+ * member on every Project; sections whose module is hidden on this Project
+ * are left out. Each section collapses to its header, remembered in this
+ * browser (ADR CM-0025).
  */
 export function ProjectDashboard({ projectId }: { projectId: string }) {
   const [duration, setDuration] = useState<Duration>(() =>

@@ -12,9 +12,9 @@ import type {
 import type { ProjectDocumentKind } from "@/src/projects/domain/project-document-rules";
 
 /**
- * The papers that gave the Company a Project (CM-413, ADR CM-0010), in the
- * order they happen. `optional` papers show on the form only once they have
- * a value or the user asks for them; the Tender / RFQ ref. has no date.
+ * The papers that gave the Company a Project (ADR CM-0010), in the order
+ * they happen. `optional` papers show on the form only once they have a
+ * value or the user asks for them; the Tender / RFQ ref. has no date.
  */
 export const PROJECT_PAPERS = [
   {

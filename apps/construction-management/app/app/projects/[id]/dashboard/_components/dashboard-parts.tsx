@@ -21,9 +21,9 @@ import { SECTION_APPEARANCE } from "./section-appearance";
 import { useSectionCollapse } from "./section-collapse";
 
 /**
- * The Project Dashboard's building blocks (CM-412): a section card, a
- * labelled figure with its grey units, and the 403 check sections use to
- * name the permission they need. Their loading skeletons are in
+ * The Project Dashboard's building blocks: a section card, a labelled
+ * figure with its grey units, and the 403 check sections use to name the
+ * permission they need. Their loading skeletons are in
  * `dashboard-skeletons.tsx`.
  */
 

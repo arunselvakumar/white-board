@@ -6,7 +6,7 @@ import type {
 import { mockApi } from "@/.storybook/mocks/api";
 import { ANUGRAHA } from "@/components/projects/documents/document-fixtures";
 
-/** Story fixtures for the Project Gallery (CM-410). */
+/** Story fixtures for the Project Gallery. */
 export const GALLERY_PROJECT_ID = ANUGRAHA.id;
 
 const PROJECT_API = `/api/construction/projects/projects/${GALLERY_PROJECT_ID}`;

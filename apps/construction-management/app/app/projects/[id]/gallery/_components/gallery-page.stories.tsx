@@ -451,7 +451,7 @@ export const ViewPdf: Story = {
   },
 };
 
-/** A tracking record's file links back to its Issue (M8). */
+/** A tracking record's file links back to its Issue. */
 export const LinksBackToIssue: Story = {
   beforeEach: galleryApi({
     items: [

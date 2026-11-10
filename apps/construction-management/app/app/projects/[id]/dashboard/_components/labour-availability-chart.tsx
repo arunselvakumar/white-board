@@ -35,12 +35,11 @@ function path(
 }
 
 /**
- * Total Labours Availability (CM-608): worksheet labour (skilled +
- * unskilled) against attendance heads, day by day over the dashboard's
- * duration. Two 2px lines in the primary and second chart hues with a
- * legend; hover, touch or the arrow keys move a crosshair whose day is
- * read out above the chart. A table of every day sits behind it for
- * screen readers.
+ * Total Labours Availability: worksheet labour (skilled + unskilled)
+ * against attendance heads, day by day over the dashboard's duration. Two
+ * 2px lines in the primary and second chart hues with a legend; hover,
+ * touch or the arrow keys move a crosshair whose day is read out above the
+ * chart. A table of every day sits behind it for screen readers.
  */
 export function LabourAvailabilityChart({
   series,

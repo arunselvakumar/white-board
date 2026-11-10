@@ -38,11 +38,11 @@ function byDefault(sections: readonly DashboardSection[]) {
 }
 
 /**
- * Manage Dashboard (CM-412): tick the sections to show and move them up or
- * down (keyboard friendly), or reset. Saved for the member on every
- * Project. A section whose module is hidden on this Project (Hide / Show
- * Modules) cannot be ticked and says why (CM-902); its tick is kept for
- * the member's other Projects.
+ * Manage Dashboard: tick the sections to show and move them up or down
+ * (keyboard friendly), or reset. Saved for the member on every Project. A
+ * section whose module is hidden on this Project (Hide / Show Modules)
+ * cannot be ticked and says why; its tick is kept for the member's other
+ * Projects.
  */
 export function ManageDashboardDialog({
   sections: initial,

@@ -2,8 +2,8 @@ import { PROJECT_MODULES } from "@/src/projects/domain/project-modules";
 import type { ProjectHome } from "@/src/queries/project-home";
 
 /**
- * A Project home for stories (CM-411): the modules of a Wings Project in
- * the default order, or the given keys in that order.
+ * A Project home for stories: the modules of a Wings Project in the
+ * default order, or the given keys in that order.
  */
 export function storyHome(
   options: {

@@ -43,7 +43,7 @@ export function project(
   };
 }
 
-/** A Project with its contract details filled in (CM-413). */
+/** A Project with its contract details filled in. */
 export const KUMARI = project({
   clientName: "Sri Balaji Developers",
   clientPhone: "+919843122110",
@@ -117,7 +117,6 @@ export const STORY_PROJECTS: ProjectResponse[] = [
     id: "0199c4a0-0000-7000-8000-000000000004",
     name: "Parvathipuram Row Houses",
     color: "rose",
-    // Added before M4: no Project Type yet.
     projectType: null,
     status: "on_hold",
     address: "Parvathipuram, Nagercoil",
@@ -136,8 +135,8 @@ export const STORY_PROJECTS: ProjectResponse[] = [
 type StoryProgress = ProjectList["items"][number]["progress"];
 
 /**
- * Project Progress % from Tasks (CM-805) by Project id; Projects without
- * tasks are absent and show no bar.
+ * Project Progress % from Tasks by Project id; Projects without tasks are
+ * absent and show no bar.
  */
 export const STORY_PROGRESS: Readonly<Record<string, StoryProgress>> = {
   [KUMARI.id]: { pct: 42.5, weighting: "price" },

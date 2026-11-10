@@ -1,5 +1,5 @@
 /**
- * Add Project's second step (CM-406, the legacy two-step wizard): a new
+ * Add Project's second step, as in the legacy two-step wizard: a new
  * Project opens on its Resources with `?step=resources`, which shows the
  * "Step 2 of 2" banner. Plain module so the server page can read it.
  */

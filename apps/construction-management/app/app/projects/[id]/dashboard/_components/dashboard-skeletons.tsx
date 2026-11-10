@@ -79,7 +79,6 @@ export function MetricFigureSkeleton() {
   );
 }
 
-/** A `MetricCard` caption while it loads. */
 export function MetricCaptionSkeleton() {
   return <SkeletonText width="75%" />;
 }

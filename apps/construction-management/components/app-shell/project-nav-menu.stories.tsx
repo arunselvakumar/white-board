@@ -138,7 +138,7 @@ export const Menu: Story = {
         ["Reports", ["Progress Reports", "Reports"]],
       ]),
     );
-    // No Home entry (#99): Opening a Project lands on Dashboard.
+    // No Home entry: opening a Project lands on Dashboard.
     await expect(menu.queryByRole("link", { name: "Home" })).toBeNull();
     await expect(menu.getByRole("link", { name: "Dashboard" })).toHaveAttribute(
       "aria-current",
@@ -270,7 +270,7 @@ export const AttendanceSubmenuFolds: Story = {
   },
 };
 
-/** Edit is not a module: nothing in the menu lights up (#99). */
+/** Edit is not a module: nothing in the menu lights up. */
 export const EditHighlightsNothing: Story = {
   parameters: at(`${PATH}/edit`),
   play: async (context) => {
@@ -282,8 +282,8 @@ export const EditHighlightsNothing: Story = {
 };
 
 /**
- * Every fold-out arrow sits on its row's centre line (#99), folded and
- * open (Payments is open on its page).
+ * Every fold-out arrow sits on its row's centre line, folded and open
+ * (Payments is open on its page).
  */
 export const SubmenuArrowsCentred: Story = {
   parameters: at(`${PATH}/payments/wages`),

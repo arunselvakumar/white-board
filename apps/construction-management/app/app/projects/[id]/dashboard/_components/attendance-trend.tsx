@@ -21,11 +21,11 @@ const WIDTH = 600;
 const HEIGHT = 160;
 
 /**
- * "Labours present at site" day by day over the dashboard's duration
- * (CM-412): one series, so the title names it and there is no legend. A
- * 2px line over a light area on a recessive baseline; hover, touch or the
- * arrow keys move a crosshair whose day is read out above the chart. A
- * table of every day sits behind it for screen readers.
+ * "Labours present at site" day by day over the dashboard's duration: one
+ * series, so the title names it and there is no legend. A 2px line over a
+ * light area on a recessive baseline; hover, touch or the arrow keys move a
+ * crosshair whose day is read out above the chart. A table of every day sits
+ * behind it for screen readers.
  */
 export function AttendanceTrend({ series }: { series: readonly Day[] }) {
   const [active, setActive] = useState(series.length - 1);

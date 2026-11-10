@@ -8,7 +8,6 @@ import type { GalleryFilter } from "@/src/queries/project-gallery";
 
 /* The Gallery while it loads (ADR-0047): real heading and type tabs. */
 
-/** The Gallery's Type tabs. */
 export const GALLERY_TYPE_TABS: FilterTab<GalleryFilter["type"]>[] = [
   { value: "all", label: "All", icon: LayoutGrid },
   { value: "image", label: "Images", icon: ImageIcon },

@@ -40,11 +40,11 @@ function monthLabel(month: string): string {
 type Month = PaymentsDashboard["months"][number];
 
 /**
- * Payment In & Out per month (CM-709): a pair of bars per month, money in
- * in the primary hue and money out in the second chart hue, with a legend.
- * Hover, touch or the arrow keys pick a month whose in, out and balance
- * are read out above the chart. A table of every month sits behind it for
- * screen readers (in a hidden wrapper, never `sr-only` on the table).
+ * Payment In & Out per month: a pair of bars per month, money in in the
+ * primary hue and money out in the second chart hue, with a legend. Hover,
+ * touch or the arrow keys pick a month whose in, out and balance are read
+ * out above the chart. A table of every month sits behind it for screen
+ * readers (in a hidden wrapper, never `sr-only` on the table).
  */
 export function PaymentFlowChart({ months }: { months: readonly Month[] }) {
   const [active, setActive] = useState(months.length - 1);
@@ -182,9 +182,9 @@ const PARTY_TYPE_LABELS = {
 } as const;
 
 /**
- * Due Payments (CM-709): parties with something due on bills from them on
- * this Project. At phone width Invoiced and Paid move under the party's
- * name, so the table never scrolls sideways.
+ * Due Payments: parties with something due on bills from them on this
+ * Project. At phone width Invoiced and Paid move under the party's name, so
+ * the table never scrolls sideways.
  */
 export function DuePaymentsTable({
   dues,
@@ -285,9 +285,9 @@ const MODULES = [
 ] as const;
 
 /**
- * Module Wise Payment (CM-709): money paid out on this Project in the
- * duration by module, one horizontal bar each with its amount and share.
- * Each row says its figure, so no hidden table is needed.
+ * Module Wise Payment: money paid out on this Project in the duration by
+ * module, one horizontal bar each with its amount and share. Each row says
+ * its figure, so no hidden table is needed.
  */
 export function ModuleWisePayment({
   modules,
@@ -346,9 +346,9 @@ export function ModuleWisePayment({
 }
 
 /**
- * Payments (CM-709, ADR CM-0017 §16): money in and out of accounts on this
- * Project by month with the running balance, Due Payments and Module Wise
- * Payment. Needs Payments Read on the Project.
+ * Payments (ADR CM-0017 §16): money in and out of accounts on this Project
+ * by month with the running balance, Due Payments and Module Wise Payment.
+ * Needs Payments Read on the Project.
  */
 export function PaymentsSection({
   projectId,
@@ -423,8 +423,8 @@ export function PaymentsSection({
 
 /**
  * Pending Transactions, transfers, petty-cash vouchers, Other Expenses and
- * settlements the viewer may decide on this Project (CM-709); "—" when
- * they may decide none of them.
+ * settlements the viewer may decide on this Project; "—" when they may
+ * decide none of them.
  */
 export function PaymentApprovalsTile({
   projectId,

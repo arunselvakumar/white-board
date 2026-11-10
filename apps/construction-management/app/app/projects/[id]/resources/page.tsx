@@ -9,8 +9,8 @@ import { ProjectResourcesSkeleton } from "@/app/app/projects/[id]/resources/_com
 export const metadata: Metadata = { title: "Resources" };
 
 /**
- * The Project's Resources (CM-406); `?step=resources` right after Add
- * Project shows it as the wizard's second step.
+ * The Project's Resources; `?step=resources` right after Add Project shows
+ * it as the wizard's second step.
  */
 export default async function ProjectResourcesRoute({
   params,

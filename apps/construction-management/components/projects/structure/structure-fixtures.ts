@@ -13,7 +13,7 @@ import type {
 import { mockApi } from "../../../.storybook/mocks/api";
 import { project } from "@/app/app/_components/projects/project-fixtures";
 
-/** Story fixtures for Phases, Wings (CM-402) and Locations (CM-405). */
+/** Story fixtures for Phases, Wings and Locations. */
 export const KUMARI_HEIGHTS = project({
   id: "0199c4a0-0000-7000-8000-0000000000b1",
   name: "Kumari Heights",

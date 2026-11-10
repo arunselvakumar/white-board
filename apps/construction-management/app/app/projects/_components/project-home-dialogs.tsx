@@ -28,7 +28,6 @@ const MENU_ORDER: readonly string[] = PROJECT_NAV_GROUPS.flatMap(
   (group) => group.keys,
 );
 
-/** The modules in the sidebar menu's order. */
 function inMenuOrder(modules: readonly ProjectHomeModule[]) {
   return [...modules].sort(
     (a, b) => MENU_ORDER.indexOf(a.key) - MENU_ORDER.indexOf(b.key),
@@ -124,9 +123,9 @@ function HideModulesForm({
 }
 
 /**
- * Hide / Show Modules (CM-411): tick the modules everyone on this Project
- * sees. Needs the Project menu's Update flag; hiding changes the sidebar
- * menu (and the Dashboard's sections), never what anyone may open.
+ * Hide / Show Modules: tick the modules everyone on this Project sees.
+ * Needs the Project menu's Update flag; hiding changes the sidebar menu
+ * (and the Dashboard's sections), never what anyone may open.
  */
 export function HideModulesDialog({
   projectId,

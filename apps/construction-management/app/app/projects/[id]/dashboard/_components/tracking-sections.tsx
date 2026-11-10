@@ -66,7 +66,7 @@ function SectionLink({ href, children }: { href: string; children: string }) {
   );
 }
 
-/** Issue status colours, matching the list's chips (CM-803). */
+/** Issue status colours, matching the list's chips. */
 const ISSUE_SWATCHES: Record<IssueStatus, string> = {
   pending: "bg-amber-500",
   delayed: "bg-red-500",
@@ -86,9 +86,9 @@ export function weightingCaption(progress: TaskDashboard["progress"]): string {
 }
 
 /**
- * Value Earned By Task (CM-805, Task Financial): each top-most task of the
- * period with its value as the track and the earned value filled in, the
- * figures written beside it.
+ * Value Earned By Task (Task Financial): each top-most task of the period
+ * with its value as the track and the earned value filled in, the figures
+ * written beside it.
  */
 export function ValueEarnedChart({
   value,
@@ -289,7 +289,7 @@ export function TaskSectionBody({
 }
 
 /**
- * Task (CM-805, ADR CM-0019 §14): the Project Progress % gauge naming its
+ * Task (ADR CM-0019 §14): the Project Progress % gauge naming its
  * weighting, tasks by status, Value Earned By Task with Financial and the
  * most delayed tasks. Needs Task Read on the Project.
  */
@@ -475,8 +475,8 @@ export function IssueSectionBody({ issues }: { issues: IssueDashboard }) {
 }
 
 /**
- * Issue & Snag (CM-805): issues raised in the period by status, priority,
- * category and assignee. Needs Issues & Snags Read on the Project.
+ * Issue & Snag: issues raised in the period by status, priority, category
+ * and assignee. Needs Issues & Snags Read on the Project.
  */
 export function IssueSection({
   projectId,
@@ -564,9 +564,9 @@ export function InspectionSectionBody({
 }
 
 /**
- * Inspection Request (CM-805): total, approved, pending and rejected in
- * the period, and the Success Rate = Approved ÷ (Approved + Rejected), "—"
- * with none decided. Needs Inspection Request Read on the Project.
+ * Inspection Request: total, approved, pending and rejected in the period,
+ * and the Success Rate = Approved ÷ (Approved + Rejected), "—" with none
+ * decided. Needs Inspection Request Read on the Project.
  */
 export function InspectionSection({
   projectId,
@@ -677,7 +677,7 @@ function TrackingTile({
   );
 }
 
-/** Pending Issues & Snags (CM-805): open in the period, delayed included. */
+/** Pending Issues & Snags: open in the period, delayed included. */
 export function PendingIssuesTile({
   projectId,
   duration,
@@ -699,7 +699,7 @@ export function PendingIssuesTile({
   );
 }
 
-/** Pending Inspections (CM-805): pending for approval in the period. */
+/** Pending Inspections: pending for approval in the period. */
 export function PendingInspectionsTile({
   projectId,
   duration,

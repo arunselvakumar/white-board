@@ -3,7 +3,7 @@ import type {
   ProjectResources,
 } from "@/src/queries/project-resources";
 
-/** Story data for a Project's Resources (CM-406). */
+/** Story data for a Project's Resources. */
 
 export const PROJECT_ID = "0199a1b2-0000-7000-8000-0000000000a1";
 

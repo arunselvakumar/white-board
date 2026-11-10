@@ -90,7 +90,7 @@ export const projectFormSchema = z
     useLogoInReports: z.boolean(),
     /** The folder colour (ADR CM-0026); always one of the palette. */
     color: z.enum(PROJECT_COLOR_KEYS),
-    /** GST state code, or "" for Not set (CM-501). */
+    /** GST state code, or "" for Not set. */
     stateCode: z
       .string()
       .refine((value): boolean => value === "" || isGstStateCode(value), {
@@ -177,8 +177,8 @@ export const projectFormSchema = z
   });
 
 /**
- * Add Project needs a Project Type (CM-401). Edit does not: a Project from
- * before M4 may stay "Not set", and the select cannot clear a type.
+ * Add Project needs a Project Type. Edit does not: an older Project may
+ * stay "Not set", and the select cannot clear a type.
  */
 export const newProjectFormSchema = projectFormSchema.superRefine(
   (values, ctx) => {
@@ -280,8 +280,8 @@ export type ProjectFormInput = ProjectInput & { status: ProjectStatus };
  * Order value and budget: only a viewer with the Project menu's Financial
  * flag sends them (`financial`, from the Projects list); the server would
  * ignore them anyway. A value that came back null and is still blank is
- * left out of the request instead of being sent as a clear. A Project
- * Type left blank (a Project from before M4) is left out, so it stays
+ * left out of the request instead of being sent as a clear. A blank
+ * Project Type (an older Project may have none) is left out, so it stays
  * "Not set". So is a State still "Not set"; one taken away is sent as null.
  */
 export function projectFormInput(

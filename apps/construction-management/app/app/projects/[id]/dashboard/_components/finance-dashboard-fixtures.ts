@@ -1,6 +1,6 @@
 import type { FinanceDashboard } from "@/src/queries/finance-dashboard";
 
-/** Story data for the Project Dashboard's Payments section (CM-709). */
+/** Story data for the Project Dashboard's Payments section. */
 
 export const FINANCE_DASHBOARD_PATH = "/api/construction/finance/dashboard";
 

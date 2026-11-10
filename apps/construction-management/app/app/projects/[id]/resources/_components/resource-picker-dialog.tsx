@@ -218,10 +218,10 @@ function PickerBody({
 }
 
 /**
- * Edit one section of a Project's Resources (CM-406): a searchable list
- * of the Company's active parties of that kind, ticked for those on the
- * Project, saved together. Inactive parties already on the Project are
- * listed so they can be taken off; they cannot be added again.
+ * Edit one section of a Project's Resources: a searchable list of the
+ * Company's active parties of that kind, ticked for those on the Project,
+ * saved together. Inactive parties already on the Project are listed so
+ * they can be taken off; they cannot be added again.
  */
 export function ResourcePickerDialog({
   projectId,

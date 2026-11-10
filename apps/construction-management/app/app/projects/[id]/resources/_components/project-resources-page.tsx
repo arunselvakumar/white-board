@@ -182,9 +182,9 @@ function ResourceCard({
 }
 
 /**
- * A Project's Resources (CM-406): who works on it, in four sections, each
- * edited in its own dialog and saved on its own. Opened with
- * `?step=resources` right after Add Project, as the wizard's second step.
+ * A Project's Resources: who works on it, in four sections, each edited in
+ * its own dialog and saved on its own. Opened with `?step=resources` right
+ * after Add Project, as the wizard's second step.
  */
 export function ProjectResourcesPage({
   projectId,

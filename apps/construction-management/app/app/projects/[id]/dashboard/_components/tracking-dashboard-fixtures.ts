@@ -1,6 +1,6 @@
 import type { TrackingDashboard } from "@/src/queries/tracking-dashboard";
 
-/** Story data for the Project Dashboard's tracking sections (CM-805). */
+/** Story data for the Project Dashboard's tracking sections. */
 
 export const TRACKING_DASHBOARD_PATH = "/api/construction/tracking/dashboard";
 

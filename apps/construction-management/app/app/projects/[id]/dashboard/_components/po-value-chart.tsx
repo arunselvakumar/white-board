@@ -18,12 +18,11 @@ function monthLabel(month: string): string {
 }
 
 /**
- * "Purchase order value per month" over the dashboard's duration (CM-510):
- * one series, so the title names it and there is no legend. Bars in the
- * primary hue with 4px rounded tops on a recessive baseline and a 2px gap;
- * hover, touch or the arrow keys pick a month whose value is read out
- * above the chart. A table of every month sits behind it for screen
- * readers.
+ * "Purchase order value per month" over the dashboard's duration: one
+ * series, so the title names it and there is no legend. Bars in the primary
+ * hue with 4px rounded tops on a recessive baseline and a 2px gap; hover,
+ * touch or the arrow keys pick a month whose value is read out above the
+ * chart. A table of every month sits behind it for screen readers.
  */
 export function PoValueChart({ months }: { months: readonly Month[] }) {
   const [active, setActive] = useState(months.length - 1);
