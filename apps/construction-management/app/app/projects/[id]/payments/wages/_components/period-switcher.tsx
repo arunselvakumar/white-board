@@ -22,7 +22,7 @@ const KINDS: { value: BalancePeriodKind; label: string }[] = [
 
 /**
  * Monthly / Weekly (Monday to Sunday) / Custom, with previous and next for
- * the first two and a date range for Custom (CM-216).
+ * the first two and a date range for Custom.
  */
 export function PeriodSwitcher({
   value,

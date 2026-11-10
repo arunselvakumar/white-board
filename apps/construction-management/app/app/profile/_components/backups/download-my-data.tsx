@@ -27,7 +27,7 @@ import { useRequestBackup, type Backup } from "@/src/queries/backups";
 import { BackupProgress } from "@/app/app/_components/backups/backup-progress";
 
 /**
- * Download My Data (CM-906, ADR CM-0021 §8): a ZIP of the User's own data
+ * Download My Data (ADR CM-0021 §8): a ZIP of the User's own data
  * across Companies, with a 7-day link for them only.
  */
 export function DownloadMyDataDialog({ onClose }: { onClose: () => void }) {
@@ -91,7 +91,7 @@ export function DownloadMyDataDialog({ onClose }: { onClose: () => void }) {
   );
 }
 
-/** My Profile → Privacy → Download My Data (a row like the other Privacy actions). */
+/** Download My Data as a row like the other Privacy actions. */
 export function DownloadMyDataAction() {
   const [open, setOpen] = useState(false);
   return (

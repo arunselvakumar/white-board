@@ -88,7 +88,7 @@ function CheckField({
 }
 
 /**
- * Backup (CM-906, ADR CM-0021 §8): pick modules (grouped, with Select
+ * Backup (ADR CM-0021 §8): pick modules (grouped, with Select
  * all), and for a Project a date range and Data and/or Media, then
  * Generate. The dialog then follows the backup until its ZIP is ready.
  */
@@ -288,7 +288,6 @@ export function BackupDialog({
   );
 }
 
-/** Project → options → Backup (CM-906). */
 export function ProjectBackupDialog({
   projectId,
   projectName,
@@ -309,7 +308,6 @@ export function ProjectBackupDialog({
   );
 }
 
-/** Masters → Backup (CM-906). */
 export function MastersBackupDialog({ onClose }: { onClose: () => void }) {
   return (
     <BackupDialog

@@ -4,7 +4,7 @@ import { PaymentsPage } from "@/app/app/projects/[id]/payments/wages/_components
 
 export const metadata: Metadata = { title: "Labour & Vendor payments" };
 
-/** M2's wage payments and balances (CM-216), a tab of Payments since M7. */
+/** Wage payments and balances, a tab of Payments. */
 export default async function ProjectWagesPage({
   params,
 }: {

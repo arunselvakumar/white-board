@@ -13,7 +13,7 @@ export const payFormSchema = z
     paymentDate: z.string().min(1, "Enter the payment date"),
     kind: z.enum(["payment", "advance"]),
     mode: z.enum(["cash", "bank"]),
-    /** The finance account it was paid from (CM-707). */
+    /** The finance account it was paid from. */
     accountId: z.string().min(1, "Choose the account it was paid from"),
     reference: z.string().trim().max(100, "Use at most 100 characters"),
     /** Rupees as typed. */

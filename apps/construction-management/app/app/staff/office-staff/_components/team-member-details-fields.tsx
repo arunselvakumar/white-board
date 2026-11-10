@@ -30,7 +30,7 @@ import {
 import type { TeamMember } from "@/src/queries/team-members";
 import { isValidAadhaar, isValidPan } from "@/src/shared-kernel/tax-ids";
 
-/** The detail fields Add Staff and Edit Staff share (CM-111). */
+/** The detail fields Add Staff and Edit Staff share. */
 export const teamMemberDetailsObject = z.object({
   memberType: z.enum(["normal", "hrms"]),
   name: z.string().trim().min(1, "Enter the name").max(100, "Name is too long"),
@@ -121,7 +121,7 @@ export function savedSalary(member: TeamMember): SavedWage {
   };
 }
 
-/** Server error codes → the field they belong to, the salary's included. */
+/** Maps server error codes to their fields, the salary's included. */
 export function detailErrorFields(
   values: TeamMemberDetailsValues,
 ): Record<string, FieldPath<TeamMemberDetailsValues>> {

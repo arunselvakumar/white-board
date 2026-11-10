@@ -161,7 +161,7 @@ export const PaymentsTab: Story = {
       await canvas.findByText("2 payments · ₹5,300.00"),
     ).toBeVisible();
     await expect(canvas.getAllByText("Prabhu Gang").length).toBeGreaterThan(0);
-    // The account each payment was paid from (CM-707).
+    // The account each payment was paid from.
     await expect(
       canvas.getAllByText("HDFC Current A/c").length,
     ).toBeGreaterThan(0);

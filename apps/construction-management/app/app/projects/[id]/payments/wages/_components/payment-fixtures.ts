@@ -9,7 +9,7 @@ import type {
   WagePaymentPage,
 } from "@/src/queries/payments";
 
-/** Story data for the Payments screens (CM-216). Amounts are paise. */
+/** Story data for the Payments screens. Amounts are paise. */
 
 /** The accounts of `components/finance/account-fixtures.ts`. */
 export const CASH_ACCOUNT = {
@@ -237,7 +237,7 @@ export const DHURESH_STATEMENT: PartyStatement = {
         cancelled: true,
         updatedAt: "2026-09-13T10:00:00.000Z",
         hasReceipt: false,
-        // Recorded before M7: no account.
+        // Some payments carry no account.
         account: null,
       },
     },

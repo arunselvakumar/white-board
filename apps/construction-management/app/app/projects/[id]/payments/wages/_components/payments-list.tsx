@@ -69,7 +69,7 @@ const KINDS: FilterTab<"all" | "payment" | "advance">[] = [
   { value: "advance", label: "Advances", icon: HandCoins },
 ];
 
-/** Recorded payments of a Project with filters and cancel (CM-216). */
+/** Recorded payments of a Project with filters and cancel. */
 export function PaymentsList({ projectId }: { projectId: string }) {
   const [filter, setFilter] = useState<PaymentListFilter>({
     projectId,

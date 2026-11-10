@@ -182,7 +182,7 @@ const HRMS_SERVER_FIELDS: Record<string, keyof HrmsValues> = {
   BACKUP_MODULE_UNKNOWN: "modules",
 };
 
-/** HRMS alone (CM-906): chosen HRMS modules, behind the same code. */
+/** HRMS alone: chosen HRMS modules, behind the same code. */
 function HrmsBackupForm() {
   const options = useQuery(backupQueries.options("hrms"));
   const request = useRequestBackup();
@@ -283,9 +283,8 @@ function HrmsBackupForm() {
 }
 
 /**
- * Masters → Settings → Backup & export (CM-906, ADR CM-0021 §8): the full
- * Company backup and an HRMS-only backup, the Owner's alone, behind a
- * code.
+ * Backup & export (ADR CM-0021 §8): the full Company backup and an
+ * HRMS-only backup, the Owner's alone, behind a code.
  */
 export function CompanyBackupScreen() {
   const { role } = useCompanyAuth();

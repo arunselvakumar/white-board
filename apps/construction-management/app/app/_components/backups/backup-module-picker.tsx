@@ -23,7 +23,7 @@ function slug(value: string): string {
 
 /**
  * The modules a backup holds, grouped under their headings, with Select
- * all for everything and for each group (CM-906). A module whose files
+ * all for everything and for each group. A module whose files
  * would carry amounts says so.
  */
 export function BackupModulePicker({
