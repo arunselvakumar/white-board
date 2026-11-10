@@ -4,7 +4,7 @@ import type {
 } from "@/src/queries/project-gallery";
 
 import { mockApi } from "@/.storybook/mocks/api";
-import { ANUGRAHA } from "@/components/projects/documents/document-fixtures";
+import { ANUGRAHA } from "@/app/app/projects/[id]/gallery/_components/document-fixtures";
 
 /** Story fixtures for the Project Gallery. */
 export const GALLERY_PROJECT_ID = ANUGRAHA.id;

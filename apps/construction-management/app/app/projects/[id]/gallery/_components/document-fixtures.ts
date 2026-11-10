@@ -1,7 +1,7 @@
 import type { ProjectDocumentKind } from "@/src/projects/domain/project-document-rules";
 import type { ProjectDocument } from "@/src/queries/project-documents";
 
-import { mockApi } from "../../../.storybook/mocks/api";
+import { mockApi } from "@/.storybook/mocks/api";
 import { project } from "@/app/app/_components/projects/project-fixtures";
 
 export const ANUGRAHA = project({

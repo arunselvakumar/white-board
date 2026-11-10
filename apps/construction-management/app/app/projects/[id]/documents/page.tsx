@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
-import { ProjectDocumentsPage } from "@/components/projects/documents/project-documents-page";
+import { ProjectDocumentsPage } from "@/app/app/projects/[id]/documents/_components/project-documents-page";
 import { QuerySuspense } from "@/components/query-suspense";
-import { ProjectDocumentsSkeleton } from "@/components/projects/documents/documents-skeletons";
+import { ProjectDocumentsSkeleton } from "@/app/app/projects/[id]/documents/_components/documents-skeletons";
 
 export const metadata: Metadata = { title: "Documents" };
 

@@ -30,12 +30,12 @@ import {
 } from "@/lib/project-documents";
 import type { ProjectDocumentKind } from "@/src/projects/domain/project-document-rules";
 
-import { DocumentFileIcon } from "./document-file-icon";
+import { DocumentFileIcon } from "@/app/app/_components/projects/documents/document-file-icon";
 import {
   canRetry,
   type DocumentUpload,
   type useDocumentUploads,
-} from "./use-document-uploads";
+} from "@/app/app/projects/_components/documents/use-document-uploads";
 
 const KIND_ITEMS = PROJECT_DOCUMENT_KIND_ORDER.map((kind) => ({
   value: kind,

@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
-import { LocationsPage } from "@/components/projects/structure/locations-page";
-import { StructureNoAccess } from "@/components/projects/structure/structure-parts";
+import { LocationsPage } from "@/app/app/projects/[id]/locations/_components/locations-page";
+import { StructureNoAccess } from "@/app/app/projects/[id]/_components/structure/structure-parts";
 
 import { structureAccess } from "../wings/structure-access";
 import { QuerySuspense } from "@/components/query-suspense";
-import { LocationsSkeleton } from "@/components/projects/structure/structure-skeletons";
+import { LocationsSkeleton } from "@/app/app/projects/[id]/_components/structure/structure-skeletons";
 
 export const metadata: Metadata = { title: "Locations" };
 

@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { getRouter } from "@storybook/nextjs-vite/navigation.mock";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
+import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { ProjectShell } from "@/app/app/projects/[id]/_components/project-shell";
-import { EditWingScreen } from "./edit-wing-screen";
+import { EditWingScreen } from "../edit/_components/edit-wing-screen";
 import {
   KUMARI_HEIGHTS,
   LAYOUT_EAST,
@@ -12,7 +12,7 @@ import {
   TOWER_B,
   WINGS_API,
   mockStructureApi,
-} from "./structure-fixtures";
+} from "@/app/app/projects/[id]/_components/structure/structure-fixtures";
 import { WingChartScreen } from "./wing-chart";
 
 let api: ReturnType<typeof mockStructureApi>;

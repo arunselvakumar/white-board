@@ -32,14 +32,21 @@ import {
   type WingResponse,
 } from "@/src/queries/project-structure";
 
-import { SectionHeader, saveProblem, wingPath } from "./structure-parts";
-import { configSummary } from "./wing-details-schema";
-import { WingEditor, type EditorProblem } from "./wing-editor";
+import {
+  SectionHeader,
+  saveProblem,
+  wingPath,
+} from "@/app/app/projects/[id]/_components/structure/structure-parts";
+import { configSummary } from "@/app/app/projects/[id]/wings/_components/wing-details-schema";
+import {
+  WingEditor,
+  type EditorProblem,
+} from "@/app/app/projects/[id]/_components/structure/wing-editor";
 import {
   editorFromSaved,
   toFloorInputs,
   type EditorFloor,
-} from "./wing-editor-state";
+} from "@/app/app/projects/[id]/_components/structure/wing-editor-state";
 
 const schema = z.object({
   name: z

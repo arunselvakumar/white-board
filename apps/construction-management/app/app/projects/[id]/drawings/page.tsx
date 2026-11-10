@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/components/projects/files/project-no-access";
-import { DrawingsPage } from "@/components/projects/drawings/drawings-page";
+import { DrawingsPage } from "@/app/app/projects/[id]/drawings/_components/drawings-page";
 import { QuerySuspense } from "@/components/query-suspense";
-import { DrawingsSkeleton } from "@/components/projects/drawings/drawings-skeletons";
+import { DrawingsSkeleton } from "@/app/app/projects/[id]/drawings/_components/drawings-skeletons";
 
 export const metadata: Metadata = { title: "Drawings" };
 

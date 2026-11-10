@@ -10,7 +10,7 @@ import { useUploadProjectDocument } from "@/src/queries/project-documents";
 import {
   useDirectUpload,
   type DirectUploadItem,
-} from "../../uploads/use-direct-upload";
+} from "@/components/uploads/use-direct-upload";
 
 export type DocumentUpload = DirectUploadItem<{ kind: ProjectDocumentKind }>;
 

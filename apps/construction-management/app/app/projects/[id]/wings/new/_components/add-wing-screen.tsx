@@ -41,7 +41,11 @@ import {
   type PhaseWithWings,
 } from "@/src/queries/project-structure";
 
-import { SectionHeader, saveProblem, wingsPath } from "./structure-parts";
+import {
+  SectionHeader,
+  saveProblem,
+  wingsPath,
+} from "@/app/app/projects/[id]/_components/structure/structure-parts";
 import {
   FIELD_BOUNDS,
   LAYOUT_FIELDS,
@@ -53,13 +57,16 @@ import {
   wingDetailsSchema,
   type ConfigNumberField,
   type WingDetailsValues,
-} from "./wing-details-schema";
-import { WingEditor, type EditorProblem } from "./wing-editor";
+} from "@/app/app/projects/[id]/wings/_components/wing-details-schema";
+import {
+  WingEditor,
+  type EditorProblem,
+} from "@/app/app/projects/[id]/_components/structure/wing-editor";
 import {
   editorFromGenerated,
   toFloorInputs,
   type EditorFloor,
-} from "./wing-editor-state";
+} from "@/app/app/projects/[id]/_components/structure/wing-editor-state";
 
 function phaseItems(phases: readonly PhaseWithWings[]) {
   return phases.map((phase) => ({ value: phase.id, label: phase.name }));

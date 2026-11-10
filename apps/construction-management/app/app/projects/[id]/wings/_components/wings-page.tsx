@@ -26,15 +26,18 @@ import {
   type WingSummary,
 } from "@/src/queries/project-structure";
 
-import { NameDialog } from "./name-dialog";
+import { NameDialog } from "@/app/app/projects/[id]/_components/structure/name-dialog";
 import {
   SectionHeader,
   StructureEmpty,
   saveProblem,
   wingPath,
   wingsPath,
-} from "./structure-parts";
-import { structureTotals, wingRowTotals } from "./wing-editor-state";
+} from "@/app/app/projects/[id]/_components/structure/structure-parts";
+import {
+  structureTotals,
+  wingRowTotals,
+} from "@/app/app/projects/[id]/_components/structure/wing-editor-state";
 
 /** What a Team Member may do here; reading is a given on this screen. */
 export type WingsAccess = {

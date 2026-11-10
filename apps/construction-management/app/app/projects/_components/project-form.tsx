@@ -46,7 +46,7 @@ import { ImageUploader } from "@/components/profile/image-uploader";
 import {
   useUploadHeldFiles,
   type HeldFile,
-} from "@/components/projects/documents/document-attachments";
+} from "@/app/app/projects/_components/documents/document-attachments";
 import { fieldForCode } from "@/lib/server-errors";
 import { PROJECT_TYPES } from "@/src/projects/domain/project-type";
 import {

@@ -10,7 +10,7 @@ import type {
   WingsOverview,
 } from "@/src/queries/project-structure";
 
-import { mockApi } from "../../../.storybook/mocks/api";
+import { mockApi } from "@/.storybook/mocks/api";
 import { project } from "@/app/app/_components/projects/project-fixtures";
 
 /** Story fixtures for Phases, Wings and Locations. */

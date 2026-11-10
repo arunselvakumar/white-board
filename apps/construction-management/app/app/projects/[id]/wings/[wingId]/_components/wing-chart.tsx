@@ -20,9 +20,13 @@ import {
   wingsQuery,
 } from "@/src/queries/project-structure";
 
-import { SectionHeader, saveProblem, wingsPath } from "./structure-parts";
-import { editorTotals } from "./wing-editor-state";
-import type { WingsAccess } from "./wings-page";
+import {
+  SectionHeader,
+  saveProblem,
+  wingsPath,
+} from "@/app/app/projects/[id]/_components/structure/structure-parts";
+import { editorTotals } from "@/app/app/projects/[id]/_components/structure/wing-editor-state";
+import type { WingsAccess } from "@/app/app/projects/[id]/wings/_components/wings-page";
 
 type ChartFloor = {
   id: string;

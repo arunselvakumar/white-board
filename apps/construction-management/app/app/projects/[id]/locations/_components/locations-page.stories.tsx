@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
+import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { ProjectShell } from "@/app/app/projects/[id]/_components/project-shell";
 import { LocationsPage } from "./locations-page";
 import {
@@ -10,7 +10,7 @@ import {
   LOCATIONS_API,
   TOLL_PLAZA,
   mockStructureApi,
-} from "./structure-fixtures";
+} from "@/app/app/projects/[id]/_components/structure/structure-fixtures";
 
 let api: ReturnType<typeof mockStructureApi>;
 

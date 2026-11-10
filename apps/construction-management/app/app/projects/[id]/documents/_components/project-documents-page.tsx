@@ -48,10 +48,10 @@ import {
 } from "@/src/queries/project-documents";
 import { projectQuery } from "@/src/queries/projects";
 
-import { DeleteDocumentDialog } from "./delete-document-dialog";
-import { DocumentFileIcon } from "./document-file-icon";
+import { DeleteDocumentDialog } from "@/app/app/projects/_components/documents/delete-document-dialog";
+import { DocumentFileIcon } from "@/app/app/_components/projects/documents/document-file-icon";
 import { UploadDocumentsDialog } from "./upload-documents-dialog";
-import { useDocumentUploads } from "./use-document-uploads";
+import { useDocumentUploads } from "@/app/app/projects/_components/documents/use-document-uploads";
 
 type Filter = "all" | ProjectDocumentKind;
 

@@ -25,7 +25,7 @@ import { Input } from "@repo/ui/components/input";
 import { Progress } from "@repo/ui/components/progress";
 
 import { FormAlert } from "@/components/auth/form-alert";
-import { DocumentFileIcon } from "@/components/projects/documents/document-file-icon";
+import { DocumentFileIcon } from "@/app/app/_components/projects/documents/document-file-icon";
 import { documentMeta } from "@/lib/project-documents";
 import { uploadErrorMessage } from "@/src/queries/direct-upload";
 import type { PartyList } from "@/src/queries/parties";

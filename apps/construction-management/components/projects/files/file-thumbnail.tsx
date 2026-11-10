@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { cn } from "@repo/ui/lib/utils";
 
-import { DocumentFileIcon } from "../documents/document-file-icon";
+import { DocumentFileIcon } from "@/app/app/_components/projects/documents/document-file-icon";
 import { isImageFile } from "./file-viewer";
 
 /**

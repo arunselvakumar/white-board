@@ -32,7 +32,7 @@ import {
   type DrawingSummary,
 } from "@/src/queries/project-drawings";
 
-import { AlbumSelectSkeleton } from "./drawings-skeletons";
+import { AlbumSelectSkeleton } from "@/app/app/projects/[id]/drawings/_components/drawings-skeletons";
 
 const schema = z.object({
   albumId: z.string().min(1, "Choose an album."),

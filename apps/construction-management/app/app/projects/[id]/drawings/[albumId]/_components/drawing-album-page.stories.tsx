@@ -6,15 +6,15 @@ import {
   within,
 } from "storybook/test";
 
-import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
-import { mockXhrUploads } from "../../../.storybook/mocks/xhr";
+import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
+import { mockXhrUploads } from "@/.storybook/mocks/xhr";
 import {
   ALBUM_IDS,
   ANUGRAHA,
   DRAWING_IDS,
   DRAWINGS_API,
   mockDrawingsApi,
-} from "./drawing-fixtures";
+} from "@/app/app/projects/[id]/drawings/_components/drawing-fixtures";
 import { DrawingAlbumPage } from "./drawing-album-page";
 
 let api: ReturnType<typeof mockDrawingsApi>;
