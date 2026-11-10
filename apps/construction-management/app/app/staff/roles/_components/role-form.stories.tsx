@@ -4,12 +4,12 @@ import { expect, waitFor } from "storybook/test";
 
 import type { Role } from "@/src/queries/roles";
 
-import { mockApi, StoryQueries } from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import {
   ROLES_URL,
   SITE_ENGINEER_ROLE,
   STORE_HELPER_ROLE,
-} from "./role-fixtures";
+} from "@/app/app/staff/_components/role-fixtures";
 import { EditRoleScreen, NewRoleScreen } from "./role-form";
 
 const ONE = `${ROLES_URL}/${SITE_ENGINEER_ROLE.id}`;

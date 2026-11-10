@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 import { QuerySuspense } from "@/components/query-suspense";
-import { EditRoleScreen } from "@/components/roles/role-form";
-import { RolesNoAccess } from "@/components/roles/roles-no-access";
-import { RoleFormSkeleton } from "@/components/roles/roles-skeletons";
+import { EditRoleScreen } from "@/app/app/staff/roles/_components/role-form";
+import { RolesNoAccess } from "@/app/app/staff/_components/roles-no-access";
+import { RoleFormSkeleton } from "@/app/app/staff/roles/[id]/_components/roles-skeletons";
 
 import { viewerRoleActions } from "../_lib/role-actions";
 

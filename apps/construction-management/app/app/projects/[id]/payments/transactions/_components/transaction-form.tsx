@@ -34,7 +34,7 @@ import {
   paiseToRupees,
   rupeesToPaise,
 } from "@/components/money/money-input";
-import { localToday } from "@/components/payments/payment-format";
+import { localToday } from "@/app/app/_components/payments/payment-format";
 import { fieldForCode } from "@/lib/server-errors";
 import {
   useTransactionCommand,

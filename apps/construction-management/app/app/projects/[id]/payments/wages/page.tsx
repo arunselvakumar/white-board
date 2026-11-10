@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { PaymentsPage } from "@/components/payments/payments-page";
+import { PaymentsPage } from "@/app/app/projects/[id]/payments/wages/_components/payments-page";
 
 export const metadata: Metadata = { title: "Labour & Vendor payments" };
 

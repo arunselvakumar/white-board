@@ -28,7 +28,10 @@ import {
   type TeamMember,
 } from "@/src/queries/team-members";
 
-import { signInWays, temporaryPassword } from "./sign-in-options";
+import {
+  signInWays,
+  temporaryPassword,
+} from "@/app/app/staff/office-staff/_components/sign-in-options";
 
 const schema = z.object({ password: temporaryPassword });
 type Values = z.infer<typeof schema>;

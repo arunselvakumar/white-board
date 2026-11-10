@@ -27,7 +27,7 @@ import {
 } from "@/src/queries/project-home";
 import { projectQuery } from "@/src/queries/projects";
 
-import { ProjectBackupDialog } from "@/components/backups/backup-dialog";
+import { ProjectBackupDialog } from "@/app/app/_components/backups/backup-dialog";
 
 import { QuerySuspense } from "@/components/query-suspense";
 

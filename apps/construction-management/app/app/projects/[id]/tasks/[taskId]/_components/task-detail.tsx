@@ -26,7 +26,7 @@ import { Button, buttonVariants } from "@repo/ui/components/button";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { LocationLabel } from "@/app/app/_components/locations/location-picker";
-import { formatDate } from "@/components/payments/payment-format";
+import { formatDate } from "@/app/app/_components/payments/payment-format";
 import { SiteRecordHeader } from "@/app/app/projects/[id]/_components/site-work/site-record-header";
 import { TrackingFileStrip } from "@/app/app/projects/[id]/_components/tracking/documents/tracking-file-strip";
 import { QueryHttpError } from "@/src/queries/http";

@@ -2,11 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 import { expect, waitFor } from "storybook/test";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { ProjectsField, TeamMemberProjectsTab } from "./projects-field";
 import { teamMember } from "./team-member-fixtures";
 

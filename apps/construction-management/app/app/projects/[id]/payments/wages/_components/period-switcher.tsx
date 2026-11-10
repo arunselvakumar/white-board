@@ -8,7 +8,11 @@ import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 
 import type { BalancePeriod, BalancePeriodKind } from "@/src/queries/balances";
 
-import { periodLabel, rangeOf, shiftPeriod } from "./payment-format";
+import {
+  periodLabel,
+  rangeOf,
+  shiftPeriod,
+} from "@/app/app/_components/payments/payment-format";
 
 const KINDS: { value: BalancePeriodKind; label: string }[] = [
   { value: "monthly", label: "Monthly" },

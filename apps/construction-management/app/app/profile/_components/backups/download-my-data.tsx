@@ -24,7 +24,7 @@ import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";
 import { useRequestBackup, type Backup } from "@/src/queries/backups";
 
-import { BackupProgress } from "./backup-progress";
+import { BackupProgress } from "@/app/app/_components/backups/backup-progress";
 
 /**
  * Download My Data (CM-906, ADR CM-0021 §8): a ZIP of the User's own data

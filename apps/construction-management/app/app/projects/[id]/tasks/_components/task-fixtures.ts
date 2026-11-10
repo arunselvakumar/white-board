@@ -1,6 +1,6 @@
 import { mockApi, type ApiCall } from "@/.storybook/mocks/api";
 import type { TrackingAccessMenu } from "@/app/api/construction/tracking/access/access-models";
-import { localToday } from "@/components/payments/payment-format";
+import { localToday } from "@/app/app/_components/payments/payment-format";
 import {
   mockTrackingDocumentApi,
   trackingFile,

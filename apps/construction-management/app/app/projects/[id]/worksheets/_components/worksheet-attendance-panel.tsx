@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@repo/ui/components/button";
 
-import { formatDate } from "@/components/payments/payment-format";
+import { formatDate } from "@/app/app/_components/payments/payment-format";
 import {
   worksheetAttendanceQuery,
   type WorksheetAttendance,

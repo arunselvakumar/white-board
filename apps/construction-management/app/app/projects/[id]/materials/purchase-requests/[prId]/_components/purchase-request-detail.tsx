@@ -15,7 +15,10 @@ import {
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { LocationLabel } from "@/app/app/_components/locations/location-picker";
-import { formatDate, money } from "@/components/payments/payment-format";
+import {
+  formatDate,
+  money,
+} from "@/app/app/_components/payments/payment-format";
 import {
   DocumentActivity,
   DocumentFiles,

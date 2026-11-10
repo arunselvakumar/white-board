@@ -17,7 +17,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 
-import { formatDate } from "@/components/payments/payment-format";
+import { formatDate } from "@/app/app/_components/payments/payment-format";
 import {
   BookingStatusBadge,
   UNIT_STATUS_DOTS,

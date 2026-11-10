@@ -12,7 +12,7 @@ import {
 } from "@repo/ui/components/item";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
-import { MastersBackupButton } from "@/components/backups/masters-backup-button";
+import { MastersBackupButton } from "@/app/app/masters/_components/backups/masters-backup-button";
 import { MASTERS_GROUPS } from "@/lib/masters-nav";
 
 export const metadata: Metadata = { title: "Masters" };

@@ -7,12 +7,12 @@ import {
   ROLES,
   ROLES_URL,
   SITE_ENGINEER_ROLE,
-} from "@/components/roles/role-fixtures";
+} from "@/app/app/staff/_components/role-fixtures";
 
-import { mockFetch, type MockRoute } from "../../.storybook/mock-fetch";
-import { signInAs } from "../../.storybook/mocks/auth";
+import { mockFetch, type MockRoute } from "@/.storybook/mock-fetch";
+import { signInAs } from "@/.storybook/mocks/auth";
 import { AddTeamMember } from "./add-team-member";
-import { teamMember } from "./team-member-fixtures";
+import { teamMember } from "@/app/app/staff/office-staff/_components/team-member-fixtures";
 
 const MEMBERS_URL = "/api/construction/organization/team-members";
 const SRI_HEIGHTS = "0199a000-0000-7000-8000-000000000001";

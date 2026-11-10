@@ -38,7 +38,10 @@ import {
 } from "@/src/queries/payments";
 import { DOCUMENT_CONTENT_TYPES } from "@/src/shared-kernel/files/document-file";
 
-import { localToday, money } from "./payment-format";
+import {
+  localToday,
+  money,
+} from "@/app/app/_components/payments/payment-format";
 import {
   payFormDefaults,
   payFormSchema,

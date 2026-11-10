@@ -28,7 +28,10 @@ import { FormAlert } from "@/components/auth/form-alert";
 import { accountLabel } from "@/app/app/_components/finance/account-picker";
 import { COUNTERPARTY_KIND_LABELS } from "@/app/app/projects/[id]/payments/_components/counterparty-field";
 import { formatPaise } from "@/components/money/money-input";
-import { formatDate, localToday } from "@/components/payments/payment-format";
+import {
+  formatDate,
+  localToday,
+} from "@/app/app/_components/payments/payment-format";
 import {
   DateFilter,
   NO_DATE_FILTER,

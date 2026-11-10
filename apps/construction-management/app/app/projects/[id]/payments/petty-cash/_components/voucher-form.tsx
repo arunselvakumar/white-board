@@ -35,7 +35,7 @@ import {
   paiseToRupees,
   rupeesToPaise,
 } from "@/components/money/money-input";
-import { localToday } from "@/components/payments/payment-format";
+import { localToday } from "@/app/app/_components/payments/payment-format";
 import { VOUCHER_TYPES } from "@/src/finance/domain/petty-cash";
 import { canInFinance, financeAccessQuery } from "@/src/queries/finance-access";
 import { accountOptionsQuery } from "@/src/queries/finance-accounts";

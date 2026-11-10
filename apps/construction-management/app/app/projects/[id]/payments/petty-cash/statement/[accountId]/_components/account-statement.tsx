@@ -17,7 +17,10 @@ import {
 import { cn } from "@repo/ui/lib/utils";
 
 import { formatPaise } from "@/components/money/money-input";
-import { formatDate, localToday } from "@/components/payments/payment-format";
+import {
+  formatDate,
+  localToday,
+} from "@/app/app/_components/payments/payment-format";
 import { SiteRecordHeader } from "@/app/app/projects/[id]/_components/site-work/site-record-header";
 import {
   accountStatementQuery,

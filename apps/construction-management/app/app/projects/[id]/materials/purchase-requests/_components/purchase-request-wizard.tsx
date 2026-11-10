@@ -22,7 +22,7 @@ import { cn } from "@repo/ui/lib/utils";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { localToday } from "@/components/payments/payment-format";
+import { localToday } from "@/app/app/_components/payments/payment-format";
 import { LocationPicker } from "@/app/app/_components/locations/location-picker";
 import { MaterialPicker } from "@/app/app/_components/procurement/material-picker";
 import { fieldForCode } from "@/lib/server-errors";

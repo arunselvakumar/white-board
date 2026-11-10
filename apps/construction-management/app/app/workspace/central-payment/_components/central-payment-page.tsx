@@ -17,7 +17,7 @@ import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { formatPaise } from "@/components/money/money-input";
-import { formatDate } from "@/components/payments/payment-format";
+import { formatDate } from "@/app/app/_components/payments/payment-format";
 import { RecentReports } from "@/app/app/_components/reports/recent-reports";
 import {
   deviceToday,

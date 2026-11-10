@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
-import { EditTeamMember } from "@/components/team-members/edit-team-member";
-import { EditTeamMemberSkeleton } from "@/components/team-members/team-members-skeletons";
+import { EditTeamMember } from "@/app/app/staff/office-staff/[id]/_components/edit-team-member";
+import { EditTeamMemberSkeleton } from "@/app/app/staff/office-staff/_components/team-members-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
-import { RolesNoAccess } from "@/components/roles/roles-no-access";
+import { RolesNoAccess } from "@/app/app/staff/_components/roles-no-access";
 
 import { viewerFlags } from "../../../_lib/viewer-can";
 

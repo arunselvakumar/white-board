@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
-import { signInAs } from "../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../.storybook/mocks/api";
-import { BACKUP_ID, BACKUPS, backupResponse } from "./backup-fixtures";
+  BACKUP_ID,
+  BACKUPS,
+  backupResponse,
+} from "@/app/app/_components/backups/backup-fixtures";
 import { DownloadMyDataAction } from "./download-my-data";
 
 const EXPORT = backupResponse({

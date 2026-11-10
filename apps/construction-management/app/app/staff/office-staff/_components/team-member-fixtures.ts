@@ -1,4 +1,4 @@
-import { SITE_ENGINEER_ROLE } from "@/components/roles/role-fixtures";
+import { SITE_ENGINEER_ROLE } from "@/app/app/staff/_components/role-fixtures";
 import type { TeamMember } from "@/src/queries/team-members";
 
 /** Story fixtures for the Staff screens (Team Members in code). */
