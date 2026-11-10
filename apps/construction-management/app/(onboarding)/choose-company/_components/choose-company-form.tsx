@@ -23,9 +23,8 @@ import { safeAppPath } from "@/lib/safe-redirect";
 const ROLE_LABEL = { owner: "Owner", member: "Team Member" } as const;
 
 /**
- * Your Companies, and creating another one (CM-103; join requests: CM-109).
- * Only a User with a Company lands here; one with none goes straight to
- * Create Company.
+ * Your Companies, and creating another one. Only a User with a Company lands
+ * here; one with none goes straight to Create Company.
  */
 export function ChooseCompanyForm({
   redirectUrl,

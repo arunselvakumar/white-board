@@ -86,7 +86,7 @@ function SectionHeading({
   );
 }
 
-/** My Profile → Devices while the sessions load. */
+/** Devices while the sessions load. */
 export function DevicesSectionSkeleton() {
   return (
     <section className="min-w-0 space-y-4">
@@ -104,7 +104,7 @@ export function DevicesSectionSkeleton() {
   );
 }
 
-/** My Profile → Privacy while the account loads. */
+/** Privacy while the account loads. */
 export function PrivacySectionSkeleton() {
   return (
     <section className="min-w-0 space-y-4">

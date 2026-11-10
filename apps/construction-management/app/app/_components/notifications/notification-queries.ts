@@ -31,7 +31,7 @@ export type PushSubscriptionInput = {
 export const MESSAGING_API = "/api/construction/messaging";
 export const NOTIFICATIONS_API = `${MESSAGING_API}/notifications`;
 
-/** The bell re-checks the unread count this often (CM-0021 §6). */
+/** The bell re-checks the unread count this often (ADR CM-0021 §6). */
 export const UNREAD_POLL_MS = 30_000;
 /** …and this often while the member has a report running. */
 export const FAST_POLL_MS = 3_000;

@@ -19,8 +19,8 @@ import {
 } from "@/src/shared-kernel/grn-fields";
 
 /*
- * Settings → Advanced Settings pages while they load (ADR-0047): the real header
- * and section headings; bars only where the saved values appear.
+ * Advanced Settings pages while they load (ADR-0047): the real header and
+ * section headings; bars only where the saved values appear.
  */
 
 const BACK = { label: "Settings", href: "/app/settings" };

@@ -67,7 +67,7 @@ const unfinished = (job: Job) =>
 
 /**
  * Query keys whose cached reads may hold a job the member is waiting for:
- * reports (CM-904), and backups, exports and Downloads (CM-906).
+ * reports, and backups, exports and Downloads.
  */
 const FAST_POLL_KEYS: readonly (readonly string[])[] = [
   REPORTS_KEY,
@@ -116,7 +116,7 @@ export function startDownload(href: string): void {
 }
 
 /**
- * The in-app popup (CM-0021 §6): when a report, backup or export the member
+ * The in-app popup (ADR CM-0021 §6): when a report, backup or export the member
  * asked for is ready, a toast offers its download. It rides the unread-count
  * poll, every 30 seconds, and every 3 seconds while a report is running.
  * Each ready notification toasts once per tab.

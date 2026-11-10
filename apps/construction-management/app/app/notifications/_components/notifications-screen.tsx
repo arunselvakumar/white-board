@@ -22,8 +22,8 @@ import {
 } from "@/app/app/_components/notifications/notification-queries";
 
 /**
- * Notifications (CM-904): the member's list in the Active Company, newest
- * first, with Load more, Mark read, Delete and Mark all read.
+ * The member's notifications in the Active Company, newest first, with Load
+ * more, Mark read, Delete and Mark all read.
  */
 export function NotificationsScreen() {
   const list = useSuspenseInfiniteQuery(notificationsQuery);

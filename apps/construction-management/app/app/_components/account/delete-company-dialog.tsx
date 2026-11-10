@@ -41,9 +41,9 @@ const SERVER_FIELDS: Record<string, keyof Values> = {
 };
 
 /**
- * Delete Company (CM-907, ADR CM-0021 §10): the Owner types the name and
- * enters a code. The Company becomes read-only for 30 days, then
- * everything in it is deleted for good.
+ * Delete Company (ADR CM-0021 §10): the Owner types the name and enters a
+ * code. The Company becomes read-only for 30 days, then everything in it is
+ * deleted for good.
  */
 export function DeleteCompanyDialog({
   companyName,

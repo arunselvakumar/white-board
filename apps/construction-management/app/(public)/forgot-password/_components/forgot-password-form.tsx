@@ -51,7 +51,7 @@ const DESCRIPTION: Record<Step["kind"], string> = {
 };
 
 /**
- * Forgot password: email → emailed 6-digit code + new password → Sign in.
+ * The email, then the emailed 6-digit code and a new password, then Sign in.
  * Step 1 always moves on, so the screen never reveals whether an email has
  * an account (the server answers the same either way).
  */

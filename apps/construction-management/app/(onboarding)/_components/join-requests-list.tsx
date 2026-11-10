@@ -28,8 +28,8 @@ import {
 } from "@/src/queries/join-requests";
 
 /**
- * Pending Join Requests for the signed-in User (CM-109). `after` renders
- * below them, and only when there are some.
+ * Pending Join Requests for the signed-in User. `after` renders below them,
+ * and only when there are some.
  */
 export function JoinRequestsList({ after }: { after?: ReactNode }) {
   const { data } = useSuspenseQuery(joinRequestsQuery);

@@ -18,7 +18,6 @@ import { DeleteAccountDialog } from "@/app/app/profile/_components/account/delet
 import { DownloadMyDataAction } from "@/components/backups/download-my-data";
 import { accountQueries } from "@/src/queries/account";
 
-/** One action in My Profile → Privacy. */
 export function PrivacyAction({
   icon,
   title,
@@ -42,7 +41,6 @@ export function PrivacyAction({
   );
 }
 
-/** Delete My Account (CM-907). */
 function DeleteAccountAction() {
   const { data } = useSuspenseQuery(accountQueries.account());
   const [open, setOpen] = useState(false);
@@ -77,8 +75,7 @@ function DeleteAccountAction() {
 }
 
 /**
- * My Profile → Privacy: a list of actions on the User's own data:
- * Download My Data (CM-906) and Delete My Account (CM-907).
+ * Actions on the User's own data: Download My Data and Delete My Account.
  */
 export function PrivacySection() {
   return (

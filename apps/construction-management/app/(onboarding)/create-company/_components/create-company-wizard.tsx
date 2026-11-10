@@ -109,8 +109,8 @@ const CURRENCY_ITEMS = CURRENCIES.map((currency) => ({
 }));
 
 /**
- * The first-run wizard (CM-105): name → contact → country and tax → the
- * setup loader → Projects.
+ * The first-run wizard: name, contact, then country and tax; then the setup
+ * loader, then Projects.
  */
 export function CreateCompanyWizard({
   setupStepMs,

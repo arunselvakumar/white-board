@@ -66,7 +66,7 @@ function browserToday(): string {
   return todayIn(Intl.DateTimeFormat().resolvedOptions().timeZone);
 }
 
-/** Manage Sequence IDs (CM-114): one module at a time, its rules and their format. */
+/** Manage Sequence IDs: one module at a time, its rules and their format. */
 export function SequenceIdsManager({
   today = browserToday(),
 }: {

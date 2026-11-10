@@ -9,7 +9,7 @@ import { MobileOtpFlow } from "@/app/(public)/_components/mobile-otp-flow";
 
 /**
  * Email and password while SMS is off (ADR CM-0009); with `mobileOtp` the
- * mobile tab comes first again (ADR CM-0002).
+ * mobile tab comes first (ADR CM-0002).
  */
 export function SignUpForm({
   redirectUrl,
