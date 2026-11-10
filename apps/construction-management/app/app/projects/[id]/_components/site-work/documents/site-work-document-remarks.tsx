@@ -63,7 +63,7 @@ export type SiteWorkDocumentRemarksProps = {
 type Props = Required<SiteWorkDocumentRemarksProps>;
 
 /**
- * The remarks thread of a site-work document (CM-0016 §8), oldest first,
+ * The remarks thread of a site-work document (ADR CM-0016 §8), oldest first,
  * newest last, with a box to add one (anyone who can read the document may
  * write) and, with Create or Update on it, photos (or PDFs on a usage
  * sheet or hindrance) to post with it.

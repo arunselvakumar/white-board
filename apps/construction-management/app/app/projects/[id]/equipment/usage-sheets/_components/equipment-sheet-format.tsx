@@ -11,7 +11,7 @@ import {
 
 import { trimDecimal } from "./equipment-sheet-live";
 
-/** Words and badges the Equipment Usage screens share (CM-604). */
+/** Words and badges the Equipment Usage screens share. */
 
 /** Company owned / Rented. */
 export function OwnershipBadge({

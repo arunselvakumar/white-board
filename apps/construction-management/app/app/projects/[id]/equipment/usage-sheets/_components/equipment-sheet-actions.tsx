@@ -30,9 +30,9 @@ import {
 } from "@/src/queries/equipment-sheets";
 
 /**
- * What can be done with one Equipment Usage sheet (CM-604), from its `actions`:
- * View, Approve, Reject, Edit, Duplicate and Delete — a menu on list rows,
- * buttons on the detail page.
+ * What can be done with one Equipment Usage sheet, from its `actions`: View,
+ * Approve, Reject, Edit, Duplicate and Delete — a menu on list rows, buttons
+ * on the detail page.
  */
 export function EquipmentSheetActions({
   sheet,

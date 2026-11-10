@@ -22,7 +22,10 @@ function savedPath(
   return equipmentSheetsPath(projectId, `/${id}${query}`);
 }
 
-/** Add usage sheet, or Duplicate when `fromId` names the source (CM-0016 §12). */
+/**
+ * Add usage sheet, or Duplicate when `fromId` names the source (ADR CM-0016
+ * §12).
+ */
 export function NewEquipmentSheetPage({
   projectId,
   fromId,
@@ -64,7 +67,6 @@ function DuplicateForm({
   );
 }
 
-/** Edit an Equipment Usage sheet (CM-604). */
 export function EditEquipmentSheetPage({
   projectId,
   id,

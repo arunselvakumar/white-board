@@ -16,7 +16,6 @@ import {
   projectEquipmentPath,
 } from "./equipment-tabs";
 
-/** Masters → Equipments → Add Equipment. */
 export function NewEquipmentPage() {
   return (
     <div className="w-full p-6">
@@ -65,7 +64,7 @@ export function EditEquipmentPage({
   );
 }
 
-/** A Project's Equipment → Add equipment: it starts at this Project. */
+/** Add equipment from a Project: it starts at this Project. */
 export function ProjectNewEquipmentPage({ projectId }: { projectId: string }) {
   const listHref = equipmentModulePath(projectId, "register");
   return (
@@ -86,7 +85,6 @@ export function ProjectNewEquipmentPage({ projectId }: { projectId: string }) {
   );
 }
 
-/** Masters → Equipments → one machine. */
 export function MastersEquipmentDetailPage({ id }: { id: string }) {
   return (
     <EquipmentDetailScreen
@@ -98,7 +96,6 @@ export function MastersEquipmentDetailPage({ id }: { id: string }) {
   );
 }
 
-/** A Project's Equipment → one machine. */
 export function ProjectEquipmentDetailPage({
   projectId,
   id,

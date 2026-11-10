@@ -31,9 +31,9 @@ import {
 } from "@/src/site-work/domain/equipment-usage";
 
 /**
- * The usage-sheet form's live figures (CM-604): the same pure rules the
- * server applies, run on what is typed so far — shift hours, the meter's
- * delta and gap, the 24-hour cap, the fuel overrun and the hire preview.
+ * The usage-sheet form's live figures: the same pure rules the server
+ * applies, run on what is typed so far — shift hours, the meter's delta and
+ * gap, the 24-hour cap, the fuel overrun and the hire preview.
  */
 
 /** The machine as the form knows it: from the sheet options, or the sheet. */

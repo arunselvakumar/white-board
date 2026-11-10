@@ -182,7 +182,6 @@ export const Rented: Story = {
   },
 };
 
-/** No maintenance yet. */
 export const NoMaintenance: Story = {
   args: { equipment: equipmentDetail({ maintenance: [] }) },
   play: async ({ canvas }) => {

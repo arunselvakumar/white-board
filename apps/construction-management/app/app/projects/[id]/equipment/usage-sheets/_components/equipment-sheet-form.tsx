@@ -491,16 +491,16 @@ function withCurrent(
 }
 
 /**
- * New, edit or duplicated Equipment Usage sheet (CM-604). A new sheet
- * starts with the date (never after today) and the equipment free that day
- * (owned and rented groups; blocked machines shown with why). The inputs
- * then follow the machine's basis and method — time shifts with their
- * hours, meter readings with the opening from the last closing and the
- * gap, km or trips — with idle and breakdown under the 24-hour cap shown
- * live, the work done, fuel with who bears it and the overrun warning,
- * the hire preview for rented machines (Financial), materials with the
- * stock on the date, remark and files. **Save**, **Save & Add New** (keeps
- * the date, shift and supervisor) and **Save & Approve** for approvers.
+ * New, edit or duplicated Equipment Usage sheet. A new sheet starts with
+ * the date (never after today) and the equipment free that day (owned and
+ * rented groups; blocked machines shown with why). The inputs then follow
+ * the machine's basis and method — time shifts with their hours, meter
+ * readings with the opening from the last closing and the gap, km or trips
+ * — with idle and breakdown under the 24-hour cap shown live, the work
+ * done, fuel with who bears it and the overrun warning, the hire preview for
+ * rented machines (Financial), materials with the stock on the date, remark
+ * and files. **Save**, **Save & Add New** (keeps the date, shift and
+ * supervisor) and **Save & Approve** for approvers.
  */
 export function EquipmentSheetForm({
   projectId,
@@ -637,7 +637,7 @@ export function EquipmentSheetForm({
     (canInSiteWork(access, "site_work.equipment_usage", "create") ||
       canInSiteWork(access, "masters.equipments", "create"));
 
-  // Contractor → Department.
+  // The Departments offered are the chosen Contractor's.
   const contractorOptions = withCurrent(
     options.contractors.map((row) => ({ value: row.id, label: row.name })),
     current?.contractor,

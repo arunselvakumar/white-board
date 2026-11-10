@@ -4,9 +4,9 @@ import type { ReactNode } from "react";
 import { cn } from "@repo/ui/lib/utils";
 
 /**
- * The module heading of a Site Diary or Hindrance page (CM-607), in the
- * style of the other M6 screens: a back link, then an `h2` (`text-lg` on
- * forms, `text-xl` on a detail), an optional line under it and actions.
+ * The module heading of a Site Diary or Hindrance page, in the style of the
+ * other screens: a back link, then an `h2` (`text-lg` on forms, `text-xl` on
+ * a detail), an optional line under it and actions.
  */
 export function SiteRecordHeader({
   back,

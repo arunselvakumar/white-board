@@ -6,7 +6,7 @@ import type {
 import type { SiteWorkDocumentType } from "@/src/site-work/domain/site-work-documents";
 
 /**
- * Story fixtures for the site-work documents' thread and files (M6).
+ * Story fixtures for the site-work documents' thread and files.
  * Other site-work stories compose the handler into their own `mockApi`:
  *
  * ```ts

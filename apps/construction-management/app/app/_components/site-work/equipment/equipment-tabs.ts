@@ -1,10 +1,10 @@
 import type { SiteWorkAccessMenu } from "@/app/api/construction/site-work/access/access-models";
 
 /**
- * The tabs of a Project's Equipment module (M6), in order. `segment` is
- * the path under `/app/projects/<id>/equipment/`; a tab shows when the
- * viewer has Read on one of its menus. Usage sheets are CM-604's; the
- * Equipment tab is the register's view of the Project (CM-603).
+ * The tabs of a Project's Equipment module, in order. `segment` is the path
+ * under `/app/projects/<id>/equipment/`; a tab shows when the viewer has
+ * Read on one of its menus. The Equipment tab is the register's view of the
+ * Project.
  */
 export const EQUIPMENT_TABS = [
   {
@@ -40,7 +40,7 @@ export function projectEquipmentPath(
   return `${equipmentModulePath(projectId, "register")}/${encodeURIComponent(equipmentId)}`;
 }
 
-/** The register's pages under Masters → Equipments. */
+/** The register's pages, under Masters. */
 export const EQUIPMENTS_PATH = "/app/masters/equipments";
 
 export function equipmentPath(id: string): string {

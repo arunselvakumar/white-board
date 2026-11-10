@@ -11,7 +11,7 @@ import type {
 } from "@/src/queries/equipment";
 import type { SiteWorkAccess } from "@/src/queries/site-work-access";
 
-/** Story fixtures for the Equipment register (CM-603, CM-605). */
+/** Story fixtures for the Equipment register. */
 
 export const EQUIPMENT_API = "/api/construction/site-work/equipment";
 export const ACCESS_API = "/api/construction/site-work/access";
