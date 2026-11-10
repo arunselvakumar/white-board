@@ -63,3 +63,7 @@ Now:
 - Column headers live in two places, the page and its skeleton, unless the page extracts them into a constant. Area files do that where a table has more than a few columns.
 - `background-attachment: fixed` is ignored by iOS Safari. Bars there still shimmer, each on its own.
 - Hover-prefetching a module's data from the sidebar is not part of this change.
+
+## Amendment (2026-11-10): server-rendered pages
+
+[ADR-0052](./0052-server-prefetch-through-route-handlers.md) moves page reads to the server. A migrated page arrives with its data, so it shows no skeleton on a full load, and a navigation keeps the current page until the next one is ready, as above. Page skeletons stay for sections, stories and pages not yet migrated, and become a route's `loading.tsx` only where its reads are measured slower than about 300 ms.

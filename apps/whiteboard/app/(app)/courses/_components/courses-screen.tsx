@@ -12,12 +12,11 @@ import { useRouter } from "next/navigation";
 import { CourseCatalog } from "@/app/(app)/courses/_components/course-catalog";
 import {
   archiveCourse,
+  COURSES_PAGE_SIZE as PAGE_SIZE,
   courseQueries,
   type CourseListPage,
 } from "@/src/queries/courses";
 import { calendarQueries } from "@/src/queries/calendar";
-
-const PAGE_SIZE = 12;
 
 export function CoursesScreen() {
   const router = useRouter();

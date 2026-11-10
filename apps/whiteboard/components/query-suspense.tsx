@@ -18,6 +18,8 @@ import {
 } from "@repo/ui/components/empty";
 import { Skeleton } from "@repo/ui/components/skeleton";
 
+import { isServerRendered } from "@/lib/server-rendered-routes";
+
 export function PageFallback() {
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4 p-6" aria-busy="true">
@@ -52,13 +54,21 @@ export function QuerySuspense({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const isClient = useIsClient();
 
-  if (!isClient) return <PageFallback />;
+  // A path that prefetches on the server renders here too, and its route's
+  // `loading.tsx` is its only Suspense boundary: a second one above it
+  // would reveal the page in two throttled steps (ADR-0052).
+  const serverRendered = isServerRendered(pathname);
+  if (!isClient && !serverRendered) return <PageFallback />;
 
   return (
     <QueryErrorResetBoundary>
       {({ reset }) => (
         <QueryErrorBoundary onReset={reset} resetKey={pathname}>
-          <Suspense fallback={<PageFallback />}>{children}</Suspense>
+          {serverRendered ? (
+            children
+          ) : (
+            <Suspense fallback={<PageFallback />}>{children}</Suspense>
+          )}
         </QueryErrorBoundary>
       )}
     </QueryErrorResetBoundary>

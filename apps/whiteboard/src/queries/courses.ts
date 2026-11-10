@@ -52,6 +52,9 @@ export type CourseDurationInput =
 
 const jsonHeaders = { "content-type": "application/json" };
 
+/** Rows on one page of the Courses list. */
+export const COURSES_PAGE_SIZE = 12;
+
 export const courseQueries = {
   key: {
     all: ["courses"] as const,
@@ -62,7 +65,7 @@ export const courseQueries = {
   list: (page?: CourseListPage) =>
     queryOptions({
       queryKey: courseQueries.key.list(page),
-      queryFn: () => {
+      queryFn: ({ meta }) => {
         const params = new URLSearchParams({
           limit: String(page?.limit ?? 100),
         });
@@ -70,6 +73,8 @@ export const courseQueries = {
         if (page?.before) params.set("before", page.before);
         return apiJson<CourseListResponse>(
           `/api/training-institute/courses?${params.toString()}`,
+          undefined,
+          meta,
         );
       },
     }),

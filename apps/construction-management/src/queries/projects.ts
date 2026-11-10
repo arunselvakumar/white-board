@@ -32,7 +32,7 @@ export const PROJECTS_KEY = ["projects", "projects"] as const;
 /** Every visible Project; the home filters by status on the client. */
 export const projectsQuery = queryOptions({
   queryKey: [...PROJECTS_KEY, "list"],
-  queryFn: () => apiJson<ProjectList>(PROJECTS_API),
+  queryFn: ({ meta }) => apiJson<ProjectList>(PROJECTS_API, undefined, meta),
 });
 
 /** Projects for pickers (Team Member assignment, Sequence IDs, labour forms). */
