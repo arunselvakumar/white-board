@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { AppShell } from "@/components/app-shell/app-shell";
+import { AppShell } from "@/app/(app)/_components/app-shell/app-shell";
 import { FeesScreen } from "@/components/fees/fees-screen";
 import { QuerySuspense } from "@/components/query-suspense";
-import { WorkspaceGate } from "@/components/workspace/workspace-gate";
+import { WorkspaceGate } from "@/app/(app)/_components/workspace/workspace-gate";
 import {
   feeDuesQueries,
   type FeeDueResponse,

@@ -35,8 +35,8 @@ import {
   TabsTrigger,
 } from "@repo/ui/components/tabs";
 
-import { PageHeader } from "@/components/app-shell/page-header";
-import { CatalogStat } from "@/components/catalog/catalog-chrome";
+import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
+import { CatalogStat } from "@/app/(app)/_components/catalog/catalog-chrome";
 import { StudentAvatar } from "@/components/students/student-avatar";
 import { formatPaiseAsRupees } from "@/lib/money";
 import {

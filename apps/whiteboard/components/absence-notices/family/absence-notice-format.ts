@@ -1,7 +1,7 @@
 // Words and grouping for the Student and Parent Absence Notice screens
 // (ADR-0041). Pure: no React, no I/O.
 
-import type { FamilyHomeRole } from "@/components/home/family-home";
+import type { FamilyHomeRole } from "@/app/(app)/_components/home/family-home";
 import type {
   FamilyAbsenceNoticeView,
   PickableClassView,

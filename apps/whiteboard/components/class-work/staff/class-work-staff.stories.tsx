@@ -3,7 +3,7 @@ import type { Decorator, Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 
-import { AppShell } from "@/components/app-shell/app-shell";
+import { AppShell } from "@/app/(app)/_components/app-shell/app-shell";
 import { QuerySuspense } from "@/components/query-suspense";
 import type {
   AttachmentView,

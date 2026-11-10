@@ -15,7 +15,7 @@ import {
   TableRow,
 } from "@repo/ui/components/table";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import { addMonths, dateKeyInZone, formatDate } from "@/lib/calendar-dates";
 import { formatPaiseAsRupees } from "@/lib/money";
 import {

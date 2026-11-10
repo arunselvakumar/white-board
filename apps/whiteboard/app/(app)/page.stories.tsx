@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
-import { AppShell } from "@/components/app-shell/app-shell";
+import { AppShell } from "@/app/(app)/_components/app-shell/app-shell";
 import { BatchCatalog } from "@/components/batches/batch-catalog";
 import { CourseCatalog } from "@/components/courses/course-catalog";
-import { OwnerDashboard } from "@/components/dashboard/owner-dashboard";
+import { OwnerDashboard } from "@/app/(app)/_components/dashboard/owner-dashboard";
 import { FeesCatalog } from "@/components/fees/fees-catalog";
 import { StudentCatalog } from "@/components/students/student-catalog";
-import { WorkspaceGate } from "@/components/workspace/workspace-gate";
+import { WorkspaceGate } from "@/app/(app)/_components/workspace/workspace-gate";
 import { signInAs } from "../../.storybook/mocks/auth";
 
 const meta = {

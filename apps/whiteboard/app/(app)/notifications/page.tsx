@@ -2,7 +2,7 @@ import { getAuth } from "@repo/auth/server";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import { NotificationsScreen } from "@/components/notifications/notifications-screen";
+import { NotificationsScreen } from "@/app/(app)/notifications/_components/notifications-screen";
 
 export const metadata: Metadata = { title: "Notifications" };
 

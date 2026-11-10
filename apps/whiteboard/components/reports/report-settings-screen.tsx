@@ -17,7 +17,7 @@ import {
 } from "@repo/ui/components/select";
 import { Spinner } from "@repo/ui/components/spinner";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { applyHttpFormError } from "@/lib/apply-http-form-error";

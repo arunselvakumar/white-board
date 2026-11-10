@@ -2,14 +2,14 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { getRouter } from "@storybook/nextjs-vite/navigation.mock";
 import { expect, waitFor } from "storybook/test";
 
-import { WorkspaceGate } from "@/components/workspace/workspace-gate";
+import { WorkspaceGate } from "@/app/(app)/_components/workspace/workspace-gate";
 import {
   authFailure,
   authMocks,
   signInAs,
   storyUser,
   type WorkspaceSummary,
-} from "../../.storybook/mocks/auth";
+} from "@/.storybook/mocks/auth";
 
 const riverside: WorkspaceSummary = {
   id: "org_riverside",

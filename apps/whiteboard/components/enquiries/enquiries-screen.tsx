@@ -38,11 +38,11 @@ import {
   TabsTrigger,
 } from "@repo/ui/components/tabs";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import {
   CatalogPagination,
   CatalogStatus,
-} from "@/components/catalog/catalog-chrome";
+} from "@/app/(app)/_components/catalog/catalog-chrome";
 import { isOwnerRole } from "@/lib/workspace-access";
 import {
   enquiryQueries,

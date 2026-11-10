@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn } from "storybook/test";
 
-import { AppShell } from "@/components/app-shell/app-shell";
-import { OwnerDashboard } from "@/components/dashboard/owner-dashboard";
-import { WorkspaceGate } from "@/components/workspace/workspace-gate";
-import { signInAs } from "../../.storybook/mocks/auth";
+import { AppShell } from "@/app/(app)/_components/app-shell/app-shell";
+import { OwnerDashboard } from "@/app/(app)/_components/dashboard/owner-dashboard";
+import { WorkspaceGate } from "@/app/(app)/_components/workspace/workspace-gate";
+import { signInAs } from "@/.storybook/mocks/auth";
 
 const meta = {
   title: "Pages/Owner Dashboard",

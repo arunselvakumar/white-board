@@ -2,11 +2,11 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
-import { PageHeader } from "@/components/app-shell/page-header";
-import { AppShell } from "@/components/app-shell/app-shell";
+import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
+import { AppShell } from "@/app/(app)/_components/app-shell/app-shell";
 import { CollectPaymentForm } from "@/components/enrollments/collect-payment-form";
 import { EnrollmentForm } from "@/components/enrollments/enrollment-form";
-import { WorkspaceGate } from "@/components/workspace/workspace-gate";
+import { WorkspaceGate } from "@/app/(app)/_components/workspace/workspace-gate";
 import { QueryHttpError } from "@/src/queries/http";
 import { signInAs } from "../../.storybook/mocks/auth";
 

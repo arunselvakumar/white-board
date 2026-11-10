@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@repo/ui/components/select";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import {
   addTeacherDocument,
   assignTeacherBatch,

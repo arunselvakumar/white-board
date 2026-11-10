@@ -17,7 +17,7 @@ import {
   TableRow,
 } from "@repo/ui/components/table";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import { BatchForm, batchToFormValues } from "@/components/batches/batch-form";
 import { batchQueries, updateBatchSchedule } from "@/src/queries/batches";
 import { calendarQueries } from "@/src/queries/calendar";

@@ -33,7 +33,7 @@ import {
   TableRow,
 } from "@repo/ui/components/table";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import { CollectPaymentForm } from "@/components/enrollments/collect-payment-form";
 import { studentFullName } from "@/components/students/student-profile-view";
 import { EnrollmentSettingsForm } from "@/components/enrollments/enrollment-settings-form";

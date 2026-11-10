@@ -1,4 +1,4 @@
-import type { FamilyHomeRole } from "@/components/home/family-home";
+import type { FamilyHomeRole } from "@/app/(app)/_components/home/family-home";
 import type {
   FamilyBatchView,
   FamilyClassWorkStudentView,

@@ -3,7 +3,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-import { OwnerDashboard } from "@/components/dashboard/owner-dashboard";
+import { OwnerDashboard } from "@/app/(app)/_components/dashboard/owner-dashboard";
 import { courseQueries } from "@/src/queries/courses";
 import { dashboardQueries } from "@/src/queries/dashboard";
 

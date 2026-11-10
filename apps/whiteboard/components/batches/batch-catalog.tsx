@@ -42,7 +42,7 @@ import {
   CatalogStat,
   CatalogStatus,
   type CatalogPaginationProps,
-} from "@/components/catalog/catalog-chrome";
+} from "@/app/(app)/_components/catalog/catalog-chrome";
 import type { BatchResponse } from "@/src/queries/batches";
 
 export function BatchCatalog({

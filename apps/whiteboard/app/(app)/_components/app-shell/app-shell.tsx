@@ -28,7 +28,7 @@ import {
 } from "@repo/ui/components/sidebar-chrome";
 import { SidebarGlide } from "@repo/ui/components/sidebar-glide";
 
-import { NotificationBell } from "@/components/notifications/notification-bell";
+import { NotificationBell } from "@/app/(app)/_components/notifications/notification-bell";
 import { navForRole } from "@/lib/app-nav";
 
 /** From package.json at build time (next.config.ts), so the browser never gets the dependency list. */

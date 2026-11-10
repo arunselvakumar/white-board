@@ -13,15 +13,15 @@ import {
   EmptyTitle,
 } from "@repo/ui/components/empty";
 
-import { PageHeader } from "@/components/app-shell/page-header";
+import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
 import {
   notificationQueries,
   type NotificationsView,
 } from "@/src/queries/notifications";
 
-import { NotificationItem } from "./notification-item";
-import { useNotificationActions } from "./use-notification-actions";
+import { NotificationItem } from "@/app/(app)/_components/notifications/notification-item";
+import { useNotificationActions } from "@/app/(app)/_components/notifications/use-notification-actions";
 
 type Cursor = { after?: string; before?: string };
 

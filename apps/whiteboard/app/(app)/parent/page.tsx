@@ -2,7 +2,7 @@ import { getAuth } from "@repo/auth/server";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import { FamilyHomeScreen } from "@/components/home/family-home-screen";
+import { FamilyHomeScreen } from "@/app/(app)/_components/home/family-home-screen";
 
 export const metadata: Metadata = { title: "Parent Home" };
 

@@ -2,13 +2,13 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 
-import { AppShell } from "@/components/app-shell/app-shell";
+import { AppShell } from "@/app/(app)/_components/app-shell/app-shell";
 import {
   callsTo,
   hasNoHorizontalOverflow,
   mockApi,
   withFreshQueryClient,
-} from "@/components/notifications/story-api";
+} from "@/app/(app)/_components/notifications/story-api";
 import type { ReportParams } from "@/src/queries/reports";
 import type {
   ReportKey,

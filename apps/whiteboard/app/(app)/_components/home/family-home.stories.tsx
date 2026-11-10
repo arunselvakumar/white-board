@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
-import { AppShell } from "@/components/app-shell/app-shell";
+import { AppShell } from "@/app/(app)/_components/app-shell/app-shell";
 import {
   ashaResults,
   COMPARISON_WORDS,
@@ -14,9 +14,9 @@ import {
   dueTodayHomework,
   overdueHomework,
 } from "@/components/class-work/family/family-class-work.fixtures";
-import { FamilyHome } from "@/components/home/family-home";
+import { FamilyHome } from "@/app/(app)/_components/home/family-home";
 import type { FamilyHomeStudent } from "@/src/queries/family-home";
-import { signInAs } from "../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 
 // 2026-09-30 09:00 in Asia/Kolkata.
 const NOW = new Date("2026-09-30T03:30:00.000Z");
