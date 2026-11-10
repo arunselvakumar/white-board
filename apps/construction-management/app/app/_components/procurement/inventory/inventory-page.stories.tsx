@@ -390,7 +390,6 @@ export const MinimumAndAlert: Story = {
   },
 };
 
-/** Update Estimation Qty. */
 export const EstimationQty: Story = {
   play: async (context) => {
     const { canvasElement, userEvent } = context;

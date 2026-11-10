@@ -65,8 +65,8 @@ const contact = (poc: { name: string | null; mobile: string | null }) =>
     .join(" · ") || "—";
 
 /**
- * One Purchase Order (CM-504): stages, supplier and addresses, lines with
- * HSN and the GST split, totals, approval / ordered / closed info, the
+ * One Purchase Order: stages, supplier and addresses, lines with HSN and
+ * the GST split, totals, approval / ordered / closed info, the
  * linked Purchase Request and Goods Receipts, files and remarks.
  */
 export function PurchaseOrderDetailPage({

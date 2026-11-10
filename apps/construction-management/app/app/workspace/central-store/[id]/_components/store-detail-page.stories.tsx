@@ -41,8 +41,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Current Inventory for the store (CM-506), then the Projects, requests,
- * notes and transfers tabs.
+ * Current Inventory for the store, then the Projects, requests, notes and
+ * transfers tabs.
  */
 export const Stock: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {

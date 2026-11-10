@@ -14,7 +14,7 @@ import type {
   StockRegister,
 } from "@/src/queries/inventory";
 
-/** Story fixtures for Current Inventory (CM-506). */
+/** Story fixtures for Current Inventory. */
 
 export const SITE = {
   kind: "project" as const,

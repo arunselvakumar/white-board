@@ -161,7 +161,7 @@ function AdjustForm({
   );
 }
 
-/** Adjust stock (CM-506): a counted quantity on a date and a reason. */
+/** Adjust stock: a counted quantity on a date and a reason. */
 export function AdjustStockDialog({
   location,
   row,

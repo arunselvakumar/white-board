@@ -235,8 +235,8 @@ function DeliverDialog({
 }
 
 /**
- * One Material Transfer (CM-507): its status, route, lines and who did
- * what; Approve (dispatch), Reject and Edit / Delete while pending, Mark
+ * One Material Transfer: its status, route, lines and who did what;
+ * Approve (dispatch), Reject and Edit / Delete while pending, Mark
  * as Delivered while in transit — each shown only to members who may;
  * then its comments and files.
  */

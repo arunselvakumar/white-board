@@ -14,7 +14,6 @@ import {
   CENTRAL_STORE_PATH,
 } from "@/app/app/_components/procurement/stores/central-store-parts";
 
-/** The Workspace page's Central Store tile (CM-508). */
 export function CentralStoreWorkspaceTile() {
   return (
     <Item
@@ -39,7 +38,6 @@ export function CentralStoreWorkspaceTile() {
   );
 }
 
-/** The Workspace page's Central Inventory tile (CM-509). */
 export function CentralInventoryWorkspaceTile() {
   return (
     <Item

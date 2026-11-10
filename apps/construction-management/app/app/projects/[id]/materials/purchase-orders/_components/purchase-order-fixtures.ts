@@ -19,7 +19,7 @@ import {
   type PurchaseOrderPage,
 } from "@/src/queries/purchase-orders";
 
-/** Purchase Order story fixtures (CM-504). */
+/** Purchase Order story fixtures. */
 
 export { CEMENT, PROJECT_ID, SAND, STEEL };
 export const TODAY = "2026-10-10";

@@ -2,7 +2,7 @@ import { Badge } from "@repo/ui/components/badge";
 
 import type { PurchaseOrder } from "@/src/queries/purchase-orders";
 
-/** Words and badges the Purchase Order screens share (CM-504). */
+/** Words and badges the Purchase Order screens share. */
 
 export const STAGE_LABELS = {
   pending: "Pending",

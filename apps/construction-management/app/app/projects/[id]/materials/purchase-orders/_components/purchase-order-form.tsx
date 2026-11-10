@@ -170,7 +170,7 @@ export type PurchaseOrderFormProps = {
   initialPurchaseRequestId?: string;
 };
 
-/** The PO form (CM-504) once its options have loaded. */
+/** The PO form once its options have loaded. */
 export function PurchaseOrderForm(props: PurchaseOrderFormProps) {
   const { data } = useSuspenseQuery(
     purchaseOrderFormOptionsQuery(props.projectId),

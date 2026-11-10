@@ -108,7 +108,6 @@ export const WithoutFinancial: Story = {
   },
 };
 
-/** Nothing received yet. */
 export const Empty: Story = {
   beforeEach: () => {
     api = mockApi(goodsReceiptHandler({ page: () => listPage([]) }));

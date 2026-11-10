@@ -75,8 +75,8 @@ const STATE_ITEMS = [
 ];
 
 /**
- * Add store / Edit store (CM-508): name, address and GST state, the
- * Projects it serves (at least one), its store keepers and Suppliers.
+ * Add store / Edit store: name, address and GST state, the Projects it
+ * serves (at least one), its store keepers and Suppliers.
  */
 export function StoreForm({ store }: { store?: Store }) {
   const router = useRouter();

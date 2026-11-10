@@ -31,7 +31,6 @@ import {
 
 export { formatQuantity } from "@/src/queries/central-inventory";
 
-/** Workspace → Central Store and its pages (CM-508). */
 export const CENTRAL_STORE_PATH = "/app/workspace/central-store";
 export const CENTRAL_INVENTORY_PATH = "/app/workspace/central-inventory";
 
@@ -55,7 +54,7 @@ export const centralStoreHref = {
     `${CENTRAL_STORE_PATH}/${encodeURIComponent(storeId)}/transfers${transferId == null ? "" : `/${encodeURIComponent(transferId)}`}`,
 };
 
-/** A Project's Materials → Material Requests pages. */
+/** A Project's Material Request pages. */
 export const projectRequestHref = {
   list: (projectId: string) => materialsPath(projectId, "material-requests"),
   create: (projectId: string) =>

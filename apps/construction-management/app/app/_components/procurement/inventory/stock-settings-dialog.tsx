@@ -190,7 +190,7 @@ function SettingsForm({
 
 /**
  * Update / Add Estimation Qty, or the minimum stock here with the
- * Start / Stop minimum stock alert toggle (CM-506).
+ * Start / Stop minimum stock alert toggle.
  */
 export function StockSettingsDialog({
   location,

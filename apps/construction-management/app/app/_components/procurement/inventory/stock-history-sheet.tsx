@@ -341,8 +341,8 @@ function Entries({
 }
 
 /**
- * A material's history at a location (CM-506): every ledger entry, newest
- * first, with its source document, counterparty, site location, remark,
+ * A material's history at a location: every ledger entry, newest first,
+ * with its source document, counterparty, site location, remark,
  * who and the running balance. Reversals from edits and deletes are shown
  * as such. Hand entries (Consume, Missing, Opening) can be edited; any
  * hand entry, adjustments too, can be deleted.

@@ -941,7 +941,7 @@ function useCanWrite(projectId: string, flag: "create" | "update") {
   return access == null || canIn(access, "procurement.material_received", flag);
 }
 
-/** Record Goods Receipt on a Project (CM-505). */
+/** Record Goods Receipt on a Project. */
 export function NewGoodsReceiptScreen({
   projectId,
   today,

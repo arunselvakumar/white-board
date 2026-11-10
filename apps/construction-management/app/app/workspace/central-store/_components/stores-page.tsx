@@ -59,8 +59,8 @@ function StoreCard({ store }: { store: Store }) {
 }
 
 /**
- * Workspace → Central Store (CM-508): the Company's stores. Add store
- * follows Central store create; Central Inventory links across.
+ * The Company's Central Stores. Add store follows Central store create;
+ * Central Inventory links across.
  */
 export function StoresPage() {
   const { data } = useSuspenseQuery(storesQuery());

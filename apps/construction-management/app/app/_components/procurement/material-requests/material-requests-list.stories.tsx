@@ -42,7 +42,6 @@ export const Requests: Story = {
   },
 };
 
-/** No requests yet. */
 export const Empty: Story = {
   beforeEach: () => mockCentralStoreApi({ requests: [] }).restore,
   play: async ({ canvas }) => {

@@ -4,7 +4,7 @@ import { PurchaseOrdersPage } from "@/app/app/projects/[id]/materials/purchase-o
 
 export const metadata: Metadata = { title: "Purchase Orders" };
 
-/** The Project's Purchase Orders (CM-504). Store POs come with CM-508. */
+/** The Project's Purchase Orders. */
 export default async function Page({
   params,
 }: {

@@ -51,7 +51,7 @@ export const SUPPLY_TYPE_LABELS = {
   inter_state: "Inter-state (IGST)",
 } as const;
 
-/** `2026-10-04` → `4 Oct 2026`. */
+/** `2026-10-04` as `4 Oct 2026`. */
 export function formatDate(date: string): string {
   return new Intl.DateTimeFormat("en-IN", {
     day: "numeric",
@@ -66,7 +66,7 @@ export function money(paise: number | null | undefined): string {
   return paise == null ? "—" : formatPaise(paise);
 }
 
-/** `12.500` → `12.5`; `40.000` → `40`. */
+/** `12.500` as `12.5`; `40.000` as `40`. */
 export function qty(value: string | null | undefined): string {
   if (value == null) return "—";
   return value.includes(".")

@@ -23,8 +23,8 @@ export function stockShortfalls(error: unknown): Shortfall[] | null {
 }
 
 /**
- * Why an edit or delete of a GRN was refused for stock (CM-0015 §3): the
- * stock it brought in has already been consumed, moved or issued.
+ * Why an edit or delete of a GRN was refused for stock (ADR CM-0015 §3):
+ * the stock it brought in has already been consumed, moved or issued.
  */
 export function StockShortfallAlert({
   shortfalls,

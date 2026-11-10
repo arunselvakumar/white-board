@@ -4,7 +4,7 @@ import { GoodsReceiptsList } from "@/app/app/projects/[id]/materials/goods-recei
 
 export const metadata: Metadata = { title: "Goods Received" };
 
-/** The Project's Goods Receipts (CM-505). */
+/** The Project's Goods Receipts. */
 export default async function Page({
   params,
 }: {
