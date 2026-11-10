@@ -3,7 +3,7 @@ import { expect, fn, waitFor, within } from "storybook/test";
 
 import { StoryQueryClient } from "@/components/masters/masters-story-support";
 
-import { mockFetch } from "../../.storybook/mock-fetch";
+import { mockFetch } from "@/.storybook/mock-fetch";
 import { ImportDialog } from "./import-dialog";
 import { PREVIEW_VALID, PREVIEW_WITH_ERRORS } from "./labour-fixtures";
 

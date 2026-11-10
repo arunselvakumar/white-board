@@ -33,9 +33,9 @@ import { FormAlert } from "@/components/auth/form-alert";
 import { LocationLabel } from "@/app/app/_components/locations/location-picker";
 import { formatDate } from "@/components/payments/payment-format";
 import { SiteRecordHeader } from "@/app/app/projects/[id]/_components/site-work/site-record-header";
-import { TrackingDocumentFiles } from "@/components/tracking/documents/tracking-document-files";
-import { TrackingEntryFilesField } from "@/components/tracking/documents/tracking-entry-files-field";
-import { TrackingFileStrip } from "@/components/tracking/documents/tracking-file-strip";
+import { TrackingDocumentFiles } from "@/app/app/projects/[id]/_components/tracking/documents/tracking-document-files";
+import { TrackingEntryFilesField } from "@/app/app/projects/[id]/_components/tracking/documents/tracking-entry-files-field";
+import { TrackingFileStrip } from "@/app/app/projects/[id]/_components/tracking/documents/tracking-file-strip";
 import { trackingRecordPath } from "@/lib/tracking-paths";
 import { QueryHttpError } from "@/src/queries/http";
 import {
@@ -57,9 +57,13 @@ import {
 import { ISSUE_LIMITS } from "@/src/tracking/domain/issue";
 
 import { IssueReopenDialog } from "./issue-reopen-dialog";
-import { formatDateTime, IssueStatusBadge, PriorityChip } from "./issue-parts";
+import {
+  formatDateTime,
+  IssueStatusBadge,
+  PriorityChip,
+} from "@/app/app/projects/[id]/_components/tracking/issues/issue-parts";
 import { FactValueSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
-import { UpdatesSkeleton } from "@/components/tracking/tracking-skeletons";
+import { UpdatesSkeleton } from "@/app/app/projects/[id]/_components/tracking/tracking-skeletons";
 
 function Fact({
   label,

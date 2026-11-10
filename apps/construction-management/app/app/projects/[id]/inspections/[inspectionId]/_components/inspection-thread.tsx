@@ -10,8 +10,8 @@ import { Textarea } from "@repo/ui/components/textarea";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { DocumentSection } from "@/app/app/_components/procurement/documents/document-section";
-import { TrackingEntryFilesField } from "@/components/tracking/documents/tracking-entry-files-field";
-import { TrackingFileStrip } from "@/components/tracking/documents/tracking-file-strip";
+import { TrackingEntryFilesField } from "@/app/app/projects/[id]/_components/tracking/documents/tracking-entry-files-field";
+import { TrackingFileStrip } from "@/app/app/projects/[id]/_components/tracking/documents/tracking-file-strip";
 import { fieldForCode } from "@/lib/server-errors";
 import type { TrackingDocumentFile } from "@/src/queries/tracking-documents";
 import {
@@ -23,7 +23,7 @@ import {
 } from "@/src/queries/tracking-inspections";
 import { INSPECTION_LIMITS } from "@/src/tracking/domain/inspection";
 
-import { instantText } from "./inspection-format";
+import { instantText } from "@/app/app/projects/[id]/inspections/_components/inspection-format";
 
 function Byline({ name, at }: { name: string | null; at: string }) {
   return (

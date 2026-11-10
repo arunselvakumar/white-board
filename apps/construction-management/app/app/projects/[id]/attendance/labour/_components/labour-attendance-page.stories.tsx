@@ -3,11 +3,7 @@ import { expect, waitFor, within } from "storybook/test";
 
 import { formatPaise } from "@/components/money/money-input";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../../.storybook/mocks/api";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import {
   ANBU,
   AT,

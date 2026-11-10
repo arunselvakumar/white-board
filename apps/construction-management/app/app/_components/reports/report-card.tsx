@@ -23,7 +23,7 @@ import {
 } from "@repo/ui/components/select";
 import { Spinner } from "@repo/ui/components/spinner";
 
-import { ChipsSelect } from "@/components/tracking/tasks/chips-select";
+import { ChipsSelect } from "@/app/app/_components/tracking/tasks/chips-select";
 
 import {
   useRequestReport,

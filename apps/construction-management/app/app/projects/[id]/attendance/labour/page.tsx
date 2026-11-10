@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { LabourAttendancePage } from "@/components/attendance/labour/labour-attendance-page";
+import { LabourAttendancePage } from "@/app/app/projects/[id]/attendance/labour/_components/labour-attendance-page";
 
 export const metadata: Metadata = { title: "Labour attendance" };
 

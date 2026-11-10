@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
-import { StoryQueries, type ApiCall } from "../../../.storybook/mocks/api";
+import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 
 import {
   ALBUM_ID,
@@ -16,7 +16,7 @@ import {
   REJECTED_ID,
   SNAG_ID,
   type InspectionApiOptions,
-} from "./inspection-fixtures";
+} from "@/app/app/projects/[id]/inspections/_components/inspection-fixtures";
 import { InspectionDetail } from "./inspection-detail";
 
 let api: ReturnType<typeof mockInspectionApi>;

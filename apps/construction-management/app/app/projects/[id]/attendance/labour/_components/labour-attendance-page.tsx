@@ -36,7 +36,7 @@ import { labourSheetQuery } from "@/src/queries/labour-attendance";
 import { LabourMarkingSheet } from "./labour-marking-sheet";
 import { LabourMonthGrid } from "./labour-month-grid";
 import { LabourRecordedList } from "./labour-recorded-list";
-import { LabourMarkingSheetSkeleton } from "@/components/attendance/attendance-skeletons";
+import { LabourMarkingSheetSkeleton } from "@/app/app/projects/[id]/attendance/_components/attendance-skeletons";
 
 /** Today on this device, `YYYY-MM-DD`. */
 export function localToday(now: Date = new Date()): string {

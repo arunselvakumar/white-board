@@ -16,7 +16,7 @@ import { MetricCard } from "@repo/ui/components/metric-card";
 
 import { formatPaise } from "@/components/money/money-input";
 import { formatCalendarDate } from "@/app/app/_components/projects/project-status";
-import { STATUS_STYLES } from "@/components/tracking/tasks/task-parts";
+import { STATUS_STYLES } from "@/app/app/projects/[id]/_components/tracking/tasks/task-parts";
 import type { Duration } from "@/lib/dashboard-duration";
 import {
   trackingDashboardQuery,

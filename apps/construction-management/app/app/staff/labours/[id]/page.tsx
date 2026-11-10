@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-import { EditLabourScreen } from "@/components/labours/labour-form";
-import { LabourFormSkeleton } from "@/components/labours/labours-skeletons";
+import { EditLabourScreen } from "@/app/app/staff/labours/_components/labour-form";
+import { LabourFormSkeleton } from "@/app/app/staff/labours/_components/labours-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Edit Labour" };

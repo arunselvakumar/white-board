@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
-import { IssuesList } from "@/components/tracking/issues/issues-list";
+import { IssuesList } from "@/app/app/projects/[id]/issues/_components/issues-list";
 
 export const metadata: Metadata = { title: "Issues & Snags" };
 

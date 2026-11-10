@@ -27,7 +27,7 @@ import {
   TaskFilterBarSkeleton,
   TaskGanttSkeleton,
   TaskTreeSkeleton,
-} from "@/components/tracking/tracking-skeletons";
+} from "@/app/app/projects/[id]/_components/tracking/tracking-skeletons";
 
 /**
  * The Project's Tasks (CM-802): the task tree with filters, the Gantt, Add

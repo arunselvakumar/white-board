@@ -1,4 +1,4 @@
-import { mockApi, type ApiCall } from "../../../.storybook/mocks/api";
+import { mockApi, type ApiCall } from "@/.storybook/mocks/api";
 import {
   TRACKING_ACCESS_MENUS,
   type TrackingAccessMenu,
@@ -8,7 +8,7 @@ import {
   mockTrackingDocumentApi,
   trackingFile,
   trackingSwatch,
-} from "@/components/tracking/documents/tracking-document-fixtures";
+} from "@/app/app/projects/[id]/_components/tracking/documents/tracking-document-fixtures";
 import type { LocationOptions } from "@/src/queries/location-options";
 import type {
   Inspection,

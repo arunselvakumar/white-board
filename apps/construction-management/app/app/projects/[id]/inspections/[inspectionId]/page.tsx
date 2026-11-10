@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { QuerySuspense } from "@/components/query-suspense";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
-import { InspectionDetail } from "@/components/tracking/inspections/inspection-detail";
-import { InspectionDetailSkeleton } from "@/components/tracking/tracking-skeletons";
+import { InspectionDetail } from "@/app/app/projects/[id]/inspections/[inspectionId]/_components/inspection-detail";
+import { InspectionDetailSkeleton } from "@/app/app/projects/[id]/_components/tracking/tracking-skeletons";
 
 export const metadata: Metadata = { title: "Inspection Request" };
 

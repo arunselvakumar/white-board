@@ -23,7 +23,7 @@ import {
 import {
   LABOUR_MONTH_TOTALS,
   MonthGridSkeleton,
-} from "@/components/attendance/attendance-skeletons";
+} from "@/app/app/projects/[id]/attendance/_components/attendance-skeletons";
 
 type Totals = LabourAttendanceMonth["totals"];
 

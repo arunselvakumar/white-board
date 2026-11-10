@@ -1,11 +1,11 @@
-import { mockApi, type ApiCall } from "../../../.storybook/mocks/api";
+import { mockApi, type ApiCall } from "@/.storybook/mocks/api";
 import type { TrackingAccessMenu } from "@/app/api/construction/tracking/access/access-models";
 import { localToday } from "@/components/payments/payment-format";
 import {
   mockTrackingDocumentApi,
   trackingFile,
   trackingSwatch,
-} from "@/components/tracking/documents/tracking-document-fixtures";
+} from "@/app/app/projects/[id]/_components/tracking/documents/tracking-document-fixtures";
 import type { Flag } from "@/src/shared-kernel/access";
 import { addDays } from "@/src/shared-kernel/calendar-date";
 import type { LocationOptions } from "@/src/queries/location-options";

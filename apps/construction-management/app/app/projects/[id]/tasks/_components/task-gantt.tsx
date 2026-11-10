@@ -35,7 +35,11 @@ import {
   TASK_STATUSES,
 } from "@/src/tracking/domain/task-progress";
 
-import { dateRange, formatPercent, STATUS_STYLES } from "./task-parts";
+import {
+  dateRange,
+  formatPercent,
+  STATUS_STYLES,
+} from "@/app/app/projects/[id]/_components/tracking/tasks/task-parts";
 
 export type GanttScale = "day" | "week" | "month";
 

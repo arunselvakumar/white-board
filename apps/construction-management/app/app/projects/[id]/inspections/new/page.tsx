@@ -6,8 +6,8 @@ import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no
 import {
   InspectionNew,
   InspectionReinspect,
-} from "@/components/tracking/inspections/inspection-pages";
-import { TrackingFormSkeleton } from "@/components/tracking/tracking-skeletons";
+} from "@/app/app/projects/[id]/inspections/_components/inspection-pages";
+import { TrackingFormSkeleton } from "@/app/app/projects/[id]/_components/tracking/tracking-skeletons";
 
 export const metadata: Metadata = { title: "Add Inspection Request" };
 

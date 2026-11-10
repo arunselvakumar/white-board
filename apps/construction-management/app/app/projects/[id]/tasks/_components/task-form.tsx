@@ -52,7 +52,7 @@ import type { LocationRef } from "@/src/shared-kernel/location-ref";
 import { TASK_LIMITS } from "@/src/tracking/domain/task";
 import { TRACKING_PRIORITIES } from "@/src/tracking/domain/tracking-documents";
 
-import { ChipsSelect } from "./chips-select";
+import { ChipsSelect } from "@/app/app/_components/tracking/tasks/chips-select";
 import { LocationPickerSkeleton } from "@/app/app/_components/locations/locations-skeletons";
 
 const NONE = "none";

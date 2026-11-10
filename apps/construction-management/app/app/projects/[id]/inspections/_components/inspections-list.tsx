@@ -72,7 +72,7 @@ import {
 import {
   InspectionFiltersSkeleton,
   InspectionRowsSkeleton,
-} from "@/components/tracking/tracking-skeletons";
+} from "@/app/app/projects/[id]/_components/tracking/tracking-skeletons";
 
 const MENU = "tracking.inspection_requests" as const;
 const ALL = "all";
