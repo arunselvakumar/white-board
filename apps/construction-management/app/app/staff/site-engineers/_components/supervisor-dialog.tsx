@@ -68,9 +68,9 @@ function mobileInput(mobile: string | null): string {
 }
 
 /**
- * Add or edit a Supervisor (CM-203): name, an optional mobile, and the Team
- * Member they are, if any. The Team Member picker needs Team Members read;
- * without it the field is not shown and the link is kept as it was.
+ * Add or edit a Supervisor: name, an optional mobile, and the Team Member
+ * they are, if any. The Team Member picker needs Team Members read; without
+ * it the field is not shown and the link is kept as it was.
  */
 export function SupervisorDialog({
   supervisor,

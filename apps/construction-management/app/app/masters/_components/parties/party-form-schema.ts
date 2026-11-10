@@ -33,7 +33,7 @@ export const GST_STATE_ITEMS: { value: string; label: string }[] = [
   })),
 ];
 
-/** Client checks; the server repeats every rule (CM-406). */
+/** Client checks; the server repeats every rule. */
 export const partyFormSchema = z
   .object({
     name: z
@@ -76,7 +76,7 @@ export const partyFormSchema = z
       }),
     /** A GST state code, or "" for Not set. */
     stateCode: z.string(),
-    /** Contractors' TDS settings (CM-706). */
+    /** Contractors' TDS settings. */
     tdsApplicable: z.boolean(),
     /** Checked only while TDS applies; ignored (and sent as null) when off. */
     tdsLowerRate: z.string().trim(),

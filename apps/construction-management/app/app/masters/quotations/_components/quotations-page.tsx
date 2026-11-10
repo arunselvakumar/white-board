@@ -77,9 +77,9 @@ function screenOf(quotation: Quotation) {
 }
 
 /**
- * Masters → View Quotations (CM-501): every Contractor's and Supplier's
- * quotation files, newest first, searchable by party or file name. Files
- * are added and removed on the party's own page.
+ * Every Contractor's and Supplier's quotation files, newest first,
+ * searchable by party or file name. Files are added and removed on the
+ * party's own page.
  */
 export function QuotationsPage() {
   const [search, setSearch] = useState("");

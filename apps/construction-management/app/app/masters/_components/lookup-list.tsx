@@ -38,9 +38,9 @@ function errorMessage(error: unknown): string {
 }
 
 /**
- * A name-only masters list (CM-203): search, Add, and per row Rename /
- * Disable / Enable / Delete. Default (seed) rows can only be disabled and
- * enabled; disabled rows stay listed, muted.
+ * A name-only masters list: search, Add, and per row Rename / Disable /
+ * Enable / Delete. Default (seed) rows can only be disabled and enabled;
+ * disabled rows stay listed, muted.
  */
 export function LookupListScreen({ config }: { config: LookupScreenConfig }) {
   return (
@@ -213,12 +213,11 @@ function LookupListContent({ config }: { config: LookupScreenConfig }) {
   );
 }
 
-/** Masters → Labour → Categories (CM-203, ADR CM-0035). */
+/** See ADR CM-0035. */
 export function LabourCategoriesList() {
   return <LookupListScreen config={LABOUR_CATEGORIES_SCREEN} />;
 }
 
-/** Masters → Departments (CM-203). */
 export function DepartmentsList() {
   return <LookupListScreen config={DEPARTMENTS_SCREEN} />;
 }

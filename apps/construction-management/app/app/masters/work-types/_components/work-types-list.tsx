@@ -42,10 +42,9 @@ function detailsOf(item: WorkTypeItem): string {
 }
 
 /**
- * Masters → Work Types (CM-601): search by name or Department, Add, and per
- * row Edit / Disable / Enable / Delete. The Default Work Type (RCC) is
- * edited for its Materials only and never deleted; disabled rows stay
- * listed, muted.
+ * Search by name or Department, Add, and per row Edit / Disable / Enable /
+ * Delete. The Default Work Type (RCC) is edited for its Materials only and
+ * never deleted; disabled rows stay listed, muted.
  */
 export function WorkTypesList() {
   return (

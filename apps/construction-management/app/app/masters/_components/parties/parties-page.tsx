@@ -100,8 +100,8 @@ export function namesText(items: readonly { name: string }[]): string {
 }
 
 /**
- * Masters → Contractors or Suppliers (CM-406): search, status chips, the
- * newest first in pages, row actions.
+ * Contractors or Suppliers: search, status chips, the newest first in
+ * pages, row actions.
  */
 export function PartiesPage({ list }: { list: PartyList }) {
   const screen = PARTY_SCREENS[list];

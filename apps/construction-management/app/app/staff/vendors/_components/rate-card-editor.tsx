@@ -198,8 +198,8 @@ function ShiftRates({
 }
 
 /**
- * The Vendor's rate card (CM-209): shifts with optional times, each with a
- * rate per day and overtime per hour for every Labour Category it supplies.
+ * The Vendor's rate card: shifts with optional times, each with a rate per
+ * day and overtime per hour for every Labour Category it supplies.
  */
 export function RateCardEditor(props: EditorProps) {
   const { control, register, errors } = props;

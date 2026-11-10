@@ -2,8 +2,6 @@ import type { LookupItem } from "@/src/queries/masters";
 import type { ProjectOption } from "@/src/queries/projects";
 import type { VendorResponse, VendorSummary } from "@/src/queries/vendors";
 
-/** Story data for the Vendor register (CM-209). */
-
 const AT = "2026-10-08T06:30:00.000Z";
 
 export const PROJECT_OPTIONS: ProjectOption[] = [

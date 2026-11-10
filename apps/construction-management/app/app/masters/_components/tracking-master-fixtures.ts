@@ -5,7 +5,7 @@ import type {
   TrackingMasterList,
 } from "@/src/queries/tracking-masters";
 
-/** Story fixtures for Masters → Issue Categories and Tags (CM-801). */
+/** Story fixtures for Issue Categories and Tags. */
 
 const AT = "2026-10-14T06:30:00.000Z";
 const LATER = "2026-10-14T07:00:00.000Z";

@@ -49,7 +49,7 @@ const STATUS_FILTERS: FilterTab<MaterialMasterFilter["status"]>[] = [
 
 type Item = { id: string; disabled: boolean; updatedAt: string };
 
-/** The words, rows and editor of one procurement master screen (CM-501). */
+/** The words, rows and editor of one procurement master screen. */
 export type PagedMasterScreen<L extends MaterialMasterList> = {
   list: L;
   singular: string;
@@ -73,9 +73,9 @@ export type PagedMasterScreen<L extends MaterialMasterList> = {
 };
 
 /**
- * A procurement master list (CM-501): search, an Enabled / Disabled
- * filter, newest first in pages, and per row Edit / Disable / Enable /
- * Delete. Seed rows can only be disabled and enabled.
+ * A procurement master list: search, an Enabled / Disabled filter, newest
+ * first in pages, and per row Edit / Disable / Enable / Delete. Seed rows
+ * can only be disabled and enabled.
  */
 export function PagedMasterListScreen<L extends MaterialMasterList>({
   screen,

@@ -287,7 +287,7 @@ function PickerSelect({
   );
 }
 
-/** The Material form (CM-501): details, Minimum Stock, Rate Details. */
+/** Details, Minimum Stock and Rate Details. */
 export function MaterialForm({
   material,
   financial,
@@ -650,7 +650,6 @@ function useMaterialsFinancial(): boolean {
   return data.financial;
 }
 
-/** Masters → Materials → Add Material (CM-501). */
 export function NewMaterialScreen() {
   const financial = useMaterialsFinancial();
   const create = useCreateMaterial();
@@ -666,7 +665,7 @@ export function NewMaterialScreen() {
   );
 }
 
-/** Masters → Materials → Edit; 409 when someone saved it since. */
+/** 409 when someone saved the Material since it loaded. */
 export function EditMaterialScreen({ id }: { id: string }) {
   const financial = useMaterialsFinancial();
   const { data } = useSuspenseQuery(materialMasterQuery("materials", id));

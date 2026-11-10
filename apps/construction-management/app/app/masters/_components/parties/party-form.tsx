@@ -159,9 +159,9 @@ function DepartmentsChecklist({
 }
 
 /**
- * A Contractor's TDS settings (CM-706, ADR CM-0017 §8): whether 194C is
- * deducted, a lower-deduction certificate's rate and a note, with the
- * payee kind the PAN gives.
+ * A Contractor's TDS settings (ADR CM-0017 §8): whether 194C is deducted,
+ * a lower-deduction certificate's rate and a note, with the payee kind the
+ * PAN gives.
  */
 function TdsSettings({
   id,
@@ -260,7 +260,7 @@ function PartyForm({
   });
   const errors = form.formState.errors;
   const id = (field: string) => `${screen.list}-${field}`;
-  // A valid GSTIN fixes the state: its first two digits (CM-501).
+  // A valid GSTIN fixes the state: its first two digits.
   const lockedState = gstinState(
     useWatch({ control: form.control, name: "gstin" }),
   );
@@ -574,7 +574,7 @@ function FormPage({
   );
 }
 
-/** On Add, quotations wait until the party exists (CM-501). */
+/** On Add, quotations wait until the party exists. */
 function PartyQuotationsNote({ screen }: { screen: PartyScreen }) {
   return (
     <section
@@ -591,7 +591,7 @@ function PartyQuotationsNote({ screen }: { screen: PartyScreen }) {
   );
 }
 
-/** Add Contractor or Add Supplier (CM-406). */
+/** Add Contractor or Add Supplier. */
 export function NewPartyScreen({ list }: { list: PartyList }) {
   const screen = PARTY_SCREENS[list];
   const create = useCreateParty(list);

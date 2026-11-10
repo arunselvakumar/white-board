@@ -287,18 +287,18 @@ function TrackingMasterListContent({ screen }: { screen: Screen }) {
 }
 
 /**
- * Masters → Issue Categories (CM-801, ADR CM-0019 §1): search, Add, and
- * per row Rename / Disable / Enable / Delete by the viewer's rights. The
- * 14 Defaults are renamed, disabled and deleted like any other; a
- * category issues use offers no Delete.
+ * Issue Categories (ADR CM-0019 §1): search, Add, and per row Rename /
+ * Disable / Enable / Delete by the viewer's rights. The 14 Defaults are
+ * renamed, disabled and deleted like any other; a category issues use
+ * offers no Delete.
  */
 export function IssueCategoriesList() {
   return <TrackingMasterListScreen screen={SCREENS["issue-categories"]} />;
 }
 
 /**
- * Masters → Tags (CM-801, ADR CM-0019 §1): search, Add, Rename and
- * Delete; a tag tasks carry offers no Delete. Tags are never disabled.
+ * Tags (ADR CM-0019 §1): search, Add, Rename and Delete; a tag tasks carry
+ * offers no Delete. Tags are never disabled.
  */
 export function TagsList() {
   return <TrackingMasterListScreen screen={SCREENS.tags} />;

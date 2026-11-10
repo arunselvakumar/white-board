@@ -3,7 +3,7 @@ import type { Party } from "@/src/queries/parties";
 import type { ProjectOption } from "@/src/queries/projects";
 import type { Quotation } from "@/src/queries/quotations";
 
-/** Story data for the Contractor and Supplier masters (CM-406). */
+/** Story data for the Contractor and Supplier masters. */
 
 const AT = "2026-10-08T06:30:00.000Z";
 
