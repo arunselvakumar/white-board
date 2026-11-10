@@ -31,7 +31,7 @@ import {
 import { itemPath } from "./transaction-format";
 
 /**
- * What can be done with one Transaction or transfer (CM-702), from its
+ * What can be done with one Transaction or transfer, from its
  * `actions`: View, Approve, Reject, Edit and Delete — a menu on list rows,
  * buttons on the detail page.
  */

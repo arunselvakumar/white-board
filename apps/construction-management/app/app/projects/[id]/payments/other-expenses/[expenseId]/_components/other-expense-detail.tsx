@@ -43,7 +43,7 @@ function Fact({ label, children }: { label: string; children: ReactNode }) {
 }
 
 /**
- * One Other Expense (CM-704): its figures, status and decision, the
+ * One Other Expense: its figures, status and decision, the
  * actions the viewer may take (Approve, Reject, Edit, Delete), then its
  * files and remarks.
  */

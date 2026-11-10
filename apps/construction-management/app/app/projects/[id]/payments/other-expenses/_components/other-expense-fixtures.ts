@@ -11,7 +11,7 @@ import {
   PAYMENT_CATEGORY_OPTIONS,
 } from "@/app/app/_components/finance/account-fixtures";
 
-/** Story data for a Project's Other Expenses (CM-704). Amounts are paise. */
+/** Story data for a Project's Other Expenses. Amounts are paise. */
 
 export const PROJECT_ID = "0199a000-0000-7000-8000-0000000000b1";
 export const TODAY = "2026-10-11";

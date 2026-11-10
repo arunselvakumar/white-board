@@ -13,7 +13,7 @@ import type {
 export const EXPENSE_MODES = ["cash", "cheque", "online", "upi"] as const;
 export type ExpenseMode = (typeof EXPENSE_MODES)[number];
 
-/** Client checks; the server repeats every rule (CM-704). */
+/** Client checks; the server repeats every rule. */
 export const otherExpenseFormSchema = z
   .object({
     expenseDate: z.string().min(1, "Enter the date of the expense"),

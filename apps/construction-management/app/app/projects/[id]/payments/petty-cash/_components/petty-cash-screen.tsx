@@ -170,7 +170,7 @@ function AccountPanel({
 }
 
 /**
- * A Project's Petty Cash tab (CM-703, ADR CM-0017 §2, §9): the petty-cash
+ * A Project's Petty Cash tab (ADR CM-0017 §2, §9): the petty-cash
  * accounts the viewer sees as cards (holder, balance of approved vouchers,
  * pending total, last voucher), and the chosen account's vouchers with
  * filters, bulk approval, its statement and Export Receipts. Without

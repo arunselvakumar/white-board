@@ -10,7 +10,6 @@ import {
 
 import { OtherExpenseForm } from "./other-expense-form";
 
-/** Record an Other Expense (CM-704). */
 export function OtherExpenseNew({
   projectId,
   today,
@@ -29,7 +28,6 @@ export function OtherExpenseNew({
   );
 }
 
-/** Edit an Other Expense (CM-704). */
 export function OtherExpenseEdit({
   projectId,
   id,

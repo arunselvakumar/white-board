@@ -101,7 +101,6 @@ export const ApprovePending: Story = {
   },
 };
 
-/** Reject asks for a reason. */
 export const RejectWithReason: Story = {
   beforeEach: serve(TEA_EXPENSE, (call) =>
     call.path === `${API}/${TEA_EXPENSE.id}/reject`

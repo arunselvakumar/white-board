@@ -97,7 +97,7 @@ export type Editing =
   | null;
 
 /**
- * A Project's Transactions (CM-702): Payment In, Payment Out and transfers
+ * A Project's Transactions: Payment In, Payment Out and transfers
  * with filters (date, type, account, category, mode, party, status), the
  * in / out totals of what is listed, bulk approve / reject, New
  * transaction, Transfer and Import. Actions follow the viewer's flags.

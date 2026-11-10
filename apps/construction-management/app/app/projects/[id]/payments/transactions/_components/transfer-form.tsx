@@ -95,7 +95,7 @@ const SERVER_FIELDS: Record<string, keyof Values> = {
 };
 
 /**
- * Transfer money between two accounts (CM-702): company to company,
+ * Transfer money between two accounts: company to company,
  * company to a holder's petty cash, or petty cash back. The mode must fit
  * the account the money leaves. Approval moves both balances.
  */

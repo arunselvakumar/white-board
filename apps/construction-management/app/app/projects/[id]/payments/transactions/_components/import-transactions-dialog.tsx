@@ -32,7 +32,7 @@ function rowErrors(error: unknown): ImportRowError[] | null {
 }
 
 /**
- * Import Transactions (CM-702): download the sample, fill one Transaction
+ * Import Transactions: download the sample, fill one Transaction
  * per row, upload it. Every row becomes a pending Transaction on this
  * Project, or none does and each problem is listed by row and column.
  */

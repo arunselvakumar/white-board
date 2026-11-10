@@ -26,7 +26,7 @@ function monthStart(today: string): string {
 }
 
 /**
- * Export Receipts (CM-0017 §9): the photos and receipts of the account's
+ * Export Receipts (ADR CM-0017 §9): the photos and receipts of the account's
  * vouchers between two dates as one ZIP, each named by its voucher number.
  * It is fetched first and saved only when the server sends it; a refusal
  * (above 500 files: choose fewer days) shows here and the dialog stays.
