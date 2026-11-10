@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { BatchesScreen } from "@/components/batches/batches-screen";
+import { BatchesScreen } from "@/app/(app)/batches/_components/batches-screen";
 
 export const metadata: Metadata = { title: "Batches" };
 

@@ -2,11 +2,11 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
 import { AppShell } from "@/app/(app)/_components/app-shell/app-shell";
-import { BatchCatalog } from "@/components/batches/batch-catalog";
-import { CourseCatalog } from "@/components/courses/course-catalog";
+import { BatchCatalog } from "@/app/(app)/batches/_components/batch-catalog";
+import { CourseCatalog } from "@/app/(app)/courses/_components/course-catalog";
 import { OwnerDashboard } from "@/app/(app)/_components/dashboard/owner-dashboard";
-import { FeesCatalog } from "@/components/fees/fees-catalog";
-import { StudentCatalog } from "@/components/students/student-catalog";
+import { FeesCatalog } from "@/app/(app)/fees/_components/fees-catalog";
+import { StudentCatalog } from "@/app/(app)/students/_components/student-catalog";
 import { WorkspaceGate } from "@/app/(app)/_components/workspace/workspace-gate";
 import { signInAs } from "../../.storybook/mocks/auth";
 

@@ -3,16 +3,16 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
 import { AppShell } from "@/app/(app)/_components/app-shell/app-shell";
-import { StudentCatalog } from "@/components/students/student-catalog";
-import { StudentForm } from "@/components/students/student-form";
-import { StudentProfileView } from "@/components/students/student-profile-view";
+import { StudentCatalog } from "@/app/(app)/students/_components/student-catalog";
+import { StudentForm } from "@/app/(app)/students/_components/student-form";
+import { StudentProfileView } from "@/app/(app)/_components/students/student-profile-view";
 import { WorkspaceGate } from "@/app/(app)/_components/workspace/workspace-gate";
 import type {
   StudentDetails,
   StudentResponse,
   StudentWriteInput,
 } from "@/src/queries/students";
-import { signInAs } from "../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 
 const NOW = "2026-09-12T12:00:00.000Z";
 

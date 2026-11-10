@@ -8,7 +8,7 @@ import { Button } from "@repo/ui/components/button";
 
 import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import { StudentTestHistorySection } from "@/components/class-tests/history/student-test-history";
-import { StudentAvatar } from "@/components/students/student-avatar";
+import { StudentAvatar } from "@/app/(app)/_components/students/student-avatar";
 import { formatPaiseAsRupees } from "@/lib/money";
 import { batchQueries } from "@/src/queries/batches";
 import { courseQueries } from "@/src/queries/courses";

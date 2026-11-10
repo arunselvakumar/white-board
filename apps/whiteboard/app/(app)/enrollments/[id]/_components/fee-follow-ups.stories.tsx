@@ -4,7 +4,7 @@ import type { Decorator, Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
 import { QuerySuspense } from "@/components/query-suspense";
-import { EnrollmentDetailScreen } from "@/components/enrollments/enrollment-detail-screen";
+import { EnrollmentDetailScreen } from "@/app/(app)/enrollments/[id]/_components/enrollment-detail-screen";
 import { addDays } from "@/lib/calendar-dates";
 import type { BatchListResponse, BatchResponse } from "@/src/queries/batches";
 import type { CourseResponse } from "@/src/queries/courses";
@@ -18,7 +18,7 @@ import type {
   FeeFollowUpResponse,
 } from "@/src/queries/fee-dues";
 import type { StudentResponse } from "@/src/queries/students";
-import { signInAs } from "../../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 
 import { followUpDateLabel, todayInZone } from "./fee-follow-up-format";
 import { FeeFollowUpsCard } from "./fee-follow-ups-card";

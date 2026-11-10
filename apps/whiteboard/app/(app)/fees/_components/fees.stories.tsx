@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
 import { AppShell } from "@/app/(app)/_components/app-shell/app-shell";
-import { FeesScreen } from "@/components/fees/fees-screen";
+import { FeesScreen } from "@/app/(app)/fees/_components/fees-screen";
 import { QuerySuspense } from "@/components/query-suspense";
 import { WorkspaceGate } from "@/app/(app)/_components/workspace/workspace-gate";
 import {
@@ -14,7 +14,7 @@ import {
   type FeeFollowUpDueResponse,
 } from "@/src/queries/fee-dues";
 import { getQueryClient } from "@/src/queries/query-client";
-import { signInAs } from "../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 
 import { feeDateLabel } from "./fees-format";
 

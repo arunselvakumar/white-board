@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { BatchCreateScreen } from "@/components/batches/batch-create-screen";
+import { BatchCreateScreen } from "@/app/(app)/batches/new/_components/batch-create-screen";
 
 export const metadata: Metadata = { title: "Add Batch" };
 

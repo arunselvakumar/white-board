@@ -11,7 +11,7 @@ import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import {
   CourseForm,
   courseToFormValues,
-} from "@/components/courses/course-form";
+} from "@/app/(app)/courses/_components/course-form";
 import { courseQueries, updateCourse } from "@/src/queries/courses";
 import { calendarQueries } from "@/src/queries/calendar";
 

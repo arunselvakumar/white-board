@@ -3,7 +3,7 @@
 import { useSuspenseQueries } from "@tanstack/react-query";
 import { useDeferredValue, useState } from "react";
 
-import { FeesCatalog } from "@/components/fees/fees-catalog";
+import { FeesCatalog } from "@/app/(app)/fees/_components/fees-catalog";
 import {
   feeDuesQueries,
   type FeeDuesFilter,

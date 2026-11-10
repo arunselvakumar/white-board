@@ -15,7 +15,7 @@ import {
 } from "@repo/ui/components/empty";
 
 import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
-import { StudentAvatar } from "@/components/students/student-avatar";
+import { StudentAvatar } from "@/app/(app)/_components/students/student-avatar";
 import {
   expectedAbsenceDays,
   giverLabel,

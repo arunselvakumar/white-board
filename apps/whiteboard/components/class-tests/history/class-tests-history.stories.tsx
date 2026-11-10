@@ -5,7 +5,7 @@ import { expect, userEvent, waitFor, within } from "storybook/test";
 
 import { AppShell } from "@/app/(app)/_components/app-shell/app-shell";
 import { QuerySuspense } from "@/components/query-suspense";
-import { StudentProfileScreen } from "@/components/students/student-profile-view";
+import { StudentProfileScreen } from "@/app/(app)/_components/students/student-profile-view";
 import type { AttendanceHistory } from "@/src/queries/attendance";
 import type { BatchListResponse } from "@/src/queries/batches";
 import type { CourseListResponse } from "@/src/queries/courses";

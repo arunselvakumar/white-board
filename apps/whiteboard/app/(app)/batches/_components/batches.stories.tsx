@@ -4,11 +4,11 @@ import { expect, within } from "storybook/test";
 
 import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import { AppShell } from "@/app/(app)/_components/app-shell/app-shell";
-import { BatchCatalog } from "@/components/batches/batch-catalog";
-import { BatchForm } from "@/components/batches/batch-form";
+import { BatchCatalog } from "@/app/(app)/batches/_components/batch-catalog";
+import { BatchForm } from "@/app/(app)/batches/_components/batch-form";
 import { WorkspaceGate } from "@/app/(app)/_components/workspace/workspace-gate";
 import type { BatchResponse, BatchWriteInput } from "@/src/queries/batches";
-import { signInAs } from "../../.storybook/mocks/auth";
+import { signInAs } from "@/.storybook/mocks/auth";
 
 const NOW = "2026-09-12T12:00:00.000Z";
 const COURSE_ID = "550e8400-e29b-41d4-a716-446655440000";

@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@repo/ui/components/button";
 
 import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
-import { StudentForm } from "@/components/students/student-form";
+import { StudentForm } from "@/app/(app)/students/_components/student-form";
 import { invalidateRegisterQueries } from "@/src/queries/invalidate-register";
 import {
   admitStudent,

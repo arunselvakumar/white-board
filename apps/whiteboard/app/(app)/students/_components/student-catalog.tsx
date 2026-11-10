@@ -40,7 +40,7 @@ import {
 } from "@repo/ui/components/table";
 
 import type { StudentResponse } from "@/src/queries/students";
-import { StudentAvatar } from "@/components/students/student-avatar";
+import { StudentAvatar } from "@/app/(app)/_components/students/student-avatar";
 
 function admittedDate(value: string): string {
   return new Intl.DateTimeFormat("en-IN", {

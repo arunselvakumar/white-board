@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { TeacherDetailScreen } from "@/components/teachers/teacher-detail-screen";
+import { TeacherDetailScreen } from "@/app/(app)/teachers/[id]/_components/teacher-detail-screen";
 export const metadata: Metadata = { title: "Teacher" };
 export default async function Page({
   params,

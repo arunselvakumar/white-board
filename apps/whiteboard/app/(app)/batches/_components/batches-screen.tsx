@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-import { BatchCatalog } from "@/components/batches/batch-catalog";
+import { BatchCatalog } from "@/app/(app)/batches/_components/batch-catalog";
 import {
   batchQueries,
   closeBatch,

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { EnrollmentDetailScreen } from "@/components/enrollments/enrollment-detail-screen";
+import { EnrollmentDetailScreen } from "@/app/(app)/enrollments/[id]/_components/enrollment-detail-screen";
 
 export const metadata: Metadata = { title: "Enrollment" };
 

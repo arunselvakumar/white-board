@@ -8,7 +8,7 @@ import {
 import { useRouter } from "next/navigation";
 
 import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
-import { BatchForm } from "@/components/batches/batch-form";
+import { BatchForm } from "@/app/(app)/batches/_components/batch-form";
 import { batchQueries, createBatch } from "@/src/queries/batches";
 import { calendarQueries } from "@/src/queries/calendar";
 import { courseQueries } from "@/src/queries/courses";

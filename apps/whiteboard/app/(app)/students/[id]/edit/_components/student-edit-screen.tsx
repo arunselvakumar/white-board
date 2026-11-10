@@ -12,8 +12,8 @@ import { Button } from "@repo/ui/components/button";
 import {
   StudentForm,
   studentToFormValues,
-} from "@/components/students/student-form";
-import { studentFullName } from "@/components/students/student-profile-view";
+} from "@/app/(app)/students/_components/student-form";
+import { studentFullName } from "@/app/(app)/_components/students/student-profile-view";
 import { formatPaiseAsRupees } from "@/lib/money";
 import { batchQueries } from "@/src/queries/batches";
 import { courseQueries } from "@/src/queries/courses";

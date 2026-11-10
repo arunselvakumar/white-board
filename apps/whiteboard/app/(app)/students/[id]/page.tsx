@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { StudentProfileScreen } from "@/components/students/student-profile-view";
+import { StudentProfileScreen } from "@/app/(app)/_components/students/student-profile-view";
 
 export const metadata: Metadata = { title: "View Student" };
 
