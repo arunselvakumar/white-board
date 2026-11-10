@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
-import { mockFinanceDocumentApi } from "@/components/finance/documents/finance-document-fixtures";
+import { mockFinanceDocumentApi } from "@/app/app/_components/finance/documents/finance-document-fixtures";
 
-import { mockApi, StoryQueries } from "../../../.storybook/mocks/api";
+import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import { TransactionDetail } from "./transaction-detail";
 import {
   PENDING_OUT,

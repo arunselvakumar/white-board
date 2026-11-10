@@ -25,11 +25,14 @@ import {
   type AccountStatement,
 } from "@/src/queries/finance-petty-cash";
 
-import { Amount, pettyCashPath } from "./petty-cash-parts";
+import {
+  Amount,
+  pettyCashPath,
+} from "@/app/app/projects/[id]/payments/petty-cash/_components/petty-cash-parts";
 import {
   STATEMENT_COLUMNS,
   StatementLinesSkeleton,
-} from "./petty-cash-skeletons";
+} from "@/app/app/projects/[id]/payments/petty-cash/_components/petty-cash-skeletons";
 
 type Entry = AccountStatement["entries"][number];
 

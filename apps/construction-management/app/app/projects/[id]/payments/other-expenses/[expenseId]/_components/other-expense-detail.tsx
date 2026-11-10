@@ -17,7 +17,7 @@ import { Button, buttonVariants } from "@repo/ui/components/button";
 
 import { PageHeader } from "@/components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
-import { FinanceDocumentActivity } from "@/components/finance/documents/finance-document-activity";
+import { FinanceDocumentActivity } from "@/app/app/projects/[id]/payments/_components/finance-document-activity";
 import { formatDate, money } from "@/components/payments/payment-format";
 import { ReasonDialog } from "@/components/procurement/purchase-requests/reason-dialog";
 import { fieldForCode } from "@/lib/server-errors";
@@ -28,7 +28,10 @@ import {
   useOtherExpenseCommand,
 } from "@/src/queries/finance-other-expenses";
 
-import { ExpenseStatusBadge, modeText } from "./other-expense-parts";
+import {
+  ExpenseStatusBadge,
+  modeText,
+} from "@/app/app/projects/[id]/payments/other-expenses/_components/other-expense-parts";
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (

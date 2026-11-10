@@ -1,4 +1,4 @@
-import type { ApiCall } from "../../../.storybook/mocks/api";
+import type { ApiCall } from "@/.storybook/mocks/api";
 import type {
   FinanceDocumentFile,
   FinanceRemark,

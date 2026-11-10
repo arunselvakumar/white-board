@@ -1,12 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fireEvent, waitFor, within } from "storybook/test";
 
-import {
-  StoryQueries,
-  mockApi,
-  type ApiCall,
-} from "../../../.storybook/mocks/api";
-import { mockXhrUploads } from "../../../.storybook/mocks/xhr";
+import { StoryQueries, mockApi, type ApiCall } from "@/.storybook/mocks/api";
+import { mockXhrUploads } from "@/.storybook/mocks/xhr";
 import { FinanceDocumentActivity } from "./finance-document-activity";
 import {
   FINANCE_DOCUMENTS_API,
@@ -14,7 +10,7 @@ import {
   financeFile,
   mockFinanceDocumentApi,
   type FinanceDocumentApiOptions,
-} from "./finance-document-fixtures";
+} from "@/app/app/_components/finance/documents/finance-document-fixtures";
 
 let api: ReturnType<typeof mockApi>;
 let xhr: ReturnType<typeof mockXhrUploads> | null = null;

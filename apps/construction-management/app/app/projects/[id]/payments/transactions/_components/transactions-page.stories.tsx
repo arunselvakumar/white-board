@@ -3,11 +3,7 @@ import { expect, waitFor, within } from "storybook/test";
 
 import { financeAccess } from "@/app/app/_components/finance/accounts/account-list-fixtures";
 
-import {
-  mockApi,
-  StoryQueries,
-  type ApiCall,
-} from "../../../.storybook/mocks/api";
+import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import {
   PROJECT_ID,
   STORY_TODAY,

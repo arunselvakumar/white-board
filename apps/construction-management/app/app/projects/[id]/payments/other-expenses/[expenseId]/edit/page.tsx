@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
-import { OtherExpenseEdit } from "@/components/finance/other-expenses/other-expense-pages";
+import { OtherExpenseEdit } from "@/app/app/projects/[id]/payments/other-expenses/_components/other-expense-pages";
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
 
 export const metadata: Metadata = { title: "Edit Other Expense" };

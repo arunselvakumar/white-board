@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
-import { StoryQueries, mockApi } from "../../../.storybook/mocks/api";
+import { StoryQueries, mockApi } from "@/.storybook/mocks/api";
 import { AccountStatementView } from "./account-statement";
 import {
   RAVI_ACCOUNT,
@@ -9,7 +9,7 @@ import {
   STORY_STATEMENT,
   pettyCashHandler,
   type PettyCashApiOptions,
-} from "./petty-cash-fixtures";
+} from "@/app/app/projects/[id]/payments/petty-cash/_components/petty-cash-fixtures";
 
 let api: ReturnType<typeof mockApi>;
 

@@ -3,18 +3,14 @@ import { useState } from "react";
 import { expect, fireEvent, waitFor, within } from "storybook/test";
 import { Button } from "@repo/ui/components/button";
 
-import {
-  StoryQueries,
-  mockApi,
-  type ApiCall,
-} from "../../../.storybook/mocks/api";
-import { mockXhrUploads } from "../../../.storybook/mocks/xhr";
+import { StoryQueries, mockApi, type ApiCall } from "@/.storybook/mocks/api";
+import { mockXhrUploads } from "@/.storybook/mocks/xhr";
 import type { FinanceDocumentType } from "@/src/finance/domain/finance-documents";
 import { FinancePendingFilesField } from "./pending-files-field";
 import {
   FINANCE_DOCUMENTS_API,
   mockFinanceDocumentApi,
-} from "./finance-document-fixtures";
+} from "@/app/app/_components/finance/documents/finance-document-fixtures";
 import { useUploadPendingFinanceFiles } from "./use-upload-pending-files";
 
 let api: ReturnType<typeof mockApi>;

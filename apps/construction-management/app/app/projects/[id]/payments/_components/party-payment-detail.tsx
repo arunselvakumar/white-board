@@ -25,7 +25,7 @@ import {
 } from "@repo/ui/components/dialog";
 
 import { PageHeader } from "@/components/app-shell/page-header";
-import { FinanceDocumentActivity } from "@/components/finance/documents/finance-document-activity";
+import { FinanceDocumentActivity } from "@/app/app/projects/[id]/payments/_components/finance-document-activity";
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";
 import { canInFinance, financeAccessQuery } from "@/src/queries/finance-access";
