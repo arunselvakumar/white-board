@@ -64,7 +64,7 @@ export const FAILED = progressReport({
   actions: { download: false, retry: true, delete: true },
 });
 
-/** A Task Progress Report for the month so far (CM-805): no number, no filters. */
+/** A Task Progress Report for the month so far: no number, no filters. */
 export const TASK_PROGRESS = progressReport({
   id: "0199c4a0-0000-7000-8000-0000000d1004",
   kind: "task_progress_report",

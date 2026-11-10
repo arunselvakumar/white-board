@@ -253,12 +253,12 @@ function defaults(
 }
 
 /**
- * Record or edit a hindrance (CM-607, ADR CM-0016 §14): start and end
- * (empty while it continues), hours lost, cause, the affected activity and
- * location, the responsible party (with the Contractor when it is one),
- * a description, the joint sign-off as signed on site, and on a new
- * hindrance its files (PDF or image), uploaded once it is saved. A usage
- * sheet's **Record hindrance** link prefills it (`HindrancePrefill`).
+ * Record or edit a hindrance (ADR CM-0016 §14): start and end (empty while
+ * it continues), hours lost, cause, the affected activity and location, the
+ * responsible party (with the Contractor when it is one), a description,
+ * the joint sign-off as signed on site, and on a new hindrance its files
+ * (PDF or image), uploaded once it is saved. A usage sheet's **Record
+ * hindrance** link prefills it (`HindrancePrefill`).
  */
 export function HindranceForm({
   projectId,

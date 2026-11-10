@@ -8,7 +8,6 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Progress Reports" };
 
-/** The Project's Progress Reports: Daily Progress Reports. */
 export default async function ProgressReportsRoute({
   params,
 }: {

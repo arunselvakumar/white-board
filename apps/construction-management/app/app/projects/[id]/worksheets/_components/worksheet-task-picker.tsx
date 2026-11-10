@@ -27,7 +27,7 @@ import {
   type WorksheetTaskOption,
 } from "@/src/queries/worksheets";
 
-/** The sheet's Task as the form holds it (CM-806). */
+/** The sheet's Task as the form holds it. */
 export type WorksheetTaskChoice = Pick<
   WorksheetTaskOption,
   "id" | "taskNo" | "name" | "unitId" | "unitName"
@@ -73,9 +73,9 @@ export function taskHint(
 }
 
 /**
- * The Daily Worksheet's optional **Task** (CM-806): live leaf tasks of the
- * Project, searched by Task No. or name. Under it, whether the sheet will
- * post progress or is only linked, and why.
+ * The Daily Worksheet's optional **Task**: live leaf tasks of the Project,
+ * searched by Task No. or name. Under it, whether the sheet will post
+ * progress or is only linked, and why.
  */
 export function WorksheetTaskPicker({
   id,

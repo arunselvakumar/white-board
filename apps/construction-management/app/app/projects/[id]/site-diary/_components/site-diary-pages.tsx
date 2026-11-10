@@ -8,7 +8,6 @@ import { siteDiaryPath, siteDiaryQuery } from "@/src/queries/site-diary";
 import { SiteDiaryForm } from "./site-diary-form";
 import { formatLongDate } from "./site-diary-parts";
 
-/** New Site Diary for a date (CM-607). */
 export function SiteDiaryNew({
   projectId,
   date,
@@ -28,7 +27,6 @@ export function SiteDiaryNew({
   );
 }
 
-/** Edit a Site Diary (CM-607). */
 export function SiteDiaryEdit({
   projectId,
   diaryId,

@@ -230,9 +230,9 @@ function SignOff({ hindrance }: { hindrance: Hindrance }) {
 }
 
 /**
- * One hindrance (CM-607): its period and time lost, cause, activity,
- * location, responsible party, description and joint sign-off, with
- * **Close**, Edit and Delete for members who may.
+ * One hindrance: its period and time lost, cause, activity, location,
+ * responsible party, description and joint sign-off, with **Close**, Edit
+ * and Delete for members who may.
  */
 export function HindranceDetail({
   projectId,

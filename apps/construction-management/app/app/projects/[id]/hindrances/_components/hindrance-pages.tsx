@@ -9,7 +9,7 @@ import { hindranceQuery, hindrancesPath } from "@/src/queries/hindrances";
 import { HindranceForm, type HindrancePrefill } from "./hindrance-form";
 import { HindranceFormFieldsSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
 
-/** Record a hindrance; a usage sheet's link prefills it (CM-607). */
+/** Record a hindrance; a usage sheet's link prefills it. */
 export function HindranceNew({
   projectId,
   prefill,
@@ -30,7 +30,6 @@ export function HindranceNew({
   );
 }
 
-/** Edit a hindrance (CM-607). */
 export function HindranceEdit({
   projectId,
   hindranceId,

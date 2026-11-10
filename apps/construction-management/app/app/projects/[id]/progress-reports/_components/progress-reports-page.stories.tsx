@@ -67,7 +67,7 @@ export const Reports: Story = {
     const items = list.getAllByRole("listitem");
     await expect(items).toHaveLength(4);
     const [running, task, ready, failed] = items.map((item) => within(item));
-    // A Task Progress Report names its period, not a number (CM-805).
+    // A Task Progress Report names its period, not a number.
     await expect(task?.getByText("Task Progress Report")).toBeVisible();
     await expect(task?.getByText("1 Oct 2026 – 10 Oct 2026")).toBeVisible();
     await expect(task?.getByText(/Tasks by location/)).toBeVisible();
@@ -194,8 +194,8 @@ export const CreateDialog: Story = {
 };
 
 /**
- * A Task Progress Report (CM-805): From and To instead of the DPR's
- * fields, To not after today, then the period is sent.
+ * A Task Progress Report: From and To instead of the DPR's fields, To not
+ * after today, then the period is sent.
  */
 export const CreateTaskProgressReport: Story = {
   beforeEach: withApi({ reports: [] }),

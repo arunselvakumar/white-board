@@ -52,10 +52,10 @@ const stamp = (iso: string) =>
   }).format(new Date(iso));
 
 /**
- * One Daily Worksheet (CM-602): everything it records — even sections the
- * Project now hides — with the location label, approval and its actions
- * (approve, reject with a reason, edit, duplicate, delete), then the
- * remarks and photos.
+ * One Daily Worksheet: everything it records — even sections the Project
+ * now hides — with the location label, approval and its actions (approve,
+ * reject with a reason, edit, duplicate, delete), then the remarks and
+ * photos.
  */
 export function WorksheetDetailPage({
   projectId,

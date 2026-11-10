@@ -160,7 +160,7 @@ function MonthDays({
 }
 
 /**
- * The Project's Site Diary module (CM-607, ADR CM-0016 §13): one diary per
+ * The Project's Site Diary module (ADR CM-0016 §13): one diary per
  * date. It opens on today, steps a day back or forward (never past today),
  * lists the month's diaries beside it, and offers "Write the diary" on a
  * date without one to members with Create.

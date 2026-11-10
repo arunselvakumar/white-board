@@ -98,10 +98,9 @@ function materialsLine(sheet: Worksheet): string {
 }
 
 /**
- * A Project's Daily Worksheets (CM-602): filters by date, Filled By,
- * Contractor, Department and approval; bulk approve / reject for
- * approvers when approval is on; the gear opens the form settings for
- * members with Update.
+ * A Project's Daily Worksheets: filters by date, Filled By, Contractor,
+ * Department and approval; bulk approve / reject for approvers when
+ * approval is on; the gear opens the form settings for members with Update.
  */
 export function WorksheetsPage({
   projectId,

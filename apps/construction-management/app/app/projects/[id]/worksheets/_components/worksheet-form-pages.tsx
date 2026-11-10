@@ -20,7 +20,7 @@ function savedPath(
   return worksheetsPath(projectId, `/${id}${query}`);
 }
 
-/** Add Worksheet, or Duplicate when `fromId` names the source (CM-0016 §9). */
+/** Add Worksheet, or Duplicate the `fromId` sheet (ADR CM-0016 §9). */
 export function NewWorksheetPage({
   projectId,
   fromId,
@@ -62,7 +62,6 @@ function DuplicateForm({
   );
 }
 
-/** Edit Worksheet (CM-602). */
 export function EditWorksheetPage({
   projectId,
   id,

@@ -36,9 +36,9 @@ function useDebounced<T>(value: T, delay: number): T {
 }
 
 /**
- * Bulk Select Materials (CM-0016 §5): the Work Type's assigned Materials
- * first, then any other Material by search. Materials already on the
- * sheet are left out. Adds one line per ticked Material.
+ * Bulk Select Materials (ADR CM-0016 §5): the Work Type's assigned
+ * Materials first, then any other Material by search. Materials already on
+ * the sheet are left out. Adds one line per ticked Material.
  */
 export function BulkSelectDialog({
   open,

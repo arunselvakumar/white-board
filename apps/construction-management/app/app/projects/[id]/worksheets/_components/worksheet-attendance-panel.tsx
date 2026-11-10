@@ -11,7 +11,7 @@ import {
 import { AttendancePanelSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
 
 /**
- * "Attendance on <date>" beside the headcounts (CM-0016 §6): the
+ * "Attendance on <date>" beside the headcounts (ADR CM-0016 §6): the
  * Project's attendance by skill, the heads already on its other
  * worksheets that date, and what remains. **Use remaining** fills the
  * two counts; the difference is shown, not enforced.

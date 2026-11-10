@@ -289,11 +289,11 @@ function ReportList({
 }
 
 /**
- * The Project's Progress Reports module (CM-606, CM-805): **Create new**
- * opens the dialog for a Daily Progress Report or a Task Progress Report;
- * **View Reports** lists the generated reports (a DPR's number and date or
- * a Task Progress Report's period, requested by, status), polling while
- * one is being prepared, with Download, Retry for a failed one, and Delete.
+ * The Project's Progress Reports module: **Create new** opens the dialog
+ * for a Daily Progress Report or a Task Progress Report; **View Reports**
+ * lists the generated reports (a DPR's number and date or a Task Progress
+ * Report's period, requested by, status), polling while one is being
+ * prepared, with Download, Retry for a failed one, and Delete.
  */
 export function ProgressReportsPage({ projectId }: { projectId: string }) {
   const { data: access } = useSuspenseQuery(siteWorkAccessQuery(projectId));
