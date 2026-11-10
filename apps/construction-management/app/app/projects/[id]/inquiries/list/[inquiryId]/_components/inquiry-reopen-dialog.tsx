@@ -21,8 +21,8 @@ import {
 } from "@/src/queries/sales-inquiries";
 
 /**
- * **Reopen** a Converted or Lost inquiry (CM-1007): it goes back to Open
- * at the stage it had. A Converted one reopens only once its booking is
+ * **Reopen** a Converted or Lost inquiry: it goes back to Open at the
+ * stage it had. A Converted one reopens only once its booking is
  * cancelled or deleted; the refusal links the booking.
  */
 export function InquiryReopenDialog({

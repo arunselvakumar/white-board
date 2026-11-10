@@ -9,7 +9,7 @@ import { inquiriesPath, inquiryQuery } from "@/src/queries/sales-inquiries";
 import { InquiryForm } from "./inquiry-form";
 import { InquiryFormSkeleton } from "./inquiries-skeletons";
 
-/** Add an inquiry with the full form (CM-1003). */
+/** Add an inquiry with the full form. */
 export function InquiryNew({ projectId }: { projectId: string }) {
   return (
     <div className="flex w-full flex-col gap-4 p-6">
@@ -26,7 +26,6 @@ export function InquiryNew({ projectId }: { projectId: string }) {
   );
 }
 
-/** Edit an inquiry (CM-1003). */
 export function InquiryEdit({
   projectId,
   inquiryId,

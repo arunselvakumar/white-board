@@ -42,7 +42,7 @@ import {
   type WageValues,
 } from "./wage-schema";
 
-/** The words on screen for each noun; Labour's are unchanged. */
+/** The words on screen for each noun. */
 const WORDS = {
   Wage: {
     type: "Wage type",
@@ -76,7 +76,7 @@ export function WageFields<Values extends FieldValues>({
   form: UseFormReturn<Values>;
   /** The nested object holding `WageValues`, e.g. `"wage"` or `"salary"`. */
   name: string;
-  /** Prefix of the input ids, e.g. `"labour"` → `labour-wage-day`. */
+  /** Prefix of the input ids, e.g. `"labour"` gives `labour-wage-day`. */
   idPrefix: string;
   options: WageOptions;
   /** False without Financial: the amounts are neither shown nor sent. */

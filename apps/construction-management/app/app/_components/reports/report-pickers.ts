@@ -40,9 +40,9 @@ export function pickerOptionsOf(
 }
 
 /**
- * The choices for the cards' pickers (CM-903), read once for the page
- * and only when one of its cards has a picker. Until they arrive (or
- * when they cannot be read) a card shows its period alone.
+ * The choices for the cards' pickers, read once for the page and only
+ * when one of its cards has a picker. Until they arrive (or when they
+ * cannot be read) a card shows its period alone.
  */
 export function useReportPickerOptions(
   projectId: string | null,

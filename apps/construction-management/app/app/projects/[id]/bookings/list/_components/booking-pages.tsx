@@ -7,7 +7,7 @@ import { bookingQuery, bookingsPath } from "@/src/queries/sales-bookings";
 
 import { BookingForm } from "./booking-form";
 
-/** Hold or Book a unit (CM-1006). */
+/** Hold or Book a unit. */
 export function BookingNew({
   projectId,
   unitId,
@@ -30,7 +30,7 @@ export function BookingNew({
   );
 }
 
-/** Edit an On Hold or Booked booking (CM-1006). */
+/** Edit an On Hold or Booked booking. */
 export function BookingEdit({
   projectId,
   bookingId,

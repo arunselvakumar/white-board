@@ -124,13 +124,13 @@ function RecentCentralReports() {
 }
 
 /**
- * Workspace → Central Reports (CM-903, ADR CM-0021 §5): every central
- * report of the catalogue the member may request — Central Reports Read
- * and the report's own Report flag — grouped like the Project's Reports
- * page. Each card takes its period, its pickers and the Projects (all
- * the member may see, or a chosen few); stock reports take a Store. Then
- * the member's recent central reports (shown only with a card: the list
- * needs a report the member may request).
+ * Every central report of the catalogue the member may request — Central
+ * Reports Read and the report's own Report flag — grouped like the
+ * Project's Reports page (ADR CM-0021 §5). Each card takes its period, its
+ * pickers and the Projects (all the member may see, or a chosen few);
+ * stock reports take a Store. Then the member's recent central reports
+ * (shown only with a card: the list needs a report the member may
+ * request).
  */
 export function CentralReportsPage({
   today = deviceToday(),

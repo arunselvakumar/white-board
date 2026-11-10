@@ -160,7 +160,6 @@ export const WingPicker: Story = {
   },
 };
 
-/** A Project without Wings yet. */
 export const NoWings: Story = {
   beforeEach: unitsApi({ wings: "none" }),
   play: async ({ canvas }) => {

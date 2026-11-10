@@ -69,7 +69,7 @@ export const NEW_ATTENDANCE = job({
   params: { from: "2026-10-01", to: "2026-10-09" },
 });
 
-// Site work reports (CM-605, CM-608).
+// Site work reports.
 
 export const CONTRACTOR_ID = "0190a000-0000-7000-8000-0000000000c1";
 export const EQUIPMENT_ID = "0190a000-0000-7000-8000-0000000000e1";
@@ -134,8 +134,8 @@ export const CENTRAL_VENDOR = job({
   projectId: null,
 });
 
-// The report catalogue (CM-901): built from the server's own catalogue, so
-// stories show the same cards, wording and filters as the app.
+// The report catalogue, built from the server's own catalogue so stories
+// show the same cards, wording and filters as the app.
 
 export const CATALOGUE_API = "/api/construction/reporting/catalogue";
 export const PROJECT_CATALOGUE_PATH = `${CATALOGUE_API}?scope=project&projectId=${PROJECT_ID}`;
@@ -209,7 +209,7 @@ export function catalogueHandler(
   };
 }
 
-// Central Reports and the cards' pickers (CM-903).
+// Central Reports and the cards' pickers.
 
 export const FILTER_OPTIONS_API = "/api/construction/reporting/filter-options";
 export const PROJECT_FILTER_OPTIONS_PATH = `${FILTER_OPTIONS_API}?scope=project&projectId=${PROJECT_ID}`;
@@ -243,9 +243,9 @@ export const FILTER_OPTIONS = {
     { id: "0190a000-0000-7000-8000-0000000000f5", name: "Cement OPC 53" },
   ],
   creators: [{ id: "user-1", name: "Prabhu Saravanan" }],
-  // The Booking Report's Wings (CM-1008).
+  // The Booking Report's Wings.
   wings: [{ id: "0190a000-0000-7000-8000-0000000000f6", name: "Tower A" }],
-  // The Inquiry Report's choices (CM-1008).
+  // The Inquiry Report's choices.
   leadSources: [
     { id: "0190a000-0000-7000-8000-0000000000f7", name: "Walk-in" },
   ],

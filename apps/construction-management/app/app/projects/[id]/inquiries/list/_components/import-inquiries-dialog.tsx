@@ -35,7 +35,7 @@ function rowErrors(error: unknown): InquiryImportRowError[] | null {
 }
 
 /**
- * Import inquiries (CM-1007, ADR CM-0022 §9): download the sample (its
+ * Import inquiries (ADR CM-0022 §9): download the sample (its
  * Lists sheet has the Project's Lead Sources, Funnel Stages, Wings and Team
  * Members), fill one lead per row, upload it. Every row becomes an
  * inquiry, or none does and each problem is listed by row and column. A

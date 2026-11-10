@@ -9,7 +9,6 @@ import {
   ItemTitle,
 } from "@repo/ui/components/item";
 
-/** The Workspace page's Central Reports tile (CM-903). */
 export function CentralReportsWorkspaceTile() {
   return (
     <Item

@@ -31,8 +31,8 @@ export function cardFilter(
 }
 
 /**
- * The other pickers a card can offer (CM-903), besides its one filter
- * above: each "All …" until a choice is made.
+ * The other pickers a card can offer, besides its one filter above: each
+ * "All …" until a choice is made.
  */
 export const PICKER_KEYS = [
   "status",
@@ -44,7 +44,7 @@ export const PICKER_KEYS = [
   "material",
   "created_by",
   "store",
-  // The sales reports (CM-1008).
+  // The sales reports.
   "wing",
   "interest_type",
   "lead_source",
@@ -60,7 +60,7 @@ export type ReportPickerOptions = Partial<
   Record<PickerKey | "projects", { value: string; label: string }[]>
 >;
 
-/** The kinds whose cards offer the pickers (CM-903). */
+/** The kinds whose cards offer the pickers. */
 const PICKER_KINDS: readonly ReportDefinition["kind"][] = [
   "vendor_attendance",
   "purchase_requests",

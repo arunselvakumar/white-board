@@ -71,11 +71,11 @@ function UnitCell({
 }
 
 /**
- * The Units chart (CM-1005): the Wing chart of CM-402 (floors top to
- * bottom, units across; a scheme's plots wrap) with each unit coloured by
- * its sales status and named by it. A tall or wide Wing scrolls inside its
- * own frame, never the page; the floor names stay in view. Selecting a
- * unit opens its panel.
+ * The Units chart: the Wing chart (floors top to bottom, units across; a
+ * scheme's plots wrap) with each unit coloured by its sales status and
+ * named by it. A tall or wide Wing scrolls inside its own frame, never
+ * the page; the floor names stay in view. Selecting a unit opens its
+ * panel.
  */
 export function SalesUnitsChart({
   name,

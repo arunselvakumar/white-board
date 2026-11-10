@@ -175,7 +175,6 @@ export const RecentStates: Story = {
   },
 };
 
-/** No reports yet. */
 export const Empty: Story = {
   beforeEach: () => {
     api = mockApi(
@@ -464,9 +463,9 @@ export const SiteWorkWithoutFilters: Story = {
 };
 
 /**
- * Payments and accounts (CM-709): a card per finance report the viewer has
- * Report on (here Transactions and the party reports; no Petty Cash or
- * Other Expenses), with the Project's Contractors as a filter.
+ * Payments and accounts: a card per finance report the viewer has Report
+ * on (here Transactions and the party reports; no Petty Cash or Other
+ * Expenses), with the Project's Contractors as a filter.
  */
 export const FinanceReports: Story = {
   beforeEach: () => {
@@ -558,9 +557,9 @@ export const NoFinanceReports: Story = {
 };
 
 /**
- * Tasks, issues and inspections (CM-805): a card per tracking report the
- * viewer has Report on (here Task and Issue & Snag, not Inspection
- * Request), each generating for its period.
+ * Tasks, issues and inspections: a card per tracking report the viewer
+ * has Report on (here Task and Issue & Snag, not Inspection Request),
+ * each generating for its period.
  */
 export const TrackingReports: Story = {
   beforeEach: () => {
@@ -629,8 +628,8 @@ export const NoTrackingReports: Story = {
 };
 
 /**
- * The cards come from the server's catalogue (CM-901): a member with
- * Labour Report and no Financial gets only the reports they may request.
+ * The cards come from the server's catalogue: a member with Labour
+ * Report and no Financial gets only the reports they may request.
  */
 export const TrimmedByTheCatalogue: Story = {
   beforeEach: () => {
@@ -794,7 +793,7 @@ function filterOptions(call: ApiCall): Response | undefined {
   return undefined;
 }
 
-/** Vendor Attendance takes a Vendor and a Labour Category (CM-903). */
+/** Vendor Attendance takes a Vendor and a Labour Category. */
 export const VendorPickers: Story = {
   beforeEach: () => {
     api = mockApi(
@@ -866,7 +865,7 @@ export const VendorPickersWithoutChoices: Story = {
   },
 };
 
-/** The Materials group: the five procurement cards and their pickers (CM-903). */
+/** The Materials group: the five procurement cards and their pickers. */
 export const MaterialsReports: Story = {
   beforeEach: () => {
     api = mockApi(

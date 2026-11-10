@@ -91,7 +91,7 @@ const EMPTY: Values = {
 };
 
 /**
- * **Quick add** (CM-1003, ADR CM-0022 §3): the same save as the full form
+ * **Quick add** (ADR CM-0022 §3): the same save as the full form
  * with fewer fields — Name, Mobile, Interest Type, Interested In,
  * Remarks and a Visiting Card photo. Dated today, at the first stage, the
  * viewer as Assignee and Lead Owner. A duplicate opens the prompt with

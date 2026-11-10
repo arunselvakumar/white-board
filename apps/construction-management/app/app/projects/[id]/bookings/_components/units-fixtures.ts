@@ -2,7 +2,7 @@ import { mockApi, type ApiCall } from "@/.storybook/mocks/api";
 import type { SalesUnit, UnitChart } from "@/src/queries/sales-units";
 import type { UnitSalesStatus } from "@/src/sales/domain/sales-terms";
 
-/** Story fixtures for the Units tab (CM-1005). */
+/** Story fixtures for the Units tab. */
 
 export const UNITS_API = "/api/construction/sales/units";
 export const SALES_PROJECT_ID = "0199c4a0-0000-7000-8000-00000000a001";

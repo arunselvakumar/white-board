@@ -6,7 +6,7 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Reports" };
 
-/** The Project's labour and vendor reports (CM-217, CM-218). */
+/** The Project's labour and vendor reports. */
 export default async function ProjectReportsPage({
   params,
 }: {

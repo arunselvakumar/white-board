@@ -137,7 +137,7 @@ function defaults(
 }
 
 /**
- * Add or edit an inquiry with the full form (CM-1003, ADR CM-0022 §3):
+ * Add or edit an inquiry with the full form (ADR CM-0022 §3):
  * Inquiry Date (not in the future; back-dated window), Name, Mobile,
  * Email, Address, Occupation, Interest Type, Interested In (a Wing and a
  * unit type), Lead Source, Funnel Stage (the first unless picked), Next

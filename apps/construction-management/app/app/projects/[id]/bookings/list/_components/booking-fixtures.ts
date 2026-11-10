@@ -14,7 +14,7 @@ import type {
 import type { SalesDocumentFile } from "@/src/queries/sales-documents";
 import type { Flag } from "@/src/shared-kernel/access";
 
-/** Story fixtures for Bookings (CM-1006). */
+/** Story fixtures for Bookings. */
 
 export const BOOKINGS_API = "/api/construction/sales/bookings";
 export const PROJECT_ID = "0199c4a0-0000-7000-8000-00000000a001";

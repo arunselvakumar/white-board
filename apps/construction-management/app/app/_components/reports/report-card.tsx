@@ -64,7 +64,7 @@ const FILTER_ALL_LABELS: Record<CardFilter, string> = {
   account: "All accounts you can see",
 };
 
-/** The Ledger's optional filters (legacy: module, mode, Paid To kind). */
+/** The Ledger's optional filters: module, mode, Paid To kind. */
 type LedgerExtras = { module: string; mode: string; counterpartyKind: string };
 
 const LEDGER_EXTRAS: {
@@ -191,7 +191,7 @@ function requestFor(
         projectId,
         params: { from: period.from, to: period.to },
       };
-    // Vendor Attendance takes a Vendor and a Labour Category (CM-903).
+    // Vendor Attendance takes a Vendor and a Labour Category.
     case "vendor_attendance":
       return {
         kind: definition.kind,
@@ -205,7 +205,7 @@ function requestFor(
           ...projects,
         },
       };
-    // Site work reports (CM-605, CM-608).
+    // Site work reports.
     case "daily_work":
       return {
         kind: definition.kind,
@@ -222,7 +222,7 @@ function requestFor(
     case "equipment_maintenance":
     case "equipment_transfers":
       return { kind: definition.kind, projectId: scope, params: range };
-    // Finance reports (CM-709).
+    // Finance reports.
     case "account_ledger":
       return {
         kind: definition.kind,
@@ -260,12 +260,12 @@ function requestFor(
         projectId: scope,
         params: { asOn: period.asOn },
       };
-    // Tracking reports (CM-805).
+    // Tracking reports.
     case "task_report":
     case "issue_snag_report":
     case "inspection_request_report":
       return { kind: definition.kind, projectId, params: range };
-    // Procurement and central labour reports (CM-903).
+    // Procurement and central labour reports.
     case "purchase_requests":
       return {
         kind: definition.kind,
@@ -342,7 +342,7 @@ function requestFor(
         projectId: null,
         params: { ...range, ...projectsParam(projectIds) },
       };
-    // Sales reports (CM-1008).
+    // Sales reports.
     case "inquiry_report":
       return {
         kind: definition.kind,
@@ -397,7 +397,7 @@ export function ReportCard({
   pickerOptions = {},
 }: {
   definition: ReportDefinition;
-  /** Null for a central report (Central Reports, Masters → Equipments, Central Payment). */
+  /** Null for a central report (Central Reports, Equipments, Central Payment). */
   projectId: string | null;
   today: string;
   /** Choices for the card's filter; the picker shows only with some. */
@@ -405,9 +405,9 @@ export function ReportCard({
   /** The filter's starting choice (Central Payment's account Ledger link). */
   initialFilter?: string;
   /**
-   * Choices for the card's other pickers (CM-903): Vendor, Labour
-   * Category, Supplier, Material Category, Material, Created By, Store and
-   * the central Projects. A picker shows only with some.
+   * Choices for the card's other pickers: Vendor, Labour Category,
+   * Supplier, Material Category, Material, Created By, Store and the
+   * central Projects. A picker shows only with some.
    */
   pickerOptions?: ReportPickerOptions;
 }) {
@@ -444,7 +444,7 @@ export function ReportCard({
   const chosen =
     required && filter === ALL ? (filterOptions[0]?.value ?? ALL) : filter;
   const missingRequired = required && chosen === ALL;
-  // The other pickers (CM-903): the single filter above keeps its own.
+  // The other pickers; the single filter above keeps its own.
   const pickers = cardPickers(definition)
     .filter((key) => filterItems == null || key !== picker?.key)
     .flatMap((key) => {

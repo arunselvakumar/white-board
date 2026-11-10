@@ -13,7 +13,7 @@ import type {
 } from "@/src/queries/sales-inquiries";
 import type { Flag } from "@/src/shared-kernel/access";
 
-/** Story fixtures for Inquiries (CM-1003, CM-1004). */
+/** Story fixtures for Inquiries. */
 
 export const INQUIRIES_API = "/api/construction/sales/inquiries";
 export const INQUIRY_PROJECT_ID = "0199c4a0-0000-7000-8000-000000510000";
@@ -251,9 +251,9 @@ export const INQUIRY_TASKS: InquiryTask[] = [
 ];
 
 /**
- * Follow-ups and tasks for every inquiry of a story (CM-1004): adding a
- * follow-up puts it on top of the timeline; tasks are added, ticked,
- * edited and deleted in memory.
+ * Follow-ups and tasks for every inquiry of a story: adding a follow-up
+ * puts it on top of the timeline; tasks are added, ticked, edited and
+ * deleted in memory.
  */
 function activityHandler(options: {
   followUps?: FollowUp[];
@@ -385,7 +385,7 @@ export type InquiryApiOptions = {
   followUps?: FollowUp[];
   tasks?: InquiryTask[];
   canManageTasks?: boolean;
-  /** Refuse convert / lose / reopen with this error (CM-1007). */
+  /** Refuse convert / lose / reopen with this error. */
   closeError?: { status: number; code: string; message: string };
   /** The import's answer: a count, or row errors. */
   importErrors?: { row: number; field: string; message: string }[];
@@ -425,7 +425,7 @@ const toItem = (detail: InquiryDetail): Inquiry => {
   return item;
 };
 
-/** "98450 12345" → "+919845012345", as the server stores it. */
+/** "98450 12345" becomes "+919845012345", as the server stores it. */
 function normalised(raw: unknown): string | null {
   if (typeof raw !== "string" || raw.trim() === "") return null;
   const digits = raw.replace(/\D/g, "");

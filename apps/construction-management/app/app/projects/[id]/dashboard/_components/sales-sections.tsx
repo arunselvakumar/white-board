@@ -220,7 +220,6 @@ function rateText(rate: number | null): string {
   return rate == null ? "—" : `${rate.toFixed(1)}%`;
 }
 
-/** The Inquiry section's body once loaded. */
 export function InquirySectionBody({
   inquiry,
   period,
