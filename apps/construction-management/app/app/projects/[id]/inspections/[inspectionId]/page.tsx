@@ -8,7 +8,6 @@ import { InspectionDetailSkeleton } from "@/components/tracking/tracking-skeleto
 
 export const metadata: Metadata = { title: "Inspection Request" };
 
-/** One Inspection Request (CM-804). */
 export default async function InspectionRoute({
   params,
 }: {

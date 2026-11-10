@@ -8,7 +8,6 @@ import { InquiryEditSkeleton } from "@/components/sales/inquiries/inquiries-skel
 
 export const metadata: Metadata = { title: "Edit Inquiry" };
 
-/** Edit an inquiry (CM-1003). */
 export default async function InquiryEditPage({
   params,
 }: {

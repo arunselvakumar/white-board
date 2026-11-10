@@ -8,7 +8,7 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Stock Register" };
 
-/** The Project's Stock Register for a date range (CM-506). */
+/** The Project's Stock Register for a date range. */
 export default async function ProjectStockRegisterRoute({
   params,
 }: {

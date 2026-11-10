@@ -14,7 +14,7 @@ import { CompanyDashboard } from "@/app/app/dashboard/_components/company-dashbo
 export const metadata: Metadata = { title: "Dashboard" };
 
 /**
- * The Company Dashboard (CM-902), behind the Dashboard menu's Read flag;
+ * The Company Dashboard, behind the Dashboard menu's Read flag;
  * the route answers 403 without it, and the main menu hides the link.
  */
 export default async function CompanyDashboardPage() {

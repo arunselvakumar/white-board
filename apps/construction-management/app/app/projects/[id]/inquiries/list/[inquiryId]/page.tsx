@@ -9,7 +9,6 @@ import { InquiryDetailSkeleton } from "@/components/sales/inquiries/inquiries-sk
 
 export const metadata: Metadata = { title: "Inquiry" };
 
-/** One inquiry (CM-1003, CM-1004). */
 export default async function InquiryPage({
   params,
   searchParams,

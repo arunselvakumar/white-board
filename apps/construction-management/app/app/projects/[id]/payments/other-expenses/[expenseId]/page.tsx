@@ -6,7 +6,6 @@ import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no
 
 export const metadata: Metadata = { title: "Other Expense" };
 
-/** One Other Expense (CM-704). */
 export default async function OtherExpensePage({
   params,
 }: {

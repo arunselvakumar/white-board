@@ -6,7 +6,7 @@ import { InquiryNew } from "@/components/sales/inquiries/inquiry-pages";
 
 export const metadata: Metadata = { title: "Add Inquiry" };
 
-/** Add an inquiry with the full form (CM-1003). */
+/** Add an inquiry with the full form. */
 export default async function InquiryNewPage({
   params,
 }: {

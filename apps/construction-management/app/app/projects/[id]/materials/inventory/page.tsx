@@ -8,7 +8,6 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Current Inventory" };
 
-/** The Project's Current Inventory (CM-506). */
 export default async function ProjectInventoryRoute({
   params,
 }: {

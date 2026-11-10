@@ -11,7 +11,7 @@ import {
 
 export const metadata: Metadata = { title: "Add usage sheet" };
 
-/** Add an Equipment Usage sheet; `?from=<id>` duplicates one (CM-0016 §12). */
+/** Add an Equipment Usage sheet; `?from=<id>` duplicates one (ADR CM-0016 §12). */
 export default async function NewEquipmentSheetRoute({
   params,
   searchParams,

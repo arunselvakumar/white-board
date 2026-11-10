@@ -8,7 +8,6 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Hindrance" };
 
-/** One hindrance (CM-607). */
 export default async function HindranceRoute({
   params,
 }: {

@@ -122,7 +122,7 @@ const IDENTIFIERS: readonly {
 ];
 
 /**
- * My Profile (CM-115): the signed-in User's own Team Member record in the
+ * My Profile: the signed-in User's own Team Member record in the
  * Active Company. While SMS is off (ADR CM-0009) the mobile is a contact
  * they may change; while it is on it is how they sign in, so it is shown,
  * not edited.

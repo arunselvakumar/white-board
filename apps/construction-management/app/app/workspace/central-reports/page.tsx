@@ -7,9 +7,8 @@ import { CentralReportsPage } from "@/components/reports/central-reports-page";
 export const metadata: Metadata = { title: "Central Reports" };
 
 /**
- * Workspace → Central Reports (CM-903, ADR CM-0021 §5): the central
- * reports the member may request, across their Projects and the Central
- * Stores (Central Reports Read).
+ * The central reports the member may request, across their Projects and the
+ * Central Stores (ADR CM-0021 §5). Needs Central Reports Read.
  */
 export default async function CentralReportsRoute() {
   if (!(await viewerCan("reporting.central_reports", "read")))

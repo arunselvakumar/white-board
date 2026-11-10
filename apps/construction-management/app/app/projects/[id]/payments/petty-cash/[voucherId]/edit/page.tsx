@@ -6,7 +6,6 @@ import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no
 
 export const metadata: Metadata = { title: "Edit voucher" };
 
-/** Edit a petty-cash voucher (CM-703). */
 export default async function VoucherEditRoute({
   params,
 }: {

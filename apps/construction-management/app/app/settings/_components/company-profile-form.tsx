@@ -149,7 +149,7 @@ function initials(name: string): string {
 }
 
 /**
- * The Company profile (CM-115): logo, name, contact, GSTIN and PAN, address,
+ * The Company profile: logo, name, contact, GSTIN and PAN, address,
  * currency and time zone. Read-only without Settings update.
  */
 export function CompanyProfileForm({

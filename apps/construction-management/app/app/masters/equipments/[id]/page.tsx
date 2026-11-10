@@ -8,7 +8,7 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Equipment" };
 
-/** One machine: details, Transfer Report and maintenance log (CM-603, CM-605). */
+/** One machine: details, Transfer Report and maintenance log. */
 export default async function EquipmentRoute({
   params,
 }: {

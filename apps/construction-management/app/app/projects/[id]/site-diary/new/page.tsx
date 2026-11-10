@@ -7,7 +7,7 @@ import { isCalendarDate } from "@/src/shared-kernel/calendar-date";
 
 export const metadata: Metadata = { title: "Write the diary" };
 
-/** A new Site Diary; `?date=` sets its date (CM-607). */
+/** A new Site Diary; `?date=` sets its date. */
 export default async function SiteDiaryNewRoute({
   params,
   searchParams,

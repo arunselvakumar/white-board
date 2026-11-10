@@ -8,7 +8,6 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Central Store" };
 
-/** Workspace → Central Store: the Company's stores (CM-508). */
 export default async function CentralStoreRoute() {
   if (!(await viewerCan("procurement.central_store", "read")))
     return <ProjectNoAccess what="Central Store" />;

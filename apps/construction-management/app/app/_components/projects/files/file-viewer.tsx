@@ -14,7 +14,7 @@ import {
 
 import { DocumentFileIcon } from "@/app/app/_components/projects/documents/document-file-icon";
 
-/** A stored file as a file route serves it (CM-407). */
+/** A stored file as a file route serves it. */
 export type ViewableFile = {
   name: string;
   /** Our route that streams it; `?download=1` saves it. */
@@ -35,10 +35,9 @@ export function downloadUrl(file: { url: string }): string {
 }
 
 /**
- * Shows a stored file (CM-408, CM-410): an image in a lightbox, a PDF in
- * the browser's own viewer (the file route allows framing by our pages
- * only), anything else — DWG, DXF — as a card to download, since browsers
- * cannot draw CAD files.
+ * Shows a stored file: an image in a lightbox, a PDF in the browser's own
+ * viewer (the file route allows framing by our pages only), anything else —
+ * DWG, DXF — as a card to download, since browsers cannot draw CAD files.
  */
 export function FileViewer({
   file,

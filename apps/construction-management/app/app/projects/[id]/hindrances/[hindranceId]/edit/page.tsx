@@ -8,7 +8,6 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Edit hindrance" };
 
-/** Edit a hindrance (CM-607). */
 export default async function HindranceEditRoute({
   params,
 }: {

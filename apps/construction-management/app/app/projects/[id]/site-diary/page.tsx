@@ -8,7 +8,7 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Site Diary" };
 
-/** The Project's Site Diary, one per date; `?date=` opens a day (CM-607). */
+/** The Project's Site Diary, one per date; `?date=` opens a day. */
 export default async function SiteDiaryRoute({
   params,
   searchParams,

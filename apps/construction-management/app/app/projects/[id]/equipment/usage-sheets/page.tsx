@@ -6,7 +6,6 @@ import { EquipmentSheetsPage } from "@/components/site-work/equipment-sheets/equ
 
 export const metadata: Metadata = { title: "Equipment Usage sheets" };
 
-/** The Project's Equipment Usage sheets (CM-604). */
 export default async function EquipmentUsageSheetsRoute({
   params,
 }: {

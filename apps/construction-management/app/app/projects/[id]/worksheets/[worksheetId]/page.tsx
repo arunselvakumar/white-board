@@ -8,7 +8,6 @@ import { WorksheetDetailSkeleton } from "@/components/site-work/site-work-skelet
 
 export const metadata: Metadata = { title: "Daily Worksheet" };
 
-/** One Daily Worksheet (CM-602). */
 export default async function WorksheetRoute({
   params,
   searchParams,

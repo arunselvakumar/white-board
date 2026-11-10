@@ -18,7 +18,7 @@ export default function MyProfilePage() {
       <QuerySuspense fallback={<MyProfileSkeleton />}>
         <MyProfileScreen />
       </QuerySuspense>
-      {/* Account sections (M9), each loading on its own. */}
+      {/* Account sections, each loading on its own. */}
       <div className="w-full px-6 pb-6">
         <div className="w-full max-w-4xl space-y-10">
           <QuerySuspense fallback={<DevicesSectionSkeleton />}>

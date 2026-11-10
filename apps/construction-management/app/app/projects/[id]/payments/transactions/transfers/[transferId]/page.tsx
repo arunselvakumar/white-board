@@ -6,7 +6,7 @@ import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no
 
 export const metadata: Metadata = { title: "Transfer" };
 
-/** One transfer between accounts (CM-702). */
+/** One transfer between accounts. */
 export default async function ProjectTransferPage({
   params,
 }: {

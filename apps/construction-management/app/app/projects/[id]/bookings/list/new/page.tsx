@@ -6,7 +6,7 @@ import { BookingNew } from "@/components/sales/bookings/booking-pages";
 
 export const metadata: Metadata = { title: "New booking" };
 
-/** Hold or Book a unit (CM-1006); `?unitId=&status=` come from the unit panel. */
+/** Hold or Book a unit; `?unitId=&status=` come from the unit panel. */
 export default async function BookingNewPage({
   params,
   searchParams,

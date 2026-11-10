@@ -16,7 +16,7 @@ import { companyProfileQuery } from "@/src/queries/company-profile";
 
 import { CompanyProfileForm } from "./company-profile-form";
 
-/** Settings: the Company profile (CM-115), then the Advanced Settings. */
+/** Settings: the Company profile, then the Advanced Settings. */
 export function CompanyProfileScreen() {
   const { data: profile } = useSuspenseQuery(companyProfileQuery);
 

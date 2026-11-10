@@ -6,7 +6,7 @@ import { SalesSettingsPage } from "@/components/sales/settings/sales-settings";
 
 export const metadata: Metadata = { title: "Inquiry settings" };
 
-/** Inquiries → Settings: Funnel Stages, Lead Sources, Lost Reasons (CM-1002). */
+/** Funnel Stages, Lead Sources and Lost Reasons. */
 export default async function InquirySettingsPage({
   params,
 }: {

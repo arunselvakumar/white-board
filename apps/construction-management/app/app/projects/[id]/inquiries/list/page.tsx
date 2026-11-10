@@ -8,7 +8,6 @@ import { InquiriesListSkeleton } from "@/components/sales/inquiries/inquiries-sk
 
 export const metadata: Metadata = { title: "Inquiries" };
 
-/** The Project's inquiries (CM-1003). */
 export default async function InquiriesListPage({
   params,
 }: {

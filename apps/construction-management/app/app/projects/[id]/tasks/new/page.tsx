@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Add Task" };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-/** Add a task; `?parentId=<task>` adds a Sub-Task under it (CM-802). */
+/** Add a task; `?parentId=<task>` adds a Sub-Task under it. */
 export default async function TaskNewRoute({
   params,
   searchParams,

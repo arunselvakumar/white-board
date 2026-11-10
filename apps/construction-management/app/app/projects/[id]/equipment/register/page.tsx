@@ -6,7 +6,7 @@ import { ProjectEquipmentList } from "@/components/site-work/equipment/equipment
 
 export const metadata: Metadata = { title: "Equipment" };
 
-/** The equipment at this Project now (CM-603). */
+/** The equipment at this Project now. */
 export default async function ProjectEquipmentRoute({
   params,
 }: {

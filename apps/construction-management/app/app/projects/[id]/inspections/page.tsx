@@ -6,7 +6,6 @@ import { InspectionsList } from "@/components/tracking/inspections/inspections-l
 
 export const metadata: Metadata = { title: "Inspections" };
 
-/** The Project's Inspection Requests (CM-804). */
 export default async function InspectionsRoute({
   params,
 }: {

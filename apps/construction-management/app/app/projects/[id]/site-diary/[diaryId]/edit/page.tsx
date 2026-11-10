@@ -8,7 +8,6 @@ import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Edit Site Diary" };
 
-/** Edit a Site Diary (CM-607). */
 export default async function SiteDiaryEditRoute({
   params,
 }: {

@@ -8,7 +8,7 @@ import { UnitsTabSkeleton } from "@/components/sales/units/units-skeletons";
 
 export const metadata: Metadata = { title: "Units" };
 
-/** Bookings → Units: the Project's units by sales status (CM-1005). */
+/** The Project's units by sales status. */
 export default async function UnitsPage({
   params,
 }: {

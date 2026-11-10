@@ -115,7 +115,7 @@ export function downloadsPage(
 
 const BACKUPS = "/api/construction/reporting/backups";
 
-/** A backup row (CM-906) as the route sends it; ready by default. */
+/** A backup row as the route sends it; ready by default. */
 export function backupDownloadRow(
   overrides: Partial<Extract<DownloadItem, { source: "backup" }>> & {
     id: string;

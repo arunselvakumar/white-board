@@ -7,10 +7,10 @@ import { DocumentFileIcon } from "@/app/app/_components/projects/documents/docum
 import { isImageFile } from "./file-viewer";
 
 /**
- * A square preview of a stored file (CM-407, CM-410): the browser-made
- * WebP thumbnail when there is one, else the image itself, else an icon
- * for the file's type (PDF, DWG …). An image that fails to load falls back
- * to the icon, so a tile is never broken.
+ * A square preview of a stored file: the browser-made WebP thumbnail when
+ * there is one, else the image itself, else an icon for the file's type
+ * (PDF, DWG …). An image that fails to load falls back to the icon, so a
+ * tile is never broken.
  */
 export function FileThumbnail({
   file,

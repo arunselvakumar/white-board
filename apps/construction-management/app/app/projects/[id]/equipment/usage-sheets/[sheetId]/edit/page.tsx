@@ -9,7 +9,6 @@ import { EditDocumentSkeleton } from "@/components/procurement/procurement-skele
 
 export const metadata: Metadata = { title: "Edit usage sheet" };
 
-/** Edit an Equipment Usage sheet (CM-604). */
 export default async function EditEquipmentSheetRoute({
   params,
 }: {
