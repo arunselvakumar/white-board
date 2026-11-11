@@ -136,6 +136,10 @@ import {
   locationOptionsOpenApiOperations,
 } from "@/app/api/construction/projects/projects/[id]/location-options/location-options-openapi";
 import {
+  projectActivityOpenApiComponents,
+  projectActivityOpenApiOperations,
+} from "@/app/api/construction/projects/projects/[id]/activity/activity-openapi";
+import {
   projectResourcesOpenApiComponents,
   projectResourcesOpenApiOperations,
 } from "@/app/api/construction/projects/projects/[id]/resources/resources-openapi";
@@ -829,6 +833,10 @@ openApiOperations.push(...locationOpenApiOperations);
 // assigned Amenities and Common Developments meet.
 Object.assign(openApiComponents, locationOptionsOpenApiComponents);
 openApiOperations.push(...locationOptionsOpenApiOperations);
+
+// The Project Activity feed (ADR CM-0038).
+Object.assign(openApiComponents, projectActivityOpenApiComponents);
+openApiOperations.push(...projectActivityOpenApiOperations);
 
 // Project Resources: where four contexts' parties meet a Project.
 Object.assign(openApiComponents, projectResourcesOpenApiComponents);
