@@ -1,6 +1,7 @@
 "use client";
 
 import { MoreHorizontal, Search, type LucideIcon } from "lucide-react";
+import Link from "next/link";
 import type { ReactNode } from "react";
 import {
   AlertDialog,
@@ -97,6 +98,7 @@ export function MasterEmpty({
 /** One row: name, details, badges, and the row menu. Disabled rows are muted. */
 export function MasterRow({
   name,
+  href,
   details,
   isSeed = false,
   disabled,
@@ -108,6 +110,8 @@ export function MasterRow({
   onDelete,
 }: {
   name: string;
+  /** The row's own page, linked from its name. */
+  href?: string;
   details?: ReactNode;
   isSeed?: boolean;
   disabled: boolean;
@@ -134,7 +138,13 @@ export function MasterRow({
             disabled ? "text-muted-foreground" : "text-foreground",
           )}
         >
-          {name}
+          {href == null ? (
+            name
+          ) : (
+            <Link href={href} className="hover:underline">
+              {name}
+            </Link>
+          )}
         </p>
         {details}
         {isSeed || disabled ? (

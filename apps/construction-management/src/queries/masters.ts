@@ -7,11 +7,8 @@ import {
 import type { ConstructionMastersDepartmentResponseModel } from "@/app/api/construction/masters/departments/department-models";
 import type {
   ConstructionMastersSupervisorResponseModel,
-  CreateConstructionMastersSupervisorRequestModel,
   ListConstructionMastersSupervisorsResponseModel,
-  UpdateConstructionMastersSupervisorRequestModel,
 } from "@/app/api/construction/masters/supervisors/supervisor-models";
-import type { ListConstructionOrganizationTeamMembersResponseModel } from "@/app/api/construction/organization/team-members/list-team-members-response-model";
 
 import type { LabourSkill } from "@/src/masters/domain/master-kind";
 
@@ -104,57 +101,4 @@ export const supervisorsQuery = queryOptions({
     apiJson<ListConstructionMastersSupervisorsResponseModel>(
       `${BASE}/${SUPERVISORS}`,
     ),
-});
-
-export type SupervisorCommand =
-  | { kind: "create"; input: CreateConstructionMastersSupervisorRequestModel }
-  | {
-      kind: "update";
-      id: string;
-      input: UpdateConstructionMastersSupervisorRequestModel;
-    }
-  | { kind: "disable" | "enable" | "delete"; id: string };
-
-export function runSupervisorCommand(
-  command: SupervisorCommand,
-): Promise<SupervisorItem | undefined> {
-  switch (command.kind) {
-    case "create":
-      return postJson(`${BASE}/${SUPERVISORS}`, command.input);
-    case "update":
-      return postJson(
-        itemUrl(SUPERVISORS, command.id, "update"),
-        command.input,
-      );
-    default:
-      return postJson(itemUrl(SUPERVISORS, command.id, command.kind));
-  }
-}
-
-export function useSupervisorCommand() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: runSupervisorCommand,
-    onSettled: () =>
-      queryClient.invalidateQueries({
-        queryKey: [...MASTERS_KEY, SUPERVISORS],
-      }),
-  });
-}
-
-export type TeamMemberOption = { value: string; label: string };
-
-/**
- * Active Team Members for the Supervisor's Team Member picker (needs
- * `organization.team_members` read; without it the picker is hidden).
- */
-export const teamMemberOptionsQuery = queryOptions({
-  queryKey: ["organization", "team-members", "options", "active"],
-  queryFn: async (): Promise<TeamMemberOption[]> => {
-    const body =
-      await apiJson<ListConstructionOrganizationTeamMembersResponseModel>(
-        "/api/construction/organization/team-members?status=active&limit=100",
-      );
-    return body.items.map((item) => ({ value: item.id, label: item.name }));
-  },
 });
