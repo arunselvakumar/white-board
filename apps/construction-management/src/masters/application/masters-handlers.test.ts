@@ -156,6 +156,8 @@ function supervisorStore(): SupervisorStore & { memory: Memory<Supervisor> } {
       name: row.name,
       mobile: row.mobile,
       teamMemberId: row.teamMemberId,
+      profile: row.profile,
+      bank: row.bank,
       disabledAt: row.disabledAt,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,

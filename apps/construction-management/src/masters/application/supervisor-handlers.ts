@@ -1,11 +1,18 @@
-import { DomainError } from "@/src/shared-kernel/domain-error";
+import { DomainError, conflict } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
 
 import {
   masterChanged,
   masterInUse,
+  masterNameInUse,
   masterNotFound,
 } from "../domain/master-kind";
+import {
+  accountLast4,
+  type SiteEngineerBankInput,
+  type SiteEngineerProfile,
+  type SiteEngineerProfileInput,
+} from "../domain/site-engineer-profile";
 import { Supervisor } from "../domain/supervisor";
 import type {
   MasterUsage,
@@ -21,6 +28,15 @@ export type SupervisorReadModel = {
   teamMemberId: string | null;
   /** The Team Member's name now; null without one or once they left. */
   teamMemberName: string | null;
+  /** ADR CM-0037; every field null on rows from before it. */
+  profile: SiteEngineerProfile;
+  /** The account number only as its last four digits. */
+  bank: {
+    accountHolder: string | null;
+    accountLast4: string | null;
+    ifsc: string | null;
+    bankName: string | null;
+  };
   disabled: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -30,6 +46,10 @@ export type SupervisorInput = {
   name: string;
   mobile?: string | null;
   teamMemberId?: string | null;
+  /** Left out on update keeps the stored profile. */
+  profile?: SiteEngineerProfileInput;
+  /** Left out on update keeps the stored bank details. */
+  bank?: SiteEngineerBankInput;
 };
 
 function toReadModel(
@@ -45,6 +65,13 @@ function toReadModel(
       supervisor.teamMemberId == null
         ? null
         : (names.get(supervisor.teamMemberId) ?? null),
+    profile: supervisor.profile,
+    bank: {
+      accountHolder: supervisor.bank.accountHolder,
+      accountLast4: accountLast4(supervisor.bank.accountNumber),
+      ifsc: supervisor.bank.ifsc,
+      bankName: supervisor.bank.bankName,
+    },
     disabled: supervisor.disabled,
     createdAt: supervisor.createdAt,
     updatedAt: supervisor.updatedAt,
@@ -101,6 +128,54 @@ export class SupervisorHandlers {
       );
   }
 
+  /**
+   * Refuses, before anything is written, what `create` would: invalid
+   * details, or a name or Employee Code another live Site Engineer has.
+   * Add Site Engineer calls it before making the sign-in (ADR CM-0037).
+   */
+  async assertCanCreate(
+    input: SupervisorInput & { workspaceId: string; by: string },
+  ): Promise<void> {
+    const now = this.clock();
+    const draft = Supervisor.create({ ...input, id: "draft", now });
+    await this.assertFree(draft);
+  }
+
+  /** As `assertCanCreate`, for `update`; also 409 when stale. */
+  async assertCanUpdate(
+    input: SupervisorInput & {
+      workspaceId: string;
+      id: string;
+      expectedUpdatedAt: Date;
+      by: string;
+    },
+  ): Promise<void> {
+    const draft = await this.load(input.workspaceId, input.id);
+    if (draft.updatedAt.getTime() !== input.expectedUpdatedAt.getTime())
+      throw masterChanged("supervisor");
+    draft.update(input, input.by, this.clock());
+    await this.assertFree(draft);
+  }
+
+  /** 409 when another live Site Engineer has the name or Employee Code. */
+  private async assertFree(supervisor: Supervisor): Promise<void> {
+    const others = (await this.store.list(supervisor.workspaceId)).filter(
+      (item) => item.id !== supervisor.id,
+    );
+    const name = supervisor.name.toLowerCase();
+    if (others.some((item) => item.name.toLowerCase() === name))
+      throw masterNameInUse("supervisor");
+    const code = supervisor.profile.employeeCode?.toLowerCase();
+    if (
+      code != null &&
+      others.some((item) => item.profile.employeeCode?.toLowerCase() === code)
+    )
+      throw conflict(
+        "SUPERVISOR_EMPLOYEE_CODE_IN_USE",
+        "Another Site Engineer has this Employee Code.",
+      );
+  }
+
   async list(
     workspaceId: string,
     status: LookupStatusFilter = "all",
@@ -135,7 +210,10 @@ export class SupervisorHandlers {
     return this.readModel(supervisor);
   }
 
-  /** Replaces name, mobile and Team Member; 409 `SUPERVISOR_CHANGED` when stale. */
+  /**
+   * Replaces name, mobile and Team Member, and the profile and bank details
+   * when given; 409 `SUPERVISOR_CHANGED` when stale.
+   */
   async update(
     input: SupervisorInput & {
       workspaceId: string;

@@ -36,6 +36,8 @@ export type TeamMemberReadModel = {
   /** 0 = Sunday … 6 = Saturday. */
   weeklyHolidays: number[];
   memberType: MemberType;
+  /** A Site Engineer's sign-in (ADR CM-0037), managed from their page. */
+  siteEngineer: boolean;
   isOwner: boolean;
   status: TeamMemberStatus;
   projectIds: string[];
@@ -91,6 +93,7 @@ export function toTeamMemberReadModel(
     workingHoursPerDay: member.salary.workingHoursPerDay,
     weeklyHolidays: [...member.salary.weeklyHolidays],
     memberType: member.memberType,
+    siteEngineer: member.siteEngineer,
     isOwner: member.isOwner,
     status: member.status,
     projectIds: [...member.projectIds],

@@ -118,6 +118,11 @@ export type TeamMemberProps = {
   /** The salary set-up; the amounts may be null (ADR CM-0033 §3). */
   salary: StaffSalary;
   memberType: MemberType;
+  /**
+   * The sign-in of a Site Engineer (ADR CM-0037): made and managed from
+   * their Site Engineer page, left off Office Staff.
+   */
+  siteEngineer: boolean;
   isOwner: boolean;
   status: TeamMemberStatus;
   projectIds: readonly string[];
@@ -153,6 +158,8 @@ export class TeamMember {
     /** Validated with `staffSalary`; none when left out. */
     salary?: StaffSalary;
     memberType: MemberType;
+    /** A Site Engineer's sign-in (ADR CM-0037); false when left out. */
+    siteEngineer?: boolean;
     projectIds?: readonly string[];
     roleId: string | null;
     by: string;
@@ -165,6 +172,7 @@ export class TeamMember {
       details: input.details,
       salary: input.salary ?? NO_SALARY,
       memberType: input.memberType,
+      siteEngineer: input.siteEngineer ?? false,
       isOwner: false,
       status: "joining_pending",
       projectIds: [],
@@ -197,6 +205,7 @@ export class TeamMember {
       details: input.details,
       salary: NO_SALARY,
       memberType: "normal",
+      siteEngineer: false,
       isOwner: true,
       status: "active",
       projectIds: [],
@@ -233,6 +242,9 @@ export class TeamMember {
   }
   get memberType(): MemberType {
     return this.props.memberType;
+  }
+  get siteEngineer(): boolean {
+    return this.props.siteEngineer;
   }
   get isOwner(): boolean {
     return this.props.isOwner;

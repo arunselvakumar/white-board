@@ -25,6 +25,7 @@ import { PrismaLookupStore } from "./prisma-lookup-store";
 import { prismaMasterUsage } from "./prisma-master-usage";
 import { PrismaProjectDirectory } from "./prisma-project-directory";
 import { PrismaSupervisorStore } from "./prisma-supervisor-store";
+import { privateDataCipher } from "./private-data-cipher";
 import { PrismaTeamMemberDirectory } from "./prisma-team-member-directory";
 import { PrismaTrackingMasterStore } from "./prisma-tracking-master-store";
 import { PrismaWorkTypeStore } from "./prisma-work-type-store";
@@ -71,7 +72,7 @@ export function createWorkTypeHandlers(deps?: {
 export function createSupervisorHandlers(deps?: { prisma?: PrismaClient }) {
   const db = deps?.prisma ?? prisma;
   return new SupervisorHandlers(
-    new PrismaSupervisorStore(db),
+    new PrismaSupervisorStore(db, privateDataCipher),
     new PrismaTeamMemberDirectory(db),
     () => new Date(),
     prismaMasterUsage(db),
