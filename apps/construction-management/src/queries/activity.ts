@@ -5,7 +5,7 @@ import type { ListConstructionProjectsProjectActivityResponseModel } from "@/app
 
 import { apiJson } from "./http";
 import { LABOURS_API, LABOURS_KEY } from "./labours";
-import { PROJECTS_API, PROJECTS_KEY } from "./projects";
+import { PROJECT_ACTIVITY_KEY, PROJECTS_API } from "./projects";
 
 export type LabourActivityPage =
   ListConstructionLabourLabourActivityResponseModel;
@@ -86,7 +86,7 @@ export function projectActivityQuery(
   if (filter.to != null) params.set("to", filter.to);
   const base = `${PROJECTS_API}/${encodeURIComponent(id)}/activity`;
   return infiniteQueryOptions({
-    queryKey: [...PROJECTS_KEY, "activity", id, params.toString()],
+    queryKey: [...PROJECT_ACTIVITY_KEY, id, params.toString()],
     initialPageParam: null as string | null,
     queryFn: ({ pageParam, meta }) =>
       apiJson<ProjectActivityPage>(

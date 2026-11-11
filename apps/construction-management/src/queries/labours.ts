@@ -15,6 +15,7 @@ import type {
 } from "@/app/api/construction/labour/labours/labour-models";
 
 import { QueryHttpError, apiJson } from "./http";
+import { PROJECT_ACTIVITY_KEY } from "./projects";
 
 export type LabourResponse = ConstructionLabourLabourResponseModel;
 export type LabourList = ListConstructionLabourLaboursResponseModel;
@@ -153,7 +154,12 @@ export function useLabourCommand() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: runLabourCommand,
-    onSettled: () => queryClient.invalidateQueries({ queryKey: LABOURS_KEY }),
+    onSettled: () =>
+      Promise.all(
+        [LABOURS_KEY, PROJECT_ACTIVITY_KEY].map((queryKey) =>
+          queryClient.invalidateQueries({ queryKey }),
+        ),
+      ),
   });
 }
 
@@ -171,7 +177,11 @@ export function useUpdateLabour(id: string) {
     mutationFn: (input: LabourUpdateInput) => updateLabour(id, input),
     onSuccess: async (updated) => {
       queryClient.setQueryData(labourQuery(id).queryKey, updated);
-      await queryClient.invalidateQueries({ queryKey: LABOURS_KEY });
+      await Promise.all(
+        [LABOURS_KEY, PROJECT_ACTIVITY_KEY].map((queryKey) =>
+          queryClient.invalidateQueries({ queryKey }),
+        ),
+      );
     },
   });
 }
