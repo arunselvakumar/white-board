@@ -13,22 +13,9 @@ import {
   projectResourcesQuery,
 } from "@/src/queries/project-resources";
 import { getQueryClient } from "@/src/queries/query-client";
-import { prefetchRoute, type RouteHandler } from "@/src/queries/route-fetch";
+import { prefetchRoute, routeHandler } from "@/src/queries/route-fetch";
 
 export const metadata: Metadata = { title: "Resources" };
-
-/** A Project route's handler, called with the `[id]` the path filled in. */
-function projectRoute(
-  handler: (
-    request: Request,
-    context: { params: Promise<{ id: string }> },
-  ) => Promise<Response>,
-): RouteHandler {
-  return (request, context) =>
-    handler(request, {
-      params: context.params.then((params) => ({ id: params["id"] ?? "" })),
-    });
-}
 
 // The prefetch reads the request's Session cookie.
 export const dynamic = "force-dynamic";
@@ -47,8 +34,8 @@ export default async function ProjectResourcesRoute({
   const [{ id }, { step }] = await Promise.all([params, searchParams]);
   const queryClient = getQueryClient();
   const routes = {
-    [RESOURCES_API]: projectRoute(readResources),
-    [PROJECT_LABOURS_API]: projectRoute(listProjectLabours),
+    [RESOURCES_API]: routeHandler(readResources),
+    [PROJECT_LABOURS_API]: routeHandler(listProjectLabours),
   };
   const [canEdit, canReadLabours, canTransfer] = await Promise.all([
     viewerCan("projects.project", "update", { projectId: id }),

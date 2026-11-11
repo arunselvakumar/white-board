@@ -124,9 +124,9 @@ Work top to bottom. One PR for the feature unless it passes CodeRabbit's file li
 | #   | Title                                                         | Status | Blocked by | Area             |
 | --- | ------------------------------------------------------------- | ------ | ---------- | ---------------- |
 | 1   | ADR CM-0038: owner's answers to §6, feed source, module rules | done   |            | Docs             |
-| 2   | Labours on a Project: add and remove from the Project         | todo   | 1          | Domain+HTTP      |
-| 3   | Site Engineers on a Project: their own Resources section      | todo   | 1          | Domain+HTTP      |
-| 4   | Resources page: Site Engineers and Labours sections           | todo   | 2, 3       | UI               |
+| 2   | Labours on a Project: add and remove from the Project         | done   | 1          | Domain+HTTP      |
+| 3   | Site Engineers on a Project: their own Resources section      | done   | 1          | Domain+HTTP      |
+| 4   | Resources page: Site Engineers and Labours sections           | done   | 2, 3       | UI               |
 | 5   | Labour activity feed: read model and route                    | todo   | 1          | Data+Domain+HTTP |
 | 6   | Labour page: Details and Activity tabs                        | todo   | 5          | UI               |
 | 7   | Project activity feed: read model and route                   | todo   | 2, 3       | Data+Domain+HTTP |

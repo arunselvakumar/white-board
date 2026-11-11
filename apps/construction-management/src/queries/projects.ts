@@ -59,8 +59,12 @@ export const customFieldLabelsQuery = queryOptions({
 export function projectQuery(id: string) {
   return queryOptions({
     queryKey: [...PROJECTS_KEY, "detail", id],
-    queryFn: () =>
-      apiJson<ProjectResponse>(`${PROJECTS_API}/${encodeURIComponent(id)}`),
+    queryFn: ({ meta }) =>
+      apiJson<ProjectResponse>(
+        `${PROJECTS_API}/${encodeURIComponent(id)}`,
+        undefined,
+        meta,
+      ),
   });
 }
 

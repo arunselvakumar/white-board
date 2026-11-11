@@ -25,6 +25,20 @@ export type RouteHandler = (
 ) => Promise<Response>;
 
 /**
+ * A route handler typed with its own params (`{ id: string }`), as
+ * `routeFetch` calls it: the params it fills come from the route's pattern.
+ */
+export function routeHandler<Params extends Record<string, string>>(
+  handler: (
+    request: Request,
+    context: { params: Promise<Params> },
+  ) => Promise<Response>,
+): RouteHandler {
+  return (request, context) =>
+    handler(request, context as { params: Promise<Params> });
+}
+
+/**
  * A transport that answers a query by calling the app's own route handler in
  * the page's request (ADR-0052). The handler's Request carries the page
  * request's cookies, so it resolves the same Session whether it reads them
