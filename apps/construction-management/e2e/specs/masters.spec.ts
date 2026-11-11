@@ -1,8 +1,9 @@
 import { expect } from "@playwright/test";
 
-import { unique } from "../api/session";
+import { PASSWORD, newMobile, unique } from "../api/session";
 import { projectTest } from "../helpers/projectTest";
 import { AddLabourPage } from "../pages/AddLabourPage";
+import { AddSiteEngineerPage } from "../pages/AddSiteEngineerPage";
 import { MasterListPage } from "../pages/MasterListPage";
 
 projectTest.describe("Masters", () => {
@@ -33,11 +34,23 @@ projectTest.describe("Masters", () => {
         "Site Engineers",
       );
       await supervisors.goto();
-      await supervisors.button("Add Site Engineer").first().click();
-      await supervisors.dialog
-        .getByLabel("Site Engineer name")
-        .fill(supervisor);
-      await supervisors.dialog.getByRole("button", { name: "Save" }).click();
+      // A page of its own, and every new Site Engineer signs in (ADR CM-0037).
+      await page
+        .getByRole("link", { name: "Add Site Engineer" })
+        .first()
+        .click();
+      const addSiteEngineerPage = new AddSiteEngineerPage(page);
+      await expect(addSiteEngineerPage.pageHeading).toBeVisible();
+      await addSiteEngineerPage.fillDetails({
+        name: supervisor,
+        mobile: newMobile().slice(3),
+        password: PASSWORD,
+      });
+      await addSiteEngineerPage.button("Add Site Engineer").click();
+      await expect(
+        addSiteEngineerPage.heading(`${supervisor} can sign in now`),
+      ).toBeVisible();
+      await supervisors.goto();
       await expect(supervisors.item(supervisor)).toBeVisible();
 
       const addLabourPage = new AddLabourPage(page);

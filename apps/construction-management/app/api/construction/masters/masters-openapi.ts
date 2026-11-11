@@ -27,6 +27,10 @@ import {
   materialMastersOpenApiOperations,
 } from "./material-masters-openapi";
 import {
+  siteEngineerOpenApiComponents,
+  siteEngineerOpenApiOperations,
+} from "./site-engineers/site-engineer-openapi";
+import {
   ConstructionMastersSupervisorResponseModel,
   CreateConstructionMastersSupervisorRequestModel,
   ListConstructionMastersSupervisorsResponseModel,
@@ -53,6 +57,7 @@ export const mastersOpenApiComponents: OpenApiComponents = {
   ConstructionMastersSupervisorResponseModel,
   CreateConstructionMastersSupervisorRequestModel,
   UpdateConstructionMastersSupervisorRequestModel,
+  ...siteEngineerOpenApiComponents,
   ...materialMastersOpenApiComponents,
   ...workTypeOpenApiComponents,
 };
@@ -200,6 +205,7 @@ export const mastersOpenApiOperations: OpenApiOperation[] = [
     create: CreateConstructionMastersSupervisorRequestModel,
     update: UpdateConstructionMastersSupervisorRequestModel,
   }),
+  ...siteEngineerOpenApiOperations,
   ...materialMastersOpenApiOperations,
   ...workTypeOpenApiOperations,
 ];

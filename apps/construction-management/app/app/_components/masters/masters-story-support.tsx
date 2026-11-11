@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Suspense, useState, type ReactNode } from "react";
 import { expect, fn, waitFor, within } from "storybook/test";
 
-import type { LookupItem, SupervisorItem } from "@/src/queries/masters";
+import type { LookupItem } from "@/src/queries/masters";
 
 /**
  * Story-only fixtures and an in-memory masters API, plus the helpers every
@@ -107,41 +107,6 @@ export const STORY_DEPARTMENTS: LookupItem[] = [
   lookup(12, "Plumbing"),
   lookup(13, "RCC"),
   lookup(14, "Fencing", { isSeed: false }),
-];
-
-export const STORY_TEAM_MEMBER_ID = "0199a1b2-0000-7000-8000-0000000004aa";
-
-export const STORY_SUPERVISORS: SupervisorItem[] = [
-  {
-    id: "0199a1b2-0000-7000-8000-000000000401",
-    name: "Rakesh Mirtha",
-    mobile: "+917708165767",
-    teamMemberId: null,
-    teamMemberName: null,
-    disabled: false,
-    createdAt: AT,
-    updatedAt: AT,
-  },
-  {
-    id: "0199a1b2-0000-7000-8000-000000000402",
-    name: "Prabhu Saravanan",
-    mobile: null,
-    teamMemberId: STORY_TEAM_MEMBER_ID,
-    teamMemberName: "Prabhu Saravanan",
-    disabled: false,
-    createdAt: AT,
-    updatedAt: AT,
-  },
-  {
-    id: "0199a1b2-0000-7000-8000-000000000403",
-    name: "Vignesh Anand",
-    mobile: null,
-    teamMemberId: null,
-    teamMemberName: null,
-    disabled: true,
-    createdAt: AT,
-    updatedAt: AT,
-  },
 ];
 
 const LATER = "2026-10-08T07:00:00.000Z";

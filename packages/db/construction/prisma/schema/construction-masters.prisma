@@ -61,24 +61,55 @@ model ConstructionMastersDepartment {
   @@schema("construction_masters")
 }
 
-/// The person on site responsible for a group of labourers. Often a Team
-/// Member (`team_member_id`), but a site may have a supervisor who never
-/// signs in, so the name is the record.
+enum ConstructionMastersGender {
+  male
+  female
+  other
+
+  @@map("gender")
+  @@schema("construction_masters")
+}
+
+/// A Site Engineer (screens) or Supervisor (code): the person on site
+/// responsible for a group of labourers (ADR CM-0036). Older rows may have
+/// no sign-in, so the name is the record. Since ADR CM-0037 a Site Engineer has
+/// a page of their own and signs in: `team_member_id` is then their
+/// sign-in membership, kept off Office Staff, which holds the contact,
+/// KYC, salary and Projects. This row holds the rest of the profile. The
+/// bank account number is AES-256-GCM ciphertext (shared-kernel
+/// `PrivateDataCipher`); the last four digits are kept for masking.
 model ConstructionMastersSupervisor {
-  id           String    @id @db.Uuid
-  workspaceId  String    @map("workspace_id")
-  name         String
+  id                   String                     @id @db.Uuid
+  workspaceId          String                     @map("workspace_id")
+  name                 String
   /// E.164.
-  mobile       String?
+  mobile               String?
   /// The Team Member this supervisor is, if any (organization context id).
-  teamMemberId String?   @map("team_member_id") @db.Uuid
-  disabledAt   DateTime? @map("disabled_at") @db.Timestamptz(3)
-  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt    DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
-  createdBy    String    @map("created_by")
-  updatedBy    String    @map("updated_by")
-  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(3)
-  deletedBy    String?   @map("deleted_by")
+  teamMemberId         String?                    @map("team_member_id") @db.Uuid
+  /// The Company's own code; unique among live rows when set (index in the migration).
+  employeeCode         String?                    @map("employee_code")
+  fatherName           String?                    @map("father_name")
+  dateOfBirth          DateTime?                  @map("date_of_birth") @db.Date
+  gender               ConstructionMastersGender?
+  /// A+, A-, B+, B-, AB+, AB-, O+ or O-.
+  bloodGroup           String?                    @map("blood_group") @db.VarChar(3)
+  joiningDate          DateTime?                  @map("joining_date") @db.Date
+  qualification        String?
+  experienceYears      Int?                       @map("experience_years")
+  /// Civil, steel / PEB, MEP …; free text.
+  specialisation       String?
+  bankAccountHolder    String?                    @map("bank_account_holder")
+  bankAccountEncrypted String?                    @map("bank_account_encrypted")
+  bankAccountLast4     String?                    @map("bank_account_last4") @db.VarChar(4)
+  bankIfsc             String?                    @map("bank_ifsc") @db.VarChar(11)
+  bankName             String?                    @map("bank_name")
+  disabledAt           DateTime?                  @map("disabled_at") @db.Timestamptz(3)
+  createdAt            DateTime                   @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt            DateTime                   @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy            String                     @map("created_by")
+  updatedBy            String                     @map("updated_by")
+  deletedAt            DateTime?                  @map("deleted_at") @db.Timestamptz(3)
+  deletedBy            String?                    @map("deleted_by")
 
   @@index([workspaceId])
   @@map("supervisors")

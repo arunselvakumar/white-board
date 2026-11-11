@@ -3,6 +3,17 @@ import { normalizeMobile } from "@repo/auth/construction/mobile";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
 import { cleanMasterName, masterNotFound } from "./master-kind";
+import {
+  NO_BANK,
+  NO_PROFILE,
+  accountLast4,
+  siteEngineerBank,
+  siteEngineerProfile,
+  type SiteEngineerBank,
+  type SiteEngineerBankInput,
+  type SiteEngineerProfile,
+  type SiteEngineerProfileInput,
+} from "./site-engineer-profile";
 
 export type SupervisorDetails = {
   name: string;
@@ -13,6 +24,9 @@ export type SupervisorDetails = {
 };
 
 export type SupervisorProps = SupervisorDetails & {
+  /** ADR CM-0037; empty for rows from before it. */
+  profile: SiteEngineerProfile;
+  bank: SiteEngineerBank;
   id: string;
   workspaceId: string;
   disabledAt: Date | null;
@@ -24,7 +38,20 @@ export type SupervisorProps = SupervisorDetails & {
   deletedBy: string | null;
 };
 
-export type SupervisorSnapshot = SupervisorDetails & { disabled: boolean };
+/** What the audit log keeps: never the full bank account number. */
+export type SupervisorSnapshot = SupervisorDetails &
+  SiteEngineerProfile & {
+    bankAccountHolder: string | null;
+    bankAccountLast4: string | null;
+    bankIfsc: string | null;
+    bankName: string | null;
+    disabled: boolean;
+  };
+
+/** The calendar date of `now` in UTC; bounds a date of birth. */
+function today(now: Date): string {
+  return now.toISOString().slice(0, 10);
+}
 
 function cleanDetails(input: {
   name: string;
@@ -61,6 +88,8 @@ export class Supervisor {
     name: string;
     mobile?: string | null;
     teamMemberId?: string | null;
+    profile?: SiteEngineerProfileInput;
+    bank?: SiteEngineerBankInput;
     by: string;
     now: Date;
   }): Supervisor {
@@ -68,6 +97,11 @@ export class Supervisor {
       id: input.id,
       workspaceId: input.workspaceId,
       ...cleanDetails(input),
+      profile:
+        input.profile == null
+          ? NO_PROFILE
+          : siteEngineerProfile(input.profile, today(input.now)),
+      bank: input.bank == null ? NO_BANK : siteEngineerBank(input.bank),
       disabledAt: null,
       createdAt: input.now,
       updatedAt: input.now,
@@ -97,6 +131,12 @@ export class Supervisor {
   get teamMemberId(): string | null {
     return this.props.teamMemberId;
   }
+  get profile(): SiteEngineerProfile {
+    return this.props.profile;
+  }
+  get bank(): SiteEngineerBank {
+    return this.props.bank;
+  }
   get disabled(): boolean {
     return this.props.disabledAt != null;
   }
@@ -123,10 +163,16 @@ export class Supervisor {
   }
 
   snapshot(): SupervisorSnapshot {
+    const { bank } = this.props;
     return {
       name: this.props.name,
       mobile: this.props.mobile,
       teamMemberId: this.props.teamMemberId,
+      ...this.props.profile,
+      bankAccountHolder: bank.accountHolder,
+      bankAccountLast4: accountLast4(bank.accountNumber),
+      bankIfsc: bank.ifsc,
+      bankName: bank.bankName,
       disabled: this.disabled,
     };
   }
@@ -135,12 +181,18 @@ export class Supervisor {
     if (this.props.deletedAt != null) throw masterNotFound("supervisor");
   }
 
-  /** Replaces name, mobile and Team Member together. */
+  /**
+   * Replaces name, mobile and Team Member together, and the profile and
+   * bank details when given (left out keeps them; a left-out account
+   * number keeps the stored one).
+   */
   update(
     input: {
       name: string;
       mobile?: string | null;
       teamMemberId?: string | null;
+      profile?: SiteEngineerProfileInput;
+      bank?: SiteEngineerBankInput;
     },
     by: string,
     now: Date,
@@ -149,6 +201,14 @@ export class Supervisor {
     this.props = {
       ...this.props,
       ...cleanDetails(input),
+      profile:
+        input.profile === undefined
+          ? this.props.profile
+          : siteEngineerProfile(input.profile, today(now)),
+      bank:
+        input.bank === undefined
+          ? this.props.bank
+          : siteEngineerBank(input.bank, this.props.bank),
       updatedAt: now,
       updatedBy: by,
     };

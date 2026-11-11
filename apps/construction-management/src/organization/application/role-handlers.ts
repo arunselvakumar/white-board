@@ -180,13 +180,17 @@ export class RoleHandlers {
     return toRoleReadModel(copy, 0);
   }
 
-  /** 409 `ROLE_IN_USE` (details `{ userCount }`) while anyone is on it. */
+  /**
+   * 409 `ROLE_IS_DEFAULT` for a default Role; 409 `ROLE_IN_USE` (details
+   * `{ userCount }`) while anyone is on it.
+   */
   async delete(input: {
     workspaceId: string;
     id: string;
     by: string;
   }): Promise<void> {
     const role = await this.load(input.workspaceId, input.id);
+    role.assertDeletable();
     const userCount =
       (await this.roles.userCounts(input.workspaceId)).get(role.id) ?? 0;
     if (userCount > 0)

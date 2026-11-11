@@ -129,10 +129,11 @@ describe("Transfer ownership (CM-907)", () => {
     const admin = (await roles.list(owner.workspaceId)).find(
       (item) => item.name === "Admin",
     );
-    await roles.delete({
-      workspaceId: owner.workspaceId,
-      id: admin?.id ?? "",
-      by: owner.userId,
+    // Default Roles cannot be deleted since ADR CM-0037; a Company may
+    // have deleted Admin before that.
+    await prisma.constructionOrganizationRole.update({
+      where: { id: admin?.id ?? "" },
+      data: { deletedAt: new Date() },
     });
     const code = await codeFor(owner, "transfer_ownership");
     const response = await transferTo(owner.cookie, member.memberId, code);

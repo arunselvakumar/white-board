@@ -10,6 +10,11 @@ export type TeamMemberListParams = {
   search?: string;
   status?: TeamMemberStatus;
   memberType?: "normal" | "hrms";
+  /**
+   * Site Engineers' sign-ins (ADR CM-0037) are left out unless true:
+   * Office Staff never lists them.
+   */
+  includeSiteEngineers?: boolean;
 };
 
 export type TeamMemberListPage = {

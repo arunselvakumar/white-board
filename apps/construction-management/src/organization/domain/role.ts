@@ -59,7 +59,9 @@ export type RoleProps = {
  * A named Permission Matrix given to Team Members (ADR CM-0030). Every
  * Team Member but the Owner has one Role, and their access is read through
  * it on every request, so editing a Role changes access for everyone on
- * it. Seeded Roles can be renamed, edited and deleted like any other.
+ * it. A default (seeded) Role keeps its name and cannot be deleted: the
+ * app finds Site Engineer and HRMS Staff by name. Its description and
+ * matrix are edited like any other (ADR CM-0037).
  */
 export class Role {
   private constructor(private props: RoleProps) {}
@@ -127,7 +129,10 @@ export class Role {
     return this.props.deletedAt;
   }
 
-  /** Replaces the name, description and the whole matrix. */
+  /**
+   * Replaces the name, description and the whole matrix. 400
+   * `ROLE_DEFAULT_NAME_LOCKED` when the name of a default Role changes.
+   */
   update(input: {
     name: string;
     description?: string | null;
@@ -135,9 +140,15 @@ export class Role {
     by: string;
     now: Date;
   }): void {
+    const name = cleanName(input.name);
+    if (this.props.isSeed && name !== this.props.name)
+      throw new DomainError(
+        "ROLE_DEFAULT_NAME_LOCKED",
+        "A default Role keeps its name. Duplicate it to make one with another name.",
+      );
     this.props = {
       ...this.props,
-      name: cleanName(input.name),
+      name,
       description: cleanDescription(input.description),
       permissions: input.permissions,
       updatedAt: input.now,
@@ -158,12 +169,23 @@ export class Role {
     });
   }
 
+  /** 409 `ROLE_IS_DEFAULT` for a default Role, which is never deleted. */
+  assertDeletable(): void {
+    if (this.props.isSeed)
+      throw new DomainError(
+        "ROLE_IS_DEFAULT",
+        "Default Roles cannot be deleted.",
+        { kind: "conflict" },
+      );
+  }
+
   /** Soft delete; the caller has checked no Team Member is on it. */
   delete(by: string, now: Date): void {
     if (this.props.deletedAt != null)
       throw new DomainError("ROLE_NOT_FOUND", "This Role was deleted.", {
         kind: "not_found",
       });
+    this.assertDeletable();
     this.props = {
       ...this.props,
       deletedAt: now,

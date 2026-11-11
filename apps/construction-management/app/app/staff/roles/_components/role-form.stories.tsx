@@ -122,6 +122,13 @@ export const EditRole: Story = {
     await expect(canvas.getByLabelText("Role name")).toHaveValue(
       "Site Engineer",
     );
+    // A default Role keeps its name.
+    await expect(canvas.getByLabelText("Role name")).toHaveAttribute(
+      "readonly",
+    );
+    await expect(
+      canvas.getByText(/A default Role keeps its name/),
+    ).toBeVisible();
     await expect(
       canvas.getByRole("checkbox", { name: "Add — Attendance" }),
     ).toBeChecked();

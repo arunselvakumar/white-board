@@ -92,7 +92,7 @@ The trade a Labour or a Vendor's headcount is booked under (Mason, Carpenter, He
 _Avoid_: skill, trade (for this list)
 
 **Supervisor**:
-The person on site who looks after a group of Labours. Often a Team Member, but need not sign in.
+The person on site who looks after a group of Labours, shown as **Site Engineer** (ADR CM-0036). A new Site Engineer signs in on the default Site Engineer Role, through a sign-in of their own that Office Staff does not list (ADR CM-0037); older ones may have none, or be an Office Staff member.
 _Avoid_: foreman, mukadam (that is a Vendor)
 
 **Rate Card**:

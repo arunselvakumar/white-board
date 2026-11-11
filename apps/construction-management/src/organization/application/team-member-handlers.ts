@@ -241,6 +241,8 @@ export class TeamMemberHandlers {
      */
     salary?: StaffSalaryInput;
     memberType: MemberType;
+    /** A Site Engineer's sign-in (ADR CM-0037), left off Office Staff. */
+    siteEngineer?: boolean;
     projectIds?: readonly string[];
     roleId?: string | null;
     invite?: boolean;
@@ -270,6 +272,7 @@ export class TeamMemberHandlers {
       details,
       salary,
       memberType: input.memberType,
+      siteEngineer: input.siteEngineer ?? false,
       projectIds: input.memberType === "hrms" ? [] : (input.projectIds ?? []),
       roleId: role?.id ?? null,
       by: input.by,

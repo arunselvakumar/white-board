@@ -21,6 +21,9 @@ export const ROLE_SEED_VERSION = SEEDS.version;
 /** The seed Role Add User preselects for an HRMS Team Member. */
 export const HRMS_STAFF_ROLE = "HRMS Staff";
 
+/** The seed Role every Site Engineer signs in with (ADR CM-0037). */
+export const SITE_ENGINEER_ROLE = "Site Engineer";
+
 function permissionsOf(seed: SeedFile["roles"][number]): PermissionSet {
   return seed.permissions === "ALL"
     ? PermissionSet.everything()

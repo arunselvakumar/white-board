@@ -7,7 +7,6 @@ import type { Role } from "@/src/queries/roles";
 import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import { ALL_ROLE_ACTIONS } from "./role-actions";
 import {
-  ACCOUNTANT_ROLE,
   ROLES,
   ROLES_URL,
   STORE_HELPER_ROLE,
@@ -127,13 +126,33 @@ export const WithRoles: Story = {
   },
 };
 
-/** A Role with staff on it cannot be deleted; the menu says why. */
-export const DeleteBlockedWhileInUse: Story = {
+/** A default Role is never deleted; the menu says why. */
+export const DefaultRoleCannotBeDeleted: Story = {
   beforeEach: serve(ROLES),
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     await userEvent.click(
-      await canvas.findByRole("button", { name: "Actions for Site Engineer" }),
+      await canvas.findByRole("button", { name: "Actions for Accountant" }),
+    );
+    const remove = await body.findByRole("menuitem", { name: /^Delete/ });
+    await expect(remove).toHaveAttribute("aria-disabled", "true");
+    await expect(
+      within(remove).getByText("Default Roles cannot be deleted."),
+    ).toBeVisible();
+  },
+};
+
+/** A Company Role with staff on it cannot be deleted; the menu says why. */
+export const DeleteBlockedWhileInUse: Story = {
+  beforeEach: serve(
+    ROLES.map((item) =>
+      item.id === STORE_HELPER_ROLE.id ? { ...item, userCount: 3 } : item,
+    ),
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Actions for Store helper" }),
     );
     const remove = await body.findByRole("menuitem", { name: /^Delete/ });
     await expect(remove).toHaveAttribute("aria-disabled", "true");
@@ -187,11 +206,11 @@ export const DuplicateAndDelete: Story = {
 
 /** Someone was put on the Role after the list loaded: 409 ROLE_IN_USE. */
 export const DeleteRefusedInUse: Story = {
-  beforeEach: serve(ROLES, ACCOUNTANT_ROLE.id),
+  beforeEach: serve(ROLES, STORE_HELPER_ROLE.id),
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
     await userEvent.click(
-      await canvas.findByRole("button", { name: "Actions for Accountant" }),
+      await canvas.findByRole("button", { name: "Actions for Store helper" }),
     );
     await userEvent.click(
       await body.findByRole("menuitem", { name: /^Delete/ }),
@@ -211,9 +230,9 @@ export const DeleteRefusedInUse: Story = {
     ).toBeDisabled();
     // The list refreshed: the count is the new one.
     await userEvent.click(confirm.getByRole("button", { name: "Cancel" }));
-    const accountant = await rowOf(canvas, "Accountant");
+    const helper = await rowOf(canvas, "Store helper");
     await waitFor(() =>
-      expect(accountant.getAllByText("1 Staff member")[0]).toBeInTheDocument(),
+      expect(helper.getAllByText("1 Staff member")[0]).toBeInTheDocument(),
     );
   },
 };
