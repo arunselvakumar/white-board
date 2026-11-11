@@ -34,10 +34,12 @@ type LabourEntry = {
   project?: { id: string; name: string };
 };
 
+/** The body as `T` (none for 204), or throws with the response when `status` differs. */
 async function ok<T>(response: Response, status: number = StatusCodes.OK) {
+  const body = await response.text();
   if (response.status !== status)
-    throw new Error(`${String(response.status)}: ${await response.text()}`);
-  return (status === StatusCodes.NO_CONTENT ? undefined : response.json()) as T;
+    throw new Error(`${String(response.status)}: ${body}`);
+  return (body === "" ? undefined : JSON.parse(body)) as T;
 }
 
 async function labour(company: Company, name: string) {
