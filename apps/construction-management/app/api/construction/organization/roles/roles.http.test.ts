@@ -234,6 +234,39 @@ describe("Role Management HTTP (ADR CM-0030)", () => {
     });
   });
 
+  it("keeps default Roles: never deleted, never renamed (ADR CM-0037)", async () => {
+    const owner = await ownerWithCompany();
+    const seed = (await list(owner.cookie)).find(
+      (role) => role.name === "Site Engineer",
+    );
+    if (seed == null) throw new Error("No Site Engineer Role");
+    expect(seed).toMatchObject({ isSeed: true, userCount: 0 });
+
+    const deleted = await deleteRole(
+      jsonRequest(`${BASE}/${seed.id}/delete`, owner.cookie, {}),
+      params(seed.id),
+    );
+    expect(deleted.status).toBe(StatusCodes.CONFLICT);
+    expect(await json(deleted)).toMatchObject({ code: "ROLE_IS_DEFAULT" });
+
+    const renamed = await update(owner.cookie, seed, { name: "Engineer" });
+    expect(renamed.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await json(renamed)).toMatchObject({
+      code: "ROLE_DEFAULT_NAME_LOCKED",
+    });
+
+    // The description and matrix still change.
+    const edited = await update(owner.cookie, seed, {
+      description: "Runs one site",
+      permissions: { "projects.project": ["read"] },
+    });
+    expect(edited.status).toBe(StatusCodes.OK);
+    expect(await json(edited)).toMatchObject({
+      name: "Site Engineer",
+      description: "Runs one site",
+    });
+  });
+
   it("changes access for everyone on the Role from their next request", async () => {
     const owner = await ownerWithCompany();
     const member = await memberWith(owner, {

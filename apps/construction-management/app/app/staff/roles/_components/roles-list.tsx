@@ -59,6 +59,7 @@ const byName = new Intl.Collator("en", { sensitivity: "base", numeric: true });
 
 /** Why a Role cannot be deleted yet, or null when it can. */
 function deleteBlockedReason(role: Role): string | null {
+  if (role.isSeed) return "Default Roles cannot be deleted.";
   if (role.userCount === 0) return null;
   return `${staffCount(role.userCount)} on it. Move them to another Role first.`;
 }

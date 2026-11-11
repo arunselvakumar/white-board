@@ -51,6 +51,7 @@ const SERVER_FIELDS: Record<string, keyof Values> = {
   ROLE_NAME_REQUIRED: "name",
   ROLE_NAME_TOO_LONG: "name",
   ROLE_NAME_TAKEN: "name",
+  ROLE_DEFAULT_NAME_LOCKED: "name",
   ROLE_DESCRIPTION_TOO_LONG: "description",
 };
 
@@ -121,11 +122,23 @@ function RoleForm({
               className="h-10"
               autoComplete="off"
               placeholder="Site Engineer"
-              readOnly={readOnly}
+              readOnly={readOnly || role?.isSeed === true}
               aria-required
               aria-invalid={errors.name != null}
+              aria-describedby={
+                role?.isSeed === true ? "role-name-locked" : undefined
+              }
               {...form.register("name")}
             />
+            {role?.isSeed === true && !readOnly ? (
+              <p
+                id="role-name-locked"
+                className="text-muted-foreground text-xs"
+              >
+                A default Role keeps its name. Duplicate it to make one with
+                another name.
+              </p>
+            ) : null}
             <FieldError message={errors.name?.message} />
           </div>
           <div className="space-y-1.5">

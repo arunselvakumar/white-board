@@ -116,6 +116,49 @@ describe("Role", () => {
       item.delete("user-1", NOW);
     }).toThrow(DomainError);
   });
+
+  it("keeps a default Role's name and never deletes it", () => {
+    const seeded = Role.create({
+      id: "r1",
+      workspaceId: "company-1",
+      name: "Site Engineer",
+      permissions: attendance,
+      isSeed: true,
+      by: "user-1",
+      now: NOW,
+    });
+    expect(() => {
+      seeded.update({
+        name: "Engineer",
+        permissions: attendance,
+        by: "user-1",
+        now: NOW,
+      });
+    }).toThrow(
+      expect.objectContaining({ code: "ROLE_DEFAULT_NAME_LOCKED" }) as Error,
+    );
+    // The description and matrix still change; spaces around the name are tidied.
+    seeded.update({
+      name: "  Site Engineer ",
+      description: "On site",
+      permissions: PermissionSet.everything(),
+      by: "user-1",
+      now: NOW,
+    });
+    expect(seeded).toMatchObject({
+      name: "Site Engineer",
+      description: "On site",
+    });
+    expect(() => {
+      seeded.delete("user-1", NOW);
+    }).toThrow(
+      expect.objectContaining({
+        code: "ROLE_IS_DEFAULT",
+        kind: "conflict",
+      }) as Error,
+    );
+    expect(seeded.deletedAt).toBeNull();
+  });
 });
 
 describe("copyName", () => {

@@ -67,7 +67,7 @@ export const roleOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: `${ITEM}/update`,
     summary:
-      "Replace a Role's name, description and matrix; everyone on it has the new access from their next request (409 STALE_ROLE; 403 OWN_ROLE, CANNOT_GRANT)",
+      "Replace a Role's name, description and matrix; everyone on it has the new access from their next request (400 ROLE_DEFAULT_NAME_LOCKED when a default Role's name changes; 409 STALE_ROLE; 403 OWN_ROLE, CANNOT_GRANT)",
     tags: ORGANIZATION,
     params: ConstructionOrganizationRoleParamsModel,
     body: UpdateConstructionOrganizationRoleRequestModel,
@@ -101,7 +101,7 @@ export const roleOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: `${ITEM}/delete`,
     summary:
-      "Delete a Role (409 ROLE_IN_USE with `{ userCount }` while anyone is on it)",
+      "Delete a Role (409 ROLE_IS_DEFAULT for a default Role; 409 ROLE_IN_USE with `{ userCount }` while anyone is on it)",
     tags: ORGANIZATION,
     params: ConstructionOrganizationRoleParamsModel,
     successStatus: StatusCodes.NO_CONTENT,
