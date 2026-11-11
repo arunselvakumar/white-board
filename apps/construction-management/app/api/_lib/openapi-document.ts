@@ -136,6 +136,10 @@ import {
   locationOptionsOpenApiOperations,
 } from "@/app/api/construction/projects/projects/[id]/location-options/location-options-openapi";
 import {
+  projectActivityOpenApiComponents,
+  projectActivityOpenApiOperations,
+} from "@/app/api/construction/projects/projects/[id]/activity/activity-openapi";
+import {
   projectResourcesOpenApiComponents,
   projectResourcesOpenApiOperations,
 } from "@/app/api/construction/projects/projects/[id]/resources/resources-openapi";
@@ -163,6 +167,10 @@ import {
   labourSummaryOpenApiComponents,
   labourSummaryOpenApiOperations,
 } from "@/app/api/construction/labour/summary/summary-openapi";
+import {
+  labourActivityOpenApiComponents,
+  labourActivityOpenApiOperations,
+} from "@/app/api/construction/labour/labours/[id]/activity/activity-openapi";
 import {
   vendorAttendanceOpenApiComponents,
   vendorAttendanceOpenApiOperations,
@@ -826,6 +834,10 @@ openApiOperations.push(...locationOpenApiOperations);
 Object.assign(openApiComponents, locationOptionsOpenApiComponents);
 openApiOperations.push(...locationOptionsOpenApiOperations);
 
+// The Project Activity feed (ADR CM-0038).
+Object.assign(openApiComponents, projectActivityOpenApiComponents);
+openApiOperations.push(...projectActivityOpenApiOperations);
+
 // Project Resources: where four contexts' parties meet a Project.
 Object.assign(openApiComponents, projectResourcesOpenApiComponents);
 openApiOperations.push(...projectResourcesOpenApiOperations);
@@ -869,6 +881,10 @@ openApiOperations.push(...vendorOpenApiOperations);
 // The Labour register lists its own models and routes.
 Object.assign(openApiComponents, labourOpenApiComponents);
 openApiOperations.push(...labourOpenApiOperations);
+
+// The Labour Activity feed (ADR CM-0038).
+Object.assign(openApiComponents, labourActivityOpenApiComponents);
+openApiOperations.push(...labourActivityOpenApiOperations);
 
 // The project labour summary lists its own model and route.
 Object.assign(openApiComponents, labourSummaryOpenApiComponents);

@@ -1,7 +1,10 @@
 import { expect } from "@playwright/test";
 
+import { createLabour } from "../api/labour";
 import { resourcesPageTest } from "../helpers/resourcesPageTest";
 import { AmenitiesPage } from "../pages/AmenitiesPage";
+import { LabourPage } from "../pages/LabourPage";
+import { ProjectActivityPage } from "../pages/ProjectActivityPage";
 import { ProjectsPage } from "../pages/ProjectsPage";
 
 resourcesPageTest.describe("Project resources", () => {
@@ -43,6 +46,32 @@ resourcesPageTest.describe("Project resources", () => {
       await expect(amenitiesPage.option("Club House")).toBeChecked();
       await expect(amenitiesPage.option("Compound Wall")).toBeChecked();
       await expect(amenitiesPage.option("Gymnasium")).not.toBeChecked();
+    },
+  );
+
+  resourcesPageTest(
+    "should show a Labour in both Activity feeds, when the Owner adds them on the Project's Resources",
+    { tag: ["@pr"] },
+    async ({ resourcesPage, project, owner, page }) => {
+      const labour = await createLabour(owner.api, { projectId: null });
+
+      await resourcesPage.goto();
+      await resourcesPage.addLabours([labour.name], "Slab work");
+      await expect(resourcesPage.section("Labours")).toContainText(labour.name);
+
+      const projectActivity = new ProjectActivityPage(page, project.id);
+      await projectActivity.goto();
+      const today = projectActivity.day("Today");
+      await expect(today).toContainText(`${labour.name} added`);
+      await expect(today).toContainText("Slab work");
+
+      const labourPage = new LabourPage(page, labour.id);
+      await labourPage.goto();
+      await labourPage.tab("Activity").click();
+      await expect(page).toHaveURL(/[?&]tab=activity/);
+      await expect(labourPage.day("Today")).toContainText(
+        `Added to ${project.name}`,
+      );
     },
   );
 });

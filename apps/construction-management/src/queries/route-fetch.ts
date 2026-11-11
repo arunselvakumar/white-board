@@ -1,6 +1,9 @@
 import type {
+  GetNextPageParamFunction,
+  InfiniteData,
   QueryClient,
   QueryExecuteOptions,
+  QueryFunction,
   QueryKey,
 } from "@tanstack/react-query";
 
@@ -111,6 +114,35 @@ export async function prefetchRoute<TData, TKey extends QueryKey>(
   }
   return queryClient.query({
     ...options,
+    queryFn: (context) =>
+      queryFn({ ...context, meta: { ...context.meta, fetch: transport } }),
+  });
+}
+
+/**
+ * `prefetchRoute` for a "Load more" list (`infiniteQueryOptions`): fetches
+ * its first page on the server through the given route handlers and keeps
+ * it for `dehydrate`. Throws when the read fails, so `error.tsx` shows.
+ */
+export async function prefetchInfiniteRoute<TPage, TPageParam>(
+  queryClient: QueryClient,
+  options: {
+    queryKey: QueryKey;
+    initialPageParam: TPageParam;
+    getNextPageParam: GetNextPageParamFunction<TPageParam, TPage>;
+    queryFn?: unknown;
+  },
+  routes: Record<string, RouteHandler>,
+): Promise<InfiniteData<TPage, TPageParam>> {
+  const transport = routeFetch(routes);
+  if (typeof options.queryFn !== "function") {
+    throw new Error("prefetchInfiniteRoute needs a query with a queryFn.");
+  }
+  const queryFn = options.queryFn as QueryFunction<TPage, QueryKey, TPageParam>;
+  return queryClient.infiniteQuery({
+    queryKey: options.queryKey,
+    initialPageParam: options.initialPageParam,
+    getNextPageParam: options.getNextPageParam,
     queryFn: (context) =>
       queryFn({ ...context, meta: { ...context.meta, fetch: transport } }),
   });

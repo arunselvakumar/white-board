@@ -18,6 +18,7 @@ import { apiJson, QueryHttpError } from "./http";
 import { LABOUR_ATTENDANCE_KEY } from "./labour-attendance";
 import { LABOURS_KEY } from "./labours";
 import { PARTIES_KEY } from "./parties";
+import { PROJECT_ACTIVITY_KEY } from "./projects";
 import { SITE_ENGINEERS_KEY } from "./site-engineers";
 import { TEAM_MEMBERS_KEY } from "./team-members";
 import { VENDORS_KEY } from "./vendors";
@@ -195,16 +196,19 @@ export function useSetProjectResources(projectId: string) {
 
 /**
  * After a Labour joins or leaves the Project: this Project's Resources, the
- * Labour register (their Projects) and attendance (who is on a Project on
- * a date) are refreshed.
+ * Labour register (their Projects and their Activity), attendance (who is
+ * on a Project on a date) and the Projects' Activity are refreshed.
  */
 function useLabourMoved(projectId: string) {
   const queryClient = useQueryClient();
   return () =>
     Promise.all(
-      [projectResourcesKey(projectId), LABOURS_KEY, LABOUR_ATTENDANCE_KEY].map(
-        (queryKey) => queryClient.invalidateQueries({ queryKey }),
-      ),
+      [
+        projectResourcesKey(projectId),
+        LABOURS_KEY,
+        LABOUR_ATTENDANCE_KEY,
+        PROJECT_ACTIVITY_KEY,
+      ].map((queryKey) => queryClient.invalidateQueries({ queryKey })),
     );
 }
 
@@ -270,6 +274,7 @@ export function useSetProjectSiteEngineers(projectId: string) {
           [...projectResourcesKey(projectId), "site-engineer-options"],
           SITE_ENGINEERS_KEY,
           TEAM_MEMBERS_KEY,
+          PROJECT_ACTIVITY_KEY,
         ].map((queryKey) => queryClient.invalidateQueries({ queryKey })),
       );
     },

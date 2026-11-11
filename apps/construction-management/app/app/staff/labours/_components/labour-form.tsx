@@ -533,7 +533,7 @@ export function LabourForm({
   );
 }
 
-function FormPage({
+export function FormPage({
   title,
   meta,
   children,
@@ -571,28 +571,37 @@ export function NewLabourScreen() {
 
 export function EditLabourScreen({ id }: { id: string }) {
   const { data } = useSuspenseQuery(labourQuery(id));
-  const update = useUpdateLabour(id);
   return (
-    <FormPage
-      title={`Edit ${data.name}`}
-      meta={`${projectsLabel(data.projects)}${data.isActive ? "" : " · Inactive"}`}
-    >
-      <div className="space-y-10">
-        <LabourForm
-          key={data.updatedAt}
-          labour={data}
-          saving={update.isPending}
-          onSave={(values, showAmounts) =>
-            update.mutateAsync(
-              updateLabourPayload(values, {
-                showAmounts,
-                expectedUpdatedAt: data.updatedAt,
-              }),
-            )
-          }
-        />
-        <LabourFiles labour={data} />
-      </div>
+    <FormPage title={`Edit ${data.name}`} meta={editLabourMeta(data)}>
+      <EditLabourDetails labour={data} />
     </FormPage>
+  );
+}
+
+/** Under Edit Labour's title: the Projects and an Inactive mark. */
+export function editLabourMeta(labour: LabourResponse): string {
+  return `${projectsLabel(labour.projects)}${labour.isActive ? "" : " · Inactive"}`;
+}
+
+/** Edit Labour's form and files: the Labour page's Details tab. */
+export function EditLabourDetails({ labour }: { labour: LabourResponse }) {
+  const update = useUpdateLabour(labour.id);
+  return (
+    <div className="space-y-10">
+      <LabourForm
+        key={labour.updatedAt}
+        labour={labour}
+        saving={update.isPending}
+        onSave={(values, showAmounts) =>
+          update.mutateAsync(
+            updateLabourPayload(values, {
+              showAmounts,
+              expectedUpdatedAt: labour.updatedAt,
+            }),
+          )
+        }
+      />
+      <LabourFiles labour={labour} />
+    </div>
   );
 }

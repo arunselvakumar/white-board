@@ -29,6 +29,9 @@ export const PROJECTS_API = "/api/construction/projects/projects";
 /** Every Project query key starts here, so one invalidation covers them. */
 export const PROJECTS_KEY = ["projects", "projects"] as const;
 
+/** Every Project's Activity: refreshed when people join or leave a Project. */
+export const PROJECT_ACTIVITY_KEY = [...PROJECTS_KEY, "activity"] as const;
+
 /** Every visible Project; the home filters by status on the client. */
 export const projectsQuery = queryOptions({
   queryKey: [...PROJECTS_KEY, "list"],

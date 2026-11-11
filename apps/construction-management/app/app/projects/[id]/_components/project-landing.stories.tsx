@@ -46,12 +46,12 @@ export const LandsOnDashboard: Story = {
   },
 };
 
-/** Dashboard hidden on the Project: the next module in the menu. */
+/** Dashboard hidden on the Project: the next module in the menu, Activity. */
 export const DashboardHidden: Story = {
   beforeEach: serve(storyHome({ hidden: ["dashboard"] })),
   play: async () => {
     await waitFor(() =>
-      expect(getRouter().replace).toHaveBeenCalledWith(`${PATH}/wings`),
+      expect(getRouter().replace).toHaveBeenCalledWith(`${PATH}/activity`),
     );
   },
 };

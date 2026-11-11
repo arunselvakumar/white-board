@@ -13,6 +13,7 @@ import {
   FileBarChart,
   FileText,
   FlaskConical,
+  History,
   Images,
   ListTodo,
   LayoutDashboard,
@@ -30,6 +31,7 @@ import type { ProjectModuleKey } from "@/src/projects/domain/project-modules";
 /** The icon of each Project module's tile and section link. */
 export const PROJECT_MODULE_ICONS: Record<ProjectModuleKey, LucideIcon> = {
   dashboard: LayoutDashboard,
+  activity: History,
   wings: Building2,
   locations: MapPin,
   amenities: Waves,

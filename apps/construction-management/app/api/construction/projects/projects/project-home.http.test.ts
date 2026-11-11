@@ -189,6 +189,7 @@ describe("Project home HTTP (CM-411)", () => {
 
     const seen = await home(member.cookie, kumari);
     expect(keys(seen)).toEqual([
+      "activity",
       "amenities",
       "drawings",
       "documents",
@@ -308,6 +309,7 @@ describe("Project home HTTP (CM-411)", () => {
       expect(keys(await home(member.cookie, id))).toEqual([
         "documents",
         "drawings",
+        "activity",
         "amenities",
         "resources",
       ]);
@@ -330,7 +332,7 @@ describe("Project home HTTP (CM-411)", () => {
       StatusCodes.OK,
     );
     await tileOrder(member.cookie, []);
-    expect(keys(await home(member.cookie, kumari))[0]).toBe("amenities");
+    expect(keys(await home(member.cookie, kumari))[0]).toBe("activity");
   });
 
   it("pins per member, pinned Projects first", async () => {
