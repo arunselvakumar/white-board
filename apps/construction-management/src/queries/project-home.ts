@@ -41,7 +41,8 @@ function projectUrl(id: string, verb: string): string {
 export function projectHomeQuery(id: string) {
   return queryOptions({
     queryKey: [...HOME_KEY, id],
-    queryFn: () => apiJson<ProjectHome>(projectUrl(id, "home")),
+    queryFn: ({ meta }) =>
+      apiJson<ProjectHome>(projectUrl(id, "home"), undefined, meta),
   });
 }
 

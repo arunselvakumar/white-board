@@ -561,6 +561,12 @@ export class TeamMemberHandlers {
    * `TEAM_MEMBER_NOT_FOUND` for an id that is not a live Team Member of
    * the Company, `TEAM_MEMBER_DECLINED` for a declined one newly added.
    * The caller has checked the Project is live and visible.
+   *
+   * `scope` narrows the save to some sign-ins: `only` those, or all
+   * `except` those. Sign-ins outside it are ignored in `ids` and
+   * `expectedIds` and keep their Projects, so the Team Members section
+   * cannot add or drop a Site Engineer's sign-in, and the Site Engineers
+   * section touches nothing else (ADR CM-0038 §3).
    */
   async setProjectTeam(input: {
     workspaceId: string;
@@ -568,12 +574,20 @@ export class TeamMemberHandlers {
     ids: readonly string[];
     expectedIds: readonly string[];
     by: string;
+    scope?: {
+      only?: ReadonlySet<string>;
+      except?: ReadonlySet<string>;
+    };
   }): Promise<void> {
+    const { only, except } = input.scope ?? {};
+    const inScope = (id: string) =>
+      (only == null || only.has(id)) && !(except?.has(id) ?? false);
     const current = (
       await this.members.listForProject(input.workspaceId, input.projectId)
-    ).filter((member) => !member.isOwner);
+    ).filter((member) => !member.isOwner && inScope(member.id));
     const currentIds = new Set(current.map((member) => member.id));
-    const expected = new Set(input.expectedIds);
+    const expected = new Set(input.expectedIds.filter(inScope));
+    const ids = input.ids.filter(inScope);
     if (
       expected.size !== currentIds.size ||
       [...expected].some((id) => !currentIds.has(id))
@@ -582,9 +596,7 @@ export class TeamMemberHandlers {
         "PROJECT_RESOURCES_CHANGED",
         "Someone else changed this Project's Resources after you opened them. Reload to see their changes.",
       );
-    const addedIds = [...new Set(input.ids)].filter(
-      (id) => !currentIds.has(id),
-    );
+    const addedIds = [...new Set(ids)].filter((id) => !currentIds.has(id));
     const found = await this.members.findByIds(input.workspaceId, addedIds);
     const foundIds = new Set(found.map((member) => member.id));
     const missing = addedIds.filter((id) => !foundIds.has(id));
@@ -597,7 +609,7 @@ export class TeamMemberHandlers {
     const added = found.filter((member) => !member.isOwner);
     const wanted = new Set([
       ...added.map((member) => member.id),
-      ...input.ids.filter((id) => currentIds.has(id)),
+      ...ids.filter((id) => currentIds.has(id)),
     ]);
     const now = this.clock();
     const entries: { member: TeamMember; audit: AuditEvent }[] = [];

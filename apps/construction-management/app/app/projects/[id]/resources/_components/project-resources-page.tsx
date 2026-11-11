@@ -27,11 +27,13 @@ import {
   type ProjectResources,
 } from "@/src/queries/project-resources";
 
+import { LaboursSection } from "./labours-section";
 import { ResourcePickerDialog } from "./resource-picker-dialog";
 import {
   RESOURCE_SECTIONS,
   type ResourceSectionInfo,
 } from "./resource-sections";
+import { SiteEngineersSection } from "./site-engineers-section";
 
 type Line = ProjectResources["teamMembers"][number];
 
@@ -47,8 +49,9 @@ function StepBanner({
       <ListChecks aria-hidden="true" />
       <AlertTitle>Step 2 of 2 · Assign resources</AlertTitle>
       <AlertDescription>
-        Choose the Team Members, Contractors, Suppliers and Vendors on this
-        Project. You can change them any time from Resources.
+        Choose the Site Engineers, Labours, Team Members, Contractors, Suppliers
+        and Vendors on this Project. You can change them any time from
+        Resources.
       </AlertDescription>
       <AlertAction className="static col-span-full mt-2 sm:absolute sm:top-2.5 sm:right-3 sm:mt-0">
         <Link
@@ -181,23 +184,38 @@ function ResourceCard({
   );
 }
 
+/** What the viewer may do beyond reading, from the Permission Matrix. */
+export type ResourcesAccess = {
+  /** Project menu Update: change every section. */
+  canEdit: boolean;
+  /** Labours Read: the Add Labours picker, Labour and Site Engineer pages. */
+  canReadLabours?: boolean;
+  /** Labour Transfer on this Project. */
+  canTransfer?: boolean;
+};
+
 /**
- * A Project's Resources: who works on it, in four sections, each edited in
- * its own dialog and saved on its own. Opened with `?step=resources` right
- * after Add Project, as the wizard's second step.
+ * A Project's Resources: who works on it. Site Engineers and Labours come
+ * first (ADR CM-0038), then four sections each edited in its own dialog
+ * and saved on its own. Opened with `?step=resources` right after Add
+ * Project, as the wizard's second step; the Project is saved by then, so
+ * every section works there too.
  */
 export function ProjectResourcesPage({
   projectId,
   canEdit,
+  canReadLabours = false,
+  canTransfer = false,
   wizard = false,
-}: {
+}: ResourcesAccess & {
   projectId: string;
-  canEdit: boolean;
   /** Add Project's step 2 of 2: a banner with Skip / Done. */
   wizard?: boolean;
 }) {
   const { data } = useSuspenseQuery(projectResourcesQuery(projectId));
   const assignedAny =
+    data.siteEngineers.length > 0 ||
+    data.labours.total > 0 ||
     data.teamMembers.some((line) => !line.isOwner) ||
     data.contractors.length > 0 ||
     data.suppliers.length > 0 ||
@@ -206,6 +224,21 @@ export function ProjectResourcesPage({
     <div className="w-full max-w-5xl space-y-6 p-6">
       {wizard && <StepBanner projectId={projectId} assignedAny={assignedAny} />}
       <div className="grid w-full gap-6 lg:grid-cols-2">
+        <SiteEngineersSection
+          projectId={projectId}
+          engineers={data.siteEngineers}
+          canEdit={canEdit}
+          canOpenPages={canReadLabours}
+        />
+        <LaboursSection
+          projectId={projectId}
+          total={data.labours.total}
+          today={data.today}
+          canEdit={canEdit}
+          canPickLabours={canReadLabours}
+          canOpenLabours={canReadLabours}
+          canTransfer={canTransfer}
+        />
         {RESOURCE_SECTIONS.map((section) => (
           <ResourceCard
             key={section.key}

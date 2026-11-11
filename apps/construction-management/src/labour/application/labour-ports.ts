@@ -1,6 +1,6 @@
 import type { AuditEvent } from "@/src/shared-kernel/audit";
 import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
-import type { ListCursor } from "@/src/shared-kernel/list-cursor";
+import type { ListCursor, NameCursor } from "@/src/shared-kernel/list-cursor";
 
 import type { Labour, LabourDetails, ProjectChanges } from "../domain/labour";
 
@@ -27,6 +27,26 @@ export type LabourMove = {
   loadedUpdatedAt: Date;
   transferDate: CalendarDate;
   remark: string | null;
+};
+
+/**
+ * Labourers joining or leaving one Project from its Resources (ADR CM-0038
+ * §2). Every history row of the command shares the labourers' new
+ * `updatedAt` and `updatedBy`, `date` and `remark`, so the Project's
+ * Activity shows the batch as one entry.
+ */
+export type LabourProjectChange = {
+  projectId: string;
+  direction: "join" | "leave";
+  labours: readonly {
+    labour: Labour;
+    /** `updatedAt` when loaded: the compare-and-set guard. */
+    loadedUpdatedAt: Date;
+  }[];
+  /** Joining: their first day on it. Leaving: their first day off it. */
+  date: CalendarDate;
+  remark: string | null;
+  audits: readonly AuditEvent[];
 };
 
 /** A new labourer and their opening balance (paise, signed). */
@@ -80,6 +100,13 @@ export type LabourRepository = {
     moves: readonly LabourMove[],
     audits: readonly AuditEvent[],
   ): Promise<void>;
+  /**
+   * Writes `labour_projects` and one history row per labourer, as Edit
+   * Labour does (no "from" when joining, no "to" when leaving), in one
+   * transaction with the audit events. `LABOUR_CHANGED` when any labourer
+   * changed since loaded; nothing is written then.
+   */
+  changeProject(change: LabourProjectChange): Promise<void>;
   /** The latest live attendance date per labourer on `projectId`. */
   latestAttendance(
     workspaceId: string,
@@ -148,6 +175,32 @@ export type LabourOption = {
   overtimeWagePerHour: number;
 };
 
+/** A labourer on a Project's Resources (ADR CM-0038 §2). */
+export type ProjectLabourLine = {
+  id: string;
+  name: string;
+  labourCode: string | null;
+  labourCategory: { id: string; name: string } | null;
+  /** Their first day on this Project. */
+  since: CalendarDate;
+  isActive: boolean;
+};
+
+export type ProjectLabourPage = {
+  items: ProjectLabourLine[];
+  total: number;
+  hasMore: boolean;
+};
+
+/** An active labourer the Project's Add Labours picker offers. */
+export type ProjectLabourChoice = {
+  id: string;
+  name: string;
+  labourCode: string | null;
+  labourCategory: { id: string; name: string } | null;
+  joiningDate: CalendarDate;
+};
+
 /** The register's reads. */
 export type LabourQueries = {
   get(workspaceId: string, id: string): Promise<LabourReadModel | null>;
@@ -160,6 +213,26 @@ export type LabourQueries = {
   ): Promise<LabourListPage>;
   /** Every match, by name (export). */
   all(filter: LabourListFilter): Promise<LabourReadModel[]>;
+  /**
+   * The labourers on a Project now, by name then id; search matches the
+   * name, Labour Id, father's name or phone.
+   */
+  onProject(filter: {
+    workspaceId: string;
+    projectId: string;
+    search?: string;
+    limit: number;
+    after?: NameCursor;
+    before?: NameCursor;
+  }): Promise<ProjectLabourPage>;
+  countOnProject(workspaceId: string, projectId: string): Promise<number>;
+  /** Active labourers not on the Project, by name; at most `limit`. */
+  addableToProject(input: {
+    workspaceId: string;
+    projectId: string;
+    search?: string;
+    limit: number;
+  }): Promise<{ items: ProjectLabourChoice[]; hasMore: boolean }>;
   /** Active labourers on `projectId` on `date` (from transfer history). */
   options(
     workspaceId: string,

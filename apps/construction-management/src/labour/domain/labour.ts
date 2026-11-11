@@ -467,6 +467,43 @@ export class Labour {
     this.touch(by, now);
   }
 
+  /**
+   * Onto one more Project from the Project's Resources (ADR CM-0038 §2);
+   * their other Projects stay. Only an active labourer is added.
+   */
+  joinProject(projectId: string, by: string, now: Date): void {
+    this.assertLive();
+    if (!this.props.isActive)
+      throw new DomainError(
+        "LABOUR_INACTIVE",
+        `${this.props.details.name} is inactive. Mark them active before adding them to a Project.`,
+        { details: { labourId: this.props.id } },
+      );
+    if (this.isOn(projectId))
+      throw conflict(
+        "LABOUR_ALREADY_ON_PROJECT",
+        `${this.props.details.name} is already on this Project.`,
+        { labourId: this.props.id },
+      );
+    this.props.projectIds = [...this.props.projectIds, projectId];
+    this.touch(by, now);
+  }
+
+  /** Off one Project from the Project's Resources; their others stay. */
+  leaveProject(projectId: string, by: string, now: Date): void {
+    this.assertLive();
+    if (!this.isOn(projectId))
+      throw conflict(
+        "LABOUR_NOT_ON_PROJECT",
+        `${this.props.details.name} is not on this Project.`,
+        { labourId: this.props.id },
+      );
+    this.props.projectIds = this.props.projectIds.filter(
+      (id) => id !== projectId,
+    );
+    this.touch(by, now);
+  }
+
   activate(by: string, now: Date): void {
     this.assertLive();
     if (this.props.isActive) return;

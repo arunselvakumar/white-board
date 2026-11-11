@@ -6,17 +6,22 @@ export type MockRoute = {
   method?: string;
   /** Exact path, or a pattern matched against the path (no origin). */
   path: string | RegExp;
-  respond: (request: { url: string; init?: RequestInit }) => Response;
+  respond: (request: {
+    url: string;
+    init?: RequestInit;
+    /** The query string, for routes that page or search. */
+    search: URLSearchParams;
+  }) => Response;
 };
 
-function pathOf(input: FetchArgs[0]): string {
+function urlOf(input: FetchArgs[0]): URL {
   const url =
     typeof input === "string"
       ? input
       : input instanceof URL
         ? input.href
         : input.url;
-  return new URL(url, "http://storybook.local").pathname;
+  return new URL(url, "http://storybook.local");
 }
 
 /**
@@ -27,7 +32,8 @@ export function mockFetch(routes: MockRoute[]) {
   const original = globalThis.fetch;
   const spy = fn((...args: FetchArgs) => {
     const [input, init] = args;
-    const path = pathOf(input);
+    const url = urlOf(input);
+    const path = url.pathname;
     const method = (init?.method ?? "GET").toUpperCase();
     const route = routes.find(
       (candidate) =>
@@ -43,7 +49,9 @@ export function mockFetch(routes: MockRoute[]) {
           { status: 404 },
         ),
       );
-    return Promise.resolve(route.respond({ url: path, init }));
+    return Promise.resolve(
+      route.respond({ url: path, init, search: url.searchParams }),
+    );
   });
   globalThis.fetch = spy;
   return {

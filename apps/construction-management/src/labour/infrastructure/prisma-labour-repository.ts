@@ -22,6 +22,7 @@ import {
 } from "../application/labour-handlers";
 import type {
   LabourMove,
+  LabourProjectChange,
   LabourRepository,
   LabourTransferRecord,
   NewLabour,
@@ -547,6 +548,63 @@ export class PrismaLabourRepository implements LabourRepository {
           })),
         });
         for (const audit of audits) await recordAudit(tx, audit);
+      },
+      { timeout: 60_000 },
+    );
+  }
+
+  async changeProject(change: LabourProjectChange): Promise<void> {
+    const [first] = change.labours;
+    if (first == null) return;
+    const date = calendarDateToDb(change.date);
+    await this.db.$transaction(
+      async (tx: Tx) => {
+        for (const { labour, loadedUpdatedAt } of change.labours) {
+          const written = await tx.constructionLabourLabour.updateMany({
+            where: {
+              id: labour.id,
+              workspaceId: labour.workspaceId,
+              deletedAt: null,
+              updatedAt: loadedUpdatedAt,
+            },
+            data: {
+              updatedAt: labour.updatedAt,
+              updatedBy: labour.updatedBy,
+            },
+          });
+          if (written.count === 0) throw labourChanged();
+        }
+        const ids = change.labours.map(({ labour }) => labour.id);
+        if (change.direction === "join")
+          await tx.constructionLabourLabourProject.createMany({
+            data: ids.map((labourId) => ({
+              workspaceId: first.labour.workspaceId,
+              labourId,
+              projectId: change.projectId,
+              since: date,
+            })),
+          });
+        else {
+          const left = await tx.constructionLabourLabourProject.deleteMany({
+            where: { labourId: { in: ids }, projectId: change.projectId },
+          });
+          if (left.count !== ids.length) throw labourChanged();
+        }
+        await tx.constructionLabourTransfer.createMany({
+          data: change.labours.map(({ labour }) => ({
+            id: newId(),
+            workspaceId: labour.workspaceId,
+            labourId: labour.id,
+            fromProjectId:
+              change.direction === "leave" ? change.projectId : null,
+            toProjectId: change.direction === "join" ? change.projectId : null,
+            transferDate: date,
+            remark: change.remark,
+            createdAt: labour.updatedAt,
+            createdBy: labour.updatedBy,
+          })),
+        });
+        for (const audit of change.audits) await recordAudit(tx, audit);
       },
       { timeout: 60_000 },
     );

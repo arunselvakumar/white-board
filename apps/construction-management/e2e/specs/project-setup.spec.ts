@@ -63,7 +63,10 @@ projectDashboardPageTest.describe("Project setup", () => {
       });
       await projectDashboardPage.goto();
       await projectDashboardPage.projectOptionsButton.click();
-      await projectDashboardPage.menuItem("Pin to top").click();
+      await projectDashboardPage.clickAndWaitFor(
+        projectDashboardPage.menuItem("Pin to top"),
+        /\/pin$/,
+      );
 
       const projectsPage = new ProjectsPage(page);
       await projectsPage.goto();

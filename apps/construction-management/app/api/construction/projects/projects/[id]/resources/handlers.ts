@@ -11,6 +11,7 @@ import {
   SetConstructionProjectsProjectResourcesRequestModel,
   toResourceOptionsResponse,
   toResourcesResponse,
+  toSiteEngineerOptionsResponse,
 } from "./resources-models";
 
 /** One composition for every Resources route. */
@@ -78,3 +79,58 @@ export function resourceKindRoutes(kind: ResourceKind) {
     },
   };
 }
+
+/**
+ * Site Engineers on the Project (ADR CM-0038 §3): `GET …/site-engineers/
+ * options` and `POST …/site-engineers` with Site Engineer ids, written to
+ * their sign-ins by the organization context. Project menu Update and the
+ * Project visible to the caller (404 otherwise).
+ */
+export const siteEngineerRoutes = {
+  options: async (request: Request, context: IdContext) => {
+    try {
+      const session = await requireAccess(
+        request,
+        "projects.project",
+        "update",
+      );
+      if (isResponse(session)) return session;
+      const { id } = parseOrThrow(
+        ConstructionProjectsProjectParamsModel.safeParse(await context.params),
+      );
+      return Response.json(
+        toSiteEngineerOptionsResponse(
+          await projectResources.assignableSiteEngineers(session.access, id),
+        ),
+      );
+    } catch (error) {
+      return mapError(error);
+    }
+  },
+
+  set: async (request: Request, context: IdContext) => {
+    try {
+      const session = await requireAccess(
+        request,
+        "projects.project",
+        "update",
+      );
+      if (isResponse(session)) return session;
+      const { id } = parseOrThrow(
+        ConstructionProjectsProjectParamsModel.safeParse(await context.params),
+      );
+      const body = parseOrThrow(
+        SetConstructionProjectsProjectResourcesRequestModel.safeParse(
+          await request.json(),
+        ),
+      );
+      return Response.json(
+        toResourcesResponse(
+          await projectResources.setSiteEngineers(session.access, id, body),
+        ),
+      );
+    } catch (error) {
+      return mapError(error);
+    }
+  },
+};
