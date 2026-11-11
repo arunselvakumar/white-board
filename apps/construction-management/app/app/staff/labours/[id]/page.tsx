@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
-import { EditLabourScreen } from "@/app/app/staff/labours/_components/labour-form";
+import { LabourPage } from "@/app/app/staff/labours/[id]/_components/labour-page";
 import { LabourFormSkeleton } from "@/app/app/staff/labours/_components/labours-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
 
 export const metadata: Metadata = { title: "Edit Labour" };
 
-export default async function EditLabourPage({
+export default async function LabourRoute({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -14,7 +14,7 @@ export default async function EditLabourPage({
   const { id } = await params;
   return (
     <QuerySuspense fallback={<LabourFormSkeleton />}>
-      <EditLabourScreen id={id} />
+      <LabourPage id={id} />
     </QuerySuspense>
   );
 }
