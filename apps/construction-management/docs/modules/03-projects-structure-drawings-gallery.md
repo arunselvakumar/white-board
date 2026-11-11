@@ -595,6 +595,14 @@ M4 answered the open questions below with recommended defaults in [ADR CM-0013](
 - **Access:** Project Read to see the sections, Update to change them, as for the rest of Resources. The Labour picker also needs `masters.labours` Read; Transfer needs `labour.labour` Transfer on the Project; names link to the Labour and Site Engineer pages for those with `masters.labours` Read.
 - Edit Labour's own Projects field still writes from today and does not apply the two date rules.
 
+### Project → Activity (ADR CM-0038)
+
+- **Activity** is a Project module (`activity`, `/app/projects/{id}/activity`) under **Overview**, right after Dashboard. Its menu is `projects.project`: anyone with Project Read who is on the Project sees it, with no Permission Matrix cell of its own, so existing Roles see it without a grant migration. Hide / show modules hides it like any other. Opening a Project still lands on Dashboard, or on Activity when Dashboard is hidden or not allowed.
+- It is a read-only feed of people joining and leaving the Project: **Site Engineer added / removed**, **Labour added / removed**, **transferred in** (from which Project) and **transferred out** (to which Project). Attendance is not in it (question 2 of the ADR).
+- Each entry shows the person (a link to their page for those with `masters.labours` Read, none once they are deleted), a Labour's Labour Id and Category, the remark, and "by _name_ · _when recorded_". Entries sit on the day they apply to: a Labour's first day on the Project, a removal's **last day**, a Site Engineer change's recorded day in the Company's time zone. One command that moved many Labours is one entry ("12 Labours added") that opens to the names.
+- Newest first, grouped by day, 30 at a time with **Load more**. Filters **Who** (All, Site Engineers, Labours) and a date range, kept in the address.
+- `GET …/projects/{id}/activity?who=&from=&to=&cursor=` needs `projects.project` Read and the viewer on the Project (404 `PROJECT_NOT_FOUND` otherwise). It reads `labour_transfers` and the Site Engineers' `team_member.*` audit events at read time; there is no activity table (ADR CM-0038 §1).
+
 ### CM-407
 
 - The kernel service is `src/shared-kernel/attachments`: `UploadPolicy` (purpose = key folder, accept, largest file, multipart threshold 8 MB), `AttachmentUploads` (`start` → `answerDirectUpload` / `receive` → `receiveThumbnail` → `complete`), `CheckedUpload` and `storedFilesOf`. Owners keep their own rows and call `complete` with `recorded` (what they already have for the key) and `record` (their transaction); completion stays idempotent on the key, and a refused or failed completion deletes the object and any thumbnail sent for it.

@@ -121,17 +121,17 @@ The feeds read these sources directly; there is no feed table ([CM-0038](../adr/
 
 Work top to bottom. One PR for the feature unless it passes CodeRabbit's file limit; then stack it (ADR + staffing, then the feeds).
 
-| #   | Title                                                         | Status | Blocked by | Area             |
-| --- | ------------------------------------------------------------- | ------ | ---------- | ---------------- |
-| 1   | ADR CM-0038: owner's answers to §6, feed source, module rules | done   |            | Docs             |
-| 2   | Labours on a Project: add and remove from the Project         | done   | 1          | Domain+HTTP      |
-| 3   | Site Engineers on a Project: their own Resources section      | done   | 1          | Domain+HTTP      |
-| 4   | Resources page: Site Engineers and Labours sections           | done   | 2, 3       | UI               |
-| 5   | Labour activity feed: read model and route                    | todo   | 1          | Data+Domain+HTTP |
-| 6   | Labour page: Details and Activity tabs                        | todo   | 5          | UI               |
-| 7   | Project activity feed: read model and route                   | todo   | 2, 3       | Data+Domain+HTTP |
-| 8   | Project → Activity module and page                            | todo   | 7          | UI               |
-| 9   | History back-fill (or read-through), e2e, docs                | todo   | 6, 8       | Data+Docs        |
+| #   | Title                                                         | Status      | Blocked by | Area             |
+| --- | ------------------------------------------------------------- | ----------- | ---------- | ---------------- |
+| 1   | ADR CM-0038: owner's answers to §6, feed source, module rules | done        |            | Docs             |
+| 2   | Labours on a Project: add and remove from the Project         | done        | 1          | Domain+HTTP      |
+| 3   | Site Engineers on a Project: their own Resources section      | done        | 1          | Domain+HTTP      |
+| 4   | Resources page: Site Engineers and Labours sections           | done        | 2, 3       | UI               |
+| 5   | Labour activity feed: read model and route                    | done        | 1          | Data+Domain+HTTP |
+| 6   | Labour page: Details and Activity tabs                        | done        | 5          | UI               |
+| 7   | Project activity feed: read model and route                   | done        | 2, 3       | Data+Domain+HTTP |
+| 8   | Project → Activity module and page                            | done        | 7          | UI               |
+| 9   | History back-fill (or read-through), e2e, docs                | in_progress | 6, 8       | Data+Docs        |
 
 ### 1 — ADR CM-0038
 
@@ -172,7 +172,7 @@ Work top to bottom. One PR for the feature unless it passes CodeRabbit's file li
 
 ### 6 — Labour page tabs
 
-**Done when:** Details and Activity tabs with the tab in the address, the feed with filters, Load more, empty and error states, stories, and the unsaved-changes guard on Details still works when switching tabs.
+**Done when:** Details and Activity tabs with the tab in the address, the feed with filters, Load more, empty and error states, stories, and changes typed on Details survive switching tabs. (The Labour page had no unsaved-changes guard to keep; a leave-page prompt is a follow-up.)
 
 ### 7 — Project activity feed
 

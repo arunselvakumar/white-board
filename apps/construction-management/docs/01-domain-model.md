@@ -53,7 +53,7 @@ erDiagram
     Vendor }o--o{ Project : "assigned to"
     Labour }o--|| LabourCategory : "is a"
     Labour }o--o| Supervisor : "reports to"
-    Labour }o--|| Project : "currently on"
+    Labour }o--o{ Project : "works on"
     Labour ||--o{ LabourTransfer : history
     Equipment }o--|| Contractor : "owned/rented from"
     Equipment }o--o| FuelType : uses
@@ -315,13 +315,14 @@ Field names for HRMS are already snake_case REST (`v2/hrms/*`) in the legacy API
 
 ## 11. Cross-cutting
 
-| Concern              | Legacy mechanism                                                                                                                                                  | Entities                                     |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| **Numbering**        | `ModulePrefix` rules per module: project scope (default/all or specific), prefix (`PR/26-27`), project id token (`P1`), start number, preview `PR/26-27/P1/00001` | `SequenceRule`, `SequenceCounter`            |
-| **Back-dated entry** | Global create/edit day limits + override designations; per-module overrides with `entry_date_field`; financial closing date                                       | `BackdatedPolicy`, `BackdatedModuleOverride` |
-| **Approval**         | Per document: status + `SetApprovalStatus` / `BulkSetApprovalStatus` / `Remark`; flags `approve`, `reject` on the menu                                            | `ApprovalRemark` (polymorphic)               |
-| **Comments**         | Threads on MR, DN, Material Transfer, Issue (`Comment By / On / Files`)                                                                                           | `Comment` (polymorphic)                      |
-| **Attachments**      | Images/files on nearly every document; 10 MB cap; storage quota per plan                                                                                          | `Attachment` (polymorphic)                   |
-| **Notifications**    | FCM push; notification list; per-menu `notification` flag; async report/ZIP delivery                                                                              | `Notification`, `DeviceToken`                |
-| **Audit**            | `createdBy/On`, `approvedBy/On`, `rejectedBy/For/On`, `Entry By` columns in reports — no general audit log                                                        | `AuditEvent` (new)                           |
-| **Dirty-form guard** | "Discard changes?" dialog; `beforeunload` on web                                                                                                                  | UI only                                      |
+| Concern              | Legacy mechanism                                                                                                                                                  | Entities                                                                                    |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| **Numbering**        | `ModulePrefix` rules per module: project scope (default/all or specific), prefix (`PR/26-27`), project id token (`P1`), start number, preview `PR/26-27/P1/00001` | `SequenceRule`, `SequenceCounter`                                                           |
+| **Back-dated entry** | Global create/edit day limits + override designations; per-module overrides with `entry_date_field`; financial closing date                                       | `BackdatedPolicy`, `BackdatedModuleOverride`                                                |
+| **Approval**         | Per document: status + `SetApprovalStatus` / `BulkSetApprovalStatus` / `Remark`; flags `approve`, `reject` on the menu                                            | `ApprovalRemark` (polymorphic)                                                              |
+| **Comments**         | Threads on MR, DN, Material Transfer, Issue (`Comment By / On / Files`)                                                                                           | `Comment` (polymorphic)                                                                     |
+| **Attachments**      | Images/files on nearly every document; 10 MB cap; storage quota per plan                                                                                          | `Attachment` (polymorphic)                                                                  |
+| **Notifications**    | FCM push; notification list; per-menu `notification` flag; async report/ZIP delivery                                                                              | `Notification`, `DeviceToken`                                                               |
+| **Audit**            | `createdBy/On`, `approvedBy/On`, `rejectedBy/For/On`, `Entry By` columns in reports — no general audit log                                                        | `AuditEvent` (new)                                                                          |
+| **Activity**         | None: who did what was only on each record                                                                                                                        | None: a read model over `LabourTransfer`, `LabourAttendance` and `AuditEvent` (ADR CM-0038) |
+| **Dirty-form guard** | "Discard changes?" dialog; `beforeunload` on web                                                                                                                  | UI only                                                                                     |
