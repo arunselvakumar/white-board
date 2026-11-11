@@ -19,8 +19,14 @@ export type ProjectResources =
 export type ProjectResource =
   ListConstructionProjectsResourceOptionsResponseModel["items"][number];
 
-/** A section of the Resources tab; also its key in the response. */
-export type ResourceSection = keyof ProjectResources;
+/**
+ * A section of the Resources tab saved as a set of parties; also its key
+ * in the response. Site Engineers and Labours have their own queries.
+ */
+export type ResourceSection = Exclude<
+  keyof ProjectResources,
+  "siteEngineers" | "labours"
+>;
 
 /** The path segment of each section's routes. */
 export const RESOURCE_PATHS: Record<ResourceSection, string> = {

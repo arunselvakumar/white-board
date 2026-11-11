@@ -68,6 +68,8 @@ export const MUTHU: ProjectResource = {
 };
 
 export const RESOURCES: ProjectResources = {
+  siteEngineers: [],
+  labours: { total: 0 },
   teamMembers: [OWNER, PRABHU],
   contractors: [RAMCO, BALAJI],
   suppliers: [KAVERI],
@@ -75,6 +77,8 @@ export const RESOURCES: ProjectResources = {
 };
 
 export const NO_RESOURCES: ProjectResources = {
+  siteEngineers: [],
+  labours: { total: 0 },
   teamMembers: [OWNER],
   contractors: [],
   suppliers: [],

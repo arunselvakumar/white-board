@@ -20,3 +20,21 @@ export function decodeListCursor(raw: string): ListCursor {
     throw new DomainError("INVALID_CURSOR", "The page cursor is not valid.");
   return { createdAt, id };
 }
+
+/** A position in a list sorted by name, then `id`. */
+export type NameCursor = { name: string; id: string };
+
+export function encodeNameCursor(cursor: NameCursor): string {
+  return Buffer.from(`${cursor.id}|${cursor.name}`, "utf8").toString(
+    "base64url",
+  );
+}
+
+export function decodeNameCursor(raw: string): NameCursor {
+  const decoded = Buffer.from(raw, "base64url").toString("utf8");
+  const separator = decoded.indexOf("|");
+  const id = decoded.slice(0, separator);
+  if (separator <= 0 || !isUuid(id))
+    throw new DomainError("INVALID_CURSOR", "The page cursor is not valid.");
+  return { id, name: decoded.slice(separator + 1) };
+}

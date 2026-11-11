@@ -6,7 +6,7 @@ import {
   todayIn,
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
-import type { ListCursor } from "@/src/shared-kernel/list-cursor";
+import type { ListCursor, NameCursor } from "@/src/shared-kernel/list-cursor";
 
 import type {
   LabourListFilter,
@@ -15,6 +15,8 @@ import type {
   LabourOption,
   LabourQueries,
   LabourReadModel,
+  ProjectLabourChoice,
+  ProjectLabourPage,
 } from "../application/labour-ports";
 import { workingHours, type Weekday } from "../domain/wages";
 import { prismaLedger } from "./prisma-ledger";
@@ -257,6 +259,151 @@ export class PrismaLabourQueries implements LabourQueries {
       include: WITH_PROJECTS,
     });
     return this.readModels(filter.workspaceId, rows);
+  }
+
+  private async categoryNames(
+    workspaceId: string,
+    ids: readonly (string | null)[],
+  ): Promise<Map<string, { id: string; name: string }>> {
+    const wanted = [...new Set(ids.filter((id): id is string => id != null))];
+    if (wanted.length === 0) return new Map();
+    const rows = await this.db.constructionMastersLabourCategory.findMany({
+      where: { workspaceId, id: { in: wanted } },
+      select: { id: true, name: true },
+    });
+    return new Map(rows.map((row) => [row.id, row]));
+  }
+
+  async onProject(filter: {
+    workspaceId: string;
+    projectId: string;
+    search?: string;
+    limit: number;
+    after?: NameCursor;
+    before?: NameCursor;
+  }): Promise<ProjectLabourPage> {
+    const filters = whereOf({
+      workspaceId: filter.workspaceId,
+      projectId: filter.projectId,
+      ...(filter.search == null ? {} : { search: filter.search }),
+    });
+    // By name; `after` pages forward, `before` pages back.
+    const backwards = filter.before != null;
+    const cursor = filter.after ?? filter.before;
+    const page = await this.db.constructionLabourLabour.findMany({
+      where: {
+        AND:
+          cursor == null
+            ? filters
+            : [
+                ...filters,
+                {
+                  OR: backwards
+                    ? [
+                        { name: { lt: cursor.name } },
+                        { name: cursor.name, id: { lt: cursor.id } },
+                      ]
+                    : [
+                        { name: { gt: cursor.name } },
+                        { name: cursor.name, id: { gt: cursor.id } },
+                      ],
+                },
+              ],
+      },
+      orderBy: backwards
+        ? [{ name: "desc" }, { id: "desc" }]
+        : [{ name: "asc" }, { id: "asc" }],
+      take: filter.limit + 1,
+      select: {
+        id: true,
+        name: true,
+        labourCode: true,
+        labourCategoryId: true,
+        isActive: true,
+        projects: {
+          where: { projectId: filter.projectId },
+          select: { since: true },
+        },
+      },
+    });
+    const hasMore = page.length > filter.limit;
+    const rows = page.slice(0, filter.limit);
+    if (backwards) rows.reverse();
+    const [total, categories] = await Promise.all([
+      this.db.constructionLabourLabour.count({ where: { AND: filters } }),
+      this.categoryNames(
+        filter.workspaceId,
+        rows.map((row) => row.labourCategoryId),
+      ),
+    ]);
+    return {
+      items: rows.map((row) => ({
+        id: row.id,
+        name: row.name,
+        labourCode: row.labourCode,
+        labourCategory:
+          row.labourCategoryId == null
+            ? null
+            : (categories.get(row.labourCategoryId) ?? null),
+        since: calendarDateFromDb(row.projects[0]?.since ?? new Date(0)),
+        isActive: row.isActive,
+      })),
+      total,
+      hasMore,
+    };
+  }
+
+  countOnProject(workspaceId: string, projectId: string): Promise<number> {
+    return this.db.constructionLabourLabour.count({
+      where: { AND: whereOf({ workspaceId, projectId }) },
+    });
+  }
+
+  async addableToProject(input: {
+    workspaceId: string;
+    projectId: string;
+    search?: string;
+    limit: number;
+  }): Promise<{ items: ProjectLabourChoice[]; hasMore: boolean }> {
+    const rows = await this.db.constructionLabourLabour.findMany({
+      where: {
+        AND: [
+          ...whereOf({
+            workspaceId: input.workspaceId,
+            active: true,
+            ...(input.search == null ? {} : { search: input.search }),
+          }),
+          { projects: { none: { projectId: input.projectId } } },
+        ],
+      },
+      orderBy: [{ name: "asc" }, { id: "asc" }],
+      take: input.limit + 1,
+      select: {
+        id: true,
+        name: true,
+        labourCode: true,
+        labourCategoryId: true,
+        joiningDate: true,
+      },
+    });
+    const kept = rows.slice(0, input.limit);
+    const categories = await this.categoryNames(
+      input.workspaceId,
+      kept.map((row) => row.labourCategoryId),
+    );
+    return {
+      items: kept.map((row) => ({
+        id: row.id,
+        name: row.name,
+        labourCode: row.labourCode,
+        labourCategory:
+          row.labourCategoryId == null
+            ? null
+            : (categories.get(row.labourCategoryId) ?? null),
+        joiningDate: calendarDateFromDb(row.joiningDate),
+      })),
+      hasMore: rows.length > input.limit,
+    };
   }
 
   async options(

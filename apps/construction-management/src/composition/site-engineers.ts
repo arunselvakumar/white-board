@@ -100,6 +100,37 @@ export type SiteEngineerCreated = SiteEngineerReadModel & {
   invited: boolean;
 };
 
+/** A Site Engineer on a Project's Resources (ADR CM-0038 §3). */
+export type ProjectSiteEngineer = {
+  /** The Site Engineer (`supervisors`) row, not their sign-in. */
+  id: string;
+  name: string;
+  mobile: string | null;
+  employeeCode: string | null;
+  disabled: boolean;
+};
+
+/** One the Add Site Engineers picker lists; without a sign-in it is shown, not offered. */
+export type ProjectSiteEngineerChoice = ProjectSiteEngineer & {
+  hasSignIn: boolean;
+};
+
+function projectLine(item: SupervisorReadModel): ProjectSiteEngineer {
+  return {
+    id: item.id,
+    name: item.name,
+    mobile: item.mobile,
+    employeeCode: item.profile.employeeCode,
+    disabled: item.disabled,
+  };
+}
+
+function sameSet(a: readonly string[], b: readonly string[]): boolean {
+  const left = new Set(a);
+  const right = new Set(b);
+  return left.size === right.size && [...left].every((id) => right.has(id));
+}
+
 function signInOf(
   supervisor: SupervisorReadModel,
   member: TeamMemberReadModel | null,
@@ -249,6 +280,156 @@ export class SiteEngineerHandlers {
       supervisor,
       await this.member(workspaceId, supervisor.teamMemberId),
     );
+  }
+
+  /**
+   * Every sign-in a Site Engineer row points at: their own, or an Office
+   * Staff one linked before ADR CM-0037. A Project's Team Members leave
+   * these out, so each person appears once (ADR CM-0038 §3).
+   */
+  async signInIds(workspaceId: string): Promise<Set<string>> {
+    const supervisors = await this.supervisors.list(workspaceId);
+    return new Set(
+      supervisors
+        .map((item) => item.teamMemberId)
+        .filter((id): id is string => id != null),
+    );
+  }
+
+  /** The sign-ins assigned to the Project, the Owner (on every one) left out. */
+  private async assignedSignIns(
+    workspaceId: string,
+    projectId: string,
+  ): Promise<{ assigned: Set<string>; ownerIds: Set<string> }> {
+    const team = await this.members.projectTeam(workspaceId, projectId);
+    return {
+      assigned: new Set(
+        team.filter((member) => !member.isOwner).map((member) => member.id),
+      ),
+      ownerIds: new Set(
+        team.filter((member) => member.isOwner).map((member) => member.id),
+      ),
+    };
+  }
+
+  /**
+   * The Site Engineers on a Project: those whose sign-in is assigned to it
+   * (ADR CM-0038 §3), by name. The caller has checked the Project is
+   * visible.
+   */
+  async onProject(
+    workspaceId: string,
+    projectId: string,
+  ): Promise<ProjectSiteEngineer[]> {
+    const [supervisors, { assigned }] = await Promise.all([
+      this.supervisors.list(workspaceId),
+      this.assignedSignIns(workspaceId, projectId),
+    ]);
+    return supervisors
+      .filter(
+        (item) => item.teamMemberId != null && assigned.has(item.teamMemberId),
+      )
+      .map(projectLine);
+  }
+
+  /**
+   * Enabled Site Engineers not on the Project. Those without a sign-in come
+   * back with `hasSignIn: false`: they cannot be put on a Project until
+   * they get one (ADR CM-0038, question 1).
+   */
+  async assignableToProject(
+    workspaceId: string,
+    projectId: string,
+  ): Promise<ProjectSiteEngineerChoice[]> {
+    const [engineers, { assigned, ownerIds }] = await Promise.all([
+      this.list(workspaceId, "enabled"),
+      this.assignedSignIns(workspaceId, projectId),
+    ]);
+    return engineers.flatMap<ProjectSiteEngineerChoice>((item) => {
+      if (item.signIn.kind === "none")
+        return [{ ...projectLine(item), hasSignIn: false }];
+      const memberId = item.signIn.memberId;
+      if (assigned.has(memberId) || ownerIds.has(memberId)) return [];
+      return [{ ...projectLine(item), hasSignIn: true }];
+    });
+  }
+
+  /**
+   * Makes `ids` (Site Engineer rows) the Site Engineers on the Project by
+   * assigning their sign-ins through the Team Member handlers, so each
+   * change is audited `team_member.projects_changed` and they see the
+   * Project at their next request. `expectedIds` is the set the screen
+   * loaded (409 `PROJECT_RESOURCES_CHANGED` when it moved). A Site Engineer
+   * newly added must exist (400 `SUPERVISOR_NOT_FOUND`), be enabled (400
+   * `SUPERVISOR_DISABLED`) and have a sign-in (409
+   * `SITE_ENGINEER_NO_SIGN_IN`). No other sign-in is touched.
+   */
+  async setOnProject(input: {
+    workspaceId: string;
+    projectId: string;
+    ids: readonly string[];
+    expectedIds: readonly string[];
+    by: string;
+  }): Promise<void> {
+    const [engineers, { assigned }] = await Promise.all([
+      this.list(input.workspaceId),
+      this.assignedSignIns(input.workspaceId, input.projectId),
+    ]);
+    const signInOfRow = (item: SiteEngineerReadModel) =>
+      item.signIn.kind === "none" ? null : item.signIn.memberId;
+    const byId = new Map(engineers.map((item) => [item.id, item]));
+    const current = engineers.filter((item) => {
+      const memberId = signInOfRow(item);
+      return memberId != null && assigned.has(memberId);
+    });
+    const currentIds = current.map((item) => item.id);
+    if (!sameSet(input.expectedIds, currentIds))
+      throw conflict(
+        "PROJECT_RESOURCES_CHANGED",
+        "Someone else changed this Project's Resources after you opened them. Reload to see their changes.",
+      );
+    const wanted: string[] = [];
+    for (const id of new Set(input.ids)) {
+      const item = byId.get(id);
+      if (item == null)
+        throw new DomainError(
+          "SUPERVISOR_NOT_FOUND",
+          "Choose Site Engineers from the list. One of them was not found.",
+          { details: { ids: [id] } },
+        );
+      const memberId = signInOfRow(item);
+      if (currentIds.includes(id) && memberId != null) {
+        wanted.push(memberId);
+        continue;
+      }
+      if (item.disabled)
+        throw new DomainError(
+          "SUPERVISOR_DISABLED",
+          `${item.name} is disabled, so they cannot be added to a Project.`,
+          { details: { ids: [id] } },
+        );
+      if (memberId == null)
+        throw conflict(
+          "SITE_ENGINEER_NO_SIGN_IN",
+          `${item.name} has no sign-in yet. Give them one on their page first.`,
+          { ids: [id] },
+        );
+      wanted.push(memberId);
+    }
+    await this.members.setProjectTeam({
+      workspaceId: input.workspaceId,
+      projectId: input.projectId,
+      ids: wanted,
+      expectedIds: current
+        .map(signInOfRow)
+        .filter((id): id is string => id != null),
+      by: input.by,
+      scope: {
+        only: new Set(
+          engineers.map(signInOfRow).filter((id): id is string => id != null),
+        ),
+      },
+    });
   }
 
   /** A new sign-in on the Site Engineer Role, left off Office Staff. */

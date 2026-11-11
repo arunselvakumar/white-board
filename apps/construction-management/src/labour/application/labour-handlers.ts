@@ -1,6 +1,7 @@
 import { assertCan, type MemberAccess } from "@/src/shared-kernel/access";
 import type { AuditEvent } from "@/src/shared-kernel/audit";
 import {
+  addDays,
   assertCalendarDate,
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
@@ -10,7 +11,7 @@ import {
   notFound,
 } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
-import type { ListCursor } from "@/src/shared-kernel/list-cursor";
+import type { ListCursor, NameCursor } from "@/src/shared-kernel/list-cursor";
 
 import {
   Labour,
@@ -37,6 +38,8 @@ import type {
   LabourReadModel,
   LabourRepository,
   LabourTransferRecord,
+  ProjectLabourChoice,
+  ProjectLabourPage,
 } from "./labour-ports";
 
 export type CreateLabourInput = LabourDetailsInput & {
@@ -90,6 +93,36 @@ function withField(error: DomainError, field: string): DomainError {
     kind: error.kind,
     details: { field },
   });
+}
+
+/** The same error, its details extended (the field and the Labour refused). */
+function withDetails(
+  error: DomainError,
+  details: Record<string, unknown>,
+  message = error.message,
+): DomainError {
+  const kept =
+    typeof error.details === "object" && error.details != null
+      ? error.details
+      : {};
+  return new DomainError(error.code, message, {
+    kind: error.kind,
+    details: { ...kept, ...details },
+  });
+}
+
+/** The most labourers one command moves (transfer, add to a Project). */
+const MAX_BATCH = 500;
+
+function remarkOf(raw: string | null | undefined): string | null {
+  const remark = raw?.trim() ?? "";
+  if (remark.length > 500)
+    throw new DomainError(
+      "REMARK_TOO_LONG",
+      "The remark must be at most 500 characters.",
+      { details: { field: "remark" } },
+    );
+  return remark.length === 0 ? null : remark;
 }
 
 /**
@@ -603,6 +636,247 @@ export class LabourHandlers {
     }
     await this.labours.transfer(moves, audits);
     return Promise.all(ids.map((id) => this.view(input.workspaceId, id)));
+  }
+
+  /** A Project's labourers for its Resources, by name (ADR CM-0038 §2). */
+  onProject(filter: {
+    workspaceId: string;
+    projectId: string;
+    search?: string;
+    limit: number;
+    after?: NameCursor;
+    before?: NameCursor;
+  }): Promise<ProjectLabourPage> {
+    return this.queries.onProject(filter);
+  }
+
+  countOnProject(workspaceId: string, projectId: string): Promise<number> {
+    return this.queries.countOnProject(workspaceId, projectId);
+  }
+
+  /** Active labourers not on the Project, for its Add Labours picker. */
+  addableToProject(input: {
+    workspaceId: string;
+    projectId: string;
+    search?: string;
+    limit: number;
+  }): Promise<{ items: ProjectLabourChoice[]; hasMore: boolean }> {
+    return this.queries.addableToProject(input);
+  }
+
+  /** The date typed, or today in the Company's time zone when left out. */
+  private async dateOr(
+    workspaceId: string,
+    raw: string | null | undefined,
+    field: string,
+    code: string,
+  ): Promise<CalendarDate> {
+    const typed = raw?.trim() ?? "";
+    if (typed === "") return this.labours.today(workspaceId);
+    try {
+      return assertCalendarDate(typed, code);
+    } catch (error) {
+      if (error instanceof DomainError) throw withField(error, field);
+      throw error;
+    }
+  }
+
+  /** The date of each labourer's last history row. */
+  private async lastMoves(
+    workspaceId: string,
+    labours: readonly Labour[],
+  ): Promise<Map<string, CalendarDate>> {
+    const last = new Map<string, CalendarDate>();
+    await Promise.all(
+      labours.map(async (labour) => {
+        const rows = await this.labours.transfers(workspaceId, labour.id);
+        const date = rows.at(-1)?.transferDate;
+        if (date != null) last.set(labour.id, date);
+      }),
+    );
+    return last;
+  }
+
+  /**
+   * Adds labourers to a Project from a date (`from`, today when left out),
+   * from the Project's Resources (ADR CM-0038 §2). Their other Projects
+   * stay. All or none: the first refusal stops the command and names the
+   * labourer (`details.labourId`) and, for a date, the field. The caller
+   * has checked the Project is visible to the viewer.
+   */
+  async addToProject(input: {
+    workspaceId: string;
+    projectId: string;
+    labourIds: readonly string[];
+    from?: string | null;
+    remark?: string | null;
+    by: string;
+  }): Promise<void> {
+    const ids = [...new Set(input.labourIds)];
+    if (ids.length === 0)
+      throw new DomainError("LABOURS_REQUIRED", "Choose at least one Labour.", {
+        details: { field: "labourIds" },
+      });
+    if (ids.length > MAX_BATCH)
+      throw new DomainError(
+        "TOO_MANY_LABOURS",
+        `Add at most ${String(MAX_BATCH)} Labours at a time.`,
+        { details: { field: "labourIds" } },
+      );
+    const remark = remarkOf(input.remark);
+    const from = await this.dateOr(
+      input.workspaceId,
+      input.from,
+      "from",
+      "FROM_DATE_INVALID",
+    );
+    await this.assertReferences(input.workspaceId, {
+      projectIds: [input.projectId],
+      labourCategoryId: null,
+      supervisorId: null,
+    });
+    const labours = await this.labours.findMany(input.workspaceId, ids);
+    const found = new Set(labours.map((labour) => labour.id));
+    const missing = ids.find((id) => !found.has(id));
+    if (missing != null)
+      throw withDetails(labourNotFound(), { labourId: missing });
+    const lastMoves = await this.lastMoves(input.workspaceId, labours);
+
+    const now = this.clock();
+    const changes: { labour: Labour; loadedUpdatedAt: Date }[] = [];
+    const audits: AuditEvent[] = [];
+    for (const labour of labours) {
+      const loadedUpdatedAt = labour.updatedAt;
+      const before = [...labour.projectIds];
+      labour.joinProject(input.projectId, input.by, now);
+      const { name, joiningDate } = labour.details;
+      if (from < joiningDate)
+        throw new DomainError(
+          "FROM_BEFORE_JOINING_DATE",
+          `${name} joined on ${joiningDate}. Choose that date or later.`,
+          {
+            details: { field: "from", labourId: labour.id, joiningDate },
+          },
+        );
+      try {
+        assertTransferDate({
+          name,
+          transferDate: from,
+          lastTransferDate: lastMoves.get(labour.id) ?? null,
+          latestAttendanceDate: null,
+        });
+      } catch (error) {
+        if (error instanceof DomainError)
+          throw withDetails(error, { field: "from", labourId: labour.id });
+        throw error;
+      }
+      changes.push({ labour, loadedUpdatedAt });
+      audits.push(
+        this.audit(labour, input.by, "labour.projects_changed", {
+          before: { projectIds: before },
+          after: {
+            projectIds: [...labour.projectIds],
+            projectId: input.projectId,
+            from,
+            remark,
+          },
+        }),
+      );
+    }
+    await this.labours.changeProject({
+      projectId: input.projectId,
+      direction: "join",
+      labours: changes,
+      date: from,
+      remark,
+      audits,
+    });
+  }
+
+  /**
+   * Takes a labourer off a Project after their `lastDay` (today when left
+   * out), from the Project's Resources (ADR CM-0038 §2). The history row is
+   * dated the day after, their first day off it (ADR CM-0033). Attendance,
+   * wages and payments already recorded stay. The Last day may not come
+   * before an attendance day on the Project, or before their last move.
+   */
+  async removeFromProject(input: {
+    workspaceId: string;
+    projectId: string;
+    labourId: string;
+    lastDay?: string | null;
+    remark?: string | null;
+    by: string;
+  }): Promise<void> {
+    const remark = remarkOf(input.remark);
+    const lastDay = await this.dateOr(
+      input.workspaceId,
+      input.lastDay,
+      "lastDay",
+      "LAST_DAY_INVALID",
+    );
+    const firstDayOff = addDays(lastDay, 1);
+    const labour = await this.labours.findById(
+      input.workspaceId,
+      input.labourId,
+    );
+    if (labour == null)
+      throw withDetails(labourNotFound(), { labourId: input.labourId });
+    const loadedUpdatedAt = labour.updatedAt;
+    const before = [...labour.projectIds];
+    labour.leaveProject(input.projectId, input.by, this.clock());
+
+    const name = labour.details.name;
+    const lastMove =
+      (await this.lastMoves(input.workspaceId, [labour])).get(labour.id) ??
+      null;
+    const attendance =
+      (
+        await this.labours.latestAttendance(
+          input.workspaceId,
+          [labour.id],
+          input.projectId,
+        )
+      ).get(labour.id) ?? null;
+    try {
+      assertTransferDate({
+        name,
+        transferDate: firstDayOff,
+        lastTransferDate: lastMove,
+        latestAttendanceDate: attendance,
+      });
+    } catch (error) {
+      if (!(error instanceof DomainError)) throw error;
+      // The rule speaks of the history row's date; the screen of the Last day.
+      const message =
+        error.code === "TRANSFER_BEFORE_ATTENDANCE"
+          ? `${name} has attendance on this Project up to ${attendance ?? ""}. Choose that day or later as the Last day.`
+          : `${name}'s Projects last changed on ${lastMove ?? ""}. Choose ${lastMove == null ? "" : addDays(lastMove, -1)} or later as the Last day.`;
+      throw withDetails(
+        error,
+        { field: "lastDay", labourId: labour.id },
+        message,
+      );
+    }
+
+    await this.labours.changeProject({
+      projectId: input.projectId,
+      direction: "leave",
+      labours: [{ labour, loadedUpdatedAt }],
+      date: firstDayOff,
+      remark,
+      audits: [
+        this.audit(labour, input.by, "labour.projects_changed", {
+          before: { projectIds: before },
+          after: {
+            projectIds: [...labour.projectIds],
+            projectId: input.projectId,
+            lastDay,
+            remark,
+          },
+        }),
+      ],
+    });
   }
 
   /** The labourer's history, oldest first, with Project names. */

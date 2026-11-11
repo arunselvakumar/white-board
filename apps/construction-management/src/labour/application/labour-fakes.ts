@@ -8,6 +8,7 @@ import { Labour, type ProjectChanges } from "../domain/labour";
 import type { LabourDirectories } from "./labour-handlers";
 import type {
   LabourMove,
+  LabourProjectChange,
   LabourQueries,
   LabourReadModel,
   LabourRepository,
@@ -195,6 +196,31 @@ export class FakeLabourRepository implements LabourRepository {
     return Promise.resolve();
   }
 
+  changeProject(change: LabourProjectChange): Promise<void> {
+    for (const { labour, loadedUpdatedAt } of change.labours)
+      if (
+        this.labours.get(labour.id)?.updatedAt.getTime() !==
+        loadedUpdatedAt.getTime()
+      )
+        return Promise.reject(conflict("LABOUR_CHANGED", "Changed."));
+    for (const { labour } of change.labours) {
+      this.labours.set(labour.id, this.copy(labour));
+      const history = this.history.get(labour.id) ?? [];
+      history.push({
+        id: `${labour.id}-${String(history.length)}`,
+        fromProjectId: change.direction === "leave" ? change.projectId : null,
+        toProjectId: change.direction === "join" ? change.projectId : null,
+        transferDate: change.date,
+        remark: change.remark,
+        createdAt: labour.updatedAt,
+        createdBy: labour.updatedBy,
+      });
+      this.history.set(labour.id, history);
+    }
+    this.audits.push(...change.audits);
+    return Promise.resolve();
+  }
+
   /** Today, as the handler tests see it. */
   todayIs: CalendarDate = "2026-10-08";
 
@@ -273,6 +299,9 @@ export function fakeQueries(repository: FakeLabourRepository): LabourQueries {
     list: () => Promise.reject(new Error("not in fakes")),
     all: () => Promise.reject(new Error("not in fakes")),
     options: () => Promise.reject(new Error("not in fakes")),
+    onProject: () => Promise.reject(new Error("not in fakes")),
+    countOnProject: () => Promise.reject(new Error("not in fakes")),
+    addableToProject: () => Promise.reject(new Error("not in fakes")),
   };
 }
 
