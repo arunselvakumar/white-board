@@ -33,7 +33,8 @@ export class ResourcesPage extends ProjectPage {
     if (remark != null) await this.dialog.getByLabel(/Remark/).fill(remark);
     await this.dialog
       .getByRole("button", {
-        name: `Add ${String(names.length)} Labour${names.length === 1 ? "" : "s"}`,
+        name: names.length > 1 ? `Add ${String(names.length)} Labours` : "Add",
+        exact: true,
       })
       .click();
     await this.dialog.waitFor({ state: "hidden" });
