@@ -19,6 +19,12 @@ import {
   RESOURCES_API,
   SURYA,
 } from "./resource-fixtures";
+import {
+  ANAND,
+  FEW_LABOURS,
+  LABOURS_API,
+  labourPage,
+} from "./staffing-fixtures";
 
 let api: ReturnType<typeof mockFetch>;
 
@@ -28,6 +34,15 @@ function sent(path: string): unknown {
   );
   const body = call?.[1]?.body;
   return typeof body === "string" ? (JSON.parse(body) as unknown) : undefined;
+}
+
+/** The Labours section's list route over `items`. */
+function laboursRoute(items: typeof FEW_LABOURS = []) {
+  return {
+    path: LABOURS_API,
+    respond: ({ search }: { search: URLSearchParams }) =>
+      Response.json(labourPage(items, search)),
+  };
 }
 
 function region(
@@ -56,6 +71,7 @@ type Story = StoryObj<typeof meta>;
 export const EditContractors: Story = {
   beforeEach: () => {
     api = mockFetch([
+      laboursRoute(),
       { path: RESOURCES_API, respond: () => Response.json(RESOURCES) },
       {
         path: `${RESOURCES_API}/contractors/options`,
@@ -130,6 +146,7 @@ export const EditContractors: Story = {
 export const EditTeamMembersChangedElsewhere: Story = {
   beforeEach: () => {
     api = mockFetch([
+      laboursRoute(),
       { path: RESOURCES_API, respond: () => Response.json(RESOURCES) },
       {
         path: `${RESOURCES_API}/team-members/options`,
@@ -190,6 +207,7 @@ export const EditTeamMembersChangedElsewhere: Story = {
 export const EmptyStates: Story = {
   beforeEach: () => {
     api = mockFetch([
+      laboursRoute(),
       { path: RESOURCES_API, respond: () => Response.json(NO_RESOURCES) },
       {
         path: `${RESOURCES_API}/vendors/options`,
@@ -227,6 +245,7 @@ export const ReadOnly: Story = {
   args: { canEdit: false },
   beforeEach: () => {
     api = mockFetch([
+      laboursRoute(),
       {
         path: RESOURCES_API,
         respond: () => Response.json({ ...NO_RESOURCES, vendors: [MUTHU] }),
@@ -249,6 +268,7 @@ export const AddProjectStepOnAPhone: Story = {
   globals: { viewport: { value: "mobile1" } },
   beforeEach: () => {
     api = mockFetch([
+      laboursRoute(),
       { path: RESOURCES_API, respond: () => Response.json(NO_RESOURCES) },
     ]);
     return api.restore;
@@ -270,6 +290,7 @@ export const AddProjectStepDone: Story = {
   args: { wizard: true },
   beforeEach: () => {
     api = mockFetch([
+      laboursRoute(),
       { path: RESOURCES_API, respond: () => Response.json(RESOURCES) },
     ]);
     return api.restore;
@@ -278,5 +299,41 @@ export const AddProjectStepDone: Story = {
     await expect(
       await canvas.findByRole("link", { name: "Done" }),
     ).toHaveAttribute("href", `/app/projects/${PROJECT_ID}`);
+  },
+};
+
+export const SiteEngineersAndLaboursFirst: Story = {
+  args: { canReadLabours: true },
+  beforeEach: () => {
+    api = mockFetch([
+      laboursRoute(FEW_LABOURS),
+      {
+        path: RESOURCES_API,
+        respond: () =>
+          Response.json({
+            ...RESOURCES,
+            siteEngineers: [ANAND],
+            labours: { total: FEW_LABOURS.length },
+          }),
+      },
+    ]);
+    return api.restore;
+  },
+  play: async ({ canvas }) => {
+    await canvas.findByRole("region", { name: "Labours 3" });
+    const headings = canvas
+      .getAllByRole("heading", { level: 2 })
+      .map((heading) => heading.textContent);
+    await expect(headings).toEqual([
+      "Site Engineers 1",
+      "Labours 3",
+      "Team Members 2",
+      "Contractors 2",
+      "Suppliers 1",
+      "Vendors 1",
+    ]);
+    await expect(
+      region(canvas, "Site Engineers 1").getByText(ANAND.name),
+    ).toBeVisible();
   },
 };

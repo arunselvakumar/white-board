@@ -85,6 +85,11 @@ export type ListConstructionProjectsSiteEngineerOptionsResponseModel = z.infer<
 
 /** A Project's Resources, each kind by name (the Owner first). */
 export const ConstructionProjectsProjectResourcesResponseModel = z.object({
+  today: z.iso
+    .date()
+    .describe(
+      "Today in the Company's time zone: the default From and Last day.",
+    ),
   siteEngineers: z
     .array(ConstructionProjectsProjectSiteEngineerResponseModel)
     .describe(
@@ -158,6 +163,7 @@ export function toResourcesResponse(
   resources: ProjectResources,
 ): ConstructionProjectsProjectResourcesResponseModel {
   return {
+    today: resources.today,
     siteEngineers: resources.siteEngineers.map(toSiteEngineer),
     labours: { total: resources.labours.total },
     teamMembers: resources.teamMembers.map((item) => ({

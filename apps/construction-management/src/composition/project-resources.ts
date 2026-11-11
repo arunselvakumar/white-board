@@ -9,6 +9,8 @@ import {
   type ProjectViewer,
 } from "@/src/projects/application/project-handlers";
 import { PrismaProjectRepository } from "@/src/projects/infrastructure/prisma-project-repository";
+import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
+import { companyToday } from "@/src/shared-kernel/company-today";
 
 import {
   createSiteEngineerHandlers,
@@ -41,6 +43,8 @@ export type ProjectTeamMemberResource = ProjectResource & {
 };
 
 export type ProjectResources = {
+  /** The Company's today: what Add Labours and Remove offer as the date. */
+  today: CalendarDate;
   /** Their sign-ins are left out of `teamMembers` (ADR CM-0038 §3). */
   siteEngineers: ProjectSiteEngineer[];
   /** How many; the list is paged on its own route (ADR CM-0038 §2). */
@@ -91,6 +95,7 @@ export type StaffingSides = {
     }): Promise<void>;
   };
   labourCount(workspaceId: string, projectId: string): Promise<number>;
+  today(workspaceId: string): Promise<CalendarDate>;
 };
 
 /**
@@ -119,6 +124,7 @@ export class ProjectResourcesService {
     await this.assertVisible(viewer, projectId);
     const { workspaceId } = viewer;
     const [
+      today,
       siteEngineers,
       labours,
       teamMembers,
@@ -126,6 +132,7 @@ export class ProjectResourcesService {
       suppliers,
       vendors,
     ] = await Promise.all([
+      this.staffing.today(workspaceId),
       this.staffing.siteEngineers.onProject(workspaceId, projectId),
       this.staffing.labourCount(workspaceId, projectId),
       this.sides.team_members.onProject(workspaceId, projectId),
@@ -134,6 +141,7 @@ export class ProjectResourcesService {
       this.sides.vendors.onProject(workspaceId, projectId),
     ]);
     return {
+      today,
       siteEngineers,
       labours: { total: labours },
       teamMembers,
@@ -267,6 +275,7 @@ export function createProjectResources(deps?: {
       },
       labourCount: (workspaceId, projectId) =>
         labours.countOnProject(workspaceId, projectId),
+      today: (workspaceId) => companyToday(db, workspaceId),
     },
   );
 }

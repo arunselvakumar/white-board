@@ -1,12 +1,37 @@
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectResourcesPage } from "@/app/app/projects/[id]/resources/_components/project-resources-page";
 import { RESOURCES_STEP } from "@/app/app/projects/_components/resources/resources-step";
-import { QuerySuspense } from "@/components/query-suspense";
-import { ProjectResourcesSkeleton } from "@/app/app/projects/[id]/resources/_components/resources-skeletons";
+import { GET as listProjectLabours } from "@/app/api/construction/projects/projects/[id]/resources/labours/route";
+import { GET as readResources } from "@/app/api/construction/projects/projects/[id]/resources/route";
+import {
+  PROJECT_LABOURS_API,
+  RESOURCES_API,
+  projectLaboursQuery,
+  projectResourcesQuery,
+} from "@/src/queries/project-resources";
+import { getQueryClient } from "@/src/queries/query-client";
+import { prefetchRoute, type RouteHandler } from "@/src/queries/route-fetch";
 
 export const metadata: Metadata = { title: "Resources" };
+
+/** A Project route's handler, called with the `[id]` the path filled in. */
+function projectRoute(
+  handler: (
+    request: Request,
+    context: { params: Promise<{ id: string }> },
+  ) => Promise<Response>,
+): RouteHandler {
+  return (request, context) =>
+    handler(request, {
+      params: context.params.then((params) => ({ id: params["id"] ?? "" })),
+    });
+}
+
+// The prefetch reads the request's Session cookie.
+export const dynamic = "force-dynamic";
 
 /**
  * The Project's Resources; `?step=resources` right after Add Project shows
@@ -20,16 +45,27 @@ export default async function ProjectResourcesRoute({
   searchParams: Promise<{ step?: string | string[] }>;
 }) {
   const [{ id }, { step }] = await Promise.all([params, searchParams]);
-  const canEdit = await viewerCan("projects.project", "update", {
-    projectId: id,
-  });
+  const queryClient = getQueryClient();
+  const routes = {
+    [RESOURCES_API]: projectRoute(readResources),
+    [PROJECT_LABOURS_API]: projectRoute(listProjectLabours),
+  };
+  const [canEdit, canReadLabours, canTransfer] = await Promise.all([
+    viewerCan("projects.project", "update", { projectId: id }),
+    viewerCan("masters.labours", "read"),
+    viewerCan("labour.labour", "transfer", { projectId: id }),
+    prefetchRoute(queryClient, projectResourcesQuery(id), routes),
+    prefetchRoute(queryClient, projectLaboursQuery(id), routes),
+  ]);
   return (
-    <QuerySuspense fallback={<ProjectResourcesSkeleton />}>
+    <HydrationBoundary state={dehydrate(queryClient)}>
       <ProjectResourcesPage
         projectId={id}
         canEdit={canEdit}
+        canReadLabours={canReadLabours}
+        canTransfer={canTransfer}
         wizard={step === RESOURCES_STEP}
       />
-    </QuerySuspense>
+    </HydrationBoundary>
   );
 }

@@ -60,6 +60,7 @@ type SiteEngineerLine = {
 };
 
 type Resources = {
+  today: string;
   siteEngineers: SiteEngineerLine[];
   labours: { total: number };
   teamMembers: { id: string; isOwner: boolean }[];
@@ -654,6 +655,7 @@ describe("Labours on a Project's Resources (ADR CM-0038 §2)", () => {
     const project = await addProject(company.workspaceId, company.userId);
     const arun = await labour(company, "Arun");
     const today = await companyToday(prisma, company.workspaceId);
+    expect((await resources(company.cookie, project)).today).toBe(today);
 
     expect(
       (await add(company.cookie, project, { labourIds: [arun] })).status,

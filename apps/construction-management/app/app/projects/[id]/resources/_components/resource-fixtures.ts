@@ -68,6 +68,7 @@ export const MUTHU: ProjectResource = {
 };
 
 export const RESOURCES: ProjectResources = {
+  today: "2026-11-11",
   siteEngineers: [],
   labours: { total: 0 },
   teamMembers: [OWNER, PRABHU],
@@ -77,6 +78,7 @@ export const RESOURCES: ProjectResources = {
 };
 
 export const NO_RESOURCES: ProjectResources = {
+  today: "2026-11-11",
   siteEngineers: [],
   labours: { total: 0 },
   teamMembers: [OWNER],
