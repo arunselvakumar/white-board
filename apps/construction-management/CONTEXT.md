@@ -137,7 +137,7 @@ The Client Order's value excluding GST, shown only to Team Members with the Proj
 _Avoid_: contract value, budget (that is the Company's own figure)
 
 **Resources**:
-Who works on a Project: its Team Members (the Owner is on every Project), Contractors, Suppliers and Vendors. Each party keeps its Projects in its own master; a Project's Resources section shows and changes all four. Assigned on Add Project's second step, or any time after (ADR CM-0013 §6).
+Who works on a Project: its Site Engineers, Labours, Team Members (the Owner is on every Project), Contractors, Suppliers and Vendors. Each party keeps its Projects in its own master or sign-in; a Project's Resources section shows and changes all six. Assigned on Add Project's second step, or any time after (ADR CM-0013 §6, CM-0038). A Site Engineer is listed only under Site Engineers, not again under Team Members.
 _Avoid_: team, members (for all four), assignment
 
 **Custom Field**:
@@ -291,6 +291,10 @@ Hours beyond the day, at a rate per hour; at most 24 hours a day for a Labour.
 **Transfer**:
 Moving a Labour to another Project from a date. Their balance goes with them.
 _Avoid_: shift (for this), reassign
+
+**From / Last day**:
+A Labour's first and last working day on a Project, asked when they are added to it or removed from it on the Project's Resources. The history is dated the first day on (From) and the first day off (the day after the Last day) (ADR CM-0038).
+_Avoid_: end date, relieving date
 
 **Ledger / Balance**:
 Every amount owed or paid is an entry that is never edited; a balance is the sum of entries (ADR CM-0004). Positive is owed to the Labour or Vendor; an Advance makes it smaller.

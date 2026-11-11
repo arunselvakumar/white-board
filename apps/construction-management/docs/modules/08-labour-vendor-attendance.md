@@ -280,6 +280,7 @@ Unique (labourId, attendanceDate) — inferred; whether a labour can have two sh
 2. Pick the Project they leave (preset when they share one, or from the list filter), the destination and the date.
 3. The Project they leave is swapped for the destination; their other Projects stay. A row is appended to transfer history (`#/labourTransferHistory`).
 4. Attendance from the transfer date onward is marked in the new project (inferred).
+5. A Labour can also be added to or removed from a Project on that Project's Resources (ADR CM-0038 §2): **Add Labours** takes a From date, **Remove** a Last day. The history rows are the ones Edit Labour writes (no "from" when adding, no "to" when removing, the removal dated the day after the Last day), audited `labour.projects_changed`. The date rules of a transfer apply: not before their last move, and on removal not before an attendance day on that Project. Resources also opens Transfer with its Project as the source.
 
 ### 3. Labour lifecycle
 
