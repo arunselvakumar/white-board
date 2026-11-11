@@ -118,7 +118,7 @@ export const Menu: Story = {
     ).toBeNull();
     await waitFor(() =>
       expect(groupsOf(nav)).toEqual([
-        ["Overview", ["Dashboard"]],
+        ["Overview", ["Dashboard", "Activity"]],
         ["Setup", ["Wings", "Amenities", "Resources"]],
         [
           "Site work",
@@ -147,6 +147,10 @@ export const Menu: Story = {
     await expect(menu.getByRole("link", { name: "Wings" })).toHaveAttribute(
       "href",
       `${PATH}/wings`,
+    );
+    await expect(menu.getByRole("link", { name: "Activity" })).toHaveAttribute(
+      "href",
+      `${PATH}/activity`,
     );
     await expect(
       menu.getByRole("link", { name: "Testing Reports" }),

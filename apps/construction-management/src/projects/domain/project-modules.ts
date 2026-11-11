@@ -17,6 +17,13 @@ export const PROJECT_MODULES = [
     menu: "reporting.project_dashboard",
   },
   {
+    key: "activity",
+    label: "Activity",
+    description: "Site Engineers and Labours added, removed and transferred.",
+    segment: "activity",
+    menu: "projects.project",
+  },
+  {
     key: "wings",
     label: "Wings",
     description: "Phases, Wings, Floors and Units of the building.",

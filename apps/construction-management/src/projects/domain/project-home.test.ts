@@ -60,7 +60,7 @@ describe("homeModules", () => {
       ...everything,
       canRead: (menu) => menu === "projects.project",
     }).map((module) => module.key);
-    expect(keys).toEqual(["amenities", "documents", "resources"]);
+    expect(keys).toEqual(["activity", "amenities", "documents", "resources"]);
   });
 
   it("drops hidden modules, or marks them for those who may unhide them", () => {

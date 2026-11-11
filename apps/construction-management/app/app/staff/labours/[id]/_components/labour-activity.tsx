@@ -24,10 +24,12 @@ import {
 import {
   ActivityDateRange,
   ActivityFilterSelect,
+} from "@/app/app/_components/activity/activity-filters";
+import {
   orderedRange,
   parseAsCalendarDate,
   parseAsUuid,
-} from "@/app/app/_components/activity/activity-filters";
+} from "@/app/app/_components/activity/activity-search-params";
 import { projectBasePath } from "@/lib/project-nav";
 import {
   LABOUR_ACTIVITY_TYPES,

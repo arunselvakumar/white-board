@@ -1,6 +1,5 @@
 "use client";
 
-import { createParser } from "nuqs";
 import { useId } from "react";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
@@ -95,30 +94,3 @@ export function ActivityDateRange({
     </>
   );
 }
-
-/** A range typed back to front is read front to back. */
-export function orderedRange(
-  from: string | null,
-  to: string | null,
-): { from: string | null; to: string | null } {
-  return from != null && to != null && from > to
-    ? { from: to, to: from }
-    : { from, to };
-}
-
-/** A `YYYY-MM-DD` in the address; anything else reads as no date. */
-export const parseAsCalendarDate = createParser({
-  parse: (value) => (/^\d{4}-\d{2}-\d{2}$/.test(value) ? value : null),
-  serialize: (value: string) => value,
-});
-
-/** An id in the address; anything that is not a uuid reads as none. */
-export const parseAsUuid = createParser({
-  parse: (value) =>
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-      value,
-    )
-      ? value.toLowerCase()
-      : null,
-  serialize: (value: string) => value,
-});

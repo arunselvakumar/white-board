@@ -7,7 +7,7 @@ import type { ProjectModuleKey } from "./project-modules";
  * A new module goes under one heading here.
  */
 export const PROJECT_NAV_GROUPS = [
-  { label: "Overview", keys: ["dashboard"] },
+  { label: "Overview", keys: ["dashboard", "activity"] },
   { label: "Setup", keys: ["wings", "locations", "amenities", "resources"] },
   {
     label: "Site work",

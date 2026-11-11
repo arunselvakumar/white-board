@@ -29,7 +29,7 @@ describe("PROJECT_NAV_GROUPS", () => {
 describe("projectNavGroups", () => {
   it("falls back to every module of the structure until the home loads", () => {
     expect(labels(projectNavGroups(undefined, "wings"))).toEqual([
-      ["Overview", ["Dashboard"]],
+      ["Overview", ["Dashboard", "Activity"]],
       ["Setup", ["Wings", "Amenities", "Resources"]],
       [
         "Site work",
