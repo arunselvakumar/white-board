@@ -20,7 +20,7 @@ The owner answered four questions on 2026-10-24. The answers are the first four 
 - **The Owner has no Role.** They can do everything, as before. HRMS Team Members also have a Role; Add User preselects **HRMS Staff** (the old HRMS default set) when Member Type is HRMS.
 - **Designations are job titles only.** The Permission Template leaves Designations (column and form section). Back-dated Entry overrides still name Designations. Choosing a Designation no longer sets access.
 - **Grant rules stay.** A Member can give a User a Role, or save a Role, only when they themselves hold every cell in it (`assertCanGrant`). Nobody can change the Role they are on, so a Member cannot widen their own access.
-- A Role with Users on it cannot be deleted (`ROLE_IN_USE`); move them first. Seeded Roles can be renamed, edited and deleted like any other.
+- A Role with Users on it cannot be deleted (`ROLE_IN_USE`); move them first. Seeded Roles can be renamed, edited and deleted like any other. _Amended by [CM-0037](CM-0037-site-engineer-page-sign-in-and-default-roles.md): a seeded (default) Role keeps its name and cannot be deleted._
 - A new menu `organization.roles` (Role Management: create, read, update, delete) guards the Role pages and APIs. It is granted to every Role that already had `organization.team_members` update.
 
 ### 2. Users & Roles is a main-menu item; Team Members leave Masters
