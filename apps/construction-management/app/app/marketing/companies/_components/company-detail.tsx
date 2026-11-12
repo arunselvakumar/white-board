@@ -4,6 +4,7 @@ import { formatMobile } from "@repo/auth/construction/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
   ArrowRightLeft,
+  CalendarClock,
   MoreHorizontal,
   Pencil,
   Plus,
@@ -53,7 +54,9 @@ import { visitPath } from "@/src/queries/marketing-visits";
 import { gstStateName } from "@/src/shared-kernel/gst-states";
 
 import { VisitButtons } from "../../_components/visit-buttons";
+import { FollowUpDialog } from "../../follow-ups/_components/follow-up-dialog";
 import {
+  followUpEntryWords,
   lostReasonWords,
   StageBadge,
   stageEntryByline,
@@ -489,6 +492,32 @@ function TimelineText({
           </p>
         </>
       );
+    case "follow_up":
+      return (
+        <>
+          <p className="break-words">
+            <span className="font-medium">{followUpEntryWords(item)}</span>
+          </p>
+          {item.note != null && (
+            <p className="break-words whitespace-pre-line">{item.note}</p>
+          )}
+          <p className="text-muted-foreground break-words">
+            {item.visitId != null && item.visitNumber != null && (
+              <>
+                {"From "}
+                <Link
+                  href={visitPath(item.visitId)}
+                  className="underline-offset-4 hover:underline"
+                >
+                  {item.visitNumber}
+                </Link>
+                {" · "}
+              </>
+            )}
+            {activityRecordedLabel(item.at, timeZone)}
+          </p>
+        </>
+      );
     case "file":
       return (
         <>
@@ -518,9 +547,10 @@ const DOT_CLASSES: Record<ProspectCompanyTimelineItem["kind"], string> = {
   visit: "bg-emerald-500/70",
   note: "bg-muted-foreground/50",
   file: "bg-muted-foreground/50",
+  follow_up: "bg-amber-500/70",
 };
 
-/** Stage changes, Visits and their notes and files, newest first. */
+/** Stage changes, Visits, their notes and files, and Follow-ups, newest first. */
 function History({
   company,
   timeZone,
@@ -557,15 +587,20 @@ function History({
 export function CompanyDetail({
   id,
   canPlanVisit = false,
+  canAddFollowUp = false,
 }: {
   id: string;
   /** Visits create: Plan Visit and Log Visit for this company. */
   canPlanVisit?: boolean;
+  /** Follow-ups create: Add Follow-up for this company. */
+  canAddFollowUp?: boolean;
 }) {
   const router = useRouter();
   const { data: company } = useSuspenseQuery(companyQuery(id));
   const remove = useDeleteCompany(company.id);
-  const [dialog, setDialog] = useState<"stage" | "delete" | null>(null);
+  const [dialog, setDialog] = useState<"stage" | "delete" | "follow-up" | null>(
+    null,
+  );
   const [error, setError] = useState<string | null>(null);
   const { canUpdate, canDelete } = company.actions;
   const meta = [company.assignedTo?.name, company.city]
@@ -585,8 +620,20 @@ export function CompanyDetail({
             </span>
           }
           actions={
-            canUpdate || canDelete || canPlanVisit ? (
+            canUpdate || canDelete || canPlanVisit || canAddFollowUp ? (
               <div className="flex flex-wrap gap-2">
+                {canAddFollowUp && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setDialog("follow-up");
+                    }}
+                  >
+                    <CalendarClock aria-hidden="true" />
+                    Add Follow-up
+                  </Button>
+                )}
                 {canPlanVisit && (
                   <VisitButtons prospectCompanyId={company.id} />
                 )}
@@ -650,6 +697,15 @@ export function CompanyDetail({
         </div>
       </div>
 
+      {canAddFollowUp && dialog === "follow-up" && (
+        <FollowUpDialog
+          open
+          prefill={{ company: { id: company.id, name: company.name } }}
+          onOpenChange={(open) => {
+            if (!open) setDialog(null);
+          }}
+        />
+      )}
       {canUpdate && (
         <MoveStageDialog
           company={company}

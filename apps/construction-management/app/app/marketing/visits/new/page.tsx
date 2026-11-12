@@ -37,14 +37,25 @@ const ROUTES = {
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/** The well-formed ids of a comma-separated list. */
+function ids(raw: string | undefined): string[] {
+  return (raw ?? "").split(",").filter((id) => UUID.test(id));
+}
+
 /**
  * `?status=planned` plans a Visit, `?status=completed` logs one already
- * made; `&prospectCompanyId=` picks the company.
+ * made; `&prospectCompanyId=` picks the company, and `&contactIds=` and
+ * `&visitorIds=` (Log the visit from a Follow-up) its people.
  */
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; prospectCompanyId?: string }>;
+  searchParams: Promise<{
+    status?: string;
+    prospectCompanyId?: string;
+    contactIds?: string;
+    visitorIds?: string;
+  }>;
 }) {
   const params = await searchParams;
   const status = params.status === "completed" ? "completed" : "planned";
@@ -56,6 +67,7 @@ export default async function Page({
   const flags = await viewerFlags("marketing.visits", ["read", "create"]);
   if (!flags.read || !flags.create)
     return <MarketingNoAccess what="adding Visits" />;
+  const canAddFollowUp = await viewerCan("marketing.follow_ups", "create");
 
   const queryClient = getQueryClient();
   await Promise.all([
@@ -73,7 +85,13 @@ export default async function Page({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <VisitNew status={status} prospectCompanyId={prospectCompanyId} />
+      <VisitNew
+        status={status}
+        prospectCompanyId={prospectCompanyId}
+        contactIds={prospectCompanyId == null ? [] : ids(params.contactIds)}
+        visitorIds={ids(params.visitorIds)}
+        canAddFollowUp={canAddFollowUp}
+      />
     </HydrationBoundary>
   );
 }

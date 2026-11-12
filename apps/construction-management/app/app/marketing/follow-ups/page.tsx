@@ -1,9 +1,53 @@
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import type { Metadata } from "next";
 
-import { MarketingSectionPage } from "../_components/marketing-section-page";
+import { viewerCan, viewerFlags } from "@/app/app/_lib/viewer-can";
+import { GET as formOptions } from "@/app/api/construction/marketing/follow-ups/form-options/route";
+import { GET as listFollowUps } from "@/app/api/construction/marketing/follow-ups/route";
+import {
+  FOLLOW_UPS_OPENING_FILTERS,
+  followUpFormOptionsQuery,
+  followUpsQuery,
+  MARKETING_FOLLOW_UPS_API,
+} from "@/src/queries/marketing-follow-ups";
+import { getQueryClient } from "@/src/queries/query-client";
+import {
+  prefetchInfiniteRoute,
+  prefetchRoute,
+} from "@/src/queries/route-fetch";
+
+import { MarketingNoAccess } from "../_components/marketing-no-access";
+import { FollowUpsList } from "./_components/follow-ups-list";
 
 export const metadata: Metadata = { title: "Follow-ups" };
 
-export default function Page() {
-  return <MarketingSectionPage section="followUps" />;
+// The prefetch reads the request's Session cookie.
+export const dynamic = "force-dynamic";
+
+const ROUTES = {
+  [MARKETING_FOLLOW_UPS_API]: listFollowUps,
+  [`${MARKETING_FOLLOW_UPS_API}/form-options`]: formOptions,
+};
+
+/** The viewer's own Open Follow-ups on arrival (ADR-0052). */
+export default async function Page() {
+  const can = await viewerFlags("marketing.follow_ups", ["read", "create"]);
+  if (!can.read) return <MarketingNoAccess what="Follow-ups" />;
+  const canLogVisit = await viewerCan("marketing.visits", "create");
+
+  const queryClient = getQueryClient();
+  await Promise.all([
+    prefetchInfiniteRoute(
+      queryClient,
+      followUpsQuery(FOLLOW_UPS_OPENING_FILTERS),
+      ROUTES,
+    ),
+    prefetchRoute(queryClient, followUpFormOptionsQuery, ROUTES),
+  ]);
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <FollowUpsList canCreate={can.create} canLogVisit={canLogVisit} />
+    </HydrationBoundary>
+  );
 }

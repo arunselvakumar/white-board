@@ -56,6 +56,7 @@ import {
 
 import { CancelVisitDialog, RescheduleVisitDialog } from "./visit-dialogs";
 import { VisitFiles } from "./visit-files";
+import { VisitFollowUps, type VisitFollowUpAccess } from "./visit-follow-ups";
 import {
   historyWords,
   InterestBadge,
@@ -303,10 +304,17 @@ type Open = "reschedule" | "cancel" | "delete" | null;
 
 /**
  * One Visit: its company, people and what was discussed, its photos and
- * files, notes and history, with Edit, Complete, Reschedule, Cancel and
- * Delete as the server's `actions` allow.
+ * files, notes, Follow-ups and history, with Edit, Complete, Reschedule,
+ * Cancel and Delete as the server's `actions` allow.
  */
-export function VisitDetail({ id }: { id: string }) {
+export function VisitDetail({
+  id,
+  followUps = null,
+}: {
+  id: string;
+  /** Follow-ups read: the Follow-ups card; null hides it. */
+  followUps?: VisitFollowUpAccess | null;
+}) {
   const router = useRouter();
   const { data: visit } = useSuspenseQuery(visitQuery(id));
   const remove = useDeleteVisit(visit.id);
@@ -447,7 +455,12 @@ export function VisitDetail({ id }: { id: string }) {
             <VisitFiles visit={visit} />
             <Notes visit={visit} />
           </div>
-          <History visit={visit} />
+          <div className="min-w-0 space-y-6">
+            {followUps != null && (
+              <VisitFollowUps visit={visit} access={followUps} />
+            )}
+            <History visit={visit} />
+          </div>
         </div>
       </div>
 

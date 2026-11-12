@@ -105,6 +105,7 @@ export const Phone: Story = {
     await expect(
       within(balaji).getByText("Last visit: 10 Nov 2026"),
     ).toBeVisible();
+    await expect(balaji).toHaveTextContent(/Next follow-up: 12 Nov 2026/);
     await expect(canvas.queryByRole("table")).toBeNull();
   },
 };
@@ -244,5 +245,41 @@ export const EmptyReadOnly: Story = {
     await expect(
       canvas.queryByRole("link", { name: "Add Prospect Company" }),
     ).toBeNull();
+  },
+};
+
+/**
+ * The Next follow-up column (a line on each phone card): each company's
+ * earliest open Follow-up, red when it is before today in the Company
+ * time zone. Story tests run at phone width, so the play checks whichever
+ * layout shows.
+ */
+export const NextFollowUps: Story = {
+  args: { now: new Date("2026-11-12T06:30:00.000Z") },
+  globals: { viewport: { value: "desktop" } },
+  play: async ({ canvas }) => {
+    await canvas.findByText("4 Prospect Companies");
+    const table = canvas.queryByRole("table", { name: "Prospect Companies" });
+    if (table != null)
+      await expect(
+        within(table).getByRole("columnheader", { name: "Next follow-up" }),
+      ).toBeVisible();
+    const layout =
+      table ?? canvas.getByRole("list", { name: "Prospect Companies" });
+    const [textiles, kaveri, steel, balaji] = within(layout)
+      .getAllByRole(table == null ? "listitem" : "row")
+      .filter((row) => within(row).queryAllByRole("link").length > 0);
+    if (textiles == null || kaveri == null || steel == null || balaji == null)
+      throw new Error("four companies");
+    await expect(within(kaveri).getByText("9 Nov 2026")).toHaveClass(
+      "text-red-700",
+    );
+    await expect(kaveri).toHaveTextContent("9 Nov 2026 (overdue)");
+    await expect(textiles).toHaveTextContent("10 Nov 2026 (overdue)");
+    await expect(steel).not.toHaveTextContent("(overdue)");
+    await expect(within(balaji).getByText("12 Nov 2026")).not.toHaveClass(
+      "text-red-700",
+    );
+    await expect(balaji).not.toHaveTextContent("(overdue)");
   },
 };

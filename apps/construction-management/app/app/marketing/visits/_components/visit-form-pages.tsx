@@ -27,14 +27,24 @@ function Frame({
   );
 }
 
-/** Plan a Visit, or log one already made (completed). */
+/**
+ * Plan a Visit, or log one already made (completed); Log the visit from a
+ * Follow-up fills in its points of contact and visitors.
+ */
 export function VisitNew({
   status,
   prospectCompanyId,
+  contactIds,
+  visitorIds,
+  canAddFollowUp,
   now,
 }: {
   status: "planned" | "completed";
   prospectCompanyId?: string;
+  contactIds?: readonly string[];
+  visitorIds?: readonly string[];
+  /** Follow-ups create: the Next Follow-up section. */
+  canAddFollowUp?: boolean;
   now?: Date;
 }) {
   return (
@@ -42,7 +52,17 @@ export function VisitNew({
       back={{ label: "Visits", href: visitPath() }}
       title={status === "planned" ? "Plan Visit" : "Log Visit"}
     >
-      <VisitForm mode={{ kind: "new", status, prospectCompanyId }} now={now} />
+      <VisitForm
+        mode={{
+          kind: "new",
+          status,
+          prospectCompanyId,
+          contactIds,
+          visitorIds,
+        }}
+        canAddFollowUp={canAddFollowUp}
+        now={now}
+      />
     </Frame>
   );
 }
@@ -68,7 +88,16 @@ export function VisitEdit({ id, now }: { id: string; now?: Date }) {
 }
 
 /** A planned (or Missed) Visit, recorded as made. */
-export function VisitComplete({ id, now }: { id: string; now?: Date }) {
+export function VisitComplete({
+  id,
+  canAddFollowUp,
+  now,
+}: {
+  id: string;
+  /** Follow-ups create: the Next Follow-up section. */
+  canAddFollowUp?: boolean;
+  now?: Date;
+}) {
   const { data: visit } = useSuspenseQuery(visitQuery(id));
   return (
     <Frame
@@ -76,7 +105,11 @@ export function VisitComplete({ id, now }: { id: string; now?: Date }) {
       title={`Complete ${visit.number}`}
     >
       {visit.actions.canComplete ? (
-        <VisitForm mode={{ kind: "complete", visit }} now={now} />
+        <VisitForm
+          mode={{ kind: "complete", visit }}
+          canAddFollowUp={canAddFollowUp}
+          now={now}
+        />
       ) : (
         <p className="text-muted-foreground text-sm">
           Only a planned Visit can be completed.

@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { Plus, Trash2 } from "lucide-react";
+import { CalendarClock, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, type ReactNode } from "react";
@@ -25,6 +25,9 @@ import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MoneyInput } from "@/components/money/money-input";
 import {
+  FOLLOW_UP_LIMITS,
+  FOLLOW_UP_TYPE_LABELS,
+  FOLLOW_UP_TYPES,
   INTEREST_LABELS,
   INTERESTS,
   MARKETING_LIMITS,
@@ -33,6 +36,7 @@ import {
   VISIT_PURPOSES,
   WORK_TYPE_LABELS,
   WORK_TYPES,
+  type FollowUpType,
   type Interest,
   type VisitPurpose,
   type WorkType,
@@ -96,6 +100,13 @@ const values = z.object({
       "Enter the approximate value in whole rupees.",
     ),
   requirementStartMonth: z.string(),
+  nextFollowUp: z.object({
+    enabled: z.boolean(),
+    type: z.string(),
+    dueDate: z.string(),
+    ownerMemberId: z.string(),
+    note: text(FOLLOW_UP_LIMITS.note, "note"),
+  }),
 });
 type Values = z.infer<typeof values>;
 
@@ -126,6 +137,18 @@ function schema(input: { completing: boolean; timeZone: string; now: Date }) {
         code: "custom",
         message: "Enter the Contact's name, or clear the mobile.",
         path: ["newCompany", "contactName"],
+      });
+    if (value.nextFollowUp.enabled && value.nextFollowUp.type === "")
+      ctx.addIssue({
+        code: "custom",
+        message: "Choose the type of Follow-up.",
+        path: ["nextFollowUp", "type"],
+      });
+    if (value.nextFollowUp.enabled && value.nextFollowUp.dueDate === "")
+      ctx.addIssue({
+        code: "custom",
+        message: "Choose the date it is due.",
+        path: ["nextFollowUp", "dueDate"],
       });
     value.newContacts.forEach((row, index) => {
       if (row.name.trim() === "")
@@ -186,6 +209,10 @@ function serverField(
   if (!(error instanceof QueryHttpError)) return null;
   const raw = (error.details as { field?: unknown } | undefined)?.field;
   if (typeof raw !== "string") return null;
+  if (error.code.startsWith("FOLLOW_UP_") || raw === "ownerMemberId")
+    return raw === "dueDate" || raw === "note" || raw === "ownerMemberId"
+      ? `nextFollowUp.${raw}`
+      : null;
   if (error.code.startsWith("PROSPECT_COMPANY_"))
     return companyNew && raw === "name" ? "newCompany.name" : null;
   if (error.code.startsWith("CONTACT_")) return "contactIds";
@@ -197,6 +224,9 @@ export type VisitFormMode =
       kind: "new";
       status: "planned" | "completed";
       prospectCompanyId?: string;
+      /** Filled in by Log the visit from a Follow-up. */
+      contactIds?: readonly string[];
+      visitorIds?: readonly string[];
     }
   | { kind: "edit"; visit: Visit }
   | { kind: "complete"; visit: Visit };
@@ -214,6 +244,11 @@ const WORK_TYPE_ITEMS = WORK_TYPES.map((key) => ({
   label: WORK_TYPE_LABELS[key],
 }));
 
+const FOLLOW_UP_TYPE_ITEMS = FOLLOW_UP_TYPES.map((key) => ({
+  value: key,
+  label: FOLLOW_UP_TYPE_LABELS[key],
+}));
+
 const BLANK_COMPANY: Values["newCompany"] = {
   name: "",
   city: "",
@@ -224,18 +259,40 @@ const BLANK_COMPANY: Values["newCompany"] = {
 
 function defaults(
   mode: VisitFormMode,
-  input: { selfMemberId: string | null; timeZone: string; now: Date },
+  input: {
+    selfMemberId: string | null;
+    mustIncludeSelf: boolean;
+    timeZone: string;
+    now: Date;
+  },
 ): Values {
+  const nextFollowUp: Values["nextFollowUp"] = {
+    enabled: false,
+    type: "",
+    dueDate: "",
+    ownerMemberId: input.selfMemberId ?? "",
+    note: "",
+  };
   if (mode.kind === "new") {
     const now = zoneFields(input.now, input.timeZone);
     const logging = mode.status === "completed";
+    const self = input.selfMemberId;
+    const given = [...(mode.visitorIds ?? [])];
+    const visitorIds =
+      given.length === 0
+        ? self == null
+          ? []
+          : [self]
+        : input.mustIncludeSelf && self != null && !given.includes(self)
+          ? [self, ...given]
+          : given;
     return {
       companyMode: "existing",
       prospectCompanyId: mode.prospectCompanyId ?? "",
       newCompany: BLANK_COMPANY,
-      contactIds: [],
+      contactIds: [...(mode.contactIds ?? [])],
       newContacts: [],
-      visitorIds: input.selfMemberId == null ? [] : [input.selfMemberId],
+      visitorIds,
       date: now.date,
       time: logging ? now.time : "",
       purpose: "",
@@ -246,6 +303,7 @@ function defaults(
       requirementWorkType: "",
       requirementValue: "",
       requirementStartMonth: "",
+      nextFollowUp,
     };
   }
   const { visit } = mode;
@@ -274,6 +332,7 @@ function defaults(
     requirementValue:
       visit.requirementValue == null ? "" : String(visit.requirementValue),
     requirementStartMonth: visit.requirementStartMonth ?? "",
+    nextFollowUp,
   };
 }
 
@@ -284,15 +343,19 @@ const orNull = (value: string) => (value.trim() === "" ? null : value.trim());
  * (PRD §3.4). The company is picked or added inline; points of contact are
  * its Contacts, or added inline; Visited by starts with the caller. Date
  * and time are in the Company time zone. A planned Visit's time changes
- * only by Reschedule, so Edit shows it read-only.
+ * only by Reschedule, so Edit shows it read-only. Plan, Log and Complete
+ * may add a Next Follow-up, saved with the Visit.
  */
 export function VisitForm({
   mode,
   now = new Date(),
+  canAddFollowUp = false,
 }: {
   mode: VisitFormMode;
   /** Fixed in stories; the device's clock otherwise. */
   now?: Date;
+  /** Follow-ups create: the Next Follow-up section. */
+  canAddFollowUp?: boolean;
 }) {
   const router = useRouter();
   const { data: options } = useSuspenseQuery(visitFormOptionsQuery);
@@ -312,6 +375,7 @@ export function VisitForm({
     resolver: zodResolver(schema({ completing, timeZone, now })),
     defaultValues: defaults(mode, {
       selfMemberId: options.selfMemberId,
+      mustIncludeSelf: options.mustIncludeSelf,
       timeZone,
       now,
     }),
@@ -324,6 +388,11 @@ export function VisitForm({
     name: "prospectCompanyId",
   });
   const companyNew = companyMode === "new";
+  const followUpShown = canAddFollowUp && mode.kind !== "edit";
+  const followUpOn = useWatch({
+    control: form.control,
+    name: "nextFollowUp.enabled",
+  });
 
   // The Visit's own company stays pickable even when the viewer cannot open it.
   const companies = useMemo<(CompanyChoice & { address: string | null })[]>(
@@ -365,6 +434,13 @@ export function VisitForm({
       if (!known.has(person.id)) known.set(person.id, person);
     return [...known.values()];
   }, [options.people, visit]);
+  const owners = useMemo(
+    () =>
+      options.people
+        .filter((person) => person.active)
+        .map((person) => ({ value: person.id, label: person.name })),
+    [options.people],
+  );
   const self = options.selfMemberId;
   const keepSelf = options.mustIncludeSelf && self != null;
   const withSelf = (ids: string[]) =>
@@ -390,6 +466,17 @@ export function VisitForm({
       mobile: orNull(row.mobile),
     }));
     const primary = orNull(input.newCompany.contactName);
+    const next = input.nextFollowUp;
+    const nextFollowUp =
+      followUpShown && next.enabled
+        ? {
+            type: next.type as FollowUpType,
+            dueDate: next.dueDate,
+            ownerMemberId:
+              next.ownerMemberId === "" ? undefined : next.ownerMemberId,
+            note: orNull(next.note),
+          }
+        : undefined;
     const body = {
       visitAt:
         timeLocked && visit != null
@@ -423,6 +510,7 @@ export function VisitForm({
       if (mode.kind === "new") {
         saved = await create.mutateAsync({
           ...body,
+          nextFollowUp,
           status: mode.status,
           ...(companyNew
             ? {
@@ -443,6 +531,7 @@ export function VisitForm({
       } else {
         saved = await complete.mutateAsync({
           ...body,
+          nextFollowUp,
           expectedUpdatedAt: mode.visit.updatedAt,
         });
       }
@@ -958,6 +1047,121 @@ export function VisitForm({
           { message: errors.requirementStartMonth?.message },
         )}
       </section>
+
+      {followUpShown && (
+        <section
+          aria-labelledby="visit-follow-up-heading"
+          className="bg-card grid min-w-0 gap-4 rounded-xl border p-4 sm:grid-cols-2 sm:p-5"
+        >
+          <div className="flex flex-wrap items-start justify-between gap-2 sm:col-span-2">
+            <div className="space-y-1">
+              <h2 id="visit-follow-up-heading" className="font-semibold">
+                Next Follow-up
+              </h2>
+              <p className="text-muted-foreground text-sm">
+                Optional. What is owed next; saving adds it to Follow-ups.
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant={followUpOn ? "ghost" : "outline"}
+              size="sm"
+              onClick={() => {
+                form.setValue("nextFollowUp.enabled", !followUpOn);
+                form.clearErrors("nextFollowUp");
+              }}
+            >
+              {followUpOn ? (
+                <>
+                  <Trash2 aria-hidden="true" />
+                  Remove Next Follow-up
+                </>
+              ) : (
+                <>
+                  <CalendarClock aria-hidden="true" />
+                  Add Next Follow-up
+                </>
+              )}
+            </Button>
+          </div>
+          {followUpOn && (
+            <>
+              {field(
+                "visit-follow-up-type",
+                "Type",
+                <Controller
+                  control={form.control}
+                  name="nextFollowUp.type"
+                  render={({ field: control }) => (
+                    <CompanySelect
+                      id="visit-follow-up-type"
+                      required
+                      value={control.value}
+                      onChange={control.onChange}
+                      items={FOLLOW_UP_TYPE_ITEMS}
+                      placeholder="Choose the type"
+                      invalid={errors.nextFollowUp?.type != null}
+                    />
+                  )}
+                />,
+                { required: true, message: errors.nextFollowUp?.type?.message },
+              )}
+              {field(
+                "visit-follow-up-due",
+                "Due date",
+                <Input
+                  id="visit-follow-up-due"
+                  type="date"
+                  aria-required
+                  aria-invalid={errors.nextFollowUp?.dueDate != null}
+                  {...form.register("nextFollowUp.dueDate")}
+                />,
+                {
+                  required: true,
+                  message: errors.nextFollowUp?.dueDate?.message,
+                },
+              )}
+              {field(
+                "visit-follow-up-owner",
+                "Owner",
+                <Controller
+                  control={form.control}
+                  name="nextFollowUp.ownerMemberId"
+                  render={({ field: control }) => (
+                    <CompanySelect
+                      id="visit-follow-up-owner"
+                      value={control.value}
+                      onChange={control.onChange}
+                      items={owners}
+                      placeholder="You"
+                      invalid={errors.nextFollowUp?.ownerMemberId != null}
+                    />
+                  )}
+                />,
+                {
+                  className: "sm:col-span-2",
+                  message: errors.nextFollowUp?.ownerMemberId?.message,
+                },
+              )}
+              {field(
+                "visit-follow-up-note",
+                "Note",
+                <Textarea
+                  id="visit-follow-up-note"
+                  rows={2}
+                  placeholder="Send the PEB warehouse rates"
+                  aria-invalid={errors.nextFollowUp?.note != null}
+                  {...form.register("nextFollowUp.note")}
+                />,
+                {
+                  className: "sm:col-span-2",
+                  message: errors.nextFollowUp?.note?.message,
+                },
+              )}
+            </>
+          )}
+        </section>
+      )}
 
       <FormAlert message={error ?? undefined} />
       <div className="flex flex-wrap justify-end gap-2">
