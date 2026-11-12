@@ -9,7 +9,7 @@ bun run --cwd apps/construction-management test:e2e:pr      # the @pr tests
 bun run --cwd apps/construction-management test:e2e         # every test
 ```
 
-105 tests, 33 tagged @pr, 6 also on a phone.
+108 tests, 34 tagged @pr, 7 also on a phone.
 
 ## Sign-in, sign-up and onboarding
 
@@ -178,11 +178,14 @@ bun run --cwd apps/construction-management test:e2e         # every test
 
 ADR [CM-0040](adr/CM-0040-marketing-context-role-and-own-entries.md).
 
-| Test                                                                                                                                         | Tags            | Spec                         |
-| -------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | ---------------------------- |
-| should show Marketing with its four entries and open its Dashboard, when a member on the Marketing Role signs in                             | **@pr** @mobile | `marketing.spec.ts`          |
-| should leave Marketing out of the main menu, when a member's Role has no Marketing menu                                                      |                 | `marketing.spec.ts`          |
-| should show every Marketing entry, when the Owner opens Marketing                                                                            |                 | `marketing.spec.ts`          |
-| should add a Prospect Company with its primary Contact and move it to Lost with a reason, when a member on the Marketing Role uses Companies | **@pr** @mobile | `prospect-companies.spec.ts` |
-| should list only a member's own Prospect Companies and not a colleague's, when the Role has no View all                                      |                 | `prospect-companies.spec.ts` |
-| should find a Prospect Company by its Contact's mobile and refuse a second company with the same name, when the Owner searches and adds      |                 | `prospect-companies.spec.ts` |
+| Test                                                                                                                                           | Tags            | Spec                         |
+| ---------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | ---------------------------- |
+| should show Marketing with its four entries and open its Dashboard, when a member on the Marketing Role signs in                               | **@pr** @mobile | `marketing.spec.ts`          |
+| should leave Marketing out of the main menu, when a member's Role has no Marketing menu                                                        |                 | `marketing.spec.ts`          |
+| should show every Marketing entry, when the Owner opens Marketing                                                                              |                 | `marketing.spec.ts`          |
+| should add a Prospect Company with its primary Contact and move it to Lost with a reason, when a member on the Marketing Role uses Companies   | **@pr** @mobile | `prospect-companies.spec.ts` |
+| should list only a member's own Prospect Companies and not a colleague's, when the Role has no View all                                        |                 | `prospect-companies.spec.ts` |
+| should find a Prospect Company by its Contact's mobile and refuse a second company with the same name, when the Owner searches and adds        |                 | `prospect-companies.spec.ts` |
+| should plan a Visit, complete it with the person met, add a note and move the company to Contacted, when a member on the Marketing Role visits | **@pr** @mobile | `visits.spec.ts`             |
+| should show a past planned Visit as Missed and list only a member's own Visits, when the Role has no View all                                  |                 | `visits.spec.ts`             |
+| should reschedule a planned Visit keeping the old time, then cancel it with a reason, when the Owner changes plans                             |                 | `visits.spec.ts`             |
