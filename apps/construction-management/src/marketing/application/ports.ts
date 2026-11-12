@@ -1,5 +1,7 @@
 import type { Prisma } from "@repo/construction-db";
 
+import type { AuditEvent } from "@/src/shared-kernel/audit";
+import type { NewStoredFile } from "@/src/shared-kernel/files/stored-files";
 import type { ListCursor, NameCursor } from "@/src/shared-kernel/list-cursor";
 import type { OwnScope } from "@/src/shared-kernel/access";
 
@@ -393,7 +395,18 @@ export type CompanyVisitsReader = {
     workspaceId: string,
     companyId: string,
     scope: OwnScope,
-  ): Promise<{ visits: CompanyVisit[]; notes: StoredVisitNote[] }>;
+  ): Promise<{
+    visits: CompanyVisit[];
+    notes: StoredVisitNote[];
+    files: {
+      id: string;
+      visitId: string;
+      fileName: string;
+      caption: string | null;
+      createdAt: Date;
+      createdBy: string;
+    }[];
+  }>;
   /** The latest completed Visit of each company. */
   lastVisits(
     db: MarketingTx,
@@ -407,4 +420,66 @@ export type CompanyVisitsReader = {
     workspaceId: string,
     companyId: string,
   ): Promise<number>;
+};
+
+// ---------------------------------------------------------------------------
+// Visit files (ADR CM-0040 §9)
+// ---------------------------------------------------------------------------
+
+export type StoredVisitFile = {
+  id: string;
+  workspaceId: string;
+  visitId: string;
+  fileKey: string;
+  fileName: string;
+  contentType: string;
+  bytes: number;
+  thumbKey: string | null;
+  caption: string | null;
+  createdAt: Date;
+  createdBy: string;
+  updatedAt: Date;
+};
+
+export type VisitFileStore = {
+  /** Live files of these Visits, oldest first. */
+  files(
+    workspaceId: string,
+    visitIds: readonly string[],
+  ): Promise<StoredVisitFile[]>;
+  file(
+    workspaceId: string,
+    visitId: string,
+    fileId: string,
+  ): Promise<StoredVisitFile | null>;
+  /** The file recorded at `key`, removed or not. */
+  fileByKey(
+    workspaceId: string,
+    visitId: string,
+    key: string,
+  ): Promise<(StoredVisitFile & { deletedAt: Date | null }) | null>;
+  countFiles(workspaceId: string, visitId: string): Promise<number>;
+  /**
+   * The file, its `stored_files` rows and the audit event in one
+   * transaction with the Visit row locked; 409 `VISIT_FILE_LIMIT` when 20
+   * are live, `"duplicate"` when the key was recorded meanwhile.
+   */
+  addFile(input: {
+    file: StoredVisitFile;
+    storedFiles: NewStoredFile[];
+    audit: AuditEvent;
+  }): Promise<"added" | "duplicate">;
+  setCaption(input: {
+    file: StoredVisitFile;
+    caption: string | null;
+    now: Date;
+    audit: AuditEvent;
+  }): Promise<void>;
+  /** A tombstone, its `stored_files` rows marked deleted; false if already gone. */
+  removeFile(input: {
+    file: StoredVisitFile;
+    by: string;
+    now: Date;
+    audit: AuditEvent;
+  }): Promise<boolean>;
 };

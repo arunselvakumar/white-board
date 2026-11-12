@@ -33,10 +33,13 @@ export {
   MULTIPART_FROM_BYTES,
   UPLOAD_ACCEPTS,
   acceptedExtensions,
+  assertKindSizeAccepted,
   assertNameAccepted,
+  declaredKind,
   assertSizeAccepted,
   programNotAllowed,
   typeNotAccepted,
   type UploadAccept,
+  type SizedKind,
   type UploadPolicy,
 } from "./upload-policy";

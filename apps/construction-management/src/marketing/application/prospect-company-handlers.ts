@@ -141,6 +141,16 @@ export type ProspectCompanyTimelineItem =
       text: string;
       at: Date;
       byName: string;
+    }
+  | {
+      kind: "file";
+      id: string;
+      visitId: string;
+      visitNumber: string;
+      fileName: string;
+      caption: string | null;
+      at: Date;
+      byName: string;
     };
 
 export type ProspectCompanyReadModel = Omit<
@@ -334,7 +344,7 @@ export class ProspectCompanyHandlers {
             id,
             ownScope(access, VISITS_MENU),
           )
-        : { visits: [], notes: [] },
+        : { visits: [], notes: [], files: [] },
     ]);
     const [members, users, timeZone] = await Promise.all([
       team.memberNames(access.workspaceId, [
@@ -345,6 +355,7 @@ export class ProspectCompanyHandlers {
         company.createdBy,
         ...changes.map((change) => change.changedBy),
         ...visits.notes.map((note) => note.createdBy),
+        ...visits.files.map((file) => file.createdBy),
       ]),
       this.deps.timeZone(access.workspaceId),
     ]);
@@ -384,6 +395,16 @@ export class ProspectCompanyHandlers {
         text: note.text,
         at: note.createdAt,
         byName: users.get(note.createdBy) ?? "Unknown",
+      })),
+      ...visits.files.map((file): ProspectCompanyTimelineItem => ({
+        kind: "file",
+        id: file.id,
+        visitId: file.visitId,
+        visitNumber: numbers.get(file.visitId) ?? "",
+        fileName: file.fileName,
+        caption: file.caption,
+        at: file.createdAt,
+        byName: users.get(file.createdBy) ?? "Unknown",
       })),
     ];
     return {

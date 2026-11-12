@@ -2,6 +2,7 @@ import { prisma } from "@repo/construction-db";
 
 import { VisitHandlers } from "@/src/marketing/application/visit-handlers";
 import { prismaProspectCompanyStore } from "@/src/marketing/infrastructure/prisma-prospect-company-store";
+import { PrismaVisitFileStore } from "@/src/marketing/infrastructure/prisma-visit-file-store";
 import { prismaVisitStore } from "@/src/marketing/infrastructure/prisma-visit-store";
 import { readAuditEvents } from "@/src/shared-kernel/audit-reader";
 import {
@@ -32,6 +33,7 @@ export function createVisitHandlers(): VisitHandlers {
   return new VisitHandlers({
     db: prisma,
     store: prismaVisitStore,
+    fileStore: new PrismaVisitFileStore(prisma),
     companyStore: prismaProspectCompanyStore,
     companies: prospectCompanyHandlers,
     team: marketingTeam,

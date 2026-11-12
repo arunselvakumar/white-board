@@ -164,6 +164,7 @@ export const ConstructionMarketingVisitActionsResponseModel = z.object({
   canCancel: z.boolean(),
   canReschedule: z.boolean(),
   canAddNote: z.boolean(),
+  canAddFiles: z.boolean(),
   canDelete: z.boolean(),
   /** A Completed Visit past its 7 days for this viewer. */
   locked: z.boolean(),
@@ -246,12 +247,31 @@ export const ConstructionMarketingVisitResponseModel = z.object({
         "rescheduled",
         "cancelled",
         "note_added",
+        "file_added",
+        "file_removed",
       ]),
       at: z.iso.datetime(),
       byName: z.string(),
       from: z.iso.datetime().nullable(),
       to: z.iso.datetime().nullable(),
       reason: z.string().nullable(),
+      /** A file added or removed: its name. */
+      fileName: z.string().nullable(),
+    }),
+  ),
+  /** Oldest first; served by `…/files/{fileId}` and `…/thumbnail`. */
+  files: z.array(
+    z.object({
+      id: z.uuid(),
+      fileName: z.string(),
+      contentType: z.string(),
+      bytes: z.number().int(),
+      viewable: z.boolean(),
+      hasThumbnail: z.boolean(),
+      caption: z.string().nullable(),
+      createdByName: z.string(),
+      createdAt: z.iso.datetime(),
+      canChange: z.boolean(),
     }),
   ),
   createdByName: z.string(),
@@ -320,6 +340,10 @@ export function toVisitResponse(
     completedAt: iso(visit.completedAt),
     createdAt: visit.createdAt.toISOString(),
     updatedAt: visit.updatedAt.toISOString(),
+    files: visit.files.map((file) => ({
+      ...file,
+      createdAt: file.createdAt.toISOString(),
+    })),
     notes: visit.notes.map((note) => ({
       ...note,
       at: note.at.toISOString(),

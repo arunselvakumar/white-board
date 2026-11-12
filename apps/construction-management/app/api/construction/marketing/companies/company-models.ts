@@ -242,6 +242,17 @@ export const ConstructionMarketingTimelineItemResponseModel =
       visitorNames: z.array(z.string()),
     }),
     z.object({
+      /** A photo or file added to one of those Visits. */
+      kind: z.literal("file"),
+      id: z.uuid(),
+      visitId: z.uuid(),
+      visitNumber: z.string(),
+      fileName: z.string(),
+      caption: z.string().nullable(),
+      at: z.iso.datetime(),
+      byName: z.string(),
+    }),
+    z.object({
       /** A note added to one of those Visits. */
       kind: z.literal("note"),
       id: z.uuid(),

@@ -21,8 +21,10 @@ import {
   type SniffedKind,
 } from "./sniff";
 import {
+  assertKindSizeAccepted,
   assertNameAccepted,
   assertSizeAccepted,
+  declaredKind,
   programNotAllowed,
   typeNotAccepted,
   type UploadPolicy,
@@ -199,6 +201,7 @@ export class AttachmentUploads {
     const fileName = cleanFileName(input.fileName, "bin");
     assertNameAccepted(policy, fileName);
     if (input.bytes > policy.maxBytes) throw fileTooLarge(policy.maxBytes);
+    assertKindSizeAccepted(policy, declaredKind(fileName), input.bytes);
     await input.check?.();
     await this.assertPlanRoom(target.workspaceId, input.bytes);
     const key = newAttachmentKey(
@@ -377,6 +380,7 @@ export class AttachmentUploads {
       if (sniffed.kind === "program") throw programNotAllowed(policy);
       if (!acceptsContent(policy.accept, sniffed.kind))
         throw typeNotAccepted(policy);
+      assertKindSizeAccepted(policy, sniffed.kind, head.bytes);
       const thumbnail = await this.thumbnailOf(key, sniffed.kind);
       await this.assertPlanRoom(
         target.workspaceId,
