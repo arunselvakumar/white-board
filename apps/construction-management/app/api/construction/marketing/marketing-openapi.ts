@@ -8,6 +8,10 @@ import {
   marketingCompanyOpenApiOperations,
 } from "./companies/companies-openapi";
 import {
+  marketingFollowUpOpenApiComponents,
+  marketingFollowUpOpenApiOperations,
+} from "./follow-ups/follow-ups-openapi";
+import {
   marketingVisitOpenApiComponents,
   marketingVisitOpenApiOperations,
 } from "./visits/visits-openapi";
@@ -16,10 +20,12 @@ import {
 export const marketingOpenApiComponents: OpenApiComponents = {
   ...marketingCompanyOpenApiComponents,
   ...marketingVisitOpenApiComponents,
+  ...marketingFollowUpOpenApiComponents,
 };
 
 /** Every marketing operation. */
 export const marketingOpenApiOperations: OpenApiOperation[] = [
   ...marketingCompanyOpenApiOperations,
   ...marketingVisitOpenApiOperations,
+  ...marketingFollowUpOpenApiOperations,
 ];

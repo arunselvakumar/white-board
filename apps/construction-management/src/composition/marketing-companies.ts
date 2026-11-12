@@ -1,6 +1,7 @@
 import { prisma } from "@repo/construction-db";
 
 import { ProspectCompanyHandlers } from "@/src/marketing/application/prospect-company-handlers";
+import { prismaCompanyFollowUpsReader } from "@/src/marketing/infrastructure/prisma-follow-up-store";
 import { prismaProspectCompanyStore } from "@/src/marketing/infrastructure/prisma-prospect-company-store";
 import { prismaCompanyVisitsReader } from "@/src/marketing/infrastructure/prisma-visit-store";
 import { companyTimezone } from "@/src/shared-kernel/company-today";
@@ -14,6 +15,7 @@ export function createProspectCompanyHandlers(): ProspectCompanyHandlers {
     store: prismaProspectCompanyStore,
     team: marketingTeam,
     visits: prismaCompanyVisitsReader,
+    followUps: prismaCompanyFollowUpsReader,
     timeZone: (workspaceId) => companyTimezone(prisma, workspaceId),
   });
 }

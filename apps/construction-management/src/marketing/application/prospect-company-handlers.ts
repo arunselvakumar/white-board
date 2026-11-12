@@ -6,6 +6,7 @@ import {
   type OwnScope,
 } from "@/src/shared-kernel/access";
 import { recordAudit } from "@/src/shared-kernel/audit";
+import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 import { conflict } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
 import type { NameCursor } from "@/src/shared-kernel/list-cursor";
@@ -20,6 +21,8 @@ import {
   prospectCompanyNotFound,
 } from "../domain/marketing-errors";
 import type {
+  FollowUpStatus,
+  FollowUpType,
   LostReason,
   Stage,
   VisitPurpose,
@@ -39,6 +42,7 @@ import {
   type ProspectCompanyDetailsInput,
 } from "../domain/prospect-company";
 import type {
+  CompanyFollowUpsReader,
   CompanyVisitsReader,
   MarketingDb,
   MarketingPerson,
@@ -51,6 +55,7 @@ import type {
 
 export const COMPANIES_MENU = "marketing.companies";
 const VISITS_MENU = "marketing.visits";
+const FOLLOW_UPS_MENU = "marketing.follow_ups";
 
 export type ProspectCompanyDeps = {
   db: MarketingDb;
@@ -58,6 +63,8 @@ export type ProspectCompanyDeps = {
   team: MarketingTeam;
   /** Visits on the company page and list, and the delete check. */
   visits: CompanyVisitsReader;
+  /** Follow-ups on the company page, and the list's next due date. */
+  followUps: CompanyFollowUpsReader;
   /** The Company's time zone, for the page's times. */
   timeZone: (workspaceId: string) => Promise<string>;
   clock?: () => Date;
@@ -103,6 +110,8 @@ export type ProspectCompanyListItem = {
   primaryContact: { name: string; mobile: string | null } | null;
   /** The latest completed Visit the viewer may see. */
   lastVisitAt: Date | null;
+  /** The earliest open Follow-up the viewer may see. */
+  nextFollowUpOn: CalendarDate | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -141,6 +150,19 @@ export type ProspectCompanyTimelineItem =
       text: string;
       at: Date;
       byName: string;
+    }
+  | {
+      kind: "follow_up";
+      id: string;
+      visitId: string | null;
+      visitNumber: string | null;
+      type: FollowUpType;
+      status: FollowUpStatus;
+      dueDate: CalendarDate;
+      ownerName: string;
+      note: string | null;
+      resultNote: string | null;
+      at: Date;
     }
   | {
       kind: "file";
@@ -206,6 +228,22 @@ export class ProspectCompanyHandlers {
 
   constructor(private readonly deps: ProspectCompanyDeps) {
     this.clock = deps.clock ?? (() => new Date());
+  }
+
+  /**
+   * The viewer's scope on Follow-ups, with the Owner's own member id, so a
+   * Follow-up they own shows without View all too.
+   */
+  private async followUpScope(access: MemberAccess): Promise<OwnScope> {
+    const scope = ownScope(access, FOLLOW_UPS_MENU);
+    if (scope == null || scope.memberId != null) return scope;
+    return {
+      ...scope,
+      memberId: await this.deps.team.memberOfUser(
+        access.workspaceId,
+        access.userId,
+      ),
+    };
   }
 
   /** Who the viewer sees: everyone with View all, else their own (§5). */
@@ -285,7 +323,7 @@ export class ProspectCompanyHandlers {
       workspaceId: access.workspaceId,
       scope: this.scope(access),
     });
-    const [names, lastVisits, timeZone] = await Promise.all([
+    const [names, lastVisits, timeZone, nextDue] = await Promise.all([
       this.deps.team.memberNames(
         access.workspaceId,
         page.items.flatMap((row) =>
@@ -301,6 +339,16 @@ export class ProspectCompanyHandlers {
           )
         : new Map<string, Date>(),
       this.deps.timeZone(access.workspaceId),
+      can(access, FOLLOW_UPS_MENU, "read")
+        ? this.followUpScope(access).then((scope) =>
+            this.deps.followUps.nextDue(
+              this.deps.db,
+              access.workspaceId,
+              page.items.map((row) => row.id),
+              scope,
+            ),
+          )
+        : new Map<string, CalendarDate>(),
     ]);
     return {
       ...page,
@@ -321,6 +369,7 @@ export class ProspectCompanyHandlers {
               },
         primaryContact: row.primaryContact,
         lastVisitAt: lastVisits.get(row.id) ?? null,
+        nextFollowUpOn: nextDue.get(row.id) ?? null,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
       })),
@@ -334,7 +383,7 @@ export class ProspectCompanyHandlers {
     assertCan(access, COMPANIES_MENU, "read");
     const { db, store, team } = this.deps;
     const company = await this.find(access, id);
-    const [contacts, changes, visits] = await Promise.all([
+    const [contacts, changes, visits, followUps] = await Promise.all([
       store.contacts(db, access.workspaceId, id),
       store.stageChanges(db, access.workspaceId, id),
       can(access, VISITS_MENU, "read")
@@ -345,11 +394,17 @@ export class ProspectCompanyHandlers {
             ownScope(access, VISITS_MENU),
           )
         : { visits: [], notes: [], files: [] },
+      can(access, FOLLOW_UPS_MENU, "read")
+        ? this.followUpScope(access).then((scope) =>
+            this.deps.followUps.forCompany(db, access.workspaceId, id, scope),
+          )
+        : Promise.resolve([]),
     ]);
     const [members, users, timeZone] = await Promise.all([
       team.memberNames(access.workspaceId, [
         ...(company.assignedMemberId == null ? [] : [company.assignedMemberId]),
         ...visits.visits.flatMap((visit) => visit.visitorIds),
+        ...followUps.map((followUp) => followUp.ownerMemberId),
       ]),
       team.userNames(access.workspaceId, [
         company.createdBy,
@@ -395,6 +450,23 @@ export class ProspectCompanyHandlers {
         text: note.text,
         at: note.createdAt,
         byName: users.get(note.createdBy) ?? "Unknown",
+      })),
+      ...followUps.map((followUp): ProspectCompanyTimelineItem => ({
+        kind: "follow_up",
+        id: followUp.id,
+        visitId: followUp.visitId,
+        visitNumber:
+          followUp.visitId == null
+            ? null
+            : (numbers.get(followUp.visitId) ?? null),
+        type: followUp.type,
+        status: followUp.status,
+        dueDate: followUp.dueDate,
+        ownerName: members.get(followUp.ownerMemberId) ?? "Removed member",
+        note: followUp.note,
+        resultNote: followUp.resultNote,
+        // Done ones sit where they were done, others where they were made.
+        at: followUp.doneAt ?? followUp.createdAt,
       })),
       ...visits.files.map((file): ProspectCompanyTimelineItem => ({
         kind: "file",

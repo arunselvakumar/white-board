@@ -1,6 +1,7 @@
 import type { Prisma } from "@repo/construction-db";
 
 import type { AuditEvent } from "@/src/shared-kernel/audit";
+import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 import type { NewStoredFile } from "@/src/shared-kernel/files/stored-files";
 import type { ListCursor, NameCursor } from "@/src/shared-kernel/list-cursor";
 import type { OwnScope } from "@/src/shared-kernel/access";
@@ -11,6 +12,8 @@ import type {
   StageMove,
 } from "../domain/prospect-company";
 import type {
+  FollowUpStatus,
+  FollowUpType,
   Interest,
   LostReason,
   Stage,
@@ -492,4 +495,121 @@ export type VisitFileStore = {
     tx: MarketingTx,
     input: { workspaceId: string; visitId: string; by: string; now: Date },
   ): Promise<Pick<StoredVisitFile, "id" | "fileKey" | "thumbKey">[]>;
+};
+
+// ---------------------------------------------------------------------------
+// Follow-ups (PRD §3.5, ADR CM-0040 §8)
+// ---------------------------------------------------------------------------
+
+export type FollowUpRow = {
+  prospectCompanyId: string;
+  visitId: string | null;
+  type: FollowUpType;
+  dueDate: CalendarDate;
+  ownerMemberId: string;
+  note: string | null;
+  status: FollowUpStatus;
+  resultNote: string | null;
+  doneOn: CalendarDate | null;
+  doneAt: Date | null;
+  doneBy: string | null;
+  cancelledAt: Date | null;
+  cancelledBy: string | null;
+  dueNotifiedOn: CalendarDate | null;
+  overdueNotifiedAt: Date | null;
+};
+
+export type StoredFollowUp = FollowUpRow & {
+  id: string;
+  workspaceId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy: string;
+};
+
+export type FollowUpListRow = StoredFollowUp & {
+  prospectCompany: {
+    id: string;
+    name: string;
+    createdBy: string;
+    assignedMemberId: string | null;
+  };
+  visit: { id: string; number: string } | null;
+};
+
+export type FollowUpListParams = {
+  workspaceId: string;
+  scope: OwnScope;
+  ownerMemberId?: string;
+  statuses?: readonly FollowUpStatus[];
+  prospectCompanyId?: string;
+  visitId?: string;
+  limit: number;
+  /** By due date, then id. */
+  after?: { dueDate: CalendarDate; id: string };
+};
+
+export type FollowUpStore = {
+  find(
+    db: MarketingTx,
+    workspaceId: string,
+    id: string,
+  ): Promise<StoredFollowUp | null>;
+  lock(
+    tx: MarketingTx,
+    workspaceId: string,
+    id: string,
+  ): Promise<StoredFollowUp | null>;
+  insert(
+    tx: MarketingTx,
+    row: FollowUpRow & {
+      id: string;
+      workspaceId: string;
+      by: string;
+      at: Date;
+    },
+  ): Promise<void>;
+  update(
+    tx: MarketingTx,
+    id: string,
+    patch: Partial<FollowUpRow>,
+    by: string,
+    at: Date,
+  ): Promise<void>;
+  remove(tx: MarketingTx, id: string, by: string, at: Date): Promise<void>;
+  list(
+    db: MarketingTx,
+    params: FollowUpListParams,
+  ): Promise<{ items: FollowUpListRow[]; hasMore: boolean; total: number }>;
+  /**
+   * Records a reminder sent, without touching `updated_at`, so nobody's
+   * open form goes stale for it.
+   */
+  markReminded(
+    id: string,
+    mark: { dueNotifiedOn: CalendarDate } | { overdueNotifiedAt: Date },
+  ): Promise<void>;
+  /** Open ones due on or before `date`, every Company, for the reminders. */
+  openDueBy(
+    date: CalendarDate,
+    page: { after?: string; limit: number },
+  ): Promise<StoredFollowUp[]>;
+};
+
+/** What the company page and list read about Follow-ups (ADR CM-0040 §5). */
+export type CompanyFollowUpsReader = {
+  /** The company's Follow-ups the scope sees, newest first. */
+  forCompany(
+    db: MarketingTx,
+    workspaceId: string,
+    companyId: string,
+    scope: OwnScope,
+  ): Promise<StoredFollowUp[]>;
+  /** The earliest open due date of each company the scope sees. */
+  nextDue(
+    db: MarketingTx,
+    workspaceId: string,
+    companyIds: readonly string[],
+    scope: OwnScope,
+  ): Promise<Map<string, CalendarDate>>;
 };
