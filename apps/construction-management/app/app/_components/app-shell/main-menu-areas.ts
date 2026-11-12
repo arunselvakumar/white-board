@@ -1,10 +1,15 @@
 import { APP_NAV, type AppNavItem } from "@/lib/app-nav";
 import { HRMS_PATH } from "@/lib/hrms-nav";
+import {
+  marketingSections,
+  type MarketingMenuAccess,
+} from "@/lib/marketing-nav";
 import { MASTERS_GROUPS } from "@/lib/masters-nav";
 import { LABOURS_PAGE_PATH } from "@/lib/staff-nav";
 
 import type { AreaNavGroup } from "./area-nav-menu";
 import { humanResourcesGroups } from "./human-resources-nav-menu";
+import { marketingGroups } from "./marketing-nav-menu";
 import { filterMenuArea, labelMatches, type AreaMatch } from "./menu-filter";
 import { WORKSPACE_GROUPS } from "./workspace-nav-menu";
 
@@ -18,11 +23,16 @@ export type MainMenuAccess = {
   canOpenDashboard: boolean;
   /** Team Members or Role Management Read (ADR CM-0030, ADR CM-0034). */
   canOpenStaffRoles: boolean;
+  /** The Marketing entries the Role opens; none leaves Marketing out (ADR CM-0040). */
+  marketing: MarketingMenuAccess;
 };
 
 export type MainMenuArea = {
   item: AppNavItem;
-  /** Where the area's own link goes (Human Resources opens on Labour or HRMS). */
+  /**
+   * Where the area's own link goes (Human Resources opens on Labour or
+   * HRMS, Marketing on the first entry the viewer may open).
+   */
   href: string;
   /** The submenu; undefined for an area that is one page. */
   groups?: readonly AreaNavGroup[];
@@ -35,11 +45,18 @@ export type MainMenuArea = {
 export function mainMenuAreas({
   canOpenDashboard,
   canOpenStaffRoles,
+  marketing,
 }: MainMenuAccess): MainMenuArea[] {
   return APP_NAV.flatMap((item): MainMenuArea[] => {
     switch (item.href) {
       case "/app/dashboard":
         return canOpenDashboard ? [{ item, href: item.href }] : [];
+      case "/app/marketing": {
+        const first = marketingSections(marketing)[0];
+        return first == null
+          ? []
+          : [{ item, href: first.href, groups: marketingGroups(marketing) }];
+      }
       case "/app/staff":
         return [
           {

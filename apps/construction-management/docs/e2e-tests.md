@@ -9,7 +9,7 @@ bun run --cwd apps/construction-management test:e2e:pr      # the @pr tests
 bun run --cwd apps/construction-management test:e2e         # every test
 ```
 
-99 tests, 30 tagged @pr, 4 also on a phone.
+102 tests, 32 tagged @pr, 5 also on a phone.
 
 ## Sign-in, sign-up and onboarding
 
@@ -173,3 +173,13 @@ bun run --cwd apps/construction-management test:e2e         # every test
 | should not offer a booked Unit again, when a second inquiry is converted                |         | `sales.spec.ts` |
 | should show the Unit as booked on Units, when an inquiry books it                       |         | `sales.spec.ts` |
 | should list the new Funnel Stage, when the Owner adds one in Inquiry settings           |         | `sales.spec.ts` |
+
+## Marketing
+
+ADR [CM-0040](adr/CM-0040-marketing-context-role-and-own-entries.md).
+
+| Test                                                                                                             | Tags            | Spec                |
+| ---------------------------------------------------------------------------------------------------------------- | --------------- | ------------------- |
+| should show Marketing with its four entries and open its Dashboard, when a member on the Marketing Role signs in | **@pr** @mobile | `marketing.spec.ts` |
+| should leave Marketing out of the main menu, when a member's Role has no Marketing menu                          |                 | `marketing.spec.ts` |
+| should show every Marketing entry, when the Owner opens Marketing                                                |                 | `marketing.spec.ts` |

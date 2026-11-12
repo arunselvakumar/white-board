@@ -33,6 +33,10 @@ import {
 import { NotificationBell } from "@/app/app/_components/notifications/notification-bell";
 import { ReadyDownloadToast } from "@/app/app/_components/notifications/ready-download-toast";
 import { isAppNavActive } from "@/lib/app-nav";
+import {
+  NO_MARKETING_ACCESS,
+  type MarketingMenuAccess,
+} from "@/lib/marketing-nav";
 import { projectIdFromPath } from "@/lib/project-nav";
 
 import { APP_NAV_ICONS } from "./app-nav-icons";
@@ -42,6 +46,7 @@ import { MastersNavMenu } from "./masters-nav-menu";
 import { NAV_BUTTON_CLASS } from "./nav-button-class";
 import { CompanyDeletionBanner } from "./company-deletion-banner";
 import { HOME_PATH, filterMainMenu, mainMenuAreas } from "./main-menu-areas";
+import { MarketingNavMenu } from "./marketing-nav-menu";
 import { setMenuLayout, useMenuLayout } from "./menu-layout";
 import { MenuTopBar } from "./menu-top-bar";
 import { menuQuery, noMatchMessage } from "./menu-filter";
@@ -59,7 +64,7 @@ const VERSION = `v${process.env["NEXT_PUBLIC_APP_VERSION"] ?? "0.0.0"}`;
  * Authenticated chrome (ADR-0049, ADR-0050): the ink sidebar carries it
  * all, with no top bar from `md` up: the User's account row with the
  * notification bell, the menu search, the Company Dashboard, Projects,
- * Human Resources, Workspace, Masters and Settings, then the plan card, My
+ * Marketing, Human Resources, Workspace, Masters and Settings, then the plan card, My
  * Profile, Switch Company (ADR-0051) and Sign out. On a phone a slim bar
  * opens the sidebar sheet and keeps the bell in reach. Inside a Project the
  * areas give way to the Project's own menu (ADR CM-0020). A User who
@@ -69,15 +74,19 @@ const VERSION = `v${process.env["NEXT_PUBLIC_APP_VERSION"] ?? "0.0.0"}`;
  * Dashboard is not in the menu. `canOpenStaffRoles` is Team Members or Role
  * Management Read (ADR CM-0030): without either, Office Staff and Role
  * Management are not in the Staff group of Human Resources (ADR CM-0034).
+ * `marketing` is the Marketing entries the Role opens: with none, Marketing
+ * is not in the menu (ADR CM-0040).
  */
 export function AppShell({
   children,
   canOpenDashboard = false,
   canOpenStaffRoles = true,
+  marketing = NO_MARKETING_ACCESS,
 }: {
   children: ReactNode;
   canOpenDashboard?: boolean;
   canOpenStaffRoles?: boolean;
+  marketing?: MarketingMenuAccess;
 }) {
   const pathname = usePathname() || "/app";
   const projectId = projectIdFromPath(pathname);
@@ -160,6 +169,7 @@ export function AppShell({
                 query={query}
                 canOpenDashboard={canOpenDashboard}
                 canOpenStaffRoles={canOpenStaffRoles}
+                marketing={marketing}
               />
             ) : (
               <ProjectNavMenu
@@ -256,23 +266,26 @@ function FooterMenu({ pathname }: { pathname: string }) {
 
 /**
  * The Company Dashboard (with Dashboard Read), Projects, then the areas
- * with a submenu each: Human Resources, Workspace and Masters, then
- * Settings (ADR CM-0034). The menu search narrows it (`menu-filter.ts`).
+ * with a submenu each: Marketing (with an entry the Role opens, ADR
+ * CM-0040), Human Resources, Workspace and Masters, then Settings (ADR
+ * CM-0034). The menu search narrows it (`menu-filter.ts`).
  */
 function MainMenu({
   pathname,
   query,
   canOpenDashboard,
   canOpenStaffRoles,
+  marketing,
 }: {
   pathname: string;
   query: string;
   canOpenDashboard: boolean;
   canOpenStaffRoles: boolean;
+  marketing: MarketingMenuAccess;
 }) {
   const q = menuQuery(query);
   const rows = filterMainMenu(
-    mainMenuAreas({ canOpenDashboard, canOpenStaffRoles }),
+    mainMenuAreas({ canOpenDashboard, canOpenStaffRoles, marketing }),
     q,
   );
 
@@ -297,6 +310,14 @@ function MainMenu({
                   };
                   if (item.href === "/app/masters")
                     return <MastersNavMenu key={item.href} {...area} />;
+                  if (item.href === "/app/marketing")
+                    return (
+                      <MarketingNavMenu
+                        key={item.href}
+                        {...area}
+                        access={marketing}
+                      />
+                    );
                   if (item.href === "/app/staff")
                     return (
                       <HumanResourcesNavMenu

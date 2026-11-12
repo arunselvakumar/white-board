@@ -73,7 +73,7 @@ describe("createCompany on Postgres (CM-104)", () => {
     });
     const stored = await createRoleHandlers().list(workspaceId);
     const seeds = seedRoles({ workspaceId, by: userId, now: new Date() });
-    expect(stored).toHaveLength(9);
+    expect(stored).toHaveLength(10);
     for (const seed of seeds)
       expect(
         stored.find((role) => role.name === seed.name),

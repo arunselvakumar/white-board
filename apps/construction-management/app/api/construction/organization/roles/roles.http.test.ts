@@ -59,7 +59,7 @@ describe("Role Management HTTP (ADR CM-0030)", () => {
     expect(response.status).toBe(StatusCodes.UNAUTHORIZED);
   });
 
-  it("lists the nine seed Roles by name, with how many Users are on each", async () => {
+  it("lists the ten seed Roles by name, with how many Users are on each", async () => {
     const owner = await ownerWithCompany();
     await memberWith(owner, {});
     const roles = await list(owner.cookie);
@@ -69,6 +69,7 @@ describe("Role Management HTTP (ADR CM-0030)", () => {
         "Accountant",
         "Admin",
         "HRMS Staff",
+        "Marketing",
         "Project Manager",
         "Quality Control",
         "Site Engineer",
@@ -232,6 +233,32 @@ describe("Role Management HTTP (ADR CM-0030)", () => {
       code: "ROLE_IN_USE",
       details: { userCount: 1 },
     });
+  });
+
+  it("gives a new Company the default Marketing Role with only its own Marketing cells, locked like every default (ADR CM-0040 §3)", async () => {
+    const owner = await ownerWithCompany();
+    const marketing = (await list(owner.cookie)).find(
+      (role) => role.name === "Marketing",
+    );
+    if (marketing == null) throw new Error("No Marketing Role");
+    expect(marketing).toMatchObject({ isSeed: true, userCount: 0 });
+    expect(marketing.permissions).toEqual({
+      "marketing.dashboard": ["read"],
+      "marketing.visits": ["create", "read", "update"],
+      "marketing.follow_ups": ["create", "read", "update", "notification"],
+      "marketing.companies": ["create", "read", "update"],
+    });
+
+    const deleted = await deleteRole(
+      jsonRequest(`${BASE}/${marketing.id}/delete`, owner.cookie, {}),
+      params(marketing.id),
+    );
+    expect(deleted.status).toBe(StatusCodes.CONFLICT);
+    expect(await json(deleted)).toMatchObject({ code: "ROLE_IS_DEFAULT" });
+    const renamed = await update(owner.cookie, marketing, {
+      name: "Business Development",
+    });
+    expect(renamed.status).toBe(StatusCodes.BAD_REQUEST);
   });
 
   it("keeps default Roles: never deleted, never renamed (ADR CM-0037)", async () => {

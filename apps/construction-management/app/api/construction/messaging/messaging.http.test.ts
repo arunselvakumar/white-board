@@ -600,6 +600,7 @@ describe("Notifications HTTP (CM-904)", () => {
     );
     expect(initial.groups.map((group) => group.key)).toEqual([
       "project_management",
+      "marketing",
       "payment_accounting",
       "materials",
       "master_records",

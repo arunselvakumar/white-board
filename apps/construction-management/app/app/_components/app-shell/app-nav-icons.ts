@@ -3,6 +3,7 @@ import {
   Building2,
   LayoutDashboard,
   Library,
+  Megaphone,
   Settings,
   UsersRound,
   type LucideIcon,
@@ -15,6 +16,7 @@ export const APP_NAV_ICONS: Record<AppNavHref, LucideIcon> = {
   // a briefcase so the two grids do not look alike.
   "/app/dashboard": LayoutDashboard,
   "/app/projects": Building2,
+  "/app/marketing": Megaphone,
   // Human Resources (ADR CM-0034): every Staff page lives under /app/staff.
   "/app/staff": UsersRound,
   "/app/workspace": Briefcase,

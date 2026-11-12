@@ -244,6 +244,36 @@ The cross-project area of the app: Central Store, Central Inventory, Central Pay
 The main-menu area for everyone the Company employs (ADR CM-0034), in three groups: Staff (Staff, Role Management), HRMS (attendance, leave and salary for staff) and Labour (Labours, Supervisors, Vendors; ADR CM-0035). Written out in the menu, never shortened. It opens on Staff.
 _Avoid_: HR, People, Team (for the area)
 
+### Marketing
+
+**Marketing (area)**:
+The main-menu area, after Projects, for winning new work from companies (ADR CM-0040): Dashboard, Visits, Follow-ups, Companies, Team and Reports. Company-level, never inside a Project. Shown only to members whose Role opens one of its entries. Not the Sales CRM, which sells a Project's Units.
+_Avoid_: Lead, Inquiry, Booking (Sales CRM words), CRM, sales (for the area)
+
+**Prospect Company**:
+A company the marketing team visits to win work. It becomes a Client only when a Project is created for it, and stays in Marketing after that.
+_Avoid_: lead, prospect, customer, account
+
+**Contact**:
+A person at a Prospect Company. Once any exist, exactly one is the primary Contact.
+_Avoid_: lead, point of contact (that is the Contact a Visit names)
+
+**Visit**:
+One planned or completed visit to a Prospect Company by one or more Marketing People, numbered MV-0001…. Missed is a planned Visit whose time passed, worked out, never stored.
+_Avoid_: meeting, call, appointment
+
+**Follow-up**:
+Something owed after a Visit (a call, a return Visit, an email, a quotation to send), with an owner and a due date.
+_Avoid_: task, reminder
+
+**Stage**:
+Where a Prospect Company stands: New, Contacted, Requirement received, Quotation sent, Negotiation, Won, Lost. Fixed in code. Not the Sales CRM's Funnel Stage.
+_Avoid_: status, funnel stage
+
+**Marketing Person**:
+A Team Member whose Role adds Visits, or the Owner. An Office Staff member on the **Marketing** Role, the default Role for them; not a record of their own.
+_Avoid_: salesman, executive, marketing staff
+
 ### Documents
 
 **Daily Worksheet**:

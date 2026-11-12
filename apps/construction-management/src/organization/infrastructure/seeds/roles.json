@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "source": "Default Roles every new Company starts with (ADR CM-0030). The first eight are the Permission Templates the Designation seeds carried before Roles; Admin holds every supported cell (\"ALL\"); HRMS Staff is the HRMS default set. Companies edit their own copy.",
+  "version": 2,
+  "source": "Default Roles every new Company starts with (ADR CM-0030). The first eight are the Permission Templates the Designation seeds carried before Roles; Admin holds every supported cell (\"ALL\"); HRMS Staff is the HRMS default set. Companies edit their own copy. Marketing is the Marketing Person's Role (ADR CM-0040): Visits, Follow-ups and Companies, their own only.",
   "roles": [
     {
       "name": "Admin",
@@ -525,6 +525,16 @@
         "hrms.attendance": ["create", "read", "notification"],
         "hrms.leaves": ["create", "read", "notification"],
         "hrms.salaries": ["read"]
+      }
+    },
+    {
+      "name": "Marketing",
+      "description": "Plans and logs Visits to Prospect Companies, keeps their Contacts and Stage, and follows up. Sees only their own Visits, Follow-ups and Companies.",
+      "permissions": {
+        "marketing.dashboard": ["read"],
+        "marketing.visits": ["create", "read", "update"],
+        "marketing.follow_ups": ["create", "read", "update", "notification"],
+        "marketing.companies": ["create", "read", "update"]
       }
     }
   ]
