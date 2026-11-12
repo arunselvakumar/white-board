@@ -1,0 +1,150 @@
+/// Construction Management — marketing context (ADR CM-0040): Prospect
+/// Companies the marketing team visits to win work, their Contacts and the
+/// history of their Stage. Visits, Follow-ups and visit targets come with
+/// their own tickets.
+///
+/// Conventions:
+/// - Team Members live in another schema: `*_member_id` columns are their
+///   ids, kept without foreign keys. `created_by` / `updated_by` /
+///   `deleted_by` are user ids, as in every other context.
+/// - Every table has `workspace_id`, so the Company purge finds it (CM-907).
+/// - Rows are soft-deleted (`deleted_at`); "one live name per Company" and
+///   "one primary Contact per Prospect Company" are partial unique indexes
+///   in the migration.
+/// - Mobile numbers are stored normalised (`+91…`).
+
+/// Where a Prospect Company stands (ADR CM-0040 §11). New and Contacted are
+/// set by the system; the rest by hand, in any order.
+enum ConstructionMarketingStage {
+  new
+  contacted
+  requirement_received
+  quotation_sent
+  negotiation
+  won
+  lost
+
+  @@map("stage")
+  @@schema("construction_marketing")
+}
+
+/// Why a Prospect Company was Lost; `other` needs words.
+enum ConstructionMarketingLostReason {
+  price
+  competitor
+  no_requirement
+  not_reachable
+  other
+
+  @@map("lost_reason")
+  @@schema("construction_marketing")
+}
+
+/// How the marketing team found the company.
+enum ConstructionMarketingCompanySource {
+  reference
+  cold_call
+  tender_notice
+  existing_client
+  exhibition
+  online
+  other
+
+  @@map("company_source")
+  @@schema("construction_marketing")
+}
+
+model ConstructionMarketingProspectCompany {
+  id               String                              @id @db.Uuid
+  workspaceId      String                              @map("workspace_id")
+  name             String
+  /// Lower case, spaces collapsed: unique among the Company's live rows.
+  nameKey          String                              @map("name_key")
+  industry         String?
+  address          String?
+  city             String?
+  /// GST state code (`33` Tamil Nadu); the GSTIN's first two digits when it
+  /// has one.
+  stateCode        String?                             @map("state_code")
+  /// Six digits.
+  pin              String?
+  /// As typed: an office line or a mobile.
+  phone            String?
+  email            String?
+  website          String?
+  /// Upper case, checksum valid.
+  gstin            String?
+  source           ConstructionMarketingCompanySource?
+  /// The Marketing Person chasing it; the creator's Team Member id unless
+  /// another is picked.
+  assignedMemberId String?                             @map("assigned_member_id") @db.Uuid
+  stage            ConstructionMarketingStage          @default(new)
+  /// Set while Lost.
+  lostReason       ConstructionMarketingLostReason?    @map("lost_reason")
+  lostReasonText   String?                             @map("lost_reason_text")
+  remarks          String?
+  createdAt        DateTime                            @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime                            @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy        String                              @map("created_by")
+  updatedBy        String                              @map("updated_by")
+  deletedAt        DateTime?                           @map("deleted_at") @db.Timestamptz(3)
+  deletedBy        String?                             @map("deleted_by")
+
+  contacts     ConstructionMarketingContact[]
+  stageChanges ConstructionMarketingStageChange[]
+
+  @@index([workspaceId, createdAt])
+  @@index([workspaceId, stage])
+  @@index([workspaceId, assignedMemberId])
+  @@index([workspaceId, createdBy])
+  @@map("prospect_companies")
+  @@schema("construction_marketing")
+}
+
+/// A person at a Prospect Company. Exactly one live Contact is primary once
+/// any exist.
+model ConstructionMarketingContact {
+  id                String    @id @db.Uuid
+  workspaceId       String    @map("workspace_id")
+  prospectCompanyId String    @map("prospect_company_id") @db.Uuid
+  name              String
+  jobTitle          String?   @map("job_title")
+  /// Normalised: `+91XXXXXXXXXX` or `+` and 8–15 digits.
+  mobile            String?
+  email             String?
+  remarks           String?
+  isPrimary         Boolean   @default(false) @map("is_primary")
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy         String    @map("created_by")
+  updatedBy         String    @map("updated_by")
+  deletedAt         DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy         String?   @map("deleted_by")
+
+  prospectCompany ConstructionMarketingProspectCompany @relation(fields: [prospectCompanyId], references: [id])
+
+  @@index([workspaceId, prospectCompanyId])
+  @@index([workspaceId, mobile])
+  @@map("contacts")
+  @@schema("construction_marketing")
+}
+
+/// Append-only: every Stage a Prospect Company moved to, with who and when.
+/// The first row of a company is its creation at New (`from_stage` null).
+model ConstructionMarketingStageChange {
+  id                String                           @id @db.Uuid
+  workspaceId       String                           @map("workspace_id")
+  prospectCompanyId String                           @map("prospect_company_id") @db.Uuid
+  fromStage         ConstructionMarketingStage?      @map("from_stage")
+  toStage           ConstructionMarketingStage       @map("to_stage")
+  lostReason        ConstructionMarketingLostReason? @map("lost_reason")
+  lostReasonText    String?                          @map("lost_reason_text")
+  changedAt         DateTime                         @default(now()) @map("changed_at") @db.Timestamptz(3)
+  changedBy         String                           @map("changed_by")
+
+  prospectCompany ConstructionMarketingProspectCompany @relation(fields: [prospectCompanyId], references: [id])
+
+  @@index([workspaceId, prospectCompanyId, changedAt])
+  @@map("stage_changes")
+  @@schema("construction_marketing")
+}

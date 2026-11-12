@@ -29,6 +29,7 @@ export async function loadMemberAccess(
       deletedAt: null,
     },
     select: {
+      id: true,
       roleId: true,
       role: {
         select: { permissions: { select: { menu: true, flags: true } } },
@@ -43,6 +44,7 @@ export async function loadMemberAccess(
     ...session,
     permissions: PermissionSet.fromMasks(masks),
     roleId: member?.roleId ?? null,
+    memberId: member?.id ?? null,
     projectIds: new Set(member?.projects.map((project) => project.projectId)),
   };
 }

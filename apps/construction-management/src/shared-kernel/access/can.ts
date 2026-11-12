@@ -17,6 +17,12 @@ export type MemberAccess = {
    * and a member without one. Absent where a caller builds access by hand.
    */
   roleId?: string | null;
+  /**
+   * The caller's Team Member id, for records that are theirs by assignment
+   * (ADR CM-0040 §5); null without a live row. Absent for the Owner, who
+   * holds View all, and where a caller builds access by hand.
+   */
+  memberId?: string | null;
   /** Projects the Team Member is assigned to (`modules/03`). */
   projectIds: ReadonlySet<string>;
 };
@@ -75,4 +81,19 @@ export function financialValue<T>(
   value: T,
 ): T | null {
   return can(member, menu, "financial") ? value : null;
+}
+
+/**
+ * Who a member without View all sees on a menu whose records are theirs by
+ * creation **or** assignment (ADR CM-0040 §5): a User id for `created_by`
+ * and a Team Member id for the visitor, owner or assigned person. Null:
+ * every record.
+ */
+export type OwnScope = { userId: string; memberId: string | null } | null;
+
+/** Null with View all on the menu; otherwise the caller's two ids. */
+export function ownScope(member: MemberAccess, menu: MenuKey): OwnScope {
+  return can(member, menu, "view_all")
+    ? null
+    : { userId: member.userId, memberId: member.memberId ?? null };
 }
