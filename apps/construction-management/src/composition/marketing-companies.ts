@@ -2,6 +2,7 @@ import { prisma } from "@repo/construction-db";
 
 import { ProspectCompanyHandlers } from "@/src/marketing/application/prospect-company-handlers";
 import { prismaProspectCompanyStore } from "@/src/marketing/infrastructure/prisma-prospect-company-store";
+import { companyTimezone } from "@/src/shared-kernel/company-today";
 
 import { marketingTeam } from "./marketing-team";
 
@@ -11,6 +12,7 @@ export function createProspectCompanyHandlers(): ProspectCompanyHandlers {
     db: prisma,
     store: prismaProspectCompanyStore,
     team: marketingTeam,
+    timeZone: (workspaceId) => companyTimezone(prisma, workspaceId),
   });
 }
 

@@ -45,6 +45,8 @@ export type ProspectCompanyDeps = {
   db: MarketingDb;
   store: ProspectCompanyStore;
   team: MarketingTeam;
+  /** The Company's time zone, for the page's times. */
+  timeZone: (workspaceId: string) => Promise<string>;
   clock?: () => Date;
 };
 
@@ -104,6 +106,8 @@ export type ProspectCompanyReadModel = Omit<
 > & {
   assignedTo: { id: string; name: string } | null;
   createdByName: string;
+  /** The Company's time zone: the page shows times in it. */
+  timeZone: string;
   contacts: ContactReadModel[];
   timeline: ProspectCompanyTimelineItem[];
   actions: ProspectCompanyActions;
@@ -254,7 +258,7 @@ export class ProspectCompanyHandlers {
       store.contacts(db, access.workspaceId, id),
       store.stageChanges(db, access.workspaceId, id),
     ]);
-    const [members, users] = await Promise.all([
+    const [members, users, timeZone] = await Promise.all([
       team.memberNames(
         access.workspaceId,
         company.assignedMemberId == null ? [] : [company.assignedMemberId],
@@ -263,6 +267,7 @@ export class ProspectCompanyHandlers {
         company.createdBy,
         ...changes.map((change) => change.changedBy),
       ]),
+      this.deps.timeZone(access.workspaceId),
     ]);
     const { assignedMemberId, ...rest } = company;
     return {
@@ -275,6 +280,7 @@ export class ProspectCompanyHandlers {
               name: members.get(assignedMemberId) ?? "Removed member",
             },
       createdByName: users.get(company.createdBy) ?? "Unknown",
+      timeZone,
       contacts,
       timeline: changes
         .map((change): ProspectCompanyTimelineItem => ({

@@ -241,6 +241,8 @@ export const ConstructionMarketingProspectCompanyResponseModel = z.object({
   lostReason: lostReason.nullable(),
   lostReasonText: z.string().nullable(),
   createdByName: z.string(),
+  /** The Company's time zone (IANA); the page shows times in it. */
+  timeZone: z.string(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
   contacts: z.array(ConstructionMarketingContactResponseModel),
@@ -330,6 +332,7 @@ export function toProspectCompanyResponse(
     lostReason: company.lostReason,
     lostReasonText: company.lostReasonText,
     createdByName: company.createdByName,
+    timeZone: company.timeZone,
     createdAt: company.createdAt.toISOString(),
     updatedAt: company.updatedAt.toISOString(),
     contacts: company.contacts.map(toContactResponse),

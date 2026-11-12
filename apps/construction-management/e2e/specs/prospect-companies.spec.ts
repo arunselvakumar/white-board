@@ -1,0 +1,104 @@
+import { expect } from "@playwright/test";
+
+import { createProspectCompany } from "../api/marketing";
+import { unique } from "../api/session";
+import { companyTest } from "../helpers/companyTest";
+import { ProspectCompaniesPage } from "../pages/ProspectCompaniesPage";
+
+companyTest.describe("Prospect Companies", () => {
+  companyTest(
+    "should add a Prospect Company with its primary Contact and move it to Lost with a reason, when a member on the Marketing Role uses Companies",
+    { tag: ["@pr", "@mobile"] },
+    async ({ newMember }) => {
+      const member = await newMember({ roleName: "Marketing" });
+      const companies = new ProspectCompaniesPage(await member.page());
+      const name = unique("Anugraha Steel");
+
+      await companies.goto();
+      await companies.link("Add Prospect Company").first().click();
+      await companies.field("Name").fill(name);
+      await companies.field("City").fill("Coimbatore");
+      await companies.field("Contact name").fill("Ravi Kumar");
+      await companies.field("Contact mobile").fill("98765 43210");
+      await companies.clickAndWaitFor(
+        companies.button("Save"),
+        "/api/construction/marketing/companies",
+      );
+
+      await expect(companies.heading(name, { level: 1 })).toBeVisible();
+      await expect(companies.contacts).toContainText("Ravi Kumar");
+      await expect(companies.contacts).toContainText("Primary");
+      await expect(companies.history).toContainText("Added at New");
+
+      await companies.action("Move Stage");
+      await companies.dialog.getByRole("radio", { name: "Lost" }).click();
+      await companies.choose("Lost Reason", "Other");
+      await companies.dialog
+        .getByLabel("Why was it lost?")
+        .fill("Project shelved");
+      await companies.clickAndWaitFor(
+        companies.dialog.getByRole("button", { name: "Move" }),
+        /\/stage$/,
+      );
+      await expect(
+        companies.history.getByRole("listitem").first(),
+      ).toContainText("Moved to Lost");
+      await expect(companies.main).toContainText("Project shelved");
+
+      // The member did not get delete with the Marketing Role.
+      await companies.button("Actions").click();
+      await expect(companies.menuItem("Delete")).toHaveCount(0);
+    },
+  );
+
+  companyTest(
+    "should list only a member's own Prospect Companies and not a colleague's, when the Role has no View all",
+    async ({ newMember }) => {
+      const ravi = await newMember({ roleName: "Marketing" });
+      const priya = await newMember({ roleName: "Marketing" });
+      const ravis = await createProspectCompany(ravi.api, {
+        name: unique("Kaveri Steel"),
+      });
+      const priyas = await createProspectCompany(priya.api, {
+        name: unique("Pandian Mills"),
+      });
+      const companies = new ProspectCompaniesPage(await ravi.page());
+
+      await companies.goto();
+      await expect(companies.list).toContainText(ravis.name);
+      await expect(companies.list).not.toContainText(priyas.name);
+
+      await companies.currentPage.goto(`${companies.url}/${priyas.id}`);
+      await expect(
+        companies.main.getByText("This Prospect Company was not found"),
+      ).toBeVisible();
+      await expect(companies.heading(priyas.name)).toHaveCount(0);
+    },
+  );
+
+  companyTest(
+    "should find a Prospect Company by its Contact's mobile and refuse a second company with the same name, when the Owner searches and adds",
+    async ({ owner, page }) => {
+      const kaveri = await createProspectCompany(owner.api, {
+        name: unique("Kaveri Steel"),
+        primaryContact: { name: "Lakshmi", mobile: "9840012345" },
+      });
+      await createProspectCompany(owner.api, { name: unique("Pandian Mills") });
+      const companies = new ProspectCompaniesPage(page);
+
+      await companies.goto();
+      await companies.search.fill("98400 12345");
+      await expect(companies.list).toContainText(kaveri.name);
+      await expect(companies.list).not.toContainText("Pandian Mills");
+
+      await companies.link("Add Prospect Company").first().click();
+      await companies.field("Name").fill(kaveri.name.toUpperCase());
+      await companies.button("Save").click();
+      await expect(
+        companies.main.getByText(
+          "A Prospect Company with this name already exists.",
+        ),
+      ).toBeVisible();
+    },
+  );
+});

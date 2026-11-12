@@ -2,6 +2,7 @@ import { prisma } from "@repo/construction-db";
 import { StatusCodes } from "http-status-codes";
 import { describe, expect, it } from "vitest";
 
+import type { PermissionGrants } from "@/src/shared-kernel/access";
 import { jsonRequest, memberWith, ownerWithCompany } from "@/test/companies";
 import { TEST_ORIGIN } from "@/test/sessions";
 
@@ -88,18 +89,18 @@ async function names(who: Session, query = ""): Promise<string[]> {
 }
 
 /** The default Marketing Role's cells (ADR CM-0040 §3). */
-const MARKETING = {
+const MARKETING: PermissionGrants = {
   "marketing.dashboard": ["read"],
   "marketing.visits": ["create", "read", "update"],
   "marketing.follow_ups": ["create", "read", "update", "notification"],
   "marketing.companies": ["create", "read", "update"],
-} as const;
+};
 
 /** A marketing manager: the Marketing Role duplicated with View all and more. */
-const MANAGER = {
+const MANAGER: PermissionGrants = {
   ...MARKETING,
   "marketing.companies": ["create", "read", "update", "delete", "view_all"],
-} as const;
+};
 
 describe("Prospect Companies (ADR CM-0040 §5, §11)", () => {
   it("adds a company at New, assigned to the creator, with its first Contact primary", async () => {
