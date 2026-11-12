@@ -21,7 +21,7 @@ import type {
   VisitShownStatus,
   VisitStatus,
 } from "../domain/marketing-terms";
-import type { VisitDetails } from "../domain/visit";
+import type { CheckPoint, VisitDetails } from "../domain/visit";
 
 export type MarketingTx = Prisma.TransactionClient;
 
@@ -271,12 +271,17 @@ export type VisitRow = VisitDetails & {
   cancelledBy: string | null;
 };
 
+/** A check-in or check-out (ADR CM-0040 §10). */
+export type VisitCheck = CheckPoint & { at: Date; by: string };
+
 export type StoredVisit = VisitRow & {
   id: string;
   workspaceId: string;
   number: string;
   visitorIds: string[];
   contactIds: string[];
+  checkIn: VisitCheck | null;
+  checkOut: VisitCheck | null;
   createdAt: Date;
   updatedAt: Date;
   createdBy: string;
@@ -326,6 +331,7 @@ export type VisitListRow = {
   visitorIds: string[];
   contactNames: string[];
   createdBy: string;
+  checkedIn: boolean;
 };
 
 export type VisitStore = {
@@ -362,6 +368,13 @@ export type VisitStore = {
     at: Date,
   ): Promise<void>;
   remove(tx: MarketingTx, id: string, by: string, at: Date): Promise<void>;
+  /** Records a check-in or check-out; `updated_at` moves with it. */
+  setCheck(
+    tx: MarketingTx,
+    id: string,
+    which: "in" | "out",
+    check: VisitCheck,
+  ): Promise<void>;
   notes(
     db: MarketingTx,
     workspaceId: string,

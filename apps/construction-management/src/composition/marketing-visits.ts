@@ -55,6 +55,7 @@ export function createVisitHandlers(): VisitHandlers {
       };
     },
     timeZone: (workspaceId) => companyTimezone(prisma, workspaceId),
+    today: (workspaceId) => companyToday(prisma, workspaceId),
     dateIn: (instant, timeZone) => todayIn(timeZone, instant),
     dayStart: (date, timeZone) => zoneInstant(date, 0, timeZone),
     async nextNumber(tx, input) {

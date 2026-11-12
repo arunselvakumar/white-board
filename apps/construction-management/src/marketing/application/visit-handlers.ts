@@ -32,8 +32,11 @@ import {
   type ContactDetailsInput,
 } from "../domain/prospect-company";
 import {
+  assertCanCheckIn,
+  assertCanCheckOut,
   assertCompletable,
   assertPlanned,
+  checkPoint,
   cancelReason,
   isVisitLocked,
   isVisitVisible,
@@ -43,6 +46,7 @@ import {
   visitLocked,
   visitNotFound,
   visitorIds,
+  type CheckPosition,
   type VisitDetails,
   type VisitDetailsInput,
 } from "../domain/visit";
@@ -53,6 +57,7 @@ import type {
   MarketingTx,
   ProspectCompanyStore,
   StoredVisit,
+  VisitCheck,
   VisitFileStore,
   VisitRow,
   VisitStore,
@@ -88,6 +93,8 @@ export type VisitDeps = {
   /** The `marketing_visit` limits for this member, on the Company's today. */
   backdated: (access: MemberAccess) => Promise<VisitBackdatedCheck>;
   timeZone: (workspaceId: string) => Promise<string>;
+  /** The Company's today. */
+  today: (workspaceId: string) => Promise<CalendarDate>;
   /** The Visit's calendar date in the Company time zone. */
   dateIn: (instant: Date, timeZone: string) => CalendarDate;
   /** Midnight starting a day in the Company time zone. */
@@ -138,6 +145,10 @@ export type VisitActions = {
   canAddNote: boolean;
   /** Add photos and files; allowed past the lock, like notes. */
   canAddFiles: boolean;
+  /** A visitor, on a Planned Visit dated today, not yet checked in. */
+  canCheckIn: boolean;
+  /** A visitor, after the check-in, not yet out. */
+  canCheckOut: boolean;
   canDelete: boolean;
   /** A Completed Visit past its 7 days for this viewer. */
   locked: boolean;
@@ -154,6 +165,8 @@ export type VisitListItem = {
   outcome: string | null;
   visitors: { id: string; name: string }[];
   contactNames: string[];
+  /** Checked in at the site (ADR CM-0040 §10). */
+  checkedIn: boolean;
 };
 
 export type VisitHistoryItem = {
@@ -166,7 +179,9 @@ export type VisitHistoryItem = {
     | "cancelled"
     | "note_added"
     | "file_added"
-    | "file_removed";
+    | "file_removed"
+    | "checked_in"
+    | "checked_out";
   at: Date;
   byName: string;
   /** Rescheduled: the old and new times. */
@@ -177,6 +192,9 @@ export type VisitHistoryItem = {
   /** A file added or removed: its name. */
   fileName: string | null;
 };
+
+/** A check-in or check-out as the Visit page shows it. */
+export type VisitCheckView = VisitCheck & { byName: string };
 
 /** A photo or file on the Visit, oldest first. */
 export type VisitFileSummary = {
@@ -218,6 +236,9 @@ export type VisitReadModel = VisitDetails & {
   }[];
   notes: { id: string; text: string; at: Date; byName: string }[];
   files: VisitFileSummary[];
+  /** Kept with the Visit only; not in the register or any export. */
+  checkIn: VisitCheckView | null;
+  checkOut: VisitCheckView | null;
   history: VisitHistoryItem[];
   createdByName: string;
   createdAt: Date;
@@ -256,6 +277,8 @@ const HISTORY_ACTIONS = new Set([
   "visit.note_added",
   "visit.file_added",
   "visit.file_removed",
+  "visit.checked_in",
+  "visit.checked_out",
 ]);
 
 function visitNumberInUse(): DomainError {
@@ -392,8 +415,15 @@ export class VisitHandlers {
     });
   }
 
-  actions(access: MemberAccess, visit: StoredVisit): VisitActions {
+  actions(
+    access: MemberAccess,
+    visit: StoredVisit,
+    /** For Check in and Check out: who is asking, today, the Visit's day. */
+    check: { self: string | null; today: string; visitDate: string },
+  ): VisitActions {
     const update = can(access, VISITS_MENU, "update");
+    const isVisitor =
+      check.self != null && visit.visitorIds.includes(check.self);
     const locked = this.locked(access, visit);
     const planned = visit.status === "planned";
     return {
@@ -403,6 +433,18 @@ export class VisitHandlers {
       canReschedule: update && planned,
       canAddNote: update,
       canAddFiles: update,
+      canCheckIn:
+        update &&
+        isVisitor &&
+        visit.status === "planned" &&
+        visit.checkIn == null &&
+        check.visitDate === check.today,
+      canCheckOut:
+        update &&
+        isVisitor &&
+        visit.status !== "cancelled" &&
+        visit.checkIn != null &&
+        visit.checkOut == null,
       canDelete: can(access, VISITS_MENU, "delete") && !locked,
       locked,
     };
@@ -501,6 +543,7 @@ export class VisitHandlers {
           name: names.get(id) ?? "Removed member",
         })),
         contactNames: row.contactNames,
+        checkedIn: row.checkedIn,
       })),
     };
   }
@@ -541,6 +584,8 @@ export class VisitHandlers {
       team.memberNames(ws, visit.visitorIds),
       team.userNames(ws, [
         visit.createdBy,
+        ...(visit.checkIn == null ? [] : [visit.checkIn.by]),
+        ...(visit.checkOut == null ? [] : [visit.checkOut.by]),
         ...notes.map((note) => note.createdBy),
         ...files.map((file) => file.createdBy),
         ...history.map((event) => event.actorUserId),
@@ -598,6 +643,20 @@ export class VisitHandlers {
         jobTitle: contact.jobTitle,
         mobile: contact.mobile,
       })),
+      checkIn:
+        visit.checkIn == null
+          ? null
+          : {
+              ...visit.checkIn,
+              byName: users.get(visit.checkIn.by) ?? "Unknown",
+            },
+      checkOut:
+        visit.checkOut == null
+          ? null
+          : {
+              ...visit.checkOut,
+              byName: users.get(visit.checkOut.by) ?? "Unknown",
+            },
       files: files.map((file) => ({
         id: file.id,
         fileName: file.fileName,
@@ -651,7 +710,11 @@ export class VisitHandlers {
       createdAt: visit.createdAt,
       updatedAt: visit.updatedAt,
       timeZone,
-      actions: this.actions(access, visit),
+      actions: this.actions(access, visit, {
+        self: await this.self(access),
+        today: await this.deps.today(ws),
+        visitDate: this.deps.dateIn(visit.visitAt, timeZone),
+      }),
     };
   }
 
@@ -1182,6 +1245,96 @@ export class VisitHandlers {
         console.error(`Could not delete ${key} from storage`, error);
       }
     }
+  }
+
+  /**
+   * Check in (ADR CM-0040 §10): a visitor, on a Planned Visit dated today,
+   * with one position or why there is none. Nothing is read in between.
+   */
+  async checkIn(
+    access: MemberAccess,
+    id: string,
+    input: {
+      position?: CheckPosition | null;
+      location?: "refused" | "unavailable" | null;
+    },
+  ): Promise<void> {
+    assertCan(access, VISITS_MENU, "update");
+    const point = checkPoint(input);
+    const ws = access.workspaceId;
+    const [timeZone, today, self] = await Promise.all([
+      this.deps.timeZone(ws),
+      this.deps.today(ws),
+      this.self(access),
+    ]);
+    const at = this.clock();
+    await this.deps.db.$transaction(async (tx) => {
+      const current = await this.visible(access, (w) =>
+        this.deps.store.lock(tx, w, id),
+      );
+      assertCanCheckIn({
+        status: current.status,
+        checkedIn: current.checkIn != null,
+        isVisitor: self != null && current.visitorIds.includes(self),
+        visitDate: this.deps.dateIn(current.visitAt, timeZone),
+        today,
+      });
+      await this.deps.store.setCheck(tx, id, "in", {
+        ...point,
+        at,
+        by: access.userId,
+      });
+      await recordAudit(tx, {
+        workspaceId: ws,
+        actorUserId: access.userId,
+        action: "visit.checked_in",
+        entityType: "marketing_visit",
+        entityId: id,
+        // The position stays on the Visit; the trail says only whether one was kept.
+        after: { location: point.location },
+        occurredAt: at,
+      });
+    });
+  }
+
+  /** Check out: a visitor, after checking in; the same single reading. */
+  async checkOut(
+    access: MemberAccess,
+    id: string,
+    input: {
+      position?: CheckPosition | null;
+      location?: "refused" | "unavailable" | null;
+    },
+  ): Promise<void> {
+    assertCan(access, VISITS_MENU, "update");
+    const point = checkPoint(input);
+    const self = await this.self(access);
+    const at = this.clock();
+    await this.deps.db.$transaction(async (tx) => {
+      const current = await this.visible(access, (w) =>
+        this.deps.store.lock(tx, w, id),
+      );
+      assertCanCheckOut({
+        status: current.status,
+        checkedIn: current.checkIn != null,
+        checkedOut: current.checkOut != null,
+        isVisitor: self != null && current.visitorIds.includes(self),
+      });
+      await this.deps.store.setCheck(tx, id, "out", {
+        ...point,
+        at,
+        by: access.userId,
+      });
+      await recordAudit(tx, {
+        workspaceId: access.workspaceId,
+        actorUserId: access.userId,
+        action: "visit.checked_out",
+        entityType: "marketing_visit",
+        entityId: id,
+        after: { location: point.location },
+        occurredAt: at,
+      });
+    });
   }
 
   /**

@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  assertCanCheckIn,
+  assertCanCheckOut,
   assertCompletable,
+  checkPoint,
   cancelReason,
   isVisitLocked,
   isVisitVisible,
@@ -202,5 +205,83 @@ describe("Missed and the lock (ADR CM-0040 §7)", () => {
         { ...creator, userId: "user-2" },
       ),
     ).toBe(false);
+  });
+});
+
+describe("Check-in and check-out (ADR CM-0040 §10)", () => {
+  it("keeps one position, or why there is none", () => {
+    expect(
+      checkPoint({
+        position: { latitude: 11.0168, longitude: 76.9558, accuracy: 12 },
+      }),
+    ).toEqual({
+      position: { latitude: 11.0168, longitude: 76.9558, accuracy: 12 },
+      location: "recorded",
+    });
+    expect(checkPoint({ location: "refused" })).toEqual({
+      position: null,
+      location: "refused",
+    });
+    expect(code(() => checkPoint({}))).toBe("CHECK_LOCATION_REQUIRED");
+    expect(
+      code(() =>
+        checkPoint({ position: { latitude: 95, longitude: 0, accuracy: 1 } }),
+      ),
+    ).toBe("CHECK_POSITION_INVALID");
+  });
+
+  it("lets a visitor check in once, on a planned Visit dated today", () => {
+    const ready = {
+      status: "planned" as const,
+      checkedIn: false,
+      isVisitor: true,
+      visitDate: "2026-11-12",
+      today: "2026-11-12",
+    };
+    expect(() => {
+      assertCanCheckIn(ready);
+    }).not.toThrow();
+    expect(
+      code(() => {
+        assertCanCheckIn({ ...ready, isVisitor: false });
+      }),
+    ).toBe("CHECK_IN_VISITORS_ONLY");
+    expect(
+      code(() => {
+        assertCanCheckIn({ ...ready, visitDate: "2026-11-13" });
+      }),
+    ).toBe("CHECK_IN_NOT_TODAY");
+    expect(
+      code(() => {
+        assertCanCheckIn({ ...ready, checkedIn: true });
+      }),
+    ).toBe("VISIT_CHECKED_IN");
+    expect(
+      code(() => {
+        assertCanCheckIn({ ...ready, status: "completed" });
+      }),
+    ).toBe("VISIT_NOT_PLANNED");
+  });
+
+  it("checks out once, after checking in", () => {
+    const ready = {
+      status: "completed" as const,
+      checkedIn: true,
+      checkedOut: false,
+      isVisitor: true,
+    };
+    expect(() => {
+      assertCanCheckOut(ready);
+    }).not.toThrow();
+    expect(
+      code(() => {
+        assertCanCheckOut({ ...ready, checkedIn: false });
+      }),
+    ).toBe("VISIT_NOT_CHECKED_IN");
+    expect(
+      code(() => {
+        assertCanCheckOut({ ...ready, checkedOut: true });
+      }),
+    ).toBe("VISIT_CHECKED_OUT");
   });
 });
