@@ -9,7 +9,7 @@ import {
   mustChangePassword,
 } from "@/lib/must-change-password";
 
-import { viewerCan } from "./_lib/viewer-can";
+import { mainMenuAccess } from "./_lib/main-menu-access";
 
 export default async function AppLayout({
   children,
@@ -20,17 +20,7 @@ export default async function AppLayout({
   // A Temporary Password is replaced before anything else (ADR CM-0030 §8).
   if (mustChangePassword(auth)) redirect(CHANGE_PASSWORD_PATH);
   if (auth.workspaceId == null) redirect("/continue");
-  // The main menu's Dashboard needs the Dashboard menu's Read.
-  const canOpenDashboard = await viewerCan(
-    "reporting.project_dashboard",
-    "read",
-  );
-
-  // The Staff group of Human Resources needs Team Members or Role Management
-  // Read (ADR CM-0030, ADR CM-0034).
-  const canOpenStaffRoles =
-    (await viewerCan("organization.team_members", "read")) ||
-    (await viewerCan("organization.roles", "read"));
+  const { canOpenDashboard, canOpenStaffRoles } = await mainMenuAccess();
 
   return (
     <AppShell
