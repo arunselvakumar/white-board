@@ -59,6 +59,7 @@ export async function GET(request: Request): Promise<Response> {
             })
           : null,
       total: page.total,
+      timeZone: page.timeZone,
     };
     return Response.json(body);
   } catch (error) {

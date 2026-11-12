@@ -50,13 +50,15 @@ const TOKEN_RE = /^[A-Za-z0-9/_.-]*$/;
 export function standardSequenceSettings(
   module: SequenceModuleKey,
 ): SequenceRuleSettings {
+  const found = sequenceModule(module);
+  const standard = "standard" in found ? found.standard : undefined;
   return {
-    prefix: sequenceModule(module).defaultPrefix,
+    prefix: found.defaultPrefix,
     projectToken: "",
     startNumber: 1,
-    padding: SEQUENCE_LIMITS.defaultPadding,
-    separator: "/",
-    fiscalYearToken: true,
+    padding: standard?.padding ?? SEQUENCE_LIMITS.defaultPadding,
+    separator: standard?.separator ?? "/",
+    fiscalYearToken: standard?.fiscalYearToken ?? true,
   };
 }
 

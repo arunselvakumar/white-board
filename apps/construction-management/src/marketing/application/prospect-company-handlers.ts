@@ -15,10 +15,17 @@ import {
   contactNotFound,
   marketingPersonNotFound,
   prospectCompanyChanged,
+  prospectCompanyHasVisits,
   prospectCompanyNameInUse,
   prospectCompanyNotFound,
 } from "../domain/marketing-errors";
-import type { LostReason, Stage } from "../domain/marketing-terms";
+import type {
+  LostReason,
+  Stage,
+  VisitPurpose,
+  VisitShownStatus,
+} from "../domain/marketing-terms";
+import { shownStatus } from "../domain/visit";
 import {
   contactDetails,
   isProspectCompanyVisible,
@@ -26,10 +33,13 @@ import {
   primaryContactRequired,
   prospectCompanyDetails,
   prospectCompanyNameKey,
+  type ContactDetails,
   type ContactDetailsInput,
+  type ProspectCompanyDetails,
   type ProspectCompanyDetailsInput,
 } from "../domain/prospect-company";
 import type {
+  CompanyVisitsReader,
   MarketingDb,
   MarketingPerson,
   MarketingTeam,
@@ -40,11 +50,14 @@ import type {
 } from "./ports";
 
 export const COMPANIES_MENU = "marketing.companies";
+const VISITS_MENU = "marketing.visits";
 
 export type ProspectCompanyDeps = {
   db: MarketingDb;
   store: ProspectCompanyStore;
   team: MarketingTeam;
+  /** Visits on the company page and list, and the delete check. */
+  visits: CompanyVisitsReader;
   /** The Company's time zone, for the page's times. */
   timeZone: (workspaceId: string) => Promise<string>;
   clock?: () => Date;
@@ -59,6 +72,13 @@ export type CreateProspectCompanyInput = ProspectCompanyDetailsInput & {
   assignedMemberId?: string | null;
   /** A first Contact, made primary, so a first visit is one form. */
   primaryContact?: ContactDetailsInput | null;
+};
+
+/** A new company checked and ready for its transaction. */
+export type PreparedCompany = {
+  details: ProspectCompanyDetails;
+  contact: ContactDetails | null;
+  assignedMemberId: string | null;
 };
 
 export type ContactInput = ContactDetailsInput & {
@@ -81,6 +101,8 @@ export type ProspectCompanyListItem = {
   stage: Stage;
   assignedTo: { id: string; name: string } | null;
   primaryContact: { name: string; mobile: string | null } | null;
+  /** The latest completed Visit the viewer may see. */
+  lastVisitAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -88,17 +110,38 @@ export type ProspectCompanyListItem = {
 export type ContactReadModel = StoredContact;
 
 /** One entry of the company page's timeline, newest first. */
-export type ProspectCompanyTimelineItem = {
-  kind: "stage";
-  id: string;
-  /** Null on the company's first entry, its creation at New. */
-  fromStage: Stage | null;
-  toStage: Stage;
-  lostReason: LostReason | null;
-  lostReasonText: string | null;
-  at: Date;
-  byName: string;
-};
+export type ProspectCompanyTimelineItem =
+  | {
+      kind: "stage";
+      id: string;
+      /** Null on the company's first entry, its creation at New. */
+      fromStage: Stage | null;
+      toStage: Stage;
+      lostReason: LostReason | null;
+      lostReasonText: string | null;
+      at: Date;
+      byName: string;
+    }
+  | {
+      kind: "visit";
+      id: string;
+      number: string;
+      /** The Visit's time. */
+      at: Date;
+      status: VisitShownStatus;
+      purpose: VisitPurpose | null;
+      outcome: string | null;
+      visitorNames: string[];
+    }
+  | {
+      kind: "note";
+      id: string;
+      visitId: string;
+      visitNumber: string;
+      text: string;
+      at: Date;
+      byName: string;
+    };
 
 export type ProspectCompanyReadModel = Omit<
   StoredProspectCompany,
@@ -223,6 +266,8 @@ export class ProspectCompanyHandlers {
     items: ProspectCompanyListItem[];
     hasMore: boolean;
     total: number;
+    /** The Company's, for Last visit. */
+    timeZone: string;
   }> {
     assertCan(access, COMPANIES_MENU, "read");
     const page = await this.deps.store.list(this.deps.db, {
@@ -230,14 +275,26 @@ export class ProspectCompanyHandlers {
       workspaceId: access.workspaceId,
       scope: this.scope(access),
     });
-    const names = await this.deps.team.memberNames(
-      access.workspaceId,
-      page.items.flatMap((row) =>
-        row.assignedMemberId == null ? [] : [row.assignedMemberId],
+    const [names, lastVisits, timeZone] = await Promise.all([
+      this.deps.team.memberNames(
+        access.workspaceId,
+        page.items.flatMap((row) =>
+          row.assignedMemberId == null ? [] : [row.assignedMemberId],
+        ),
       ),
-    );
+      can(access, VISITS_MENU, "read")
+        ? this.deps.visits.lastVisits(
+            this.deps.db,
+            access.workspaceId,
+            page.items.map((row) => row.id),
+            ownScope(access, VISITS_MENU),
+          )
+        : new Map<string, Date>(),
+      this.deps.timeZone(access.workspaceId),
+    ]);
     return {
       ...page,
+      timeZone,
       items: page.items.map((row) => ({
         id: row.id,
         name: row.name,
@@ -253,6 +310,7 @@ export class ProspectCompanyHandlers {
                 name: names.get(row.assignedMemberId) ?? "Removed member",
               },
         primaryContact: row.primaryContact,
+        lastVisitAt: lastVisits.get(row.id) ?? null,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
       })),
@@ -266,22 +324,68 @@ export class ProspectCompanyHandlers {
     assertCan(access, COMPANIES_MENU, "read");
     const { db, store, team } = this.deps;
     const company = await this.find(access, id);
-    const [contacts, changes] = await Promise.all([
+    const [contacts, changes, visits] = await Promise.all([
       store.contacts(db, access.workspaceId, id),
       store.stageChanges(db, access.workspaceId, id),
+      can(access, VISITS_MENU, "read")
+        ? this.deps.visits.timeline(
+            db,
+            access.workspaceId,
+            id,
+            ownScope(access, VISITS_MENU),
+          )
+        : { visits: [], notes: [] },
     ]);
     const [members, users, timeZone] = await Promise.all([
-      team.memberNames(
-        access.workspaceId,
-        company.assignedMemberId == null ? [] : [company.assignedMemberId],
-      ),
+      team.memberNames(access.workspaceId, [
+        ...(company.assignedMemberId == null ? [] : [company.assignedMemberId]),
+        ...visits.visits.flatMap((visit) => visit.visitorIds),
+      ]),
       team.userNames(access.workspaceId, [
         company.createdBy,
         ...changes.map((change) => change.changedBy),
+        ...visits.notes.map((note) => note.createdBy),
       ]),
       this.deps.timeZone(access.workspaceId),
     ]);
     const { assignedMemberId, ...rest } = company;
+    const now = this.clock();
+    const numbers = new Map(
+      visits.visits.map((visit) => [visit.id, visit.number]),
+    );
+    const timeline: ProspectCompanyTimelineItem[] = [
+      ...changes.map((change): ProspectCompanyTimelineItem => ({
+        kind: "stage",
+        id: change.id,
+        fromStage: change.fromStage,
+        toStage: change.toStage,
+        lostReason: change.lostReason,
+        lostReasonText: change.lostReasonText,
+        at: change.changedAt,
+        byName: users.get(change.changedBy) ?? "Unknown",
+      })),
+      ...visits.visits.map((visit): ProspectCompanyTimelineItem => ({
+        kind: "visit",
+        id: visit.id,
+        number: visit.number,
+        at: visit.visitAt,
+        status: shownStatus(visit, now),
+        purpose: visit.purpose,
+        outcome: visit.outcome,
+        visitorNames: visit.visitorIds.map(
+          (memberId) => members.get(memberId) ?? "Removed member",
+        ),
+      })),
+      ...visits.notes.map((note): ProspectCompanyTimelineItem => ({
+        kind: "note",
+        id: note.id,
+        visitId: note.visitId,
+        visitNumber: numbers.get(note.visitId) ?? "",
+        text: note.text,
+        at: note.createdAt,
+        byName: users.get(note.createdBy) ?? "Unknown",
+      })),
+    ];
     return {
       ...rest,
       assignedTo:
@@ -294,18 +398,7 @@ export class ProspectCompanyHandlers {
       createdByName: users.get(company.createdBy) ?? "Unknown",
       timeZone,
       contacts,
-      timeline: changes
-        .map((change): ProspectCompanyTimelineItem => ({
-          kind: "stage",
-          id: change.id,
-          fromStage: change.fromStage,
-          toStage: change.toStage,
-          lostReason: change.lostReason,
-          lostReasonText: change.lostReasonText,
-          at: change.changedAt,
-          byName: users.get(change.changedBy) ?? "Unknown",
-        }))
-        .sort((a, b) => b.at.getTime() - a.at.getTime()),
+      timeline: timeline.sort((a, b) => b.at.getTime() - a.at.getTime()),
       actions: this.actions(access),
     };
   }
@@ -350,70 +443,135 @@ export class ProspectCompanyHandlers {
     access: MemberAccess,
     input: CreateProspectCompanyInput,
   ): Promise<string> {
-    assertCanWrite(access, "create");
-    const details = prospectCompanyDetails(input);
-    const contact =
-      input.primaryContact == null
-        ? null
-        : contactDetails(input.primaryContact);
-    const assignedMemberId = await this.assignee(
-      access,
-      input.assignedMemberId,
-    );
-    const ws = access.workspaceId;
-    const id = newId();
-    const at = this.clock();
-    const by = access.userId;
+    const prepared = await this.prepareCreate(access, input);
     try {
-      await this.deps.db.$transaction(async (tx) => {
-        await this.assertNameFree(tx, ws, details.name, null);
-        await this.deps.store.insert(tx, {
-          ...details,
-          id,
-          workspaceId: ws,
-          assignedMemberId,
-          by,
-          at,
-        });
-        await this.deps.store.appendStageChange(tx, {
-          workspaceId: ws,
-          prospectCompanyId: id,
-          fromStage: null,
-          move: { stage: "new", lostReason: null, lostReasonText: null },
-          by,
-          at,
-        });
-        const contactId = contact == null ? null : newId();
-        if (contact != null && contactId != null)
-          await this.deps.store.insertContact(tx, {
-            ...contact,
-            id: contactId,
-            workspaceId: ws,
-            prospectCompanyId: id,
-            isPrimary: true,
-            by,
-            at,
-          });
-        await recordAudit(tx, {
-          workspaceId: ws,
-          actorUserId: by,
-          action: "prospect_company.created",
-          entityType: "prospect_company",
-          entityId: id,
-          after: {
-            ...details,
-            assignedMemberId,
-            stage: "new",
-            ...(contact == null ? {} : { primaryContact: contact }),
-          },
-          occurredAt: at,
-        });
-      });
+      return await this.deps.db.$transaction((tx) =>
+        this.createInTx(tx, access, prepared),
+      );
     } catch (error) {
       if (isUniqueViolation(error)) throw prospectCompanyNameInUse();
       throw error;
     }
+  }
+
+  /**
+   * Checks a new company before its transaction: Companies create, the
+   * form, and the assigned person. The Visit form uses it too (PRD §3.3).
+   */
+  async prepareCreate(
+    access: MemberAccess,
+    input: CreateProspectCompanyInput,
+  ): Promise<PreparedCompany> {
+    assertCanWrite(access, "create");
+    return {
+      details: prospectCompanyDetails(input),
+      contact:
+        input.primaryContact == null
+          ? null
+          : contactDetails(input.primaryContact),
+      assignedMemberId: await this.assignee(access, input.assignedMemberId),
+    };
+  }
+
+  /**
+   * Adds a prepared company inside the caller's transaction, at New, with
+   * its first Contact. A name in use is 409 here; a race on it surfaces as
+   * a unique violation the caller maps.
+   */
+  async createInTx(
+    tx: MarketingTx,
+    access: MemberAccess,
+    prepared: PreparedCompany,
+  ): Promise<string> {
+    const { details, contact, assignedMemberId } = prepared;
+    const ws = access.workspaceId;
+    const id = newId();
+    const at = this.clock();
+    const by = access.userId;
+    await this.assertNameFree(tx, ws, details.name, null);
+    await this.deps.store.insert(tx, {
+      ...details,
+      id,
+      workspaceId: ws,
+      assignedMemberId,
+      by,
+      at,
+    });
+    await this.deps.store.appendStageChange(tx, {
+      workspaceId: ws,
+      prospectCompanyId: id,
+      fromStage: null,
+      move: { stage: "new", lostReason: null, lostReasonText: null },
+      by,
+      at,
+    });
+    if (contact != null)
+      await this.deps.store.insertContact(tx, {
+        ...contact,
+        id: newId(),
+        workspaceId: ws,
+        prospectCompanyId: id,
+        isPrimary: true,
+        by,
+        at,
+      });
+    await recordAudit(tx, {
+      workspaceId: ws,
+      actorUserId: by,
+      action: "prospect_company.created",
+      entityType: "prospect_company",
+      entityId: id,
+      after: {
+        ...details,
+        assignedMemberId,
+        stage: "new",
+        ...(contact == null ? {} : { primaryContact: contact }),
+      },
+      occurredAt: at,
+    });
     return id;
+  }
+
+  /**
+   * New to Contacted on a company's first completed Visit (ADR CM-0040
+   * §7), in the Visit's transaction; any other Stage is left as it is.
+   */
+  async markContactedInTx(
+    tx: MarketingTx,
+    access: MemberAccess,
+    companyId: string,
+  ): Promise<void> {
+    const company = await this.deps.store.lock(
+      tx,
+      access.workspaceId,
+      companyId,
+    );
+    if (company?.stage !== "new") return;
+    const at = this.clock();
+    const move = {
+      stage: "contacted" as const,
+      lostReason: null,
+      lostReasonText: null,
+    };
+    await this.deps.store.setStage(tx, companyId, move, access.userId, at);
+    await this.deps.store.appendStageChange(tx, {
+      workspaceId: access.workspaceId,
+      prospectCompanyId: companyId,
+      fromStage: "new",
+      move,
+      by: access.userId,
+      at,
+    });
+    await recordAudit(tx, {
+      workspaceId: access.workspaceId,
+      actorUserId: access.userId,
+      action: "prospect_company.stage_changed",
+      entityType: "prospect_company",
+      entityId: companyId,
+      before: { stage: "new" },
+      after: { ...move, byVisit: true },
+      occurredAt: at,
+    });
   }
 
   /** Edits the details; the assigned person moves only by Reassign. */
@@ -454,8 +612,8 @@ export class ProspectCompanyHandlers {
   }
 
   /**
-   * A tombstone, with its Contacts (ADR CM-0040 §11). Refusing it while the
-   * company has Visits comes with Visits.
+   * A tombstone, with its Contacts (ADR CM-0040 §11); refused while the
+   * company has Visits, whoever logged them.
    */
   async delete(
     access: MemberAccess,
@@ -468,6 +626,8 @@ export class ProspectCompanyHandlers {
       const current = await this.lockVisible(tx, access, id);
       if (!same(current.updatedAt, expectedUpdatedAt))
         throw prospectCompanyChanged();
+      if ((await this.deps.visits.liveCount(tx, access.workspaceId, id)) > 0)
+        throw prospectCompanyHasVisits();
       await this.deps.store.remove(tx, id, access.userId, at);
       await recordAudit(tx, {
         workspaceId: access.workspaceId,
@@ -536,37 +696,54 @@ export class ProspectCompanyHandlers {
   ): Promise<string> {
     assertCanWrite(access, "update");
     const details = contactDetails(input);
+    return this.deps.db.$transaction(async (tx) => {
+      await this.lockVisible(tx, access, companyId);
+      return this.addContactInTx(tx, access, companyId, {
+        ...details,
+        isPrimary: input.isPrimary,
+      });
+    });
+  }
+
+  /**
+   * Adds a checked Contact to a company the caller has locked: the first,
+   * or one marked primary, becomes the primary Contact.
+   */
+  async addContactInTx(
+    tx: MarketingTx,
+    access: MemberAccess,
+    companyId: string,
+    input: ContactDetails & { isPrimary?: boolean },
+  ): Promise<string> {
+    const { isPrimary, ...details } = input;
     const id = newId();
     const at = this.clock();
-    await this.deps.db.$transaction(async (tx) => {
-      await this.lockVisible(tx, access, companyId);
-      const existing = await this.deps.store.contacts(
-        tx,
-        access.workspaceId,
-        companyId,
-      );
-      const first = existing.length === 0;
-      const primary = first || input.isPrimary === true;
-      await this.deps.store.insertContact(tx, {
-        ...details,
-        id,
-        workspaceId: access.workspaceId,
-        prospectCompanyId: companyId,
-        isPrimary: first,
-        by: access.userId,
-        at,
-      });
-      if (primary && !first)
-        await this.deps.store.makePrimary(tx, companyId, id, access.userId, at);
-      await recordAudit(tx, {
-        workspaceId: access.workspaceId,
-        actorUserId: access.userId,
-        action: "prospect_company.contact_added",
-        entityType: "prospect_company",
-        entityId: companyId,
-        after: { contactId: id, ...details, isPrimary: primary },
-        occurredAt: at,
-      });
+    const existing = await this.deps.store.contacts(
+      tx,
+      access.workspaceId,
+      companyId,
+    );
+    const first = existing.length === 0;
+    const primary = first || isPrimary === true;
+    await this.deps.store.insertContact(tx, {
+      ...details,
+      id,
+      workspaceId: access.workspaceId,
+      prospectCompanyId: companyId,
+      isPrimary: first,
+      by: access.userId,
+      at,
+    });
+    if (primary && !first)
+      await this.deps.store.makePrimary(tx, companyId, id, access.userId, at);
+    await recordAudit(tx, {
+      workspaceId: access.workspaceId,
+      actorUserId: access.userId,
+      action: "prospect_company.contact_added",
+      entityType: "prospect_company",
+      entityId: companyId,
+      after: { contactId: id, ...details, isPrimary: primary },
+      occurredAt: at,
     });
     return id;
   }

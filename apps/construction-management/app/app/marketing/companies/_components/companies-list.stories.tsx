@@ -74,6 +74,8 @@ export const WithData: Story = {
     await expect(balaji).toHaveTextContent("Ravi Shankar");
     await expect(balaji).toHaveTextContent("Senthil Kumar");
     await expect(balaji).toHaveTextContent("+91 98450 12345");
+    await expect(balaji).toHaveTextContent("10 Nov 2026");
+    await expect(rows[0]).toHaveTextContent("—");
     await expect(within(layout).getByText("Lost")).toBeVisible();
     await expect(
       canvas.getByRole("link", { name: "Add Prospect Company" }),
@@ -100,6 +102,9 @@ export const Phone: Story = {
       within(balaji).getByText("Chennai · Ravi Shankar"),
     ).toBeVisible();
     await expect(within(balaji).getByText(/\+91 98450 12345/)).toBeVisible();
+    await expect(
+      within(balaji).getByText("Last visit: 10 Nov 2026"),
+    ).toBeVisible();
     await expect(canvas.queryByRole("table")).toBeNull();
   },
 };

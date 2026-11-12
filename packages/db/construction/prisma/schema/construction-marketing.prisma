@@ -1,7 +1,8 @@
 /// Construction Management — marketing context (ADR CM-0040): Prospect
-/// Companies the marketing team visits to win work, their Contacts and the
-/// history of their Stage. Visits, Follow-ups and visit targets come with
-/// their own tickets.
+/// Companies the marketing team visits to win work, their Contacts, the
+/// history of their Stage, and Visits with their visitors, points of
+/// contact and notes. Follow-ups and visit targets come with their own
+/// tickets.
 ///
 /// Conventions:
 /// - Team Members live in another schema: `*_member_id` columns are their
@@ -92,6 +93,7 @@ model ConstructionMarketingProspectCompany {
 
   contacts     ConstructionMarketingContact[]
   stageChanges ConstructionMarketingStageChange[]
+  visits       ConstructionMarketingVisit[]
 
   @@index([workspaceId, createdAt])
   @@index([workspaceId, stage])
@@ -122,6 +124,7 @@ model ConstructionMarketingContact {
   deletedBy         String?   @map("deleted_by")
 
   prospectCompany ConstructionMarketingProspectCompany @relation(fields: [prospectCompanyId], references: [id])
+  visits          ConstructionMarketingVisitContact[]
 
   @@index([workspaceId, prospectCompanyId])
   @@index([workspaceId, mobile])
@@ -146,5 +149,143 @@ model ConstructionMarketingStageChange {
 
   @@index([workspaceId, prospectCompanyId, changedAt])
   @@map("stage_changes")
+  @@schema("construction_marketing")
+}
+
+/// Stored Visit states (ADR CM-0040 §7). Missed is a Planned Visit whose
+/// time has passed, worked out on read.
+enum ConstructionMarketingVisitStatus {
+  planned
+  completed
+  cancelled
+
+  @@map("visit_status")
+  @@schema("construction_marketing")
+}
+
+enum ConstructionMarketingVisitPurpose {
+  cold_call
+  introduction
+  requirement_discussion
+  quotation
+  negotiation
+  relationship
+  payment_follow_up
+  other
+
+  @@map("visit_purpose")
+  @@schema("construction_marketing")
+}
+
+enum ConstructionMarketingInterest {
+  hot
+  warm
+  cold
+
+  @@map("interest")
+  @@schema("construction_marketing")
+}
+
+/// The kind of work a Visit found a requirement for.
+enum ConstructionMarketingWorkType {
+  civil
+  peb
+  steel_fabrication
+  shed_erection
+  other
+
+  @@map("work_type")
+  @@schema("construction_marketing")
+}
+
+/// One planned or completed visit to a Prospect Company (PRD §3.4).
+model ConstructionMarketingVisit {
+  id                    String                             @id @db.Uuid
+  workspaceId           String                             @map("workspace_id")
+  /// `MV-0001`, from the sequence kernel's `marketing_visit` module.
+  number                String
+  sequence              Int
+  prospectCompanyId     String                             @map("prospect_company_id") @db.Uuid
+  /// An instant; entered and shown in the Company time zone.
+  visitAt               DateTime                           @map("visit_at") @db.Timestamptz(3)
+  status                ConstructionMarketingVisitStatus   @default(planned)
+  purpose               ConstructionMarketingVisitPurpose?
+  location              String?
+  discussion            String?
+  outcome               String?
+  interest              ConstructionMarketingInterest?
+  requirementWorkType   ConstructionMarketingWorkType?     @map("requirement_work_type")
+  /// Approximate value in whole rupees.
+  requirementValue      BigInt?                            @map("requirement_value")
+  /// The first day of the month the work is expected to start.
+  requirementStartMonth DateTime?                          @map("requirement_start_month") @db.Date
+  /// When it was marked Completed; the edit lock counts from it.
+  completedAt           DateTime?                          @map("completed_at") @db.Timestamptz(3)
+  completedBy           String?                            @map("completed_by")
+  cancelReason          String?                            @map("cancel_reason")
+  cancelledAt           DateTime?                          @map("cancelled_at") @db.Timestamptz(3)
+  cancelledBy           String?                            @map("cancelled_by")
+  createdAt             DateTime                           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime                           @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy             String                             @map("created_by")
+  updatedBy             String                             @map("updated_by")
+  deletedAt             DateTime?                          @map("deleted_at") @db.Timestamptz(3)
+  deletedBy             String?                            @map("deleted_by")
+
+  prospectCompany ConstructionMarketingProspectCompany @relation(fields: [prospectCompanyId], references: [id])
+  visitors        ConstructionMarketingVisitVisitor[]
+  contacts        ConstructionMarketingVisitContact[]
+  notes           ConstructionMarketingVisitNote[]
+
+  @@unique([workspaceId, number])
+  @@index([workspaceId, visitAt])
+  @@index([workspaceId, prospectCompanyId, visitAt])
+  @@index([workspaceId, createdBy])
+  @@map("visits")
+  @@schema("construction_marketing")
+}
+
+/// A Marketing Person on a Visit (a Team Member id).
+model ConstructionMarketingVisitVisitor {
+  workspaceId String @map("workspace_id")
+  visitId     String @map("visit_id") @db.Uuid
+  memberId    String @map("member_id") @db.Uuid
+
+  visit ConstructionMarketingVisit @relation(fields: [visitId], references: [id])
+
+  @@id([visitId, memberId])
+  @@index([workspaceId, memberId])
+  @@map("visit_visitors")
+  @@schema("construction_marketing")
+}
+
+/// A point of contact met on a Visit.
+model ConstructionMarketingVisitContact {
+  workspaceId String @map("workspace_id")
+  visitId     String @map("visit_id") @db.Uuid
+  contactId   String @map("contact_id") @db.Uuid
+
+  visit   ConstructionMarketingVisit   @relation(fields: [visitId], references: [id])
+  contact ConstructionMarketingContact @relation(fields: [contactId], references: [id])
+
+  @@id([visitId, contactId])
+  @@index([workspaceId, contactId])
+  @@map("visit_contacts")
+  @@schema("construction_marketing")
+}
+
+/// Append-only: a dated note added after a Visit, never edited.
+model ConstructionMarketingVisitNote {
+  id          String   @id @db.Uuid
+  workspaceId String   @map("workspace_id")
+  visitId     String   @map("visit_id") @db.Uuid
+  text        String
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy   String   @map("created_by")
+
+  visit ConstructionMarketingVisit @relation(fields: [visitId], references: [id])
+
+  @@index([workspaceId, visitId, createdAt])
+  @@map("visit_notes")
   @@schema("construction_marketing")
 }

@@ -52,3 +52,10 @@ export function marketingPersonNotFound(field: string): DomainError {
     field,
   );
 }
+
+export function prospectCompanyHasVisits(): DomainError {
+  return conflict(
+    "PROSPECT_COMPANY_HAS_VISITS",
+    "This Prospect Company has Visits, so it cannot be deleted.",
+  );
+}

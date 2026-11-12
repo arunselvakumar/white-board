@@ -63,19 +63,24 @@ export function contact(
   };
 }
 
+type StageEntry = Extract<ProspectCompanyTimelineItem, { kind: "stage" }>;
+
 function entry(
   id: string,
   fromStage: Stage | null,
   toStage: Stage,
   at: string,
   byName: string,
-  lost: Pick<ProspectCompanyTimelineItem, "lostReason" | "lostReasonText"> = {
+  lost: Pick<StageEntry, "lostReason" | "lostReasonText"> = {
     lostReason: null,
     lostReasonText: null,
   },
 ): ProspectCompanyTimelineItem {
   return { kind: "stage", id, fromStage, toStage, at, byName, ...lost };
 }
+
+/** MV-0003 on Sri Balaji, completed; the Visit stories open the same id. */
+export const BALAJI_VISIT_ID = "0199d000-0000-7000-8000-000000000503";
 
 /** Sri Balaji Infra Projects at Quotation sent, with two Contacts. */
 export function company(
@@ -123,6 +128,25 @@ export function company(
         "2026-11-12T10:35:00.000Z",
         "Ravi Shankar",
       ),
+      {
+        kind: "note",
+        id: "0199d000-0000-7000-8000-000000000601",
+        visitId: BALAJI_VISIT_ID,
+        visitNumber: "MV-0003",
+        text: "Sent the PEB drawings they asked for.",
+        at: "2026-11-11T06:30:00.000Z",
+        byName: "Priya Raman",
+      },
+      {
+        kind: "visit",
+        id: BALAJI_VISIT_ID,
+        number: "MV-0003",
+        at: "2026-11-10T08:00:00.000Z",
+        status: "completed",
+        purpose: "requirement_discussion",
+        outcome: "Asked for a quotation",
+        visitorNames: ["Ravi Shankar", "Priya Raman"],
+      },
       entry(
         "0199d000-0000-7000-8000-000000000303",
         "contacted",
@@ -230,6 +254,10 @@ export function toListItem(detail: ProspectCompany): ProspectCompanyListItem {
     assignedTo: detail.assignedTo,
     primaryContact:
       primary == null ? null : { name: primary.name, mobile: primary.mobile },
+    lastVisitAt:
+      detail.timeline.find(
+        (item) => item.kind === "visit" && item.status === "completed",
+      )?.at ?? null,
     createdAt: detail.createdAt,
     updatedAt: detail.updatedAt,
   };
@@ -327,6 +355,7 @@ export function companyHandler(
         items: page.map(toListItem),
         nextCursor: next < matching.length ? String(next) : null,
         total: matching.length,
+        timeZone: "Asia/Kolkata",
       } satisfies ProspectCompanyPage);
     }
 

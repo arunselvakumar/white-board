@@ -182,20 +182,20 @@ Without `view_all` every figure is the member's own. With it, the figures are th
 
 Sequential. Update the Status column.
 
-| #   | Ticket                                                                                         | Status |
-| --- | ---------------------------------------------------------------------------------------------- | ------ |
-| 1   | ADR CM-0040: Marketing main menu, context and schema, the Marketing Role, the own-entries rule | done   |
-| 2   | Menus and flags, Marketing default Role and its migration, main-menu item and submenu          | done   |
-| 3   | Prospect Companies and Contacts: list, form, company page, Stage and its history               | done   |
-| 4   | Visits: form, list, statuses, notes, numbering, back-dated and lock rules, audit               | todo   |
-| 5   | Visit photos and files on the attachments service                                              | todo   |
-| 6   | Follow-ups: list, Done and Log the visit, creation from a Visit, notifications                 | todo   |
-| 7   | Visit calendar and check-in / check-out                                                        | todo   |
-| 8   | Team page, visit targets, reassign and the "needs reassigning" list                            | todo   |
-| 9   | Marketing Dashboard                                                                            | todo   |
-| 10  | Won → Create Project, and the Projects shown on the company page                               | todo   |
-| 11  | Reports and exports; Prospect Company import                                                   | todo   |
-| 12  | e2e tests (`e2e-tests.md`), `modules/` spec for Marketing, README table of contents            | todo   |
+| #   | Ticket                                                                                         | Status      |
+| --- | ---------------------------------------------------------------------------------------------- | ----------- |
+| 1   | ADR CM-0040: Marketing main menu, context and schema, the Marketing Role, the own-entries rule | done        |
+| 2   | Menus and flags, Marketing default Role and its migration, main-menu item and submenu          | done        |
+| 3   | Prospect Companies and Contacts: list, form, company page, Stage and its history               | done        |
+| 4   | Visits: form, list, statuses, notes, numbering, back-dated and lock rules, audit               | in_progress |
+| 5   | Visit photos and files on the attachments service                                              | todo        |
+| 6   | Follow-ups: list, Done and Log the visit, creation from a Visit, notifications                 | todo        |
+| 7   | Visit calendar and check-in / check-out                                                        | todo        |
+| 8   | Team page, visit targets, reassign and the "needs reassigning" list                            | todo        |
+| 9   | Marketing Dashboard                                                                            | todo        |
+| 10  | Won → Create Project, and the Projects shown on the company page                               | todo        |
+| 11  | Reports and exports; Prospect Company import                                                   | todo        |
+| 12  | e2e tests (`e2e-tests.md`), `modules/` spec for Marketing, README table of contents            | todo        |
 
 ## 7. Questions the owner answered
 

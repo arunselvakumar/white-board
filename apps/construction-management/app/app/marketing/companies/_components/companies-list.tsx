@@ -244,6 +244,17 @@ function toQuery(filters: Filters): CompanyFilters {
   };
 }
 
+/** "12 Nov 2026" in the Company time zone, or "—". */
+function lastVisit(at: string | null, timeZone: string): string {
+  if (at == null) return "—";
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone,
+  }).format(new Date(at));
+}
+
 function PrimaryContact({
   contact,
 }: {
@@ -273,6 +284,7 @@ function CompanyRows({
   const pages = query.data.pages;
   const items = pages.flatMap((page) => page.items);
   const total = pages[0]?.total ?? 0;
+  const timeZone = pages[0]?.timeZone ?? "Asia/Kolkata";
   const filtered =
     filters.search.trim() !== "" ||
     filters.stages.length > 0 ||
@@ -351,6 +363,9 @@ function CompanyRows({
                 <TableCell className="max-w-56">
                   <PrimaryContact contact={company.primaryContact} />
                 </TableCell>
+                <TableCell className="text-muted-foreground whitespace-nowrap">
+                  {lastVisit(company.lastVisitAt, timeZone)}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -375,6 +390,9 @@ function CompanyRows({
               {[company.city, company.assignedTo?.name]
                 .filter((part): part is string => part != null)
                 .join(" · ") || "—"}
+            </p>
+            <p className="text-muted-foreground text-xs">
+              {`Last visit: ${lastVisit(company.lastVisitAt, timeZone)}`}
             </p>
             {company.primaryContact != null && (
               <p className="truncate text-xs">

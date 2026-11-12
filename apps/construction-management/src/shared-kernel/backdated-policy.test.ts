@@ -36,11 +36,11 @@ function errorOf(run: () => void): DomainError {
 }
 
 describe("module catalogue", () => {
-  it("lists the 24 modules of modules/12, M6's two and M7's five in seven groups", () => {
+  it("lists the 24 modules of modules/12, M6's two, M7's five and Marketing's one in eight groups", () => {
     // Site Diary and Hindrance joined the Site group in M6 (ADR CM-0016);
     // party payments, party invoices, Other Expenses and the two wage
     // payment modules in M7 (ADR CM-0017 §15).
-    expect(BACKDATED_MODULES).toHaveLength(31);
+    expect(BACKDATED_MODULES).toHaveLength(32);
     const counts = Object.fromEntries(
       BACKDATED_MODULE_GROUPS.map((group) => [
         group.label,
@@ -55,8 +55,9 @@ describe("module catalogue", () => {
       "Labour & Vendor": 4,
       Sales: 3,
       HRMS: 3,
+      Marketing: 1,
     });
-    expect(new Set(BACKDATED_MODULES.map((item) => item.key)).size).toBe(31);
+    expect(new Set(BACKDATED_MODULES.map((item) => item.key)).size).toBe(32);
   });
 });
 
@@ -76,6 +77,35 @@ describe("calendar dates", () => {
 });
 
 describe("assertCanCreate / assertCanEdit", () => {
+  it("limits Marketing Visits to 7 days in a Company that has not set it (ADR CM-0040 §7)", () => {
+    const eightDaysAgo = addDays(TODAY, -8);
+    expect(
+      errorOf(() => {
+        assertCanCreate(
+          DEFAULT_BACKDATED_POLICY,
+          "marketing_visit",
+          eightDaysAgo,
+          engineer,
+          TODAY,
+        );
+      }).code,
+    ).toBe("BACKDATED_CREATE_BLOCKED");
+    expect(() => {
+      assertCanEdit(
+        DEFAULT_BACKDATED_POLICY,
+        "marketing_visit",
+        addDays(TODAY, -7),
+        engineer,
+        TODAY,
+      );
+    }).not.toThrow();
+    // A stored policy that never named the module keeps its default.
+    expect(
+      createBackdatedPolicy({ create: { days: 0 }, edit: { days: 0 } }).modules
+        .marketing_visit,
+    ).toMatchObject({ mode: "custom", create: { days: 7 } });
+  });
+
   it("allows anything when every limit is 0", () => {
     expect(() => {
       assertCanCreate(

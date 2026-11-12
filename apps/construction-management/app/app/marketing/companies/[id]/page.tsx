@@ -35,6 +35,8 @@ export default async function Page({
   if (!(await viewerCan("marketing.companies", "read")))
     return <MarketingNoAccess what="Prospect Companies" />;
 
+  const canPlanVisit = await viewerCan("marketing.visits", "create");
+
   const queryClient = getQueryClient();
   try {
     await prefetchRoute(queryClient, companyQuery(id), ROUTES);
@@ -45,7 +47,7 @@ export default async function Page({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <CompanyDetail id={id} />
+      <CompanyDetail id={id} canPlanVisit={canPlanVisit} />
     </HydrationBoundary>
   );
 }
