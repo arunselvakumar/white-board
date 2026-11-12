@@ -91,7 +91,7 @@ async function upload(
   who: Session,
   visitId: string,
   fileName: string,
-  bytes: Uint8Array,
+  bytes: Uint8Array<ArrayBuffer>,
   options: { caption?: string; declared?: number } = {},
 ): Promise<Response> {
   const started = await start(

@@ -1,5 +1,10 @@
 import { mockApi, type ApiCall } from "@/.storybook/mocks/api";
 import {
+  VISIT_FILE_LIMIT,
+  visitFilesUrl,
+  type VisitFile,
+} from "@/src/queries/marketing-visit-files";
+import {
   MARKETING_VISITS_API,
   type Visit,
   type VisitFormOptions,
@@ -94,6 +99,7 @@ const ALL_ACTIONS: Visit["actions"] = {
   canCancel: false,
   canReschedule: false,
   canAddNote: true,
+  canAddFiles: true,
   canDelete: true,
   locked: false,
 };
@@ -143,6 +149,7 @@ export function visit(overrides: Partial<Visit> = {}): Visit {
         from: null,
         to: null,
         reason: null,
+        fileName: null,
       },
       {
         id: "0199d000-0000-7000-8000-000000000703",
@@ -152,6 +159,7 @@ export function visit(overrides: Partial<Visit> = {}): Visit {
         from: null,
         to: null,
         reason: null,
+        fileName: null,
       },
       {
         id: "0199d000-0000-7000-8000-000000000702",
@@ -161,6 +169,7 @@ export function visit(overrides: Partial<Visit> = {}): Visit {
         from: "2026-11-08T04:30:00.000Z",
         to: "2026-11-10T08:00:00.000Z",
         reason: null,
+        fileName: null,
       },
       {
         id: "0199d000-0000-7000-8000-000000000701",
@@ -170,8 +179,10 @@ export function visit(overrides: Partial<Visit> = {}): Visit {
         from: null,
         to: null,
         reason: null,
+        fileName: null,
       },
     ],
+    files: [],
     createdByName: "Ravi Shankar",
     createdAt: "2026-11-05T04:30:00.000Z",
     updatedAt: "2026-11-11T06:30:00.000Z",
@@ -179,6 +190,42 @@ export function visit(overrides: Partial<Visit> = {}): Visit {
     actions: ALL_ACTIONS,
     ...overrides,
   };
+}
+
+let fileIds = 0;
+
+/** A Visit's saved photo or PDF, uploaded by Ravi and his to change. */
+export function visitFile(
+  fileName: string,
+  extra: Partial<VisitFile> = {},
+): VisitFile {
+  fileIds += 1;
+  const pdf = fileName.endsWith(".pdf");
+  return {
+    id: `0199d000-0000-7000-8000-0000000e${String(fileIds).padStart(4, "0")}`,
+    fileName,
+    contentType: pdf ? "application/pdf" : "image/jpeg",
+    bytes: pdf ? 2_400_000 : 420_000,
+    viewable: true,
+    hasThumbnail: !pdf,
+    caption: null,
+    createdByName: "Ravi Shankar",
+    createdAt: "2026-11-10T09:05:00.000Z",
+    canChange: true,
+    ...extra,
+  };
+}
+
+/** A visiting card and a site photo with captions, and a requirement sheet. */
+export function visitFiles(): VisitFile[] {
+  return [
+    visitFile("card.jpg", { caption: "Senthil's visiting card" }),
+    visitFile("site.jpg", { caption: "Plot for the PEB warehouse" }),
+    visitFile("requirement.pdf", {
+      createdByName: "Priya Raman",
+      canChange: false,
+    }),
+  ];
 }
 
 const PLAN_HISTORY = (at: string, byName: string): Visit["history"] => [
@@ -190,6 +237,7 @@ const PLAN_HISTORY = (at: string, byName: string): Visit["history"] => [
     from: null,
     to: null,
     reason: null,
+    fileName: null,
   },
 ];
 
@@ -277,6 +325,7 @@ export function cancelledVisit(overrides: Partial<Visit> = {}): Visit {
         from: null,
         to: null,
         reason: "Their MD is travelling this month",
+        fileName: null,
       },
       ...PLAN_HISTORY("2026-11-03T04:00:00.000Z", "Priya Raman"),
     ],
@@ -414,6 +463,7 @@ const historyEntry = (
   from: null,
   to: null,
   reason: null,
+  fileName: null,
   ...extra,
 });
 
@@ -427,6 +477,90 @@ export function visitHandler(
   const save = (next: Visit) => {
     visits = visits.map((item) => (item.id === next.id ? next : item));
     return json(next);
+  };
+  const started = new Map<string, number>();
+
+  /** The Visit files routes: start, thumbnail, complete, caption, remove. */
+  const fileCall = (
+    id: string,
+    rest: string | undefined,
+    call: ApiCall,
+    body: Record<string, unknown>,
+  ): Response | undefined => {
+    const found = visits.find((item) => item.id === id);
+    if (found == null || call.method !== "POST") return undefined;
+    const limit = () =>
+      json(
+        {
+          code: "VISIT_FILE_LIMIT",
+          message: `A Visit keeps up to ${String(VISIT_FILE_LIMIT)} photos and files. Remove one to add another.`,
+        },
+        409,
+      );
+    const base = visitFilesUrl(id);
+    if (rest === "uploads") {
+      if (found.files.length >= VISIT_FILE_LIMIT) return limit();
+      const key = `companies/w1/marketing_visit/${id}/${String(started.size + 1)}.bin`;
+      started.set(key, Number(body["bytes"]));
+      const encoded = encodeURIComponent(key);
+      return json(
+        {
+          key,
+          fileName: String(body["fileName"]),
+          upload: { via: "app", url: `${base}/uploads/app?key=${encoded}` },
+          thumbnailUrl: `${base}/uploads/thumbnail?key=${encoded}`,
+        },
+        201,
+      );
+    }
+    if (rest === "uploads/thumbnail")
+      return new Response(null, { status: 204 });
+    if (rest == null) {
+      if (found.files.length >= VISIT_FILE_LIMIT) return limit();
+      const fileName = String(body["fileName"]);
+      const added = visitFile(fileName, {
+        bytes: started.get(String(body["key"])) ?? 0,
+        createdByName: "Arun Selva Kumar",
+        createdAt: SAVED_AT,
+      });
+      save({
+        ...found,
+        files: [...found.files, added],
+        history: [historyEntry("file_added", { fileName }), ...found.history],
+      });
+      return json(added, 201);
+    }
+    const [fileId, action] = rest.split("/");
+    const file = found.files.find((item) => item.id === fileId);
+    if (file == null)
+      return json(
+        { code: "VISIT_FILE_NOT_FOUND", message: "This file was not found." },
+        404,
+      );
+    if (action === "update") {
+      const caption = body["caption"];
+      const next = {
+        ...file,
+        caption: typeof caption === "string" && caption !== "" ? caption : null,
+      };
+      save({
+        ...found,
+        files: found.files.map((item) => (item.id === file.id ? next : item)),
+      });
+      return json(next);
+    }
+    if (action === "delete") {
+      save({
+        ...found,
+        files: found.files.filter((item) => item.id !== file.id),
+        history: [
+          historyEntry("file_removed", { fileName: file.fileName }),
+          ...found.history,
+        ],
+      });
+      return new Response(null, { status: 204 });
+    }
+    return undefined;
   };
 
   return (call) => {
@@ -559,6 +693,12 @@ export function visitHandler(
       visits = [created, ...visits];
       return json(created, 201);
     }
+
+    const files =
+      /^\/api\/construction\/marketing\/visits\/([^/]+)\/files(?:\/(.+))?$/.exec(
+        path,
+      );
+    if (files != null) return fileCall(files[1] ?? "", files[2], call, body);
 
     const match =
       /^\/api\/construction\/marketing\/visits\/([^/]+)(?:\/(update|complete|reschedule|cancel|notes|delete))?$/.exec(

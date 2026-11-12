@@ -77,35 +77,45 @@ export const WithContactsAndHistory: Story = {
 
     const history = within(canvas.getByRole("list", { name: "History" }));
     const entries = history.getAllByRole("listitem");
-    await expect(entries).toHaveLength(6);
+    await expect(entries).toHaveLength(7);
     await expect(entries[0]).toHaveTextContent(
       "Moved to Quotation sent · by Ravi Shankar · 12 Nov 2026, 4:05 pm",
     );
-    await expect(entries[5]).toHaveTextContent(
+    await expect(entries[6]).toHaveTextContent(
       "Added at New · by Arun Selva Kumar · 1 Nov 2026, 10:00 am",
     );
   },
 };
 
-/** Visits and their notes join the Stage changes, each linking to its Visit. */
+/**
+ * Visits with their notes and photos join the Stage changes, each linking
+ * to its Visit.
+ */
 export const HistoryWithVisits: Story = {
   play: async ({ canvas }) => {
     const history = within(
       await canvas.findByRole("list", { name: "History" }),
     );
-    const [, note, visit] = history.getAllByRole("listitem");
-    if (note == null || visit == null) throw new Error("a note and a Visit");
+    const [, note, photo, visit] = history.getAllByRole("listitem");
+    if (note == null || photo == null || visit == null)
+      throw new Error("a note, a photo and a Visit");
     await expect(note).toHaveTextContent(
       "Note on MV-0003: Sent the PEB drawings they asked for.",
     );
     await expect(note).toHaveTextContent("by Priya Raman");
+    await expect(photo).toHaveTextContent(
+      "Photo on MV-0003: card.jpg — Senthil's visiting card",
+    );
+    await expect(photo).toHaveTextContent(
+      "by Ravi Shankar · 10 Nov 2026, 2:35 pm",
+    );
     await expect(visit).toHaveTextContent(
       "MV-0003 · Completed · Requirement discussion · by Ravi Shankar, Priya Raman",
     );
     await expect(visit).toHaveTextContent(
       "10 Nov 2026, 1:30 pm · Asked for a quotation",
     );
-    for (const item of [note, visit])
+    for (const item of [note, photo, visit])
       await expect(
         within(item).getByRole("link", { name: "MV-0003" }),
       ).toHaveAttribute("href", `/app/marketing/visits/${BALAJI_VISIT_ID}`);

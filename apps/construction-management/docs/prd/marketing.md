@@ -189,7 +189,7 @@ Sequential. Update the Status column.
 | 2   | Menus and flags, Marketing default Role and its migration, main-menu item and submenu          | done   |
 | 3   | Prospect Companies and Contacts: list, form, company page, Stage and its history               | done   |
 | 4   | Visits: form, list, statuses, notes, numbering, back-dated and lock rules, audit               | done   |
-| 5   | Visit photos and files on the attachments service                                              | todo   |
+| 5   | Visit photos and files on the attachments service                                              | done   |
 | 6   | Follow-ups: list, Done and Log the visit, creation from a Visit, notifications                 | todo   |
 | 7   | Visit calendar and check-in / check-out                                                        | todo   |
 | 8   | Team page, visit targets, reassign and the "needs reassigning" list                            | todo   |

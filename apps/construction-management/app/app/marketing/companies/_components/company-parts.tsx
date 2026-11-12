@@ -72,7 +72,7 @@ export function stageEntryWords(item: TimelineEntry<"stage">): string {
 
 /** "by Ravi · 12 Nov 2026, 4:05 pm" in the Company's time zone. */
 export function stageEntryByline(
-  item: TimelineEntry<"stage"> | TimelineEntry<"note">,
+  item: TimelineEntry<"stage" | "note" | "file">,
   timeZone: string,
 ): string {
   return `by ${item.byName} · ${activityRecordedLabel(item.at, timeZone)}`;

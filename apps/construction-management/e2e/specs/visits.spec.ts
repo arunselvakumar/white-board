@@ -2,6 +2,7 @@ import { expect } from "@playwright/test";
 
 import { todayInIndia } from "../api/dates";
 import { createProspectCompany, createVisit } from "../api/marketing";
+import { FIXTURES } from "../fixtures";
 import { companyTest } from "../helpers/companyTest";
 import { ProspectCompaniesPage } from "../pages/ProspectCompaniesPage";
 import { VisitsPage } from "../pages/VisitsPage";
@@ -134,6 +135,39 @@ companyTest.describe("Visits", () => {
       );
       await expect(visits.main).toContainText("Cancelled");
       await expect(visits.history).toContainText("Plant head on leave");
+    },
+  );
+
+  companyTest(
+    "should add a site photo and a PDF to a Visit and open the photo, when a member on the Marketing Role logs what they saw",
+    async ({ newMember }) => {
+      const member = await newMember({ roleName: "Marketing" });
+      const company = await createProspectCompany(member.api);
+      const visit = await createVisit(member.api, {
+        prospectCompanyId: company.id,
+      });
+      const page = await member.page();
+      const visits = new VisitsPage(page);
+
+      await page.goto(`${visits.url}/${visit.id}`);
+      const done = page.waitForResponse(
+        (response) =>
+          response.request().method() === "POST" &&
+          response.url().endsWith("/files") &&
+          response.ok(),
+      );
+      await visits.upload("Choose photos or files", [
+        FIXTURES.sitePhoto,
+        FIXTURES.drawingPdf,
+      ]);
+      await done;
+      const files = visits.main.getByRole("list", { name: "Photos and files" });
+      await expect(files.getByRole("link", { name: /^Open / })).toHaveCount(2);
+      await expect(files).toContainText("site-photo.jpg");
+      await expect(visits.history).toContainText("Photo added");
+
+      await files.getByRole("link", { name: "Open site-photo.jpg" }).click();
+      await expect(page.getByRole("dialog")).toBeVisible();
     },
   );
 });

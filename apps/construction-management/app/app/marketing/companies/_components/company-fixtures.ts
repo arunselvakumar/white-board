@@ -138,6 +138,16 @@ export function company(
         byName: "Priya Raman",
       },
       {
+        kind: "file",
+        id: "0199d000-0000-7000-8000-000000000901",
+        visitId: BALAJI_VISIT_ID,
+        visitNumber: "MV-0003",
+        fileName: "card.jpg",
+        caption: "Senthil's visiting card",
+        at: "2026-11-10T09:05:00.000Z",
+        byName: "Ravi Shankar",
+      },
+      {
         kind: "visit",
         id: BALAJI_VISIT_ID,
         number: "MV-0003",
