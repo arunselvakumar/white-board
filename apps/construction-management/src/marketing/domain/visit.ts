@@ -180,12 +180,18 @@ export function visitorIds(input: {
   return ids;
 }
 
-/** Shown as Missed: Planned, and its time has passed (never stored). */
+/**
+ * Shown as Missed: Planned, its time has passed, and nobody checked in at
+ * the site (never stored). A checked-in Visit stays Planned until it is
+ * completed.
+ */
 export function shownStatus(
-  visit: { status: VisitStatus; visitAt: Date },
+  visit: { status: VisitStatus; visitAt: Date; checkedIn: boolean },
   now: Date,
 ): VisitShownStatus {
-  return visit.status === "planned" && visit.visitAt.getTime() < now.getTime()
+  return visit.status === "planned" &&
+    !visit.checkedIn &&
+    visit.visitAt.getTime() < now.getTime()
     ? "missed"
     : visit.status;
 }

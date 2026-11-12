@@ -396,6 +396,7 @@ export type CompanyVisit = {
   number: string;
   visitAt: Date;
   status: VisitStatus;
+  checkedIn: boolean;
   purpose: VisitPurpose | null;
   outcome: string | null;
   visitorIds: string[];

@@ -141,6 +141,21 @@ describe("Check-in and check-out (ADR CM-0040 §10)", () => {
     expect(items.items.find((item) => item.id === visit.id)?.checkedIn).toBe(
       true,
     );
+    // Checked in, so not Missed once its time has passed.
+    await prisma.constructionMarketingVisit.update({
+      where: { id: visit.id },
+      data: { visitAt: new Date(Date.now() - 60_000) },
+    });
+    const missed = await json<{ items: { id: string }[] }>(
+      await list(jsonRequest(`${VISITS}?status=missed`, ravi.cookie)),
+    );
+    expect(missed.items.map((item) => item.id)).not.toContain(visit.id);
+    const planned = await json<{ items: { id: string; status: string }[] }>(
+      await list(jsonRequest(`${VISITS}?status=planned`, ravi.cookie)),
+    );
+    expect(planned.items.find((item) => item.id === visit.id)?.status).toBe(
+      "planned",
+    );
     const trail =
       await prisma.constructionOrganizationAuditEvent.findFirstOrThrow({
         where: { entityId: visit.id, action: "visit.checked_in" },

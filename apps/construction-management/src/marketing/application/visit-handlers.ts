@@ -630,7 +630,10 @@ export class VisitHandlers {
           isProspectCompanyVisible(company, companyScope),
       },
       visitAt: visit.visitAt,
-      status: shownStatus(visit, this.clock()),
+      status: shownStatus(
+        { ...visit, checkedIn: visit.checkIn != null },
+        this.clock(),
+      ),
       cancelReason: visit.cancelReason,
       completedAt: visit.completedAt,
       visitors: visit.visitorIds.map((memberId) => ({

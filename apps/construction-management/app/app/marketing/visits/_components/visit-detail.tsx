@@ -54,6 +54,7 @@ import {
   type Visit,
 } from "@/src/queries/marketing-visits";
 
+import { CheckLine, VisitCheckPanel, type Locate } from "./visit-check-in";
 import { CancelVisitDialog, RescheduleVisitDialog } from "./visit-dialogs";
 import { VisitFiles } from "./visit-files";
 import { VisitFollowUps, type VisitFollowUpAccess } from "./visit-follow-ups";
@@ -131,6 +132,20 @@ function Details({ visit }: { visit: Visit }) {
         <Fact label="Location" className="sm:col-span-2">
           {visit.location ?? "—"}
         </Fact>
+        {visit.checkIn != null && (
+          <Fact label="Check-in" className="sm:col-span-2">
+            <CheckLine check={visit.checkIn} word="Checked in" visit={visit} />
+          </Fact>
+        )}
+        {visit.checkOut != null && (
+          <Fact label="Check-out" className="sm:col-span-2">
+            <CheckLine
+              check={visit.checkOut}
+              word="Checked out"
+              visit={visit}
+            />
+          </Fact>
+        )}
         <Fact label="Outcome" className="sm:col-span-2">
           {visit.outcome ?? "—"}
         </Fact>
@@ -304,16 +319,19 @@ type Open = "reschedule" | "cancel" | "delete" | null;
 
 /**
  * One Visit: its company, people and what was discussed, its photos and
- * files, notes, Follow-ups and history, with Edit, Complete, Reschedule,
- * Cancel and Delete as the server's `actions` allow.
+ * files, notes, Follow-ups and history, with Check in / Check out, Edit,
+ * Complete, Reschedule, Cancel and Delete as the server's `actions` allow.
  */
 export function VisitDetail({
   id,
   followUps = null,
+  locate,
 }: {
   id: string;
   /** Follow-ups read: the Follow-ups card; null hides it. */
   followUps?: VisitFollowUpAccess | null;
+  /** Reads the position at check-in; the browser's when left out. */
+  locate?: Locate;
 }) {
   const router = useRouter();
   const { data: visit } = useSuspenseQuery(visitQuery(id));
@@ -437,6 +455,8 @@ export function VisitDetail({
         )}
 
         <FormAlert message={error ?? undefined} />
+
+        <VisitCheckPanel visit={visit} locate={locate} />
 
         <div className="grid w-full min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
           <div className="min-w-0 space-y-6">

@@ -6,6 +6,7 @@ import { GET as formOptions } from "@/app/api/construction/marketing/visits/form
 import { GET as listVisits } from "@/app/api/construction/marketing/visits/route";
 import {
   MARKETING_VISITS_API,
+  visitCalendarQuery,
   visitFormOptionsQuery,
   visitsQuery,
 } from "@/src/queries/marketing-visits";
@@ -14,8 +15,14 @@ import {
   prefetchInfiniteRoute,
   prefetchRoute,
 } from "@/src/queries/route-fetch";
+import { todayIn } from "@/src/shared-kernel/calendar-date";
 
 import { MarketingNoAccess } from "../_components/marketing-no-access";
+import {
+  calendarDays,
+  chosenDay,
+  type CalendarSpan,
+} from "./_components/visit-calendar-dates";
 import { VisitsList } from "./_components/visits-list";
 
 export const metadata: Metadata = { title: "Visits" };
@@ -28,16 +35,39 @@ const ROUTES = {
   [`${MARKETING_VISITS_API}/form-options`]: formOptions,
 };
 
-/** Visits, unfiltered on arrival (ADR-0052). */
-export default async function Page() {
+/**
+ * Visits, unfiltered on arrival (ADR-0052): the list, or with
+ * `?view=calendar` the days the calendar opens on.
+ */
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ view?: string; calendar?: string; day?: string }>;
+}) {
   const can = await viewerFlags("marketing.visits", ["read", "create"]);
   if (!can.read) return <MarketingNoAccess what="Visits" />;
+  const params = await searchParams;
 
   const queryClient = getQueryClient();
-  await Promise.all([
-    prefetchInfiniteRoute(queryClient, visitsQuery(), ROUTES),
-    prefetchRoute(queryClient, visitFormOptionsQuery, ROUTES),
-  ]);
+  if (params.view === "calendar") {
+    const options = await prefetchRoute(
+      queryClient,
+      visitFormOptionsQuery,
+      ROUTES,
+    );
+    const span: CalendarSpan = params.calendar === "week" ? "week" : "month";
+    const days = calendarDays(
+      span,
+      chosenDay(params.day, todayIn(options.timeZone)),
+    );
+    const [from = "", to = ""] = [days[0], days.at(-1)];
+    await prefetchRoute(queryClient, visitCalendarQuery({}, from, to), ROUTES);
+  } else {
+    await Promise.all([
+      prefetchInfiniteRoute(queryClient, visitsQuery(), ROUTES),
+      prefetchRoute(queryClient, visitFormOptionsQuery, ROUTES),
+    ]);
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

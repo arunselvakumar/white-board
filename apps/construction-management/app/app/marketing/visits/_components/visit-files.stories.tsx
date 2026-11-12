@@ -365,6 +365,8 @@ export const ReadOnly: Story = {
           canReschedule: false,
           canAddNote: false,
           canAddFiles: false,
+          canCheckIn: false,
+          canCheckOut: false,
           canDelete: false,
           locked: false,
         },

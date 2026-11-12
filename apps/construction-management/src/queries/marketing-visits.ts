@@ -9,6 +9,7 @@ import type { z } from "zod";
 import type {
   AddConstructionMarketingVisitNoteRequestModel,
   CancelConstructionMarketingVisitRequestModel,
+  CheckConstructionMarketingVisitRequestModel,
   CompleteConstructionMarketingVisitRequestModel,
   ConstructionMarketingVisitListItemResponseModel,
   ConstructionMarketingVisitResponse,
@@ -54,6 +55,10 @@ export type CancelVisitInput = z.input<
 export type AddVisitNoteInput = z.input<
   typeof AddConstructionMarketingVisitNoteRequestModel
 >;
+/** One position from the browser, or why there is none. */
+export type CheckVisitInput = z.input<
+  typeof CheckConstructionMarketingVisitRequestModel
+>;
 
 export const MARKETING_VISITS_API = "/api/construction/marketing/visits";
 
@@ -62,6 +67,9 @@ export const MARKETING_VISITS_KEY = ["marketing", "visits"] as const;
 
 /** Rows per page of the list. */
 const PAGE_SIZE = 50;
+
+/** The most Visits the calendar reads for the days it shows. */
+export const CALENDAR_LIMIT = 500;
 
 export type VisitFilters = {
   /** `YYYY-MM-DD`, inclusive, in the Company time zone. */
@@ -75,8 +83,8 @@ export type VisitFilters = {
 };
 
 /** The list's query string without the cursor (shared with the stories' mock). */
-export function visitListParams(filters: VisitFilters = {}) {
-  const params = new URLSearchParams({ limit: String(PAGE_SIZE) });
+export function visitListParams(filters: VisitFilters = {}, limit = PAGE_SIZE) {
+  const params = new URLSearchParams({ limit: String(limit) });
   const set = (key: string, value: string | undefined) => {
     if (value != null && value !== "") params.set(key, value);
   };
@@ -109,6 +117,28 @@ export function visitsQuery(filters: VisitFilters = {}) {
       );
     },
     getNextPageParam: (last) => last.nextCursor,
+  });
+}
+
+/**
+ * The calendar's Visits from `from` to `to` (inclusive, Company time zone)
+ * in one read of up to `CALENDAR_LIMIT`; a `nextCursor` means some are
+ * not shown.
+ */
+export function visitCalendarQuery(
+  filters: Omit<VisitFilters, "from" | "to">,
+  from: string,
+  to: string,
+) {
+  const params = visitListParams({ ...filters, from, to }, CALENDAR_LIMIT);
+  return queryOptions({
+    queryKey: [...MARKETING_VISITS_KEY, "calendar", params.toString()],
+    queryFn: ({ meta }) =>
+      apiJson<VisitPage>(
+        `${MARKETING_VISITS_API}?${params.toString()}`,
+        undefined,
+        meta,
+      ),
   });
 }
 
@@ -245,6 +275,16 @@ export function useAddVisitNote(id: string) {
   return useMutation({
     mutationFn: (input: AddVisitNoteInput) =>
       post<Visit>(item(id, "notes"), input),
+    onSuccess: saved,
+  });
+}
+
+/** Check in or check out: the time, and one position or why there is none. */
+export function useCheckVisit(id: string, action: "check-in" | "check-out") {
+  const saved = useSaved();
+  return useMutation({
+    mutationFn: (input: CheckVisitInput) =>
+      post<Visit>(item(id, action), input),
     onSuccess: saved,
   });
 }

@@ -154,22 +154,31 @@ describe("Who sees a Visit (ADR CM-0040 §5)", () => {
 });
 
 describe("Missed and the lock (ADR CM-0040 §7)", () => {
-  it("shows a Planned Visit whose time passed as Missed", () => {
+  it("shows a Planned Visit whose time passed as Missed, unless someone checked in", () => {
+    const past = new Date(NOW.getTime() - 1);
     expect(
-      shownStatus(
-        { status: "planned", visitAt: new Date(NOW.getTime() - 1) },
-        NOW,
-      ),
+      shownStatus({ status: "planned", visitAt: past, checkedIn: false }, NOW),
     ).toBe("missed");
     expect(
+      shownStatus({ status: "planned", visitAt: past, checkedIn: true }, NOW),
+    ).toBe("planned");
+    expect(
       shownStatus(
-        { status: "planned", visitAt: new Date(NOW.getTime() + 1) },
+        {
+          status: "planned",
+          visitAt: new Date(NOW.getTime() + 1),
+          checkedIn: false,
+        },
         NOW,
       ),
     ).toBe("planned");
     expect(
       shownStatus(
-        { status: "cancelled", visitAt: new Date(NOW.getTime() - 1) },
+        {
+          status: "cancelled",
+          visitAt: new Date(NOW.getTime() - 1),
+          checkedIn: false,
+        },
         NOW,
       ),
     ).toBe("cancelled");

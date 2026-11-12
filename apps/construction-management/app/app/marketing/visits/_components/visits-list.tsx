@@ -4,8 +4,9 @@ import {
   useSuspenseInfiniteQuery,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { MapPinned } from "lucide-react";
+import { CalendarDays, List, MapPinned } from "lucide-react";
 import Link from "next/link";
+import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
 import { Suspense, useState, useTransition } from "react";
 import { Button } from "@repo/ui/components/button";
 import {
@@ -33,6 +34,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
@@ -50,6 +52,7 @@ import {
   type VisitShownStatus,
 } from "@/src/marketing/domain/marketing-terms";
 import { companyPath } from "@/src/queries/marketing-companies";
+import { todayIn } from "@/src/shared-kernel/calendar-date";
 import {
   visitFormOptionsQuery,
   visitPath,
@@ -59,8 +62,26 @@ import {
 
 import { VisitButtons } from "../../_components/visit-buttons";
 import { ProspectCompanyPicker } from "./prospect-company-picker";
-import { InterestBadge, VisitStatusBadge, visitWhen } from "./visit-parts";
-import { VISIT_COLUMNS, VisitRowsSkeleton } from "./visits-skeletons";
+import {
+  CALENDAR_SPANS,
+  chosenDay,
+  shiftDay,
+  VISIT_VIEWS,
+  type CalendarSpan,
+  type VisitView,
+} from "./visit-calendar-dates";
+import {
+  CheckedInMark,
+  InterestBadge,
+  VisitStatusBadge,
+  visitWhen,
+} from "./visit-parts";
+import { CalendarToolbar, VisitsCalendar } from "./visits-calendar";
+import {
+  VISIT_COLUMNS,
+  VisitCalendarSkeleton,
+  VisitRowsSkeleton,
+} from "./visits-skeletons";
 
 type Filters = {
   from: string;
@@ -82,6 +103,16 @@ const NO_FILTERS: Filters = {
   interests: [],
 };
 
+/** List or calendar, kept in the address so Back returns to it. */
+const viewParam = parseAsStringLiteral(VISIT_VIEWS).withDefault("list");
+const spanParam = parseAsStringLiteral(CALENDAR_SPANS).withDefault("month");
+const dayParam = parseAsString.withDefault("");
+
+const VIEWS: { value: VisitView; label: string; icon: typeof List }[] = [
+  { value: "list", label: "List", icon: List },
+  { value: "calendar", label: "Calendar", icon: CalendarDays },
+];
+
 function visits(n: number): string {
   return `${String(n)} ${n === 1 ? "Visit" : "Visits"}`;
 }
@@ -91,17 +122,27 @@ function visits(n: number): string {
  * Company, status (Missed included), purpose and interest. Without View
  * all the server lists only the viewer's own (ADR CM-0040 §5). The person
  * and company filters need the form options, which only a Role that adds
- * or edits Visits reads.
+ * or edits Visits reads. The calendar (`?view=calendar`) shows the
+ * same filters' Visits by day, without the date range.
  */
-export function VisitsList({ canCreate }: { canCreate: boolean }) {
+export function VisitsList({
+  canCreate,
+  now,
+}: {
+  canCreate: boolean;
+  /** The clock "today" is read from; the stories fix it. */
+  now?: Date;
+}) {
   const section = marketingSection("visits");
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
+  const [view, setView] = useQueryState("view", viewParam);
   const [updating, startTransition] = useTransition();
   const change = (next: Partial<Filters>) => {
     startTransition(() => {
       setFilters((current) => ({ ...current, ...next }));
     });
   };
+  const calendar = view === "calendar";
   return (
     <div className="w-full p-6">
       <div className="flex w-full max-w-7xl min-w-0 flex-col gap-6">
@@ -110,23 +151,47 @@ export function VisitsList({ canCreate }: { canCreate: boolean }) {
           meta={section.description}
           actions={canCreate ? <VisitButtons /> : undefined}
         />
+        <ToggleGroup
+          aria-label="Show Visits as"
+          value={[view]}
+          onValueChange={(next: string[]) => {
+            const picked = VIEWS.find((item) => item.value === next[0]);
+            if (picked == null) return;
+            startTransition(() => {
+              void setView(picked.value === "list" ? null : picked.value);
+            });
+          }}
+          variant="outline"
+          size="sm"
+        >
+          {VIEWS.map((item) => (
+            <ToggleGroupItem key={item.value} value={item.value}>
+              <item.icon aria-hidden="true" />
+              {item.label}
+            </ToggleGroupItem>
+          ))}
+        </ToggleGroup>
         <div className="grid min-w-0 grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-end">
-          <DateFilter
-            id="visits-from"
-            label="From"
-            value={filters.from}
-            onChange={(from) => {
-              change({ from });
-            }}
-          />
-          <DateFilter
-            id="visits-to"
-            label="To"
-            value={filters.to}
-            onChange={(to) => {
-              change({ to });
-            }}
-          />
+          {!calendar && (
+            <>
+              <DateFilter
+                id="visits-from"
+                label="From"
+                value={filters.from}
+                onChange={(from) => {
+                  change({ from });
+                }}
+              />
+              <DateFilter
+                id="visits-to"
+                label="To"
+                value={filters.to}
+                onChange={(to) => {
+                  change({ to });
+                }}
+              />
+            </>
+          )}
           <PeopleAndCompanyFilters filters={filters} onChange={change} />
           <MultiFilter
             id="visits-status"
@@ -168,10 +233,79 @@ export function VisitsList({ canCreate }: { canCreate: boolean }) {
         <div
           className={cn("min-w-0", updating && "opacity-60 transition-opacity")}
         >
-          <Suspense fallback={<VisitRowsSkeleton />}>
-            <VisitRows filters={filters} canCreate={canCreate} />
-          </Suspense>
+          {calendar ? (
+            <Suspense fallback={<VisitCalendarSkeleton />}>
+              <CalendarSection filters={filters} now={now} />
+            </Suspense>
+          ) : (
+            <Suspense fallback={<VisitRowsSkeleton />}>
+              <VisitRows filters={filters} canCreate={canCreate} />
+            </Suspense>
+          )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The calendar's span and day (`?calendar=week&day=2026-11-12`), "today"
+ * in the Company time zone, and the Visits of the days shown.
+ */
+function CalendarSection({ filters, now }: { filters: Filters; now?: Date }) {
+  const { data: options } = useSuspenseQuery(visitFormOptionsQuery);
+  const today = todayIn(options.timeZone, now ?? new Date());
+  const [span, setSpan] = useQueryState("calendar", spanParam);
+  const [dayValue, setDayValue] = useQueryState("day", dayParam);
+  const [moving, startTransition] = useTransition();
+  const day = chosenDay(dayValue, today);
+  const go = (next: { span?: CalendarSpan; day?: string }) => {
+    startTransition(() => {
+      if (next.span != null)
+        void setSpan(next.span === "month" ? null : next.span);
+      if (next.day != null)
+        void setDayValue(next.day === today ? null : next.day);
+    });
+  };
+  // The days shown are the range; the list's From and To do not apply.
+  const rest = {
+    memberId: filters.memberId,
+    prospectCompanyId: filters.prospectCompanyId,
+    statuses: filters.statuses,
+    purposes: filters.purposes,
+    interests: filters.interests,
+  };
+  return (
+    <div className="min-w-0 space-y-3">
+      <CalendarToolbar
+        span={span}
+        day={day}
+        today={today}
+        onSpan={(next) => {
+          go({ span: next });
+        }}
+        onPrevious={() => {
+          go({ day: shiftDay(span, day, -1, today) });
+        }}
+        onNext={() => {
+          go({ day: shiftDay(span, day, 1, today) });
+        }}
+        onToday={() => {
+          go({ day: today });
+        }}
+      />
+      <div className={cn("min-w-0", moving && "opacity-60 transition-opacity")}>
+        <Suspense fallback={<VisitCalendarSkeleton />}>
+          <VisitsCalendar
+            filters={rest}
+            span={span}
+            day={day}
+            today={today}
+            onDay={(next) => {
+              go({ day: next });
+            }}
+          />
+        </Suspense>
       </div>
     </div>
   );
@@ -417,7 +551,10 @@ function VisitRows({
                     : VISIT_PURPOSE_LABELS[visit.purpose]}
                 </TableCell>
                 <TableCell>
-                  <VisitStatusBadge status={visit.status} />
+                  <span className="flex flex-wrap items-center gap-1.5">
+                    <VisitStatusBadge status={visit.status} />
+                    {visit.checkedIn && <CheckedInMark />}
+                  </span>
                 </TableCell>
                 <TableCell>
                   <InterestBadge interest={visit.interest} />
@@ -443,7 +580,10 @@ function VisitRows({
               >
                 {visit.number}
               </Link>
-              <VisitStatusBadge status={visit.status} />
+              <span className="flex items-center gap-1.5">
+                {visit.checkedIn && <CheckedInMark />}
+                <VisitStatusBadge status={visit.status} />
+              </span>
             </div>
             <div className="min-w-0 text-sm">
               <CompanyName visit={visit} />

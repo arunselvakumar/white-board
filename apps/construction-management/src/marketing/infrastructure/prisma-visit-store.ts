@@ -33,12 +33,16 @@ export function visitVisibleWhere(scope: OwnScope): Where {
   };
 }
 
+/** As `shownStatus`: a checked-in Visit whose time passed is still Planned. */
 function statusWhere(status: VisitShownStatus, now: Date): Where {
   switch (status) {
     case "planned":
-      return { status: "planned", visitAt: { gte: now } };
+      return {
+        status: "planned",
+        OR: [{ visitAt: { gte: now } }, { checkInAt: { not: null } }],
+      };
     case "missed":
-      return { status: "planned", visitAt: { lt: now } };
+      return { status: "planned", visitAt: { lt: now }, checkInAt: null };
     default:
       return { status };
   }
@@ -431,6 +435,7 @@ export const prismaCompanyVisitsReader: CompanyVisitsReader = {
         status: true,
         purpose: true,
         outcome: true,
+        checkInAt: true,
         visitors: { select: { memberId: true }, orderBy: { memberId: "asc" } },
       },
     });
@@ -453,8 +458,9 @@ export const prismaCompanyVisitsReader: CompanyVisitsReader = {
           }),
     ]);
     return {
-      visits: visits.map(({ visitors, ...visit }) => ({
+      visits: visits.map(({ visitors, checkInAt, ...visit }) => ({
         ...visit,
+        checkedIn: checkInAt != null,
         visitorIds: visitors.map((item) => item.memberId),
       })),
       notes,

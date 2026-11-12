@@ -35,3 +35,24 @@ export function VisitRowsSkeleton() {
     </SkeletonGroup>
   );
 }
+
+/** Six weeks of days while the calendar's Visits load (ADR-0047). */
+export function VisitCalendarSkeleton() {
+  return (
+    <SkeletonGroup
+      label="Loading the calendar"
+      className="bg-card overflow-hidden rounded-lg border"
+    >
+      <div aria-hidden="true" className="grid grid-cols-7">
+        {Array.from({ length: 42 }, (_, index) => (
+          <div
+            key={index}
+            className="min-h-14 border-r border-b p-1.5 sm:min-h-28 [&:nth-child(7n)]:border-r-0"
+          >
+            <SkeletonText size="xs" width="1.25rem" />
+          </div>
+        ))}
+      </div>
+    </SkeletonGroup>
+  );
+}

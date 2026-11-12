@@ -1,5 +1,6 @@
 "use client";
 
+import { MapPinCheck } from "lucide-react";
 import { Badge } from "@repo/ui/components/badge";
 import { cn } from "@repo/ui/lib/utils";
 
@@ -14,7 +15,8 @@ import { visitFileWord } from "@/src/queries/marketing-visit-files";
 import type { VisitHistoryItem } from "@/src/queries/marketing-visits";
 import { zoneInstant, zoneParts } from "@/src/shared-kernel/zone-time";
 
-const STATUS_CLASSES: Record<VisitShownStatus, string> = {
+/** A status's colours, for its badge and the calendar's entries. */
+export const STATUS_CLASSES: Record<VisitShownStatus, string> = {
   planned:
     "border-sky-300 bg-sky-50 text-sky-900 dark:border-sky-800 dark:bg-sky-950 dark:text-sky-100",
   missed:
@@ -38,6 +40,16 @@ export function VisitStatusBadge({
   );
 }
 
+/** "Checked in" at the site; `compact` keeps the words for screen readers. */
+export function CheckedInMark({ compact = false }: { compact?: boolean }) {
+  return (
+    <span className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+      <MapPinCheck aria-hidden="true" className="size-3.5" />
+      <span className={compact ? "sr-only" : undefined}>Checked in</span>
+    </span>
+  );
+}
+
 const INTEREST_CLASSES: Record<Interest, string> = {
   hot: "border-orange-300 bg-orange-50 text-orange-900 dark:border-orange-800 dark:bg-orange-950 dark:text-orange-100",
   warm: "border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-100",
@@ -58,8 +70,17 @@ export function visitWhen(at: string, timeZone: string): string {
   return activityRecordedLabel(at, timeZone);
 }
 
+/** "10:00 am" in the Company time zone. */
+export function visitTime(at: string, timeZone: string): string {
+  return new Intl.DateTimeFormat("en-IN", {
+    timeZone,
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(at));
+}
+
 /** "12 Nov, 10:00 am": the same, without the year. */
-function shortWhen(at: string, timeZone: string): string {
+export function shortWhen(at: string, timeZone: string): string {
   return new Intl.DateTimeFormat("en-IN", {
     timeZone,
     day: "numeric",
@@ -135,5 +156,9 @@ export function historyWords(
       const done = item.action === "file_added" ? "added" : "removed";
       return `${visitFileWord(name)} ${done} · ${name}`;
     }
+    case "checked_in":
+      return "Checked in";
+    case "checked_out":
+      return "Checked out";
   }
 }
