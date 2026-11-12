@@ -9,22 +9,35 @@ import {
   setMenuLayout,
 } from "@/app/app/_components/app-shell/menu-layout";
 import { HRMS_PATH, HRMS_SECTIONS } from "@/lib/hrms-nav";
+import {
+  FULL_MARKETING_ACCESS,
+  MARKETING_PATH,
+  MARKETING_SECTIONS,
+  NO_MARKETING_ACCESS,
+  type MarketingMenuAccess,
+} from "@/lib/marketing-nav";
 import { MASTERS_SECTIONS } from "@/lib/masters-nav";
 import { LABOURS_PAGE_PATH, staffSections } from "@/lib/staff-nav";
 
 import { signInAs } from "@/.storybook/mocks/auth";
 
-function homeWith(canOpenDashboard = true, canOpenStaffRoles = true) {
+function homeWith(
+  canOpenDashboard = true,
+  canOpenStaffRoles = true,
+  marketing: MarketingMenuAccess = FULL_MARKETING_ACCESS,
+) {
   return {
     parameters: { nextjs: { navigation: { pathname: "/app" } } },
     render: () => (
       <AppShell
         canOpenDashboard={canOpenDashboard}
         canOpenStaffRoles={canOpenStaffRoles}
+        marketing={marketing}
       >
         <HomeMenu
           canOpenDashboard={canOpenDashboard}
           canOpenStaffRoles={canOpenStaffRoles}
+          marketing={marketing}
         />
       </AppShell>
     ),
@@ -84,6 +97,7 @@ export const Home: Story = {
       [/^Dashboard/, "/app/dashboard"],
       [/^Projects/, "/app/projects"],
       [/^Settings/, "/app/settings"],
+      ["Marketing", MARKETING_PATH],
       ["Human Resources", LABOURS_PAGE_PATH],
       ["Workspace", "/app/workspace"],
       ["Masters", "/app/masters"],
@@ -93,6 +107,11 @@ export const Home: Story = {
         href,
       );
 
+    const marketing = within(nav.getByRole("region", { name: "Marketing" }));
+    for (const section of MARKETING_SECTIONS)
+      await expect(
+        marketing.getByRole("link", { name: section.label }),
+      ).toHaveAttribute("href", section.href);
     const staff = within(nav.getByRole("list", { name: "Staff" }));
     for (const section of staffSections(true))
       await expect(
@@ -146,6 +165,16 @@ export const WithoutStaffRoles: Story = {
     await expect(
       staff.queryByRole("link", { name: "Role Management" }),
     ).toBeNull();
+  },
+};
+
+/** A Role with no Marketing menu has no Marketing block (ADR CM-0040 §1). */
+export const WithoutMarketing: Story = {
+  ...homeWith(true, true, NO_MARKETING_ACCESS),
+  play: async ({ canvas }) => {
+    const nav = within(canvas.getByRole("navigation", { name: "Main" }));
+    await expect(nav.queryByRole("region", { name: "Marketing" })).toBeNull();
+    await expect(nav.queryByRole("link", { name: "Marketing" })).toBeNull();
   },
 };
 

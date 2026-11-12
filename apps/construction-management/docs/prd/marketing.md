@@ -185,7 +185,7 @@ Sequential. Update the Status column.
 | #   | Ticket                                                                                         | Status |
 | --- | ---------------------------------------------------------------------------------------------- | ------ |
 | 1   | ADR CM-0040: Marketing main menu, context and schema, the Marketing Role, the own-entries rule | done   |
-| 2   | Menus and flags, Marketing default Role and its migration, main-menu item and submenu          | todo   |
+| 2   | Menus and flags, Marketing default Role and its migration, main-menu item and submenu          | done   |
 | 3   | Prospect Companies and Contacts: list, form, company page, Stage and its history               | todo   |
 | 4   | Visits: form, list, statuses, notes, numbering, back-dated and lock rules, audit               | todo   |
 | 5   | Visit photos and files on the attachments service                                              | todo   |

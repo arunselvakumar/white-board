@@ -3,8 +3,18 @@ import { expect, fn, waitFor, within } from "storybook/test";
 
 import { AppAreaPage } from "@/app/app/_components/app-shell/app-area-page";
 import { AppShell } from "@/app/app/_components/app-shell/app-shell";
+import { PagePlaceholder } from "@/app/app/_components/app-shell/page-placeholder";
 import { APP_NAV, appPageByHref, type AppNavHref } from "@/lib/app-nav";
 import { HRMS_PATH, HRMS_SECTIONS } from "@/lib/hrms-nav";
+import {
+  FULL_MARKETING_ACCESS,
+  MARKETING_PATH,
+  MARKETING_SECTIONS,
+  MARKETING_VISITS_PATH,
+  NO_MARKETING_ACCESS,
+  marketingSection,
+  type MarketingMenuAccess,
+} from "@/lib/marketing-nav";
 import { MASTERS_GROUPS } from "@/lib/masters-nav";
 import { LABOURS_PAGE_PATH, staffSections } from "@/lib/staff-nav";
 
@@ -14,6 +24,7 @@ function shellAt(
   href: AppNavHref,
   canOpenDashboard = true,
   canOpenStaffRoles = true,
+  marketing: MarketingMenuAccess = FULL_MARKETING_ACCESS,
 ) {
   return {
     parameters: { nextjs: { navigation: { pathname: href } } },
@@ -21,6 +32,7 @@ function shellAt(
       <AppShell
         canOpenDashboard={canOpenDashboard}
         canOpenStaffRoles={canOpenStaffRoles}
+        marketing={marketing}
       >
         <AppAreaPage href={href} />
       </AppShell>
@@ -196,6 +208,119 @@ export const WithoutStaffRoles: Story = {
     ).toBeNull();
     await expect(submenu.getByRole("list", { name: "HRMS" })).toBeVisible();
     await expect(nav.getByRole("link", { name: "Settings" })).toBeVisible();
+  },
+};
+
+/** The Marketing Role's entries (ADR CM-0040 §3): no Team, no Reports. */
+const MARKETING_ROLE_ACCESS: MarketingMenuAccess = {
+  ...NO_MARKETING_ACCESS,
+  dashboard: true,
+  visits: true,
+  followUps: true,
+  companies: true,
+};
+
+function marketingShellAt(
+  pathname: string,
+  marketing: MarketingMenuAccess = FULL_MARKETING_ACCESS,
+) {
+  const section =
+    MARKETING_SECTIONS.find((item) => item.href === pathname) ??
+    marketingSection("dashboard");
+  return {
+    parameters: { nextjs: { navigation: { pathname } } },
+    render: () => (
+      <AppShell marketing={marketing}>
+        <PagePlaceholder
+          title={section.title}
+          description={section.description}
+          icon={section.icon}
+        />
+      </AppShell>
+    ),
+  };
+}
+
+/**
+ * Marketing (ADR CM-0040 §1) sits after Projects and folds out into its six
+ * entries; on its Dashboard the area is open and Dashboard is the current
+ * entry.
+ */
+export const Marketing: Story = {
+  ...marketingShellAt(MARKETING_PATH),
+  play: async (context) => {
+    const nav = await mainMenu(context);
+    const areas = nav
+      .getAllByRole("link")
+      .filter((link) => link.closest("[data-sidebar=menu-sub]") == null)
+      .map((link) => link.textContent);
+    await expect(areas.slice(0, 4)).toEqual([
+      "Projects",
+      "Marketing",
+      "Human Resources",
+      "Workspace",
+    ]);
+    const submenu = within(await nav.findByRole("list", { name: "Marketing" }));
+    for (const section of MARKETING_SECTIONS)
+      await expect(
+        submenu.getByRole("link", { name: section.label }),
+      ).toHaveAttribute("href", section.href);
+    await expect(
+      submenu.getByRole("link", { name: "Dashboard" }),
+    ).toHaveAttribute("aria-current", "page");
+    await expect(nav.getByRole("link", { name: "Marketing" })).toHaveAttribute(
+      "href",
+      MARKETING_PATH,
+    );
+  },
+};
+
+/**
+ * The Marketing Role opens Dashboard, Visits, Follow-ups and Companies; Team
+ * and Reports are left out of its submenu.
+ */
+export const MarketingRole: Story = {
+  ...marketingShellAt(MARKETING_VISITS_PATH, MARKETING_ROLE_ACCESS),
+  play: async (context) => {
+    const nav = await mainMenu(context);
+    const submenu = within(await nav.findByRole("list", { name: "Marketing" }));
+    await expect(
+      submenu.getAllByRole("link").map((link) => link.textContent),
+    ).toEqual(["Dashboard", "Visits", "Follow-ups", "Companies"]);
+    await expect(submenu.getByRole("link", { name: "Visits" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+  },
+};
+
+/**
+ * Without the Dashboard, Marketing opens on the first entry the Role
+ * opens.
+ */
+export const MarketingWithoutDashboard: Story = {
+  ...marketingShellAt(MARKETING_VISITS_PATH, {
+    ...MARKETING_ROLE_ACCESS,
+    dashboard: false,
+  }),
+  play: async (context) => {
+    const nav = await mainMenu(context);
+    await expect(nav.getByRole("link", { name: "Marketing" })).toHaveAttribute(
+      "href",
+      MARKETING_VISITS_PATH,
+    );
+  },
+};
+
+/** A Role with no Marketing menu has no Marketing in the main menu. */
+export const WithoutMarketing: Story = {
+  ...shellAt("/app/projects", true, true, NO_MARKETING_ACCESS),
+  play: async (context) => {
+    const nav = await mainMenu(context);
+    await expect(nav.queryByRole("link", { name: "Marketing" })).toBeNull();
+    await expect(
+      nav.getByRole("link", { name: "Human Resources" }),
+    ).toBeVisible();
   },
 };
 

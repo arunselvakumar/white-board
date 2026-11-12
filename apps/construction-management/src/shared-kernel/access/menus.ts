@@ -3,6 +3,8 @@ import { maskFromLetters } from "./flags";
 /** Permission Matrix categories, in the order the matrix shows them. */
 export const MENU_CATEGORIES = [
   { key: "project_management", label: "Project Management" },
+  // Company-level business development, in main-menu order (ADR CM-0040).
+  { key: "marketing", label: "Marketing" },
   { key: "payment_accounting", label: "Payment & Accounting" },
   { key: "materials", label: "Materials" },
   { key: "master_records", label: "Master records" },
@@ -103,6 +105,12 @@ const DEFINITIONS = [
     "CRUDPO",
     true,
   ],
+  // Marketing: Company-level, no Project (ADR CM-0040 §2).
+  ["marketing.dashboard", "Dashboard", "marketing", "RV", false],
+  ["marketing.visits", "Visits", "marketing", "CRUDVEO", false],
+  ["marketing.follow_ups", "Follow-ups", "marketing", "CRUDVN", false],
+  ["marketing.companies", "Companies", "marketing", "CRUDVTEI", false],
+  ["marketing.team", "Team", "marketing", "RU", false],
   // Payment & Accounting.
   [
     "finance.central_payment",

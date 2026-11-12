@@ -16,7 +16,7 @@ describe("role seed set (ADR CM-0030 §5)", () => {
     now: new Date("2026-10-24T00:00:00Z"),
   });
 
-  it("holds the nine default Roles", () => {
+  it("holds the ten default Roles", () => {
     expect(seeded.map((role) => role.name)).toEqual([
       "Admin",
       "Project Manager",
@@ -27,6 +27,8 @@ describe("role seed set (ADR CM-0030 §5)", () => {
       "Quality Control",
       "Structural Engineer",
       "HRMS Staff",
+      // ADR CM-0040 §3.
+      "Marketing",
     ]);
     expect(seeded.every((role) => role.isSeed)).toBe(true);
   });
