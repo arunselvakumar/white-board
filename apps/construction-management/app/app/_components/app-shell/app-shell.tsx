@@ -1,9 +1,9 @@
 "use client";
 
 import { useCompanySignOut } from "@repo/auth/construction/react";
-import { LogOut, UserRound } from "lucide-react";
+import { LayoutGrid, LogOut, UserRound } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import {
   SidebarFootnote,
@@ -12,6 +12,7 @@ import {
   SidebarSearch,
   SidebarSectionLabel,
 } from "@repo/ui/components/sidebar-chrome";
+import { Button } from "@repo/ui/components/button";
 import { SidebarGlide } from "@repo/ui/components/sidebar-glide";
 import { SkipLink } from "@repo/ui/components/skip-link";
 import {
@@ -31,40 +32,25 @@ import {
 
 import { NotificationBell } from "@/app/app/_components/notifications/notification-bell";
 import { ReadyDownloadToast } from "@/app/app/_components/notifications/ready-download-toast";
-import { APP_NAV, isAppNavActive } from "@/lib/app-nav";
-import { MASTERS_GROUPS } from "@/lib/masters-nav";
+import { isAppNavActive } from "@/lib/app-nav";
 import { projectIdFromPath } from "@/lib/project-nav";
 
 import { APP_NAV_ICONS } from "./app-nav-icons";
-import type { AreaNavGroup } from "./area-nav-menu";
 import { BrandMark } from "@/components/app-shell/brand-mark";
-import {
-  HumanResourcesNavMenu,
-  humanResourcesGroups,
-} from "./human-resources-nav-menu";
+import { HumanResourcesNavMenu } from "./human-resources-nav-menu";
 import { MastersNavMenu } from "./masters-nav-menu";
+import { NAV_BUTTON_CLASS } from "./nav-button-class";
 import { CompanyDeletionBanner } from "./company-deletion-banner";
-import {
-  filterMenuArea,
-  labelMatches,
-  menuQuery,
-  noMatchMessage,
-  type AreaMatch,
-} from "./menu-filter";
+import { HOME_PATH, filterMainMenu, mainMenuAreas } from "./main-menu-areas";
+import { setMenuLayout, useMenuLayout } from "./menu-layout";
+import { MenuTopBar } from "./menu-top-bar";
+import { menuQuery, noMatchMessage } from "./menu-filter";
 import { PlanBanner } from "./plan-banner";
 import { ProjectNavMenu } from "./project-nav-menu";
 import { SidebarAccountRow } from "./sidebar-account-row";
 import { SidebarPlanCard } from "./sidebar-plan-card";
 import { SwitchCompany } from "./switch-company";
-import { WORKSPACE_GROUPS, WorkspaceNavMenu } from "./workspace-nav-menu";
-
-/**
- * A sidebar row (ADR-0049): muted on the ink panel, the primary pill when
- * current. No hover background of its own: the `SidebarGlide` pill moves
- * under the hovered row (ADR-0050).
- */
-const NAV_BUTTON_CLASS =
-  "text-sidebar-foreground/70 hover:bg-transparent hover:text-sidebar-foreground data-active:bg-sidebar-primary data-active:text-sidebar-primary-foreground data-active:[&_svg]:text-sidebar-primary-foreground data-active:font-semibold h-10 gap-3 rounded-xl px-3 transition-colors [&_svg]:size-[18px] [&_svg]:text-sidebar-foreground/65 hover:[&_svg]:text-sidebar-foreground";
+import { WorkspaceNavMenu } from "./workspace-nav-menu";
 
 /** From package.json at build time (next.config.ts), so the browser never gets the dependency list. */
 const VERSION = `v${process.env["NEXT_PUBLIC_APP_VERSION"] ?? "0.0.0"}`;
@@ -76,7 +62,9 @@ const VERSION = `v${process.env["NEXT_PUBLIC_APP_VERSION"] ?? "0.0.0"}`;
  * Human Resources, Workspace, Masters and Settings, then the plan card, My
  * Profile, Switch Company (ADR-0051) and Sign out. On a phone a slim bar
  * opens the sidebar sheet and keeps the bell in reach. Inside a Project the
- * areas give way to the Project's own menu (ADR CM-0020).
+ * areas give way to the Project's own menu (ADR CM-0020). A User who
+ * picked the full-page menu (ADR CM-0039) gets a top bar in the sidebar's
+ * ink and no sidebar, outside a Project: the main menu is then a page.
  * `canOpenDashboard` is the Dashboard menu's Read flag: without it the
  * Dashboard is not in the menu. `canOpenStaffRoles` is Team Members or Role
  * Management Read (ADR CM-0030): without either, Office Staff and Role
@@ -103,6 +91,29 @@ export function AppShell({
     setQuery("");
   }
 
+  const layout = useMenuLayout();
+  const router = useRouter();
+
+  // Inside a Project the sidebar stays: it is the Project's own menu.
+  if (layout === "full" && projectId == null)
+    return (
+      // The provider is for Switch Company's row, a sidebar menu button.
+      <SidebarProvider className="bg-background flex-col">
+        <SkipLink />
+        <MenuTopBar pathname={pathname} />
+        <PlanBanner />
+        <CompanyDeletionBanner />
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="flex min-w-0 flex-1 flex-col outline-none"
+        >
+          {children}
+        </main>
+        <ReadyDownloadToast />
+      </SidebarProvider>
+    );
+
   return (
     <SidebarProvider style={{ "--sidebar-width": "17.5rem" } as CSSProperties}>
       <SkipLink />
@@ -114,14 +125,32 @@ export function AppShell({
       >
         <SidebarHeader className="gap-3 px-3 pt-4 pb-2">
           <SidebarAccountRow />
-          <SidebarSearch
-            aria-label="Search menu"
-            placeholder="Search menu…"
-            value={query}
-            onChange={(event) => {
-              setQuery(event.target.value);
-            }}
-          />
+          <div className="flex items-center gap-1.5">
+            <div className="min-w-0 flex-1">
+              <SidebarSearch
+                aria-label="Search menu"
+                placeholder="Search menu…"
+                value={query}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                }}
+              />
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-foreground size-10 shrink-0 rounded-full"
+              aria-label="Show the menu on a full page"
+              title="Full-page menu"
+              onClick={() => {
+                setMenuLayout("full");
+                router.push(HOME_PATH);
+              }}
+            >
+              <LayoutGrid aria-hidden="true" />
+            </Button>
+          </div>
         </SidebarHeader>
         <SidebarContent>
           <SidebarGlide>
@@ -225,29 +254,6 @@ function FooterMenu({ pathname }: { pathname: string }) {
   );
 }
 
-type MainMenuRow = {
-  item: (typeof APP_NAV)[number];
-  /** An area's groups under the menu search; null for a plain row. */
-  match: AreaMatch<AreaNavGroup> | null;
-};
-
-/** The areas with a submenu, by their main-menu link. */
-function areaGroups(
-  href: string,
-  canOpenStaffRoles: boolean,
-): readonly AreaNavGroup[] | undefined {
-  switch (href) {
-    case "/app/staff":
-      return humanResourcesGroups(canOpenStaffRoles);
-    case "/app/workspace":
-      return WORKSPACE_GROUPS;
-    case "/app/masters":
-      return MASTERS_GROUPS;
-    default:
-      return undefined;
-  }
-}
-
 /**
  * The Company Dashboard (with Dashboard Read), Projects, then the areas
  * with a submenu each: Human Resources, Workspace and Masters, then
@@ -265,14 +271,10 @@ function MainMenu({
   canOpenStaffRoles: boolean;
 }) {
   const q = menuQuery(query);
-  const rows = APP_NAV.flatMap((item): MainMenuRow[] => {
-    if (item.href === "/app/dashboard" && !canOpenDashboard) return [];
-    const groups = areaGroups(item.href, canOpenStaffRoles);
-    if (groups == null)
-      return labelMatches(item.label, q) ? [{ item, match: null }] : [];
-    const match = filterMenuArea(item.label, groups, q);
-    return match == null ? [] : [{ item, match }];
-  });
+  const rows = filterMainMenu(
+    mainMenuAreas({ canOpenDashboard, canOpenStaffRoles }),
+    q,
+  );
 
   return (
     <SidebarGroup className="px-3 pt-2">
@@ -285,7 +287,7 @@ function MainMenu({
             </p>
           ) : (
             <SidebarMenu className="gap-1">
-              {rows.map(({ item, match }) => {
+              {rows.map(({ area: { item }, match }) => {
                 if (match != null) {
                   const area = {
                     pathname,
