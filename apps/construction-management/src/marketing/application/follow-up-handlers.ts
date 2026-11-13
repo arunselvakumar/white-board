@@ -101,8 +101,10 @@ export type FollowUpReadModel = {
 };
 
 export type FollowUpFormOptions = {
-  /** Active Marketing People. */
+  /** Active Marketing People: the ones a Follow-up can be given to. */
   people: MarketingPerson[];
+  /** Inactive ones too, whose Follow-ups remain: the list's owner filter. */
+  allPeople: MarketingPerson[];
   selfMemberId: string | null;
   /** The Prospect Companies the caller can pick, A–Z. */
   companies: { id: string; name: string }[];
@@ -211,6 +213,7 @@ export class FollowUpHandlers {
     ]);
     return {
       people: people.filter((person) => person.active),
+      allPeople: people,
       selfMemberId: self,
       companies: companies.map(({ id, name }) => ({ id, name })),
       today,
@@ -499,7 +502,10 @@ export class FollowUpHandlers {
     });
   }
 
-  /** Changes an Open one; a new due date clears both reminder marks. */
+  /**
+   * Changes an Open one; a new due date or a new owner clears both
+   * reminder marks, so the new day or the new owner is told (ADR CM-0040 §8).
+   */
   async update(
     access: MemberAccess,
     id: string,
@@ -523,7 +529,8 @@ export class FollowUpHandlers {
       const patch: Partial<FollowUpRow> = {
         ...details,
         ownerMemberId,
-        ...(details.dueDate === current.dueDate
+        ...(details.dueDate === current.dueDate &&
+        ownerMemberId === current.ownerMemberId
           ? {}
           : { dueNotifiedOn: null, overdueNotifiedAt: null }),
       };

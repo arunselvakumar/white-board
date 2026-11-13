@@ -589,14 +589,22 @@ export type FollowUpStore = {
     id: string,
     mark: { dueNotifiedOn: CalendarDate } | { overdueNotifiedAt: Date },
   ): Promise<void>;
-  /** Open ones due on or before `date`, every Company, for the reminders. */
+  /**
+   * Open ones of live companies that may still owe a reminder, every
+   * Company, for the reminders: due before `date` and not yet told overdue,
+   * or due on `date` and not told that day. `date` is the latest today
+   * anywhere, so a row read is checked against its own Company's today.
+   */
   openDueBy(
     date: CalendarDate,
     page: { after?: string; limit: number },
   ): Promise<StoredFollowUp[]>;
 };
 
-/** What the company page and list read about Follow-ups (ADR CM-0040 §5). */
+/**
+ * What the company page and list read about Follow-ups (ADR CM-0040 §5),
+ * and the company delete's tombstoning of them (§11).
+ */
 export type CompanyFollowUpsReader = {
   /** The company's Follow-ups the scope sees, newest first. */
   forCompany(
@@ -612,4 +620,12 @@ export type CompanyFollowUpsReader = {
     companyIds: readonly string[],
     scope: OwnScope,
   ): Promise<Map<string, CalendarDate>>;
+  /**
+   * Inside the company's delete: tombstones all its live Follow-ups, open
+   * or closed, and returns their ids.
+   */
+  removeForCompany(
+    tx: MarketingTx,
+    input: { workspaceId: string; companyId: string; by: string; now: Date },
+  ): Promise<string[]>;
 };

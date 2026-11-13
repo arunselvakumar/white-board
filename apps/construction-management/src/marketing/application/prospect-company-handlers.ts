@@ -705,8 +705,8 @@ export class ProspectCompanyHandlers {
   }
 
   /**
-   * A tombstone, with its Contacts (ADR CM-0040 §11); refused while the
-   * company has Visits, whoever logged them.
+   * A tombstone, with its Contacts and all its Follow-ups (ADR CM-0040
+   * §11); refused while the company has Visits, whoever logged them.
    */
   async delete(
     access: MemberAccess,
@@ -722,13 +722,19 @@ export class ProspectCompanyHandlers {
       if ((await this.deps.visits.liveCount(tx, access.workspaceId, id)) > 0)
         throw prospectCompanyHasVisits();
       await this.deps.store.remove(tx, id, access.userId, at);
+      const followUpIds = await this.deps.followUps.removeForCompany(tx, {
+        workspaceId: access.workspaceId,
+        companyId: id,
+        by: access.userId,
+        now: at,
+      });
       await recordAudit(tx, {
         workspaceId: access.workspaceId,
         actorUserId: access.userId,
         action: "prospect_company.deleted",
         entityType: "prospect_company",
         entityId: id,
-        before: { ...detailsOf(current), stage: current.stage },
+        before: { ...detailsOf(current), stage: current.stage, followUpIds },
         occurredAt: at,
       });
     });

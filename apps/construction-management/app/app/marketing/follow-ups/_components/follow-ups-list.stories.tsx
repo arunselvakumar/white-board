@@ -120,6 +120,10 @@ export const EveryoneByOwner: Story = {
 
     const body = within(canvasElement.ownerDocument.body);
     await userEvent.click(canvas.getByLabelText("Owner"));
+    // Someone no longer active stays in the filter: their Follow-ups remain.
+    await expect(
+      await body.findByRole("option", { name: "Karthik Raja (inactive)" }),
+    ).toBeVisible();
     await userEvent.click(
       await body.findByRole("option", { name: "Ravi Shankar" }),
     );

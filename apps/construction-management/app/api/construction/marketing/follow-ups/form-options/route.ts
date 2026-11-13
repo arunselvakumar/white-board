@@ -8,8 +8,9 @@ import { FOLLOW_UPS_MENU, followUpHandlers as handlers } from "../handlers";
 export const dynamic = "force-dynamic";
 
 /**
- * Active Marketing People, the caller's own member id, the companies they
- * can pick and the Company's today. Needs Follow-ups read.
+ * Active Marketing People, and inactive ones too for the list's owner
+ * filter, the caller's own member id, the companies they can pick and the
+ * Company's today. Needs Follow-ups read.
  */
 export async function GET(request: Request): Promise<Response> {
   try {

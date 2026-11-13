@@ -6,14 +6,16 @@ import { describe, expect, it } from "vitest";
 
 import { createFollowUpRemindersHandler } from "@/src/composition/marketing-follow-up-reminders";
 import { FOLLOW_UP_REMINDERS_JOB } from "@/src/marketing/application/follow-up-reminders";
+import { prismaFollowUpStore } from "@/src/marketing/infrastructure/prisma-follow-up-store";
 import type { PermissionGrants } from "@/src/shared-kernel/access";
-import { addDays } from "@/src/shared-kernel/calendar-date";
+import { addDays, todayIn } from "@/src/shared-kernel/calendar-date";
 import { companyToday } from "@/src/shared-kernel/company-today";
 import { newId } from "@/src/shared-kernel/ids";
 import type { QueueJob } from "@/src/shared-kernel/queue";
 import { jsonRequest, memberWith, ownerWithCompany } from "@/test/companies";
 import { TEST_ORIGIN } from "@/test/sessions";
 
+import { POST as removeCompany } from "../companies/[id]/delete/route";
 import { GET as getCompany } from "../companies/[id]/route";
 import {
   GET as listCompanies,
@@ -24,6 +26,7 @@ import { POST as cancel } from "./[id]/cancel/route";
 import { POST as done } from "./[id]/done/route";
 import { GET as getOne } from "./[id]/route";
 import { POST as update } from "./[id]/update/route";
+import { GET as formOptions } from "./form-options/route";
 import { GET as list, POST as create } from "./route";
 
 const BASE = `${TEST_ORIGIN}/api/construction/marketing/follow-ups`;
@@ -95,6 +98,29 @@ async function runReminders(): Promise<void> {
     maxAttempts: 3,
   };
   await createFollowUpRemindersHandler().run(job, new AbortController().signal);
+}
+
+/** Every id the reminder query reads now, page by page. */
+async function readByReminders(): Promise<Set<string>> {
+  const date = todayIn("Pacific/Kiritimati", new Date());
+  const read = new Set<string>();
+  let after: string | undefined;
+  for (;;) {
+    const page = await prismaFollowUpStore.openDueBy(date, {
+      after,
+      limit: 1_000,
+    });
+    for (const row of page) read.add(row.id);
+    if (page.length < 1_000) return read;
+    after = page.at(-1)?.id;
+  }
+}
+
+async function notices(workspaceId: string) {
+  return prisma.constructionMessagingNotification.findMany({
+    where: { workspaceId, type: { startsWith: "marketing.follow_up" } },
+    orderBy: { type: "asc" },
+  });
 }
 
 describe("Follow-ups (ADR CM-0040 §5, §8)", () => {
@@ -310,6 +336,8 @@ describe("Follow-ups (ADR CM-0040 §5, §8)", () => {
       ["marketing.follow_up_overdue", ravi.userId, "Follow-up overdue"],
     ]);
     expect(sent[0]?.body).toContain("Ask about the drawings");
+    // An overdue one already told is not read again by the next runs.
+    expect((await readByReminders()).has(overdue.id)).toBe(false);
 
     // A new due date clears the marks, so the new day is told again.
     const moved = await update(
@@ -342,6 +370,136 @@ describe("Follow-ups (ADR CM-0040 §5, §8)", () => {
         },
       }),
     ).resolves.toBe(2);
+  });
+
+  it("tells a new owner too: a change of owner clears both marks", async () => {
+    const owner = await ownerWithCompany();
+    const ravi = await memberWith(owner, MARKETING);
+    const priya = await memberWith(owner, MARKETING);
+    const companyId = await aCompany(ravi);
+    const today = await companyToday(prisma, owner.workspaceId);
+    const followUp = await add(ravi, {
+      prospectCompanyId: companyId,
+      dueDate: today,
+    });
+    await runReminders();
+
+    const given = await update(
+      jsonRequest(`${BASE}/${followUp.id}/update`, ravi.cookie, {
+        type: "call",
+        dueDate: today,
+        ownerMemberId: priya.memberId,
+        expectedUpdatedAt: followUp.updatedAt,
+      }),
+      params(followUp.id),
+    );
+    expect(given.status).toBe(StatusCodes.OK);
+    await expect(
+      prisma.constructionMarketingFollowUp.findUniqueOrThrow({
+        where: { id: followUp.id },
+        select: { dueNotifiedOn: true, overdueNotifiedAt: true },
+      }),
+    ).resolves.toEqual({ dueNotifiedOn: null, overdueNotifiedAt: null });
+    await runReminders();
+    const sent = await notices(owner.workspaceId);
+    expect(new Set(sent.map((row) => row.recipientUserId))).toEqual(
+      new Set([ravi.userId, priya.userId]),
+    );
+    expect(sent.map((row) => row.type)).toEqual([
+      "marketing.follow_up_due",
+      "marketing.follow_up_due",
+    ]);
+  });
+
+  it("goes with its Prospect Company: deleted, out of the list, never reminded", async () => {
+    const owner = await ownerWithCompany();
+    const companyId = await aCompany(owner);
+    const today = await companyToday(prisma, owner.workspaceId);
+    const open = await add(owner, {
+      prospectCompanyId: companyId,
+      dueDate: addDays(today, -1),
+    });
+    const closed = await add(owner, {
+      prospectCompanyId: companyId,
+      dueDate: today,
+    });
+    const cancelled = await cancel(
+      jsonRequest(`${BASE}/${closed.id}/cancel`, owner.cookie, {
+        expectedUpdatedAt: closed.updatedAt,
+      }),
+      params(closed.id),
+    );
+    expect(cancelled.status).toBe(StatusCodes.OK);
+    const company = await json<{ updatedAt: string }>(
+      await getCompany(
+        jsonRequest(`${COMPANIES}/${companyId}`, owner.cookie),
+        params(companyId),
+      ),
+    );
+
+    const deleted = await removeCompany(
+      jsonRequest(`${COMPANIES}/${companyId}/delete`, owner.cookie, {
+        expectedUpdatedAt: company.updatedAt,
+      }),
+      params(companyId),
+    );
+    expect(deleted.status).toBe(StatusCodes.NO_CONTENT);
+    const gone = await getOne(
+      jsonRequest(`${BASE}/${open.id}`, owner.cookie),
+      params(open.id),
+    );
+    expect(gone.status).toBe(StatusCodes.NOT_FOUND);
+    expect(await ids(owner)).toEqual([]);
+    const rows = await prisma.constructionMarketingFollowUp.findMany({
+      where: { prospectCompanyId: companyId },
+      select: { deletedAt: true, deletedBy: true },
+    });
+    expect(rows).toHaveLength(2);
+    for (const row of rows)
+      expect(row).toEqual({
+        deletedAt: expect.any(Date) as unknown,
+        deletedBy: owner.userId,
+      });
+    const audit =
+      await prisma.constructionOrganizationAuditEvent.findFirstOrThrow({
+        where: {
+          workspaceId: owner.workspaceId,
+          entityId: companyId,
+          action: "prospect_company.deleted",
+        },
+      });
+    expect(
+      new Set((audit.before as { followUpIds: string[] }).followUpIds),
+    ).toEqual(new Set([open.id, closed.id]));
+
+    expect((await readByReminders()).has(open.id)).toBe(false);
+    await runReminders();
+    expect(await notices(owner.workspaceId)).toEqual([]);
+  });
+
+  it("offers the form active Marketing People, and the list everyone", async () => {
+    const owner = await ownerWithCompany();
+    const ravi = await memberWith(owner, MARKETING);
+    const left = await memberWith(owner, MARKETING);
+    await prisma.constructionOrganizationTeamMember.update({
+      where: { id: left.memberId },
+      data: { status: "left" },
+    });
+    const options = await json<{
+      selfMemberId: string;
+      people: { id: string }[];
+      allPeople: { id: string; active: boolean }[];
+    }>(await formOptions(jsonRequest(`${BASE}/form-options`, ravi.cookie)));
+    expect(options.selfMemberId).toBe(ravi.memberId);
+    const people = options.people.map((person) => person.id);
+    expect(people).toContain(ravi.memberId);
+    expect(people).not.toContain(left.memberId);
+    expect(options.allPeople).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: ravi.memberId, active: true }),
+        expect.objectContaining({ id: left.memberId, active: false }),
+      ]),
+    );
   });
 
   it("needs the Follow-ups menu", async () => {

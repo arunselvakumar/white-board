@@ -127,17 +127,24 @@ export const ListConstructionMarketingFollowUpsResponseModel = z.object({
   today: z.iso.date(),
 });
 
+const ConstructionMarketingFollowUpPersonResponseModel = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  mobile: z.string().nullable(),
+  isOwner: z.boolean(),
+  /** False for someone no longer a Marketing Person or Team Member. */
+  active: z.boolean(),
+});
+
 export const GetConstructionMarketingFollowUpFormOptionsResponseModel =
   z.object({
-    people: z.array(
-      z.object({
-        id: z.uuid(),
-        name: z.string(),
-        mobile: z.string().nullable(),
-        isOwner: z.boolean(),
-        active: z.boolean(),
-      }),
-    ),
+    /** Active Marketing People: the ones a Follow-up can be given to. */
+    people: z.array(ConstructionMarketingFollowUpPersonResponseModel),
+    /**
+     * Inactive ones too (their Follow-ups remain): the list's owner
+     * filter.
+     */
+    allPeople: z.array(ConstructionMarketingFollowUpPersonResponseModel),
     selfMemberId: z.uuid().nullable(),
     companies: z.array(Ref),
     today: z.iso.date(),
@@ -164,5 +171,6 @@ export function toFollowUpFormOptions(options: FollowUpFormOptions) {
   return {
     ...options,
     people: options.people.map((person) => ({ ...person })),
+    allPeople: options.allPeople.map((person) => ({ ...person })),
   };
 }

@@ -139,9 +139,12 @@ export function FollowUpsList({
               label="Owner"
               allLabel="Anyone"
               value={owner}
-              options={options.people.map((person) => ({
+              // People no longer active stay here: their Follow-ups remain.
+              options={options.allPeople.map((person) => ({
                 value: person.id,
-                label: person.name,
+                label: person.active
+                  ? person.name
+                  : `${person.name} (inactive)`,
               }))}
               onChange={(next) => {
                 startTransition(() => {

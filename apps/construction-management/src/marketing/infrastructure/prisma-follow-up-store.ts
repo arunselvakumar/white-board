@@ -33,6 +33,12 @@ export function followUpVisibleWhere(scope: OwnScope): Where {
   };
 }
 
+/**
+ * A Follow-up whose company is gone is gone too (ADR CM-0040 §11): the
+ * company delete tombstones them, and every read checks it again.
+ */
+const LIVE_COMPANY = { prospectCompany: { deletedAt: null } } as const;
+
 const SELECT = {
   id: true,
   workspaceId: true,
@@ -89,7 +95,7 @@ function toData(patch: Partial<FollowUpRow>) {
 
 async function find(db: MarketingTx, workspaceId: string, id: string) {
   const row = await db.constructionMarketingFollowUp.findFirst({
-    where: { id, workspaceId, deletedAt: null },
+    where: { id, workspaceId, deletedAt: null, ...LIVE_COMPANY },
     select: SELECT,
   });
   return row == null ? null : toStored(row);
@@ -153,6 +159,7 @@ export const prismaFollowUpStore: FollowUpStore = {
     const where: Where = {
       workspaceId: params.workspaceId,
       deletedAt: null,
+      ...LIVE_COMPANY,
       AND: and,
     };
     const after = params.after;
@@ -214,11 +221,21 @@ export const prismaFollowUpStore: FollowUpStore = {
   },
 
   async openDueBy(date, page) {
+    const day = calendarDateToDb(date);
     const rows = await prisma.constructionMarketingFollowUp.findMany({
       where: {
         status: "open",
         deletedAt: null,
-        dueDate: { lte: calendarDateToDb(date) },
+        ...LIVE_COMPANY,
+        // Not every old overdue one again each day: only those not yet
+        // told, and those due on `date` not yet told that day.
+        OR: [
+          { dueDate: { lt: day }, overdueNotifiedAt: null },
+          {
+            dueDate: day,
+            OR: [{ dueNotifiedOn: null }, { dueNotifiedOn: { not: day } }],
+          },
+        ],
       },
       orderBy: { id: "asc" },
       take: page.limit,
@@ -236,6 +253,7 @@ export const prismaCompanyFollowUpsReader: CompanyFollowUpsReader = {
         workspaceId,
         prospectCompanyId: companyId,
         deletedAt: null,
+        ...LIVE_COMPANY,
         ...followUpVisibleWhere(scope),
       },
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
@@ -253,6 +271,7 @@ export const prismaCompanyFollowUpsReader: CompanyFollowUpsReader = {
         prospectCompanyId: { in: [...companyIds] },
         status: "open",
         deletedAt: null,
+        ...LIVE_COMPANY,
         ...followUpVisibleWhere(scope),
       },
       _min: { dueDate: true },
@@ -262,5 +281,25 @@ export const prismaCompanyFollowUpsReader: CompanyFollowUpsReader = {
       if (row._min.dueDate != null)
         next.set(row.prospectCompanyId, calendarDateFromDb(row._min.dueDate));
     return next;
+  },
+
+  async removeForCompany(tx, input) {
+    const where = {
+      workspaceId: input.workspaceId,
+      prospectCompanyId: input.companyId,
+      deletedAt: null,
+    };
+    const rows = await tx.constructionMarketingFollowUp.findMany({
+      where,
+      orderBy: { id: "asc" },
+      select: { id: true },
+    });
+    if (rows.length === 0) return [];
+    const ids = rows.map((row) => row.id);
+    await tx.constructionMarketingFollowUp.updateMany({
+      where: { ...where, id: { in: ids } },
+      data: tombstone(input.by, input.now),
+    });
+    return ids;
   },
 };

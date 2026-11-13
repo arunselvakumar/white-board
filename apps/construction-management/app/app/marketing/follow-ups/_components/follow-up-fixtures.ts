@@ -46,11 +46,23 @@ const company = (id: string, canOpen = true) => {
   return { id, name: found?.name ?? "Unknown", canOpen };
 };
 
+const FOLLOW_UP_PEOPLE: FollowUpFormOptions["people"] = [
+  { ...OWNER, mobile: "+919840000001", isOwner: true, active: true },
+  { ...PRIYA, mobile: "+919840000003", isOwner: false, active: true },
+  { ...RAVI, mobile: "+919840000002", isOwner: false, active: true },
+];
+
 export const FOLLOW_UP_FORM_OPTIONS: FollowUpFormOptions = {
-  people: [
-    { ...OWNER, mobile: "+919840000001", isOwner: true, active: true },
-    { ...PRIYA, mobile: "+919840000003", isOwner: false, active: true },
-    { ...RAVI, mobile: "+919840000002", isOwner: false, active: true },
+  people: FOLLOW_UP_PEOPLE,
+  allPeople: [
+    ...FOLLOW_UP_PEOPLE,
+    {
+      id: "5c0e7d1a-3b2f-4e6a-9d8c-7b6a5f4e3d2c",
+      name: "Karthik Raja",
+      mobile: "+919840000004",
+      isOwner: false,
+      active: false,
+    },
   ],
   selfMemberId: OWNER_MEMBER_ID,
   companies: COMPANIES.map((item) => ({ id: item.id, name: item.name })).sort(

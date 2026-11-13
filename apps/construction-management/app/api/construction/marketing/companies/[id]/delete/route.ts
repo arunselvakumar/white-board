@@ -16,8 +16,9 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Deletes a Prospect Company and its Contacts (a tombstone). 409
- * `PROSPECT_COMPANY_CHANGED` when stale. Needs Companies delete.
+ * Deletes a Prospect Company with its Contacts and Follow-ups (a
+ * tombstone). 409 `PROSPECT_COMPANY_CHANGED` when stale. Needs Companies
+ * delete.
  */
 export async function POST(
   request: Request,
