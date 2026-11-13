@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { normalizeMobile } from "@repo/auth/construction/mobile";
@@ -50,7 +49,6 @@ import {
 import { fieldForCode } from "@/lib/server-errors";
 import { PROJECT_TYPES } from "@/src/projects/domain/project-type";
 import {
-  projectsQuery,
   useApplyProjectLogo,
   useCreateProject,
   useDeleteProject,
@@ -763,12 +761,14 @@ function ProjectForm({
  */
 export function NewProjectScreen({
   clientName,
+  financial,
 }: {
   /** The client name to start with, from `?clientName=`. */
   clientName?: string;
-} = {}) {
+  /** The viewer's Projects Financial flag, worked out on the server. */
+  financial: boolean;
+}) {
   const router = useRouter();
-  const { data: list } = useSuspenseQuery(projectsQuery);
   const create = useCreateProject();
   const applyLogo = useApplyProjectLogo();
   const uploads = useUploadHeldFiles();
@@ -788,7 +788,7 @@ export function NewProjectScreen({
         <ProjectForm
           project={null}
           initialClientName={clientName}
-          financial={list.financial}
+          financial={financial}
           saving={create.isPending || savingLogo || uploading != null}
           savingLabel={
             progress != null

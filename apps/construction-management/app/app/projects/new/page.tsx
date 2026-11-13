@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { NewProjectSkeleton } from "@/app/app/projects/_components/projects-skeletons";
+import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { QuerySuspense } from "@/components/query-suspense";
 import { PROJECT_CLIENT_NAME_MAX } from "@/src/projects/domain/project-contract-rules";
 
@@ -22,10 +23,18 @@ export default async function NewProjectPage({
 }: {
   searchParams: Promise<{ clientName?: string | string[] }>;
 }) {
-  const { clientName } = await searchParams;
+  const [{ clientName }, financial] = await Promise.all([
+    searchParams,
+    // From the session, not the Projects list, so a member with Projects
+    // create but no read can open the form too.
+    viewerCan("projects.project", "financial"),
+  ]);
   return (
     <QuerySuspense fallback={<NewProjectSkeleton />}>
-      <NewProjectScreen clientName={clientNameOf(clientName)} />
+      <NewProjectScreen
+        clientName={clientNameOf(clientName)}
+        financial={financial}
+      />
     </QuerySuspense>
   );
 }

@@ -69,7 +69,11 @@ export type MarketingTeam = {
 // §12). Implemented in `src/composition/marketing-client-projects.ts`.
 // ---------------------------------------------------------------------------
 
-/** A Project's status, as the projects context names it. */
+/**
+ * A Project's status, as the projects context names it. Copied on purpose,
+ * so marketing imports nothing from projects; the composition root's types
+ * keep the two lists in step (`check-types` fails if they drift).
+ */
 export type ClientProjectStatus =
   "ongoing" | "not_started" | "on_hold" | "completed";
 

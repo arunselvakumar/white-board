@@ -15,6 +15,7 @@ import type { ListConstructionProjectsProjectOptionsResponseModel } from "@/app/
 import type { ConstructionProjectsProjectResponseModel } from "@/app/api/construction/projects/projects/project-models";
 
 import { apiJson } from "./http";
+import { MARKETING_COMPANIES_KEY } from "./marketing-companies";
 
 export type ProjectResponse = ConstructionProjectsProjectResponseModel;
 export type ProjectList = ListConstructionProjectsProjectsResponseModel;
@@ -127,8 +128,17 @@ function useInvalidateProjects() {
 }
 
 export function useCreateProject() {
-  const invalidate = useInvalidateProjects();
-  return useMutation({ mutationFn: createProject, onSuccess: invalidate });
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createProject,
+    // A Prospect Company page lists the Projects by its client name, so a
+    // new Project refreshes the Marketing companies too.
+    onSuccess: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: PROJECTS_KEY }),
+        queryClient.invalidateQueries({ queryKey: MARKETING_COMPANIES_KEY }),
+      ]),
+  });
 }
 
 export function useUpdateProject(id: string) {

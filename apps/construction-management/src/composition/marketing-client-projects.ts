@@ -14,6 +14,10 @@ export function createClientProjects(
 ): ClientProjects {
   return {
     async forClient(access, clientName) {
+      // The whole visible list on purpose: the client name is free text
+      // matched by a collator, so it can't be a database filter. Fine at
+      // today's Project counts; a slim id/name/status/clientName query in
+      // the projects context is the next step if they grow.
       const { items } = await projects.list(access);
       return items
         .filter((project) => sameClientName(project.clientName, clientName))

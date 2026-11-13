@@ -34,16 +34,30 @@ function posts(): ApiCall[] {
 }
 
 /**
- * `financial`: the viewer's Project menu Financial flag, which the form
- * reads from the Projects list.
+ * `financial`: the viewer's Project menu Financial flag, as the Projects
+ * list reports it (the edit screen reads it there; New Project gets it as
+ * a prop). `noRead`: every Projects read is refused, as for a member with
+ * Projects create but no read.
  */
 function api(
   handler: (call: ApiCall) => Response | undefined,
-  { financial = true }: { financial?: boolean } = {},
+  {
+    financial = true,
+    noRead = false,
+  }: { financial?: boolean; noRead?: boolean } = {},
 ) {
   calls = [];
   const mocked = mockApi((call) => {
     calls.push(call);
+    if (
+      noRead &&
+      call.method === "GET" &&
+      (call.path === LABELS || call.path === BASE)
+    )
+      return Response.json(
+        { code: "FORBIDDEN", message: "You do not have access to this." },
+        { status: 403 },
+      );
     if (call.method === "GET" && call.path === LABELS)
       return Response.json({
         items: ["Site engineer", "Architect", "Structural consultant"],
@@ -119,6 +133,7 @@ function cardButton(
 const meta = {
   title: "Projects/ProjectForm",
   component: NewProjectScreen,
+  args: { financial: true },
   render: (args) => (
     <StoryQueries>
       <NewProjectScreen {...args} />
@@ -210,7 +225,7 @@ export const NewValidatesAndSaves: Story = {
  * the address, filled in with the Client card open, and is saved.
  */
 export const NewWithClientNameFromAddress: Story = {
-  args: { clientName: "Madurai Steel Structures" },
+  args: { clientName: "Madurai Steel Structures", financial: true },
   beforeEach: () => api(created),
   play: async ({ canvas, canvasElement, userEvent }) => {
     await expect(await canvas.findByLabelText("Client name")).toHaveValue(
@@ -1042,6 +1057,7 @@ export const NewWithBudget: Story = {
 };
 
 export const NewWithoutFinancialHidesBudget: Story = {
+  args: { financial: false },
   beforeEach: () => api(created, { financial: false }),
   play: async ({ canvas, canvasElement, userEvent }) => {
     await userEvent.type(
@@ -1329,5 +1345,36 @@ export const ColourPickerDark: Story = {
     await expect(
       await canvas.findByRole("radiogroup", { name: "Colour" }),
     ).toBeVisible();
+  },
+};
+
+/**
+ * Create Project for a member with Projects create but no read: the form
+ * opens without the Projects list (Financial comes from the server page)
+ * and saves; only the custom-field label suggestions are missing.
+ */
+export const NewWithoutProjectsRead: Story = {
+  args: { clientName: "Madurai Steel Structures", financial: false },
+  beforeEach: () => api(created, { noRead: true }),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.type(
+      await canvas.findByLabelText("Project name"),
+      "Kappalur PEB Plant",
+    );
+    await expect(canvas.getByLabelText("Client name")).toHaveValue(
+      "Madurai Steel Structures",
+    );
+    await expect(canvas.queryByLabelText("Budget")).toBeNull();
+    await chooseType(
+      canvas,
+      within(canvasElement.ownerDocument.body),
+      userEvent,
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Add Project" }));
+    await waitFor(() => expect(posts()).toHaveLength(1));
+    await expect(posts()[0]?.body).toMatchObject({
+      name: "Kappalur PEB Plant",
+      clientName: "Madurai Steel Structures",
+    });
   },
 };
