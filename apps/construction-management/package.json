@@ -50,6 +50,7 @@
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-hook-form": "^7.87.0",
+    "recharts": "3.8.0",
     "regenerator-runtime": "0.14.1",
     "sharp": "0.35.4",
     "web-push": "3.6.7",

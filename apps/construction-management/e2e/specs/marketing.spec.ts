@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test";
 
+import { createProspectCompany, createVisit } from "../api/marketing";
 import { createProject } from "../api/projects";
 import { marketingPageTest } from "../helpers/marketingPageTest";
 import { MarketingPage } from "../pages/MarketingPage";
@@ -82,6 +83,42 @@ marketingPageTest.describe("Marketing", () => {
         "/app/marketing/visits",
       );
       await expect(marketingPage.heading("Visits", { level: 1 })).toBeVisible();
+    },
+  );
+
+  marketingPageTest(
+    "should count a member's completed Visit on their Dashboard and show none for last month, when a member on the Marketing Role logs a Visit",
+    { tag: ["@pr"] },
+    async ({ newMember }) => {
+      const member = await newMember({ roleName: "Marketing" });
+      const company = await createProspectCompany(member.api, {
+        primaryContact: { name: "Senthil Kumar" },
+      });
+      // A minute ago, so it falls in this month unless the month began in it.
+      await createVisit(member.api, {
+        prospectCompanyId: company.id,
+        status: "completed",
+        visitAt: new Date(Date.now() - 60 * 1000),
+        contactIds: company.contactIds,
+      });
+      const marketing = new MarketingPage(await member.page());
+
+      await marketing.goto();
+      await expect(marketing.main).toContainText("Your figures");
+      await expect(marketing.total("Visits completed")).toContainText(
+        /Visits completed\s*1\s*In the period/,
+      );
+      await expect(
+        marketing.currentPage.getByRole("combobox", {
+          name: "Marketing Person",
+        }),
+      ).toHaveCount(0);
+
+      await marketing.choose("Period", "Last month");
+      await expect(marketing.currentPage).toHaveURL(/[?&]period=last_month/);
+      await expect(marketing.total("Visits completed")).toContainText(
+        /Visits completed\s*0\s*In the period/,
+      );
     },
   );
 });
