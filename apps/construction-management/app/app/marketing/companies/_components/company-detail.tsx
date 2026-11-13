@@ -5,6 +5,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import {
   ArrowRightLeft,
   CalendarClock,
+  FolderPlus,
   MoreHorizontal,
   Pencil,
   Plus,
@@ -26,7 +27,7 @@ import {
   AlertDialogTitle,
 } from "@repo/ui/components/alert-dialog";
 import { Badge } from "@repo/ui/components/badge";
-import { Button } from "@repo/ui/components/button";
+import { Button, buttonVariants } from "@repo/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,6 +39,7 @@ import { cn } from "@repo/ui/lib/utils";
 
 import { activityRecordedLabel } from "@/app/app/_components/activity/activity-feed";
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
+import { ProjectStatusBadge } from "@/app/app/_components/projects/project-status";
 import { FormAlert } from "@/components/auth/form-alert";
 import { COMPANY_SOURCE_LABELS } from "@/src/marketing/domain/marketing-terms";
 import {
@@ -422,6 +424,65 @@ function Contacts({
   );
 }
 
+/** New Project with the client name filled in from the company's name. */
+function newProjectPath(clientName: string): string {
+  return `/app/projects/new?clientName=${encodeURIComponent(clientName)}`;
+}
+
+/**
+ * The Projects whose client name is the company's name, those the viewer
+ * may open (ADR CM-0040 §12), with Create Project on a Won company.
+ */
+function Projects({
+  company,
+  projects,
+  canCreate,
+}: {
+  company: ProspectCompany;
+  projects: NonNullable<ProspectCompany["projects"]>;
+  canCreate: boolean;
+}) {
+  return (
+    <Card
+      title="Projects"
+      action={
+        canCreate ? (
+          <Link
+            href={newProjectPath(company.name)}
+            className={buttonVariants({ size: "sm", variant: "outline" })}
+          >
+            <FolderPlus aria-hidden="true" />
+            Create Project
+          </Link>
+        ) : undefined
+      }
+    >
+      {projects.length === 0 ? (
+        <p className="text-muted-foreground text-sm">
+          No Projects for this client yet.
+        </p>
+      ) : (
+        <ul aria-label="Projects" className="divide-y">
+          {projects.map((project) => (
+            <li
+              key={project.id}
+              className="flex min-w-0 items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
+            >
+              <Link
+                href={`/app/projects/${project.id}`}
+                className="min-w-0 font-medium break-words underline-offset-4 hover:underline"
+              >
+                {project.name}
+              </Link>
+              <ProjectStatusBadge status={project.status} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </Card>
+  );
+}
+
 function TimelineText({
   item,
   timeZone,
@@ -583,9 +644,10 @@ function History({
 }
 
 /**
- * One Prospect Company: its details, Contacts and the history of its
- * Stage, with Edit, Move Stage, Reassign and Delete as the server's
- * `actions` allow.
+ * One Prospect Company: its details, Contacts, the Projects of its client
+ * name and the history of its Stage, with Edit, Move Stage, Reassign and
+ * Delete as the server's `actions` allow, and Create Project on a Won
+ * company for a member who may create Projects.
  */
 export function CompanyDetail({
   id,
@@ -606,7 +668,8 @@ export function CompanyDetail({
   >(null);
   const [error, setError] = useState<string | null>(null);
   const { canUpdate, canDelete, canReassign } = company.actions;
-  const hasMenu = canUpdate || canDelete || canReassign;
+  const canCreateProject = company.stage === "won" && company.canCreateProject;
+  const hasMenu = canUpdate || canDelete || canReassign || canCreateProject;
   const meta = [company.assignedTo?.name, company.city]
     .filter((part): part is string => part != null)
     .join(" · ");
@@ -680,9 +743,18 @@ export function CompanyDetail({
                           Reassign
                         </DropdownMenuItem>
                       )}
-                      {canDelete && (canUpdate || canReassign) && (
-                        <DropdownMenuSeparator />
+                      {canCreateProject && (
+                        <DropdownMenuItem
+                          render={<Link href={newProjectPath(company.name)} />}
+                        >
+                          <FolderPlus aria-hidden="true" />
+                          Create Project
+                        </DropdownMenuItem>
                       )}
+                      {canDelete &&
+                        (canUpdate || canReassign || canCreateProject) && (
+                          <DropdownMenuSeparator />
+                        )}
                       {canDelete && (
                         <DropdownMenuItem
                           variant="destructive"
@@ -708,6 +780,13 @@ export function CompanyDetail({
           <div className="min-w-0 space-y-6">
             <Details company={company} />
             <Contacts company={company} onError={setError} />
+            {company.projects != null && (
+              <Projects
+                company={company}
+                projects={company.projects}
+                canCreate={canCreateProject}
+              />
+            )}
           </div>
           <History company={company} timeZone={company.timeZone} />
         </div>

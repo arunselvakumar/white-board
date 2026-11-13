@@ -13,10 +13,14 @@ import {
   LAKSHMI_ID,
   MARKETING_COMPANIES_API,
   SENTHIL_ID,
+  STEEL_ID,
+  STEEL_PLANT_PROJECT_ID,
+  STEEL_SHED_PROJECT_ID,
   company,
   followUpEntries,
   lostCompany,
   mockCompanyApi,
+  wonCompany,
   type CompanyApiOptions,
 } from "./company-fixtures";
 
@@ -86,6 +90,121 @@ export const WithContactsAndHistory: Story = {
     await expect(entries[6]).toHaveTextContent(
       "Added at New · by Arun Selva Kumar · 1 Nov 2026, 10:00 am",
     );
+  },
+};
+
+const NEW_STEEL_PROJECT =
+  "/app/projects/new?clientName=Madurai%20Steel%20Structures";
+
+/**
+ * Won, with the Projects whose client name is the company's: each opens
+ * its Project, with its status. Create Project opens New Project with the
+ * client name filled in, from the Projects card and from Actions.
+ */
+export const WonWithProjects: Story = {
+  args: { id: STEEL_ID },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const card = within(
+      await canvas.findByRole("region", { name: "Projects" }),
+    );
+    const [plant, shed] = card.getAllByRole("listitem");
+    if (plant == null || shed == null) throw new Error("two Projects");
+    await expect(
+      within(plant).getByRole("link", { name: "Kappalur PEB Plant" }),
+    ).toHaveAttribute("href", `/app/projects/${STEEL_PLANT_PROJECT_ID}`);
+    await expect(within(plant).getByText("Ongoing")).toBeVisible();
+    await expect(
+      within(shed).getByRole("link", { name: "Thirumangalam Warehouse Shed" }),
+    ).toHaveAttribute("href", `/app/projects/${STEEL_SHED_PROJECT_ID}`);
+    await expect(within(shed).getByText("Completed")).toBeVisible();
+    await expect(
+      card.getByRole("link", { name: "Create Project" }),
+    ).toHaveAttribute("href", NEW_STEEL_PROJECT);
+
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(canvas.getByRole("button", { name: "Actions" }));
+    await expect(
+      await body.findByRole("menuitem", { name: "Create Project" }),
+    ).toHaveAttribute("href", NEW_STEEL_PROJECT);
+  },
+};
+
+/** Won with no Projects yet: the empty text, and Create Project beside it. */
+export const WonWithoutProjects: Story = {
+  args: { id: STEEL_ID },
+  beforeEach: serve({ companies: [wonCompany({ projects: [] })] }),
+  play: async ({ canvas }) => {
+    const card = within(
+      await canvas.findByRole("region", { name: "Projects" }),
+    );
+    await expect(
+      card.getByText("No Projects for this client yet."),
+    ).toBeVisible();
+    await expect(
+      card.getByRole("link", { name: "Create Project" }),
+    ).toHaveAttribute("href", NEW_STEEL_PROJECT);
+  },
+};
+
+/** Not Won yet: the Projects card lists, but there is no Create Project. */
+export const NotWonNoCreateProject: Story = {
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const card = within(
+      await canvas.findByRole("region", { name: "Projects" }),
+    );
+    await expect(
+      card.getByText("No Projects for this client yet."),
+    ).toBeVisible();
+    await expect(
+      card.queryByRole("link", { name: "Create Project" }),
+    ).toBeNull();
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(canvas.getByRole("button", { name: "Actions" }));
+    await body.findByRole("menuitem", { name: "Move Stage" });
+    await expect(
+      body.queryByRole("menuitem", { name: "Create Project" }),
+    ).toBeNull();
+  },
+};
+
+/** A member without Projects read: no Projects card; Create Project stays. */
+export const WonWithoutProjectsRead: Story = {
+  args: { id: STEEL_ID },
+  beforeEach: serve({ companies: [wonCompany({ projects: null })] }),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await canvas.findByRole("heading", { name: "Madurai Steel Structures" });
+    await expect(canvas.queryByRole("region", { name: "Projects" })).toBeNull();
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(canvas.getByRole("button", { name: "Actions" }));
+    await expect(
+      await body.findByRole("menuitem", { name: "Create Project" }),
+    ).toHaveAttribute("href", NEW_STEEL_PROJECT);
+  },
+};
+
+/**
+ * A member without Projects create: the Projects they may open, but no
+ * Create Project; a member who may only read has no Actions at all.
+ */
+export const WonWithoutProjectsCreate: Story = {
+  args: { id: STEEL_ID },
+  beforeEach: serve({
+    companies: [
+      wonCompany({
+        canCreateProject: false,
+        actions: { canUpdate: false, canDelete: false, canReassign: false },
+      }),
+    ],
+  }),
+  play: async ({ canvas }) => {
+    const card = within(
+      await canvas.findByRole("region", { name: "Projects" }),
+    );
+    await expect(card.getAllByRole("listitem")).toHaveLength(2);
+    await expect(
+      card.queryByRole("link", { name: "Create Project" }),
+    ).toBeNull();
+    await expect(canvas.queryByRole("button", { name: "Actions" })).toBeNull();
   },
 };
 
