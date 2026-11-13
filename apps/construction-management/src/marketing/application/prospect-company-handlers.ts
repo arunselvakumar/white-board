@@ -14,6 +14,7 @@ import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import {
   contactNotFound,
+  invalidField,
   marketingPersonNotFound,
   prospectCompanyChanged,
   prospectCompanyHasVisits,
@@ -97,6 +98,8 @@ export type ContactInput = ContactDetailsInput & {
 export type ProspectCompanyActions = {
   canUpdate: boolean;
   canDelete: boolean;
+  /** Companies transfer: Reassign. */
+  canReassign: boolean;
 };
 
 export type ProspectCompanyListItem = {
@@ -186,6 +189,11 @@ export type ProspectCompanyReadModel = Omit<
   contacts: ContactReadModel[];
   timeline: ProspectCompanyTimelineItem[];
   actions: ProspectCompanyActions;
+  /**
+   * Open Follow-ups of the company, whoever owns them: Reassign moves them
+   * too (ADR CM-0040 §11). Null without Companies transfer.
+   */
+  openFollowUps: number | null;
 };
 
 export type ProspectCompanyFormOptions = {
@@ -210,7 +218,7 @@ const same = (a: Date, b: Date) => a.getTime() === b.getTime();
  */
 function assertCanWrite(
   access: MemberAccess,
-  flag: "create" | "update" | "delete",
+  flag: "create" | "update" | "delete" | "transfer",
 ): void {
   assertCan(access, COMPANIES_MENU, "read");
   assertCan(access, COMPANIES_MENU, flag);
@@ -255,6 +263,7 @@ export class ProspectCompanyHandlers {
     return {
       canUpdate: can(access, COMPANIES_MENU, "update"),
       canDelete: can(access, COMPANIES_MENU, "delete"),
+      canReassign: can(access, COMPANIES_MENU, "transfer"),
     };
   }
 
@@ -381,25 +390,42 @@ export class ProspectCompanyHandlers {
     id: string,
   ): Promise<ProspectCompanyReadModel> {
     assertCan(access, COMPANIES_MENU, "read");
+    return this.readModel(access, await this.find(access, id));
+  }
+
+  /**
+   * The company page of a company already checked: by `get`, or by a write
+   * that answers with the company as saved, which the caller may no longer
+   * see (Reassign away from oneself).
+   */
+  private async readModel(
+    access: MemberAccess,
+    company: StoredProspectCompany,
+  ): Promise<ProspectCompanyReadModel> {
     const { db, store, team } = this.deps;
-    const company = await this.find(access, id);
-    const [contacts, changes, visits, followUps] = await Promise.all([
-      store.contacts(db, access.workspaceId, id),
-      store.stageChanges(db, access.workspaceId, id),
-      can(access, VISITS_MENU, "read")
-        ? this.deps.visits.timeline(
-            db,
-            access.workspaceId,
-            id,
-            ownScope(access, VISITS_MENU),
-          )
-        : { visits: [], notes: [], files: [] },
-      can(access, FOLLOW_UPS_MENU, "read")
-        ? this.followUpScope(access).then((scope) =>
-            this.deps.followUps.forCompany(db, access.workspaceId, id, scope),
-          )
-        : Promise.resolve([]),
-    ]);
+    const id = company.id;
+    const canReassign = can(access, COMPANIES_MENU, "transfer");
+    const [contacts, changes, visits, followUps, openFollowUps] =
+      await Promise.all([
+        store.contacts(db, access.workspaceId, id),
+        store.stageChanges(db, access.workspaceId, id),
+        can(access, VISITS_MENU, "read")
+          ? this.deps.visits.timeline(
+              db,
+              access.workspaceId,
+              id,
+              ownScope(access, VISITS_MENU),
+            )
+          : { visits: [], notes: [], files: [] },
+        can(access, FOLLOW_UPS_MENU, "read")
+          ? this.followUpScope(access).then((scope) =>
+              this.deps.followUps.forCompany(db, access.workspaceId, id, scope),
+            )
+          : Promise.resolve([]),
+        canReassign
+          ? this.deps.followUps.openCount(db, access.workspaceId, id)
+          : Promise.resolve(null),
+      ]);
     const [members, users, timeZone] = await Promise.all([
       team.memberNames(access.workspaceId, [
         ...(company.assignedMemberId == null ? [] : [company.assignedMemberId]),
@@ -493,6 +519,7 @@ export class ProspectCompanyHandlers {
       contacts,
       timeline: timeline.sort((a, b) => b.at.getTime() - a.at.getTime()),
       actions: this.actions(access),
+      openFollowUps,
     };
   }
 
@@ -738,6 +765,59 @@ export class ProspectCompanyHandlers {
         occurredAt: at,
       });
     });
+  }
+
+  /**
+   * Reassign (Companies transfer, ADR CM-0040 §11): the company and every
+   * open Follow-up of it go to another active Marketing Person in one
+   * transaction. Past Visits keep their visitors, and whoever created the
+   * company keeps seeing it (§5). Answers the company as saved, read from
+   * the locked row: a caller who saw it only as its assigned person sees
+   * it no more once it has moved, and still gets their answer.
+   */
+  async reassign(
+    access: MemberAccess,
+    id: string,
+    input: { assignedMemberId: string; expectedUpdatedAt: Date },
+  ): Promise<ProspectCompanyReadModel> {
+    assertCanWrite(access, "transfer");
+    const to = await this.assignee(access, input.assignedMemberId);
+    if (to == null) throw marketingPersonNotFound("assignedMemberId");
+    const at = this.clock();
+    const saved = await this.deps.db.$transaction(async (tx) => {
+      const current = await this.lockVisible(tx, access, id);
+      if (!same(current.updatedAt, input.expectedUpdatedAt))
+        throw prospectCompanyChanged();
+      if (current.assignedMemberId === to)
+        throw invalidField(
+          "PROSPECT_COMPANY_ALREADY_ASSIGNED",
+          "The company is already assigned to this person.",
+          "assignedMemberId",
+        );
+      await this.deps.store.assign(tx, id, to, access.userId, at);
+      const followUpIds = await this.deps.followUps.reassignOpen(
+        tx,
+        access.workspaceId,
+        id,
+        to,
+        access.userId,
+        at,
+      );
+      await recordAudit(tx, {
+        workspaceId: access.workspaceId,
+        actorUserId: access.userId,
+        action: "prospect_company.reassigned",
+        entityType: "prospect_company",
+        entityId: id,
+        before: { assignedMemberId: current.assignedMemberId },
+        after: { assignedMemberId: to, followUpIds },
+        occurredAt: at,
+      });
+      const row = await this.deps.store.find(tx, access.workspaceId, id);
+      if (row == null) throw prospectCompanyNotFound();
+      return row;
+    });
+    return this.readModel(access, saved);
   }
 
   /** A Stage moved by hand (ADR CM-0040 §11), kept in the history. */

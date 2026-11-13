@@ -9,15 +9,24 @@ import { viewerFlags } from "../../../_lib/viewer-can";
 
 export const metadata: Metadata = { title: "Add Staff" };
 
-export default async function Page() {
+/** `?roleId=` picks a Role on arrival (Add Marketing Person). */
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ roleId?: string | string[] }>;
+}) {
   const can = await viewerFlags("organization.team_members", [
     "create",
     "financial",
   ]);
   if (!can.create) return <RolesNoAccess what="adding Staff" />;
+  const { roleId } = await searchParams;
   return (
     <QuerySuspense fallback={<AddTeamMemberSkeleton />}>
-      <AddTeamMember canSeeSalary={can.financial} />
+      <AddTeamMember
+        canSeeSalary={can.financial}
+        roleId={typeof roleId === "string" ? roleId : undefined}
+      />
     </QuerySuspense>
   );
 }

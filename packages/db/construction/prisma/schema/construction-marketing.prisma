@@ -415,3 +415,25 @@ enum ConstructionMarketingCheckLocation {
   @@map("check_location")
   @@schema("construction_marketing")
 }
+
+/// A Marketing Person's monthly Visit target (ADR CM-0040 §4). The target
+/// for a month is the latest row on or before it; a change writes the
+/// current month's row, so earlier months keep theirs. A null target is
+/// "no target" from that month.
+model ConstructionMarketingVisitTarget {
+  id             String   @id @db.Uuid
+  workspaceId    String   @map("workspace_id")
+  /// A Team Member id.
+  memberId       String   @map("member_id") @db.Uuid
+  /// The first day of the month it starts.
+  effectiveMonth DateTime @map("effective_month") @db.Date
+  target         Int?
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy      String   @map("created_by")
+  updatedBy      String   @map("updated_by")
+
+  @@unique([workspaceId, memberId, effectiveMonth])
+  @@map("visit_targets")
+  @@schema("construction_marketing")
+}

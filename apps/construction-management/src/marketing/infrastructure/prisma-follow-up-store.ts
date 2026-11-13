@@ -262,6 +262,44 @@ export const prismaCompanyFollowUpsReader: CompanyFollowUpsReader = {
     return rows.map(toStored);
   },
 
+  async reassignOpen(db, workspaceId, companyId, toMemberId, by, at) {
+    // Locked first: a Done that commits meanwhile is seen here as no
+    // longer open, so it is neither moved nor listed in the audit.
+    const open = await db.$queryRaw<{ id: string }[]>(Prisma.sql`
+      SELECT id FROM construction_marketing.follow_ups
+      WHERE workspace_id = ${workspaceId}
+        AND prospect_company_id = ${companyId}::uuid
+        AND status = 'open'
+        AND deleted_at IS NULL
+        AND owner_member_id <> ${toMemberId}::uuid
+      FOR UPDATE`);
+    const ids = open.map((row) => row.id);
+    if (ids.length > 0)
+      await db.constructionMarketingFollowUp.updateMany({
+        where: { id: { in: ids }, status: "open", deletedAt: null },
+        data: {
+          ownerMemberId: toMemberId,
+          dueNotifiedOn: null,
+          overdueNotifiedAt: null,
+          updatedAt: at,
+          updatedBy: by,
+        },
+      });
+    return ids;
+  },
+
+  async openCount(db, workspaceId, companyId) {
+    return db.constructionMarketingFollowUp.count({
+      where: {
+        workspaceId,
+        prospectCompanyId: companyId,
+        status: "open",
+        deletedAt: null,
+        ...LIVE_COMPANY,
+      },
+    });
+  },
+
   async nextDue(db, workspaceId, companyIds, scope) {
     if (companyIds.length === 0) return new Map();
     const rows = await db.constructionMarketingFollowUp.groupBy({

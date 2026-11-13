@@ -5,8 +5,8 @@ import { viewerCan, viewerFlags } from "@/app/app/_lib/viewer-can";
 import { GET as formOptions } from "@/app/api/construction/marketing/follow-ups/form-options/route";
 import { GET as listFollowUps } from "@/app/api/construction/marketing/follow-ups/route";
 import {
-  FOLLOW_UPS_OPENING_FILTERS,
   followUpFormOptionsQuery,
+  followUpsArrivalFilters,
   followUpsQuery,
   MARKETING_FOLLOW_UPS_API,
 } from "@/src/queries/marketing-follow-ups";
@@ -29,25 +29,41 @@ const ROUTES = {
   [`${MARKETING_FOLLOW_UPS_API}/form-options`]: formOptions,
 };
 
-/** The viewer's own Open Follow-ups on arrival (ADR-0052). */
-export default async function Page() {
+/**
+ * The viewer's own Open Follow-ups on arrival (ADR-0052), or with
+ * `?owner=` and View all, everyone's of that owner.
+ */
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ owner?: string | string[] }>;
+}) {
   const can = await viewerFlags("marketing.follow_ups", ["read", "create"]);
   if (!can.read) return <MarketingNoAccess what="Follow-ups" />;
   const canLogVisit = await viewerCan("marketing.visits", "create");
 
+  const { owner: raw } = await searchParams;
+  const owner = typeof raw === "string" ? raw : undefined;
+
   const queryClient = getQueryClient();
-  await Promise.all([
-    prefetchInfiniteRoute(
-      queryClient,
-      followUpsQuery(FOLLOW_UPS_OPENING_FILTERS),
-      ROUTES,
-    ),
-    prefetchRoute(queryClient, followUpFormOptionsQuery, ROUTES),
-  ]);
+  const options = await prefetchRoute(
+    queryClient,
+    followUpFormOptionsQuery,
+    ROUTES,
+  );
+  await prefetchInfiniteRoute(
+    queryClient,
+    followUpsQuery(followUpsArrivalFilters(owner, options.canSeeAll)),
+    ROUTES,
+  );
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <FollowUpsList canCreate={can.create} canLogVisit={canLogVisit} />
+      <FollowUpsList
+        canCreate={can.create}
+        canLogVisit={canLogVisit}
+        owner={owner}
+      />
     </HydrationBoundary>
   );
 }

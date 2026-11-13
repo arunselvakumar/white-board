@@ -5,6 +5,7 @@ import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 
 import {
   checkedInVisit,
+  KARTHIK_MEMBER_ID,
   KAVERI_ID,
   MARKETING_VISITS_API,
   MISSED_ID,
@@ -223,5 +224,23 @@ export const CheckedIn: Story = {
     if (row == null) throw new Error("one Visit");
     await expect(row).toHaveTextContent("MV-0007");
     await expect(within(row).getByText("Checked in")).toBeVisible();
+  },
+};
+
+/**
+ * From a Team row of someone no longer active: the Marketing Person filter
+ * names them, so the list is plainly theirs.
+ */
+export const ArrivalForInactivePerson: Story = {
+  args: { memberId: KARTHIK_MEMBER_ID },
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByRole("combobox", { name: "Marketing Person" }),
+    ).toHaveTextContent("Karthik Raja (inactive)");
+    await waitFor(() =>
+      expect(listCalls().at(-1)?.path).toContain(
+        `memberId=${KARTHIK_MEMBER_ID}`,
+      ),
+    );
   },
 };

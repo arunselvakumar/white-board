@@ -192,7 +192,7 @@ Sequential. Update the Status column.
 | 5   | Visit photos and files on the attachments service                                              | done   |
 | 6   | Follow-ups: list, Done and Log the visit, creation from a Visit, notifications                 | done   |
 | 7   | Visit calendar and check-in / check-out                                                        | done   |
-| 8   | Team page, visit targets, reassign and the "needs reassigning" list                            | todo   |
+| 8   | Team page, visit targets, reassign and the "needs reassigning" list                            | done   |
 | 9   | Marketing Dashboard                                                                            | todo   |
 | 10  | Won → Create Project, and the Projects shown on the company page                               | todo   |
 | 11  | Reports and exports; Prospect Company import                                                   | todo   |

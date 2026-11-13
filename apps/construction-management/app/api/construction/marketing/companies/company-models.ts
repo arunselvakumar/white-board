@@ -165,6 +165,14 @@ export const ListConstructionMarketingProspectCompaniesRequestModel = z.object({
   after: z.string().max(400).optional(),
 });
 
+/** Reassign: the company and its open Follow-ups to another person. */
+export const ReassignConstructionMarketingProspectCompanyRequestModel =
+  z.object({
+    /** An active Marketing Person (400 `MARKETING_PERSON_NOT_FOUND`). */
+    assignedMemberId: z.uuid(),
+    expectedUpdatedAt: z.iso.datetime(),
+  });
+
 // ---------------------------------------------------------------------------
 // Responses
 // ---------------------------------------------------------------------------
@@ -176,6 +184,8 @@ export const ConstructionMarketingProspectCompanyActionsResponseModel =
     /** Edit, Stage and Contacts (Companies update). */
     canUpdate: z.boolean(),
     canDelete: z.boolean(),
+    /** Companies transfer: Reassign. */
+    canReassign: z.boolean(),
   });
 
 export const ConstructionMarketingProspectCompanyListItemResponseModel =
@@ -309,6 +319,11 @@ export const ConstructionMarketingProspectCompanyResponseModel = z.object({
   /** Newest first. */
   timeline: z.array(ConstructionMarketingTimelineItemResponseModel),
   actions: ConstructionMarketingProspectCompanyActionsResponseModel,
+  /**
+   * Open Follow-ups of the company, whoever owns them: Reassign moves them
+   * too. Null without Companies transfer.
+   */
+  openFollowUps: z.number().int().nullable(),
 });
 
 export const GetConstructionMarketingProspectCompanyFormOptionsResponseModel =
@@ -399,6 +414,7 @@ export function toProspectCompanyResponse(
     contacts: company.contacts.map(toContactResponse),
     timeline: company.timeline.map(toTimelineResponse),
     actions: toActions(company.actions),
+    openFollowUps: company.openFollowUps,
   };
 }
 

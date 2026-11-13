@@ -34,6 +34,7 @@ import {
 } from "@/src/marketing/domain/marketing-terms";
 import {
   followUpFormOptionsQuery,
+  followUpsArrivalFilters,
   followUpsQuery,
   type FollowUp,
   type FollowUpFilters,
@@ -69,16 +70,22 @@ const GROUPS: { due: FollowUpDue; title: string; empty: string }[] = [
 export function FollowUpsList({
   canCreate,
   canLogVisit,
+  owner: arrivalOwner,
 }: {
   /** Follow-ups create: Add Follow-up. */
   canCreate: boolean;
   /** Visits create: Log the visit after a Visit-type one is Done. */
   canLogVisit: boolean;
+  /** `?owner=`: opens on Everyone, that owner's, with View all. */
+  owner?: string;
 }) {
   const section = marketingSection("followUps");
   const { data: options } = useSuspenseQuery(followUpFormOptionsQuery);
-  const [view, setView] = useState<View>("mine");
-  const [owner, setOwner] = useState("");
+  const arrival = followUpsArrivalFilters(arrivalOwner, options.canSeeAll);
+  const [view, setView] = useState<View>(
+    arrival.mine === true ? "mine" : "everyone",
+  );
+  const [owner, setOwner] = useState(arrival.ownerMemberId ?? "");
   const [status, setStatus] = useState<FollowUpStatus>("open");
   const [adding, setAdding] = useState(false);
   const [updating, startTransition] = useTransition();

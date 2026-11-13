@@ -166,7 +166,11 @@ export const LostWithReason: Story = {
 /** A member who may only read: no Actions, no Add Contact, no Contact menus. */
 export const ReadOnly: Story = {
   beforeEach: serve({
-    companies: [company({ actions: { canUpdate: false, canDelete: false } })],
+    companies: [
+      company({
+        actions: { canUpdate: false, canDelete: false, canReassign: false },
+      }),
+    ],
   }),
   play: async ({ canvas }) => {
     await canvas.findByRole("heading", { name: "Sri Balaji Infra Projects" });
@@ -178,6 +182,56 @@ export const ReadOnly: Story = {
     await expect(
       canvas.queryByRole("button", { name: /^Actions for/ }),
     ).toBeNull();
+  },
+};
+
+/** With Companies transfer, Reassign moves it to another person. */
+export const Reassign: Story = {
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Actions" }),
+    );
+    await userEvent.click(
+      await body.findByRole("menuitem", { name: "Reassign" }),
+    );
+    const dialog = within(
+      await body.findByRole("dialog", {
+        name: "Reassign Sri Balaji Infra Projects",
+      }),
+    );
+    await userEvent.click(
+      await dialog.findByRole("combobox", {
+        name: "New Marketing Person",
+      }),
+    );
+    await userEvent.click(
+      await body.findByRole("option", { name: "Priya Raman" }),
+    );
+    await userEvent.click(dialog.getByRole("button", { name: "Reassign" }));
+    await waitFor(() => expect(posts(`${ONE}/reassign`)).toHaveLength(1));
+    await expect(
+      await canvas.findByText("Priya Raman · Chennai"),
+    ).toBeVisible();
+  },
+};
+
+/** Without transfer there is no Reassign. */
+export const NoReassign: Story = {
+  beforeEach: serve({
+    companies: [
+      company({
+        actions: { canUpdate: true, canDelete: true, canReassign: false },
+      }),
+    ],
+  }),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Actions" }),
+    );
+    await body.findByRole("menuitem", { name: "Move Stage" });
+    await expect(body.queryByRole("menuitem", { name: "Reassign" })).toBeNull();
   },
 };
 

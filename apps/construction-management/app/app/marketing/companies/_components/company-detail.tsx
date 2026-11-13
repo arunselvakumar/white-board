@@ -11,6 +11,7 @@ import {
   Star,
   Trash2,
   UserRound,
+  UserRoundCog,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -65,6 +66,7 @@ import {
 } from "./company-parts";
 import { ContactDialog } from "./contact-dialog";
 import { MoveStageDialog } from "./move-stage-dialog";
+import { ReassignDialog } from "./reassign-dialog";
 
 function Fact({
   label,
@@ -582,7 +584,8 @@ function History({
 
 /**
  * One Prospect Company: its details, Contacts and the history of its
- * Stage, with Edit, Move Stage and Delete as the server's `actions` allow.
+ * Stage, with Edit, Move Stage, Reassign and Delete as the server's
+ * `actions` allow.
  */
 export function CompanyDetail({
   id,
@@ -598,11 +601,12 @@ export function CompanyDetail({
   const router = useRouter();
   const { data: company } = useSuspenseQuery(companyQuery(id));
   const remove = useDeleteCompany(company.id);
-  const [dialog, setDialog] = useState<"stage" | "delete" | "follow-up" | null>(
-    null,
-  );
+  const [dialog, setDialog] = useState<
+    "stage" | "reassign" | "delete" | "follow-up" | null
+  >(null);
   const [error, setError] = useState<string | null>(null);
-  const { canUpdate, canDelete } = company.actions;
+  const { canUpdate, canDelete, canReassign } = company.actions;
+  const hasMenu = canUpdate || canDelete || canReassign;
   const meta = [company.assignedTo?.name, company.city]
     .filter((part): part is string => part != null)
     .join(" · ");
@@ -620,7 +624,7 @@ export function CompanyDetail({
             </span>
           }
           actions={
-            canUpdate || canDelete || canPlanVisit || canAddFollowUp ? (
+            hasMenu || canPlanVisit || canAddFollowUp ? (
               <div className="flex flex-wrap gap-2">
                 {canAddFollowUp && (
                   <Button
@@ -637,7 +641,7 @@ export function CompanyDetail({
                 {canPlanVisit && (
                   <VisitButtons prospectCompanyId={company.id} />
                 )}
-                {(canUpdate || canDelete) && (
+                {hasMenu && (
                   <DropdownMenu>
                     <DropdownMenuTrigger
                       render={<Button type="button" variant="outline" />}
@@ -666,7 +670,19 @@ export function CompanyDetail({
                           Move Stage
                         </DropdownMenuItem>
                       )}
-                      {canDelete && canUpdate && <DropdownMenuSeparator />}
+                      {canReassign && (
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setDialog("reassign");
+                          }}
+                        >
+                          <UserRoundCog aria-hidden="true" />
+                          Reassign
+                        </DropdownMenuItem>
+                      )}
+                      {canDelete && (canUpdate || canReassign) && (
+                        <DropdownMenuSeparator />
+                      )}
                       {canDelete && (
                         <DropdownMenuItem
                           variant="destructive"
@@ -712,6 +728,15 @@ export function CompanyDetail({
           open={dialog === "stage"}
           onOpenChange={(open) => {
             setDialog(open ? "stage" : null);
+          }}
+        />
+      )}
+      {canReassign && dialog === "reassign" && (
+        <ReassignDialog
+          company={company}
+          open
+          onOpenChange={(open) => {
+            if (!open) setDialog(null);
           }}
         />
       )}

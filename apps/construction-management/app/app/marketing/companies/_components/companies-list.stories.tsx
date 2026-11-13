@@ -7,6 +7,7 @@ import { CompaniesList } from "./companies-list";
 import {
   BALAJI_ID,
   MARKETING_COMPANIES_API,
+  NEEDS_REASSIGNING,
   RAVI_MEMBER_ID,
   mockCompanyApi,
   type CompanyApiOptions,
@@ -281,5 +282,83 @@ export const NextFollowUps: Story = {
       "text-red-700",
     );
     await expect(balaji).not.toHaveTextContent("(overdue)");
+  },
+};
+
+/**
+ * With Companies transfer, a notice counts the companies and open
+ * Follow-ups of people who left, linking to their list.
+ */
+export const NeedsReassigningNotice: Story = {
+  args: { canTransfer: true },
+  beforeEach: serve({ needsReassigning: NEEDS_REASSIGNING }),
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByRole("link", { name: /3 need reassigning/ }),
+    ).toHaveAttribute("href", `${BASE}/needs-reassigning`);
+  },
+};
+
+/**
+ * The notice's read fails: no notice, and the list still shows. It is
+ * optional, so it never takes the page down with it.
+ */
+export const NoticeFailed: Story = {
+  args: { canTransfer: true },
+  beforeEach: serve({
+    extra: (call) =>
+      call.method === "GET" && call.path.endsWith("/needs-reassigning")
+        ? Response.json(
+            { code: "INTERNAL", message: "Something went wrong." },
+            { status: 500 },
+          )
+        : undefined,
+  }),
+  play: async ({ canvas }) => {
+    await canvas.findByText("4 Prospect Companies");
+    await waitFor(() =>
+      expect(
+        api.calls.mock.calls.some(([call]) =>
+          call.path.endsWith("/needs-reassigning"),
+        ),
+      ).toBe(true),
+    );
+    await expect(
+      canvas.queryByRole("link", { name: /need reassigning/ }),
+    ).toBeNull();
+    await expect(canvas.getByText("4 Prospect Companies")).toBeVisible();
+  },
+};
+
+/** Nothing to reassign, or no transfer: no notice, and no read without it. */
+export const NoNotice: Story = {
+  args: { canTransfer: true },
+  play: async ({ canvas }) => {
+    await canvas.findByText("4 Prospect Companies");
+    await waitFor(() =>
+      expect(
+        api.calls.mock.calls.some(([call]) =>
+          call.path.endsWith("/needs-reassigning"),
+        ),
+      ).toBe(true),
+    );
+    await expect(
+      canvas.queryByRole("link", { name: /need reassigning/ }),
+    ).toBeNull();
+  },
+};
+
+export const WithoutTransfer: Story = {
+  beforeEach: serve({ needsReassigning: NEEDS_REASSIGNING }),
+  play: async ({ canvas }) => {
+    await canvas.findByText("4 Prospect Companies");
+    await expect(
+      canvas.queryByRole("link", { name: /need reassigning/ }),
+    ).toBeNull();
+    await expect(
+      api.calls.mock.calls.some(([call]) =>
+        call.path.endsWith("/needs-reassigning"),
+      ),
+    ).toBe(false);
   },
 };

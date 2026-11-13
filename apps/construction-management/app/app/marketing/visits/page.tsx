@@ -36,17 +36,27 @@ const ROUTES = {
 };
 
 /**
- * Visits, unfiltered on arrival (ADR-0052): the list, or with
- * `?view=calendar` the days the calendar opens on.
+ * Visits on arrival (ADR-0052): the list, or with `?view=calendar` the days
+ * the calendar opens on; `?memberId=` (a row on the Team page) filters
+ * them to one Marketing Person.
  */
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ view?: string; calendar?: string; day?: string }>;
+  searchParams: Promise<{
+    view?: string;
+    calendar?: string;
+    day?: string;
+    memberId?: string | string[];
+  }>;
 }) {
   const can = await viewerFlags("marketing.visits", ["read", "create"]);
   if (!can.read) return <MarketingNoAccess what="Visits" />;
   const params = await searchParams;
+  const memberId =
+    typeof params.memberId === "string" && params.memberId !== ""
+      ? params.memberId
+      : undefined;
 
   const queryClient = getQueryClient();
   if (params.view === "calendar") {
@@ -61,17 +71,21 @@ export default async function Page({
       chosenDay(params.day, todayIn(options.timeZone)),
     );
     const [from = "", to = ""] = [days[0], days.at(-1)];
-    await prefetchRoute(queryClient, visitCalendarQuery({}, from, to), ROUTES);
+    await prefetchRoute(
+      queryClient,
+      visitCalendarQuery({ memberId }, from, to),
+      ROUTES,
+    );
   } else {
     await Promise.all([
-      prefetchInfiniteRoute(queryClient, visitsQuery(), ROUTES),
+      prefetchInfiniteRoute(queryClient, visitsQuery({ memberId }), ROUTES),
       prefetchRoute(queryClient, visitFormOptionsQuery, ROUTES),
     ]);
   }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <VisitsList canCreate={can.create} />
+      <VisitsList canCreate={can.create} memberId={memberId} />
     </HydrationBoundary>
   );
 }

@@ -19,6 +19,7 @@ import {
   TEXTILES_ID,
 } from "../../companies/_components/company-fixtures";
 import {
+  KARTHIK_MEMBER_ID,
   MISSED_ID,
   visitHandler,
   type VisitApiOptions,
@@ -57,7 +58,7 @@ export const FOLLOW_UP_FORM_OPTIONS: FollowUpFormOptions = {
   allPeople: [
     ...FOLLOW_UP_PEOPLE,
     {
-      id: "5c0e7d1a-3b2f-4e6a-9d8c-7b6a5f4e3d2c",
+      id: KARTHIK_MEMBER_ID,
       name: "Karthik Raja",
       mobile: "+919840000004",
       isOwner: false,
