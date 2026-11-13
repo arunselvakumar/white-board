@@ -5,7 +5,7 @@ describe("The OpenAPI document", () => {
   // show (a `.transform`, for one) fails the build, not only /api/docs.
   it("builds from every registered model", async () => {
     const { openApiDocument } = await import("./openapi-document");
-    expect(Object.keys(openApiDocument.paths ?? {})).toContain(
+    expect(Object.keys(openApiDocument.paths)).toContain(
       "/api/construction/marketing/companies",
     );
   }, 30_000); // Importing every model takes a few seconds.
