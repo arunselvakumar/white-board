@@ -43,6 +43,8 @@ import {
   type ProspectCompanyDetailsInput,
 } from "../domain/prospect-company";
 import type {
+  ClientProject,
+  ClientProjects,
   CompanyFollowUpsReader,
   CompanyVisitsReader,
   MarketingDb,
@@ -57,6 +59,7 @@ import type {
 export const COMPANIES_MENU = "marketing.companies";
 const VISITS_MENU = "marketing.visits";
 const FOLLOW_UPS_MENU = "marketing.follow_ups";
+const PROJECTS_MENU = "projects.project";
 
 export type ProspectCompanyDeps = {
   db: MarketingDb;
@@ -66,6 +69,8 @@ export type ProspectCompanyDeps = {
   visits: CompanyVisitsReader;
   /** Follow-ups on the company page, and the list's next due date. */
   followUps: CompanyFollowUpsReader;
+  /** The Projects whose client name is the company's (ADR CM-0040 §12). */
+  projects: ClientProjects;
   /** The Company's time zone, for the page's times. */
   timeZone: (workspaceId: string) => Promise<string>;
   clock?: () => Date;
@@ -194,6 +199,13 @@ export type ProspectCompanyReadModel = Omit<
    * too (ADR CM-0040 §11). Null without Companies transfer.
    */
   openFollowUps: number | null;
+  /**
+   * The Projects the viewer may open whose client name is the company's
+   * name (ADR CM-0040 §12), at any Stage. Null without Projects read.
+   */
+  projects: ClientProject[] | null;
+  /** Projects create: Create Project on a Won company. */
+  canCreateProject: boolean;
 };
 
 export type ProspectCompanyFormOptions = {
@@ -405,7 +417,7 @@ export class ProspectCompanyHandlers {
     const { db, store, team } = this.deps;
     const id = company.id;
     const canReassign = can(access, COMPANIES_MENU, "transfer");
-    const [contacts, changes, visits, followUps, openFollowUps] =
+    const [contacts, changes, visits, followUps, openFollowUps, projects] =
       await Promise.all([
         store.contacts(db, access.workspaceId, id),
         store.stageChanges(db, access.workspaceId, id),
@@ -424,6 +436,9 @@ export class ProspectCompanyHandlers {
           : Promise.resolve([]),
         canReassign
           ? this.deps.followUps.openCount(db, access.workspaceId, id)
+          : Promise.resolve(null),
+        can(access, PROJECTS_MENU, "read")
+          ? this.deps.projects.forClient(access, company.name)
           : Promise.resolve(null),
       ]);
     const [members, users, timeZone] = await Promise.all([
@@ -520,6 +535,8 @@ export class ProspectCompanyHandlers {
       timeline: timeline.sort((a, b) => b.at.getTime() - a.at.getTime()),
       actions: this.actions(access),
       openFollowUps,
+      projects,
+      canCreateProject: can(access, PROJECTS_MENU, "create"),
     };
   }
 

@@ -6,9 +6,13 @@ import { prismaProspectCompanyStore } from "@/src/marketing/infrastructure/prism
 import { prismaCompanyVisitsReader } from "@/src/marketing/infrastructure/prisma-visit-store";
 import { companyTimezone } from "@/src/shared-kernel/company-today";
 
+import { marketingClientProjects } from "./marketing-client-projects";
 import { marketingTeam } from "./marketing-team";
 
-/** Prospect Company handlers (ADR CM-0040) wired to Prisma and the team. */
+/**
+ * Prospect Company handlers (ADR CM-0040) wired to Prisma, the team and
+ * the Projects of the company's client name.
+ */
 export function createProspectCompanyHandlers(): ProspectCompanyHandlers {
   return new ProspectCompanyHandlers({
     db: prisma,
@@ -16,6 +20,7 @@ export function createProspectCompanyHandlers(): ProspectCompanyHandlers {
     team: marketingTeam,
     visits: prismaCompanyVisitsReader,
     followUps: prismaCompanyFollowUpsReader,
+    projects: marketingClientProjects,
     timeZone: (workspaceId) => companyTimezone(prisma, workspaceId),
   });
 }

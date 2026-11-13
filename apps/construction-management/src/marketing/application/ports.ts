@@ -4,7 +4,7 @@ import type { AuditEvent } from "@/src/shared-kernel/audit";
 import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 import type { NewStoredFile } from "@/src/shared-kernel/files/stored-files";
 import type { ListCursor, NameCursor } from "@/src/shared-kernel/list-cursor";
-import type { OwnScope } from "@/src/shared-kernel/access";
+import type { MemberAccess, OwnScope } from "@/src/shared-kernel/access";
 
 import type {
   ContactDetails,
@@ -62,6 +62,30 @@ export type MarketingTeam = {
   ): Promise<Map<string, string>>;
   /** The caller's own live Team Member id; the Owner's included. */
   memberOfUser(workspaceId: string, userId: string): Promise<string | null>;
+};
+
+// ---------------------------------------------------------------------------
+// ClientProjects: what the company page reads from projects (ADR CM-0040
+// §12). Implemented in `src/composition/marketing-client-projects.ts`.
+// ---------------------------------------------------------------------------
+
+/** A Project's status, as the projects context names it. */
+export type ClientProjectStatus =
+  "ongoing" | "not_started" | "on_hold" | "completed";
+
+export type ClientProject = {
+  id: string;
+  name: string;
+  status: ClientProjectStatus;
+};
+
+export type ClientProjects = {
+  /**
+   * The live Projects the viewer may open whose client name is this name
+   * by CM-0027's rule (case, spacing and accents ignored), in the Projects
+   * list's order. Nothing is stored: there is no Client master.
+   */
+  forClient(access: MemberAccess, clientName: string): Promise<ClientProject[]>;
 };
 
 // ---------------------------------------------------------------------------
