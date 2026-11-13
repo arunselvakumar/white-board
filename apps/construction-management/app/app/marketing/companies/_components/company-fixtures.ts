@@ -182,8 +182,60 @@ export function company(
     ],
     actions: { canUpdate: true, canDelete: true, canReassign: true },
     openFollowUps: 2,
+    projects: [],
+    canCreateProject: true,
     ...overrides,
   };
+}
+
+export const STEEL_PLANT_PROJECT_ID = "0199d000-0000-7000-8000-000000000701";
+export const STEEL_SHED_PROJECT_ID = "0199d000-0000-7000-8000-000000000702";
+
+/** Madurai Steel's Projects, as the Projects list orders them. */
+export const STEEL_PROJECTS: NonNullable<ProspectCompany["projects"]> = [
+  {
+    id: STEEL_PLANT_PROJECT_ID,
+    name: "Kappalur PEB Plant",
+    status: "ongoing",
+  },
+  {
+    id: STEEL_SHED_PROJECT_ID,
+    name: "Thirumangalam Warehouse Shed",
+    status: "completed",
+  },
+];
+
+/** Madurai Steel Structures, Won, with two Projects for its client name. */
+export function wonCompany(
+  overrides: Partial<ProspectCompany> = {},
+): ProspectCompany {
+  return company({
+    id: STEEL_ID,
+    name: "Madurai Steel Structures",
+    industry: "Steel fabrication",
+    city: "Madurai",
+    stage: "won",
+    assignedTo: OWNER,
+    contacts: [],
+    timeline: [
+      entry(
+        "0199d000-0000-7000-8000-000000000322",
+        "negotiation",
+        "won",
+        "2026-11-11T09:00:00.000Z",
+        "Arun Selva Kumar",
+      ),
+      entry(
+        "0199d000-0000-7000-8000-000000000321",
+        null,
+        "new",
+        "2026-10-15T04:30:00.000Z",
+        "Arun Selva Kumar",
+      ),
+    ],
+    projects: STEEL_PROJECTS,
+    ...overrides,
+  });
 }
 
 /** Kaveri Cement Works, Lost for "Other" with the words. */
@@ -241,16 +293,7 @@ export const COMPANIES: ProspectCompany[] = [
     timeline: [],
   }),
   lostCompany(),
-  company({
-    id: STEEL_ID,
-    name: "Madurai Steel Structures",
-    industry: "Steel fabrication",
-    city: "Madurai",
-    stage: "won",
-    assignedTo: OWNER,
-    contacts: [],
-    timeline: [],
-  }),
+  wonCompany(),
   company(),
 ];
 

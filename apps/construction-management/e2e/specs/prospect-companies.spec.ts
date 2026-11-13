@@ -3,6 +3,7 @@ import { expect } from "@playwright/test";
 import { createProspectCompany } from "../api/marketing";
 import { unique } from "../api/session";
 import { companyTest } from "../helpers/companyTest";
+import { ProjectFormPage } from "../pages/ProjectFormPage";
 import { ProspectCompaniesPage } from "../pages/ProspectCompaniesPage";
 
 companyTest.describe("Prospect Companies", () => {
@@ -98,6 +99,44 @@ companyTest.describe("Prospect Companies", () => {
         companies.main.getByText(
           "A Prospect Company with this name already exists.",
         ),
+      ).toBeVisible();
+    },
+  );
+
+  companyTest(
+    "should open New Project with the client name filled in and list the saved Project on the company, when the Owner wins a Prospect Company and creates its Project",
+    async ({ owner, page }) => {
+      const company = await createProspectCompany(owner.api, {
+        name: unique("Madurai Steel Structures"),
+      });
+      const project = unique("Kappalur PEB Plant");
+      const companies = new ProspectCompaniesPage(page);
+
+      await page.goto(`${companies.url}/${company.id}`);
+      await expect(companies.heading(company.name, { level: 1 })).toBeVisible();
+      await companies.action("Move Stage");
+      await companies.dialog.getByRole("radio", { name: "Won" }).click();
+      await companies.clickAndWaitFor(
+        companies.dialog.getByRole("button", { name: "Move" }),
+        /\/stage$/,
+      );
+      await expect(
+        companies.projects.getByText("No Projects for this client yet."),
+      ).toBeVisible();
+
+      await companies.projects
+        .getByRole("link", { name: "Create Project" })
+        .click();
+      await expect(page).toHaveURL(/\/app\/projects\/new\?clientName=/);
+      const form = new ProjectFormPage(page);
+      await expect(form.field("Client name")).toHaveValue(company.name);
+      await form.fill({ name: project });
+      await form.addProjectButton.click();
+      await expect(page).toHaveURL(/\/app\/projects\/[0-9a-f-]{36}/);
+
+      await page.goto(`${companies.url}/${company.id}`);
+      await expect(
+        companies.projects.getByRole("link", { name: project }),
       ).toBeVisible();
     },
   );

@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { normalizeMobile } from "@repo/auth/construction/mobile";
@@ -50,7 +49,6 @@ import {
 import { fieldForCode } from "@/lib/server-errors";
 import { PROJECT_TYPES } from "@/src/projects/domain/project-type";
 import {
-  projectsQuery,
   useApplyProjectLogo,
   useCreateProject,
   useDeleteProject,
@@ -230,7 +228,8 @@ const PROGRESS_LABEL = (done: number, total: number) =>
  * Contract and Additional details, which are optional and fold up to a
  * one-line summary. On Add they start closed; on Edit a card starts open
  * when it has something in it. A card with an error opens and its field
- * takes focus.
+ * takes focus. Add may start with a client name (Create Project from a
+ * Won Prospect Company), and then the Client card starts open.
  *
  * The Project card also holds the colour (ADR CM-0026), the Project Type,
  * the Budget and the logo with "Use Project logo on reports". Budget and
@@ -240,6 +239,7 @@ const PROGRESS_LABEL = (done: number, total: number) =>
  */
 function ProjectForm({
   project,
+  initialClientName,
   financial,
   saving,
   savingLabel,
@@ -248,6 +248,8 @@ function ProjectForm({
   onSave,
 }: {
   project: ProjectResponse | null;
+  /** Add only: the client name to start with. */
+  initialClientName?: string;
   /** The Project menu's Financial flag: Budget and Order value show. */
   financial: boolean;
   saving: boolean;
@@ -261,7 +263,12 @@ function ProjectForm({
     logo: ProjectLogoChange,
   ) => Promise<void>;
 }) {
-  const [initial] = useState(() => projectFormValues(project));
+  const [initial] = useState(() => {
+    const values = projectFormValues(project);
+    return project == null && initialClientName != null
+      ? { ...values, clientName: initialClientName }
+      : values;
+  });
   const form = useForm<ProjectFormValues>({
     resolver: zodResolver(
       project == null ? newProjectFormSchema : projectFormSchema,
@@ -278,7 +285,7 @@ function ProjectForm({
 
   const [open, setOpen] = useState<Record<OptionalCard, boolean>>(() => ({
     client:
-      project != null &&
+      (project != null || initialClientName != null) &&
       (filled(initial.clientName) || filled(initial.clientPhone)),
     contract: project != null && hasContract(initial),
     more: project != null && customFieldCount(initial) > 0,
@@ -752,9 +759,16 @@ function ProjectForm({
  * either way, on its Resources as step 2 of 2, and its Overview says what
  * did not make it.
  */
-export function NewProjectScreen() {
+export function NewProjectScreen({
+  clientName,
+  financial,
+}: {
+  /** The client name to start with, from `?clientName=`. */
+  clientName?: string;
+  /** The viewer's Projects Financial flag, worked out on the server. */
+  financial: boolean;
+}) {
   const router = useRouter();
-  const { data: list } = useSuspenseQuery(projectsQuery);
   const create = useCreateProject();
   const applyLogo = useApplyProjectLogo();
   const uploads = useUploadHeldFiles();
@@ -773,7 +787,8 @@ export function NewProjectScreen() {
         />
         <ProjectForm
           project={null}
-          financial={list.financial}
+          initialClientName={clientName}
+          financial={financial}
           saving={create.isPending || savingLogo || uploading != null}
           savingLabel={
             progress != null

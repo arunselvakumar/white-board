@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { groupByClient } from "./client-groups";
+import { groupByClient, sameClientName } from "./client-groups";
 
 const p = (name: string, clientName: string | null) => ({ name, clientName });
 
@@ -77,5 +77,40 @@ describe("groupByClient (ADR CM-0027 §1)", () => {
 
   it("returns no groups for no Projects", () => {
     expect(groupByClient([])).toEqual([]);
+  });
+});
+
+describe("sameClientName (ADR CM-0027 §1, CM-0040 §12)", () => {
+  it("ignores case and spacing", () => {
+    expect(
+      sameClientName("Sri Balaji Developers", "  sri balaji   DEVELOPERS "),
+    ).toBe(true);
+  });
+
+  it("ignores accents", () => {
+    expect(sameClientName("Café Builders", "Cafe Builders")).toBe(true);
+  });
+
+  it("keeps Tamil names apart that differ by a vowel sign", () => {
+    expect(sameClientName("கா கட்டுமானம்", "க கட்டுமானம்")).toBe(false);
+    expect(sameClientName("கா கட்டுமானம்", "கா கட்டுமானம்")).toBe(true);
+  });
+
+  it("keeps numbered clients apart", () => {
+    expect(sameClientName("Block 01", "Block 1")).toBe(false);
+  });
+
+  it("keeps other names apart", () => {
+    expect(sameClientName("Sri Balaji Developers", "Sri Balaji Devs")).toBe(
+      false,
+    );
+  });
+
+  it("never matches a blank or missing name", () => {
+    expect(sameClientName(null, null)).toBe(false);
+    expect(sameClientName("", "")).toBe(false);
+    expect(sameClientName("   ", " ")).toBe(false);
+    expect(sameClientName("Sri Balaji Developers", null)).toBe(false);
+    expect(sameClientName(null, "Sri Balaji Developers")).toBe(false);
   });
 });

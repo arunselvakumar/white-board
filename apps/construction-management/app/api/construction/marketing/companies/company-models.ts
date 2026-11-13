@@ -18,6 +18,7 @@ import {
   VISIT_PURPOSES,
   VISIT_SHOWN_STATUSES,
 } from "@/src/marketing/domain/marketing-terms";
+import { PROJECT_STATUSES } from "@/src/projects/domain/project";
 
 export const COMPANIES_PATH = "/api/construction/marketing/companies";
 
@@ -324,6 +325,22 @@ export const ConstructionMarketingProspectCompanyResponseModel = z.object({
    * too. Null without Companies transfer.
    */
   openFollowUps: z.number().int().nullable(),
+  /**
+   * The Projects the viewer may open whose client name is the company's
+   * name, ignoring case, spacing and accents, in the Projects list's order;
+   * at any Stage. Null without Projects read.
+   */
+  projects: z
+    .array(
+      z.object({
+        id: z.uuid(),
+        name: z.string(),
+        status: z.enum(PROJECT_STATUSES),
+      }),
+    )
+    .nullable(),
+  /** Projects create: Create Project on a Won company. */
+  canCreateProject: z.boolean(),
 });
 
 export const GetConstructionMarketingProspectCompanyFormOptionsResponseModel =
@@ -415,6 +432,8 @@ export function toProspectCompanyResponse(
     timeline: company.timeline.map(toTimelineResponse),
     actions: toActions(company.actions),
     openFollowUps: company.openFollowUps,
+    projects: company.projects,
+    canCreateProject: company.canCreateProject,
   };
 }
 

@@ -25,6 +25,11 @@ export class ProspectCompaniesPage extends AppShellPage {
     return this.main.getByRole("list", { name: "History" });
   }
 
+  /** The company page's Projects card: the Projects of its client name. */
+  public get projects() {
+    return this.main.getByRole("region", { name: "Projects" });
+  }
+
   /** Opens the company page's Actions menu and picks `item`. */
   public async action(item: string) {
     await this.button("Actions").click();

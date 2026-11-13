@@ -28,6 +28,18 @@ function tidy(name: string | null): string | null {
   return text === "" ? null : text;
 }
 
+/**
+ * Whether two client names are one client by the rule above: case,
+ * spacing and accents ignored. A blank name is no client, so it never
+ * matches, not even another blank one. A Prospect Company's page lists
+ * its Projects by this rule too (ADR CM-0040 §12).
+ */
+export function sameClientName(a: string | null, b: string | null): boolean {
+  const left = tidy(a);
+  const right = tidy(b);
+  return left != null && right != null && sameClient.compare(left, right) === 0;
+}
+
 export function groupByClient<T extends { clientName: string | null }>(
   projects: readonly T[],
   all: readonly { clientName: string | null }[] = projects,
@@ -35,8 +47,8 @@ export function groupByClient<T extends { clientName: string | null }>(
   // The first spelling of each client in the unfiltered list.
   const spellings: string[] = [];
   const spellingOf = (clientName: string): string => {
-    const known = spellings.find(
-      (spelling) => sameClient.compare(spelling, clientName) === 0,
+    const known = spellings.find((spelling) =>
+      sameClientName(spelling, clientName),
     );
     if (known != null) return known;
     spellings.push(clientName);
