@@ -319,6 +319,11 @@ export const ConstructionMarketingProspectCompanyResponseModel = z.object({
   /** Newest first. */
   timeline: z.array(ConstructionMarketingTimelineItemResponseModel),
   actions: ConstructionMarketingProspectCompanyActionsResponseModel,
+  /**
+   * Open Follow-ups of the company, whoever owns them: Reassign moves them
+   * too. Null without Companies transfer.
+   */
+  openFollowUps: z.number().int().nullable(),
 });
 
 export const GetConstructionMarketingProspectCompanyFormOptionsResponseModel =
@@ -409,6 +414,7 @@ export function toProspectCompanyResponse(
     contacts: company.contacts.map(toContactResponse),
     timeline: company.timeline.map(toTimelineResponse),
     actions: toActions(company.actions),
+    openFollowUps: company.openFollowUps,
   };
 }
 

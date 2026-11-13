@@ -17,7 +17,8 @@ export const dynamic = "force-dynamic";
 /**
  * Reassigns a Prospect Company, with every open Follow-up of it, to another
  * active Marketing Person; past Visits keep their visitors. Needs
- * Companies transfer.
+ * Companies read and transfer. Answers the company as saved, even to a
+ * caller who no longer sees it once it has moved.
  */
 export async function POST(
   request: Request,
@@ -36,12 +37,13 @@ export async function POST(
         await request.json(),
       ),
     );
-    await handlers.reassign(session.access, id, {
-      assignedMemberId: model.assignedMemberId,
-      expectedUpdatedAt: new Date(model.expectedUpdatedAt),
-    });
     return Response.json(
-      toProspectCompanyResponse(await handlers.get(session.access, id)),
+      toProspectCompanyResponse(
+        await handlers.reassign(session.access, id, {
+          assignedMemberId: model.assignedMemberId,
+          expectedUpdatedAt: new Date(model.expectedUpdatedAt),
+        }),
+      ),
     );
   } catch (error) {
     return mapError(error);

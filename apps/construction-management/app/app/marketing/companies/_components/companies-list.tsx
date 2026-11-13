@@ -2,6 +2,7 @@
 
 import { formatMobile } from "@repo/auth/construction/react";
 import {
+  useQuery,
   useSuspenseInfiniteQuery,
   useSuspenseQuery,
 } from "@tanstack/react-query";
@@ -127,11 +128,7 @@ export function CompaniesList({
           meta={section.description}
           actions={canCreate ? <AddButton /> : undefined}
         />
-        {canTransfer && (
-          <Suspense fallback={null}>
-            <NeedsReassigningNotice />
-          </Suspense>
-        )}
+        {canTransfer && <NeedsReassigningNotice />}
         <FilterBar filters={filters} onChange={change} />
         <div
           className={cn("min-w-0", updating && "opacity-60 transition-opacity")}
@@ -145,9 +142,14 @@ export function CompaniesList({
   );
 }
 
-/** "3 need reassigning": companies and open Follow-ups of people who left. */
+/**
+ * "3 need reassigning": companies and open Follow-ups of people who left.
+ * Not shown while it loads or when it fails, so it never holds up or
+ * breaks the list.
+ */
 function NeedsReassigningNotice() {
-  const { data } = useSuspenseQuery(needsReassigningQuery);
+  const { data } = useQuery(needsReassigningQuery);
+  if (data == null) return null;
   const count = data.companies.length + data.followUps.length;
   if (count === 0) return null;
   return (

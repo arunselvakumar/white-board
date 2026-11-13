@@ -10,12 +10,12 @@ export const dynamic = "force-dynamic";
 
 /**
  * Prospect Companies and open Follow-ups whose person is no longer an
- * active Marketing Person (ADR CM-0040 §4). Needs Companies transfer.
+ * active Marketing Person (ADR CM-0040 §4). Needs Companies transfer; the
+ * route asks only read, so an ended plan does not hide the list.
  */
 export async function GET(request: Request): Promise<Response> {
   try {
-    // A read: `transfer` is checked by the handler, so an ended plan does
-    // not hide the list.
+    // Companies `transfer` is checked in the handler (needsReassigning).
     const session = await requireAccess(request, COMPANIES_MENU, "read");
     if (isResponse(session)) return session;
     return Response.json(

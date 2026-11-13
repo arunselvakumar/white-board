@@ -29,7 +29,17 @@ export type ReassignTarget = {
   name: string;
   assignedTo: { id: string; name: string } | null;
   updatedAt: string;
+  /** Open Follow-ups that move with it, whoever owns them; null if unknown. */
+  openFollowUps: number | null;
 };
+
+/** How many open Follow-ups go with the company (ADR CM-0040 §11). */
+function followUpsMove(count: number | null): string {
+  if (count == null) return "Its open Follow-ups move with it.";
+  if (count === 0) return "It has no open Follow-ups.";
+  if (count === 1) return "1 open Follow-up moves to the new person too.";
+  return `${String(count)} open Follow-ups move to the new person too.`;
+}
 
 /**
  * Reassign (Companies transfer): the company, and every open Follow-up of
@@ -51,7 +61,7 @@ export function ReassignDialog({
         <DialogHeader>
           <DialogTitle className="break-words">{`Reassign ${company.name}`}</DialogTitle>
           <DialogDescription>
-            {`${company.assignedTo == null ? "No one is" : `${company.assignedTo.name} is`} its Marketing Person. Its open Follow-ups move with it; past Visits keep their visitors.`}
+            {`${company.assignedTo == null ? "No one is" : `${company.assignedTo.name} is`} its Marketing Person. ${followUpsMove(company.openFollowUps)} Past Visits keep their visitors.`}
           </DialogDescription>
         </DialogHeader>
         <Suspense

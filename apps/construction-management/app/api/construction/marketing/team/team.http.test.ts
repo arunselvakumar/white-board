@@ -75,6 +75,25 @@ const memberParams = (memberId: string) => ({
 });
 const companyParams = (id: string) => ({ params: Promise.resolve({ id }) });
 
+/** `YYYY-MM` of an instant in the Company time zone. */
+const monthIn = (at: Date) =>
+  new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+  })
+    .format(at)
+    .slice(0, 7);
+
+type NeedsReassigningBody = {
+  companies: {
+    id: string;
+    assignedTo: { id: string };
+    openFollowUps: number;
+  }[];
+  followUps: { id: string }[];
+};
+
 describe("Marketing Team (ADR CM-0040 §4)", () => {
   it("lists each Marketing Person with this month's Visits, target, Follow-ups overdue and last Visit", async () => {
     const owner = await ownerWithCompany();
@@ -82,15 +101,17 @@ describe("Marketing Team (ADR CM-0040 §4)", () => {
     const clerk = await memberWith(owner, { "marketing.companies": ["read"] });
     const today = await companyToday(prisma, owner.workspaceId);
     const company = await aCompany(ravi);
-    await createVisit(
+    const visitAt = new Date(Date.now() - 60_000);
+    const visit = await createVisit(
       jsonRequest(`${BASE}/visits`, ravi.cookie, {
         status: "completed",
         prospectCompanyId: company.id,
-        visitAt: new Date(Date.now() - 60_000).toISOString(),
+        visitAt: visitAt.toISOString(),
         contactIds: company.contacts.map((contact) => contact.id),
         discussion: "Shed rates.",
       }),
     );
+    expect(visit.status).toBe(StatusCodes.CREATED);
     await createFollowUp(
       jsonRequest(`${BASE}/follow-ups`, ravi.cookie, {
         prospectCompanyId: company.id,
@@ -111,7 +132,9 @@ describe("Marketing Team (ADR CM-0040 §4)", () => {
     });
     expect(rowOf(found, ravi.memberId)?.lastVisitAt).not.toBeNull();
     // A minute ago is this month, except in the first minute of one.
-    expect(rowOf(found, ravi.memberId)?.visitsThisMonth).toBeLessThanOrEqual(1);
+    expect(rowOf(found, ravi.memberId)?.visitsThisMonth).toBe(
+      monthIn(visitAt) === found.month ? 1 : 0,
+    );
     expect(found).toMatchObject({
       month: today.slice(0, 7),
       canSetTargets: true,
@@ -128,10 +151,13 @@ describe("Marketing Team (ADR CM-0040 §4)", () => {
     expect(found.addPersonRoleId).toBe(marketingRole.id);
   });
 
-  it("sets a target from this month, leaving earlier months theirs, with Team update only", async () => {
+  it("sets a target from this month, leaving earlier months theirs, with Team read and update", async () => {
     const owner = await ownerWithCompany();
     const ravi = await memberWith(owner, MARKETING);
     const viewer = await memberWith(owner, { "marketing.team": ["read"] });
+    const updateOnly = await memberWith(owner, {
+      "marketing.team": ["update"],
+    });
     const today = await companyToday(prisma, owner.workspaceId);
     const month = today.slice(0, 7);
 
@@ -143,6 +169,20 @@ describe("Marketing Team (ADR CM-0040 §4)", () => {
     );
     expect(refused.status).toBe(StatusCodes.FORBIDDEN);
     expect((await team(viewer)).canSetTargets).toBe(false);
+    // Update without read is refused before anything is saved: the answer
+    // is the Team, which they could not read.
+    const unread = await setTarget(
+      jsonRequest(`${BASE}/team/${ravi.memberId}/target`, updateOnly.cookie, {
+        target: 10,
+      }),
+      memberParams(ravi.memberId),
+    );
+    expect(unread.status).toBe(StatusCodes.FORBIDDEN);
+    expect(
+      await prisma.constructionMarketingVisitTarget.count({
+        where: { workspaceId: owner.workspaceId, memberId: ravi.memberId },
+      }),
+    ).toBe(0);
 
     // A target set some months ago still holds until it is changed.
     const earlier = addDays(`${month}-01`, -40).slice(0, 7);
@@ -203,17 +243,18 @@ describe("Marketing Team (ADR CM-0040 §4)", () => {
       where: { id: ravi.memberId },
       data: { deletedAt: new Date() },
     });
-    const listed = await json<{
-      companies: { id: string; assignedTo: { id: string } }[];
-      followUps: { id: string }[];
-    }>(
+    const listed = await json<NeedsReassigningBody>(
       await needsReassigning(
         jsonRequest(`${BASE}/companies/needs-reassigning`, owner.cookie),
       ),
     );
-    expect(listed.companies.map((row) => [row.id, row.assignedTo.id])).toEqual([
-      [company.id, ravi.memberId],
-    ]);
+    expect(
+      listed.companies.map((row) => [
+        row.id,
+        row.assignedTo.id,
+        row.openFollowUps,
+      ]),
+    ).toEqual([[company.id, ravi.memberId, 1]]);
     expect(listed.followUps.map((row) => row.id)).toEqual([followUp.id]);
     const withoutTransfer = await needsReassigning(
       jsonRequest(`${BASE}/companies/needs-reassigning`, priya.cookie),
@@ -244,6 +285,126 @@ describe("Marketing Team (ADR CM-0040 §4)", () => {
       ),
     );
     expect(after).toEqual({ companies: [], followUps: [] });
+  });
+
+  it("answers a Reassign with the company as saved, even to a caller who saw it only as its assigned person", async () => {
+    const owner = await ownerWithCompany();
+    const ravi = await memberWith(owner, MARKETING);
+    const priya = await memberWith(owner, MARKETING);
+    // Transfer without View all: Kumar sees the company only while it is his.
+    const kumar = await memberWith(owner, {
+      ...MARKETING,
+      "marketing.companies": ["create", "read", "update", "transfer"],
+    });
+    const company = await json<{ id: string; updatedAt: string }>(
+      await createCompany(
+        jsonRequest(`${BASE}/companies`, ravi.cookie, {
+          name: `Kaveri Steel ${randomUUID().slice(0, 6)}`,
+          assignedMemberId: kumar.memberId,
+          primaryContact: { name: "Lakshmi" },
+        }),
+      ),
+    );
+
+    const moved = await reassign(
+      jsonRequest(`${BASE}/companies/${company.id}/reassign`, kumar.cookie, {
+        assignedMemberId: priya.memberId,
+        expectedUpdatedAt: company.updatedAt,
+      }),
+      companyParams(company.id),
+    );
+    expect(moved.status).toBe(StatusCodes.OK);
+    expect(
+      await json<{ id: string; assignedTo: { id: string } }>(moved),
+    ).toMatchObject({ id: company.id, assignedTo: { id: priya.memberId } });
+  });
+
+  it("lists what needs reassigning within the caller's scope, and only Follow-ups of live companies", async () => {
+    const owner = await ownerWithCompany();
+    const ravi = await memberWith(owner, MARKETING);
+    // Transfer without View all on Companies or Follow-ups.
+    const kumar = await memberWith(owner, {
+      ...MARKETING,
+      "marketing.companies": ["create", "read", "update", "transfer"],
+    });
+    const today = await companyToday(prisma, owner.workspaceId);
+    const followUp = async (
+      who: Session,
+      prospectCompanyId: string,
+      ownerMemberId: string,
+    ) =>
+      json<{ id: string }>(
+        await createFollowUp(
+          jsonRequest(`${BASE}/follow-ups`, who.cookie, {
+            prospectCompanyId,
+            type: "call",
+            dueDate: today,
+            ownerMemberId,
+          }),
+        ),
+      );
+    // Kumar made this one, for Ravi; Ravi made the other himself.
+    const kumars = await json<{ id: string }>(
+      await createCompany(
+        jsonRequest(`${BASE}/companies`, kumar.cookie, {
+          name: `Kaveri Steel ${randomUUID().slice(0, 6)}`,
+          assignedMemberId: ravi.memberId,
+          primaryContact: { name: "Lakshmi" },
+        }),
+      ),
+    );
+    const ravis = await aCompany(ravi);
+    const gone = await aCompany(ravi);
+    const kumarMade = await followUp(kumar, kumars.id, ravi.memberId);
+    const raviMade = await followUp(ravi, kumars.id, ravi.memberId);
+    const onRavis = await followUp(ravi, ravis.id, ravi.memberId);
+    const onGone = await followUp(ravi, gone.id, ravi.memberId);
+    // A company tombstoned with a live open Follow-up left behind.
+    await prisma.constructionMarketingProspectCompany.update({
+      where: { id: gone.id },
+      data: { deletedAt: new Date() },
+    });
+    await prisma.constructionOrganizationTeamMember.update({
+      where: { id: ravi.memberId },
+      data: { deletedAt: new Date() },
+    });
+
+    const all = await json<NeedsReassigningBody>(
+      await needsReassigning(
+        jsonRequest(`${BASE}/companies/needs-reassigning`, owner.cookie),
+      ),
+    );
+    expect(all.companies.map((row) => row.id).sort()).toEqual(
+      [kumars.id, ravis.id].sort(),
+    );
+    expect(all.followUps.map((row) => row.id).sort()).toEqual(
+      [kumarMade.id, raviMade.id, onRavis.id].sort(),
+    );
+    expect(all.followUps.map((row) => row.id)).not.toContain(onGone.id);
+
+    const own = await needsReassigning(
+      jsonRequest(`${BASE}/companies/needs-reassigning`, kumar.cookie),
+    );
+    expect(own.status).toBe(StatusCodes.OK);
+    const scoped = await json<NeedsReassigningBody>(own);
+    expect(scoped.companies.map((row) => [row.id, row.openFollowUps])).toEqual([
+      [kumars.id, 2],
+    ]);
+    expect(scoped.followUps.map((row) => row.id)).toEqual([kumarMade.id]);
+
+    // Transfer and View all on Companies, but no Follow-ups read: companies only.
+    const meena = await memberWith(owner, {
+      "marketing.companies": ["read", "view_all", "transfer"],
+    });
+    const noFollowUps = await json<NeedsReassigningBody>(
+      await needsReassigning(
+        jsonRequest(`${BASE}/companies/needs-reassigning`, meena.cookie),
+      ),
+    );
+    expect(noFollowUps.companies.map((row) => row.id).sort()).toEqual(
+      [kumars.id, ravis.id].sort(),
+    );
+    expect(noFollowUps.followUps).toEqual([]);
   });
 
   it("reassigns only with Companies transfer, and only to an active Marketing Person", async () => {

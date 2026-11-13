@@ -14,7 +14,8 @@ export const dynamic = "force-dynamic";
 
 /**
  * Sets a Marketing Person's monthly Visit target from this month on;
- * earlier months keep theirs. Answers the Team. Needs Team update.
+ * earlier months keep theirs. Answers the Team. Needs Team read and
+ * update; the handler checks both before saving.
  */
 export async function POST(
   request: Request,

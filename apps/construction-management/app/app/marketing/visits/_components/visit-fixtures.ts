@@ -70,12 +70,15 @@ const VISIT_PEOPLE: VisitFormOptions["people"] = [
   { ...RAVI, mobile: "+919840000002", isOwner: false, active: true },
 ];
 
+/** Karthik Raja, a Marketing Person no longer active. */
+export const KARTHIK_MEMBER_ID = "5c0e7d1a-3b2f-4e6a-9d8c-7b6a5f4e3d2c";
+
 export const VISIT_FORM_OPTIONS: VisitFormOptions = {
   people: VISIT_PEOPLE,
   allPeople: [
     ...VISIT_PEOPLE,
     {
-      id: "5c0e7d1a-3b2f-4e6a-9d8c-7b6a5f4e3d2c",
+      id: KARTHIK_MEMBER_ID,
       name: "Karthik Raja",
       mobile: "+919840000004",
       isOwner: false,

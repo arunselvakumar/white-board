@@ -637,7 +637,9 @@ export type CompanyFollowUpsReader = {
   ): Promise<StoredFollowUp[]>;
   /**
    * Gives every open Follow-up of the company to another owner (Reassign,
-   * ADR CM-0040 §11); returns their ids. Their reminder marks start again.
+   * ADR CM-0040 §11), locking them first; returns the ids of those it
+   * moved, so one marked Done meanwhile is neither moved nor listed. Their
+   * reminder marks start again.
    */
   reassignOpen(
     tx: MarketingTx,
@@ -647,6 +649,12 @@ export type CompanyFollowUpsReader = {
     by: string,
     at: Date,
   ): Promise<string[]>;
+  /** Every open Follow-up of the company, whoever owns it: what Reassign moves. */
+  openCount(
+    db: MarketingTx,
+    workspaceId: string,
+    companyId: string,
+  ): Promise<number>;
   /** The earliest open due date of each company the scope sees. */
   nextDue(
     db: MarketingTx,
@@ -677,14 +685,17 @@ export type TeamStore = {
     { memberId: string; effectiveMonth: string; target: number | null }[]
   >;
   /** Writes or replaces the row for `month`. */
-  setTarget(input: {
-    workspaceId: string;
-    memberId: string;
-    month: string;
-    target: number | null;
-    by: string;
-    at: Date;
-  }): Promise<void>;
+  setTarget(
+    tx: MarketingTx,
+    input: {
+      workspaceId: string;
+      memberId: string;
+      month: string;
+      target: number | null;
+      by: string;
+      at: Date;
+    },
+  ): Promise<void>;
   /** Completed Visits each member went on between the two instants. */
   completedVisits(
     workspaceId: string,
@@ -698,10 +709,14 @@ export type TeamStore = {
     workspaceId: string,
     today: CalendarDate,
   ): Promise<Map<string, number>>;
-  /** Live companies assigned to anyone not in `active`. */
+  /**
+   * Live companies assigned to anyone not in `active` that the scope sees,
+   * with how many open Follow-ups Reassign would move with each.
+   */
   companiesOutside(
     workspaceId: string,
     active: readonly string[],
+    scope: OwnScope,
   ): Promise<
     {
       id: string;
@@ -709,13 +724,18 @@ export type TeamStore = {
       city: string | null;
       stage: Stage;
       assignedMemberId: string;
+      openFollowUps: number;
       updatedAt: Date;
     }[]
   >;
-  /** Open Follow-ups owned by anyone not in `active`. */
+  /**
+   * Open Follow-ups of live companies owned by anyone not in `active` that
+   * the scope sees.
+   */
   followUpsOutside(
     workspaceId: string,
     active: readonly string[],
+    scope: OwnScope,
   ): Promise<
     {
       id: string;

@@ -119,7 +119,10 @@ export const BothLists: Story = {
   },
 };
 
-/** Reassign a company from the list; it leaves the list. */
+/**
+ * Reassign a company from the list, told how many open Follow-ups go with
+ * it; it leaves the list.
+ */
 export const ReassignCompany: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
@@ -134,6 +137,9 @@ export const ReassignCompany: Story = {
       }),
     );
     await expect(dialog.getByText(/^Mani Kandan is its/)).toBeVisible();
+    await expect(
+      dialog.getByText(/1 open Follow-up moves to the new person too\./),
+    ).toBeVisible();
     await userEvent.click(
       await dialog.findByRole("combobox", {
         name: "New Marketing Person",

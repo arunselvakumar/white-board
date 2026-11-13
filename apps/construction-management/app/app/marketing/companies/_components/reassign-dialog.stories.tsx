@@ -54,8 +54,8 @@ async function openDialog(canvasElement: HTMLElement) {
 }
 
 /**
- * Only the other active Marketing People are offered; it says the open
- * Follow-ups move and past Visits stay with their visitors.
+ * Only the other active Marketing People are offered; it says how many
+ * open Follow-ups move and that past Visits stay with their visitors.
  */
 export const People: Story = {
   play: async ({ canvasElement, userEvent }) => {
@@ -63,7 +63,7 @@ export const People: Story = {
     const dialog = await openDialog(canvasElement);
     await expect(
       dialog.getByText(
-        "Ravi Shankar is its Marketing Person. Its open Follow-ups move with it; past Visits keep their visitors.",
+        "Ravi Shankar is its Marketing Person. 2 open Follow-ups move to the new person too. Past Visits keep their visitors.",
       ),
     ).toBeVisible();
     await userEvent.click(
@@ -149,5 +149,30 @@ export const Stale: Story = {
       await dialog.findByText(/Someone else changed this Prospect Company/),
     ).toBeVisible();
     await expect(args.onOpenChange).not.toHaveBeenCalled();
+  },
+};
+
+/** One open Follow-up, or none: the count reads right either way. */
+export const FollowUpCounts: Story = {
+  args: { company: company({ openFollowUps: 1 }) },
+  play: async ({ canvasElement }) => {
+    const dialog = await openDialog(canvasElement);
+    await expect(
+      dialog.getByText(
+        "Ravi Shankar is its Marketing Person. 1 open Follow-up moves to the new person too. Past Visits keep their visitors.",
+      ),
+    ).toBeVisible();
+  },
+};
+
+export const NoFollowUps: Story = {
+  args: { company: company({ openFollowUps: 0 }) },
+  play: async ({ canvasElement }) => {
+    const dialog = await openDialog(canvasElement);
+    await expect(
+      dialog.getByText(
+        "Ravi Shankar is its Marketing Person. It has no open Follow-ups. Past Visits keep their visitors.",
+      ),
+    ).toBeVisible();
   },
 };

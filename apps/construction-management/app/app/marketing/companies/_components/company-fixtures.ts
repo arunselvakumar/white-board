@@ -181,6 +181,7 @@ export function company(
       ),
     ],
     actions: { canUpdate: true, canDelete: true, canReassign: true },
+    openFollowUps: 2,
     ...overrides,
   };
 }
@@ -334,6 +335,7 @@ export const NEEDS_REASSIGNING: NeedsReassigning = {
       city: "Tiruchirappalli",
       stage: "negotiation",
       assignedTo: { id: MANI_MEMBER_ID, name: "Mani Kandan" },
+      openFollowUps: 1,
       updatedAt: "2026-11-10T09:00:00.000Z",
     },
   ],

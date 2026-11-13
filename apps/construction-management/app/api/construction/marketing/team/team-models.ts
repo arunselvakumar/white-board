@@ -53,6 +53,8 @@ export const GetConstructionMarketingNeedsReassigningResponseModel = z.object({
       city: z.string().nullable(),
       stage: z.enum(STAGES),
       assignedTo: Ref,
+      /** Open Follow-ups Reassign moves with it, whoever owns them. */
+      openFollowUps: z.number().int(),
       updatedAt: z.iso.datetime(),
     }),
   ),

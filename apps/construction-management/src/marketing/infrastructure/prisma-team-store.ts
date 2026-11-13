@@ -7,6 +7,8 @@ import {
 import { newId } from "@/src/shared-kernel/ids";
 
 import type { TeamStore } from "../application/ports";
+import { followUpVisibleWhere } from "./prisma-follow-up-store";
+import { prospectCompanyVisibleWhere } from "./prisma-prospect-company-store";
 
 /** Team figures and targets over the marketing tables (ADR CM-0040 §4). */
 export const prismaTeamStore: TeamStore = {
@@ -24,9 +26,9 @@ export const prismaTeamStore: TeamStore = {
     }));
   },
 
-  async setTarget(input) {
+  async setTarget(tx, input) {
     const effectiveMonth = calendarDateToDb(`${input.month}-01`);
-    await prisma.constructionMarketingVisitTarget.upsert({
+    await tx.constructionMarketingVisitTarget.upsert({
       where: {
         workspaceId_memberId_effectiveMonth: {
           workspaceId: input.workspaceId,
@@ -97,12 +99,13 @@ export const prismaTeamStore: TeamStore = {
     return new Map(rows.map((row) => [row.ownerMemberId, row._count._all]));
   },
 
-  async companiesOutside(workspaceId, active) {
+  async companiesOutside(workspaceId, active, scope) {
     const rows = await prisma.constructionMarketingProspectCompany.findMany({
       where: {
         workspaceId,
         deletedAt: null,
         assignedMemberId: { not: null, notIn: [...active] },
+        ...prospectCompanyVisibleWhere(scope),
       },
       orderBy: [{ nameKey: "asc" }, { id: "asc" }],
       select: {
@@ -112,22 +115,36 @@ export const prismaTeamStore: TeamStore = {
         stage: true,
         assignedMemberId: true,
         updatedAt: true,
+        // What Reassign moves with it: every open Follow-up, whoever owns it.
+        _count: {
+          select: {
+            followUps: { where: { status: "open", deletedAt: null } },
+          },
+        },
       },
     });
-    return rows.flatMap((row) =>
+    return rows.flatMap(({ _count, ...row }) =>
       row.assignedMemberId == null
         ? []
-        : [{ ...row, assignedMemberId: row.assignedMemberId }],
+        : [
+            {
+              ...row,
+              assignedMemberId: row.assignedMemberId,
+              openFollowUps: _count.followUps,
+            },
+          ],
     );
   },
 
-  async followUpsOutside(workspaceId, active) {
+  async followUpsOutside(workspaceId, active, scope) {
     const rows = await prisma.constructionMarketingFollowUp.findMany({
       where: {
         workspaceId,
         deletedAt: null,
         status: "open",
         ownerMemberId: { notIn: [...active] },
+        prospectCompany: { deletedAt: null },
+        ...followUpVisibleWhere(scope),
       },
       orderBy: [{ dueDate: "asc" }, { id: "asc" }],
       select: {

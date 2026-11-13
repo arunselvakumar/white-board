@@ -1,4 +1,10 @@
-import { assertCan, can, type MemberAccess } from "@/src/shared-kernel/access";
+import {
+  assertCan,
+  can,
+  ownScope,
+  type MemberAccess,
+  type OwnScope,
+} from "@/src/shared-kernel/access";
 import { recordAudit } from "@/src/shared-kernel/audit";
 import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 
@@ -9,6 +15,7 @@ import type { MarketingDb, MarketingTeam, TeamStore } from "./ports";
 
 export const TEAM_MENU = "marketing.team";
 const COMPANIES_MENU = "marketing.companies";
+const FOLLOW_UPS_MENU = "marketing.follow_ups";
 
 export type TeamDeps = {
   db: MarketingDb;
@@ -57,6 +64,8 @@ export type NeedsReassigning = {
     city: string | null;
     stage: Stage;
     assignedTo: { id: string; name: string };
+    /** Open Follow-ups Reassign moves with it, whoever owns them. */
+    openFollowUps: number;
     updatedAt: Date;
   }[];
   followUps: {
@@ -129,13 +138,15 @@ export class TeamHandlers {
 
   /**
    * A person's monthly target from the current month on; earlier months
-   * keep the target they had (ADR CM-0040 §4).
+   * keep the target they had (ADR CM-0040 §4). Needs Team read as well as
+   * update, checked first: the route answers with the Team.
    */
   async setTarget(
     access: MemberAccess,
     memberId: string,
     raw: number | null,
   ): Promise<void> {
+    assertCan(access, TEAM_MENU, "read");
     assertCan(access, TEAM_MENU, "update");
     const target = visitTarget(raw);
     const ws = access.workspaceId;
@@ -147,39 +158,67 @@ export class TeamHandlers {
       throw marketingPersonNotFound("memberId");
     const month = monthOf(today);
     const at = this.clock();
-    await this.deps.store.setTarget({
-      workspaceId: ws,
-      memberId,
-      month,
-      target,
-      by: access.userId,
-      at,
+    await this.deps.db.$transaction(async (tx) => {
+      await this.deps.store.setTarget(tx, {
+        workspaceId: ws,
+        memberId,
+        month,
+        target,
+        by: access.userId,
+        at,
+      });
+      await recordAudit(tx, {
+        workspaceId: ws,
+        actorUserId: access.userId,
+        action: "visit_target.set",
+        entityType: "marketing_visit_target",
+        entityId: memberId,
+        after: { month, target },
+        occurredAt: at,
+      });
     });
-    await recordAudit(this.deps.db, {
-      workspaceId: ws,
-      actorUserId: access.userId,
-      action: "visit_target.set",
-      entityType: "marketing_visit_target",
-      entityId: memberId,
-      after: { month, target },
-      occurredAt: at,
-    });
+  }
+
+  /** The caller's Follow-ups scope, with the Owner's own member id. */
+  private async followUpScope(access: MemberAccess): Promise<OwnScope> {
+    const scope = ownScope(access, FOLLOW_UPS_MENU);
+    if (scope == null || scope.memberId != null) return scope;
+    return {
+      ...scope,
+      memberId: await this.deps.team.memberOfUser(
+        access.workspaceId,
+        access.userId,
+      ),
+    };
   }
 
   /**
    * Prospect Companies and open Follow-ups whose person is no longer an
    * active Marketing Person (ADR CM-0040 §4), for Companies transfer.
+   * Each list keeps the caller's scope (§5): without View all, only the
+   * companies they created or are assigned, and the Follow-ups they
+   * created or own.
    */
   async needsReassigning(access: MemberAccess): Promise<NeedsReassigning> {
     assertCan(access, COMPANIES_MENU, "transfer");
     const ws = access.workspaceId;
-    const people = await this.deps.team.people(ws);
+    const [people, followUpScope] = await Promise.all([
+      this.deps.team.people(ws),
+      this.followUpScope(access),
+    ]);
     const active = people
       .filter((person) => person.active)
       .map((person) => person.id);
     const [companies, followUps] = await Promise.all([
-      this.deps.store.companiesOutside(ws, active),
-      this.deps.store.followUpsOutside(ws, active),
+      this.deps.store.companiesOutside(
+        ws,
+        active,
+        ownScope(access, COMPANIES_MENU),
+      ),
+      // Follow-ups are listed only to someone who may read them.
+      can(access, FOLLOW_UPS_MENU, "read")
+        ? this.deps.store.followUpsOutside(ws, active, followUpScope)
+        : Promise.resolve([]),
     ]);
     const names = await this.deps.team.memberNames(ws, [
       ...companies.map((company) => company.assignedMemberId),

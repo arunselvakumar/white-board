@@ -9,6 +9,7 @@ import {
   OWNER_MEMBER_ID,
   RAVI_MEMBER_ID,
 } from "../../companies/_components/company-fixtures";
+import { KARTHIK_MEMBER_ID } from "../../visits/_components/visit-fixtures";
 import {
   MARKETING_FOLLOW_UPS_API,
   OVERDUE_VISIT_ID,
@@ -275,5 +276,23 @@ export const Phone: Story = {
     await expect(
       within(today).getByRole("button", { name: "Done" }),
     ).toBeVisible();
+  },
+};
+
+/**
+ * From a Team row of someone no longer active: Everyone, with the Owner
+ * filter naming them.
+ */
+export const ArrivalForInactiveOwner: Story = {
+  args: { owner: KARTHIK_MEMBER_ID },
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByRole("combobox", { name: "Owner" }),
+    ).toHaveTextContent("Karthik Raja (inactive)");
+    await waitFor(() =>
+      expect(
+        calls("GET", `${MARKETING_FOLLOW_UPS_API}?`).at(-1)?.path,
+      ).toContain(`ownerMemberId=${KARTHIK_MEMBER_ID}`),
+    );
   },
 };
