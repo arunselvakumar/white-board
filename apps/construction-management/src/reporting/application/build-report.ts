@@ -240,7 +240,9 @@ export async function buildReportDocument(
     header: {
       company: facts.companyName,
       title: body.title,
-      project: facts.project?.name ?? "All projects",
+      project: job.kind.startsWith("marketing_")
+        ? null
+        : (facts.project?.name ?? "All projects"),
       address: facts.project?.address ?? null,
       period: periodLabel(job),
       generated: generatedByLine(facts.requesterName, now, facts.timezone),

@@ -146,6 +146,10 @@ async function table(who: Session, job: Job, first: string) {
   );
   const rows = rowsOf(book.worksheets[0]);
   const headerIndex = rows.findIndex((row) => row[0] === first);
+  // Marketing is not about Projects: no Project line above the table.
+  expect(rows.slice(0, headerIndex).map((row) => row[0])).not.toContain(
+    "Project",
+  );
   const header = (rows[headerIndex] ?? []) as string[];
   const body = rows.slice(headerIndex + 1);
   const totals = body.findIndex((row) => row[0] === "Total");
