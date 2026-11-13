@@ -6,6 +6,7 @@ import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
 import type {
   DprSource,
   FinanceReportSource,
+  MarketingReportSource,
   ProcurementReportSource,
   SalesReportSource,
   ReportRenderer,
@@ -49,6 +50,8 @@ type ReportingOptions = {
   procurement?: ProcurementReportSource;
   /** The sales reports' read model (CM-1008). */
   sales?: SalesReportSource;
+  /** The Marketing reports' read model (ADR CM-0040 §13). */
+  marketing?: MarketingReportSource;
   /** The tracking reports' and Task Progress Report's read models (CM-805). */
   tracking?: {
     source: TrackingReportSource;
@@ -83,6 +86,7 @@ export function createReportingExecutor(
     finance: options.finance,
     procurement: options.procurement,
     sales: options.sales,
+    marketing: options.marketing,
     tracking:
       options.tracking == null
         ? undefined

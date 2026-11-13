@@ -254,6 +254,13 @@ export const FILTER_OPTIONS = {
   assignees: [
     { id: "0190a000-0000-7000-8000-0000000000fa", name: "Karthik R" },
   ],
+  // The Marketing reports' choices.
+  marketingPeople: [
+    { id: "0190a000-0000-7000-8000-0000000000fb", name: "Ravi Kumar" },
+  ],
+  prospectCompanies: [
+    { id: "0190a000-0000-7000-8000-0000000000fc", name: "Kaveri Steel" },
+  ],
 };
 
 export const CENTRAL_REPORTS_LIST_PATH = API;

@@ -1,6 +1,11 @@
 import { z } from "zod";
 
 import {
+  STAGES,
+  VISIT_PURPOSES,
+  VISIT_SHOWN_STATUSES,
+} from "@/src/marketing/domain/marketing-terms";
+import {
   REPORT_KINDS,
   REPORT_TITLES,
   type ReportJob,
@@ -306,6 +311,39 @@ export const RequestConstructionReportingReportRequestModel =
         wingId: z.uuid().optional(),
       }),
     }),
+    // Marketing reports (ADR CM-0040 §13): Company-level, Visits Report.
+    // Rows follow your View all on each record's menu (§5).
+    z.object({
+      kind: z.literal("marketing_visit_register"),
+      projectId: z.null(),
+      /** Visits on these days, in the Company time zone. */
+      params: DateRangeParams.extend({
+        /** A visitor on the Visit (a Team Member id). */
+        memberId: z.uuid().optional(),
+        prospectCompanyId: z.uuid().optional(),
+        /** Missed: Planned, its time passed, not checked in. */
+        status: z.enum(VISIT_SHOWN_STATUSES).optional(),
+        purpose: z.enum(VISIT_PURPOSES).optional(),
+      }),
+    }),
+    z.object({
+      kind: z.literal("marketing_person_summary"),
+      projectId: z.null(),
+      /** Without Visits View all, your own row. */
+      params: MonthParams,
+    }),
+    z.object({
+      kind: z.literal("marketing_company_pipeline"),
+      projectId: z.null(),
+      params: z.object({
+        /** The day the pipeline is read as on. */
+        asOn: z.iso.date(),
+        /** The Stage on that day. */
+        stage: z.enum(STAGES).optional(),
+        /** The assigned Marketing Person (a Team Member id). */
+        memberId: z.uuid().optional(),
+      }),
+    }),
   ]);
 
 export type RequestConstructionReportingReportRequestModel = z.infer<
@@ -368,6 +406,11 @@ export const ConstructionReportingReportJobResponseModel = z.object({
     funnelStageId: z.string().nullable().optional(),
     lostReasonId: z.string().nullable().optional(),
     assigneeMemberId: z.string().nullable().optional(),
+    /** The Marketing reports' filters. */
+    memberId: z.string().nullable().optional(),
+    prospectCompanyId: z.string().nullable().optional(),
+    purpose: z.string().nullable().optional(),
+    stage: z.string().nullable().optional(),
     /** The Projects the requester chose for a central report. */
     projectIds: z.array(z.string()).optional(),
   }),
@@ -527,6 +570,24 @@ function responseParams(
         to: params.to,
         status: params.status,
         wingId: params.wingId,
+      };
+    // Marketing reports.
+    case "marketing_visit_register":
+      return {
+        from: params.from,
+        to: params.to,
+        memberId: params.memberId,
+        prospectCompanyId: params.prospectCompanyId,
+        status: params.status,
+        purpose: params.purpose,
+      };
+    case "marketing_person_summary":
+      return { month: params.month };
+    case "marketing_company_pipeline":
+      return {
+        asOn: params.asOn,
+        stage: params.stage,
+        memberId: params.memberId,
       };
     default:
       return { from: params.from, to: params.to };

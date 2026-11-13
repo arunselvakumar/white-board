@@ -4,6 +4,7 @@ import { createFinanceReportSource } from "@/src/composition/finance-report-sour
 import { createProcurementReportSource } from "@/src/composition/procurement-report-source";
 import { createProgressReportSource } from "@/src/composition/progress-report-source";
 import { messagingEvents } from "@/src/composition/messaging";
+import { createMarketingReportSource } from "@/src/composition/marketing-report-source";
 import { createSalesReportSource } from "@/src/composition/sales-report-source";
 import { enqueue, kickQueue } from "@/src/composition/queue";
 import {
@@ -13,6 +14,7 @@ import {
 import type {
   DprSource,
   FinanceReportSource,
+  MarketingReportSource,
   ProcurementReportSource,
   SalesReportSource,
   TaskProgressSource,
@@ -36,6 +38,7 @@ type ReportJobsOptions = {
   finance?: FinanceReportSource;
   procurement?: ProcurementReportSource;
   sales?: SalesReportSource;
+  marketing?: MarketingReportSource;
   tracking?: TrackingReportSource;
   taskProgress?: TaskProgressSource;
   timeLimitMs?: number;
@@ -51,6 +54,8 @@ function reportQueueHandlerFor(options: ReportJobsOptions): QueueHandler {
     procurement: options.procurement ?? createProcurementReportSource(),
     // The sales reports (CM-1008).
     sales: options.sales ?? createSalesReportSource(),
+    // The Marketing reports (ADR CM-0040 §13).
+    marketing: options.marketing ?? createMarketingReportSource(),
     tracking: {
       source: options.tracking ?? createTrackingReportSource(),
       taskProgress: options.taskProgress ?? createTaskProgressSource(),

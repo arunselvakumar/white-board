@@ -62,6 +62,9 @@ describe("the report catalogue (ADR CM-0021 §2)", () => {
     expect([...CENTRAL_ONLY_KINDS].sort()).toEqual([
       "account_ledger",
       "labour_attendance_central",
+      "marketing_company_pipeline",
+      "marketing_person_summary",
+      "marketing_visit_register",
       "tds_194c",
     ]);
   });
@@ -149,7 +152,42 @@ describe("the report catalogue (ADR CM-0021 §2)", () => {
       ["account_ledger", "central_payment"],
       ["tds_194c", "central_payment"],
       ["due_payments", "central_payment"],
+      ["marketing_visit_register", "marketing"],
+      ["marketing_person_summary", "marketing"],
+      ["marketing_company_pipeline", "marketing"],
     ]);
+  });
+
+  it("puts the Marketing reports on Marketing → Reports, gated on Visits Report (ADR CM-0040 §13)", () => {
+    const marketing = REPORT_CATALOGUE.filter(
+      (entry) => entry.group === "marketing",
+    );
+    expect(marketing.map((entry) => [entry.kind, entry.period])).toEqual([
+      ["marketing_visit_register", "range"],
+      ["marketing_person_summary", "month"],
+      ["marketing_company_pipeline", "as_on"],
+    ]);
+    for (const entry of marketing) {
+      expect(entry.scopes, entry.kind).toEqual(["central"]);
+      expect([entry.menu, entry.request, entry.download]).toEqual([
+        "marketing.visits",
+        "report",
+        "report",
+      ]);
+      expect(entry.formats, entry.kind).toEqual(["xlsx", "pdf"]);
+      // Marketing has no Financial: the approximate value prints for all.
+      expect(printsAmounts(entry.kind), entry.kind).toBe(false);
+    }
+    expect(
+      catalogueEntry("marketing_visit_register").filters.map(
+        (filter) => filter.key,
+      ),
+    ).toEqual(["visited_by", "prospect_company", "status", "visit_purpose"]);
+    expect(
+      catalogueEntry("marketing_company_pipeline").filters.map(
+        (filter) => filter.key,
+      ),
+    ).toEqual(["prospect_stage", "assigned_to"]);
   });
 
   it("gives each new kind its filters, the Store and Projects central only", () => {

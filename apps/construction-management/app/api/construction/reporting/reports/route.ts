@@ -13,6 +13,7 @@ import {
   isReportAvailable,
   printsAmounts,
   REPORT_KINDS,
+  type MarketingReportScopes,
   type ReportKind,
   type ReportOwnScope,
   type ReportParams,
@@ -32,6 +33,7 @@ import {
   reports,
   requireReportSession,
   inquiryOwnScope,
+  marketingScopes,
   trackingOwnScope,
 } from "./handlers";
 import {
@@ -71,6 +73,7 @@ function paramsOf(
   scope: Scope,
   pettyCashAccounts: string[] | null,
   own: ReportOwnScope | null,
+  marketing: MarketingReportScopes,
 ): ReportParams {
   const { projectIds } = scope;
   const places = {
@@ -242,6 +245,28 @@ function paramsOf(
         status: model.params.status ?? null,
         wingId: model.params.wingId ?? null,
       };
+    // Marketing reports.
+    case "marketing_visit_register":
+      return {
+        kind: model.kind,
+        from: model.params.from,
+        to: model.params.to,
+        memberId: model.params.memberId ?? null,
+        prospectCompanyId: model.params.prospectCompanyId ?? null,
+        status: model.params.status ?? null,
+        purpose: model.params.purpose ?? null,
+        scopes: marketing,
+      };
+    case "marketing_person_summary":
+      return { kind: model.kind, month: model.params.month, scopes: marketing };
+    case "marketing_company_pipeline":
+      return {
+        kind: model.kind,
+        asOn: model.params.asOn,
+        stage: model.params.stage ?? null,
+        memberId: model.params.memberId ?? null,
+        scopes: marketing,
+      };
   }
 }
 
@@ -411,11 +436,13 @@ export async function POST(request: Request): Promise<Response> {
         : model.kind === "inquiry_report"
           ? await inquiryOwnScope(session, model.projectId)
           : null;
+    // Marketing reports: the requester's scope on each record's menu.
+    const marketing = await marketingScopes(session, model.kind);
     const job = await reports.request({
       workspaceId: session.workspaceId,
       userId: session.userId,
       projectId: model.projectId,
-      params: paramsOf(model, scope, pettyCashAccounts, own),
+      params: paramsOf(model, scope, pettyCashAccounts, own, marketing),
       includesMoney: financial && printsAmounts(model.kind),
     });
     return Response.json(toReportJobResponse(job), {

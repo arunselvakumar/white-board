@@ -54,6 +54,10 @@ export const ListConstructionReportingFilterOptionsResponseModel = z.object({
   lostReasons: z.array(Choice),
   /** Active Team Members on the Project; `id` is a Team Member id. */
   assignees: z.array(Choice),
+  /** Central: Marketing People, inactive ones too; Team Member ids. */
+  marketingPeople: z.array(Choice),
+  /** Central: the live Prospect Companies you may see. */
+  prospectCompanies: z.array(Choice),
 });
 
 export type ListConstructionReportingFilterOptionsResponseModel = z.infer<

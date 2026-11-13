@@ -8,6 +8,8 @@ import {
   requireCompanySession,
 } from "@/app/api/_lib/require-session";
 import type {
+  MarketingRecordScope,
+  MarketingReportScopes,
   ReportKind,
   ReportJob,
   ReportOwnScope,
@@ -160,6 +162,64 @@ export async function inquiryOwnScope(
     select: { id: true },
   });
   return { userId: session.userId, memberId: member?.id ?? null };
+}
+
+const MARKETING_MENUS = {
+  visits: "marketing.visits",
+  companies: "marketing.companies",
+  followUps: "marketing.follow_ups",
+} as const;
+
+const EVERYTHING: MarketingReportScopes = {
+  visits: "all",
+  companies: "all",
+  followUps: "all",
+};
+
+/**
+ * What a Marketing report reads of each record (ADR CM-0040 §5, §13):
+ * every record with View all on its menu (the Owner holds it), else the
+ * requester's own (created by them, or theirs by assignment), or nothing
+ * without Read, fixed with the job. Every other kind reads no marketing
+ * record.
+ */
+export async function marketingScopes(
+  session: AccessSession,
+  kind: ReportKind,
+): Promise<MarketingReportScopes> {
+  if (!kind.startsWith("marketing_")) return EVERYTHING;
+  let self: Promise<ReportOwnScope> | null = null;
+  const own = (): Promise<ReportOwnScope> => {
+    self ??= (async () => {
+      const memberId =
+        session.access.memberId ??
+        (
+          await prisma.constructionOrganizationTeamMember.findFirst({
+            where: {
+              workspaceId: session.workspaceId,
+              userId: session.userId,
+              deletedAt: null,
+            },
+            select: { id: true },
+          })
+        )?.id ??
+        null;
+      return { userId: session.userId, memberId };
+    })();
+    return self;
+  };
+  const scopeOf = async (
+    menu: (typeof MARKETING_MENUS)[keyof typeof MARKETING_MENUS],
+  ): Promise<MarketingRecordScope> => {
+    if (!can(session.access, menu, "read")) return "none";
+    if (can(session.access, menu, "view_all")) return "all";
+    return own();
+  };
+  return {
+    visits: await scopeOf(MARKETING_MENUS.visits),
+    companies: await scopeOf(MARKETING_MENUS.companies),
+    followUps: await scopeOf(MARKETING_MENUS.followUps),
+  };
 }
 
 /**

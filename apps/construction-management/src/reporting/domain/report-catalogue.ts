@@ -29,6 +29,8 @@ export const REPORT_GROUPS = [
   "procurement",
   // Sales (CM-1008, ADR CM-0022 §11).
   "sales",
+  // Marketing (ADR CM-0040 §13): Company-level, on Marketing → Reports.
+  "marketing",
   "progress",
 ] as const;
 
@@ -69,7 +71,13 @@ export type ReportFilterKey =
   | "lead_source"
   | "funnel_stage"
   | "lost_reason"
-  | "assignee";
+  | "assignee"
+  // The Marketing reports' filters (ADR CM-0040 §13).
+  | "visited_by"
+  | "prospect_company"
+  | "visit_purpose"
+  | "prospect_stage"
+  | "assigned_to";
 
 export type ReportFilter = {
   key: ReportFilterKey;
@@ -89,11 +97,13 @@ export type ReportMoney = "always" | "with_financial" | "never";
 /**
  * A module that hosts a central report of its own besides Central
  * Reports (CM-903): Central Payment (the Ledger, TDS 194C, Due Payments)
- * and Masters → Equipments (maintenance and transfers). Their central
- * requests keep that module's gate; every other central request also
- * needs Central Reports Read (ADR CM-0021 §5).
+ * and Masters → Equipments (maintenance and transfers), and Marketing →
+ * Reports (ADR CM-0040 §13). Their central requests keep that module's
+ * gate; every other central request also needs Central Reports Read (ADR
+ * CM-0021 §5).
  */
-export type ReportCentralHost = "central_payment" | "masters_equipments";
+export type ReportCentralHost =
+  "central_payment" | "masters_equipments" | "marketing";
 
 type Wording = {
   description: string;
@@ -751,6 +761,72 @@ const DEFINITIONS = {
     formats: TABLE,
     period: "range",
     filters: [{ key: "status" }, { key: "wing" }],
+    progressReport: false,
+    available: true,
+  },
+  // Marketing reports (ADR CM-0040 §13): Company-level, hosted by
+  // Marketing → Reports, gated on Visits Report. Rows follow the
+  // requester's View all on each record's menu (§5). The approximate
+  // value prints for everyone who reads the Visit (open question 3):
+  // Marketing has no Financial, so these never need it.
+  marketing_visit_register: {
+    title: "Visit register",
+    description:
+      "Every Visit in the period, newest first: number, date and time, Prospect Company, city, Contacts met, visited by, purpose, status, discussion and outcome, interest, approximate value, next Follow-up and whether it was checked in.",
+    needs:
+      "Needs Visits Report; without Visits View all, the Visits you created or went on.",
+    group: "marketing",
+    scopes: CENTRAL,
+    centralHost: "marketing",
+    menu: "marketing.visits",
+    request: "report",
+    download: "report",
+    money: "never",
+    formats: TABLE,
+    period: "range",
+    filters: [
+      { key: "visited_by" },
+      { key: "prospect_company" },
+      { key: "status" },
+      { key: "visit_purpose" },
+    ],
+    progressReport: false,
+    available: true,
+  },
+  marketing_person_summary: {
+    title: "Marketing Person summary",
+    description:
+      "Each Marketing Person's month: visit target, Visits completed and missed, new Prospect Companies, Follow-ups done and overdue, and companies won.",
+    needs: "Needs Visits Report; without Visits View all, your own row.",
+    group: "marketing",
+    scopes: CENTRAL,
+    centralHost: "marketing",
+    menu: "marketing.visits",
+    request: "report",
+    download: "report",
+    money: "never",
+    formats: TABLE,
+    period: "month",
+    filters: [],
+    progressReport: false,
+    available: true,
+  },
+  marketing_company_pipeline: {
+    title: "Company pipeline",
+    description:
+      "Prospect Companies as on a day: Stage, assigned person, city, last Visit, next open Follow-up and the approximate value of the latest Visit that has one.",
+    needs:
+      "Needs Visits Report; without Companies View all, the companies you created or are assigned.",
+    group: "marketing",
+    scopes: CENTRAL,
+    centralHost: "marketing",
+    menu: "marketing.visits",
+    request: "report",
+    download: "report",
+    money: "never",
+    formats: TABLE,
+    period: "as_on",
+    filters: [{ key: "prospect_stage" }, { key: "assigned_to" }],
     progressReport: false,
     available: true,
   },

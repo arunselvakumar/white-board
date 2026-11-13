@@ -47,6 +47,10 @@ export const REPORT_KINDS = [
   // Sales reports (CM-1008).
   "inquiry_report",
   "booking_report",
+  // Marketing reports (ADR CM-0040 §13).
+  "marketing_visit_register",
+  "marketing_person_summary",
+  "marketing_company_pipeline",
 ] as const;
 
 export type ReportKind = (typeof REPORT_KINDS)[number];
@@ -108,6 +112,47 @@ export type InterestTypeFilter = "hot" | "warm" | "cold";
 /** A booking's status as the Booking Report filters it (CM-0022 §7, §11). */
 export type BookingStatusFilter =
   "on_hold" | "hold_expired" | "booked" | "cancelled";
+
+/**
+ * A Visit's status as the Visit register filters it (ADR CM-0040 §7):
+ * Missed is a Planned Visit whose time passed without a check-in.
+ */
+export type VisitStatusFilter =
+  "planned" | "missed" | "completed" | "cancelled";
+
+export type VisitPurposeFilter =
+  | "cold_call"
+  | "introduction"
+  | "requirement_discussion"
+  | "quotation"
+  | "negotiation"
+  | "relationship"
+  | "payment_follow_up"
+  | "other";
+
+/** A Prospect Company's Stage as the Company pipeline filters it. */
+export type ProspectStageFilter =
+  | "new"
+  | "contacted"
+  | "requirement_received"
+  | "quotation_sent"
+  | "negotiation"
+  | "won"
+  | "lost";
+
+/**
+ * Which records of one Marketing menu a report reads (ADR CM-0040 §5),
+ * fixed with the job: `all` with View all, the requester's own ones
+ * (created by them or theirs by assignment), or `none` without Read.
+ */
+export type MarketingRecordScope = "all" | "none" | ReportOwnScope;
+
+/** The requester's scope on each Marketing record a report reads. */
+export type MarketingReportScopes = {
+  visits: MarketingRecordScope;
+  companies: MarketingRecordScope;
+  followUps: MarketingRecordScope;
+};
 
 /** A procurement document's approval status (Purchase Requests and Orders). */
 export type ProcurementApprovalFilter = "pending" | "approved" | "rejected";
@@ -363,6 +408,36 @@ export type ReportParams =
       /** Hold expired is On Hold past Hold until on the Company's today. */
       status: BookingStatusFilter | null;
       wingId: string | null;
+    }
+  // Marketing reports (ADR CM-0040 §13): Company-level, no Project.
+  | {
+      kind: "marketing_visit_register";
+      /** Visits on these days in the Company time zone. */
+      from: string;
+      to: string;
+      /** A visitor on the Visit (a Team Member id). */
+      memberId: string | null;
+      prospectCompanyId: string | null;
+      /** Missed as on the moment the report is made. */
+      status: VisitStatusFilter | null;
+      purpose: VisitPurposeFilter | null;
+      scopes: MarketingReportScopes;
+    }
+  | {
+      kind: "marketing_person_summary";
+      /** `YYYY-MM`, in the Company time zone. */
+      month: string;
+      /** Without Visits View all, only the requester's own row. */
+      scopes: MarketingReportScopes;
+    }
+  | {
+      kind: "marketing_company_pipeline";
+      /** The day the pipeline is read as on, `YYYY-MM-DD`. */
+      asOn: string;
+      stage: ProspectStageFilter | null;
+      /** The assigned Marketing Person (a Team Member id). */
+      memberId: string | null;
+      scopes: MarketingReportScopes;
     };
 
 /** `expired`: retention deleted its files after 30 days (CM-0021 §3). */
@@ -436,6 +511,15 @@ export function checkReportParams(params: ReportParams): ReportParams {
     case "inquiry_report":
     case "booking_report":
       return { ...params, ...checkRange(params) };
+    // Marketing reports (ADR CM-0040 §13).
+    case "marketing_visit_register":
+      return { ...params, ...checkRange(params) };
+    case "marketing_person_summary":
+      monthRange(params.month);
+      return params;
+    case "marketing_company_pipeline":
+      assertCalendarDate(params.asOn, "REPORT_DATE_INVALID");
+      return params;
     case "due_payments":
       assertCalendarDate(params.asOn, "REPORT_DATE_INVALID");
       return params;
@@ -504,12 +588,14 @@ export function reportFileName(params: ReportParams): string {
   switch (params.kind) {
     case "labour_month":
     case "muster_roll":
+    case "marketing_person_summary":
       return `${slug}-${params.month}`;
     case "daily_progress_report":
       return `${params.number.replace(/[^A-Za-z0-9._-]+/g, "-")}-${params.date}`;
     case "tds_194c":
       return `${slug}-fy-${params.fy}`;
     case "due_payments":
+    case "marketing_company_pipeline":
       return `${slug}-${params.asOn}`;
     default:
       return params.from === params.to

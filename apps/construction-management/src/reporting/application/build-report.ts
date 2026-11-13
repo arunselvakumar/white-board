@@ -35,9 +35,15 @@ import {
 import { buildCentralLabourAttendanceReport } from "../domain/central-labour-attendance-report";
 // Sales reports (CM-1008).
 import { salesReportBody, SALES_TABLE_KINDS } from "./build-sales-report";
+// Marketing reports (ADR CM-0040 §13).
+import {
+  MARKETING_TABLE_KINDS,
+  marketingReportBody,
+} from "./build-marketing-report";
 import type {
   FinanceReportSource,
   HeaderFacts,
+  MarketingReportSource,
   ProcurementReportSource,
   ReportSource,
   SalesReportSource,
@@ -50,6 +56,7 @@ export function periodLabel(job: Pick<ReportJob, "params">): string {
   switch (params.kind) {
     case "labour_month":
     case "muster_roll":
+    case "marketing_person_summary":
       return monthLabel(params.month);
     case "daily_progress_report":
       return rangeLabel({ from: params.date, to: params.date });
@@ -59,6 +66,7 @@ export function periodLabel(job: Pick<ReportJob, "params">): string {
     case "tds_194c":
       return `FY ${params.fy} (${rangeLabel(financialYearRange(params.fy))})`;
     case "due_payments":
+    case "marketing_company_pipeline":
       return `As on ${rangeLabel({ from: params.asOn, to: params.asOn })}`;
     default:
       return rangeLabel(params);
@@ -73,6 +81,8 @@ async function bodyFor(
   tracking: TrackingReportSource | undefined,
   procurement: ProcurementReportSource | undefined,
   sales: SalesReportSource | undefined,
+  marketing: MarketingReportSource | undefined,
+  now: Date,
 ): Promise<ReportBody> {
   const params = job.params;
   const projectId = job.projectId ?? "";
@@ -173,6 +183,11 @@ async function bodyFor(
     case "inquiry_report":
     case "booking_report":
       return salesReportBody(job, params, sales, today);
+    // Marketing reports (ADR CM-0040 §13).
+    case "marketing_visit_register":
+    case "marketing_person_summary":
+    case "marketing_company_pipeline":
+      return marketingReportBody(job, params, marketing, now);
     case "daily_progress_report":
     case "task_progress_report":
       // PDFs of their own, not table reports (`createReportExecutor`).
@@ -202,6 +217,8 @@ export async function buildReportDocument(
   procurement?: ProcurementReportSource,
   /** The sales reports' read model (CM-1008). */
   sales?: SalesReportSource,
+  /** The Marketing reports' read model (ADR CM-0040 §13). */
+  marketing?: MarketingReportSource,
 ): Promise<ReportDocument> {
   const facts: HeaderFacts = await source.header(
     job.workspaceId,
@@ -216,6 +233,8 @@ export async function buildReportDocument(
     tracking,
     procurement,
     sales,
+    marketing,
+    now,
   );
   return {
     header: {
@@ -236,7 +255,8 @@ export async function buildReportDocument(
       FINANCE_A3_KINDS.includes(job.kind) ||
       TRACKING_A3_KINDS.includes(job.kind) ||
       PROCUREMENT_A3_KINDS.includes(job.kind) ||
-      SALES_TABLE_KINDS.includes(job.kind)
+      SALES_TABLE_KINDS.includes(job.kind) ||
+      job.kind === "marketing_visit_register"
         ? "a3"
         : "a4",
     fileName: reportFileName(job.params),
@@ -246,6 +266,8 @@ export async function buildReportDocument(
     ...(TRACKING_TABLE_KINDS.includes(job.kind) ||
     PROCUREMENT_A3_KINDS.includes(job.kind) ||
     SALES_TABLE_KINDS.includes(job.kind) ||
+    // And the Marketing reports: companies, Contacts and notes.
+    MARKETING_TABLE_KINDS.includes(job.kind) ||
     job.kind === "labour_attendance_central"
       ? { fonts: "noto" as const }
       : {}),
