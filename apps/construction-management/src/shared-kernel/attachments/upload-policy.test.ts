@@ -9,8 +9,10 @@ import { isProgramName } from "./program-names";
 import {
   MULTIPART_FROM_BYTES,
   acceptedExtensions,
+  assertKindSizeAccepted,
   assertNameAccepted,
   assertSizeAccepted,
+  declaredKind,
   type UploadAccept,
   type UploadPolicy,
 } from "./upload-policy";
@@ -104,6 +106,35 @@ describe("upload policies (CM-407)", () => {
         "Programs cannot be kept on a Project.",
       );
     }
+  });
+});
+
+describe("a size limit per kind (ADR CM-0040 §9)", () => {
+  const visit: UploadPolicy = {
+    ...policy("pdf_or_image", 25 * MB),
+    maxBytesByKind: { image: 10 * MB, pdf: 25 * MB },
+  };
+
+  it("holds images to 10 MB and PDFs to 25 MB", () => {
+    expect(() => {
+      assertKindSizeAccepted(visit, "image", 10 * MB);
+    }).not.toThrow();
+    expect(() => {
+      assertKindSizeAccepted(visit, "image", 10 * MB + 1);
+    }).toThrow(expect.objectContaining({ code: "FILE_TOO_LARGE" }));
+    expect(() => {
+      assertKindSizeAccepted(visit, "pdf", 20 * MB);
+    }).not.toThrow();
+    // A policy without kinds, or another kind, only has its largest.
+    expect(() => {
+      assertKindSizeAccepted(policy("pdf_or_image"), "image", 20 * MB);
+    }).not.toThrow();
+  });
+
+  it("reads the kind a name declares", () => {
+    expect(declaredKind("card.JPG")).toBe("image");
+    expect(declaredKind("brochure.pdf")).toBe("pdf");
+    expect(declaredKind("plan.dwg")).toBeNull();
   });
 });
 

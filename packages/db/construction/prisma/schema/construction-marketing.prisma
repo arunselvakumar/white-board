@@ -236,6 +236,7 @@ model ConstructionMarketingVisit {
   visitors        ConstructionMarketingVisitVisitor[]
   contacts        ConstructionMarketingVisitContact[]
   notes           ConstructionMarketingVisitNote[]
+  files           ConstructionMarketingVisitFile[]
 
   @@unique([workspaceId, number])
   @@index([workspaceId, visitAt])
@@ -287,5 +288,34 @@ model ConstructionMarketingVisitNote {
 
   @@index([workspaceId, visitId, createdAt])
   @@map("visit_notes")
+  @@schema("construction_marketing")
+}
+
+/// A photo or file on a Visit (ADR CM-0040 §9): an image, or a PDF such as
+/// a visiting card scan, a brochure or a requirement sheet. Uploaded
+/// through the attachments service; never in a Project's Gallery.
+model ConstructionMarketingVisitFile {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  visitId     String    @map("visit_id") @db.Uuid
+  /// `companies/<workspaceId>/marketing_visit/<visitId>/<id>.<ext>`.
+  fileKey     String    @unique @map("file_key")
+  fileName    String    @map("file_name")
+  /// The type it is served as, from the sniffed content.
+  contentType String    @map("content_type")
+  bytes       Int
+  /// The browser-made WebP of an image.
+  thumbKey    String?   @map("thumb_key")
+  caption     String?
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  visit ConstructionMarketingVisit @relation(fields: [visitId], references: [id])
+
+  @@index([workspaceId, visitId, createdAt])
+  @@map("visit_files")
   @@schema("construction_marketing")
 }

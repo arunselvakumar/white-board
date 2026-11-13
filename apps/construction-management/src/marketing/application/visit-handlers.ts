@@ -8,11 +8,8 @@ import {
 import type { AuditRecord } from "@/src/shared-kernel/audit-reader";
 import { recordAudit } from "@/src/shared-kernel/audit";
 import { addDays, type CalendarDate } from "@/src/shared-kernel/calendar-date";
-import {
-  conflict,
-  notFound,
-  type DomainError,
-} from "@/src/shared-kernel/domain-error";
+import { conflict, type DomainError } from "@/src/shared-kernel/domain-error";
+import type { ObjectStorage } from "@/src/shared-kernel/files";
 import { newId } from "@/src/shared-kernel/ids";
 import type { ListCursor } from "@/src/shared-kernel/list-cursor";
 import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
@@ -44,6 +41,7 @@ import {
   shownStatus,
   visitDetails,
   visitLocked,
+  visitNotFound,
   visitorIds,
   type VisitDetails,
   type VisitDetailsInput,
@@ -55,6 +53,7 @@ import type {
   MarketingTx,
   ProspectCompanyStore,
   StoredVisit,
+  VisitFileStore,
   VisitRow,
   VisitStore,
 } from "./ports";
@@ -76,6 +75,10 @@ export type VisitDeps = {
   db: MarketingDb;
   store: VisitStore;
   companyStore: ProspectCompanyStore;
+  /** Its photos and files (ADR CM-0040 §9). */
+  fileStore: VisitFileStore;
+  /** Where those files are; a deleted Visit's objects go after the commit. */
+  storage: ObjectStorage;
   /** Inline company and Contacts, and New → Contacted. */
   companies: ProspectCompanyHandlers;
   team: MarketingTeam;
@@ -125,6 +128,8 @@ export type VisitActions = {
   canCancel: boolean;
   canReschedule: boolean;
   canAddNote: boolean;
+  /** Add photos and files; allowed past the lock, like notes. */
+  canAddFiles: boolean;
   canDelete: boolean;
   /** A Completed Visit past its 7 days for this viewer. */
   locked: boolean;
@@ -151,7 +156,9 @@ export type VisitHistoryItem = {
     | "completed"
     | "rescheduled"
     | "cancelled"
-    | "note_added";
+    | "note_added"
+    | "file_added"
+    | "file_removed";
   at: Date;
   byName: string;
   /** Rescheduled: the old and new times. */
@@ -159,6 +166,24 @@ export type VisitHistoryItem = {
   to: Date | null;
   /** Cancelled: the reason. */
   reason: string | null;
+  /** A file added or removed: its name. */
+  fileName: string | null;
+};
+
+/** A photo or file on the Visit, oldest first. */
+export type VisitFileSummary = {
+  id: string;
+  fileName: string;
+  contentType: string;
+  bytes: number;
+  /** A PDF or an image, which the browser shows. */
+  viewable: boolean;
+  hasThumbnail: boolean;
+  caption: string | null;
+  createdByName: string;
+  createdAt: Date;
+  /** Its uploader, or View all, with Visits update: caption and remove. */
+  canChange: boolean;
 };
 
 export type VisitReadModel = VisitDetails & {
@@ -184,6 +209,7 @@ export type VisitReadModel = VisitDetails & {
     mobile: string | null;
   }[];
   notes: { id: string; text: string; at: Date; byName: string }[];
+  files: VisitFileSummary[];
   history: VisitHistoryItem[];
   createdByName: string;
   createdAt: Date;
@@ -220,11 +246,9 @@ const HISTORY_ACTIONS = new Set([
   "visit.rescheduled",
   "visit.cancelled",
   "visit.note_added",
+  "visit.file_added",
+  "visit.file_removed",
 ]);
-
-function visitNotFound() {
-  return notFound("VISIT_NOT_FOUND", "This Visit was not found.");
-}
 
 function visitNumberInUse(): DomainError {
   return conflict(
@@ -264,6 +288,27 @@ function visitChanged() {
 }
 
 const same = (a: Date, b: Date) => a.getTime() === b.getTime();
+
+const VIEWABLE = new Set([
+  "application/pdf",
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+]);
+
+/** The file named by a `visit.file_added` / `.file_removed` event. */
+function fileNameOf(event: AuditRecord): string | null {
+  if (
+    event.action !== "visit.file_added" &&
+    event.action !== "visit.file_removed"
+  )
+    return null;
+  const payload = (
+    event.action === "visit.file_added" ? event.after : event.before
+  ) as Record<string, unknown> | null;
+  const name = payload?.["fileName"];
+  return typeof name === "string" ? name : null;
+}
 
 function dateOf(value: unknown): Date | null {
   return typeof value === "string" ? new Date(value) : null;
@@ -349,6 +394,7 @@ export class VisitHandlers {
       canCancel: update && planned,
       canReschedule: update && planned,
       canAddNote: update,
+      canAddFiles: update,
       canDelete: can(access, VISITS_MENU, "delete") && !locked,
       locked,
     };
@@ -469,11 +515,12 @@ export class VisitHandlers {
     const { db, store, companyStore, team } = this.deps;
     const visit = await this.find(access, id);
     const ws = access.workspaceId;
-    const [company, contacts, notes, events, timeZone, companyScope] =
+    const [company, contacts, notes, files, events, timeZone, companyScope] =
       await Promise.all([
         companyStore.find(db, ws, visit.prospectCompanyId),
         companyStore.contacts(db, ws, visit.prospectCompanyId),
         store.notes(db, ws, [visit.id]),
+        this.deps.fileStore.files(ws, [visit.id]),
         this.deps.history(ws, visit.id),
         this.deps.timeZone(ws),
         this.companyScope(access),
@@ -487,6 +534,7 @@ export class VisitHandlers {
       team.userNames(ws, [
         visit.createdBy,
         ...notes.map((note) => note.createdBy),
+        ...files.map((file) => file.createdBy),
         ...history.map((event) => event.actorUserId),
       ]),
     ]);
@@ -542,6 +590,21 @@ export class VisitHandlers {
         jobTitle: contact.jobTitle,
         mobile: contact.mobile,
       })),
+      files: files.map((file) => ({
+        id: file.id,
+        fileName: file.fileName,
+        contentType: file.contentType,
+        bytes: file.bytes,
+        viewable: VIEWABLE.has(file.contentType),
+        hasThumbnail: file.thumbKey != null,
+        caption: file.caption,
+        createdByName: users.get(file.createdBy) ?? "Unknown",
+        createdAt: file.createdAt,
+        canChange:
+          can(access, VISITS_MENU, "update") &&
+          (file.createdBy === access.userId ||
+            can(access, VISITS_MENU, "view_all")),
+      })),
       notes: notes.map((note) => ({
         id: note.id,
         text: note.text,
@@ -572,6 +635,7 @@ export class VisitHandlers {
               typeof after["cancelReason"] === "string"
                 ? after["cancelReason"]
                 : null,
+            fileName: fileNameOf(event),
           };
         })
         .reverse(),
@@ -1083,7 +1147,22 @@ export class VisitHandlers {
     });
   }
 
-  /** A tombstone; a Completed Visit keeps its lock and back-dated limit. */
+  /** Best effort: a leftover object costs storage, and the orphan job takes it. */
+  private async discard(keys: readonly string[]): Promise<void> {
+    for (const key of keys) {
+      try {
+        await this.deps.storage.delete(key);
+      } catch (error) {
+        console.error(`Could not delete ${key} from storage`, error);
+      }
+    }
+  }
+
+  /**
+   * A tombstone; a Completed Visit keeps its lock and back-dated limit. Its
+   * live files are tombstoned in the same transaction and stop counting
+   * towards storage; their objects are deleted after the commit.
+   */
   async delete(
     access: MemberAccess,
     id: string,
@@ -1094,7 +1173,7 @@ export class VisitHandlers {
     const ws = access.workspaceId;
     const timeZone = await this.deps.timeZone(ws);
     const check = await this.deps.backdated(access);
-    await this.deps.db.$transaction(async (tx) => {
+    const removed = await this.deps.db.$transaction(async (tx) => {
       const current = await this.visible(access, (w) =>
         this.deps.store.lock(tx, w, id),
       );
@@ -1103,16 +1182,32 @@ export class VisitHandlers {
       if (current.status === "completed")
         check("edit", this.deps.dateIn(current.visitAt, timeZone));
       await this.deps.store.remove(tx, id, access.userId, now);
+      const files = await this.deps.fileStore.removeFilesOfVisit(tx, {
+        workspaceId: ws,
+        visitId: id,
+        by: access.userId,
+        now,
+      });
       await recordAudit(tx, {
         workspaceId: ws,
         actorUserId: access.userId,
         action: "visit.deleted",
         entityType: "marketing_visit",
         entityId: id,
-        before: { number: current.number, ...snapshot(current) },
+        before: {
+          number: current.number,
+          ...snapshot(current),
+          fileIds: files.map((file) => file.id),
+        },
         occurredAt: now,
       });
+      return files;
     });
+    await this.discard(
+      removed.flatMap((file) =>
+        file.thumbKey == null ? [file.fileKey] : [file.fileKey, file.thumbKey],
+      ),
+    );
   }
 }
 

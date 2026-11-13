@@ -21,6 +21,20 @@ export type UploadAccept = (typeof UPLOAD_ACCEPTS)[number];
 
 const MB = 1024 * 1024;
 
+/** The kinds a policy may give a size limit of their own. */
+export type SizedKind = "pdf" | "image";
+
+const IMAGE_EXTENSIONS = ["png", "jpg", "jpeg", "webp"];
+
+/** The kind a name says a file is, for the limit checked before upload. */
+export function declaredKind(fileName: string): SizedKind | null {
+  const extension = fileExtension(fileName);
+  if (extension === "pdf") return "pdf";
+  return extension != null && IMAGE_EXTENSIONS.includes(extension)
+    ? "image"
+    : null;
+}
+
 /** Files at most this size go up in one request; larger ones in parts (CM-0010). */
 export const MULTIPART_FROM_BYTES = 8 * MB;
 
@@ -34,6 +48,12 @@ export type UploadPolicy = {
   purpose: string;
   accept: UploadAccept;
   maxBytes: number;
+  /**
+   * A lower limit for one kind of file, e.g. images at 10 MB beside PDFs
+   * at 25 MB (ADR CM-0040 §9): checked from the name at start and from the
+   * content at complete. `maxBytes` stays the largest of any kind.
+   */
+  maxBytesByKind?: Partial<Record<SizedKind, number>>;
   multipartFromBytes: number;
   /** What a refused program is told, in the owner's words. */
   programMessage?: string;
@@ -97,4 +117,18 @@ export function assertSizeAccepted(policy: UploadPolicy, bytes: number): void {
   if (bytes === 0)
     throw new DomainError("FILE_EMPTY", "Choose a file to upload.");
   if (bytes > policy.maxBytes) throw fileTooLarge(policy.maxBytes);
+}
+
+/**
+ * Refuses a file over its kind's own limit (`maxBytesByKind`): before
+ * upload with the kind its name declares, at complete with the sniffed one.
+ */
+export function assertKindSizeAccepted(
+  policy: UploadPolicy,
+  kind: string | null,
+  bytes: number,
+): void {
+  if (kind !== "pdf" && kind !== "image") return;
+  const limit = policy.maxBytesByKind?.[kind];
+  if (limit != null && bytes > limit) throw fileTooLarge(limit);
 }

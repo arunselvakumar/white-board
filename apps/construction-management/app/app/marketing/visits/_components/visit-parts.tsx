@@ -10,6 +10,7 @@ import {
   type Interest,
   type VisitShownStatus,
 } from "@/src/marketing/domain/marketing-terms";
+import { visitFileWord } from "@/src/queries/marketing-visit-files";
 import type { VisitHistoryItem } from "@/src/queries/marketing-visits";
 import { zoneInstant, zoneParts } from "@/src/shared-kernel/zone-time";
 
@@ -105,7 +106,8 @@ export function monthWords(month: string): string {
 
 /**
  * One History line: "Planned by Ravi", "Rescheduled from 12 Nov, 10:00 am
- * to 14 Nov, 11:30 am", "Cancelled · Client not available".
+ * to 14 Nov, 11:30 am", "Cancelled · Client not available", "Photo added ·
+ * card.jpg".
  */
 export function historyWords(
   item: VisitHistoryItem,
@@ -127,5 +129,11 @@ export function historyWords(
       return item.reason == null ? "Cancelled" : `Cancelled · ${item.reason}`;
     case "note_added":
       return "Note added";
+    case "file_added":
+    case "file_removed": {
+      const name = item.fileName ?? "a file";
+      const done = item.action === "file_added" ? "added" : "removed";
+      return `${visitFileWord(name)} ${done} · ${name}`;
+    }
   }
 }

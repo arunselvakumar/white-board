@@ -48,6 +48,7 @@ import {
   type ProspectCompanyContact,
   type ProspectCompanyTimelineItem,
 } from "@/src/queries/marketing-companies";
+import { visitFileWord } from "@/src/queries/marketing-visit-files";
 import { visitPath } from "@/src/queries/marketing-visits";
 import { gstStateName } from "@/src/shared-kernel/gst-states";
 
@@ -488,6 +489,27 @@ function TimelineText({
           </p>
         </>
       );
+    case "file":
+      return (
+        <>
+          <p className="break-words">
+            <span className="font-medium">
+              {`${visitFileWord(item.fileName)} on `}
+              <Link
+                href={visitPath(item.visitId)}
+                className="underline-offset-4 hover:underline"
+              >
+                {item.visitNumber}
+              </Link>
+              {`: ${item.fileName}`}
+            </span>
+            {item.caption == null ? "" : ` — ${item.caption}`}
+          </p>
+          <p className="text-muted-foreground">
+            {stageEntryByline(item, timeZone)}
+          </p>
+        </>
+      );
   }
 }
 
@@ -495,9 +517,10 @@ const DOT_CLASSES: Record<ProspectCompanyTimelineItem["kind"], string> = {
   stage: "bg-primary/60",
   visit: "bg-emerald-500/70",
   note: "bg-muted-foreground/50",
+  file: "bg-muted-foreground/50",
 };
 
-/** Stage changes, Visits and their notes, newest first. */
+/** Stage changes, Visits and their notes and files, newest first. */
 function History({
   company,
   timeZone,

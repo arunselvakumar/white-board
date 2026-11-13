@@ -179,6 +179,7 @@ export const Locked: Story = {
           canCancel: false,
           canReschedule: false,
           canAddNote: true,
+          canAddFiles: true,
           canDelete: false,
           locked: true,
         },

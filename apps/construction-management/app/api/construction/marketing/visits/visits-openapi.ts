@@ -27,11 +27,16 @@ import {
   UpdateConstructionMarketingVisitRequestModel,
   VISITS_PATH,
 } from "./visit-models";
+import {
+  marketingVisitFileOpenApiComponents,
+  marketingVisitFileOpenApiOperations,
+} from "./files-openapi";
 
 const ITEM = `${VISITS_PATH}/{id}`;
 
 /** Visit models. */
 export const marketingVisitOpenApiComponents: OpenApiComponents = {
+  ...marketingVisitFileOpenApiComponents,
   CreateConstructionMarketingVisitRequestModel,
   UpdateConstructionMarketingVisitRequestModel,
   CompleteConstructionMarketingVisitRequestModel,
@@ -70,6 +75,7 @@ const write = (
  * (ADR CM-0040 §5).
  */
 export const marketingVisitOpenApiOperations: OpenApiOperation[] = [
+  ...marketingVisitFileOpenApiOperations,
   {
     method: "get",
     path: VISITS_PATH,

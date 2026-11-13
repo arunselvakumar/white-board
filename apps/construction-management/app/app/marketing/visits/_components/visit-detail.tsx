@@ -55,6 +55,7 @@ import {
 } from "@/src/queries/marketing-visits";
 
 import { CancelVisitDialog, RescheduleVisitDialog } from "./visit-dialogs";
+import { VisitFiles } from "./visit-files";
 import {
   historyWords,
   InterestBadge,
@@ -301,9 +302,9 @@ function History({ visit }: { visit: Visit }) {
 type Open = "reschedule" | "cancel" | "delete" | null;
 
 /**
- * One Visit: its company, people and what was discussed, its notes and
- * history, with Edit, Complete, Reschedule, Cancel and Delete as the
- * server's `actions` allow.
+ * One Visit: its company, people and what was discussed, its photos and
+ * files, notes and history, with Edit, Complete, Reschedule, Cancel and
+ * Delete as the server's `actions` allow.
  */
 export function VisitDetail({ id }: { id: string }) {
   const router = useRouter();
@@ -443,6 +444,7 @@ export function VisitDetail({ id }: { id: string }) {
                 )}
               </p>
             </Card>
+            <VisitFiles visit={visit} />
             <Notes visit={visit} />
           </div>
           <History visit={visit} />

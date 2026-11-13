@@ -335,17 +335,31 @@ export const prismaCompanyVisitsReader: CompanyVisitsReader = {
         visitors: { select: { memberId: true }, orderBy: { memberId: "asc" } },
       },
     });
-    const notes = await prismaVisitStore.notes(
-      db,
-      workspaceId,
-      visits.map((visit) => visit.id),
-    );
+    const ids = visits.map((visit) => visit.id);
+    const [notes, files] = await Promise.all([
+      prismaVisitStore.notes(db, workspaceId, ids),
+      ids.length === 0
+        ? Promise.resolve([])
+        : db.constructionMarketingVisitFile.findMany({
+            where: { workspaceId, visitId: { in: ids }, deletedAt: null },
+            orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+            select: {
+              id: true,
+              visitId: true,
+              fileName: true,
+              caption: true,
+              createdAt: true,
+              createdBy: true,
+            },
+          }),
+    ]);
     return {
       visits: visits.map(({ visitors, ...visit }) => ({
         ...visit,
         visitorIds: visitors.map((item) => item.memberId),
       })),
       notes,
+      files,
     };
   },
 
