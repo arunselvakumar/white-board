@@ -45,6 +45,19 @@ import type {
 } from "./ports";
 
 export const FOLLOW_UPS_MENU = "marketing.follow_ups";
+
+/**
+ * A write checks Follow-ups read as well as its own flag before anything
+ * is saved, like the other Marketing writes: a Role with a write flag but
+ * no read gets 403, not a saved change it cannot see.
+ */
+function assertCanWrite(
+  access: MemberAccess,
+  flag: "create" | "update" | "delete",
+): void {
+  assertCan(access, FOLLOW_UPS_MENU, "read");
+  assertCan(access, FOLLOW_UPS_MENU, flag);
+}
 const COMPANIES_MENU = "marketing.companies";
 const VISITS_MENU = "marketing.visits";
 
@@ -436,7 +449,7 @@ export class FollowUpHandlers {
     access: MemberAccess,
     input: FollowUpInput,
   ): Promise<PreparedFollowUp> {
-    assertCan(access, FOLLOW_UPS_MENU, "create");
+    assertCanWrite(access, "create");
     return {
       ...followUpDetails(input),
       ownerMemberId: await this.owner(access, input.ownerMemberId, null),
@@ -528,7 +541,7 @@ export class FollowUpHandlers {
     id: string,
     input: FollowUpInput & { expectedUpdatedAt: Date },
   ): Promise<void> {
-    assertCan(access, FOLLOW_UPS_MENU, "update");
+    assertCanWrite(access, "update");
     const details = followUpDetails(input);
     const at = this.clock();
     await this.deps.db.$transaction(async (tx) => {
@@ -574,7 +587,7 @@ export class FollowUpHandlers {
       expectedUpdatedAt: Date;
     },
   ): Promise<void> {
-    assertCan(access, FOLLOW_UPS_MENU, "update");
+    assertCanWrite(access, "update");
     const today = await this.deps.today(access.workspaceId);
     const done = followUpDone(input, today);
     const at = this.clock();
@@ -615,7 +628,7 @@ export class FollowUpHandlers {
     id: string,
     expectedUpdatedAt: Date,
   ): Promise<void> {
-    assertCan(access, FOLLOW_UPS_MENU, "update");
+    assertCanWrite(access, "update");
     const at = this.clock();
     await this.deps.db.$transaction(async (tx) => {
       const current = await this.visible(access, (ws) =>
@@ -648,7 +661,7 @@ export class FollowUpHandlers {
     id: string,
     expectedUpdatedAt: Date,
   ): Promise<void> {
-    assertCan(access, FOLLOW_UPS_MENU, "delete");
+    assertCanWrite(access, "delete");
     const at = this.clock();
     await this.deps.db.$transaction(async (tx) => {
       const current = await this.visible(access, (ws) =>
