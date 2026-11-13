@@ -1,7 +1,7 @@
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import type { Metadata } from "next";
 
-import { viewerCan } from "@/app/app/_lib/viewer-can";
+import { viewerFlags } from "@/app/app/_lib/viewer-can";
 import { GET as getCompany } from "@/app/api/construction/marketing/companies/[id]/route";
 import { GET as formOptions } from "@/app/api/construction/marketing/companies/form-options/route";
 import {
@@ -36,7 +36,8 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  if (!(await viewerCan("marketing.companies", "update")))
+  const flags = await viewerFlags("marketing.companies", ["read", "update"]);
+  if (!flags.read || !flags.update)
     return <MarketingNoAccess what="editing Prospect Companies" />;
 
   const queryClient = getQueryClient();

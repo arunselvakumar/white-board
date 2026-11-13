@@ -196,6 +196,9 @@ export function CompanyForm({ company }: { company?: ProspectCompany }) {
     resolver: zodResolver(schema),
     defaultValues: defaults(company),
   });
+  // The form keeps its first values, so the save checks against the
+  // company as it was then, not a newer copy that came in since.
+  const [filledFrom] = useState(() => company?.updatedAt);
   const errors = form.formState.errors;
   const people = options.people
     .filter((person) => person.active)
@@ -244,7 +247,7 @@ export function CompanyForm({ company }: { company?: ProspectCompany }) {
       } else {
         saved = await update.mutateAsync({
           ...details,
-          expectedUpdatedAt: company.updatedAt,
+          expectedUpdatedAt: filledFrom ?? company.updatedAt,
         });
       }
       setLeaving(true);

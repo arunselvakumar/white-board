@@ -104,7 +104,8 @@ export const MoveConstructionMarketingProspectCompanyStageRequestModel =
   z.object({
     /**
      * Requirement received, Quotation sent, Negotiation, Won or Lost (400
-     * `STAGE_NOT_MANUAL` for New and Contacted; `STAGE_UNCHANGED`).
+     * `STAGE_NOT_MANUAL` for New and Contacted; `STAGE_UNCHANGED`, but
+     * Lost to Lost may change the Lost Reason).
      */
     stage,
     /** Required for Lost (400 `LOST_REASON_REQUIRED`). */
@@ -156,8 +157,12 @@ export const ListConstructionMarketingProspectCompaniesRequestModel = z.object({
     .max(MARKETING_LIMITS.industry * 2)
     .optional(),
   limit: z.coerce.number().int().min(1).max(100).default(50),
-  /** `nextCursor` of the previous page. */
-  after: z.string().max(400).optional(),
+  /** `nextCursor` of the previous page; empty means the first page. */
+  after: z
+    .string()
+    .max(400)
+    .optional()
+    .transform((value) => (value === "" ? undefined : value)),
 });
 
 // ---------------------------------------------------------------------------

@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 
+import type { Stage } from "./marketing-terms";
 import {
   contactDetails,
   isProspectCompanyVisible,
   manualStageMove,
   prospectCompanyDetails,
   prospectCompanyNameKey,
+  type StageMove,
 } from "./prospect-company";
 
 function code(run: () => unknown): string | undefined {
@@ -115,43 +117,90 @@ describe("Contact details", () => {
 });
 
 describe("Stage moved by hand (ADR CM-0040 §11)", () => {
+  const at = (stage: Stage): StageMove => ({
+    stage,
+    lostReason: null,
+    lostReasonText: null,
+  });
   it("moves to any later Stage, in any order", () => {
-    expect(manualStageMove("new", { stage: "quotation_sent" })).toEqual({
+    expect(manualStageMove(at("new"), { stage: "quotation_sent" })).toEqual({
       stage: "quotation_sent",
       lostReason: null,
       lostReasonText: null,
     });
-    expect(manualStageMove("won", { stage: "negotiation" }).stage).toBe(
+    expect(manualStageMove(at("won"), { stage: "negotiation" }).stage).toBe(
       "negotiation",
     );
   });
 
   it("leaves New and Contacted to the system", () => {
-    expect(code(() => manualStageMove("won", { stage: "contacted" }))).toBe(
+    expect(code(() => manualStageMove(at("won"), { stage: "contacted" }))).toBe(
       "STAGE_NOT_MANUAL",
     );
-    expect(code(() => manualStageMove("won", { stage: "new" }))).toBe(
+    expect(code(() => manualStageMove(at("won"), { stage: "new" }))).toBe(
       "STAGE_NOT_MANUAL",
     );
   });
 
   it("refuses the Stage the company is at", () => {
-    expect(code(() => manualStageMove("won", { stage: "won" }))).toBe(
+    expect(code(() => manualStageMove(at("won"), { stage: "won" }))).toBe(
       "STAGE_UNCHANGED",
     );
   });
 
-  it("needs a Lost Reason, and words for Other", () => {
-    expect(code(() => manualStageMove("negotiation", { stage: "lost" }))).toBe(
-      "LOST_REASON_REQUIRED",
-    );
+  it("moves Lost to Lost only to change the reason", () => {
+    const lost: StageMove = {
+      stage: "lost",
+      lostReason: "price",
+      lostReasonText: null,
+    };
+    expect(
+      manualStageMove(lost, { stage: "lost", lostReason: "competitor" }),
+    ).toEqual({
+      stage: "lost",
+      lostReason: "competitor",
+      lostReasonText: null,
+    });
+    expect(
+      code(() => manualStageMove(lost, { stage: "lost", lostReason: "price" })),
+    ).toBe("STAGE_UNCHANGED");
+    const other: StageMove = {
+      stage: "lost",
+      lostReason: "other",
+      lostReasonText: "Project shelved",
+    };
+    expect(
+      manualStageMove(other, {
+        stage: "lost",
+        lostReason: "other",
+        lostReasonText: "Went to a relative",
+      }).lostReasonText,
+    ).toBe("Went to a relative");
     expect(
       code(() =>
-        manualStageMove("negotiation", { stage: "lost", lostReason: "other" }),
+        manualStageMove(other, {
+          stage: "lost",
+          lostReason: "other",
+          lostReasonText: " Project shelved ",
+        }),
+      ),
+    ).toBe("STAGE_UNCHANGED");
+  });
+
+  it("needs a Lost Reason, and words for Other", () => {
+    expect(
+      code(() => manualStageMove(at("negotiation"), { stage: "lost" })),
+    ).toBe("LOST_REASON_REQUIRED");
+    expect(
+      code(() =>
+        manualStageMove(at("negotiation"), {
+          stage: "lost",
+          lostReason: "other",
+        }),
       ),
     ).toBe("LOST_REASON_TEXT_REQUIRED");
     expect(
-      manualStageMove("negotiation", {
+      manualStageMove(at("negotiation"), {
         stage: "lost",
         lostReason: "other",
         lostReasonText: " Project shelved ",
@@ -163,7 +212,7 @@ describe("Stage moved by hand (ADR CM-0040 §11)", () => {
     });
     // Words are kept only for Other.
     expect(
-      manualStageMove("negotiation", {
+      manualStageMove(at("negotiation"), {
         stage: "lost",
         lostReason: "price",
         lostReasonText: "Too high",

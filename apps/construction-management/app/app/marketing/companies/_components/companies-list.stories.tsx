@@ -174,6 +174,47 @@ export const LoadMore: Story = {
   },
 };
 
+/** A failed Load more says so, and the button tries again. */
+export const LoadMoreFailed: Story = {
+  beforeEach: () => {
+    let failures = 0;
+    api = mockCompanyApi({
+      pageSize: 2,
+      extra: (call) => {
+        if (
+          call.method !== "GET" ||
+          !call.path.includes("after=2") ||
+          failures > 0
+        )
+          return undefined;
+        failures += 1;
+        return Response.json(
+          { code: "INTERNAL", message: "Something went wrong." },
+          { status: 500 },
+        );
+      },
+    });
+    return api.restore;
+  },
+  play: async ({ canvas, userEvent }) => {
+    await canvas.findByText("Showing 2 of 4 Prospect Companies");
+    await userEvent.click(canvas.getByRole("button", { name: "Load more" }));
+    await expect(
+      await canvas.findByText("Couldn't load more. Please try again."),
+    ).toBeVisible();
+    await expect(
+      canvas.getByText("Showing 2 of 4 Prospect Companies"),
+    ).toBeVisible();
+    const retry = canvas.getByRole("button", { name: "Load more" });
+    await expect(retry).toBeEnabled();
+    await userEvent.click(retry);
+    await expect(await canvas.findByText("4 Prospect Companies")).toBeVisible();
+    await expect(
+      canvas.queryByText("Couldn't load more. Please try again."),
+    ).toBeNull();
+  },
+};
+
 /** No companies yet: what the list is for, and Add Prospect Company. */
 export const Empty: Story = {
   beforeEach: serve({ companies: [] }),

@@ -5,8 +5,8 @@ name: End-to-end
 # the nightly run takes every test. Only changes that can reach the app
 # start a run.
 on:
+  # Every pull request, stacked ones too (a PR into another PR's branch).
   pull_request:
-    branches: [main]
     paths:
       - "apps/construction-management/**"
       - "packages/auth/**"

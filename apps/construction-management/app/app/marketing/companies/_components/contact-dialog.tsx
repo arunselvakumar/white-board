@@ -78,6 +78,8 @@ function values(
 /**
  * Add or edit a Contact of a Prospect Company. The first Contact is always
  * primary, and the primary one stays so until another is made primary.
+ * While a save is pending the dialog stays open, so its answer lands on
+ * this opening and not on one opened after it.
  */
 export function ContactDialog({
   company,
@@ -99,6 +101,10 @@ export function ContactDialog({
     defaultValues: values(contact, firstContact),
   });
   const errors = form.formState.errors;
+  const pending = form.formState.isSubmitting;
+  const errorId = (field: keyof Values) => `contact-${field}-error`;
+  const describedBy = (field: keyof Values) =>
+    errors[field] == null ? undefined : errorId(field);
   const { reset } = form;
   // A different Contact (or Add after Edit) starts from its own values.
   useEffect(() => {
@@ -157,8 +163,8 @@ export function ContactDialog({
     <Dialog
       open={open}
       onOpenChange={(next) => {
-        if (!next) dismiss();
-        else onOpenChange(true);
+        if (next) onOpenChange(true);
+        else if (!pending) dismiss();
       }}
     >
       <DialogContent className="max-h-[90dvh] grid-cols-1 overflow-y-auto sm:max-w-lg">
@@ -184,9 +190,10 @@ export function ContactDialog({
                 autoComplete="off"
                 aria-required
                 aria-invalid={errors.name != null}
+                aria-describedby={describedBy("name")}
                 {...form.register("name")}
               />
-              <FieldError message={errors.name?.message} />
+              <FieldError id={errorId("name")} message={errors.name?.message} />
             </div>
             <div className="min-w-0 space-y-1.5">
               <Label htmlFor="contact-jobTitle">Job title</Label>
@@ -194,9 +201,13 @@ export function ContactDialog({
                 id="contact-jobTitle"
                 autoComplete="off"
                 aria-invalid={errors.jobTitle != null}
+                aria-describedby={describedBy("jobTitle")}
                 {...form.register("jobTitle")}
               />
-              <FieldError message={errors.jobTitle?.message} />
+              <FieldError
+                id={errorId("jobTitle")}
+                message={errors.jobTitle?.message}
+              />
             </div>
             <div className="min-w-0 space-y-1.5">
               <Label htmlFor="contact-mobile">Mobile</Label>
@@ -207,9 +218,13 @@ export function ContactDialog({
                 autoComplete="off"
                 placeholder="98450 12345"
                 aria-invalid={errors.mobile != null}
+                aria-describedby={describedBy("mobile")}
                 {...form.register("mobile")}
               />
-              <FieldError message={errors.mobile?.message} />
+              <FieldError
+                id={errorId("mobile")}
+                message={errors.mobile?.message}
+              />
             </div>
             <div className="min-w-0 space-y-1.5">
               <Label htmlFor="contact-email">Email</Label>
@@ -218,9 +233,13 @@ export function ContactDialog({
                 type="email"
                 autoComplete="off"
                 aria-invalid={errors.email != null}
+                aria-describedby={describedBy("email")}
                 {...form.register("email")}
               />
-              <FieldError message={errors.email?.message} />
+              <FieldError
+                id={errorId("email")}
+                message={errors.email?.message}
+              />
             </div>
             <div className="min-w-0 space-y-1.5 sm:col-span-2">
               <Label htmlFor="contact-remarks">Remarks</Label>
@@ -228,9 +247,13 @@ export function ContactDialog({
                 id="contact-remarks"
                 rows={2}
                 aria-invalid={errors.remarks != null}
+                aria-describedby={describedBy("remarks")}
                 {...form.register("remarks")}
               />
-              <FieldError message={errors.remarks?.message} />
+              <FieldError
+                id={errorId("remarks")}
+                message={errors.remarks?.message}
+              />
             </div>
           </div>
           <Controller
@@ -261,11 +284,16 @@ export function ContactDialog({
           )}
           <FormAlert message={error ?? undefined} />
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={dismiss}>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={pending}
+              onClick={dismiss}
+            >
               Cancel
             </Button>
-            <Button type="submit" disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting ? "Saving…" : "Save"}
+            <Button type="submit" disabled={pending}>
+              {pending ? "Saving…" : "Save"}
             </Button>
           </DialogFooter>
         </form>

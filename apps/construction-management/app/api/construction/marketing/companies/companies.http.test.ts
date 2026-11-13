@@ -170,9 +170,18 @@ describe("Prospect Companies (ADR CM-0040 §5, §11)", () => {
   it("shows a member without View all the companies they created or are assigned, and 404 for any other", async () => {
     const owner = await ownerWithCompany();
     const ravi = await memberWith(owner, MARKETING);
-    const priya = await memberWith(owner, MARKETING);
+    // Priya may delete, so the delete below is refused by visibility.
+    const priya = await memberWith(owner, {
+      ...MARKETING,
+      "marketing.companies": ["create", "read", "update", "delete"],
+    });
     const manager = await memberWith(owner, MANAGER);
-    const ravis = await add(ravi, { name: "Kaveri Steel" });
+    const ravis = await add(ravi, {
+      name: "Kaveri Steel",
+      primaryContact: { name: "Ravi Kumar" },
+    });
+    const ravisContact = ravis.contacts[0];
+    if (ravisContact == null) throw new Error("No Contact");
     await add(priya, { name: "Pandian Mills" });
     // The Owner assigns one to Ravi.
     const assigned = await add(owner, {
@@ -221,6 +230,42 @@ describe("Prospect Companies (ADR CM-0040 §5, §11)", () => {
       params(ravis.id),
     );
     expect(contact.status).toBe(StatusCodes.NOT_FOUND);
+    const contactUrl = `${BASE}/${ravis.id}/contacts/${ravisContact.id}`;
+    const editContact = await updateContact(
+      jsonRequest(`${contactUrl}/update`, priya.cookie, {
+        name: "Someone",
+        expectedUpdatedAt: ravisContact.updatedAt,
+      }),
+      contactParams(ravis.id, ravisContact.id),
+    );
+    const dropContact = await removeContact(
+      jsonRequest(`${contactUrl}/delete`, priya.cookie, {
+        expectedUpdatedAt: ravisContact.updatedAt,
+      }),
+      contactParams(ravis.id, ravisContact.id),
+    );
+    const dropCompany = await remove(
+      jsonRequest(`${BASE}/${ravis.id}/delete`, priya.cookie, {
+        expectedUpdatedAt: ravis.updatedAt,
+      }),
+      params(ravis.id),
+    );
+    for (const response of [editContact, dropContact, dropCompany]) {
+      expect(response.status).toBe(StatusCodes.NOT_FOUND);
+      expect(await json(response)).toMatchObject({
+        code: "PROSPECT_COMPANY_NOT_FOUND",
+      });
+    }
+    const unchanged = await json<Company>(
+      await getOne(
+        jsonRequest(`${BASE}/${ravis.id}`, ravi.cookie),
+        params(ravis.id),
+      ),
+    );
+    expect(unchanged.updatedAt).toBe(ravis.updatedAt);
+    expect(unchanged.contacts).toEqual([
+      expect.objectContaining({ name: "Ravi Kumar" }),
+    ]);
 
     // The assigned company opens for Ravi, who did not create it.
     const opened = await getOne(
@@ -294,6 +339,8 @@ describe("Prospect Companies (ADR CM-0040 §5, §11)", () => {
     );
     expect(second.items.map((item) => item.name)).toEqual(["Pandian Mills"]);
     expect(second.nextCursor).toBeNull();
+    // An empty cursor is the first page.
+    expect(await names(owner, "?after=")).toHaveLength(3);
 
     const options = await json<{
       people: { id: string; isOwner: boolean; active: boolean }[];
@@ -365,6 +412,22 @@ describe("Prospect Companies (ADR CM-0040 §5, §11)", () => {
       lostReasonText: "Project shelved",
     });
 
+    // Lost again changes only the reason; the same reason is no move.
+    const sameReason = await move({
+      stage: "lost",
+      lostReason: "other",
+      lostReasonText: "Project shelved",
+    });
+    expect(await json(sameReason)).toMatchObject({ code: "STAGE_UNCHANGED" });
+    const newReason = await move({ stage: "lost", lostReason: "competitor" });
+    expect(newReason.status).toBe(StatusCodes.OK);
+    company = await json<Company>(newReason);
+    expect(company).toMatchObject({
+      stage: "lost",
+      lostReason: "competitor",
+      lostReasonText: null,
+    });
+
     const stale = await moveStage(
       jsonRequest(`${BASE}/${company.id}/stage`, owner.cookie, {
         stage: "won",
@@ -384,10 +447,12 @@ describe("Prospect Companies (ADR CM-0040 §5, §11)", () => {
       company.timeline.map((item) => [item.fromStage, item.toStage]),
     ).toEqual([
       ["lost", "negotiation"],
+      ["lost", "lost"],
       ["new", "lost"],
       [null, "new"],
     ]);
-    expect(company.timeline[1]?.lostReason).toBe("other");
+    expect(company.timeline[1]?.lostReason).toBe("competitor");
+    expect(company.timeline[2]?.lostReason).toBe("other");
   });
 
   it("edits the details, refusing a stale edit or another company's name", async () => {
@@ -467,6 +532,32 @@ describe("Prospect Companies (ADR CM-0040 §5, §11)", () => {
       code: "CONTACT_PRIMARY_REQUIRED",
     });
 
+    const ravi = current.contacts[1];
+    if (ravi == null) throw new Error("No Contact");
+    const edited = await updateContact(
+      jsonRequest(
+        `${BASE}/${company.id}/contacts/${ravi.id}/update`,
+        owner.cookie,
+        {
+          name: "Ravi Kumar",
+          mobile: "98765 43210",
+          expectedUpdatedAt: ravi.updatedAt,
+        },
+      ),
+      contactParams(company.id, ravi.id),
+    );
+    expect(edited.status).toBe(StatusCodes.OK);
+    current = await json<Company>(edited);
+    expect(current.contacts).toEqual([
+      expect.objectContaining({ name: "Lakshmi", isPrimary: true }),
+      expect.objectContaining({
+        id: ravi.id,
+        name: "Ravi Kumar",
+        mobile: "+919876543210",
+        isPrimary: false,
+      }),
+    ]);
+
     current = await json<Company>(
       await removeContact(
         jsonRequest(
@@ -478,7 +569,7 @@ describe("Prospect Companies (ADR CM-0040 §5, §11)", () => {
       ),
     );
     expect(current.contacts.map((c) => [c.name, c.isPrimary])).toEqual([
-      ["Ravi", true],
+      ["Ravi Kumar", true],
     ]);
   });
 
@@ -510,11 +601,22 @@ describe("Prospect Companies (ADR CM-0040 §5, §11)", () => {
       params(company.id),
     );
     expect(read.status).toBe(StatusCodes.NOT_FOUND);
-    await expect(
-      prisma.constructionMarketingContact.count({
-        where: { prospectCompanyId: company.id, deletedAt: null },
+    // Tombstones: the rows stay, marked deleted by the Owner.
+    const rows = [
+      await prisma.constructionMarketingProspectCompany.findUniqueOrThrow({
+        where: { id: company.id },
+        select: { deletedAt: true, deletedBy: true },
       }),
-    ).resolves.toBe(0);
+      ...(await prisma.constructionMarketingContact.findMany({
+        where: { prospectCompanyId: company.id },
+        select: { deletedAt: true, deletedBy: true },
+      })),
+    ];
+    expect(rows).toHaveLength(2);
+    for (const row of rows) {
+      expect(row.deletedAt).toBeInstanceOf(Date);
+      expect(row.deletedBy).toBe(owner.userId);
+    }
     await add(owner, { name: "Kaveri Steel" });
   });
 
@@ -531,6 +633,20 @@ describe("Prospect Companies (ADR CM-0040 §5, §11)", () => {
     expect(added.status).toBe(StatusCodes.FORBIDDEN);
     const listed = await list(jsonRequest(BASE, outsider.cookie));
     expect(listed.status).toBe(StatusCodes.FORBIDDEN);
+
+    // A write needs read too, checked before anything is saved.
+    const writer = await memberWith(owner, {
+      "marketing.companies": ["create"],
+    });
+    const blind = await create(
+      jsonRequest(BASE, writer.cookie, { name: "Pandian Mills" }),
+    );
+    expect(blind.status).toBe(StatusCodes.FORBIDDEN);
+    await expect(
+      prisma.constructionMarketingProspectCompany.count({
+        where: { workspaceId: owner.workspaceId },
+      }),
+    ).resolves.toBe(0);
   });
 
   it("does not show another Company's Prospect Company", async () => {
@@ -543,5 +659,24 @@ describe("Prospect Companies (ADR CM-0040 §5, §11)", () => {
     );
     expect(read.status).toBe(StatusCodes.NOT_FOUND);
     expect(await names(other)).toEqual([]);
+
+    const write = await update(
+      jsonRequest(`${BASE}/${company.id}/update`, other.cookie, {
+        name: "Taken Over",
+        expectedUpdatedAt: company.updatedAt,
+      }),
+      params(company.id),
+    );
+    expect(write.status).toBe(StatusCodes.NOT_FOUND);
+    const after = await json<Company>(
+      await getOne(
+        jsonRequest(`${BASE}/${company.id}`, owner.cookie),
+        params(company.id),
+      ),
+    );
+    expect(after).toMatchObject({
+      name: "Kaveri Steel",
+      updatedAt: company.updatedAt,
+    });
   });
 });

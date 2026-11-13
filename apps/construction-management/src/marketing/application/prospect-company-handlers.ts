@@ -130,6 +130,18 @@ function contactChanged() {
 const same = (a: Date, b: Date) => a.getTime() === b.getTime();
 
 /**
+ * A write also needs Companies read, checked first: the route answers with
+ * the company read back, so a write without read would save and then fail.
+ */
+function assertCanWrite(
+  access: MemberAccess,
+  flag: "create" | "update" | "delete",
+): void {
+  assertCan(access, COMPANIES_MENU, "read");
+  assertCan(access, COMPANIES_MENU, flag);
+}
+
+/**
  * Prospect Companies and their Contacts (PRD §3.3, ADR CM-0040 §5, §11):
  * list, read, create, edit, delete, Stage moved by hand, and Contacts.
  * Without View all on Companies, a member sees and changes only the
@@ -338,7 +350,7 @@ export class ProspectCompanyHandlers {
     access: MemberAccess,
     input: CreateProspectCompanyInput,
   ): Promise<string> {
-    assertCan(access, COMPANIES_MENU, "create");
+    assertCanWrite(access, "create");
     const details = prospectCompanyDetails(input);
     const contact =
       input.primaryContact == null
@@ -410,7 +422,7 @@ export class ProspectCompanyHandlers {
     id: string,
     input: ProspectCompanyDetailsInput & { expectedUpdatedAt: Date },
   ): Promise<void> {
-    assertCan(access, COMPANIES_MENU, "update");
+    assertCanWrite(access, "update");
     const details = prospectCompanyDetails(input);
     const at = this.clock();
     try {
@@ -450,7 +462,7 @@ export class ProspectCompanyHandlers {
     id: string,
     expectedUpdatedAt: Date,
   ): Promise<void> {
-    assertCan(access, COMPANIES_MENU, "delete");
+    assertCanWrite(access, "delete");
     const at = this.clock();
     await this.deps.db.$transaction(async (tx) => {
       const current = await this.lockVisible(tx, access, id);
@@ -480,13 +492,13 @@ export class ProspectCompanyHandlers {
       expectedUpdatedAt: Date;
     },
   ): Promise<void> {
-    assertCan(access, COMPANIES_MENU, "update");
+    assertCanWrite(access, "update");
     const at = this.clock();
     await this.deps.db.$transaction(async (tx) => {
       const current = await this.lockVisible(tx, access, id);
       if (!same(current.updatedAt, input.expectedUpdatedAt))
         throw prospectCompanyChanged();
-      const move = manualStageMove(current.stage, input);
+      const move = manualStageMove(current, input);
       await this.deps.store.setStage(tx, id, move, access.userId, at);
       await this.deps.store.appendStageChange(tx, {
         workspaceId: access.workspaceId,
@@ -522,7 +534,7 @@ export class ProspectCompanyHandlers {
     companyId: string,
     input: ContactInput,
   ): Promise<string> {
-    assertCan(access, COMPANIES_MENU, "update");
+    assertCanWrite(access, "update");
     const details = contactDetails(input);
     const id = newId();
     const at = this.clock();
@@ -582,7 +594,7 @@ export class ProspectCompanyHandlers {
     contactId: string,
     input: ContactInput & { expectedUpdatedAt: Date },
   ): Promise<void> {
-    assertCan(access, COMPANIES_MENU, "update");
+    assertCanWrite(access, "update");
     const details = contactDetails(input);
     const at = this.clock();
     await this.deps.db.$transaction(async (tx) => {
@@ -636,7 +648,7 @@ export class ProspectCompanyHandlers {
     contactId: string,
     expectedUpdatedAt: Date,
   ): Promise<void> {
-    assertCan(access, COMPANIES_MENU, "update");
+    assertCanWrite(access, "update");
     const at = this.clock();
     await this.deps.db.$transaction(async (tx) => {
       const { contact, all } = await this.contactOf(

@@ -7,6 +7,8 @@ import {
   BALAJI_ID,
   MARKETING_COMPANIES_API,
   company,
+  KAVERI_ID,
+  lostCompany,
   mockCompanyApi,
   type CompanyApiOptions,
 } from "./company-fixtures";
@@ -14,12 +16,13 @@ import { MoveStageDialog } from "./move-stage-dialog";
 
 let api: ReturnType<typeof mockCompanyApi>;
 
-const STAGE_PATH = `${MARKETING_COMPANIES_API}/${BALAJI_ID}/stage`;
+const stagePath = (id: string) => `${MARKETING_COMPANIES_API}/${id}/stage`;
+const STAGE_PATH = stagePath(BALAJI_ID);
 
-function moves(): ApiCall[] {
+function moves(path = STAGE_PATH): ApiCall[] {
   return api.calls.mock.calls
     .map(([call]) => call)
-    .filter((call) => call.method === "POST" && call.path === STAGE_PATH);
+    .filter((call) => call.method === "POST" && call.path === path);
 }
 
 function serve(options: CompanyApiOptions = {}) {
@@ -44,7 +47,10 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** The current Stage can't be picked; New and Contacted are never offered. */
+/**
+ * The current Stage can't be picked (Lost can, to change the reason); New
+ * and Contacted are never offered.
+ */
 export const Stages: Story = {
   play: async ({ canvasElement }) => {
     const dialog = within(
@@ -103,7 +109,10 @@ export const LostNeedsReason: Story = {
   },
 };
 
-/** A reason other than Other sends no words. */
+/**
+ * A reason other than Other sends no words, and over-long words left
+ * behind under Other do not block the move.
+ */
 export const LostForPrice: Story = {
   play: async ({ canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body);
@@ -111,9 +120,12 @@ export const LostForPrice: Story = {
       await body.findByRole("dialog", { name: "Move Stage" }),
     );
     await userEvent.click(dialog.getByRole("radio", { name: "Lost" }));
-    await userEvent.click(
-      dialog.getByRole("combobox", { name: "Lost Reason" }),
-    );
+    const reason = dialog.getByRole("combobox", { name: "Lost Reason" });
+    await userEvent.click(reason);
+    await userEvent.click(await body.findByRole("option", { name: "Other" }));
+    await userEvent.click(dialog.getByLabelText("Why was it lost?"));
+    await userEvent.paste("x".repeat(301));
+    await userEvent.click(reason);
     await userEvent.click(await body.findByRole("option", { name: "Price" }));
     await expect(dialog.queryByLabelText("Why was it lost?")).toBeNull();
     await userEvent.click(dialog.getByRole("button", { name: "Move" }));
@@ -123,6 +135,50 @@ export const LostForPrice: Story = {
       lostReason: "price",
       lostReasonText: null,
     });
+  },
+};
+
+/** A Lost company can be marked Lost again, to change the Lost Reason. */
+export const LostAgain: Story = {
+  args: { company: lostCompany() },
+  beforeEach: serve({ companies: [lostCompany()] }),
+  play: async ({ canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    const dialog = within(
+      await body.findByRole("dialog", { name: "Move Stage" }),
+    );
+    const lost = dialog.getByRole("radio", { name: "Lost (now)" });
+    await expect(lost).not.toHaveAttribute("aria-disabled", "true");
+    await userEvent.click(lost);
+    await userEvent.click(
+      dialog.getByRole("combobox", { name: "Lost Reason" }),
+    );
+    await userEvent.click(
+      await body.findByRole("option", { name: "Went to a competitor" }),
+    );
+    await userEvent.click(dialog.getByRole("button", { name: "Move" }));
+    await waitFor(() => expect(moves(stagePath(KAVERI_ID))).toHaveLength(1));
+    await expect(moves(stagePath(KAVERI_ID))[0]?.body).toMatchObject({
+      stage: "lost",
+      lostReason: "competitor",
+      lostReasonText: null,
+    });
+  },
+};
+
+/** A missing Stage is announced with the radio group. */
+export const ErrorsDescribeFields: Story = {
+  play: async ({ canvasElement, userEvent }) => {
+    const dialog = within(
+      await within(canvasElement.ownerDocument.body).findByRole("dialog", {
+        name: "Move Stage",
+      }),
+    );
+    await userEvent.click(dialog.getByRole("button", { name: "Move" }));
+    await expect(await dialog.findByText("Choose a Stage.")).toBeVisible();
+    const group = dialog.getByRole("radiogroup", { name: "Stage" });
+    await expect(group).toHaveAttribute("aria-invalid", "true");
+    await expect(group).toHaveAccessibleDescription("Choose a Stage.");
   },
 };
 

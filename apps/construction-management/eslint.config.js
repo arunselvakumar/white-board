@@ -19,6 +19,7 @@ const BOUNDED_CONTEXTS = [
   "hrms",
   "reporting",
   "messaging",
+  "marketing",
 ];
 
 // The auth vendor stays behind @repo/auth (root ADR-0034).

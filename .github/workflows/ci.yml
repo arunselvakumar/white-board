@@ -3,8 +3,8 @@ name: CI
 on:
   push:
     branches: [main]
+  # Every pull request, stacked ones too (a PR into another PR's branch).
   pull_request:
-    branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -35,7 +35,11 @@ jobs:
       - run: bun run check-versions
       - run: bun run format:check
       - run: bun run check-comments
+      # Type-aware ESLint over Construction Management outgrew Node's
+      # default heap on the runner (16 GB of RAM).
       - run: bun run lint
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
       - run: bun run check-types
 
   test:

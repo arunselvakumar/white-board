@@ -41,25 +41,31 @@ const schema = z
   .object({
     stage: z.string().min(1, "Choose a Stage."),
     lostReason: z.string(),
-    lostReasonText: z
-      .string()
-      .max(
-        MARKETING_LIMITS.lostReasonText,
-        `Keep the reason to ${String(MARKETING_LIMITS.lostReasonText)} characters.`,
-      ),
+    lostReasonText: z.string(),
   })
   .superRefine((value, ctx) => {
     if (value.stage !== "lost") return;
-    if (value.lostReason === "")
+    if (value.lostReason === "") {
       ctx.addIssue({
         code: "custom",
         message: "Choose why the company was lost.",
         path: ["lostReason"],
       });
-    else if (value.lostReason === "other" && value.lostReasonText.trim() === "")
+      return;
+    }
+    // The words are only sent, and shown, for Other.
+    if (value.lostReason !== "other") return;
+    const words = value.lostReasonText.trim();
+    if (words === "")
       ctx.addIssue({
         code: "custom",
         message: "Say why the company was lost.",
+        path: ["lostReasonText"],
+      });
+    else if (words.length > MARKETING_LIMITS.lostReasonText)
+      ctx.addIssue({
+        code: "custom",
+        message: `Keep the reason to ${String(MARKETING_LIMITS.lostReasonText)} characters.`,
         path: ["lostReasonText"],
       });
   });
@@ -74,11 +80,18 @@ const REASON_ITEMS = LOST_REASONS.map((reason) => ({
 
 const FRESH: Values = { stage: "", lostReason: "", lostReasonText: "" };
 
+const ERROR_IDS = {
+  stage: "move-stage-stage-error",
+  lostReason: "move-stage-lost-reason-error",
+  lostReasonText: "move-stage-lost-text-error",
+} as const;
+
 /**
  * Moves a Prospect Company to a later Stage by hand (ADR CM-0040 §11):
  * Requirement received, Quotation sent, Negotiation, Won or Lost, in any
- * order; the current one is not offered. Lost needs a Lost Reason, and
- * Other needs words.
+ * order; the current one is not offered, except Lost, to change the Lost
+ * Reason. Lost needs a Lost Reason, and Other needs words. While a move
+ * is saving the dialog stays open, so its answer lands on this opening.
  */
 export function MoveStageDialog({
   company,
@@ -96,8 +109,11 @@ export function MoveStageDialog({
     defaultValues: FRESH,
   });
   const errors = form.formState.errors;
+  const pending = form.formState.isSubmitting;
   const stage = useWatch({ control: form.control, name: "stage" });
   const reason = useWatch({ control: form.control, name: "lostReason" });
+  const describedBy = (field: keyof typeof ERROR_IDS) =>
+    errors[field] == null ? undefined : ERROR_IDS[field];
 
   const dismiss = () => {
     form.reset(FRESH);
@@ -134,8 +150,8 @@ export function MoveStageDialog({
     <Dialog
       open={open}
       onOpenChange={(next) => {
-        if (!next) dismiss();
-        else onOpenChange(true);
+        if (next) onOpenChange(true);
+        else if (!pending) dismiss();
       }}
     >
       <DialogContent className="max-h-[90dvh] grid-cols-1 overflow-y-auto sm:max-w-md">
@@ -161,6 +177,8 @@ export function MoveStageDialog({
                 <RadioGroup
                   aria-label="Stage"
                   aria-required
+                  aria-invalid={errors.stage != null}
+                  aria-describedby={describedBy("stage")}
                   value={field.value}
                   onValueChange={(value) => {
                     field.onChange(value);
@@ -175,7 +193,7 @@ export function MoveStageDialog({
                       <RadioGroupItem
                         id={`move-stage-${value}`}
                         value={value}
-                        disabled={value === company.stage}
+                        disabled={value === company.stage && value !== "lost"}
                       />
                       <Label
                         htmlFor={`move-stage-${value}`}
@@ -189,7 +207,7 @@ export function MoveStageDialog({
                 </RadioGroup>
               )}
             />
-            <FieldError message={errors.stage?.message} />
+            <FieldError id={ERROR_IDS.stage} message={errors.stage?.message} />
           </div>
           {stage === "lost" && (
             <div className="space-y-1.5">
@@ -206,12 +224,16 @@ export function MoveStageDialog({
                     value={field.value}
                     onChange={field.onChange}
                     invalid={errors.lostReason != null}
+                    describedBy={describedBy("lostReason")}
                     items={REASON_ITEMS}
                     placeholder="Choose a reason"
                   />
                 )}
               />
-              <FieldError message={errors.lostReason?.message} />
+              <FieldError
+                id={ERROR_IDS.lostReason}
+                message={errors.lostReason?.message}
+              />
             </div>
           )}
           {stage === "lost" && reason === "other" && (
@@ -224,18 +246,27 @@ export function MoveStageDialog({
                 rows={2}
                 aria-required
                 aria-invalid={errors.lostReasonText != null}
+                aria-describedby={describedBy("lostReasonText")}
                 {...form.register("lostReasonText")}
               />
-              <FieldError message={errors.lostReasonText?.message} />
+              <FieldError
+                id={ERROR_IDS.lostReasonText}
+                message={errors.lostReasonText?.message}
+              />
             </div>
           )}
           <FormAlert message={error ?? undefined} />
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={dismiss}>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={pending}
+              onClick={dismiss}
+            >
               Cancel
             </Button>
-            <Button type="submit" disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting ? "Saving…" : "Move"}
+            <Button type="submit" disabled={pending}>
+              {pending ? "Saving…" : "Move"}
             </Button>
           </DialogFooter>
         </form>

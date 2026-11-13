@@ -118,6 +118,13 @@ export const Validation: Story = {
     await expect(
       dialog.getByText("Enter a valid email address."),
     ).toBeVisible();
+    // Each error is the description of its field.
+    await expect(dialog.getByLabelText("Name")).toHaveAccessibleDescription(
+      "Enter the Contact's name.",
+    );
+    await expect(dialog.getByLabelText("Email")).toHaveAccessibleDescription(
+      "Enter a valid email address.",
+    );
     await expect(posts(CONTACTS)).toHaveLength(0);
   },
 };

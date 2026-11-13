@@ -301,10 +301,10 @@ export type StageMove = {
 /**
  * A move by hand (ADR CM-0040 §11): to any Stage after Contacted, in any
  * order. Lost needs a Lost Reason, and "Other" needs words; leaving Lost
- * clears them.
+ * clears them. Lost to Lost is allowed only to change the reason.
  */
 export function manualStageMove(
-  current: Stage,
+  current: StageMove,
   input: {
     stage: string;
     lostReason?: LostReason | null;
@@ -318,12 +318,13 @@ export function manualStageMove(
       "stage",
     );
   const stage = input.stage as ManualStage;
-  if (stage === current)
-    throw invalidField(
+  const unchanged = () =>
+    invalidField(
       "STAGE_UNCHANGED",
       "The company is already at this Stage.",
       "stage",
     );
+  if (stage === current.stage && stage !== "lost") throw unchanged();
   if (stage !== "lost")
     return { stage, lostReason: null, lostReasonText: null };
   const lostReason = input.lostReason ?? null;
@@ -346,11 +347,18 @@ export function manualStageMove(
       `Keep the reason to ${MARKETING_LIMITS.lostReasonText} characters.`,
       "lostReasonText",
     );
-  return {
+  const move = {
     stage,
     lostReason,
     lostReasonText: lostReason === "other" ? text : null,
   };
+  if (
+    current.stage === "lost" &&
+    current.lostReason === move.lostReason &&
+    current.lostReasonText === move.lostReasonText
+  )
+    throw unchanged();
+  return move;
 }
 
 /**

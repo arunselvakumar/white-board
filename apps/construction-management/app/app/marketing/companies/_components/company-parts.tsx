@@ -86,6 +86,7 @@ export function CompanySelect({
   invalid,
   required = false,
   disabled,
+  describedBy,
 }: {
   id: string;
   value: string;
@@ -97,6 +98,8 @@ export function CompanySelect({
   invalid?: boolean;
   required?: boolean;
   disabled?: boolean;
+  /** The id of the field's error, when it shows one. */
+  describedBy?: string;
 }) {
   const all: CompanyOption[] =
     noneLabel == null
@@ -117,6 +120,7 @@ export function CompanySelect({
         className="w-full min-w-0"
         aria-invalid={invalid}
         aria-required={required}
+        aria-describedby={describedBy}
       >
         <SelectValue placeholder={noneLabel ?? placeholder} />
       </SelectTrigger>

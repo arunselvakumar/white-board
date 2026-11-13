@@ -1,7 +1,7 @@
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import type { Metadata } from "next";
 
-import { viewerCan } from "@/app/app/_lib/viewer-can";
+import { viewerFlags } from "@/app/app/_lib/viewer-can";
 import { GET as formOptions } from "@/app/api/construction/marketing/companies/form-options/route";
 import {
   companyFormOptionsQuery,
@@ -19,7 +19,9 @@ export const metadata: Metadata = { title: "Add Prospect Company" };
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
-  if (!(await viewerCan("marketing.companies", "create")))
+  // The form reads its options and answers with the company: read too.
+  const flags = await viewerFlags("marketing.companies", ["read", "create"]);
+  if (!flags.read || !flags.create)
     return <MarketingNoAccess what="adding Prospect Companies" />;
 
   const queryClient = getQueryClient();

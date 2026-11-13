@@ -38,6 +38,7 @@ import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FilterSelect } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/filter-select";
+import { FormAlert } from "@/components/auth/form-alert";
 import { marketingSection } from "@/lib/marketing-nav";
 import {
   STAGE_LABELS,
@@ -188,6 +189,7 @@ function FilterBar({
           type="search"
           placeholder="Name, city, Contact or mobile"
           className="w-full sm:w-64"
+          maxLength={100}
           value={search}
           onChange={(event) => {
             setSearch(event.target.value);
@@ -389,7 +391,10 @@ function CompanyRows({
         ))}
       </ul>
       {query.hasNextPage && (
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center gap-2">
+          {query.isFetchNextPageError && (
+            <FormAlert message="Couldn't load more. Please try again." />
+          )}
           <Button
             type="button"
             variant="outline"
