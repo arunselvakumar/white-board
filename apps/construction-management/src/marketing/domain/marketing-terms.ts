@@ -85,3 +85,86 @@ export const MARKETING_LIMITS = {
   lostReasonText: 300,
   jobTitle: 80,
 } as const;
+
+/** Stored Visit states; Missed is worked out (ADR CM-0040 §7). */
+export const VISIT_STATUSES = ["planned", "completed", "cancelled"] as const;
+export type VisitStatus = (typeof VISIT_STATUSES)[number];
+
+/** What a list shows and filters by: the stored state, or Missed. */
+export const VISIT_SHOWN_STATUSES = [
+  "planned",
+  "missed",
+  "completed",
+  "cancelled",
+] as const;
+export type VisitShownStatus = (typeof VISIT_SHOWN_STATUSES)[number];
+
+export const VISIT_STATUS_LABELS: Record<VisitShownStatus, string> = {
+  planned: "Planned",
+  missed: "Missed",
+  completed: "Completed",
+  cancelled: "Cancelled",
+};
+
+export const VISIT_PURPOSES = [
+  "cold_call",
+  "introduction",
+  "requirement_discussion",
+  "quotation",
+  "negotiation",
+  "relationship",
+  "payment_follow_up",
+  "other",
+] as const;
+export type VisitPurpose = (typeof VISIT_PURPOSES)[number];
+
+export const VISIT_PURPOSE_LABELS: Record<VisitPurpose, string> = {
+  cold_call: "Cold call",
+  introduction: "Introduction",
+  requirement_discussion: "Requirement discussion",
+  quotation: "Quotation",
+  negotiation: "Negotiation",
+  relationship: "Relationship",
+  payment_follow_up: "Payment follow-up",
+  other: "Other",
+};
+
+export const INTERESTS = ["hot", "warm", "cold"] as const;
+export type Interest = (typeof INTERESTS)[number];
+
+export const INTEREST_LABELS: Record<Interest, string> = {
+  hot: "Hot",
+  warm: "Warm",
+  cold: "Cold",
+};
+
+export const WORK_TYPES = [
+  "civil",
+  "peb",
+  "steel_fabrication",
+  "shed_erection",
+  "other",
+] as const;
+export type WorkType = (typeof WORK_TYPES)[number];
+
+export const WORK_TYPE_LABELS: Record<WorkType, string> = {
+  civil: "Civil",
+  peb: "PEB",
+  steel_fabrication: "Steel fabrication",
+  shed_erection: "Shed erection",
+  other: "Other",
+};
+
+/** Longest Visit texts, in characters. */
+export const VISIT_LIMITS = {
+  location: 300,
+  discussion: 4000,
+  outcome: 300,
+  cancelReason: 300,
+  note: 2000,
+  /** ₹ 10,000 crore: an approximate value, not an amount to account for. */
+  value: 100_000_000_000,
+} as const;
+
+/** A creator may change a Completed Visit for this long (ADR CM-0040 §7). */
+export const VISIT_LOCK_DAYS = 7;

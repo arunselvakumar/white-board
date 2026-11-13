@@ -165,6 +165,11 @@ function parametersFor(operation: OpenApiOperation): unknown[] {
         in: "query",
         required: required.has(name),
         schema: property,
+        // Every list route reads one comma-separated value per key
+        // (`?status=planned,missed`), not the key repeated.
+        ...(property["type"] === "array"
+          ? { style: "form", explode: false }
+          : {}),
       });
     }
   }

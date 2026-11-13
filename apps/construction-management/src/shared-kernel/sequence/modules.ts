@@ -1,7 +1,8 @@
 /**
  * Modules whose documents get a Sequence ID (`modules/12` "Manage Sequence
  * IDs"). Keys are stored; labels are screen copy; `defaultPrefix` starts the
- * standard rule.
+ * standard rule, and `standard` changes its other parts for a module that
+ * numbers differently.
  */
 export const SEQUENCE_MODULES = [
   {
@@ -59,6 +60,13 @@ export const SEQUENCE_MODULES = [
   { key: "transaction", label: "Transaction (TXN)", defaultPrefix: "TXN" },
   { key: "party_payment", label: "Party Payment (PAY)", defaultPrefix: "PAY" },
   { key: "other_expense", label: "Other Expense (EXP)", defaultPrefix: "EXP" },
+  // Marketing (ADR CM-0040 §7): a Company-level register, `MV-0001`.
+  {
+    key: "marketing_visit",
+    label: "Marketing Visit (MV)",
+    defaultPrefix: "MV",
+    standard: { padding: 4, separator: "-", fiscalYearToken: false },
+  },
 ] as const;
 
 export type SequenceModuleKey = (typeof SEQUENCE_MODULES)[number]["key"];

@@ -32,6 +32,7 @@ export function ChipsSelect({
   emptyText,
   disabled = false,
   invalid = false,
+  required = false,
 }: {
   id: string;
   /** The list's accessible name ("Team Members", "Tags"). */
@@ -44,6 +45,8 @@ export function ChipsSelect({
   emptyText: string;
   disabled?: boolean;
   invalid?: boolean;
+  /** At least one is needed; sets `aria-required` on the input. */
+  required?: boolean;
 }) {
   const anchor = useComboboxAnchor();
   const [query, setQuery] = useState("");
@@ -115,6 +118,7 @@ export function ChipsSelect({
                 id={id}
                 disabled={disabled}
                 aria-invalid={invalid}
+                aria-required={required || undefined}
                 placeholder={chosen.length > 0 ? "" : placeholder}
               />
             </>

@@ -13,6 +13,8 @@ import {
   LOST_REASONS,
   MARKETING_LIMITS,
   STAGES,
+  VISIT_PURPOSES,
+  VISIT_SHOWN_STATUSES,
 } from "@/src/marketing/domain/marketing-terms";
 
 export const COMPANIES_PATH = "/api/construction/marketing/companies";
@@ -186,6 +188,8 @@ export const ConstructionMarketingProspectCompanyListItemResponseModel =
     primaryContact: z
       .object({ name: z.string(), mobile: z.string().nullable() })
       .nullable(),
+    /** The latest completed Visit the viewer may see. */
+    lastVisitAt: z.iso.datetime().nullable(),
     createdAt: z.iso.datetime(),
     updatedAt: z.iso.datetime(),
   });
@@ -196,6 +200,8 @@ export const ListConstructionMarketingProspectCompaniesResponseModel = z.object(
     /** Pass as `after` for the next page; null on the last. */
     nextCursor: z.string().nullable(),
     total: z.number().int(),
+    /** The Company's time zone, for Last visit. */
+    timeZone: z.string(),
   },
 );
 
@@ -210,18 +216,42 @@ export const ConstructionMarketingContactResponseModel = z.object({
   updatedAt: z.iso.datetime(),
 });
 
-export const ConstructionMarketingTimelineItemResponseModel = z.object({
-  /** `stage`: a Stage change; Visits, notes, files and Follow-ups follow. */
-  kind: z.literal("stage"),
-  id: z.uuid(),
-  /** Null on the first entry: the company was added at New. */
-  fromStage: stage.nullable(),
-  toStage: stage,
-  lostReason: lostReason.nullable(),
-  lostReasonText: z.string().nullable(),
-  at: z.iso.datetime(),
-  byName: z.string(),
-});
+export const ConstructionMarketingTimelineItemResponseModel =
+  z.discriminatedUnion("kind", [
+    z.object({
+      /** A Stage change. */
+      kind: z.literal("stage"),
+      id: z.uuid(),
+      /** Null on the first entry: the company was added at New. */
+      fromStage: stage.nullable(),
+      toStage: stage,
+      lostReason: lostReason.nullable(),
+      lostReasonText: z.string().nullable(),
+      at: z.iso.datetime(),
+      byName: z.string(),
+    }),
+    z.object({
+      /** A Visit the viewer may see, at its time. */
+      kind: z.literal("visit"),
+      id: z.uuid(),
+      number: z.string(),
+      at: z.iso.datetime(),
+      status: z.enum(VISIT_SHOWN_STATUSES),
+      purpose: z.enum(VISIT_PURPOSES).nullable(),
+      outcome: z.string().nullable(),
+      visitorNames: z.array(z.string()),
+    }),
+    z.object({
+      /** A note added to one of those Visits. */
+      kind: z.literal("note"),
+      id: z.uuid(),
+      visitId: z.uuid(),
+      visitNumber: z.string(),
+      text: z.string(),
+      at: z.iso.datetime(),
+      byName: z.string(),
+    }),
+  ]);
 
 export const ConstructionMarketingProspectCompanyResponseModel = z.object({
   id: z.uuid(),
@@ -287,6 +317,7 @@ export function toProspectCompanyListItemResponse(
 ): ConstructionMarketingProspectCompanyListItemResponse {
   return {
     ...item,
+    lastVisitAt: item.lastVisitAt?.toISOString() ?? null,
     createdAt: item.createdAt.toISOString(),
     updatedAt: item.updatedAt.toISOString(),
   };

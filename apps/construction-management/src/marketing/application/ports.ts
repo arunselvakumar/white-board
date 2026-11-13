@@ -1,6 +1,6 @@
 import type { Prisma } from "@repo/construction-db";
 
-import type { NameCursor } from "@/src/shared-kernel/list-cursor";
+import type { ListCursor, NameCursor } from "@/src/shared-kernel/list-cursor";
 import type { OwnScope } from "@/src/shared-kernel/access";
 
 import type {
@@ -8,7 +8,15 @@ import type {
   ProspectCompanyDetails,
   StageMove,
 } from "../domain/prospect-company";
-import type { LostReason, Stage } from "../domain/marketing-terms";
+import type {
+  Interest,
+  LostReason,
+  Stage,
+  VisitPurpose,
+  VisitShownStatus,
+  VisitStatus,
+} from "../domain/marketing-terms";
+import type { VisitDetails } from "../domain/visit";
 
 export type MarketingTx = Prisma.TransactionClient;
 
@@ -183,6 +191,14 @@ export type ProspectCompanyStore = {
     db: MarketingTx,
     params: ProspectCompanyListParams,
   ): Promise<ProspectCompanyPage>;
+  /** Every live company the scope sees, A–Z, for the Visit form's picker. */
+  pickable(
+    db: MarketingTx,
+    workspaceId: string,
+    scope: OwnScope,
+  ): Promise<
+    { id: string; name: string; address: string | null; city: string | null }[]
+  >;
   /** Industries typed on the Company's live companies the scope sees, A–Z. */
   industries(
     db: MarketingTx,
@@ -221,10 +237,174 @@ export type ProspectCompanyStore = {
     by: string,
     at: Date,
   ): Promise<void>;
+  /** Contacts by id, removed ones included (a past Visit's points of contact). */
+  contactsByIds(
+    db: MarketingTx,
+    workspaceId: string,
+    ids: readonly string[],
+  ): Promise<StoredContact[]>;
   removeContact(
     tx: MarketingTx,
     id: string,
     by: string,
     at: Date,
   ): Promise<void>;
+};
+
+// ---------------------------------------------------------------------------
+// Visits (ADR CM-0040 §7)
+// ---------------------------------------------------------------------------
+
+export type VisitRow = VisitDetails & {
+  prospectCompanyId: string;
+  visitAt: Date;
+  status: VisitStatus;
+  completedAt: Date | null;
+  completedBy: string | null;
+  cancelReason: string | null;
+  cancelledAt: Date | null;
+  cancelledBy: string | null;
+};
+
+export type StoredVisit = VisitRow & {
+  id: string;
+  workspaceId: string;
+  number: string;
+  visitorIds: string[];
+  contactIds: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy: string;
+};
+
+export type StoredVisitNote = {
+  id: string;
+  visitId: string;
+  text: string;
+  createdAt: Date;
+  createdBy: string;
+};
+
+export type VisitListParams = {
+  workspaceId: string;
+  scope: OwnScope;
+  now: Date;
+  /** `visit_at` on or after. */
+  from?: Date;
+  /** `visit_at` before. */
+  to?: Date;
+  /** A visitor on it. */
+  memberId?: string;
+  prospectCompanyId?: string;
+  statuses?: readonly VisitShownStatus[];
+  purposes?: readonly VisitPurpose[];
+  interests?: readonly Interest[];
+  limit: number;
+  /** Newest first: `visitAt` then `id`, as a list cursor. */
+  after?: ListCursor;
+};
+
+export type VisitListRow = {
+  id: string;
+  number: string;
+  prospectCompany: {
+    id: string;
+    name: string;
+    createdBy: string;
+    assignedMemberId: string | null;
+  };
+  visitAt: Date;
+  status: VisitStatus;
+  purpose: VisitPurpose | null;
+  interest: Interest | null;
+  outcome: string | null;
+  visitorIds: string[];
+  contactNames: string[];
+  createdBy: string;
+};
+
+export type VisitStore = {
+  find(
+    db: MarketingTx,
+    workspaceId: string,
+    id: string,
+  ): Promise<StoredVisit | null>;
+  lock(
+    tx: MarketingTx,
+    workspaceId: string,
+    id: string,
+  ): Promise<StoredVisit | null>;
+  insert(
+    tx: MarketingTx,
+    row: VisitRow & {
+      id: string;
+      workspaceId: string;
+      number: string;
+      sequence: number;
+      visitorIds: readonly string[];
+      contactIds: readonly string[];
+      by: string;
+      at: Date;
+    },
+  ): Promise<void>;
+  /** Changes the row; the visitors and contacts only when given. */
+  update(
+    tx: MarketingTx,
+    id: string,
+    patch: Partial<VisitRow>,
+    links: { visitorIds?: readonly string[]; contactIds?: readonly string[] },
+    by: string,
+    at: Date,
+  ): Promise<void>;
+  remove(tx: MarketingTx, id: string, by: string, at: Date): Promise<void>;
+  notes(
+    db: MarketingTx,
+    workspaceId: string,
+    visitIds: readonly string[],
+  ): Promise<StoredVisitNote[]>;
+  addNote(
+    tx: MarketingTx,
+    row: StoredVisitNote & { workspaceId: string },
+  ): Promise<void>;
+  list(
+    db: MarketingTx,
+    params: VisitListParams,
+  ): Promise<{ items: VisitListRow[]; hasMore: boolean; total: number }>;
+};
+
+/** A Visit on its company's timeline. */
+export type CompanyVisit = {
+  id: string;
+  number: string;
+  visitAt: Date;
+  status: VisitStatus;
+  purpose: VisitPurpose | null;
+  outcome: string | null;
+  visitorIds: string[];
+};
+
+/**
+ * What the company page and list read about Visits (ADR CM-0040 §5): only
+ * the Visits the viewer may see.
+ */
+export type CompanyVisitsReader = {
+  timeline(
+    db: MarketingTx,
+    workspaceId: string,
+    companyId: string,
+    scope: OwnScope,
+  ): Promise<{ visits: CompanyVisit[]; notes: StoredVisitNote[] }>;
+  /** The latest completed Visit of each company. */
+  lastVisits(
+    db: MarketingTx,
+    workspaceId: string,
+    companyIds: readonly string[],
+    scope: OwnScope,
+  ): Promise<Map<string, Date>>;
+  /** Live Visits of the company, whoever logged them. */
+  liveCount(
+    tx: MarketingTx,
+    workspaceId: string,
+    companyId: string,
+  ): Promise<number>;
 };

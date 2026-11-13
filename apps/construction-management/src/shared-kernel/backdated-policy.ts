@@ -31,6 +31,7 @@ export const BACKDATED_MODULE_GROUPS = [
   { key: "labour_vendor", label: "Labour & Vendor" },
   { key: "sales", label: "Sales" },
   { key: "hrms", label: "HRMS" },
+  { key: "marketing", label: "Marketing" },
 ] as const;
 
 export type BackdatedModuleGroup =
@@ -219,16 +220,31 @@ export const BACKDATED_MODULES = [
   ),
   m("leave", "Leave", "hrms", "fromDate", "hrms.leaves"),
   m("holiday", "Holiday", "hrms", "holidayDate", "hrms.holidays"),
+  // A completed Visit's date (ADR CM-0040 §7); 7 days unless changed.
+  m(
+    "marketing_visit",
+    "Marketing Visit",
+    "marketing",
+    "visitAt",
+    "marketing.visits",
+    7,
+  ),
 ] as const;
 
+/**
+ * `defaultDays`: the module's own limit for create and edit in a Company
+ * that has not set one; without it the module follows the defaults, which
+ * start at no limit.
+ */
 function m<Key extends string>(
   key: Key,
   label: string,
   group: BackdatedModuleGroup,
   entryDateField: string,
   menu: MenuKey,
+  defaultDays?: number,
 ) {
-  return { key, label, group, entryDateField, menu } as const;
+  return { key, label, group, entryDateField, menu, defaultDays } as const;
 }
 
 export type BackdatedModuleKey = (typeof BACKDATED_MODULES)[number]["key"];
@@ -277,16 +293,24 @@ export const MAX_BACKDATED_DAYS = 3650;
 
 const NO_LIMIT: BackdatedLimit = { days: 0, overrideRoleIds: [] };
 
-/** A new Company: no limits, no closing date. */
+/** A module's setting before the Company changes it. */
+function defaultSetting(item: BackdatedModule): BackdatedModuleSetting {
+  if (item.defaultDays == null)
+    return { mode: "global", create: NO_LIMIT, edit: NO_LIMIT };
+  const limit = { days: item.defaultDays, overrideRoleIds: [] };
+  return { mode: "custom", create: limit, edit: limit };
+}
+
+/**
+ * A new Company: no limits and no closing date, except the modules with a
+ * limit of their own (Marketing Visits, 7 days).
+ */
 export const DEFAULT_BACKDATED_POLICY: BackdatedPolicy = {
   create: NO_LIMIT,
   edit: NO_LIMIT,
   financialClosingDate: null,
   modules: Object.fromEntries(
-    BACKDATED_MODULES.map((item) => [
-      item.key,
-      { mode: "global", create: NO_LIMIT, edit: NO_LIMIT },
-    ]),
+    BACKDATED_MODULES.map((item) => [item.key, defaultSetting(item)]),
   ) as Record<BackdatedModuleKey, BackdatedModuleSetting>,
 };
 

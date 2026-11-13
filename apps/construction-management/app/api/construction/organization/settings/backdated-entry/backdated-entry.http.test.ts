@@ -133,7 +133,7 @@ describe("Back-dated Entry policy HTTP (CM-113)", () => {
     expect(await json(response)).toMatchObject({ code: "PERMISSION_DENIED" });
   });
 
-  it("starts a new Company with no limits and no closing date", async () => {
+  it("starts a new Company with no limits and no closing date, but 7 days on Marketing Visits", async () => {
     const company = await newCompany();
     session({ userId: company.ownerId, workspaceId: company.workspaceId });
     const response = await getPolicy(getRequest());
@@ -143,11 +143,19 @@ describe("Back-dated Entry policy HTTP (CM-113)", () => {
     expect(body.edit).toEqual({ days: 0, overrideRoleIds: [] });
     expect(body.financialClosingDate).toBeNull();
     expect(body.updatedAt).toBeNull();
-    expect(body.modules).toHaveLength(31);
+    expect(body.modules).toHaveLength(32);
     expect(body.modules[0]).toMatchObject({
       key: "purchase_request",
       group: "procurement",
       mode: "global",
+    });
+    // Its own default (ADR CM-0040 §7).
+    expect(body.modules.at(-1)).toMatchObject({
+      key: "marketing_visit",
+      group: "marketing",
+      mode: "custom",
+      create: { days: 7 },
+      edit: { days: 7 },
     });
   });
 

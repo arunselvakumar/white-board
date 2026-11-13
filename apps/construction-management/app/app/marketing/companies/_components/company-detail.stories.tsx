@@ -7,6 +7,7 @@ import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { CompanyDetail } from "./company-detail";
 import {
   BALAJI_ID,
+  BALAJI_VISIT_ID,
   KAVERI_ID,
   LAKSHMI_ID,
   MARKETING_COMPANIES_API,
@@ -76,12 +77,56 @@ export const WithContactsAndHistory: Story = {
 
     const history = within(canvas.getByRole("list", { name: "History" }));
     const entries = history.getAllByRole("listitem");
-    await expect(entries).toHaveLength(4);
+    await expect(entries).toHaveLength(6);
     await expect(entries[0]).toHaveTextContent(
       "Moved to Quotation sent · by Ravi Shankar · 12 Nov 2026, 4:05 pm",
     );
-    await expect(entries[3]).toHaveTextContent(
+    await expect(entries[5]).toHaveTextContent(
       "Added at New · by Arun Selva Kumar · 1 Nov 2026, 10:00 am",
+    );
+  },
+};
+
+/** Visits and their notes join the Stage changes, each linking to its Visit. */
+export const HistoryWithVisits: Story = {
+  play: async ({ canvas }) => {
+    const history = within(
+      await canvas.findByRole("list", { name: "History" }),
+    );
+    const [, note, visit] = history.getAllByRole("listitem");
+    if (note == null || visit == null) throw new Error("a note and a Visit");
+    await expect(note).toHaveTextContent(
+      "Note on MV-0003: Sent the PEB drawings they asked for.",
+    );
+    await expect(note).toHaveTextContent("by Priya Raman");
+    await expect(visit).toHaveTextContent(
+      "MV-0003 · Completed · Requirement discussion · by Ravi Shankar, Priya Raman",
+    );
+    await expect(visit).toHaveTextContent(
+      "10 Nov 2026, 1:30 pm · Asked for a quotation",
+    );
+    for (const item of [note, visit])
+      await expect(
+        within(item).getByRole("link", { name: "MV-0003" }),
+      ).toHaveAttribute("href", `/app/marketing/visits/${BALAJI_VISIT_ID}`);
+  },
+};
+
+/** With Visits create: Plan Visit and Log Visit open the form on this company. */
+export const PlanAndLogVisit: Story = {
+  args: { canPlanVisit: true },
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByRole("link", { name: "Plan Visit" }),
+    ).toHaveAttribute(
+      "href",
+      `/app/marketing/visits/new?status=planned&prospectCompanyId=${BALAJI_ID}`,
+    );
+    await expect(
+      canvas.getByRole("link", { name: "Log Visit" }),
+    ).toHaveAttribute(
+      "href",
+      `/app/marketing/visits/new?status=completed&prospectCompanyId=${BALAJI_ID}`,
     );
   },
 };
@@ -114,6 +159,7 @@ export const ReadOnly: Story = {
   play: async ({ canvas }) => {
     await canvas.findByRole("heading", { name: "Sri Balaji Infra Projects" });
     await expect(canvas.queryByRole("button", { name: "Actions" })).toBeNull();
+    await expect(canvas.queryByRole("link", { name: "Plan Visit" })).toBeNull();
     await expect(
       canvas.queryByRole("button", { name: "Add Contact" }),
     ).toBeNull();

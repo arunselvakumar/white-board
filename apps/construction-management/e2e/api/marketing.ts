@@ -14,12 +14,54 @@ export async function createProspectCompany(
     city?: string;
     primaryContact?: { name: string; mobile?: string };
   } = {},
-): Promise<{ id: string; name: string }> {
+): Promise<{ id: string; name: string; contactIds: string[] }> {
   const name = input.name ?? unique("Kaveri Steel");
-  const created = await api.post<{ id: string; name: string }>(COMPANIES, {
+  const created = await api.post<{
+    id: string;
+    name: string;
+    contacts: { id: string }[];
+  }>(COMPANIES, {
     name,
     city: input.city ?? "Coimbatore",
     primaryContact: input.primaryContact ?? null,
   });
-  return { id: created.id, name: created.name };
+  return {
+    id: created.id,
+    name: created.name,
+    contactIds: created.contacts.map((contact) => contact.id),
+  };
+}
+
+const VISITS = "/api/construction/marketing/visits";
+
+/**
+ * A Visit to a Prospect Company, planned (tomorrow unless `visitAt`) or
+ * logged as completed an hour ago with the company's Contacts.
+ */
+export async function createVisit(
+  api: ApiClient,
+  input: {
+    prospectCompanyId: string;
+    status?: "planned" | "completed";
+    visitAt?: Date;
+    visitorIds?: string[];
+    contactIds?: string[];
+    discussion?: string;
+  },
+): Promise<{ id: string; number: string; updatedAt: string }> {
+  const completed = input.status === "completed";
+  const visitAt =
+    input.visitAt ??
+    new Date(Date.now() + (completed ? -1 : 24) * 60 * 60 * 1000);
+  return api.post<{ id: string; number: string; updatedAt: string }>(VISITS, {
+    status: input.status ?? "planned",
+    prospectCompanyId: input.prospectCompanyId,
+    visitAt: visitAt.toISOString(),
+    purpose: "introduction",
+    ...(input.visitorIds == null ? {} : { visitorIds: input.visitorIds }),
+    ...(input.contactIds == null ? {} : { contactIds: input.contactIds }),
+    ...(completed
+      ? { discussion: input.discussion ?? "Talked about their new shed." }
+      : {}),
+  });
 }

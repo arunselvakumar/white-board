@@ -14,10 +14,17 @@ import { activityRecordedLabel } from "@/app/app/_components/activity/activity-f
 import {
   LOST_REASON_LABELS,
   STAGE_LABELS,
+  VISIT_PURPOSE_LABELS,
+  VISIT_STATUS_LABELS,
   type LostReason,
   type Stage,
 } from "@/src/marketing/domain/marketing-terms";
 import type { ProspectCompanyTimelineItem } from "@/src/queries/marketing-companies";
+
+type TimelineEntry<K extends ProspectCompanyTimelineItem["kind"]> = Extract<
+  ProspectCompanyTimelineItem,
+  { kind: K }
+>;
 
 const STAGE_CLASSES: Record<Stage, string> = {
   new: "border-border bg-muted text-foreground",
@@ -58,17 +65,31 @@ export function lostReasonWords(
 }
 
 /** "Added at New" for the first entry, "Moved to Quotation sent" after. */
-export function stageEntryWords(item: ProspectCompanyTimelineItem): string {
+export function stageEntryWords(item: TimelineEntry<"stage">): string {
   const stage = STAGE_LABELS[item.toStage];
   return item.fromStage == null ? `Added at ${stage}` : `Moved to ${stage}`;
 }
 
 /** "by Ravi · 12 Nov 2026, 4:05 pm" in the Company's time zone. */
 export function stageEntryByline(
-  item: ProspectCompanyTimelineItem,
+  item: TimelineEntry<"stage"> | TimelineEntry<"note">,
   timeZone: string,
 ): string {
   return `by ${item.byName} · ${activityRecordedLabel(item.at, timeZone)}`;
+}
+
+/** "MV-0003 · Completed · Requirement discussion · by Ravi, Priya". */
+export function visitEntryWords(item: TimelineEntry<"visit">): string {
+  return [
+    item.number,
+    VISIT_STATUS_LABELS[item.status],
+    item.purpose == null ? null : VISIT_PURPOSE_LABELS[item.purpose],
+    item.visitorNames.length === 0
+      ? null
+      : `by ${item.visitorNames.join(", ")}`,
+  ]
+    .filter((part): part is string => part != null)
+    .join(" · ");
 }
 
 const NONE = "__none";

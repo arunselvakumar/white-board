@@ -34,6 +34,7 @@ import {
 } from "@repo/ui/components/dropdown-menu";
 import { cn } from "@repo/ui/lib/utils";
 
+import { activityRecordedLabel } from "@/app/app/_components/activity/activity-feed";
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
 import { COMPANY_SOURCE_LABELS } from "@/src/marketing/domain/marketing-terms";
@@ -45,14 +46,18 @@ import {
   useDeleteCompany,
   type ProspectCompany,
   type ProspectCompanyContact,
+  type ProspectCompanyTimelineItem,
 } from "@/src/queries/marketing-companies";
+import { visitPath } from "@/src/queries/marketing-visits";
 import { gstStateName } from "@/src/shared-kernel/gst-states";
 
+import { VisitButtons } from "../../_components/visit-buttons";
 import {
   lostReasonWords,
   StageBadge,
   stageEntryByline,
   stageEntryWords,
+  visitEntryWords,
 } from "./company-parts";
 import { ContactDialog } from "./contact-dialog";
 import { MoveStageDialog } from "./move-stage-dialog";
@@ -411,6 +416,88 @@ function Contacts({
   );
 }
 
+function TimelineText({
+  item,
+  timeZone,
+}: {
+  item: ProspectCompanyTimelineItem;
+  timeZone: string;
+}) {
+  switch (item.kind) {
+    case "stage": {
+      const lost =
+        item.toStage === "lost"
+          ? lostReasonWords(item.lostReason, item.lostReasonText)
+          : null;
+      return (
+        <>
+          <p>
+            <span className="font-medium">{stageEntryWords(item)}</span>
+            <span className="text-muted-foreground">
+              {` · ${stageEntryByline(item, timeZone)}`}
+            </span>
+          </p>
+          {lost != null && (
+            <p className="text-muted-foreground break-words">
+              {`Lost Reason: ${lost}`}
+            </p>
+          )}
+        </>
+      );
+    }
+    case "visit": {
+      const [number, ...rest] = visitEntryWords(item).split(" · ");
+      return (
+        <>
+          <p className="break-words">
+            <Link
+              href={visitPath(item.id)}
+              className="font-medium underline-offset-4 hover:underline"
+            >
+              {number}
+            </Link>
+            <span className="font-medium">
+              {rest.length === 0 ? "" : ` · ${rest.join(" · ")}`}
+            </span>
+          </p>
+          <p className="text-muted-foreground break-words">
+            {activityRecordedLabel(item.at, timeZone)}
+            {item.outcome == null ? "" : ` · ${item.outcome}`}
+          </p>
+        </>
+      );
+    }
+    case "note":
+      return (
+        <>
+          <p className="break-words whitespace-pre-line">
+            <span className="font-medium">
+              {"Note on "}
+              <Link
+                href={visitPath(item.visitId)}
+                className="underline-offset-4 hover:underline"
+              >
+                {item.visitNumber}
+              </Link>
+              {": "}
+            </span>
+            {item.text}
+          </p>
+          <p className="text-muted-foreground">
+            {stageEntryByline(item, timeZone)}
+          </p>
+        </>
+      );
+  }
+}
+
+const DOT_CLASSES: Record<ProspectCompanyTimelineItem["kind"], string> = {
+  stage: "bg-primary/60",
+  visit: "bg-emerald-500/70",
+  note: "bg-muted-foreground/50",
+};
+
+/** Stage changes, Visits and their notes, newest first. */
 function History({
   company,
   timeZone,
@@ -421,33 +508,20 @@ function History({
   return (
     <Card title="History">
       <ol aria-label="History" className="space-y-3">
-        {company.timeline.map((item) => {
-          const lost =
-            item.toStage === "lost"
-              ? lostReasonWords(item.lostReason, item.lostReasonText)
-              : null;
-          return (
-            <li key={item.id} className="flex min-w-0 gap-3">
-              <span
-                aria-hidden="true"
-                className="bg-primary/60 mt-1.5 size-2 shrink-0 rounded-full"
-              />
-              <div className="min-w-0 text-sm">
-                <p>
-                  <span className="font-medium">{stageEntryWords(item)}</span>
-                  <span className="text-muted-foreground">
-                    {` · ${stageEntryByline(item, timeZone)}`}
-                  </span>
-                </p>
-                {lost != null && (
-                  <p className="text-muted-foreground break-words">
-                    {`Lost Reason: ${lost}`}
-                  </p>
-                )}
-              </div>
-            </li>
-          );
-        })}
+        {company.timeline.map((item) => (
+          <li key={`${item.kind}-${item.id}`} className="flex min-w-0 gap-3">
+            <span
+              aria-hidden="true"
+              className={cn(
+                "mt-1.5 size-2 shrink-0 rounded-full",
+                DOT_CLASSES[item.kind],
+              )}
+            />
+            <div className="min-w-0 text-sm">
+              <TimelineText item={item} timeZone={timeZone} />
+            </div>
+          </li>
+        ))}
       </ol>
     </Card>
   );
@@ -457,7 +531,14 @@ function History({
  * One Prospect Company: its details, Contacts and the history of its
  * Stage, with Edit, Move Stage and Delete as the server's `actions` allow.
  */
-export function CompanyDetail({ id }: { id: string }) {
+export function CompanyDetail({
+  id,
+  canPlanVisit = false,
+}: {
+  id: string;
+  /** Visits create: Plan Visit and Log Visit for this company. */
+  canPlanVisit?: boolean;
+}) {
   const router = useRouter();
   const { data: company } = useSuspenseQuery(companyQuery(id));
   const remove = useDeleteCompany(company.id);
@@ -481,47 +562,56 @@ export function CompanyDetail({ id }: { id: string }) {
             </span>
           }
           actions={
-            canUpdate || canDelete ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger
-                  render={<Button type="button" variant="outline" />}
-                >
-                  <MoreHorizontal aria-hidden="true" />
-                  Actions
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-44">
-                  {canUpdate && (
-                    <DropdownMenuItem
-                      render={<Link href={`${companyPath(company.id)}/edit`} />}
+            canUpdate || canDelete || canPlanVisit ? (
+              <div className="flex flex-wrap gap-2">
+                {canPlanVisit && (
+                  <VisitButtons prospectCompanyId={company.id} />
+                )}
+                {(canUpdate || canDelete) && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger
+                      render={<Button type="button" variant="outline" />}
                     >
-                      <Pencil aria-hidden="true" />
-                      Edit
-                    </DropdownMenuItem>
-                  )}
-                  {canUpdate && (
-                    <DropdownMenuItem
-                      onClick={() => {
-                        setDialog("stage");
-                      }}
-                    >
-                      <ArrowRightLeft aria-hidden="true" />
-                      Move Stage
-                    </DropdownMenuItem>
-                  )}
-                  {canDelete && canUpdate && <DropdownMenuSeparator />}
-                  {canDelete && (
-                    <DropdownMenuItem
-                      variant="destructive"
-                      onClick={() => {
-                        setDialog("delete");
-                      }}
-                    >
-                      <Trash2 aria-hidden="true" />
-                      Delete
-                    </DropdownMenuItem>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                      <MoreHorizontal aria-hidden="true" />
+                      Actions
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-44">
+                      {canUpdate && (
+                        <DropdownMenuItem
+                          render={
+                            <Link href={`${companyPath(company.id)}/edit`} />
+                          }
+                        >
+                          <Pencil aria-hidden="true" />
+                          Edit
+                        </DropdownMenuItem>
+                      )}
+                      {canUpdate && (
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setDialog("stage");
+                          }}
+                        >
+                          <ArrowRightLeft aria-hidden="true" />
+                          Move Stage
+                        </DropdownMenuItem>
+                      )}
+                      {canDelete && canUpdate && <DropdownMenuSeparator />}
+                      {canDelete && (
+                        <DropdownMenuItem
+                          variant="destructive"
+                          onClick={() => {
+                            setDialog("delete");
+                          }}
+                        >
+                          <Trash2 aria-hidden="true" />
+                          Delete
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </div>
             ) : undefined
           }
         />

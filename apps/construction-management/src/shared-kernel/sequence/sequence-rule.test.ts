@@ -85,6 +85,7 @@ describe("formatSequenceNumber", () => {
       "TXN",
       "PAY",
       "EXP",
+      "MV",
     ]);
     expect(
       formatSequenceNumber(
@@ -93,6 +94,16 @@ describe("formatSequenceNumber", () => {
         1,
       ),
     ).toBe("GRN/26-27/00001");
+  });
+
+  it("numbers Marketing Visits MV-0001, without the fiscal year (ADR CM-0040 §7)", () => {
+    expect(
+      formatSequenceNumber(
+        standardSequenceSettings("marketing_visit"),
+        fiscalYearOf("2026-11-12"),
+        1,
+      ),
+    ).toBe("MV-0001");
   });
 });
 

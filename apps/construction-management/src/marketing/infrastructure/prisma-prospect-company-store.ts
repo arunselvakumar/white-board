@@ -277,6 +277,18 @@ export const prismaProspectCompanyStore: ProspectCompanyStore = {
     };
   },
 
+  pickable(db, workspaceId, scope) {
+    return db.constructionMarketingProspectCompany.findMany({
+      where: {
+        workspaceId,
+        deletedAt: null,
+        ...prospectCompanyVisibleWhere(scope),
+      },
+      orderBy: [{ nameKey: "asc" }, { id: "asc" }],
+      select: { id: true, name: true, address: true, city: true },
+    });
+  },
+
   async industries(db, workspaceId, scope) {
     const rows = await db.constructionMarketingProspectCompany.findMany({
       where: {
@@ -350,6 +362,14 @@ export const prismaProspectCompanyStore: ProspectCompanyStore = {
     await db.constructionMarketingContact.update({
       where: { id: contactId },
       data: { isPrimary: true, updatedAt: at, updatedBy: by },
+    });
+  },
+
+  async contactsByIds(db, workspaceId, ids) {
+    if (ids.length === 0) return [];
+    return db.constructionMarketingContact.findMany({
+      where: { workspaceId, id: { in: [...ids] } },
+      select: CONTACT_SELECT,
     });
   },
 

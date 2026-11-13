@@ -63,19 +63,24 @@ export function contact(
   };
 }
 
+type StageEntry = Extract<ProspectCompanyTimelineItem, { kind: "stage" }>;
+
 function entry(
   id: string,
   fromStage: Stage | null,
   toStage: Stage,
   at: string,
   byName: string,
-  lost: Pick<ProspectCompanyTimelineItem, "lostReason" | "lostReasonText"> = {
+  lost: Pick<StageEntry, "lostReason" | "lostReasonText"> = {
     lostReason: null,
     lostReasonText: null,
   },
 ): ProspectCompanyTimelineItem {
   return { kind: "stage", id, fromStage, toStage, at, byName, ...lost };
 }
+
+/** MV-0003 on Sri Balaji, completed; the Visit stories open the same id. */
+export const BALAJI_VISIT_ID = "0199d000-0000-7000-8000-000000000503";
 
 /** Sri Balaji Infra Projects at Quotation sent, with two Contacts. */
 export function company(
@@ -123,6 +128,25 @@ export function company(
         "2026-11-12T10:35:00.000Z",
         "Ravi Shankar",
       ),
+      {
+        kind: "note",
+        id: "0199d000-0000-7000-8000-000000000601",
+        visitId: BALAJI_VISIT_ID,
+        visitNumber: "MV-0003",
+        text: "Sent the PEB drawings they asked for.",
+        at: "2026-11-11T06:30:00.000Z",
+        byName: "Priya Raman",
+      },
+      {
+        kind: "visit",
+        id: BALAJI_VISIT_ID,
+        number: "MV-0003",
+        at: "2026-11-10T08:00:00.000Z",
+        status: "completed",
+        purpose: "requirement_discussion",
+        outcome: "Asked for a quotation",
+        visitorNames: ["Ravi Shankar", "Priya Raman"],
+      },
       entry(
         "0199d000-0000-7000-8000-000000000303",
         "contacted",
@@ -230,6 +254,10 @@ export function toListItem(detail: ProspectCompany): ProspectCompanyListItem {
     assignedTo: detail.assignedTo,
     primaryContact:
       primary == null ? null : { name: primary.name, mobile: primary.mobile },
+    lastVisitAt:
+      detail.timeline.find(
+        (item) => item.kind === "visit" && item.status === "completed",
+      )?.at ?? null,
     createdAt: detail.createdAt,
     updatedAt: detail.updatedAt,
   };
@@ -260,11 +288,22 @@ function text(body: Record<string, unknown>, key: string): string | null {
 
 const json = (body: unknown, status = 200) => Response.json(body, { status });
 
+/**
+ * A story's company answers, and `add` for a company another screen's mock
+ * creates (a Visit with a new company), so its page opens afterwards.
+ */
+export type CompanyHandler = ((call: ApiCall) => Response | undefined) & {
+  add: (company: ProspectCompany) => void;
+};
+
 /** Answers the Prospect Company screens' reads and writes for one story. */
 export function companyHandler(
   options: CompanyApiOptions = {},
-): (call: ApiCall) => Response | undefined {
+): CompanyHandler {
   let companies = [...(options.companies ?? COMPANIES)];
+  const add = (next: ProspectCompany) => {
+    companies = [...companies.filter((item) => item.id !== next.id), next];
+  };
   const taken = (name: unknown, exceptId?: string) =>
     typeof name === "string" &&
     [
@@ -287,7 +326,7 @@ export function companyHandler(
     return json(next);
   };
 
-  return (call) => {
+  const handler = (call: ApiCall): Response | undefined => {
     const extra = options.extra?.(call);
     if (extra != null) return extra;
     const url = new URL(call.path, "http://storybook.local");
@@ -327,6 +366,7 @@ export function companyHandler(
         items: page.map(toListItem),
         nextCursor: next < matching.length ? String(next) : null,
         total: matching.length,
+        timeZone: "Asia/Kolkata",
       } satisfies ProspectCompanyPage);
     }
 
@@ -485,6 +525,7 @@ export function companyHandler(
     }
     return undefined;
   };
+  return Object.assign(handler, { add });
 }
 
 export function mockCompanyApi(options: CompanyApiOptions = {}) {
