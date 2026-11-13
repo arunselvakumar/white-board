@@ -12,6 +12,7 @@ import { cn } from "@repo/ui/lib/utils";
 
 import { activityRecordedLabel } from "@/app/app/_components/activity/activity-feed";
 import {
+  FOLLOW_UP_TYPE_LABELS,
   LOST_REASON_LABELS,
   STAGE_LABELS,
   VISIT_PURPOSE_LABELS,
@@ -90,6 +91,28 @@ export function visitEntryWords(item: TimelineEntry<"visit">): string {
   ]
     .filter((part): part is string => part != null)
     .join(" · ");
+}
+
+/** `2026-11-14` as "14 Nov". */
+function shortDay(date: string): string {
+  const [year = 1970, month = 1, day = 1] = date.split("-").map(Number);
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(year, month - 1, day)));
+}
+
+/**
+ * "Call due 14 Nov · Ravi Shankar — Done: sent the rates", "… —
+ * Cancelled", or no ending while it is Open.
+ */
+export function followUpEntryWords(item: TimelineEntry<"follow_up">): string {
+  const head = `${FOLLOW_UP_TYPE_LABELS[item.type]} due ${shortDay(item.dueDate)} · ${item.ownerName}`;
+  if (item.status === "done")
+    return `${head} — Done${item.resultNote == null ? "" : `: ${item.resultNote}`}`;
+  if (item.status === "cancelled") return `${head} — Cancelled`;
+  return head;
 }
 
 const NONE = "__none";

@@ -168,3 +168,35 @@ export const VISIT_LIMITS = {
 
 /** A creator may change a Completed Visit for this long (ADR CM-0040 §7). */
 export const VISIT_LOCK_DAYS = 7;
+
+export const FOLLOW_UP_TYPES = [
+  "call",
+  "visit",
+  "email",
+  "send_quotation",
+  "other",
+] as const;
+export type FollowUpType = (typeof FOLLOW_UP_TYPES)[number];
+
+export const FOLLOW_UP_TYPE_LABELS: Record<FollowUpType, string> = {
+  call: "Call",
+  visit: "Visit",
+  email: "Email",
+  send_quotation: "Send quotation",
+  other: "Other",
+};
+
+export const FOLLOW_UP_STATUSES = ["open", "done", "cancelled"] as const;
+export type FollowUpStatus = (typeof FOLLOW_UP_STATUSES)[number];
+
+export const FOLLOW_UP_STATUS_LABELS: Record<FollowUpStatus, string> = {
+  open: "Open",
+  done: "Done",
+  cancelled: "Cancelled",
+};
+
+/** An Open Follow-up's group on the Company's today (PRD §3.5). */
+export const FOLLOW_UP_DUES = ["overdue", "today", "upcoming"] as const;
+export type FollowUpDue = (typeof FOLLOW_UP_DUES)[number];
+
+export const FOLLOW_UP_LIMITS = { note: 1000, resultNote: 1000 } as const;

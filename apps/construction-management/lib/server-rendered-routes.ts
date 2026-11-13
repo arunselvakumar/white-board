@@ -8,6 +8,7 @@ export const SERVER_RENDERED_ROUTES: readonly string[] = [
   "/app/marketing/companies/new",
   "/app/marketing/companies/[id]",
   "/app/marketing/companies/[id]/edit",
+  "/app/marketing/follow-ups",
   "/app/marketing/visits",
   "/app/marketing/visits/new",
   "/app/marketing/visits/[id]",

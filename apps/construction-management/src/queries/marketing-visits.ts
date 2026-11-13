@@ -27,6 +27,7 @@ import type {
 
 import { apiJson, QueryHttpError } from "./http";
 import { MARKETING_COMPANIES_KEY } from "./marketing-companies";
+import { MARKETING_FOLLOW_UPS_KEY } from "./marketing-follow-ups";
 
 export type Visit = ConstructionMarketingVisitResponse;
 export type VisitListItem = z.infer<
@@ -141,14 +142,25 @@ export function visitPath(id?: string): string {
     : `${MARKETING_VISITS_PATH}/${encodeURIComponent(id)}`;
 }
 
-/** The form: plan or log, with a company already picked when given. */
+/**
+ * The form: plan or log, with a company already picked when given, and
+ * its points of contact and visitors (Log the visit from a Follow-up).
+ */
 export function newVisitPath(
   status: "planned" | "completed",
   prospectCompanyId?: string,
+  people: {
+    contactIds?: readonly string[];
+    visitorIds?: readonly string[];
+  } = {},
 ): string {
   const params = new URLSearchParams({ status });
   if (prospectCompanyId != null)
     params.set("prospectCompanyId", prospectCompanyId);
+  if (people.contactIds != null && people.contactIds.length > 0)
+    params.set("contactIds", people.contactIds.join(","));
+  if (people.visitorIds != null && people.visitorIds.length > 0)
+    params.set("visitorIds", people.visitorIds.join(","));
   return `${MARKETING_VISITS_PATH}/new?${params.toString()}`;
 }
 
@@ -165,9 +177,9 @@ const item = (id: string, action: string) =>
 
 /**
  * Keeps the answered Visit as its page's data, then refreshes the Visit
- * lists and form options, and every Prospect Company read: a Visit shows
- * on its company's history, may move its Stage, and may add the company or
- * Contacts.
+ * lists and form options, every Prospect Company read (a Visit shows on
+ * its company's history, may move its Stage, and may add the company or
+ * Contacts) and the Follow-up lists (its Next Follow-up).
  */
 function useSaved() {
   const client = useQueryClient();
@@ -179,6 +191,7 @@ function useSaved() {
         predicate: (query) => query.queryKey[2] !== "detail",
       }),
       client.invalidateQueries({ queryKey: MARKETING_COMPANIES_KEY }),
+      client.invalidateQueries({ queryKey: MARKETING_FOLLOW_UPS_KEY }),
     ]);
   };
 }

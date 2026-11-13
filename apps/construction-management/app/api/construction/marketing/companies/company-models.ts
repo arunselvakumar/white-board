@@ -11,6 +11,8 @@ import type {
 import {
   COMPANY_SOURCES,
   LOST_REASONS,
+  FOLLOW_UP_STATUSES,
+  FOLLOW_UP_TYPES,
   MARKETING_LIMITS,
   STAGES,
   VISIT_PURPOSES,
@@ -190,6 +192,8 @@ export const ConstructionMarketingProspectCompanyListItemResponseModel =
       .nullable(),
     /** The latest completed Visit the viewer may see. */
     lastVisitAt: z.iso.datetime().nullable(),
+    /** The earliest open Follow-up the viewer may see. */
+    nextFollowUpOn: z.iso.date().nullable(),
     createdAt: z.iso.datetime(),
     updatedAt: z.iso.datetime(),
   });
@@ -240,6 +244,20 @@ export const ConstructionMarketingTimelineItemResponseModel =
       purpose: z.enum(VISIT_PURPOSES).nullable(),
       outcome: z.string().nullable(),
       visitorNames: z.array(z.string()),
+    }),
+    z.object({
+      /** A Follow-up the viewer may see: where it was done, or made. */
+      kind: z.literal("follow_up"),
+      id: z.uuid(),
+      visitId: z.uuid().nullable(),
+      visitNumber: z.string().nullable(),
+      type: z.enum(FOLLOW_UP_TYPES),
+      status: z.enum(FOLLOW_UP_STATUSES),
+      dueDate: z.iso.date(),
+      ownerName: z.string(),
+      note: z.string().nullable(),
+      resultNote: z.string().nullable(),
+      at: z.iso.datetime(),
     }),
     z.object({
       /** A photo or file added to one of those Visits. */

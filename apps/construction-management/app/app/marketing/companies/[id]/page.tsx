@@ -3,10 +3,15 @@ import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { GET as getCompany } from "@/app/api/construction/marketing/companies/[id]/route";
+import { GET as followUpFormOptions } from "@/app/api/construction/marketing/follow-ups/form-options/route";
 import {
   companyQuery,
   MARKETING_COMPANIES_API,
 } from "@/src/queries/marketing-companies";
+import {
+  followUpFormOptionsQuery,
+  MARKETING_FOLLOW_UPS_API,
+} from "@/src/queries/marketing-follow-ups";
 import { getQueryClient } from "@/src/queries/query-client";
 import { prefetchRoute, routeHandler } from "@/src/queries/route-fetch";
 
@@ -24,6 +29,7 @@ export const dynamic = "force-dynamic";
 
 const ROUTES = {
   [`${MARKETING_COMPANIES_API}/[id]`]: routeHandler(getCompany),
+  [`${MARKETING_FOLLOW_UPS_API}/form-options`]: followUpFormOptions,
 };
 
 export default async function Page({
@@ -36,10 +42,19 @@ export default async function Page({
     return <MarketingNoAccess what="Prospect Companies" />;
 
   const canPlanVisit = await viewerCan("marketing.visits", "create");
+  const canAddFollowUp = await viewerCan("marketing.follow_ups", "create");
 
   const queryClient = getQueryClient();
   try {
-    await prefetchRoute(queryClient, companyQuery(id), ROUTES);
+    await Promise.all([
+      prefetchRoute(queryClient, companyQuery(id), ROUTES),
+      // What Add Follow-up's form reads.
+      canAddFollowUp
+        ? prefetchRoute(queryClient, followUpFormOptionsQuery, ROUTES).catch(
+            () => undefined,
+          )
+        : undefined,
+    ]);
   } catch (error) {
     if (isCompanyNotFound(error)) return <CompanyNotFound />;
     throw error;
@@ -47,7 +62,11 @@ export default async function Page({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <CompanyDetail id={id} canPlanVisit={canPlanVisit} />
+      <CompanyDetail
+        id={id}
+        canPlanVisit={canPlanVisit}
+        canAddFollowUp={canAddFollowUp}
+      />
     </HydrationBoundary>
   );
 }

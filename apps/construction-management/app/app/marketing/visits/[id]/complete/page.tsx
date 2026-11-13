@@ -1,7 +1,7 @@
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import type { Metadata } from "next";
 
-import { viewerFlags } from "@/app/app/_lib/viewer-can";
+import { viewerCan, viewerFlags } from "@/app/app/_lib/viewer-can";
 import { GET as getVisit } from "@/app/api/construction/marketing/visits/[id]/route";
 import { GET as formOptions } from "@/app/api/construction/marketing/visits/form-options/route";
 import {
@@ -40,6 +40,7 @@ export default async function Page({
   const flags = await viewerFlags("marketing.visits", ["read", "update"]);
   if (!flags.read || !flags.update)
     return <MarketingNoAccess what="completing Visits" />;
+  const canAddFollowUp = await viewerCan("marketing.follow_ups", "create");
 
   const queryClient = getQueryClient();
   try {
@@ -54,7 +55,7 @@ export default async function Page({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <VisitComplete id={id} />
+      <VisitComplete id={id} canAddFollowUp={canAddFollowUp} />
     </HydrationBoundary>
   );
 }

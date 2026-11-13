@@ -5,6 +5,10 @@ import { expect, waitFor, within } from "storybook/test";
 import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 
 import {
+  KAVERI_ID,
+  MURUGAN_ID,
+} from "../../companies/_components/company-fixtures";
+import {
   BALAJI_ID,
   MARKETING_VISITS_API,
   NEW_VISIT_ID,
@@ -328,5 +332,91 @@ export const BackdatedRefused: Story = {
       ),
     ).toBeVisible();
     await expect(getRouter().push).not.toHaveBeenCalled();
+  },
+};
+
+/**
+ * With Follow-ups create, Plan, Log and Complete can add a Next
+ * Follow-up: its type and due date are required once added, the owner
+ * starts as the viewer, and it is sent with the Visit.
+ */
+export const PlanWithNextFollowUp: Story = {
+  args: { canAddFollowUp: true },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    const form = within(
+      await canvas.findByRole("form", { name: "Plan Visit" }),
+    );
+    await userEvent.type(form.getByLabelText("Visit time"), "11:30");
+    await userEvent.click(
+      form.getByRole("button", { name: "Add Next Follow-up" }),
+    );
+    await expect(form.getByLabelText("Owner")).toHaveTextContent(
+      "Arun Selva Kumar",
+    );
+    await userEvent.click(form.getByRole("button", { name: "Save" }));
+    await expect(
+      await form.findByText("Choose the type of Follow-up."),
+    ).toBeVisible();
+    await expect(form.getByText("Choose the date it is due.")).toBeVisible();
+    await expect(posts(MARKETING_VISITS_API)).toHaveLength(0);
+
+    await userEvent.click(form.getByLabelText("Type"));
+    await userEvent.click(await body.findByRole("option", { name: "Call" }));
+    await userEvent.type(form.getByLabelText("Due date"), "2026-11-19");
+    await userEvent.click(form.getByLabelText("Owner"));
+    await userEvent.click(
+      await body.findByRole("option", { name: "Ravi Shankar" }),
+    );
+    await userEvent.type(form.getByLabelText("Note"), "Send the rates");
+    await userEvent.click(form.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(posts(MARKETING_VISITS_API)).toHaveLength(1));
+    await expect(posts(MARKETING_VISITS_API)[0]?.body).toMatchObject({
+      status: "planned",
+      nextFollowUp: {
+        type: "call",
+        dueDate: "2026-11-19",
+        ownerMemberId: RAVI_MEMBER_ID,
+        note: "Send the rates",
+      },
+    });
+  },
+};
+
+/** Without Follow-ups create there is no Next Follow-up, nor on Edit. */
+export const NoNextFollowUp: Story = {
+  play: async ({ canvas }) => {
+    await canvas.findByRole("form", { name: "Plan Visit" });
+    await expect(
+      canvas.queryByRole("heading", { name: "Next Follow-up" }),
+    ).toBeNull();
+  },
+};
+
+/**
+ * Log the visit from a Follow-up: the company, its Visit's Contact and the
+ * Follow-up's owner as visitor are filled in.
+ */
+export const LogTheVisitFilledIn: Story = {
+  args: {
+    status: "completed",
+    prospectCompanyId: KAVERI_ID,
+    contactIds: [MURUGAN_ID],
+    visitorIds: [RAVI_MEMBER_ID],
+  },
+  play: async ({ canvas }) => {
+    const form = within(await canvas.findByRole("form", { name: "Log Visit" }));
+    await expect(
+      form.getByRole("combobox", { name: "Prospect Company" }),
+    ).toHaveValue("Kaveri Cement Works");
+    await expect(
+      await form.findByRole("button", { name: "Remove Murugan P · Director" }),
+    ).toBeVisible();
+    await expect(
+      form.getByRole("button", { name: "Remove Ravi Shankar" }),
+    ).toBeVisible();
+    await expect(
+      form.queryByRole("button", { name: "Remove Arun Selva Kumar" }),
+    ).toBeNull();
   },
 };

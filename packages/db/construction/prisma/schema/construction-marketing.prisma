@@ -94,6 +94,7 @@ model ConstructionMarketingProspectCompany {
   contacts     ConstructionMarketingContact[]
   stageChanges ConstructionMarketingStageChange[]
   visits       ConstructionMarketingVisit[]
+  followUps    ConstructionMarketingFollowUp[]
 
   @@index([workspaceId, createdAt])
   @@index([workspaceId, stage])
@@ -237,6 +238,7 @@ model ConstructionMarketingVisit {
   contacts        ConstructionMarketingVisitContact[]
   notes           ConstructionMarketingVisitNote[]
   files           ConstructionMarketingVisitFile[]
+  followUps       ConstructionMarketingFollowUp[]
 
   @@unique([workspaceId, number])
   @@index([workspaceId, visitAt])
@@ -317,5 +319,73 @@ model ConstructionMarketingVisitFile {
 
   @@index([workspaceId, visitId, createdAt])
   @@map("visit_files")
+  @@schema("construction_marketing")
+}
+
+enum ConstructionMarketingFollowUpType {
+  call
+  visit
+  email
+  send_quotation
+  other
+
+  @@map("follow_up_type")
+  @@schema("construction_marketing")
+}
+
+/// Stored Follow-up states. Overdue, Today and Upcoming are an Open one's
+/// due date against the Company's today, worked out on read.
+enum ConstructionMarketingFollowUpStatus {
+  open
+  done
+  cancelled
+
+  @@map("follow_up_status")
+  @@schema("construction_marketing")
+}
+
+/// Something owed after a Visit, with an owner and a due date (PRD §3.5,
+/// ADR CM-0040 §8).
+model ConstructionMarketingFollowUp {
+  id                String                              @id @db.Uuid
+  workspaceId       String                              @map("workspace_id")
+  prospectCompanyId String                              @map("prospect_company_id") @db.Uuid
+  /// The Visit it came from, if any.
+  visitId           String?                             @map("visit_id") @db.Uuid
+  type              ConstructionMarketingFollowUpType
+  /// A calendar date in the Company time zone.
+  dueDate           DateTime                            @map("due_date") @db.Date
+  /// The Marketing Person who owes it (a Team Member id).
+  ownerMemberId     String                              @map("owner_member_id") @db.Uuid
+  note              String?
+  status            ConstructionMarketingFollowUpStatus @default(open)
+  /// Set when Done.
+  resultNote        String?                             @map("result_note")
+  doneOn            DateTime?                           @map("done_on") @db.Date
+  doneAt            DateTime?                           @map("done_at") @db.Timestamptz(3)
+  doneBy            String?                             @map("done_by")
+  cancelledAt       DateTime?                           @map("cancelled_at") @db.Timestamptz(3)
+  cancelledBy       String?                             @map("cancelled_by")
+  /// The Company's day its "due today" notice went out; cleared when the
+  /// due date changes.
+  dueNotifiedOn     DateTime?                           @map("due_notified_on") @db.Date
+  /// When its one "overdue" notice went out; cleared when the due date
+  /// changes.
+  overdueNotifiedAt DateTime?                           @map("overdue_notified_at") @db.Timestamptz(3)
+  createdAt         DateTime                            @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime                            @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy         String                              @map("created_by")
+  updatedBy         String                              @map("updated_by")
+  deletedAt         DateTime?                           @map("deleted_at") @db.Timestamptz(3)
+  deletedBy         String?                             @map("deleted_by")
+
+  prospectCompany ConstructionMarketingProspectCompany @relation(fields: [prospectCompanyId], references: [id])
+  visit           ConstructionMarketingVisit?          @relation(fields: [visitId], references: [id])
+
+  @@index([workspaceId, status, dueDate])
+  @@index([workspaceId, ownerMemberId, status])
+  @@index([workspaceId, prospectCompanyId])
+  @@index([workspaceId, createdBy])
+  @@map("follow_ups")
   @@schema("construction_marketing")
 }

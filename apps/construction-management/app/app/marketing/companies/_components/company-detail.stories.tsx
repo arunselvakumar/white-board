@@ -4,6 +4,7 @@ import { expect, waitFor, within } from "storybook/test";
 
 import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 
+import { mockFollowUpApi } from "../../follow-ups/_components/follow-up-fixtures";
 import { CompanyDetail } from "./company-detail";
 import {
   BALAJI_ID,
@@ -13,6 +14,7 @@ import {
   MARKETING_COMPANIES_API,
   SENTHIL_ID,
   company,
+  followUpEntries,
   lostCompany,
   mockCompanyApi,
   type CompanyApiOptions,
@@ -332,5 +334,68 @@ export const DeleteRefused: Story = {
       ),
     ).toBeVisible();
     await expect(getRouter().push).not.toHaveBeenCalled();
+  },
+};
+
+/**
+ * Follow-ups on the history: what was owed, by whom, and what came of it,
+ * linking to the Visit it came from. Add Follow-up has the company given.
+ */
+export const HistoryWithFollowUps: Story = {
+  args: { canAddFollowUp: true },
+  beforeEach: () => {
+    api = mockFollowUpApi({
+      visits: {
+        companies: {
+          companies: [
+            company({
+              timeline: [...followUpEntries(), ...company().timeline],
+            }),
+          ],
+        },
+      },
+    });
+    return api.restore;
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const history = within(
+      await canvas.findByRole("list", { name: "History" }),
+    );
+    const [done, cancelled] = history.getAllByRole("listitem");
+    if (done == null || cancelled == null) throw new Error("two Follow-ups");
+    await expect(done).toHaveTextContent(
+      "Call due 11 Nov · Ravi Shankar — Done: Sent the rates",
+    );
+    await expect(done).toHaveTextContent("Check the drawings reached them");
+    await expect(
+      within(done).getByRole("link", { name: "MV-0003" }),
+    ).toHaveAttribute("href", `/app/marketing/visits/${BALAJI_VISIT_ID}`);
+    await expect(cancelled).toHaveTextContent(
+      "Email due 4 Nov · Priya Raman — Cancelled",
+    );
+    await expect(within(cancelled).queryByRole("link")).toBeNull();
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Add Follow-up" }),
+    );
+    const body = within(canvasElement.ownerDocument.body);
+    const form = within(
+      await body.findByRole("form", { name: "Add Follow-up" }),
+    );
+    await expect(form.getByText("Sri Balaji Infra Projects")).toBeVisible();
+    await userEvent.click(form.getByLabelText("Type"));
+    await userEvent.click(await body.findByRole("option", { name: "Call" }));
+    await userEvent.type(form.getByLabelText("Due date"), "2026-11-14");
+    await userEvent.click(form.getByRole("button", { name: "Add Follow-up" }));
+    await waitFor(() =>
+      expect(
+        posts("/api/construction/marketing/follow-ups")[0]?.body,
+      ).toMatchObject({
+        prospectCompanyId: BALAJI_ID,
+        visitId: null,
+        type: "call",
+        dueDate: "2026-11-14",
+      }),
+    );
   },
 };

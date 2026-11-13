@@ -252,6 +252,53 @@ export const COMPANIES: ProspectCompany[] = [
   company(),
 ];
 
+/**
+ * Each company's earliest open Follow-up, as the Follow-up stories have
+ * them on 12 Nov: Kaveri's and Coimbatore's are overdue, Balaji's is today.
+ */
+const NEXT_FOLLOW_UP_ON: Record<string, string> = {
+  [BALAJI_ID]: "2026-11-12",
+  [KAVERI_ID]: "2026-11-09",
+  [TEXTILES_ID]: "2026-11-10",
+};
+
+type FollowUpEntry = Extract<
+  ProspectCompanyTimelineItem,
+  { kind: "follow_up" }
+>;
+
+/** Balaji's Follow-ups on its history: a call Done, and one cancelled. */
+export function followUpEntries(): FollowUpEntry[] {
+  return [
+    {
+      kind: "follow_up",
+      id: "0199d000-0000-7000-8000-000000000805",
+      visitId: BALAJI_VISIT_ID,
+      visitNumber: "MV-0003",
+      type: "call",
+      status: "done",
+      dueDate: "2026-11-11",
+      ownerName: "Ravi Shankar",
+      note: "Check the drawings reached them",
+      resultNote: "Sent the rates",
+      at: "2026-11-11T09:00:00.000Z",
+    },
+    {
+      kind: "follow_up",
+      id: "0199d000-0000-7000-8000-000000000806",
+      visitId: null,
+      visitNumber: null,
+      type: "email",
+      status: "cancelled",
+      dueDate: "2026-11-04",
+      ownerName: "Priya Raman",
+      note: null,
+      resultNote: null,
+      at: "2026-11-03T09:00:00.000Z",
+    },
+  ];
+}
+
 export function toListItem(detail: ProspectCompany): ProspectCompanyListItem {
   const primary = detail.contacts.find((item) => item.isPrimary);
   return {
@@ -268,6 +315,7 @@ export function toListItem(detail: ProspectCompany): ProspectCompanyListItem {
       detail.timeline.find(
         (item) => item.kind === "visit" && item.status === "completed",
       )?.at ?? null,
+    nextFollowUpOn: NEXT_FOLLOW_UP_ON[detail.id] ?? null,
     createdAt: detail.createdAt,
     updatedAt: detail.updatedAt,
   };

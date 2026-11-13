@@ -53,6 +53,7 @@ import {
   type ProspectCompanyListItem,
 } from "@/src/queries/marketing-companies";
 
+import { zoneFields } from "../../visits/_components/visit-parts";
 import { COMPANY_COLUMNS, CompanyRowsSkeleton } from "./companies-skeletons";
 import { StageBadge } from "./company-parts";
 
@@ -95,7 +96,14 @@ function AddButton() {
  * mobile) and filters by Stage, assigned person and industry. Without View
  * all the server lists only the viewer's own (ADR CM-0040 §5).
  */
-export function CompaniesList({ canCreate }: { canCreate: boolean }) {
+export function CompaniesList({
+  canCreate,
+  now,
+}: {
+  canCreate: boolean;
+  /** Fixed in stories; the device's clock otherwise (overdue follow-ups). */
+  now?: Date;
+}) {
   const section = marketingSection("companies");
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [updating, startTransition] = useTransition();
@@ -117,7 +125,7 @@ export function CompaniesList({ canCreate }: { canCreate: boolean }) {
           className={cn("min-w-0", updating && "opacity-60 transition-opacity")}
         >
           <Suspense fallback={<CompanyRowsSkeleton />}>
-            <CompanyRows filters={filters} canCreate={canCreate} />
+            <CompanyRows filters={filters} canCreate={canCreate} now={now} />
           </Suspense>
         </div>
       </div>
@@ -255,6 +263,34 @@ function lastVisit(at: string | null, timeZone: string): string {
   }).format(new Date(at));
 }
 
+/** `2026-11-14` as "14 Nov 2026". */
+function day(date: string): string {
+  const [year = 1970, month = 1, dayOf = 1] = date.split("-").map(Number);
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(year, month - 1, dayOf)));
+}
+
+/** The earliest open Follow-up's date; red when it is before today. */
+function NextFollowUp({ on, today }: { on: string | null; today: string }) {
+  if (on == null) return <span className="text-muted-foreground">—</span>;
+  const overdue = on < today;
+  return (
+    <span
+      className={cn(
+        "text-muted-foreground",
+        overdue && "font-medium text-red-700 dark:text-red-300",
+      )}
+    >
+      {day(on)}
+      {overdue && <span className="sr-only"> (overdue)</span>}
+    </span>
+  );
+}
+
 function PrimaryContact({
   contact,
 }: {
@@ -276,15 +312,18 @@ function PrimaryContact({
 function CompanyRows({
   filters,
   canCreate,
+  now,
 }: {
   filters: Filters;
   canCreate: boolean;
+  now?: Date;
 }) {
   const query = useSuspenseInfiniteQuery(companiesQuery(toQuery(filters)));
   const pages = query.data.pages;
   const items = pages.flatMap((page) => page.items);
   const total = pages[0]?.total ?? 0;
   const timeZone = pages[0]?.timeZone ?? "Asia/Kolkata";
+  const today = zoneFields(now ?? new Date(), timeZone).date;
   const filtered =
     filters.search.trim() !== "" ||
     filters.stages.length > 0 ||
@@ -366,6 +405,9 @@ function CompanyRows({
                 <TableCell className="text-muted-foreground whitespace-nowrap">
                   {lastVisit(company.lastVisitAt, timeZone)}
                 </TableCell>
+                <TableCell className="whitespace-nowrap">
+                  <NextFollowUp on={company.nextFollowUpOn} today={today} />
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -394,6 +436,12 @@ function CompanyRows({
             <p className="text-muted-foreground text-xs">
               {`Last visit: ${lastVisit(company.lastVisitAt, timeZone)}`}
             </p>
+            {company.nextFollowUpOn != null && (
+              <p className="text-muted-foreground text-xs">
+                {"Next follow-up: "}
+                <NextFollowUp on={company.nextFollowUpOn} today={today} />
+              </p>
+            )}
             {company.primaryContact != null && (
               <p className="truncate text-xs">
                 {company.primaryContact.name}

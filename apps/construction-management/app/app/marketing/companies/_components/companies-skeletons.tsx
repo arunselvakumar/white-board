@@ -14,6 +14,7 @@ export const COMPANY_COLUMNS: SkeletonColumn[] = [
   { header: "Assigned to", kind: "muted" },
   { header: "Primary Contact", kind: "muted" },
   { header: "Last visit", kind: "muted", className: "whitespace-nowrap" },
+  { header: "Next follow-up", kind: "muted", className: "whitespace-nowrap" },
 ];
 
 /** The count, then table rows (cards on a phone) while a filter loads (ADR-0047). */

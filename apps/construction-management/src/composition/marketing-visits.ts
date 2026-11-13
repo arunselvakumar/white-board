@@ -23,6 +23,7 @@ import { zoneInstant } from "@/src/shared-kernel/zone-time";
 import { nextSequenceNumber } from "@/src/shared-kernel/sequence/next-sequence-number";
 
 import { prospectCompanyHandlers } from "./marketing-companies";
+import { followUpHandlers } from "./marketing-follow-ups";
 import { marketingTeam } from "./marketing-team";
 
 /**
@@ -39,6 +40,7 @@ export function createVisitHandlers(): VisitHandlers {
     storage: objectStorage(),
     companyStore: prismaProspectCompanyStore,
     companies: prospectCompanyHandlers,
+    followUps: followUpHandlers,
     team: marketingTeam,
     async backdated(access) {
       const [policy, actor, today] = await Promise.all([

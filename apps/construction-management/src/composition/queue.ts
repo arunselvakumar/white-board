@@ -21,10 +21,12 @@ import {
   queueCleanupHandler,
 } from "@/src/shared-kernel/queue/cleanup";
 
+import { FOLLOW_UP_REMINDERS_JOB } from "@/src/marketing/application/follow-up-reminders";
 import { BACKUP_RETENTION_JOB_TYPE } from "@/src/reporting/application/backup-queue";
 
 import { backupQueueHandlersFromEnv } from "./backup-jobs";
 import { COMPANY_PURGE_JOB, companyPurgeQueueHandler } from "./company-purge";
+import { createFollowUpRemindersHandler } from "./marketing-follow-up-reminders";
 import {
   createMessagingDelayedHandler,
   // Sales (CM-1004)
@@ -56,6 +58,8 @@ export function queueHandlers(): QueueHandler[] {
     createMessagingDelayedHandler(),
     // Sales (CM-1004): the daily follow-ups-due notices.
     createMessagingFollowUpsDueHandler(),
+    // Marketing (ADR CM-0040 §8): Follow-ups due today and overdue.
+    createFollowUpRemindersHandler(),
     // CM-907: purge Companies whose deletion came due.
     companyPurgeQueueHandler(),
     // CM-906: backup parts, the zip step and the daily 7-day expiry.
@@ -78,6 +82,8 @@ export const DAILY_JOB_TYPES: readonly string[] = [
   "messaging.delayed",
   // Sales (CM-1004)
   "messaging.follow_ups_due",
+  // Marketing (ADR CM-0040 §8)
+  FOLLOW_UP_REMINDERS_JOB,
   // CM-907
   COMPANY_PURGE_JOB,
   // CM-906

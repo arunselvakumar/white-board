@@ -126,7 +126,7 @@ export const marketingCompanyOpenApiOperations: OpenApiOperation[] = [
   {
     method: "post",
     path: `${ITEM}/delete`,
-    summary: "Delete a Prospect Company and its Contacts",
+    summary: "Delete a Prospect Company, its Contacts and its Follow-ups",
     tags: MARKETING_TAGS,
     params: ConstructionMarketingProspectCompanyParamsModel,
     body: DeleteConstructionMarketingProspectCompanyRequestModel,

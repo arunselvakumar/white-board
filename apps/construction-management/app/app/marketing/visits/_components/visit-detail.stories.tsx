@@ -4,6 +4,7 @@ import { expect, waitFor, within } from "storybook/test";
 
 import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 
+import { mockFollowUpApi } from "../../follow-ups/_components/follow-up-fixtures";
 import { VisitDetail } from "./visit-detail";
 import {
   BALAJI_ID,
@@ -223,5 +224,60 @@ export const Cancelled: Story = {
       await body.findByRole("menuitem", { name: "Delete" }),
     ).toBeVisible();
     await expect(body.queryByRole("menuitem", { name: "Edit" })).toBeNull();
+  },
+};
+
+/**
+ * With Follow-ups read, a card lists this Visit's Follow-ups with their
+ * status or due; Add Follow-up has the Visit and its company filled in.
+ */
+export const WithFollowUps: Story = {
+  args: { followUps: { create: true, logVisit: true } },
+  beforeEach: () => {
+    api = mockFollowUpApi();
+    return api.restore;
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const card = within(
+      await canvas.findByRole("region", { name: "Follow-ups" }),
+    );
+    const items = within(
+      await card.findByRole("list", { name: "Follow-ups of this Visit" }),
+    ).getAllByRole("listitem");
+    await expect(items).toHaveLength(3);
+    const [done, today, upcoming] = items;
+    if (done == null || today == null || upcoming == null)
+      throw new Error("three Follow-ups");
+    await expect(done).toHaveTextContent("Done 11 Nov 2026: Sent the rates");
+    await expect(within(today).getByText("Due today")).toBeVisible();
+    await expect(within(upcoming).getByText("Upcoming")).toBeVisible();
+
+    await userEvent.click(card.getByRole("button", { name: "Add Follow-up" }));
+    const body = within(canvasElement.ownerDocument.body);
+    const form = within(
+      await body.findByRole("form", { name: "Add Follow-up" }),
+    );
+    await expect(
+      form.getByText("Sri Balaji Infra Projects", { exact: false }),
+    ).toHaveTextContent("Sri Balaji Infra Projects · from MV-0003");
+    await userEvent.click(form.getByLabelText("Type"));
+    await userEvent.click(await body.findByRole("option", { name: "Email" }));
+    await userEvent.type(form.getByLabelText("Due date"), "2026-11-18");
+    await userEvent.click(form.getByRole("button", { name: "Add Follow-up" }));
+    await waitFor(() =>
+      expect(
+        within(
+          card.getByRole("list", { name: "Follow-ups of this Visit" }),
+        ).getAllByRole("listitem"),
+      ).toHaveLength(4),
+    );
+    await expect(
+      posts("/api/construction/marketing/follow-ups")[0]?.body,
+    ).toMatchObject({
+      prospectCompanyId: BALAJI_ID,
+      visitId: COMPLETED_ID,
+      type: "email",
+      dueDate: "2026-11-18",
+    });
   },
 };

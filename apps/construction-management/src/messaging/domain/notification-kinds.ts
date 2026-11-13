@@ -72,6 +72,12 @@ export const NOTIFICATION_KINDS = {
   // Sales (CM-1004, ADR CM-0022 §10).
   "inquiry.assigned": { menu: "sales.inquiries", flag: "read" },
   "inquiry.follow_ups_due": { menu: "sales.inquiries", flag: "read" },
+  // Marketing (ADR CM-0040 §8): to a Follow-up's owner only.
+  "marketing.follow_up_due": { menu: "marketing.follow_ups", flag: "read" },
+  "marketing.follow_up_overdue": {
+    menu: "marketing.follow_ups",
+    flag: "read",
+  },
 } as const satisfies Record<string, NotificationKind>;
 
 export type NotificationType = keyof typeof NOTIFICATION_KINDS;

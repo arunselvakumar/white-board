@@ -65,3 +65,25 @@ export async function createVisit(
       : {}),
   });
 }
+
+const FOLLOW_UPS = "/api/construction/marketing/follow-ups";
+
+/** A Follow-up on a Prospect Company, owned by whoever the client is. */
+export async function createFollowUp(
+  api: ApiClient,
+  input: {
+    prospectCompanyId: string;
+    dueDate: string;
+    type?: "call" | "visit" | "email" | "send_quotation" | "other";
+    note?: string;
+    visitId?: string;
+  },
+): Promise<{ id: string; updatedAt: string }> {
+  return api.post<{ id: string; updatedAt: string }>(FOLLOW_UPS, {
+    prospectCompanyId: input.prospectCompanyId,
+    dueDate: input.dueDate,
+    type: input.type ?? "call",
+    note: input.note ?? null,
+    visitId: input.visitId ?? null,
+  });
+}

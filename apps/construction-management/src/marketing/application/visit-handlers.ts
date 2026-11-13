@@ -57,6 +57,7 @@ import type {
   VisitRow,
   VisitStore,
 } from "./ports";
+import type { FollowUpHandlers, FollowUpInput } from "./follow-up-handlers";
 import type {
   CreateProspectCompanyInput,
   ProspectCompanyHandlers,
@@ -81,6 +82,8 @@ export type VisitDeps = {
   storage: ObjectStorage;
   /** Inline company and Contacts, and New → Contacted. */
   companies: ProspectCompanyHandlers;
+  /** A Next Follow-up saved with the Visit (PRD §3.4, §3.5). */
+  followUps: FollowUpHandlers;
   team: MarketingTeam;
   /** The `marketing_visit` limits for this member, on the Company's today. */
   backdated: (access: MemberAccess) => Promise<VisitBackdatedCheck>;
@@ -111,6 +114,11 @@ export type VisitWriteInput = VisitDetailsInput & {
   contactIds?: readonly string[];
   /** Contacts added to the company in the same save (PRD §3.3). */
   newContacts?: readonly ContactDetailsInput[];
+  /**
+   * Saving makes it a Follow-up of this Visit, in the same transaction
+   * (Follow-ups create). Read on create and complete.
+   */
+  nextFollowUp?: FollowUpInput | null;
 };
 
 export type CreateVisitInput = VisitWriteInput & {
@@ -767,6 +775,10 @@ export class VisitHandlers {
     const date = this.deps.dateIn(input.visitAt, timeZone);
     if (input.status === "completed")
       (await this.deps.backdated(access))("create", date);
+    const nextFollowUp =
+      input.nextFollowUp == null
+        ? null
+        : await this.deps.followUps.prepare(access, input.nextFollowUp);
     const id = newId();
     try {
       await this.deps.db.$transaction(async (tx) => {
@@ -826,6 +838,11 @@ export class VisitHandlers {
         });
         if (completed)
           await this.deps.companies.markContactedInTx(tx, access, companyId);
+        if (nextFollowUp != null)
+          await this.deps.followUps.createInTx(tx, access, nextFollowUp, {
+            prospectCompanyId: companyId,
+            visitId: id,
+          });
         await recordAudit(tx, {
           workspaceId: ws,
           actorUserId: access.userId,
@@ -968,6 +985,10 @@ export class VisitHandlers {
       "create",
       this.deps.dateIn(input.visitAt, timeZone),
     );
+    const nextFollowUp =
+      input.nextFollowUp == null
+        ? null
+        : await this.deps.followUps.prepare(access, input.nextFollowUp);
     await this.deps.db.$transaction(async (tx) => {
       const current = await this.visible(access, (w) =>
         this.deps.store.lock(tx, w, id),
@@ -1012,6 +1033,11 @@ export class VisitHandlers {
         access,
         current.prospectCompanyId,
       );
+      if (nextFollowUp != null)
+        await this.deps.followUps.createInTx(tx, access, nextFollowUp, {
+          prospectCompanyId: current.prospectCompanyId,
+          visitId: id,
+        });
       await recordAudit(tx, {
         workspaceId: ws,
         actorUserId: access.userId,

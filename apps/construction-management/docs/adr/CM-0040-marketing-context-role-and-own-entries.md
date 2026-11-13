@@ -128,7 +128,7 @@ Without `view_all` on the record's menu, a member sees:
 ### 8. Follow-ups and their notifications
 
 - Overdue, Today and Upcoming are worked out from `due_date` and the Company's today; nothing is stored.
-- **Notifications** run in the daily drain (CM-0021 §3, 07:00 in India). Marketing raises one event for each Open Follow-up due today that has not had its due notice today, and one for each Open Follow-up first found overdue (`overdue_notified_at` is null). Messaging's listener sends each to **the Follow-up's owner only**, and only while the owner holds `notification` and read on Follow-ups (CM-0021 §6). A change of due date clears both marks.
+- **Notifications** run in the daily drain (CM-0021 §3, 07:00 in India). Marketing raises one event for each Open Follow-up due today that has not had its due notice today, and one for each Open Follow-up first found overdue (`overdue_notified_at` is null). Messaging's listener sends each to **the Follow-up's owner only**, and only while the owner holds `notification` and read on Follow-ups (CM-0021 §6). A change of due date or of owner clears both marks, so the new day or the new owner is told. The daily query reads only Follow-ups that may still owe a notice: overdue ones not yet told, and ones due today not yet told today.
 - A Follow-up is not notified when it is created or reassigned. The PRD does not ask for that.
 
 ### 9. Photos and files
@@ -150,7 +150,7 @@ Without `view_all` on the record's menu, a member sees:
 
 - **Stages** are fixed in code: New and Contacted are set by the system (§7). The others (Requirement received, Quotation sent, Negotiation, Won, Lost) are set by hand, in any order. **Lost** needs a Lost Reason ("Other" needs text), and leaving Lost clears it. A Lost company can be moved to Lost again only to change the reason. Every change is a `stage_changes` row and an audit event.
 - **GSTIN** is checked with the tax-ids kernel; PIN is six digits.
-- **Delete** is a tombstone, refused while the company has live Visits (`PROSPECT_COMPANY_HAS_VISITS`). Its Contacts and Follow-ups are tombstoned with it.
+- **Delete** is a tombstone, refused while the company has live Visits (`PROSPECT_COMPANY_HAS_VISITS`). Its Contacts and all its Follow-ups, open or closed, are tombstoned with it in the same transaction, and `prospect_company.deleted` lists the Follow-up ids. Every Follow-up read (the list, one Follow-up, the company page, the reminders) also takes only those of a live company.
 - **Reassign** (`transfer`) moves the assigned person and the owner of every Open Follow-up of the company to the new person in one transaction. Past Visits keep their visitors.
 - **Import** reads Excel through the xlsx guard: name, city, phone, primary Contact name and mobile. Valid rows are created, assigned to the importer. Duplicate names, within the file or against live companies, and invalid rows are reported, not created.
 

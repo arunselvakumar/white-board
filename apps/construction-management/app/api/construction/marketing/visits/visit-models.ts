@@ -7,6 +7,8 @@ import type {
   VisitReadModel,
 } from "@/src/marketing/application/visit-handlers";
 import {
+  FOLLOW_UP_LIMITS,
+  FOLLOW_UP_TYPES,
   INTERESTS,
   MARKETING_LIMITS,
   VISIT_LIMITS,
@@ -51,6 +53,15 @@ const NewContact = z.object({
   email: optionalText(MARKETING_LIMITS.email),
 });
 
+const NextFollowUp = z.object({
+  type: z.enum(FOLLOW_UP_TYPES),
+  /** `YYYY-MM-DD`, the Company's calendar. */
+  dueDate: z.iso.date(),
+  /** An active Marketing Person; the creator when left out. */
+  ownerMemberId: z.uuid().optional(),
+  note: optionalText(FOLLOW_UP_LIMITS.note),
+});
+
 const VisitBody = z.object({
   /** An instant (ISO 8601); the screens enter it in the Company time zone. */
   visitAt: z.iso.datetime({ offset: true }),
@@ -83,6 +94,11 @@ const VisitBody = z.object({
    * on an existing company (Companies create covers a new one).
    */
   newContacts: z.array(NewContact).max(5).optional(),
+  /**
+   * Saving makes it a Follow-up of this Visit (Follow-ups create); read on
+   * create and complete, ignored on edit.
+   */
+  nextFollowUp: NextFollowUp.nullable().optional(),
 });
 
 export const CreateConstructionMarketingVisitRequestModel = VisitBody.extend({
