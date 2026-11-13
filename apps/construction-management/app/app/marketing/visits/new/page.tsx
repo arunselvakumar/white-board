@@ -1,7 +1,7 @@
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import type { Metadata } from "next";
 
-import { viewerFlags } from "@/app/app/_lib/viewer-can";
+import { viewerCan, viewerFlags } from "@/app/app/_lib/viewer-can";
 import { GET as getCompany } from "@/app/api/construction/marketing/companies/[id]/route";
 import { GET as formOptions } from "@/app/api/construction/marketing/visits/form-options/route";
 import {
