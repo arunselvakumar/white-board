@@ -170,6 +170,10 @@ describe("the report catalogue HTTP (ADR CM-0021 §2)", () => {
       "material_received",
       "material_transfers",
       "stock_register",
+      // Marketing → Reports (ADR CM-0040 §13).
+      "marketing_visit_register",
+      "marketing_person_summary",
+      "marketing_company_pipeline",
     ]);
     expect(
       owner.find((item) => item.kind === "stock_register")?.filters,
