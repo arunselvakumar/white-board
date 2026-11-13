@@ -12,7 +12,7 @@ import {
 
 /** The totals grid, for the loaded cards and their skeleton alike. */
 export const MARKETING_TOTALS_GRID =
-  "grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-7";
+  "grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4";
 
 /** A section's card and its heading. */
 export const MARKETING_SECTION =

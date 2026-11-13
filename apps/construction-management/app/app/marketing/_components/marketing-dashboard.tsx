@@ -297,7 +297,7 @@ function totalsOf(data: Dashboard, followUpsHref: string | null): Total[] {
       label: "Won",
       icon: Trophy,
       value: totals.companiesWon,
-      caption: "Prospect Companies moved to Won",
+      caption: "Moved to Won in the period",
     },
   ];
   return all.filter((total): total is Total => total.value != null);
