@@ -21,6 +21,7 @@ import type {
   VisitShownStatus,
   VisitStatus,
 } from "../domain/marketing-terms";
+import type { DashboardScope } from "../domain/dashboard";
 import type { CheckPoint, VisitDetails } from "../domain/visit";
 
 export type MarketingTx = Prisma.TransactionClient;
@@ -744,6 +745,120 @@ export type TeamStore = {
       ownerMemberId: string;
       prospectCompany: { id: string; name: string };
       updatedAt: Date;
+    }[]
+  >;
+};
+
+// ---------------------------------------------------------------------------
+// Dashboard (ADR CM-0040 §13): figures over the marketing tables, nothing
+// stored. Each query takes the Dashboard's scope and turns it into each
+// record's `where` (§5).
+// ---------------------------------------------------------------------------
+
+/** A Visit of the period, cancelled ones left out, to count and bucket. */
+export type DashboardVisit = {
+  visitAt: Date;
+  status: VisitStatus;
+  checkedIn: boolean;
+};
+
+/** One line of recent activity, before names are put on it. */
+export type DashboardActivity = {
+  kind: "visit_completed" | "note" | "stage_change" | "follow_up_done";
+  at: Date;
+  /** A User id; null where none was recorded. */
+  byUserId: string | null;
+  company: { id: string; name: string };
+  visit: { id: string; number: string } | null;
+  /** The note's text, the Stage move, or the Follow-up's type. */
+  note?: string;
+  stage?: { from: Stage; to: Stage };
+  followUpType?: FollowUpType;
+};
+
+export type DashboardStore = {
+  /** Live Visits in scope whose time is between the instants, not cancelled. */
+  visitsBetween(
+    workspaceId: string,
+    scope: DashboardScope,
+    from: Date,
+    to: Date,
+  ): Promise<DashboardVisit[]>;
+  /** Open Follow-ups in scope of live companies due on or before `today`. */
+  openFollowUpsDueBy(
+    workspaceId: string,
+    scope: DashboardScope,
+    today: CalendarDate,
+  ): Promise<{ dueToday: number; overdue: number }>;
+  /**
+   * Live companies in scope: how many were added between the instants, how
+   * many stand at each Stage now, and how many distinct ones moved to Won
+   * and to Lost between the instants.
+   */
+  companyFigures(
+    workspaceId: string,
+    scope: DashboardScope,
+    from: Date,
+    to: Date,
+  ): Promise<{
+    created: number;
+    byStage: Map<Stage, number>;
+    won: number;
+    lost: number;
+  }>;
+  /** The caller's own Visits (§5) between the instants, not cancelled, earliest first. */
+  ownVisitsBetween(
+    workspaceId: string,
+    scope: NonNullable<OwnScope>,
+    from: Date,
+    to: Date,
+  ): Promise<
+    {
+      id: string;
+      number: string;
+      visitAt: Date;
+      status: VisitStatus;
+      checkedIn: boolean;
+      company: { id: string; name: string };
+    }[]
+  >;
+  /** Open Follow-ups of live companies the member owns, due on the day. */
+  ownedFollowUpsDue(
+    workspaceId: string,
+    memberId: string,
+    date: CalendarDate,
+  ): Promise<
+    {
+      id: string;
+      type: FollowUpType;
+      dueDate: CalendarDate;
+      company: { id: string; name: string };
+    }[]
+  >;
+  /**
+   * The latest `limit` of each kind asked for, in scope, newest first: a
+   * kind left out of `kinds` is not read.
+   */
+  recentActivity(
+    workspaceId: string,
+    scope: DashboardScope,
+    kinds: { visits: boolean; companies: boolean; followUps: boolean },
+    limit: number,
+  ): Promise<DashboardActivity[]>;
+  /**
+   * Live companies in scope whose latest Completed Visit was Hot and that
+   * have no open Follow-up, whoever owns it; newest last Visit first.
+   */
+  hotWithoutFollowUp(
+    workspaceId: string,
+    scope: DashboardScope,
+    limit: number,
+  ): Promise<
+    {
+      id: string;
+      name: string;
+      lastVisitAt: Date;
+      assignedMemberId: string | null;
     }[]
   >;
 };

@@ -8,6 +8,10 @@ import {
   marketingCompanyOpenApiOperations,
 } from "./companies/companies-openapi";
 import {
+  marketingDashboardOpenApiComponents,
+  marketingDashboardOpenApiOperations,
+} from "./dashboard/dashboard-openapi";
+import {
   marketingFollowUpOpenApiComponents,
   marketingFollowUpOpenApiOperations,
 } from "./follow-ups/follow-ups-openapi";
@@ -26,6 +30,7 @@ export const marketingOpenApiComponents: OpenApiComponents = {
   ...marketingVisitOpenApiComponents,
   ...marketingFollowUpOpenApiComponents,
   ...marketingTeamOpenApiComponents,
+  ...marketingDashboardOpenApiComponents,
 };
 
 /** Every marketing operation. */
@@ -34,4 +39,5 @@ export const marketingOpenApiOperations: OpenApiOperation[] = [
   ...marketingVisitOpenApiOperations,
   ...marketingFollowUpOpenApiOperations,
   ...marketingTeamOpenApiOperations,
+  ...marketingDashboardOpenApiOperations,
 ];
