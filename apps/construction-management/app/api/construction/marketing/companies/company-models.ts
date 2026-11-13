@@ -158,11 +158,7 @@ export const ListConstructionMarketingProspectCompaniesRequestModel = z.object({
     .optional(),
   limit: z.coerce.number().int().min(1).max(100).default(50),
   /** `nextCursor` of the previous page; empty means the first page. */
-  after: z
-    .string()
-    .max(400)
-    .optional()
-    .transform((value) => (value === "" ? undefined : value)),
+  after: z.string().max(400).optional(),
 });
 
 // ---------------------------------------------------------------------------

@@ -44,7 +44,9 @@ export async function GET(request: Request): Promise<Response> {
       assignedMemberId: model.assignedMemberId,
       industry: model.industry,
       limit: model.limit,
-      after: model.after == null ? undefined : decodeNameCursor(model.after),
+      // An empty cursor is the first page. No `.transform` in the model:
+      // the OpenAPI document cannot show one.
+      after: model.after ? decodeNameCursor(model.after) : undefined,
     });
     const last = page.items.at(-1);
     const body: ListConstructionMarketingProspectCompaniesResponse = {
