@@ -9,7 +9,7 @@ bun run --cwd apps/construction-management test:e2e:pr      # the @pr tests
 bun run --cwd apps/construction-management test:e2e         # every test
 ```
 
-115 tests, 35 tagged @pr, 7 also on a phone.
+116 tests, 35 tagged @pr, 7 also on a phone.
 
 ## Sign-in, sign-up and onboarding
 
@@ -188,6 +188,7 @@ ADR [CM-0040](adr/CM-0040-marketing-context-role-and-own-entries.md).
 | should list only a member's own Prospect Companies and not a colleague's, when the Role has no View all                                                                    |                 | `prospect-companies.spec.ts` |
 | should find a Prospect Company by its Contact's mobile and refuse a second company with the same name, when the Owner searches and adds                                    |                 | `prospect-companies.spec.ts` |
 | should open New Project with the client name filled in and list the saved Project on the company, when the Owner wins a Prospect Company and creates its Project           |                 | `prospect-companies.spec.ts` |
+| should add the new companies and report the duplicate, when the Owner imports Prospect Companies from the Excel template                                                   |                 | `prospect-companies.spec.ts` |
 | should plan a Visit, complete it with the person met, add a note and move the company to Contacted, when a member on the Marketing Role visits                             | **@pr** @mobile | `visits.spec.ts`             |
 | should show a past planned Visit as Missed and list only a member's own Visits, when the Role has no View all                                                              |                 | `visits.spec.ts`             |
 | should reschedule a planned Visit keeping the old time, then cancel it with a reason, when the Owner changes plans                                                         |                 | `visits.spec.ts`             |

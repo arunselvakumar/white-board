@@ -157,6 +157,7 @@ Without `view_all` on the record's menu, a member sees:
 - **Delete** is a tombstone, refused while the company has live Visits (`PROSPECT_COMPANY_HAS_VISITS`). Its Contacts and all its Follow-ups, open or closed, are tombstoned with it in the same transaction, and `prospect_company.deleted` lists the Follow-up ids. Every Follow-up read (the list, one Follow-up, the company page, the reminders) also takes only those of a live company.
 - **Reassign** (`transfer`) moves the assigned person and the owner of every Open Follow-up of the company to the new person in one transaction. Past Visits keep their visitors.
 - **Import** reads Excel through the xlsx guard: name, city, phone, primary Contact name and mobile. Valid rows are created, assigned to the importer. Duplicate names, within the file or against live companies, and invalid rows are reported, not created.
+  As built: "assigned to the importer" follows create's rule, so an importer who is not an active Marketing Person leaves the rows unassigned. Each row is its own create and transaction, so a name taken while the import runs makes only that row a duplicate; at most 500 rows, and a workbook with macros is refused.
 
 ### 12. Won → Create Project
 
