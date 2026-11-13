@@ -17,6 +17,8 @@ import { TEST_ORIGIN } from "@/test/sessions";
 import { POST as createCompany } from "../companies/route";
 import { POST as checkIn } from "./[id]/check-in/route";
 import { POST as checkOut } from "./[id]/check-out/route";
+import { POST as reschedule } from "./[id]/reschedule/route";
+import { GET as getVisit } from "./[id]/route";
 import { GET as list, POST as createVisit } from "./route";
 
 const VISITS = `${TEST_ORIGIN}/api/construction/marketing/visits`;
@@ -30,10 +32,16 @@ type Check = {
 
 type Visit = {
   id: string;
-  checkIn: Check;
+  visitAt: string;
+  updatedAt: string;
+  checkIn: (NonNullable<Check> & { at: string }) | null;
   checkOut: Check;
   history: { action: string }[];
-  actions: { canCheckIn: boolean; canCheckOut: boolean };
+  actions: {
+    canCheckIn: boolean;
+    canCheckOut: boolean;
+    canReschedule: boolean;
+  };
 };
 
 type Session = { cookie: string; workspaceId?: string };
@@ -192,5 +200,69 @@ describe("Check-in and check-out (ADR CM-0040 §10)", () => {
       position: SULUR,
     });
     expect(await json(notToday)).toMatchObject({ code: "CHECK_IN_NOT_TODAY" });
+  });
+
+  it("refuses Reschedule once the Visit is checked in, and keeps its time and check-in", async () => {
+    const owner = await ownerWithCompany();
+    const ravi = await memberWith(owner, MARKETING);
+    const visit = await plan(ravi, owner.workspaceId);
+    expect(visit.actions.canReschedule).toBe(true);
+
+    const checkedIn = await json<Visit>(
+      await check(checkIn, "check-in", ravi, visit.id, { position: SULUR }),
+    );
+    expect(checkedIn.actions.canReschedule).toBe(false);
+
+    const moved = await reschedule(
+      jsonRequest(`${VISITS}/${visit.id}/reschedule`, ravi.cookie, {
+        visitAt: await noon(owner.workspaceId, 1),
+        expectedUpdatedAt: checkedIn.updatedAt,
+      }),
+      params(visit.id),
+    );
+    expect(moved.status).toBe(StatusCodes.CONFLICT);
+    expect(await json(moved)).toMatchObject({
+      code: "VISIT_CHECKED_IN",
+      message: "This Visit is checked in. Complete it instead.",
+    });
+
+    const after = await json<Visit>(
+      await getVisit(
+        jsonRequest(`${VISITS}/${visit.id}`, ravi.cookie),
+        params(visit.id),
+      ),
+    );
+    expect(after.visitAt).toBe(checkedIn.visitAt);
+    expect(after.checkIn).toEqual(checkedIn.checkIn);
+    expect(after.updatedAt).toBe(checkedIn.updatedAt);
+  });
+
+  it("checks out only on the Visit's day", async () => {
+    const owner = await ownerWithCompany();
+    const ravi = await memberWith(owner, MARKETING);
+    const visit = await plan(ravi, owner.workspaceId);
+    await check(checkIn, "check-in", ravi, visit.id, { position: SULUR });
+
+    // The Visit's day has gone by: it was yesterday.
+    await prisma.constructionMarketingVisit.update({
+      where: { id: visit.id },
+      data: { visitAt: new Date(await noon(owner.workspaceId, -1)) },
+    });
+    const later = await json<Visit>(
+      await getVisit(
+        jsonRequest(`${VISITS}/${visit.id}`, ravi.cookie),
+        params(visit.id),
+      ),
+    );
+    expect(later.actions.canCheckOut).toBe(false);
+    const out = await check(checkOut, "check-out", ravi, visit.id, {
+      position: SULUR,
+    });
+    expect(out.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await json(out)).toMatchObject({ code: "CHECK_OUT_NOT_TODAY" });
+    const row = await prisma.constructionMarketingVisit.findUniqueOrThrow({
+      where: { id: visit.id },
+    });
+    expect(row.checkOutAt).toBeNull();
   });
 });

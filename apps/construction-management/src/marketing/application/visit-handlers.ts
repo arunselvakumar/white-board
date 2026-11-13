@@ -34,6 +34,7 @@ import {
 import {
   assertCanCheckIn,
   assertCanCheckOut,
+  assertCanReschedule,
   assertCompletable,
   assertPlanned,
   checkPoint,
@@ -430,7 +431,8 @@ export class VisitHandlers {
       canUpdate: update && !locked && visit.status !== "cancelled",
       canComplete: update && planned,
       canCancel: update && planned,
-      canReschedule: update && planned,
+      // A check-in belongs to its day; a checked-in Visit is completed instead.
+      canReschedule: update && planned && visit.checkIn == null,
       canAddNote: update,
       canAddFiles: update,
       canCheckIn:
@@ -444,7 +446,8 @@ export class VisitHandlers {
         isVisitor &&
         visit.status !== "cancelled" &&
         visit.checkIn != null &&
-        visit.checkOut == null,
+        visit.checkOut == null &&
+        check.visitDate === check.today,
       canDelete: can(access, VISITS_MENU, "delete") && !locked,
       locked,
     };
@@ -1136,7 +1139,10 @@ export class VisitHandlers {
       );
       if (!same(current.updatedAt, input.expectedUpdatedAt))
         throw visitChanged();
-      assertPlanned(current.status, "rescheduled");
+      assertCanReschedule({
+        status: current.status,
+        checkedIn: current.checkIn != null,
+      });
       if (same(current.visitAt, input.visitAt))
         throw invalidField(
           "VISIT_TIME_UNCHANGED",
@@ -1262,15 +1268,16 @@ export class VisitHandlers {
       location?: "refused" | "unavailable" | null;
     },
   ): Promise<void> {
-    assertCan(access, VISITS_MENU, "update");
+    // One instant: the day check and the saved time.
+    const at = this.clock();
+    assertCanWrite(access, "update");
     const point = checkPoint(input);
     const ws = access.workspaceId;
-    const [timeZone, today, self] = await Promise.all([
+    const [timeZone, self] = await Promise.all([
       this.deps.timeZone(ws),
-      this.deps.today(ws),
       this.self(access),
     ]);
-    const at = this.clock();
+    const today = this.deps.dateIn(at, timeZone);
     await this.deps.db.$transaction(async (tx) => {
       const current = await this.visible(access, (w) =>
         this.deps.store.lock(tx, w, id),
@@ -1300,7 +1307,10 @@ export class VisitHandlers {
     });
   }
 
-  /** Check out: a visitor, after checking in; the same single reading. */
+  /**
+   * Check out: a visitor, after checking in, on the Visit's day; the same
+   * single reading.
+   */
   async checkOut(
     access: MemberAccess,
     id: string,
@@ -1309,10 +1319,15 @@ export class VisitHandlers {
       location?: "refused" | "unavailable" | null;
     },
   ): Promise<void> {
-    assertCan(access, VISITS_MENU, "update");
-    const point = checkPoint(input);
-    const self = await this.self(access);
     const at = this.clock();
+    assertCanWrite(access, "update");
+    const point = checkPoint(input);
+    const ws = access.workspaceId;
+    const [timeZone, self] = await Promise.all([
+      this.deps.timeZone(ws),
+      this.self(access),
+    ]);
+    const today = this.deps.dateIn(at, timeZone);
     await this.deps.db.$transaction(async (tx) => {
       const current = await this.visible(access, (w) =>
         this.deps.store.lock(tx, w, id),
@@ -1322,6 +1337,8 @@ export class VisitHandlers {
         checkedIn: current.checkIn != null,
         checkedOut: current.checkOut != null,
         isVisitor: self != null && current.visitorIds.includes(self),
+        visitDate: this.deps.dateIn(current.visitAt, timeZone),
+        today,
       });
       await this.deps.store.setCheck(tx, id, "out", {
         ...point,
@@ -1329,7 +1346,7 @@ export class VisitHandlers {
         by: access.userId,
       });
       await recordAudit(tx, {
-        workspaceId: access.workspaceId,
+        workspaceId: ws,
         actorUserId: access.userId,
         action: "visit.checked_out",
         entityType: "marketing_visit",

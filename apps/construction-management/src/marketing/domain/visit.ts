@@ -361,12 +361,35 @@ export function assertCanCheckIn(input: {
     );
 }
 
-/** Check out: a visitor, after the check-in, once; not on a cancelled Visit. */
+/**
+ * Reschedule moves a Planned Visit that nobody checked in at (ADR CM-0040
+ * §10): the check-in proves someone was at the site on that day, so a
+ * checked-in Visit is completed instead.
+ */
+export function assertCanReschedule(input: {
+  status: VisitStatus;
+  checkedIn: boolean;
+}): void {
+  assertPlanned(input.status, "rescheduled");
+  if (input.checkedIn)
+    throw new DomainError(
+      "VISIT_CHECKED_IN",
+      "This Visit is checked in. Complete it instead.",
+      { kind: "conflict" },
+    );
+}
+
+/**
+ * Check out: a visitor, after the check-in, on the Visit's day, once; not
+ * on a cancelled Visit.
+ */
 export function assertCanCheckOut(input: {
   status: VisitStatus;
   checkedIn: boolean;
   checkedOut: boolean;
   isVisitor: boolean;
+  visitDate: string;
+  today: string;
 }): void {
   if (!input.isVisitor) throw onlyVisitors();
   if (input.status === "cancelled")
@@ -380,6 +403,12 @@ export function assertCanCheckOut(input: {
       "VISIT_NOT_CHECKED_IN",
       "Check in before you check out.",
       { kind: "conflict" },
+    );
+  if (input.visitDate !== input.today)
+    throw invalidField(
+      "CHECK_OUT_NOT_TODAY",
+      "You can check out on the day of the Visit.",
+      "visitAt",
     );
   if (input.checkedOut)
     throw new DomainError(

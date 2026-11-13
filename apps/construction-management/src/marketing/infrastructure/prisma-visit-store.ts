@@ -290,6 +290,9 @@ export const prismaVisitStore: VisitStore = {
     const latitude = position?.latitude ?? null;
     const longitude = position?.longitude ?? null;
     const accuracy = position?.accuracy ?? null;
+    // The write's own time, so `updatedAt` never moves back behind a write
+    // that committed while this one waited for the lock.
+    const updatedAt = new Date();
     await db.constructionMarketingVisit.update({
       where: { id },
       data:
@@ -301,7 +304,7 @@ export const prismaVisitStore: VisitStore = {
               checkInLongitude: longitude,
               checkInAccuracy: accuracy,
               checkInLocation: check.location,
-              updatedAt: check.at,
+              updatedAt,
               updatedBy: check.by,
             }
           : {
@@ -311,7 +314,7 @@ export const prismaVisitStore: VisitStore = {
               checkOutLongitude: longitude,
               checkOutAccuracy: accuracy,
               checkOutLocation: check.location,
-              updatedAt: check.at,
+              updatedAt,
               updatedBy: check.by,
             },
     });

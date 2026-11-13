@@ -367,6 +367,9 @@ export function checkedInVisit(overrides: Partial<Visit> = {}): Visit {
     number: "MV-0007",
     visitAt: "2026-11-12T07:00:00.000Z",
     status: "planned",
+    // The stories' viewer is the Owner, so they went too: only a visitor
+    // checks out.
+    visitors: [RAVI, OWNER],
     checkIn: RAVI_CHECK_IN,
     history: [
       {
@@ -381,7 +384,8 @@ export function checkedInVisit(overrides: Partial<Visit> = {}): Visit {
       },
       ...PLAN_HISTORY("2026-11-10T04:00:00.000Z", "Ravi Shankar"),
     ],
-    actions: { ...PLANNED_ACTIONS, canCheckOut: true },
+    // Checked in: Complete it, not Reschedule (ADR CM-0040 §10).
+    actions: { ...PLANNED_ACTIONS, canReschedule: false, canCheckOut: true },
     ...overrides,
   });
 }
@@ -792,6 +796,14 @@ export function visitHandler(
           history: [historyEntry("completed"), ...found.history],
         });
       case "reschedule":
+        if (found.checkIn != null)
+          return json(
+            {
+              code: "VISIT_CHECKED_IN",
+              message: "This Visit is checked in. Complete it instead.",
+            },
+            409,
+          );
         return save({
           ...found,
           visitAt: String(body["visitAt"]),
@@ -869,6 +881,7 @@ export function visitHandler(
             ...found.actions,
             canCheckIn: false,
             canCheckOut: checkIn,
+            canReschedule: checkIn ? false : found.actions.canReschedule,
           },
           history: [
             historyEntry(checkIn ? "checked_in" : "checked_out"),

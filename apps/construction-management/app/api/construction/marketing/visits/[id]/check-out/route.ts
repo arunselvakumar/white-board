@@ -12,7 +12,8 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Checks out (ADR CM-0040 §10): a visitor, after checking in, once. Takes one position from the browser, or why there is
+ * Checks out (ADR CM-0040 §10): a visitor, after checking in, on the
+ * Visit's day, once. Takes one position from the browser, or why there is
  * none (`refused`, `unavailable`); the time is kept either way. Needs
  * Visits update.
  */

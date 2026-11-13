@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   assertCanCheckIn,
   assertCanCheckOut,
+  assertCanReschedule,
   assertCompletable,
   checkPoint,
   cancelReason,
@@ -272,12 +273,14 @@ describe("Check-in and check-out (ADR CM-0040 §10)", () => {
     ).toBe("VISIT_NOT_PLANNED");
   });
 
-  it("checks out once, after checking in", () => {
+  it("checks out once, after checking in, on the Visit's day", () => {
     const ready = {
       status: "completed" as const,
       checkedIn: true,
       checkedOut: false,
       isVisitor: true,
+      visitDate: "2026-11-12",
+      today: "2026-11-12",
     };
     expect(() => {
       assertCanCheckOut(ready);
@@ -292,5 +295,36 @@ describe("Check-in and check-out (ADR CM-0040 §10)", () => {
         assertCanCheckOut({ ...ready, checkedOut: true });
       }),
     ).toBe("VISIT_CHECKED_OUT");
+    expect(
+      code(() => {
+        assertCanCheckOut({ ...ready, today: "2026-11-13" });
+      }),
+    ).toBe("CHECK_OUT_NOT_TODAY");
+    expect(
+      code(() => {
+        assertCanCheckOut({ ...ready, isVisitor: false });
+      }),
+    ).toBe("CHECK_IN_VISITORS_ONLY");
+    expect(
+      code(() => {
+        assertCanCheckOut({ ...ready, status: "cancelled" });
+      }),
+    ).toBe("VISIT_CANCELLED");
+  });
+
+  it("reschedules only a planned Visit nobody checked in at", () => {
+    expect(() => {
+      assertCanReschedule({ status: "planned", checkedIn: false });
+    }).not.toThrow();
+    expect(
+      code(() => {
+        assertCanReschedule({ status: "planned", checkedIn: true });
+      }),
+    ).toBe("VISIT_CHECKED_IN");
+    expect(
+      code(() => {
+        assertCanReschedule({ status: "completed", checkedIn: false });
+      }),
+    ).toBe("VISIT_NOT_PLANNED");
   });
 });

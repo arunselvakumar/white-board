@@ -134,7 +134,7 @@ export const marketingVisitOpenApiOperations: OpenApiOperation[] = [
   ),
   write(
     `${ITEM}/reschedule`,
-    "Move a planned Visit to a new time",
+    "Move a planned Visit that is not checked in to a new time",
     RescheduleConstructionMarketingVisitRequestModel,
   ),
   write(

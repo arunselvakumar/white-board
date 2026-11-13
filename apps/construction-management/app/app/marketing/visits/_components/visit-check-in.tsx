@@ -23,8 +23,9 @@ export type CheckLocation =
 export type Locate = () => Promise<CheckLocation>;
 
 /**
- * One `getCurrentPosition` request, never a watch (ADR CM-0040 §10). It
- * never fails: a refusal is `refused`, anything else `unavailable`.
+ * One `getCurrentPosition` request, never a watch (ADR CM-0040 §10), and
+ * a fresh reading, never a cached one. It never fails: a refusal is
+ * `refused`, anything else `unavailable`.
  */
 export const locateOnce: Locate = () =>
   new Promise((resolve) => {
@@ -50,7 +51,7 @@ export const locateOnce: Locate = () =>
             error.code === error.PERMISSION_DENIED ? "refused" : "unavailable",
         });
       },
-      { enableHighAccuracy: true, timeout: 15_000, maximumAge: 60_000 },
+      { enableHighAccuracy: true, timeout: 15_000, maximumAge: 0 },
     );
   });
 
