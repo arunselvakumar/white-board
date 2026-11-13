@@ -9,7 +9,7 @@ bun run --cwd apps/construction-management test:e2e:pr      # the @pr tests
 bun run --cwd apps/construction-management test:e2e         # every test
 ```
 
-113 tests, 34 tagged @pr, 7 also on a phone.
+114 tests, 35 tagged @pr, 7 also on a phone.
 
 ## Sign-in, sign-up and onboarding
 
@@ -183,6 +183,7 @@ ADR [CM-0040](adr/CM-0040-marketing-context-role-and-own-entries.md).
 | should show Marketing with its four entries and open its Dashboard, when a member on the Marketing Role signs in                                                           | **@pr** @mobile | `marketing.spec.ts`          |
 | should leave Marketing out of the main menu, when a member's Role has no Marketing menu                                                                                    |                 | `marketing.spec.ts`          |
 | should show every Marketing entry, when the Owner opens Marketing                                                                                                          |                 | `marketing.spec.ts`          |
+| should count a member's completed Visit on their Dashboard and show none for last month, when a member on the Marketing Role logs a Visit                                  | **@pr**         | `marketing.spec.ts`          |
 | should add a Prospect Company with its primary Contact and move it to Lost with a reason, when a member on the Marketing Role uses Companies                               | **@pr** @mobile | `prospect-companies.spec.ts` |
 | should list only a member's own Prospect Companies and not a colleague's, when the Role has no View all                                                                    |                 | `prospect-companies.spec.ts` |
 | should find a Prospect Company by its Contact's mobile and refuse a second company with the same name, when the Owner searches and adds                                    |                 | `prospect-companies.spec.ts` |

@@ -15,4 +15,12 @@ export class MarketingPage extends AppShellPage {
   public get submenuLinks() {
     return this.submenu.getByRole("link");
   }
+
+  /** A Dashboard total's card, by its label. */
+  public total(name: string) {
+    return this.page
+      .getByRole("list", { name: "Totals" })
+      .getByRole("listitem")
+      .filter({ hasText: name });
+  }
 }
