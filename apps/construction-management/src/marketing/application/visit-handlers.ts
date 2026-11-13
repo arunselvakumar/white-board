@@ -8,7 +8,11 @@ import {
 import type { AuditRecord } from "@/src/shared-kernel/audit-reader";
 import { recordAudit } from "@/src/shared-kernel/audit";
 import { addDays, type CalendarDate } from "@/src/shared-kernel/calendar-date";
-import { conflict, notFound } from "@/src/shared-kernel/domain-error";
+import {
+  conflict,
+  notFound,
+  type DomainError,
+} from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
 import type { ListCursor } from "@/src/shared-kernel/list-cursor";
 import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
@@ -189,8 +193,10 @@ export type VisitReadModel = VisitDetails & {
 };
 
 export type VisitFormOptions = {
-  /** Active Marketing People. */
+  /** Active Marketing People: the ones a Visit can name. */
   people: MarketingPerson[];
+  /** Inactive ones too, whose past Visits remain: the list's filter. */
+  allPeople: MarketingPerson[];
   /** The caller's own Team Member id: the default visitor. */
   selfMemberId: string | null;
   /** Without View all the caller must stay among the visitors. */
@@ -218,6 +224,36 @@ const HISTORY_ACTIONS = new Set([
 
 function visitNotFound() {
   return notFound("VISIT_NOT_FOUND", "This Visit was not found.");
+}
+
+function visitNumberInUse(): DomainError {
+  return conflict(
+    "VISIT_NUMBER_IN_USE",
+    "This Visit number is already used. Check Manage Sequence IDs.",
+  );
+}
+
+/**
+ * A unique index refused the Visit's save: the Prospect Company name
+ * (`prospect_companies_workspace_name_live_key` on `name_key`) or the Visit
+ * number (`visits_workspace_id_number_key`). Any other is left as it is.
+ */
+function mapUniqueViolation(error: unknown): unknown {
+  if (!isUniqueViolation(error)) return error;
+  const target = JSON.stringify(error.meta ?? {});
+  if (target.includes("name_key") || target.includes("workspace_name_live"))
+    return prospectCompanyNameInUse();
+  if (target.includes("number")) return visitNumberInUse();
+  return error;
+}
+
+/** Every Visit write needs Visits read as well as its own flag. */
+function assertCanWrite(
+  access: MemberAccess,
+  flag: "create" | "update" | "delete",
+): void {
+  assertCan(access, VISITS_MENU, "read");
+  assertCan(access, VISITS_MENU, flag);
 }
 
 function visitChanged() {
@@ -340,6 +376,7 @@ export class VisitHandlers {
     ]);
     return {
       people: people.filter((person) => person.active),
+      allPeople: people,
       selfMemberId: self,
       mustIncludeSelf: this.scope(access) != null,
       companies,
@@ -577,24 +614,29 @@ export class VisitHandlers {
   }
 
   /**
-   * The points of contact: live Contacts of the company, plus the new
-   * ones, added to the company in this transaction (Companies update).
+   * The points of contact: the given ones (on an edit the current ones, by
+   * default), plus the new ones, added to the company in this transaction.
+   * Each added id is a live Contact of the company; one already on the
+   * Visit may stay after it is removed from the company, and still counts.
+   * New Contacts on an existing company need Companies update and a
+   * company the caller sees (ADR CM-0040 §5); otherwise 404.
    */
   private async contacts(
     tx: MarketingTx,
     access: MemberAccess,
-    companyId: string,
+    company: { id: string; createdBy: string; assignedMemberId: string | null },
     input: VisitWriteInput,
-    newCompany: boolean,
+    options: { newCompany: boolean; current: readonly string[] },
   ): Promise<string[]> {
-    const ids = [...new Set(input.contactIds ?? [])];
-    if (ids.length > 0) {
+    const ids = [...new Set(input.contactIds ?? options.current)];
+    const added = ids.filter((id) => !options.current.includes(id));
+    if (added.length > 0) {
       const live = await this.deps.companyStore.contacts(
         tx,
         access.workspaceId,
-        companyId,
+        company.id,
       );
-      for (const id of ids)
+      for (const id of added)
         if (!live.some((contact) => contact.id === id))
           throw invalidField(
             "VISIT_CONTACT_NOT_FOUND",
@@ -603,14 +645,18 @@ export class VisitHandlers {
           );
     }
     const extra = input.newContacts ?? [];
-    if (extra.length > 0 && !newCompany)
+    if (extra.length > 0 && !options.newCompany) {
+      assertCan(access, COMPANIES_MENU, "read");
       assertCan(access, COMPANIES_MENU, "update");
+      if (!isProspectCompanyVisible(company, await this.companyScope(access)))
+        throw prospectCompanyNotFound();
+    }
     for (const raw of extra)
       ids.push(
         await this.deps.companies.addContactInTx(
           tx,
           access,
-          companyId,
+          company.id,
           contactDetails(raw),
         ),
       );
@@ -622,7 +668,7 @@ export class VisitHandlers {
     tx: MarketingTx,
     workspaceId: string,
     companyId: string,
-  ): Promise<void> {
+  ) {
     const company = await this.deps.companyStore.lock(
       tx,
       workspaceId,
@@ -630,10 +676,11 @@ export class VisitHandlers {
     );
     // On a write any live company of the Company will do (ADR CM-0040 §5).
     if (company == null) throw prospectCompanyNotFound();
+    return company;
   }
 
   async create(access: MemberAccess, input: CreateVisitInput): Promise<string> {
-    assertCan(access, VISITS_MENU, "create");
+    assertCanWrite(access, "create");
     const details = visitDetails(input);
     const now = this.clock();
     const ws = access.workspaceId;
@@ -664,15 +711,20 @@ export class VisitHandlers {
           (prepared == null
             ? ""
             : await this.deps.companies.createInTx(tx, access, prepared));
-        await this.lockCompany(tx, ws, companyId);
-        const contactIds = await this.contacts(
-          tx,
-          access,
-          companyId,
-          input,
-          prepared != null,
-        );
+        const company = await this.lockCompany(tx, ws, companyId);
+        const contactIds = await this.contacts(tx, access, company, input, {
+          newCompany: prepared != null,
+          current: [],
+        });
         const completed = input.status === "completed";
+        // Logged with a new company and its primary Contact, and no one
+        // else named: that Contact is who was met.
+        if (completed && prepared?.contact != null && contactIds.length === 0) {
+          const primary = (
+            await this.deps.companyStore.contacts(tx, ws, companyId)
+          ).find((contact) => contact.isPrimary);
+          if (primary != null) contactIds.push(primary.id);
+        }
         if (completed)
           assertCompletable({
             visitAt: input.visitAt,
@@ -680,7 +732,6 @@ export class VisitHandlers {
             contactCount: contactIds.length,
             discussion: details.discussion,
           });
-        const company = await this.deps.companyStore.find(tx, ws, companyId);
         const row: VisitRow = {
           ...details,
           location: details.location ?? defaultLocation(company),
@@ -725,8 +776,7 @@ export class VisitHandlers {
         });
       });
     } catch (error) {
-      if (isUniqueViolation(error)) throw prospectCompanyNameInUse();
-      throw error;
+      throw mapUniqueViolation(error);
     }
     return id;
   }
@@ -745,7 +795,7 @@ export class VisitHandlers {
       expectedUpdatedAt: Date;
     },
   ): Promise<void> {
-    assertCan(access, VISITS_MENU, "update");
+    assertCanWrite(access, "update");
     const details = visitDetails(input);
     const now = this.clock();
     const ws = access.workspaceId;
@@ -774,14 +824,15 @@ export class VisitHandlers {
         input.visitorIds,
         current.visitorIds,
       );
-      await this.lockCompany(tx, ws, input.prospectCompanyId);
-      const contactIds = await this.contacts(
-        tx,
-        access,
-        input.prospectCompanyId,
-        input,
-        false,
-      );
+      const company = await this.lockCompany(tx, ws, input.prospectCompanyId);
+      const contactIds = await this.contacts(tx, access, company, input, {
+        newCompany: false,
+        // The current Contacts stay only with the company they belong to.
+        current:
+          current.prospectCompanyId === input.prospectCompanyId
+            ? current.contactIds
+            : [],
+      });
       if (current.status === "completed") {
         check("edit", this.deps.dateIn(current.visitAt, timeZone));
         if (!same(current.visitAt, input.visitAt))
@@ -844,7 +895,7 @@ export class VisitHandlers {
     id: string,
     input: VisitWriteInput & { expectedUpdatedAt: Date },
   ): Promise<void> {
-    assertCan(access, VISITS_MENU, "update");
+    assertCanWrite(access, "update");
     const details = visitDetails(input);
     const now = this.clock();
     const ws = access.workspaceId;
@@ -865,14 +916,11 @@ export class VisitHandlers {
         input.visitorIds,
         current.visitorIds,
       );
-      await this.lockCompany(tx, ws, current.prospectCompanyId);
-      const contactIds = await this.contacts(
-        tx,
-        access,
-        current.prospectCompanyId,
-        input,
-        false,
-      );
+      const company = await this.lockCompany(tx, ws, current.prospectCompanyId);
+      const contactIds = await this.contacts(tx, access, company, input, {
+        newCompany: false,
+        current: current.contactIds,
+      });
       assertCompletable({
         visitAt: input.visitAt,
         now,
@@ -924,7 +972,7 @@ export class VisitHandlers {
     id: string,
     input: { visitAt: Date; expectedUpdatedAt: Date },
   ): Promise<void> {
-    assertCan(access, VISITS_MENU, "update");
+    assertCanWrite(access, "update");
     const now = this.clock();
     await this.deps.db.$transaction(async (tx) => {
       const current = await this.visible(access, (w) =>
@@ -965,7 +1013,7 @@ export class VisitHandlers {
     id: string,
     input: { reason: string; expectedUpdatedAt: Date },
   ): Promise<void> {
-    assertCan(access, VISITS_MENU, "update");
+    assertCanWrite(access, "update");
     const reason = cancelReason(input.reason);
     const now = this.clock();
     await this.deps.db.$transaction(async (tx) => {
@@ -1007,7 +1055,7 @@ export class VisitHandlers {
     id: string,
     input: { text: string },
   ): Promise<void> {
-    assertCan(access, VISITS_MENU, "update");
+    assertCanWrite(access, "update");
     const text = noteText(input.text);
     const now = this.clock();
     const noteId = newId();
@@ -1041,7 +1089,7 @@ export class VisitHandlers {
     id: string,
     expectedUpdatedAt: Date,
   ): Promise<void> {
-    assertCan(access, VISITS_MENU, "delete");
+    assertCanWrite(access, "delete");
     const now = this.clock();
     const ws = access.workspaceId;
     const timeZone = await this.deps.timeZone(ws);

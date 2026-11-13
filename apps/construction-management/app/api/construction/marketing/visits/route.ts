@@ -65,7 +65,7 @@ export async function GET(request: Request): Promise<Response> {
  * Plans a Visit, or logs a past one as Completed, numbered `MV-0001`. The
  * Prospect Company and new Contacts can be added in the same save. A
  * Completed one moves its company from New to Contacted. Needs Visits
- * create.
+ * read and create.
  */
 export async function POST(request: Request): Promise<Response> {
   try {

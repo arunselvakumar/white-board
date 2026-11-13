@@ -288,11 +288,22 @@ function text(body: Record<string, unknown>, key: string): string | null {
 
 const json = (body: unknown, status = 200) => Response.json(body, { status });
 
+/**
+ * A story's company answers, and `add` for a company another screen's mock
+ * creates (a Visit with a new company), so its page opens afterwards.
+ */
+export type CompanyHandler = ((call: ApiCall) => Response | undefined) & {
+  add: (company: ProspectCompany) => void;
+};
+
 /** Answers the Prospect Company screens' reads and writes for one story. */
 export function companyHandler(
   options: CompanyApiOptions = {},
-): (call: ApiCall) => Response | undefined {
+): CompanyHandler {
   let companies = [...(options.companies ?? COMPANIES)];
+  const add = (next: ProspectCompany) => {
+    companies = [...companies.filter((item) => item.id !== next.id), next];
+  };
   const taken = (name: unknown, exceptId?: string) =>
     typeof name === "string" &&
     [
@@ -315,7 +326,7 @@ export function companyHandler(
     return json(next);
   };
 
-  return (call) => {
+  const handler = (call: ApiCall): Response | undefined => {
     const extra = options.extra?.(call);
     if (extra != null) return extra;
     const url = new URL(call.path, "http://storybook.local");
@@ -514,6 +525,7 @@ export function companyHandler(
     }
     return undefined;
   };
+  return Object.assign(handler, { add });
 }
 
 export function mockCompanyApi(options: CompanyApiOptions = {}) {

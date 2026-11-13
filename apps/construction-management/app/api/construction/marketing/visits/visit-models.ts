@@ -73,7 +73,9 @@ const VisitBody = z.object({
   visitorIds: z.array(z.uuid()).min(1).max(20).optional(),
   /**
    * Live Contacts of the Visit's company; one or more is required to
-   * complete (400 `VISIT_CONTACT_REQUIRED`).
+   * complete (400 `VISIT_CONTACT_REQUIRED`). An edit that leaves it out
+   * keeps the current ones, and may keep a Contact removed from the
+   * company since; `[]` clears them.
    */
   contactIds: z.array(z.uuid()).max(20).optional(),
   /**
@@ -259,16 +261,23 @@ export const ConstructionMarketingVisitResponseModel = z.object({
   actions: ConstructionMarketingVisitActionsResponseModel,
 });
 
+const ConstructionMarketingVisitPersonResponseModel = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  mobile: z.string().nullable(),
+  isOwner: z.boolean(),
+  /** False for someone no longer a Marketing Person or Team Member. */
+  active: z.boolean(),
+});
+
 export const GetConstructionMarketingVisitFormOptionsResponseModel = z.object({
-  people: z.array(
-    z.object({
-      id: z.uuid(),
-      name: z.string(),
-      mobile: z.string().nullable(),
-      isOwner: z.boolean(),
-      active: z.boolean(),
-    }),
-  ),
+  /** Active Marketing People: the ones a Visit can name. */
+  people: z.array(ConstructionMarketingVisitPersonResponseModel),
+  /**
+   * Everyone who can be a visitor, inactive ones included (their past
+   * Visits remain): the list's Marketing Person filter.
+   */
+  allPeople: z.array(ConstructionMarketingVisitPersonResponseModel),
   selfMemberId: z.uuid().nullable(),
   mustIncludeSelf: z.boolean(),
   companies: z.array(
@@ -331,5 +340,6 @@ export function toVisitFormOptions(
   return {
     ...options,
     people: options.people.map((person) => ({ ...person })),
+    allPeople: options.allPeople.map((person) => ({ ...person })),
   };
 }

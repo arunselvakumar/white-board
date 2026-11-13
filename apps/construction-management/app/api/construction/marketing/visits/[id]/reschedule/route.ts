@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * Moves a planned Visit to a new time; the old one stays in its history.
- * Needs Visits update.
+ * Needs Visits read and update.
  */
 export async function POST(
   request: Request,

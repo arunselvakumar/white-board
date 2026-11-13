@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test";
 
+import { todayInIndia } from "../api/dates";
 import { createProspectCompany, createVisit } from "../api/marketing";
 import { companyTest } from "../helpers/companyTest";
 import { ProspectCompaniesPage } from "../pages/ProspectCompaniesPage";
@@ -90,22 +91,40 @@ companyTest.describe("Visits", () => {
     "should reschedule a planned Visit keeping the old time, then cancel it with a reason, when the Owner changes plans",
     async ({ owner, page }) => {
       const company = await createProspectCompany(owner.api);
+      // Tomorrow at 10:00 am in the Company's zone; moved a day, same time.
+      const oldAt = new Date(`${todayInIndia(1)}T10:00:00+05:30`);
+      const newDate = todayInIndia(2);
+      const newAt = new Date(`${newDate}T10:00:00+05:30`);
       const visit = await createVisit(owner.api, {
         prospectCompanyId: company.id,
+        visitAt: oldAt,
       });
       const visits = new VisitsPage(page);
 
       await page.goto(`${visits.url}/${visit.id}`);
       await visits.action("Reschedule");
-      const tomorrowPlusOne = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
-      await visits.dialog
-        .getByLabel("New date")
-        .fill(tomorrowPlusOne.toISOString().slice(0, 10));
+      await visits.dialog.getByLabel("New date").fill(newDate);
       await visits.clickAndWaitFor(
         visits.dialog.getByRole("button", { name: "Reschedule" }),
         /\/reschedule$/,
       );
-      await expect(visits.history).toContainText("Rescheduled from");
+      // Formatted in the browser, as the History line formats them.
+      const [oldShown, newShown] = await page.evaluate(
+        (instants) =>
+          instants.map((at) =>
+            new Intl.DateTimeFormat("en-IN", {
+              timeZone: "Asia/Kolkata",
+              day: "numeric",
+              month: "short",
+              hour: "numeric",
+              minute: "2-digit",
+            }).format(new Date(at)),
+          ),
+        [oldAt.toISOString(), newAt.toISOString()],
+      );
+      await expect(visits.history).toContainText(
+        `Rescheduled from ${String(oldShown)} to ${String(newShown)}`,
+      );
 
       await visits.action("Cancel Visit");
       await visits.dialog.getByLabel("Reason").fill("Plant head on leave");

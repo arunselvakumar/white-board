@@ -118,6 +118,7 @@ Read first: [CM-0034](../adr/CM-0034-hr-main-menu.md) (main-menu shape), [CM-003
 - **Notes after the visit**: anyone who can update the Visit can add dated notes to it. Notes are never edited, only added, and show who wrote them.
 - **Back-dated entry**: a completed Visit can be logged with a past date within the Company's Back-dated Entry setting for this menu (default 7 days).
 - **Lock**: a completed Visit can be edited by its creator for 7 days, then only by someone with `view_all` and update. Notes and Follow-ups can still be added.
+- **Delete**: someone with delete on Visits can delete a Visit. It is hidden, not erased, and the audit trail keeps it. A completed Visit can be deleted only while it can still be edited: within the 7-day lock (or with `view_all`) and within the back-dated limit.
 - Every create, change, cancel and reschedule is written to the audit trail.
 - A planned Visit whose date passed and is neither completed nor cancelled shows as **Missed** in lists and on the Dashboard. Missed is shown, not stored.
 

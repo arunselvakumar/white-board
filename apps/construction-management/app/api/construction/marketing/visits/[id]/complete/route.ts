@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 /**
  * Completes a planned Visit: when it happened (not in the future, within
  * the back-dated limit), a point of contact and the Discussion. Its
- * company moves from New to Contacted. Needs Visits update.
+ * company moves from New to Contacted. Needs Visits read and update.
  */
 export async function POST(
   request: Request,

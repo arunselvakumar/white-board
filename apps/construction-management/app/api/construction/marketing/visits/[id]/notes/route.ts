@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * Adds a dated note to a Visit; notes are never edited, and can be added
- * past the lock. Needs Visits update.
+ * past the lock. Needs Visits read and update.
  */
 export async function POST(
   request: Request,

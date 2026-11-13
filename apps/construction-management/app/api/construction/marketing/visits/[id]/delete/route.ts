@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * Deletes a Visit (a tombstone). A Completed one keeps its lock and
- * back-dated limit. Needs Visits delete.
+ * back-dated limit. Needs Visits read and delete.
  */
 export async function POST(
   request: Request,

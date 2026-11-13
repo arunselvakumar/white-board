@@ -14,12 +14,15 @@ import {
   KAVERI_ID,
   LAKSHMI_ID,
   MURUGAN_ID,
+  NEW_COMPANY_ID,
   OWNER_MEMBER_ID,
   PRIYA_MEMBER_ID,
   RAVI_MEMBER_ID,
   SENTHIL_ID,
   TEXTILES_ID,
+  company as companyFixture,
   companyHandler,
+  contact as contactFixture,
   type CompanyApiOptions,
 } from "../../companies/_components/company-fixtures";
 
@@ -54,11 +57,23 @@ const SENTHIL = {
   mobile: "+919845012345",
 };
 
+const VISIT_PEOPLE: VisitFormOptions["people"] = [
+  { ...OWNER, mobile: "+919840000001", isOwner: true, active: true },
+  { ...PRIYA, mobile: "+919840000003", isOwner: false, active: true },
+  { ...RAVI, mobile: "+919840000002", isOwner: false, active: true },
+];
+
 export const VISIT_FORM_OPTIONS: VisitFormOptions = {
-  people: [
-    { ...OWNER, mobile: "+919840000001", isOwner: true, active: true },
-    { ...PRIYA, mobile: "+919840000003", isOwner: false, active: true },
-    { ...RAVI, mobile: "+919840000002", isOwner: false, active: true },
+  people: VISIT_PEOPLE,
+  allPeople: [
+    ...VISIT_PEOPLE,
+    {
+      id: "5c0e7d1a-3b2f-4e6a-9d8c-7b6a5f4e3d2c",
+      name: "Karthik Raja",
+      mobile: "+919840000004",
+      isOwner: false,
+      active: false,
+    },
   ],
   selfMemberId: OWNER_MEMBER_ID,
   mustIncludeSelf: false,
@@ -316,6 +331,18 @@ function text(body: Record<string, unknown>, key: string): string | null {
   return typeof value === "string" && value !== "" ? value : null;
 }
 
+/** An instant's calendar day in the Company time zone, as the server reads `from`/`to`. */
+const kolkataDay = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Kolkata",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+/** A new Contact's id, the same on the Visit and on its company. */
+const newContactId = (index: number) =>
+  `0199d000-0000-7000-8000-00000000028${String(index)}`;
+
 /** The Visit fields a write sends, as the answered Visit shows them. */
 function written(body: Record<string, unknown>, base: Visit): Visit {
   const people = VISIT_FORM_OPTIONS.people;
@@ -331,7 +358,7 @@ function written(body: Record<string, unknown>, base: Visit): Visit {
     (body["newContacts"] as
       { name: string; mobile: string | null }[] | undefined) ?? []
   ).map((row, index) => ({
-    id: `0199d000-0000-7000-8000-00000000028${String(index)}`,
+    id: newContactId(index),
     name: row.name,
     jobTitle: null,
     mobile: row.mobile,
@@ -426,7 +453,7 @@ export function visitHandler(
       const company = url.searchParams.get("prospectCompanyId");
       const from = url.searchParams.get("from");
       const to = url.searchParams.get("to");
-      const day = (at: string) => at.slice(0, 10);
+      const day = (at: string) => kolkataDay.format(new Date(at));
       const matching = visits.filter(
         (item) =>
           (statuses == null || statuses.includes(item.status)) &&
@@ -464,13 +491,58 @@ export function visitHandler(
               canOpen: true,
             }
           : {
-              id: "0199d000-0000-7000-8000-000000000199",
+              id: NEW_COMPANY_ID,
               name: String(fresh["name"]),
               address: null,
               city: text(fresh, "city"),
               canOpen: true,
             };
       const completed = body["status"] === "completed";
+      // The new company joins the company mock, so its page opens.
+      if (fresh != null) {
+        const rows =
+          (body["newContacts"] as
+            | {
+                name: string;
+                jobTitle?: string | null;
+                mobile: string | null;
+              }[]
+            | undefined) ?? [];
+        companies.add(
+          companyFixture({
+            id: NEW_COMPANY_ID,
+            name: company.name,
+            industry: null,
+            address: null,
+            city: company.city,
+            stateCode: null,
+            pin: null,
+            phone: text(fresh, "phone"),
+            email: null,
+            website: null,
+            gstin: null,
+            source: null,
+            remarks: null,
+            assignedTo: OWNER,
+            stage: completed ? "contacted" : "new",
+            createdAt: SAVED_AT,
+            updatedAt: SAVED_AT,
+            contacts: rows.map((row, index) =>
+              contactFixture({
+                id: newContactId(index),
+                name: row.name,
+                jobTitle: row.jobTitle ?? null,
+                mobile: row.mobile,
+                email: null,
+                remarks: null,
+                isPrimary: index === 0,
+                updatedAt: SAVED_AT,
+              }),
+            ),
+            timeline: [],
+          }),
+        );
+      }
       const created = written(
         body,
         plannedVisit({

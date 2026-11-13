@@ -14,7 +14,8 @@ import {
 import { optionalText } from "./prospect-company";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-const MONTH = /^\d{4}-(0[1-9]|1[0-2])$/;
+/** `YYYY-MM`; year 0000 is not a month anyone starts work in. */
+const MONTH = /^(?!0000)\d{4}-(0[1-9]|1[0-2])$/;
 
 function optionalLines(raw: string | null | undefined): string | null {
   const value =

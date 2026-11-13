@@ -221,9 +221,10 @@ function PeopleAndCompanyFilters({
         label="Marketing Person"
         allLabel="Anyone"
         value={filters.memberId}
-        options={options.people.map((person) => ({
+        // People no longer active stay here: their past Visits remain.
+        options={options.allPeople.map((person) => ({
           value: person.id,
-          label: person.name,
+          label: person.active ? person.name : `${person.name} (inactive)`,
         }))}
         onChange={(memberId) => {
           onChange({ memberId });

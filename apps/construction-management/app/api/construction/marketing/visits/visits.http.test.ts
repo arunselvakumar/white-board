@@ -6,6 +6,7 @@ import type { PermissionGrants } from "@/src/shared-kernel/access";
 import { jsonRequest, memberWith, ownerWithCompany } from "@/test/companies";
 import { TEST_ORIGIN } from "@/test/sessions";
 
+import { POST as removeContact } from "../companies/[id]/contacts/[contactId]/delete/route";
 import { POST as removeCompany } from "../companies/[id]/delete/route";
 import { GET as getCompany } from "../companies/[id]/route";
 import {
@@ -35,6 +36,7 @@ type Visit = {
   status: string;
   location: string | null;
   discussion: string | null;
+  outcome: string | null;
   requirementValue: number | null;
   visitors: { id: string; name: string }[];
   contacts: { id: string; name: string }[];
@@ -53,7 +55,12 @@ type Company = {
   id: string;
   stage: string;
   updatedAt: string;
-  contacts: { id: string; name: string; isPrimary: boolean }[];
+  contacts: {
+    id: string;
+    name: string;
+    isPrimary: boolean;
+    updatedAt: string;
+  }[];
   timeline: {
     kind: string;
     number?: string;
@@ -70,6 +77,15 @@ async function json<T>(response: Response): Promise<T> {
 
 function params(id: string) {
   return { params: Promise.resolve({ id }) };
+}
+
+async function readCompany(who: Session, id: string): Promise<Company> {
+  const response = await getCompany(
+    jsonRequest(`${COMPANIES}/${id}`, who.cookie),
+    params(id),
+  );
+  expect(response.status).toBe(StatusCodes.OK);
+  return json<Company>(response);
 }
 
 const iso = (offset: number) => new Date(Date.now() + offset).toISOString();
@@ -271,7 +287,11 @@ describe("Visits (ADR CM-0040 §5, §7)", () => {
   it("shows a member without View all the Visits they created or went on, and 404 for any other", async () => {
     const owner = await ownerWithCompany();
     const ravi = await memberWith(owner, MARKETING);
-    const priya = await memberWith(owner, MARKETING);
+    // Delete too, so her delete reaches the Visit (and answers 404, not 403).
+    const priya = await memberWith(owner, {
+      ...MARKETING,
+      "marketing.visits": ["create", "read", "update", "delete"],
+    });
     const anil = await memberWith(owner, MARKETING);
     const manager = await memberWith(owner, MANAGER);
     const ravis = await addCompany(ravi);
@@ -304,11 +324,116 @@ describe("Visits (ADR CM-0040 §5, §7)", () => {
     );
     expect(hidden.status).toBe(StatusCodes.NOT_FOUND);
     expect(await json(hidden)).toMatchObject({ code: "VISIT_NOT_FOUND" });
-    const note = await addNote(
-      jsonRequest(`${BASE}/${alone.id}/notes`, priya.cookie, { text: "Hi" }),
-      params(alone.id),
+    const expectedUpdatedAt = alone.updatedAt;
+    const writes: [string, Promise<Response>][] = [
+      [
+        "notes",
+        addNote(
+          jsonRequest(`${BASE}/${alone.id}/notes`, priya.cookie, {
+            text: "Hi",
+          }),
+          params(alone.id),
+        ),
+      ],
+      [
+        "update",
+        update(
+          jsonRequest(`${BASE}/${alone.id}/update`, priya.cookie, {
+            prospectCompanyId: ravis.id,
+            visitAt: alone.visitAt,
+            outcome: "Mine now",
+            expectedUpdatedAt,
+          }),
+          params(alone.id),
+        ),
+      ],
+      [
+        "complete",
+        complete(
+          jsonRequest(`${BASE}/${alone.id}/complete`, priya.cookie, {
+            visitAt: iso(-HOUR),
+            contactIds: ravis.contacts.map((contact) => contact.id),
+            discussion: "Discussed the shed.",
+            expectedUpdatedAt,
+          }),
+          params(alone.id),
+        ),
+      ],
+      [
+        "reschedule",
+        reschedule(
+          jsonRequest(`${BASE}/${alone.id}/reschedule`, priya.cookie, {
+            visitAt: iso(4 * DAY),
+            expectedUpdatedAt,
+          }),
+          params(alone.id),
+        ),
+      ],
+      [
+        "cancel",
+        cancel(
+          jsonRequest(`${BASE}/${alone.id}/cancel`, priya.cookie, {
+            reason: "Not needed",
+            expectedUpdatedAt,
+          }),
+          params(alone.id),
+        ),
+      ],
+      [
+        "delete",
+        remove(
+          jsonRequest(`${BASE}/${alone.id}/delete`, priya.cookie, {
+            expectedUpdatedAt,
+          }),
+          params(alone.id),
+        ),
+      ],
+    ];
+    for (const [name, pending] of writes) {
+      const response = await pending;
+      expect({ name, status: response.status }).toEqual({
+        name,
+        status: StatusCodes.NOT_FOUND,
+      });
+      expect(await json(response)).toMatchObject({ code: "VISIT_NOT_FOUND" });
+    }
+    const untouched = await json<Visit>(
+      await getOne(
+        jsonRequest(`${BASE}/${alone.id}`, ravi.cookie),
+        params(alone.id),
+      ),
     );
-    expect(note.status).toBe(StatusCodes.NOT_FOUND);
+    expect(untouched).toMatchObject({
+      status: "planned",
+      updatedAt: alone.updatedAt,
+      notes: [],
+    });
+
+    // Her own Visit to Ravi's company is allowed, but adding Contacts to a
+    // company she cannot see is not, and nothing is saved.
+    const before = await prisma.constructionMarketingVisit.count({
+      where: { workspaceId: owner.workspaceId },
+    });
+    const withContacts = await create(
+      jsonRequest(BASE, priya.cookie, {
+        status: "planned",
+        visitAt: iso(DAY),
+        prospectCompanyId: ravis.id,
+        newContacts: [{ name: "Murugan", mobile: "9840099999" }],
+      }),
+    );
+    expect(withContacts.status).toBe(StatusCodes.NOT_FOUND);
+    expect(await json(withContacts)).toMatchObject({
+      code: "PROSPECT_COMPANY_NOT_FOUND",
+    });
+    expect(
+      (await readCompany(ravi, ravis.id)).contacts.map((item) => item.name),
+    ).toEqual(["Lakshmi"]);
+    expect(
+      await prisma.constructionMarketingVisit.count({
+        where: { workspaceId: owner.workspaceId },
+      }),
+    ).toBe(before);
 
     // Without View all a member cannot log a Visit for others only.
     const forOthers = await create(
@@ -512,11 +637,125 @@ describe("Visits (ADR CM-0040 §5, §7)", () => {
       items: { id: string; lastVisitAt: string | null }[];
     }>(await listCompanies(jsonRequest(COMPANIES, owner.cookie)));
     expect(
-      companies.items.find((item) => item.id === first.id)?.lastVisitAt,
-    ).not.toBeNull();
+      typeof companies.items.find((item) => item.id === first.id)?.lastVisitAt,
+    ).toBe("string");
     expect(
       companies.items.find((item) => item.id === second.id)?.lastVisitAt,
     ).toBeNull();
+  });
+
+  it("reads from and to as days in the Company's time zone (Asia/Kolkata)", async () => {
+    const owner = await ownerWithCompany();
+    const company = await addCompany(owner);
+    // 20:00 UTC is 1:30 am the next day in India.
+    const utcDay = new Date(Date.now() + 3 * DAY).toISOString().slice(0, 10);
+    const indiaDay = new Date(Date.parse(`${utcDay}T00:00:00Z`) + DAY)
+      .toISOString()
+      .slice(0, 10);
+    const late = await plan(owner, {
+      prospectCompanyId: company.id,
+      visitAt: `${utcDay}T20:00:00.000Z`,
+    });
+
+    expect(await numbers(owner, `?from=${indiaDay}&to=${indiaDay}`)).toEqual([
+      late.number,
+    ]);
+    expect(await numbers(owner, `?from=${utcDay}&to=${utcDay}`)).toEqual([]);
+  });
+
+  it("links a new company's primary Contact to a Visit logged with no one else named", async () => {
+    const owner = await ownerWithCompany();
+    const ravi = await memberWith(owner, MARKETING);
+    const response = await create(
+      jsonRequest(BASE, ravi.cookie, {
+        status: "completed",
+        visitAt: iso(-HOUR),
+        newProspectCompany: {
+          name: `Pandian Mills ${crypto.randomUUID().slice(0, 6)}`,
+          primaryContact: { name: "Meena S", mobile: "9443322110" },
+        },
+        discussion: "Wants a quote for a 2,000 sq m shed.",
+      }),
+    );
+    expect(response.status).toBe(StatusCodes.CREATED);
+    const visit = await json<Visit>(response);
+    expect(visit.contacts).toEqual([
+      expect.objectContaining({ name: "Meena S" }),
+    ]);
+    const company = await readCompany(ravi, visit.prospectCompany.id);
+    expect(visit.contacts[0]?.id).toBe(company.contacts[0]?.id);
+    expect(company.stage).toBe("contacted");
+  });
+
+  it("keeps a Contact removed from the company on the Visit it was met on, and an edit can still save", async () => {
+    const owner = await ownerWithCompany();
+    const ravi = await memberWith(owner, MARKETING);
+    const company = await addCompany(ravi);
+    const [met] = company.contacts;
+    if (met == null) throw new Error("The company has its primary Contact.");
+    let visit = await json<Visit>(await log(ravi, company));
+    expect(visit.contacts.map((item) => item.id)).toEqual([met.id]);
+
+    const removed = await removeContact(
+      jsonRequest(
+        `${COMPANIES}/${company.id}/contacts/${met.id}/delete`,
+        ravi.cookie,
+        { expectedUpdatedAt: met.updatedAt },
+      ),
+      { params: Promise.resolve({ id: company.id, contactId: met.id }) },
+    );
+    expect(removed.status).toBe(StatusCodes.OK);
+    expect((await readCompany(ravi, company.id)).contacts).toEqual([]);
+
+    // The form sends the ticked Contact back as it is.
+    const edited = await update(
+      jsonRequest(`${BASE}/${visit.id}/update`, ravi.cookie, {
+        prospectCompanyId: company.id,
+        visitAt: visit.visitAt,
+        contactIds: [met.id],
+        discussion: visit.discussion,
+        outcome: "Asked for a quotation",
+        expectedUpdatedAt: visit.updatedAt,
+      }),
+      params(visit.id),
+    );
+    expect(edited.status).toBe(StatusCodes.OK);
+    visit = await json<Visit>(edited);
+    expect(visit.outcome).toBe("Asked for a quotation");
+    expect(visit.contacts).toEqual([
+      expect.objectContaining({ id: met.id, name: "Lakshmi" }),
+    ]);
+
+    // Left out, the Contacts stay as they are.
+    const kept = await update(
+      jsonRequest(`${BASE}/${visit.id}/update`, ravi.cookie, {
+        prospectCompanyId: company.id,
+        visitAt: visit.visitAt,
+        discussion: visit.discussion,
+        outcome: "Quotation sent",
+        expectedUpdatedAt: visit.updatedAt,
+      }),
+      params(visit.id),
+    );
+    expect(kept.status).toBe(StatusCodes.OK);
+    visit = await json<Visit>(kept);
+    expect(visit.contacts.map((item) => item.id)).toEqual([met.id]);
+
+    // A removed Contact cannot be added to another Visit.
+    const other = await plan(ravi, { prospectCompanyId: company.id });
+    const refused = await update(
+      jsonRequest(`${BASE}/${other.id}/update`, ravi.cookie, {
+        prospectCompanyId: company.id,
+        visitAt: other.visitAt,
+        contactIds: [met.id],
+        expectedUpdatedAt: other.updatedAt,
+      }),
+      params(other.id),
+    );
+    expect(await json(refused)).toMatchObject({
+      code: "VISIT_CONTACT_NOT_FOUND",
+      details: { field: "contactIds" },
+    });
   });
 
   it("refuses to delete a company with Visits until they are deleted", async () => {
@@ -561,6 +800,7 @@ describe("Visits (ADR CM-0040 §5, §7)", () => {
       mustIncludeSelf: boolean;
       companies: { id: string }[];
       people: { id: string }[];
+      allPeople: { id: string; active: boolean }[];
     }>(await formOptions(jsonRequest(`${BASE}/form-options`, ravi.cookie)));
     expect(options).toMatchObject({
       selfMemberId: ravi.memberId,
@@ -568,6 +808,9 @@ describe("Visits (ADR CM-0040 §5, §7)", () => {
     });
     expect(options.companies.map((company) => company.id)).toEqual([mine.id]);
     expect(options.people.map((person) => person.id)).toContain(ravi.memberId);
+    expect(options.allPeople.map((person) => person.id)).toContain(
+      ravi.memberId,
+    );
   });
 
   it("needs the Visits menu", async () => {
@@ -585,5 +828,58 @@ describe("Visits (ADR CM-0040 §5, §7)", () => {
       }),
     );
     expect(refused.status).toBe(StatusCodes.FORBIDDEN);
+  });
+
+  it("refuses every Visit write without Visits read, before saving anything", async () => {
+    const owner = await ownerWithCompany();
+    const writer = await memberWith(owner, {
+      "marketing.visits": ["create"],
+      "marketing.companies": ["read", "create"],
+    });
+    const company = await addCompany(writer);
+
+    const refused = await create(
+      jsonRequest(BASE, writer.cookie, {
+        status: "planned",
+        visitAt: iso(DAY),
+        prospectCompanyId: company.id,
+      }),
+    );
+    expect(refused.status).toBe(StatusCodes.FORBIDDEN);
+    const withCompany = await create(
+      jsonRequest(BASE, writer.cookie, {
+        status: "planned",
+        visitAt: iso(DAY),
+        newProspectCompany: { name: `Write Only ${crypto.randomUUID()}` },
+      }),
+    );
+    expect(withCompany.status).toBe(StatusCodes.FORBIDDEN);
+    expect(
+      await prisma.constructionMarketingVisit.count({
+        where: { workspaceId: owner.workspaceId },
+      }),
+    ).toBe(0);
+    expect(
+      await prisma.constructionMarketingProspectCompany.count({
+        where: { workspaceId: owner.workspaceId },
+      }),
+    ).toBe(1);
+
+    const visit = await plan(owner, { prospectCompanyId: company.id });
+    const updater = await memberWith(owner, {
+      "marketing.visits": ["update", "view_all"],
+    });
+    const note = await addNote(
+      jsonRequest(`${BASE}/${visit.id}/notes`, updater.cookie, {
+        text: "Saved twice?",
+      }),
+      params(visit.id),
+    );
+    expect(note.status).toBe(StatusCodes.FORBIDDEN);
+    expect(
+      await prisma.constructionMarketingVisitNote.count({
+        where: { visitId: visit.id },
+      }),
+    ).toBe(0);
   });
 });

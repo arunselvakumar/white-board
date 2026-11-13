@@ -1,7 +1,7 @@
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import type { Metadata } from "next";
 
-import { viewerCan } from "@/app/app/_lib/viewer-can";
+import { viewerFlags } from "@/app/app/_lib/viewer-can";
 import { GET as getVisit } from "@/app/api/construction/marketing/visits/[id]/route";
 import { GET as formOptions } from "@/app/api/construction/marketing/visits/form-options/route";
 import {
@@ -36,7 +36,9 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  if (!(await viewerCan("marketing.visits", "update")))
+  // A write needs Visits read too: the routes answer 403 without it.
+  const flags = await viewerFlags("marketing.visits", ["read", "update"]);
+  if (!flags.read || !flags.update)
     return <MarketingNoAccess what="editing Visits" />;
 
   const queryClient = getQueryClient();

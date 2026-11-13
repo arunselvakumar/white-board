@@ -689,6 +689,7 @@ export function VisitForm({
                   value={control.value}
                   onChange={control.onChange}
                   invalid={errors.contactIds != null}
+                  required={completing}
                   placeholder={
                     detail.isPending && detail.fetchStatus !== "idle"
                       ? "Loading Contacts…"
@@ -801,6 +802,7 @@ export function VisitForm({
                   control.onChange(withSelf(ids));
                 }}
                 invalid={errors.visitorIds != null}
+                required
                 placeholder="Choose Marketing People"
                 emptyText="No Marketing Person matches"
               />

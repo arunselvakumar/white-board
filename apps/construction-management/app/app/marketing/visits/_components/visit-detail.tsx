@@ -191,11 +191,13 @@ function Notes({ visit }: { visit: Visit }) {
     }
     if (tooLong) return;
     setError(null);
+    const sent = note;
     add.mutate(
-      { text: note },
+      { text: sent },
       {
         onSuccess: () => {
-          setNote("");
+          // Typing on while it saved starts the next note: keep that.
+          setNote((current) => (current === sent ? "" : current));
         },
         onError: (caught) => {
           setError(visitErrorMessage(caught));
@@ -215,11 +217,15 @@ function Notes({ visit }: { visit: Visit }) {
             placeholder="What happened after the Visit"
             value={note}
             aria-invalid={error != null || tooLong}
+            aria-describedby={
+              error != null || tooLong ? "visit-note-error" : undefined
+            }
             onChange={(event) => {
               setNote(event.target.value);
             }}
           />
           <FieldError
+            id="visit-note-error"
             message={
               tooLong
                 ? `Keep the note to ${String(VISIT_LIMITS.note)} characters.`

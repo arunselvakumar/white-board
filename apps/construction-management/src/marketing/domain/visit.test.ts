@@ -57,6 +57,9 @@ describe("Visit details (PRD §3.4)", () => {
     expect(code(() => visitDetails({ requirementStartMonth: "2027-13" }))).toBe(
       "VISIT_START_MONTH_INVALID",
     );
+    expect(code(() => visitDetails({ requirementStartMonth: "0000-01" }))).toBe(
+      "VISIT_START_MONTH_INVALID",
+    );
   });
 });
 

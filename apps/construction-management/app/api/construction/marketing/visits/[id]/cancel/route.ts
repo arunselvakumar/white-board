@@ -13,7 +13,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Cancels a planned Visit, with a reason. Needs Visits update. */
+/** Cancels a planned Visit, with a reason. Needs Visits read and update. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

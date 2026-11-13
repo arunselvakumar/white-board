@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 /**
  * Edits a Visit. A planned one changes time only by Reschedule; a
  * Completed one keeps its rules and its 7-day lock (403 `VISIT_LOCKED`).
- * Needs Visits update.
+ * Needs Visits read and update.
  */
 export async function POST(
   request: Request,
