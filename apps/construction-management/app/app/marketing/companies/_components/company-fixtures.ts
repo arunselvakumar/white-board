@@ -1,5 +1,6 @@
 import { mockApi, type ApiCall } from "@/.storybook/mocks/api";
 import type { Stage } from "@/src/marketing/domain/marketing-terms";
+import type { NeedsReassigning } from "@/src/queries/marketing-team";
 import {
   MARKETING_COMPANIES_API,
   type ProspectCompany,
@@ -179,7 +180,7 @@ export function company(
         "Arun Selva Kumar",
       ),
     ],
-    actions: { canUpdate: true, canDelete: true },
+    actions: { canUpdate: true, canDelete: true, canReassign: true },
     ...overrides,
   };
 }
@@ -321,8 +322,45 @@ export function toListItem(detail: ProspectCompany): ProspectCompanyListItem {
   };
 }
 
+/**
+ * Mani Kandan left: Kaveri is still his, with an open call; Priya's
+ * Coimbatore quotation is his too.
+ */
+export const NEEDS_REASSIGNING: NeedsReassigning = {
+  companies: [
+    {
+      id: KAVERI_ID,
+      name: "Kaveri Cement Works",
+      city: "Tiruchirappalli",
+      stage: "negotiation",
+      assignedTo: { id: MANI_MEMBER_ID, name: "Mani Kandan" },
+      updatedAt: "2026-11-10T09:00:00.000Z",
+    },
+  ],
+  followUps: [
+    {
+      id: "0199d000-0000-7000-8000-000000000871",
+      type: "call",
+      dueDate: "2026-11-14",
+      owner: { id: MANI_MEMBER_ID, name: "Mani Kandan" },
+      prospectCompany: { id: KAVERI_ID, name: "Kaveri Cement Works" },
+      updatedAt: "2026-11-09T09:00:00.000Z",
+    },
+    {
+      id: "0199d000-0000-7000-8000-000000000872",
+      type: "send_quotation",
+      dueDate: "2026-11-10",
+      owner: { id: MANI_MEMBER_ID, name: "Mani Kandan" },
+      prospectCompany: { id: TEXTILES_ID, name: "Coimbatore Textiles Ltd" },
+      updatedAt: "2026-11-08T09:00:00.000Z",
+    },
+  ],
+};
+
 export type CompanyApiOptions = {
   companies?: ProspectCompany[];
+  /** What needs reassigning; nothing unless set. */
+  needsReassigning?: NeedsReassigning;
   /** Rows per list page; all at once unless set. */
   pageSize?: number;
   /** Names a create or edit refuses as in use. */
@@ -397,6 +435,12 @@ export function companyHandler(
     )
       return json(COMPANY_FORM_OPTIONS);
 
+    if (
+      call.method === "GET" &&
+      path === `${MARKETING_COMPANIES_API}/needs-reassigning`
+    )
+      return json(options.needsReassigning ?? { companies: [], followUps: [] });
+
     if (call.method === "GET" && path === MARKETING_COMPANIES_API) {
       const search = url.searchParams.get("search")?.toLowerCase();
       const stages = url.searchParams.get("stage")?.split(",");
@@ -458,7 +502,7 @@ export function companyHandler(
     }
 
     const match =
-      /^\/api\/construction\/marketing\/companies\/([^/]+)(?:\/(update|delete|stage|contacts)(?:\/([^/]+)\/(update|delete))?)?$/.exec(
+      /^\/api\/construction\/marketing\/companies\/([^/]+)(?:\/(update|delete|stage|reassign|contacts)(?:\/([^/]+)\/(update|delete))?)?$/.exec(
         path,
       );
     if (match == null) return undefined;
@@ -483,6 +527,25 @@ export function companyHandler(
         name: String(body["name"]),
         city: text(body, "city"),
         industry: text(body, "industry"),
+        updatedAt: SAVED_AT,
+      });
+    }
+    if (action === "reassign") {
+      const person = COMPANY_FORM_OPTIONS.people.find(
+        (item) => item.id === body["assignedMemberId"] && item.active,
+      );
+      if (person == null)
+        return json(
+          {
+            code: "MARKETING_PERSON_NOT_FOUND",
+            message: "Choose an active Marketing Person.",
+            details: { field: "assignedMemberId" },
+          },
+          400,
+        );
+      return save({
+        ...found,
+        assignedTo: { id: person.id, name: person.name },
         updatedAt: SAVED_AT,
       });
     }

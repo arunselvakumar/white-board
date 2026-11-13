@@ -5,7 +5,7 @@ import {
   useSuspenseInfiniteQuery,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { Building, Plus } from "lucide-react";
+import { ArrowRight, Building, Plus, UserRoundX } from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
@@ -52,6 +52,10 @@ import {
   type CompanyFilters,
   type ProspectCompanyListItem,
 } from "@/src/queries/marketing-companies";
+import {
+  NEEDS_REASSIGNING_PATH,
+  needsReassigningQuery,
+} from "@/src/queries/marketing-team";
 
 import { zoneFields } from "../../visits/_components/visit-parts";
 import { COMPANY_COLUMNS, CompanyRowsSkeleton } from "./companies-skeletons";
@@ -98,9 +102,12 @@ function AddButton() {
  */
 export function CompaniesList({
   canCreate,
+  canTransfer = false,
   now,
 }: {
   canCreate: boolean;
+  /** Companies transfer: the "need reassigning" notice. */
+  canTransfer?: boolean;
   /** Fixed in stories; the device's clock otherwise (overdue follow-ups). */
   now?: Date;
 }) {
@@ -120,6 +127,11 @@ export function CompaniesList({
           meta={section.description}
           actions={canCreate ? <AddButton /> : undefined}
         />
+        {canTransfer && (
+          <Suspense fallback={null}>
+            <NeedsReassigningNotice />
+          </Suspense>
+        )}
         <FilterBar filters={filters} onChange={change} />
         <div
           className={cn("min-w-0", updating && "opacity-60 transition-opacity")}
@@ -130,6 +142,29 @@ export function CompaniesList({
         </div>
       </div>
     </div>
+  );
+}
+
+/** "3 need reassigning": companies and open Follow-ups of people who left. */
+function NeedsReassigningNotice() {
+  const { data } = useSuspenseQuery(needsReassigningQuery);
+  const count = data.companies.length + data.followUps.length;
+  if (count === 0) return null;
+  return (
+    <Link
+      href={NEEDS_REASSIGNING_PATH}
+      className="flex min-w-0 items-center gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-100 dark:hover:bg-amber-900"
+    >
+      <UserRoundX aria-hidden="true" className="size-4 shrink-0" />
+      <span className="min-w-0 flex-1">
+        <span className="font-medium">{`${String(count)} need reassigning`}</span>
+        <span className="block text-xs opacity-80">
+          Prospect Companies and open Follow-ups of people who are no longer
+          active Marketing People.
+        </span>
+      </span>
+      <ArrowRight aria-hidden="true" className="size-4 shrink-0" />
+    </Link>
   );
 }
 

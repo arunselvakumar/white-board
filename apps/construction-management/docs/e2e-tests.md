@@ -9,7 +9,7 @@ bun run --cwd apps/construction-management test:e2e:pr      # the @pr tests
 bun run --cwd apps/construction-management test:e2e         # every test
 ```
 
-112 tests, 34 tagged @pr, 7 also on a phone.
+113 tests, 34 tagged @pr, 7 also on a phone.
 
 ## Sign-in, sign-up and onboarding
 
@@ -193,3 +193,4 @@ ADR [CM-0040](adr/CM-0040-marketing-context-role-and-own-entries.md).
 | should find today's Visit on the calendar and check in with the phone's location, when a member on the Marketing Role reaches the site                                     |                 | `visits.spec.ts`             |
 | should group a member's Follow-ups as Overdue and Today, and offer to log the visit once a Visit Follow-up is done, when a member on the Marketing Role works through them |                 | `follow-ups.spec.ts`         |
 | should save a Next Follow-up with a Visit as it is completed, when a member on the Marketing Role finishes a Visit                                                         |                 | `follow-ups.spec.ts`         |
+| should set a Marketing Person's monthly target and reassign their company to a colleague, when the Owner manages the Marketing Team                                        |                 | `marketing-team.spec.ts`     |

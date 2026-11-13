@@ -127,14 +127,20 @@ function visits(n: number): string {
  */
 export function VisitsList({
   canCreate,
+  memberId,
   now,
 }: {
   canCreate: boolean;
+  /** `?memberId=`: the Marketing Person picked on arrival. */
+  memberId?: string;
   /** The clock "today" is read from; the stories fix it. */
   now?: Date;
 }) {
   const section = marketingSection("visits");
-  const [filters, setFilters] = useState<Filters>(NO_FILTERS);
+  const [filters, setFilters] = useState<Filters>(() => ({
+    ...NO_FILTERS,
+    memberId: memberId ?? "",
+  }));
   const [view, setView] = useQueryState("view", viewParam);
   const [updating, startTransition] = useTransition();
   const change = (next: Partial<Filters>) => {

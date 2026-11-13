@@ -71,9 +71,12 @@ type Created = TeamMember &
  */
 export function AddTeamMember({
   canSeeSalary,
+  roleId: suggestedRoleId,
 }: {
   /** Financial on Staff (ADR CM-0032). */
   canSeeSalary: boolean;
+  /** `?roleId=`: picked on arrival when it is one of the Roles offered. */
+  roleId?: string;
 }) {
   const { data: roles } = useSuspenseQuery(rolesQuery);
   const { company } = useActiveCompany();
@@ -87,7 +90,11 @@ export function AddTeamMember({
     control: form.control,
     name: ["memberType", "email", "password", "invite"],
   });
-  const [chosenRoleId, setChosenRoleId] = useState<string | null>(null);
+  const [chosenRoleId, setChosenRoleId] = useState<string | null>(() =>
+    roles.some((role) => role.id === suggestedRoleId)
+      ? (suggestedRoleId ?? null)
+      : null,
+  );
   const [roleError, setRoleError] = useState<string | undefined>();
   const [created, setCreated] = useState<Created | null>(null);
   const [projectIds, setProjectIds] = useState<string[]>([]);

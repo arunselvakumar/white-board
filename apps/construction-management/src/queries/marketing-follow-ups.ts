@@ -69,6 +69,20 @@ export const FOLLOW_UPS_OPENING_FILTERS: FollowUpFilters = {
   statuses: ["open"],
 };
 
+/**
+ * What the page opens on for `?owner=` (a person's row on the Team page):
+ * everyone's Open ones of that owner, with View all; otherwise the owner
+ * is ignored.
+ */
+export function followUpsArrivalFilters(
+  owner: string | undefined,
+  canSeeAll: boolean,
+): FollowUpFilters {
+  if (owner == null || owner === "" || !canSeeAll)
+    return FOLLOW_UPS_OPENING_FILTERS;
+  return { mine: false, ownerMemberId: owner, statuses: ["open"] };
+}
+
 export function followUpListParams(filters: FollowUpFilters = {}) {
   const params = new URLSearchParams({ limit: String(PAGE_SIZE) });
   const set = (key: string, value: string | undefined) => {

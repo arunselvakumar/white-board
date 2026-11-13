@@ -293,6 +293,45 @@ export const WithoutSalaryRight: Story = {
   },
 };
 
+/**
+ * Add Marketing Person on the Marketing Team page opens Add Staff with
+ * `?roleId=`: that Role is picked on arrival and sent.
+ */
+export const RoleFromAddress: Story = {
+  args: { canSeeSalary: false, roleId: SITE_ENGINEER_ROLE.id },
+  beforeEach: serve(createdAs({ email: null })),
+  play: async (context) => {
+    const { canvas, userEvent } = context;
+    await fillBasics(context);
+    await expect(
+      canvas.getByRole("combobox", { name: "Role" }),
+    ).toHaveTextContent("Site Engineer");
+    await userEvent.type(canvas.getByLabelText("Mobile"), "77081 65767");
+    await userEvent.click(canvas.getByRole("button", { name: "Add Staff" }));
+    await waitFor(() =>
+      expect(sentBody()).toMatchObject({ roleId: SITE_ENGINEER_ROLE.id }),
+    );
+  },
+};
+
+/** A `roleId` that is not one of the Roles offered picks nothing. */
+export const UnknownRoleFromAddress: Story = {
+  args: {
+    canSeeSalary: false,
+    roleId: "0199a000-0000-7000-8000-00000000dead",
+  },
+  beforeEach: serve(createdAs({ email: null })),
+  play: async (context) => {
+    const { canvas, userEvent } = context;
+    await fillBasics(context);
+    await userEvent.type(canvas.getByLabelText("Mobile"), "77081 65767");
+    await userEvent.click(canvas.getByRole("button", { name: "Add Staff" }));
+    await expect(
+      await canvas.findByText("Choose a Role", { selector: "p" }),
+    ).toBeVisible();
+  },
+};
+
 /** A password set: Invite them steps aside; they can sign in now. */
 export const SetAPassword: Story = {
   beforeEach: serve(

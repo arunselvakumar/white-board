@@ -35,7 +35,7 @@ marketingPageTest.describe("Marketing", () => {
       await marketing.currentPage.goto("/app/marketing/team");
       await expect(
         marketing.currentPage.getByText(
-          "You don't have access to Marketing Team",
+          "You don't have access to the Marketing Team",
         ),
       ).toBeVisible();
     },
