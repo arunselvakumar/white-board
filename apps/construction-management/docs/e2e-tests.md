@@ -99,21 +99,22 @@ bun run --cwd apps/construction-management test:e2e         # every test
 
 ## Projects and structure
 
-| Test                                                                                           | Tags    | Spec                    |
-| ---------------------------------------------------------------------------------------------- | ------- | ----------------------- |
-| should open the new Project's dashboard and list it on Projects, when the Owner adds a Project | **@pr** | `projects.spec.ts`      |
-| should group Projects under their client, when a Project names a client                        |         | `projects.spec.ts`      |
-| should list the Locations in order, when the Owner divides an Infrastructure Project           |         | `project-setup.spec.ts` |
-| should drop a module from the Project menu, when the Owner hides it                            |         | `project-setup.spec.ts` |
-| should put the Project first on Projects, when the Owner pins it                               |         | `project-setup.spec.ts` |
-| should keep the client and contract details, when the Owner edits the Project                  |         | `project-setup.spec.ts` |
-| should make the Wing's floors and units, when the Owner adds a Residential Wing                | **@pr** | `wings.spec.ts`         |
-| should list a second Phase, when the Owner adds one                                            |         | `wings.spec.ts`         |
-| should show the drawing in its album and in the Gallery, when the Owner uploads a drawing      | **@pr** | `project-files.spec.ts` |
-| should keep a PDF and refuse a program, when the Owner uploads Project documents               | **@pr** | `project-files.spec.ts` |
-| should list the report under its material, when the Owner uploads a testing report             |         | `project-files.spec.ts` |
-| should let a member see the Project, when the Owner puts them on its Team Members              |         | `resources.spec.ts`     |
-| should keep the ticked Amenities, when the Owner saves them                                    |         | `resources.spec.ts`     |
+| Test                                                                                             | Tags    | Spec                    |
+| ------------------------------------------------------------------------------------------------ | ------- | ----------------------- |
+| should open the new Project's dashboard and list it on Projects, when the Owner adds a Project   | **@pr** | `projects.spec.ts`      |
+| should group Projects under their client, when a Project names a client                          |         | `projects.spec.ts`      |
+| should list the Locations in order, when the Owner divides an Infrastructure Project             |         | `project-setup.spec.ts` |
+| should drop a module from the Project menu, when the Owner hides it                              |         | `project-setup.spec.ts` |
+| should put the Project first on Projects, when the Owner pins it                                 |         | `project-setup.spec.ts` |
+| should keep the client and contract details, when the Owner edits the Project                    |         | `project-setup.spec.ts` |
+| should make the Wing's floors and units, when the Owner adds a Residential Wing                  | **@pr** | `wings.spec.ts`         |
+| should list a second Phase, when the Owner adds one                                              |         | `wings.spec.ts`         |
+| should show the drawing in its album and in the Gallery, when the Owner uploads a drawing        | **@pr** | `project-files.spec.ts` |
+| should keep a PDF and refuse a program, when the Owner uploads Project documents                 | **@pr** | `project-files.spec.ts` |
+| should list the report under its material, when the Owner uploads a testing report               |         | `project-files.spec.ts` |
+| should let a member see the Project, when the Owner puts them on its Team Members                |         | `resources.spec.ts`     |
+| should keep the ticked Amenities, when the Owner saves them                                      |         | `resources.spec.ts`     |
+| should show a Labour in both Activity feeds, when the Owner adds them on the Project's Resources | **@pr** | `resources.spec.ts`     |
 
 ## Procurement and inventory
 
