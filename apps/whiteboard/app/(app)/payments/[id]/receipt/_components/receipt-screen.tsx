@@ -36,6 +36,7 @@ export function ReceiptScreen({ paymentId }: { paymentId: string }) {
             label: "Enrollment",
           }}
           title={`Receipt ${payment.receiptNumber}`}
+          watermark="Receipt"
           meta={`${student.name} · ${course.name} · ${batch.name}`}
           actions={
             <Button

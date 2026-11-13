@@ -283,13 +283,22 @@ function VendorForm({
   );
 }
 
-function FormPage({ title, children }: { title: string; children: ReactNode }) {
+function FormPage({
+  title,
+  watermark,
+  children,
+}: {
+  title: string;
+  watermark?: string;
+  children: ReactNode;
+}) {
   return (
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
           back={{ label: "Vendors", href: VENDORS_PATH }}
           title={title}
+          watermark={watermark}
         />
         {children}
       </div>
@@ -314,7 +323,7 @@ export function EditVendorScreen({ id }: { id: string }) {
   const { data } = useSuspenseQuery(vendorQuery(id));
   const update = useUpdateVendor(id);
   return (
-    <FormPage title={`Edit ${data.name}`}>
+    <FormPage title={`Edit ${data.name}`} watermark="Vendors">
       <VendorForm
         key={data.updatedAt}
         vendor={data}

@@ -201,6 +201,7 @@ export function DeliveryNoteForm({
       <PageHeader
         back={back}
         title={note == null ? "Create Delivery Note" : `Edit ${note.number}`}
+        watermark={note == null ? undefined : "Delivery Notes"}
         meta={`${request.number} · ${request.storeName ?? "Store"} → ${request.projectName ?? "Project"}`}
       />
       <form

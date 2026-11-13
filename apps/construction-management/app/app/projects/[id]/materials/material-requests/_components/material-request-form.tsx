@@ -262,6 +262,7 @@ export function MaterialRequestForm({
               ? "Raise Material Request"
               : `Edit ${request.number}`
           }
+          watermark={request == null ? undefined : "Material Requests"}
         />
         <form
           noValidate

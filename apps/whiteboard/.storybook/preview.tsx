@@ -35,8 +35,9 @@ function PreviewShell({
       {dynamicTheme && <ThemePreferenceSync />}
       <TooltipProvider>
         <QueryProvider>
+          {/* isolate, overflow-x-clip: as the shell's <main> does for PageWatermark. */}
           <div
-            className={`typeface-satoshi ${fontMono.variable} bg-background text-foreground font-sans antialiased`}
+            className={`typeface-satoshi ${fontMono.variable} bg-background text-foreground isolate overflow-x-clip font-sans antialiased`}
           >
             <SatoshiStylesheet />
             {children}

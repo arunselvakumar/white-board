@@ -97,6 +97,7 @@ function BatchWorkspace({
                 title={
                   view === "create" ? "Add Batch" : (editing?.name ?? "Batch")
                 }
+                watermark={view === "create" ? undefined : "Batches"}
                 meta={
                   view === "edit" && editing != null
                     ? `${courses.find((course) => course.id === editing.courseId)?.name ?? "Course"} · ${editing.closedAt == null ? "Open" : "Closed"}`

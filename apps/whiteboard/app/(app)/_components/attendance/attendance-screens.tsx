@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { Button } from "@repo/ui/components/button";
+import { PageWatermark } from "@repo/ui/components/page-watermark";
 
 import { batchQueries } from "@/src/queries/batches";
 import {
@@ -53,7 +54,10 @@ export function AttendanceBatchesScreen() {
   return (
     <div className="w-full p-6">
       <div className="max-w-4xl space-y-6">
-        <h1 className="text-2xl font-semibold">Attendance</h1>
+        <div className="relative">
+          <PageWatermark text="Attendance" />
+          <h1 className="text-2xl font-semibold">Attendance</h1>
+        </div>
         <p className="text-muted-foreground">
           Choose a Batch to open an Attendance Register or review earlier
           Registers.
@@ -159,7 +163,10 @@ export function BatchAttendanceScreen({
         <Link href={backHref} className="text-sm underline">
           {teacher ? "My Batches" : "Attendance"}
         </Link>
-        <h1 className="text-2xl font-semibold">Batch Attendance</h1>
+        <div className="relative">
+          <PageWatermark text="Batch Attendance" />
+          <h1 className="text-2xl font-semibold">Batch Attendance</h1>
+        </div>
         {registers.isPending ? (
           <p>Loading Attendance…</p>
         ) : registers.isError ? (

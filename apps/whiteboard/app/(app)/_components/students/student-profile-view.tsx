@@ -106,6 +106,7 @@ export function StudentProfileView({
         <PageHeader
           back={{ label: "Students", onClick: onBack }}
           title={fullName}
+          watermark="Students"
           meta={`${student.phone} · ${status}`}
           leading={
             <StudentAvatar

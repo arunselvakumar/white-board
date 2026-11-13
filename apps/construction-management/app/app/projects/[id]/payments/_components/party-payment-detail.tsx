@@ -126,6 +126,7 @@ export function PartyPaymentDetail({
           href: paths.party(payment.party.id),
         }}
         title={payment.number}
+        watermark={screen.plural}
         meta={
           <span className="flex flex-wrap items-center gap-2">
             <Badge variant="outline">

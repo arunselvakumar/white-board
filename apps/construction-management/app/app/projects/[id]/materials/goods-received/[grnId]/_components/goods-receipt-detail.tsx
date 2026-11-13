@@ -301,6 +301,7 @@ export function GoodsReceiptDetail({
       <PageHeader
         back={{ label: "Goods Received", href: goodsReceivedPath(projectId) }}
         title={receipt.number}
+        watermark="Goods Received"
         meta={
           <span className="text-muted-foreground text-sm">
             {receipt.supplier.name}

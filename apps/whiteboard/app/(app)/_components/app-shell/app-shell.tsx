@@ -158,10 +158,12 @@ export function AppShell({ children }: { children: ReactNode }) {
           <AppBreadcrumbs />
         </div>
         {/* tabIndex -1: Skip to content can move focus here without adding a Tab stop. */}
+        {/* isolate, overflow-x-clip: PageWatermark paints below the page's
+            content but above this background, and is cut at the edge. */}
         <main
           id="main-content"
           tabIndex={-1}
-          className="flex min-w-0 flex-1 flex-col outline-none"
+          className="isolate flex min-w-0 flex-1 flex-col overflow-x-clip outline-none"
         >
           {children}
         </main>

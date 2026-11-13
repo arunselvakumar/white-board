@@ -20,6 +20,7 @@ import {
   EmptyDescription,
   EmptyHeader,
 } from "@repo/ui/components/empty";
+import { PageWatermark } from "@repo/ui/components/page-watermark";
 import {
   Select,
   SelectContent,
@@ -90,7 +91,8 @@ export function BatchCatalog({
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-6 p-4 sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="space-y-1">
+        <div className="relative space-y-1">
+          <PageWatermark text="Batches" />
           <h1 className="text-3xl font-semibold tracking-tight">Batches</h1>
           <p className="text-muted-foreground text-sm">
             Schedules, Class Modes, and seats for this Workspace.

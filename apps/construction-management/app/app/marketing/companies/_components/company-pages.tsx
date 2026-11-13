@@ -29,6 +29,7 @@ export function CompanyEdit({ id }: { id: string }) {
         <PageHeader
           back={{ label: company.name, href: companyPath(company.id) }}
           title={`Edit ${company.name}`}
+          watermark="Prospect Companies"
         />
         {company.actions.canUpdate ? (
           <CompanyForm company={company} />

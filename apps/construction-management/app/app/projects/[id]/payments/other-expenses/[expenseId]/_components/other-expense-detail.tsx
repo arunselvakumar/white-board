@@ -139,6 +139,7 @@ export function OtherExpenseDetail({
       <PageHeader
         back={{ label: "Other Expenses", href: otherExpensesPath(projectId) }}
         title={expense.number}
+        watermark="Other Expenses"
         meta={
           <span className="inline-flex flex-wrap items-center gap-2">
             <ExpenseStatusBadge status={expense.status} />

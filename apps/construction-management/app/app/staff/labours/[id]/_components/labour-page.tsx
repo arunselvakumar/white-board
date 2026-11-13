@@ -40,7 +40,11 @@ export function LabourPage({
     parseAsStringLiteral(TABS).withDefault("details"),
   );
   return (
-    <FormPage title={`Edit ${data.name}`} meta={editLabourMeta(data)}>
+    <FormPage
+      title={`Edit ${data.name}`}
+      watermark="Labours"
+      meta={editLabourMeta(data)}
+    >
       <Tabs
         value={tab}
         onValueChange={(next: (typeof TABS)[number]) => {

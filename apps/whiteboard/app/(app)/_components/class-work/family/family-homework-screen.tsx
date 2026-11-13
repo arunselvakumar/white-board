@@ -8,6 +8,7 @@ import {
   EmptyDescription,
   EmptyHeader,
 } from "@repo/ui/components/empty";
+import { PageWatermark } from "@repo/ui/components/page-watermark";
 import {
   Tabs,
   TabsContent,
@@ -205,7 +206,10 @@ export function FamilyHomework({
   return (
     <div className="w-full p-6">
       <div className="max-w-3xl space-y-6">
-        <h1 className="text-2xl tracking-tight">Homework</h1>
+        <div className="relative">
+          <PageWatermark text="Homework" />
+          <h1 className="text-2xl tracking-tight">Homework</h1>
+        </div>
         {classWork.students.length === 0 ? (
           <EmptyText>
             {role === "parent"

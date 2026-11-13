@@ -158,6 +158,7 @@ export function EditTeamMember({
         <PageHeader
           back={{ label: "Office Staff", href: STAFF_PATH }}
           title={member.name}
+          watermark="Office Staff"
           meta={
             <span className="inline-flex flex-wrap items-center gap-2">
               {member.role == null ? null : `Role: ${member.role.name}`}

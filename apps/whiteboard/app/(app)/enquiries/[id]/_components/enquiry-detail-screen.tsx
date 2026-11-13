@@ -279,6 +279,7 @@ export function EnquiryDetailView({
         <PageHeader
           back={{ href: "/enquiries", label: "Enquiries" }}
           title={enquiry.prospectName}
+          watermark="Enquiries"
           actions={
             joined ? null : closed ? (
               <>
