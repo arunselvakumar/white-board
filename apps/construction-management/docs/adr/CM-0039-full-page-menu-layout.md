@@ -1,6 +1,6 @@
 # CM-0039 — The main menu can be a full page: a layout the User picks
 
-- Status: accepted (2026-11-11; the owner asked for the full-page menu, then, with their designer, for it to be a choice beside the sidebar and kept in local storage)
+- Status: accepted (2026-11-11; the owner asked for the full-page menu, then, with their designer, for it to be a choice beside the sidebar and kept in local storage); amended 2026-11-13 (§3: in the sidebar layout `/app` opens the Dashboard, after the owner saw the menu twice on one screen)
 - Date: 2026-11-11
 - Relates to: [CM-0034](CM-0034-hr-main-menu.md) (the main menu's areas), [CM-0020](CM-0020-project-sidebar-menu.md) (the menu inside a Project), [CM-0028](CM-0028-settings-main-menu.md), repo ADR-0049 (ink sidebar, menu search), ADR-0050 (the sidebar carries the shell), ADR-0051 (Switch Company)
 
@@ -24,7 +24,8 @@ The main menu has six areas and, under Human Resources, Workspace and Masters, t
 
 - `/app` used to redirect to Projects. It now shows the one-page areas (Dashboard, Projects, Settings) as cards, then Human Resources, Workspace and Masters each as a block with its groups and one icon tile per entry. Each tile is an ordinary link.
 - It has a search box with the sidebar's matching rule (ADR-0049, `menu-filter.ts`): the same query shows the same entries in both places.
-- In the sidebar layout the page still opens at `/app`, beside the sidebar. Nothing links to it there.
+- The page belongs to the full-page layout only. In the sidebar layout the menu is already beside every page, so `/app` shows nothing and opens the Dashboard, or Projects for a User without Dashboard Read: a User never sees the menu twice. The same happens when **Sidebar** is pressed in the top bar while the menu page is open. Nothing links to `/app` in the sidebar layout; a typed address or a bookmark is how a User gets there.
+- The browser does this, not the server, because the server cannot read the layout (§2). The page reads the stored choice before it redirects, so a User who picked the full-page menu stays on `/app` after a full page load.
 - An HRMS Team Member is sent from `/app` to HRMS, as from Projects: they have no Projects and work only in HRMS.
 
 ### 4. One list drives the page and the sidebar
