@@ -21,6 +21,7 @@ import {
   DeleteConstructionMarketingProspectCompanyRequestModel,
   ExportConstructionMarketingProspectCompaniesRequestModel,
   GetConstructionMarketingProspectCompanyFormOptionsResponseModel,
+  ImportConstructionMarketingProspectCompaniesResponseModel,
   ListConstructionMarketingProspectCompaniesRequestModel,
   ListConstructionMarketingProspectCompaniesResponseModel,
   MoveConstructionMarketingProspectCompanyStageRequestModel,
@@ -64,6 +65,7 @@ export const marketingCompanyOpenApiComponents: OpenApiComponents = {
   ConstructionMarketingTimelineItemResponseModel,
   ConstructionMarketingProspectCompanyResponseModel,
   GetConstructionMarketingProspectCompanyFormOptionsResponseModel,
+  ImportConstructionMarketingProspectCompaniesResponseModel,
 };
 
 /**
@@ -93,6 +95,29 @@ export const marketingCompanyOpenApiOperations: OpenApiOperation[] = [
     successDescription: "An .xlsx file",
     successBinaryContentTypes: [XLSX_CONTENT_TYPE],
     errors: MARKETING_READ_ERRORS,
+  },
+  {
+    method: "get",
+    path: `${COMPANIES_PATH}/import-template`,
+    summary:
+      "The Excel template for the Prospect Company import (needs Companies import)",
+    tags: MARKETING_TAGS,
+    successStatus: StatusCodes.OK,
+    successDescription: "An .xlsx file",
+    successBinaryContentTypes: [XLSX_CONTENT_TYPE],
+    errors: MARKETING_READ_ERRORS,
+  },
+  {
+    method: "post",
+    path: `${COMPANIES_PATH}/import`,
+    summary:
+      "Import Prospect Companies from the template (the .xlsx as the body): valid rows are created, assigned to you; duplicate names and invalid rows are reported, not created (needs Companies create and import)",
+    tags: MARKETING_TAGS,
+    bodyBinaryContentTypes: [XLSX_CONTENT_TYPE],
+    successStatus: StatusCodes.OK,
+    successDescription: "What was created, and every row that was not",
+    successSchema: ImportConstructionMarketingProspectCompaniesResponseModel,
+    errors: MARKETING_WRITE_ERRORS,
   },
   {
     method: "post",

@@ -1,8 +1,10 @@
 import ExcelJS from "exceljs";
+import { unzipSync, zipSync } from "fflate";
 import { describe, expect, it } from "vitest";
 
 import {
   inflatesWithin,
+  xlsxHasMacros,
   xlsxUnpacksWithin,
   zipUnpackedBytes,
 } from "./xlsx-guard";
@@ -76,5 +78,14 @@ describe("xlsx expansion guard (review of #92, CWE-409)", () => {
       zipUnpackedBytes(new Uint8Array([0x50, 0x4b, 3, 4, 0, 0])),
     ).toBeNull();
     expect(xlsxUnpacksWithin(new Uint8Array(30))).toBe(false);
+  });
+
+  it("finds a VBA project in a workbook, and none in a plain one", async () => {
+    const bytes = await workbook(5);
+    expect(xlsxHasMacros(bytes)).toBe(false);
+    const entries = unzipSync(bytes);
+    entries["xl/vbaProject.bin"] = new Uint8Array([0xd0, 0xcf, 0x11, 0xe0]);
+    expect(xlsxHasMacros(zipSync(entries))).toBe(true);
+    expect(xlsxHasMacros(new Uint8Array(30))).toBe(true);
   });
 });
