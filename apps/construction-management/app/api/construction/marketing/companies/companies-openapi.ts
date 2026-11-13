@@ -22,6 +22,7 @@ import {
   ListConstructionMarketingProspectCompaniesRequestModel,
   ListConstructionMarketingProspectCompaniesResponseModel,
   MoveConstructionMarketingProspectCompanyStageRequestModel,
+  ReassignConstructionMarketingProspectCompanyRequestModel,
   UpdateConstructionMarketingContactRequestModel,
   UpdateConstructionMarketingProspectCompanyRequestModel,
 } from "./company-models";
@@ -46,6 +47,7 @@ const CONTACT = `${ITEM}/contacts/{contactId}`;
 
 /** Prospect Company models. */
 export const marketingCompanyOpenApiComponents: OpenApiComponents = {
+  ReassignConstructionMarketingProspectCompanyRequestModel,
   CreateConstructionMarketingProspectCompanyRequestModel,
   UpdateConstructionMarketingProspectCompanyRequestModel,
   DeleteConstructionMarketingProspectCompanyRequestModel,
@@ -141,6 +143,19 @@ export const marketingCompanyOpenApiOperations: OpenApiOperation[] = [
     tags: MARKETING_TAGS,
     params: ConstructionMarketingProspectCompanyParamsModel,
     body: MoveConstructionMarketingProspectCompanyStageRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The Prospect Company",
+    successSchema: ConstructionMarketingProspectCompanyResponseModel,
+    errors: MARKETING_WRITE_ERRORS,
+  },
+  {
+    method: "post",
+    path: `${ITEM}/reassign`,
+    summary:
+      "Reassign a Prospect Company and its open Follow-ups (Companies transfer)",
+    tags: MARKETING_TAGS,
+    params: ConstructionMarketingProspectCompanyParamsModel,
+    body: ReassignConstructionMarketingProspectCompanyRequestModel,
     successStatus: StatusCodes.OK,
     successDescription: "The Prospect Company",
     successSchema: ConstructionMarketingProspectCompanyResponseModel,

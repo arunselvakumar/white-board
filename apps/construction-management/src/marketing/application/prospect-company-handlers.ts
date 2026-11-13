@@ -14,6 +14,7 @@ import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import {
   contactNotFound,
+  invalidField,
   marketingPersonNotFound,
   prospectCompanyChanged,
   prospectCompanyHasVisits,
@@ -97,6 +98,8 @@ export type ContactInput = ContactDetailsInput & {
 export type ProspectCompanyActions = {
   canUpdate: boolean;
   canDelete: boolean;
+  /** Companies transfer: Reassign. */
+  canReassign: boolean;
 };
 
 export type ProspectCompanyListItem = {
@@ -255,6 +258,7 @@ export class ProspectCompanyHandlers {
     return {
       canUpdate: can(access, COMPANIES_MENU, "update"),
       canDelete: can(access, COMPANIES_MENU, "delete"),
+      canReassign: can(access, COMPANIES_MENU, "transfer"),
     };
   }
 
@@ -735,6 +739,53 @@ export class ProspectCompanyHandlers {
         entityType: "prospect_company",
         entityId: id,
         before: { ...detailsOf(current), stage: current.stage, followUpIds },
+        occurredAt: at,
+      });
+    });
+  }
+
+  /**
+   * Reassign (Companies transfer, ADR CM-0040 §11): the company and every
+   * open Follow-up of it go to another active Marketing Person in one
+   * transaction. Past Visits keep their visitors, and whoever created the
+   * company keeps seeing it (§5).
+   */
+  async reassign(
+    access: MemberAccess,
+    id: string,
+    input: { assignedMemberId: string; expectedUpdatedAt: Date },
+  ): Promise<void> {
+    assertCan(access, COMPANIES_MENU, "transfer");
+    const to = await this.assignee(access, input.assignedMemberId);
+    if (to == null) throw marketingPersonNotFound("assignedMemberId");
+    const at = this.clock();
+    await this.deps.db.$transaction(async (tx) => {
+      const current = await this.lockVisible(tx, access, id);
+      if (!same(current.updatedAt, input.expectedUpdatedAt))
+        throw prospectCompanyChanged();
+      if (current.assignedMemberId === to)
+        throw invalidField(
+          "PROSPECT_COMPANY_ALREADY_ASSIGNED",
+          "The company is already assigned to this person.",
+          "assignedMemberId",
+        );
+      await this.deps.store.assign(tx, id, to, access.userId, at);
+      const followUpIds = await this.deps.followUps.reassignOpen(
+        tx,
+        access.workspaceId,
+        id,
+        to,
+        access.userId,
+        at,
+      );
+      await recordAudit(tx, {
+        workspaceId: access.workspaceId,
+        actorUserId: access.userId,
+        action: "prospect_company.reassigned",
+        entityType: "prospect_company",
+        entityId: id,
+        before: { assignedMemberId: current.assignedMemberId },
+        after: { assignedMemberId: to, followUpIds },
         occurredAt: at,
       });
     });

@@ -167,6 +167,14 @@ export type ProspectCompanyStore = {
     by: string,
     at: Date,
   ): Promise<void>;
+  /** Moves the company to another Marketing Person. */
+  assign(
+    tx: MarketingTx,
+    id: string,
+    memberId: string,
+    by: string,
+    at: Date,
+  ): Promise<void>;
   setStage(
     tx: MarketingTx,
     id: string,
@@ -627,6 +635,18 @@ export type CompanyFollowUpsReader = {
     companyId: string,
     scope: OwnScope,
   ): Promise<StoredFollowUp[]>;
+  /**
+   * Gives every open Follow-up of the company to another owner (Reassign,
+   * ADR CM-0040 §11); returns their ids. Their reminder marks start again.
+   */
+  reassignOpen(
+    tx: MarketingTx,
+    workspaceId: string,
+    companyId: string,
+    toMemberId: string,
+    by: string,
+    at: Date,
+  ): Promise<string[]>;
   /** The earliest open due date of each company the scope sees. */
   nextDue(
     db: MarketingTx,
@@ -642,4 +662,68 @@ export type CompanyFollowUpsReader = {
     tx: MarketingTx,
     input: { workspaceId: string; companyId: string; by: string; now: Date },
   ): Promise<string[]>;
+};
+
+// ---------------------------------------------------------------------------
+// Team (ADR CM-0040 §4)
+// ---------------------------------------------------------------------------
+
+export type TeamStore = {
+  /** Every target row of these members, oldest month first (`YYYY-MM`). */
+  targets(
+    workspaceId: string,
+    memberIds: readonly string[],
+  ): Promise<
+    { memberId: string; effectiveMonth: string; target: number | null }[]
+  >;
+  /** Writes or replaces the row for `month`. */
+  setTarget(input: {
+    workspaceId: string;
+    memberId: string;
+    month: string;
+    target: number | null;
+    by: string;
+    at: Date;
+  }): Promise<void>;
+  /** Completed Visits each member went on between the two instants. */
+  completedVisits(
+    workspaceId: string,
+    from: Date,
+    to: Date,
+  ): Promise<Map<string, number>>;
+  /** The latest completed Visit each member went on. */
+  lastVisits(workspaceId: string): Promise<Map<string, Date>>;
+  /** Open Follow-ups due before `today`, by owner. */
+  overdueFollowUps(
+    workspaceId: string,
+    today: CalendarDate,
+  ): Promise<Map<string, number>>;
+  /** Live companies assigned to anyone not in `active`. */
+  companiesOutside(
+    workspaceId: string,
+    active: readonly string[],
+  ): Promise<
+    {
+      id: string;
+      name: string;
+      city: string | null;
+      stage: Stage;
+      assignedMemberId: string;
+      updatedAt: Date;
+    }[]
+  >;
+  /** Open Follow-ups owned by anyone not in `active`. */
+  followUpsOutside(
+    workspaceId: string,
+    active: readonly string[],
+  ): Promise<
+    {
+      id: string;
+      type: FollowUpType;
+      dueDate: CalendarDate;
+      ownerMemberId: string;
+      prospectCompany: { id: string; name: string };
+      updatedAt: Date;
+    }[]
+  >;
 };

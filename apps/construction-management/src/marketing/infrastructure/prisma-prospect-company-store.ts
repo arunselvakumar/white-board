@@ -168,6 +168,13 @@ export const prismaProspectCompanyStore: ProspectCompanyStore = {
     });
   },
 
+  async assign(db, id, memberId, by, at) {
+    await db.constructionMarketingProspectCompany.update({
+      where: { id },
+      data: { assignedMemberId: memberId, updatedAt: at, updatedBy: by },
+    });
+  },
+
   async setStage(db, id, move, by, at) {
     await db.constructionMarketingProspectCompany.update({
       where: { id },

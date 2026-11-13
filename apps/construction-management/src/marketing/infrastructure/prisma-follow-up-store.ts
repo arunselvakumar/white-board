@@ -262,6 +262,32 @@ export const prismaCompanyFollowUpsReader: CompanyFollowUpsReader = {
     return rows.map(toStored);
   },
 
+  async reassignOpen(db, workspaceId, companyId, toMemberId, by, at) {
+    const open = await db.constructionMarketingFollowUp.findMany({
+      where: {
+        workspaceId,
+        prospectCompanyId: companyId,
+        status: "open",
+        deletedAt: null,
+        ownerMemberId: { not: toMemberId },
+      },
+      select: { id: true },
+    });
+    const ids = open.map((row) => row.id);
+    if (ids.length > 0)
+      await db.constructionMarketingFollowUp.updateMany({
+        where: { id: { in: ids } },
+        data: {
+          ownerMemberId: toMemberId,
+          dueNotifiedOn: null,
+          overdueNotifiedAt: null,
+          updatedAt: at,
+          updatedBy: by,
+        },
+      });
+    return ids;
+  },
+
   async nextDue(db, workspaceId, companyIds, scope) {
     if (companyIds.length === 0) return new Map();
     const rows = await db.constructionMarketingFollowUp.groupBy({

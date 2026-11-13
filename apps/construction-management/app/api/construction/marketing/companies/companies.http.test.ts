@@ -276,6 +276,7 @@ describe("Prospect Companies (ADR CM-0040 §5, §11)", () => {
     expect((await json<Company>(opened)).actions).toEqual({
       canUpdate: true,
       canDelete: false,
+      canReassign: false,
     });
   });
 
