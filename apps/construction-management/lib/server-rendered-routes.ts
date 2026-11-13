@@ -4,6 +4,7 @@
  * its client-only gate for these; it goes when every in-app path is listed.
  */
 export const SERVER_RENDERED_ROUTES: readonly string[] = [
+  "/app/marketing",
   "/app/marketing/companies",
   "/app/marketing/companies/new",
   "/app/marketing/companies/[id]",
