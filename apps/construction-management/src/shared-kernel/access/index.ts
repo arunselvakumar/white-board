@@ -29,5 +29,7 @@ export {
   can,
   financialValue,
   ownEntriesOnly,
+  ownScope,
   type MemberAccess,
+  type OwnScope,
 } from "./can";

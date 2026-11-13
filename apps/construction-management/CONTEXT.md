@@ -270,6 +270,14 @@ _Avoid_: task, reminder
 Where a Prospect Company stands: New, Contacted, Requirement received, Quotation sent, Negotiation, Won, Lost. Fixed in code. Not the Sales CRM's Funnel Stage.
 _Avoid_: status, funnel stage
 
+**Lost Reason** (Marketing):
+Why a Prospect Company moved to Lost: Price, Went to a competitor, No requirement now, Not reachable, or Other with words. Fixed in code; cleared when the company leaves Lost. Not the Sales CRM's per-Project Lost Reasons.
+_Avoid_: loss reason, close reason
+
+**Assigned to**:
+The Marketing Person chasing a Prospect Company; the person who added it unless they pick another. Only Reassign moves it.
+_Avoid_: owner (a Follow-up has an owner), account manager
+
 **Marketing Person**:
 A Team Member whose Role adds Visits, or the Owner. An Office Staff member on the **Marketing** Role, the default Role for them; not a record of their own.
 _Avoid_: salesman, executive, marketing staff

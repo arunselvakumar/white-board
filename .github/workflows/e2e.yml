@@ -5,8 +5,8 @@ name: End-to-end
 # the nightly run takes every test. Only changes that can reach the app
 # start a run.
 on:
+  # Every pull request, stacked ones too (a PR into another PR's branch).
   pull_request:
-    branches: [main]
     paths:
       - "apps/construction-management/**"
       - "packages/auth/**"
@@ -107,6 +107,9 @@ jobs:
       - name: Build for end-to-end tests
         if: steps.fresh.outputs.run == 'true'
         run: bun run test:e2e:build
+        # The webpack compile outgrew Node's default heap (see ci.yml).
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
 
       - name: "@pr tests"
         if: steps.fresh.outputs.run == 'true' && env.NIGHTLY != 'true'

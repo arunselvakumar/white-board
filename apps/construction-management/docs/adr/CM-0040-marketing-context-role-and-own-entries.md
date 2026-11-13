@@ -146,7 +146,7 @@ Without `view_all` on the record's menu, a member sees:
 
 ### 11. Prospect Companies and Stages
 
-- **Stages** are fixed in code: New and Contacted are set by the system (§7). The others (Requirement received, Quotation sent, Negotiation, Won, Lost) are set by hand, in any order. **Lost** needs a Lost Reason ("Other" needs text), and leaving Lost clears it. Every change is a `stage_changes` row and an audit event.
+- **Stages** are fixed in code: New and Contacted are set by the system (§7). The others (Requirement received, Quotation sent, Negotiation, Won, Lost) are set by hand, in any order. **Lost** needs a Lost Reason ("Other" needs text), and leaving Lost clears it. A Lost company can be moved to Lost again only to change the reason. Every change is a `stage_changes` row and an audit event.
 - **GSTIN** is checked with the tax-ids kernel; PIN is six digits.
 - **Delete** is a tombstone, refused while the company has live Visits (`PROSPECT_COMPANY_HAS_VISITS`). Its Contacts and Follow-ups are tombstoned with it.
 - **Reassign** (`transfer`) moves the assigned person and the owner of every Open Follow-up of the company to the new person in one transaction. Past Visits keep their visitors.

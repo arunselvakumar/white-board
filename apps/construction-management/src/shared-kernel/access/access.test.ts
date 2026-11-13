@@ -9,6 +9,7 @@ import {
   fromMask,
   hrmsDefaultPermissions,
   ownEntriesOnly,
+  ownScope,
   toMask,
   type MemberAccess,
 } from "./index";
@@ -154,6 +155,31 @@ describe("View All and Financial", () => {
       createdBy: "user-2",
     });
     expect(ownEntriesOnly(withAll, "tracking.tasks")).toBeNull();
+  });
+
+  it("scopes to what the member created or is assigned without View All (ADR CM-0040 §5)", () => {
+    const without = {
+      ...member(PermissionSet.fromGrants({ "marketing.visits": ["read"] })),
+      memberId: "member-2",
+    };
+    const withAll = member(
+      PermissionSet.fromGrants({ "marketing.visits": ["read", "view_all"] }),
+    );
+    expect(ownScope(without, "marketing.visits")).toEqual({
+      userId: "user-2",
+      memberId: "member-2",
+    });
+    expect(ownScope(withAll, "marketing.visits")).toBeNull();
+    // Access built by hand has no member id: only what they created.
+    expect(
+      ownScope(
+        member(PermissionSet.fromGrants({ "marketing.visits": ["read"] })),
+        "marketing.visits",
+      ),
+    ).toEqual({ userId: "user-2", memberId: null });
+    expect(
+      ownScope({ ...without, role: "owner" }, "marketing.visits"),
+    ).toBeNull();
   });
 
   it("nulls amounts without Financial", () => {
