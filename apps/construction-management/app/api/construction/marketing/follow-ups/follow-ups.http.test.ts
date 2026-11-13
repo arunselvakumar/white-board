@@ -23,6 +23,7 @@ import {
 } from "../companies/route";
 import { POST as createVisit } from "../visits/route";
 import { POST as cancel } from "./[id]/cancel/route";
+import { POST as remove } from "./[id]/delete/route";
 import { POST as done } from "./[id]/done/route";
 import { GET as getOne } from "./[id]/route";
 import { POST as update } from "./[id]/update/route";
@@ -516,5 +517,74 @@ describe("Follow-ups (ADR CM-0040 §5, §8)", () => {
       }),
     );
     expect(refused.status).toBe(StatusCodes.FORBIDDEN);
+  });
+});
+
+describe("Follow-up writes need Follow-ups read", () => {
+  it("refuses every write from a Role with the write flags but no read, and saves nothing", async () => {
+    const owner = await ownerWithCompany();
+    const companyId = await aCompany(owner);
+    const today = await companyToday(prisma, owner.workspaceId);
+    const followUp = await add(owner, {
+      prospectCompanyId: companyId,
+      dueDate: today,
+    });
+    const blind = await memberWith(owner, {
+      "marketing.follow_ups": ["create", "update", "delete"],
+      "marketing.companies": ["read", "view_all"],
+    });
+    const before = await prisma.constructionMarketingFollowUp.count({
+      where: { workspaceId: owner.workspaceId },
+    });
+
+    const refused = [
+      await create(
+        jsonRequest(BASE, blind.cookie, {
+          type: "call",
+          prospectCompanyId: companyId,
+          dueDate: today,
+        }),
+      ),
+      await update(
+        jsonRequest(`${BASE}/${followUp.id}/update`, blind.cookie, {
+          expectedUpdatedAt: followUp.updatedAt,
+          type: "call",
+          dueDate: today,
+          note: "Changed",
+        }),
+        params(followUp.id),
+      ),
+      await done(
+        jsonRequest(`${BASE}/${followUp.id}/done`, blind.cookie, {
+          expectedUpdatedAt: followUp.updatedAt,
+        }),
+        params(followUp.id),
+      ),
+      await cancel(
+        jsonRequest(`${BASE}/${followUp.id}/cancel`, blind.cookie, {
+          expectedUpdatedAt: followUp.updatedAt,
+        }),
+        params(followUp.id),
+      ),
+      await remove(
+        jsonRequest(`${BASE}/${followUp.id}/delete`, blind.cookie, {
+          expectedUpdatedAt: followUp.updatedAt,
+        }),
+        params(followUp.id),
+      ),
+    ];
+    expect(refused.map((response) => response.status)).toEqual(
+      Array(5).fill(StatusCodes.FORBIDDEN),
+    );
+    expect(
+      await prisma.constructionMarketingFollowUp.count({
+        where: { workspaceId: owner.workspaceId },
+      }),
+    ).toBe(before);
+    const kept = await prisma.constructionMarketingFollowUp.findUniqueOrThrow({
+      where: { id: followUp.id },
+    });
+    expect(kept).toMatchObject({ status: "open", deletedAt: null, note: null });
+    expect(kept.updatedAt.toISOString()).toBe(followUp.updatedAt);
   });
 });
