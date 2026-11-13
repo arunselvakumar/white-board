@@ -1,4 +1,5 @@
 import { expect } from "@playwright/test";
+import ExcelJS from "exceljs";
 
 import { createProspectCompany } from "../api/marketing";
 import { unique } from "../api/session";
@@ -138,6 +139,57 @@ companyTest.describe("Prospect Companies", () => {
       await expect(
         companies.projects.getByRole("link", { name: project }),
       ).toBeVisible();
+    },
+  );
+
+  companyTest(
+    "should add the new companies and report the duplicate, when the Owner imports Prospect Companies from the Excel template",
+    async ({ owner, page }) => {
+      const live = await createProspectCompany(owner.api, {
+        name: unique("Sri Balaji Builders"),
+      });
+      const names = [unique("Kaveri Steel"), unique("Pandian Mills")];
+      const book = new ExcelJS.Workbook();
+      const sheet = book.addWorksheet("Prospect Companies");
+      sheet.addRow([
+        "Name",
+        "City",
+        "Phone",
+        "Primary Contact name",
+        "Primary Contact mobile",
+      ]);
+      sheet.addRow([names[0], "Salem", null, "Lakshmi", "98400 12345"]);
+      sheet.addRow([live.name.toUpperCase(), "Chennai"]);
+      sheet.addRow([names[1], "Madurai"]);
+      const filled = Buffer.from(await book.xlsx.writeBuffer());
+      const companies = new ProspectCompaniesPage(page);
+
+      await companies.goto();
+      await companies.button("Import").click();
+      await companies.upload("Choose Excel file", {
+        name: "prospect-companies.xlsx",
+        mimeType:
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        buffer: filled,
+      });
+      await companies.clickAndWaitFor(
+        companies.dialog.getByRole("button", { name: "Import" }),
+        "/api/construction/marketing/companies/import",
+      );
+      await expect(
+        companies.status("Added 2 Prospect Companies. 1 duplicate not added."),
+      ).toBeVisible();
+      const notImported = companies.dialog.getByRole("table", {
+        name: "Rows not imported",
+      });
+      await expect(notImported).toContainText(live.name.toUpperCase());
+      await expect(notImported).toContainText(
+        "A Prospect Company with this name already exists.",
+      );
+      await companies.dialog.getByRole("button", { name: "Done" }).click();
+
+      for (const name of names)
+        await expect(companies.list).toContainText(name);
     },
   );
 });

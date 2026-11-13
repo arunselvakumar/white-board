@@ -166,6 +166,13 @@ export const ListConstructionMarketingProspectCompaniesRequestModel = z.object({
   after: z.string().max(400).optional(),
 });
 
+/** The Excel export: the list's search and filters without the paging. */
+export const ExportConstructionMarketingProspectCompaniesRequestModel =
+  ListConstructionMarketingProspectCompaniesRequestModel.omit({
+    limit: true,
+    after: true,
+  });
+
 /** Reassign: the company and its open Follow-ups to another person. */
 export const ReassignConstructionMarketingProspectCompanyRequestModel =
   z.object({
@@ -358,6 +365,36 @@ export const GetConstructionMarketingProspectCompanyFormOptionsResponseModel =
     /** Industries already typed, A–Z. */
     industries: z.array(z.string()),
   });
+
+/** The import's reply: what was created, and every row that was not. */
+export const ImportConstructionMarketingProspectCompaniesResponseModel =
+  z.object({
+    created: z.number().int(),
+    /** A name used by a live company or repeated earlier in the sheet. */
+    duplicates: z.number().int(),
+    /** Rows that break a rule of the company form. */
+    invalid: z.number().int(),
+    /** The companies created, in sheet order. */
+    companies: z.array(
+      z.object({ row: z.number().int(), id: z.uuid(), name: z.string() }),
+    ),
+    /** Duplicates and invalid rows, in sheet order. Not created. */
+    problems: z.array(
+      z.object({
+        /** The row number in the sheet; the headers are row 1. */
+        row: z.number().int(),
+        name: z.string().nullable(),
+        reason: z.enum(["duplicate", "invalid"]),
+        /** The column: name, city, phone, contactName or contactMobile. Null for a duplicate. */
+        field: z.string().nullable(),
+        message: z.string(),
+      }),
+    ),
+  });
+
+export type ImportConstructionMarketingProspectCompaniesResponse = z.infer<
+  typeof ImportConstructionMarketingProspectCompaniesResponseModel
+>;
 
 export type ListConstructionMarketingProspectCompaniesResponse = z.infer<
   typeof ListConstructionMarketingProspectCompaniesResponseModel

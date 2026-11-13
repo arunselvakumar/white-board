@@ -12,6 +12,7 @@ import type {
   CreateConstructionMarketingContactRequestModel,
   CreateConstructionMarketingProspectCompanyRequestModel,
   GetConstructionMarketingProspectCompanyFormOptionsResponse,
+  ImportConstructionMarketingProspectCompaniesResponse,
   ListConstructionMarketingProspectCompaniesResponse,
   MoveConstructionMarketingProspectCompanyStageRequestModel,
   UpdateConstructionMarketingContactRequestModel,
@@ -29,6 +30,8 @@ export type ProspectCompanyPage =
   ListConstructionMarketingProspectCompaniesResponse;
 export type ProspectCompanyFormOptions =
   GetConstructionMarketingProspectCompanyFormOptionsResponse;
+export type ProspectCompanyImportResult =
+  ImportConstructionMarketingProspectCompaniesResponse;
 export type ProspectCompanyContact = ProspectCompany["contacts"][number];
 export type ProspectCompanyTimelineItem = ProspectCompany["timeline"][number];
 export type CreateProspectCompanyInput = z.input<
@@ -74,6 +77,14 @@ export function companyListParams(filters: CompanyFilters = {}) {
   set("assignedMemberId", filters.assignedMemberId);
   set("industry", filters.industry);
   return params;
+}
+
+/** The Excel of the list with this search and filters (needs Companies export). */
+export function companiesExportUrl(filters: CompanyFilters = {}): string {
+  const params = companyListParams(filters);
+  params.delete("limit");
+  const query = params.toString();
+  return `${MARKETING_COMPANIES_API}/export${query === "" ? "" : `?${query}`}`;
 }
 
 /** Prospect Companies A–Z, a page at a time ("Load more"). */
@@ -194,6 +205,36 @@ export function useDeleteCompany(id: string) {
         queryKey: MARKETING_COMPANIES_KEY,
         predicate: (query) => query.queryKey[2] !== "detail",
       });
+    },
+  });
+}
+
+/** The Excel template for the import (needs Companies import). */
+export const COMPANY_IMPORT_TEMPLATE_URL = `${MARKETING_COMPANIES_API}/import-template`;
+
+const XLSX =
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+/**
+ * Uploads the filled template: valid rows are created, duplicates and
+ * invalid rows come back by row. The lists refresh when any was created,
+ * and after a failure too: each row is saved on its own, so rows before
+ * the failure may be in.
+ */
+export function useImportCompanies() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (file: Blob) =>
+      apiJson<ProspectCompanyImportResult>(
+        `${MARKETING_COMPANIES_API}/import`,
+        { method: "POST", headers: { "content-type": XLSX }, body: file },
+      ),
+    onSettled: async (result) => {
+      if (result == null || result.created > 0)
+        await client.invalidateQueries({
+          queryKey: MARKETING_COMPANIES_KEY,
+          predicate: (query) => query.queryKey[2] !== "detail",
+        });
     },
   });
 }

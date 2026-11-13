@@ -65,7 +65,16 @@ import type {
   BookingStatusFilter,
   InquiryStatusFilter,
   InterestTypeFilter,
+  MarketingReportScopes,
+  ProspectStageFilter,
+  VisitPurposeFilter,
+  VisitStatusFilter,
 } from "../domain/report-job";
+import type {
+  PersonSummaryRow,
+  PipelineRow,
+  VisitRegisterRow,
+} from "../domain/marketing-reports";
 
 /** A rendered file written to storage for a job. */
 export type ReportFile = {
@@ -551,4 +560,42 @@ export type SalesReportSource = {
       own: ReportOwnScope | null;
     },
   ): Promise<{ rows: InquiryReportRow[]; filterNames: string[] }>;
+};
+
+/**
+ * The Marketing reports' read model (ADR CM-0040 §13): marketing's
+ * records through its own scope rules (§5), with names from the
+ * organization. Implemented in `src/composition/marketing-report-source.ts`.
+ * `filterNames` names the picked filters for the notes.
+ */
+export type MarketingReportSource = {
+  /** Live Visits on the range's days (Company time zone), newest first. */
+  visitRegister(
+    workspaceId: string,
+    filter: {
+      range: DateRange;
+      memberId: string | null;
+      prospectCompanyId: string | null;
+      status: VisitStatusFilter | null;
+      purpose: VisitPurposeFilter | null;
+      scopes: MarketingReportScopes;
+      /** Missed is as on this moment. */
+      now: Date;
+    },
+  ): Promise<{ rows: VisitRegisterRow[]; filterNames: string[] }>;
+  /** One row per Marketing Person for the month (`YYYY-MM`). */
+  personSummary(
+    workspaceId: string,
+    filter: { month: string; scopes: MarketingReportScopes; now: Date },
+  ): Promise<PersonSummaryRow[]>;
+  /** Live Prospect Companies as on the day, in Stage order. */
+  companyPipeline(
+    workspaceId: string,
+    filter: {
+      asOn: CalendarDate;
+      stage: ProspectStageFilter | null;
+      memberId: string | null;
+      scopes: MarketingReportScopes;
+    },
+  ): Promise<{ rows: PipelineRow[]; stages: string[]; filterNames: string[] }>;
 };

@@ -37,6 +37,12 @@ const FILTER_KEYS = [
   "funnel_stage",
   "lost_reason",
   "assignee",
+  // The Marketing reports' filters.
+  "visited_by",
+  "prospect_company",
+  "visit_purpose",
+  "prospect_stage",
+  "assigned_to",
 ] as const;
 
 // Requests

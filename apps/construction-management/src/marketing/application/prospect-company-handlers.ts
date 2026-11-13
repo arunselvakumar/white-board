@@ -7,11 +7,15 @@ import {
 } from "@/src/shared-kernel/access";
 import { recordAudit } from "@/src/shared-kernel/audit";
 import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
-import { conflict } from "@/src/shared-kernel/domain-error";
+import { conflict, DomainError } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
 import type { NameCursor } from "@/src/shared-kernel/list-cursor";
 import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
+import {
+  importedCompany,
+  type CompanySheetRow,
+} from "../domain/company-import";
 import {
   contactNotFound,
   invalidField,
@@ -36,6 +40,7 @@ import {
   manualStageMove,
   primaryContactRequired,
   prospectCompanyDetails,
+  optionalText,
   prospectCompanyNameKey,
   type ContactDetails,
   type ContactDetailsInput,
@@ -60,6 +65,9 @@ export const COMPANIES_MENU = "marketing.companies";
 const VISITS_MENU = "marketing.visits";
 const FOLLOW_UPS_MENU = "marketing.follow_ups";
 const PROJECTS_MENU = "projects.project";
+
+/** The export reads the list a page at a time. */
+const EXPORT_PAGE = 100;
 
 export type ProspectCompanyDeps = {
   db: MarketingDb;
@@ -215,6 +223,27 @@ export type ProspectCompanyFormOptions = {
   industries: string[];
 };
 
+/** A row the import did not create, and why. */
+export type ProspectCompanyImportProblem = {
+  /** The row number in the sheet (the header is row 1). */
+  row: number;
+  name: string | null;
+  reason: "duplicate" | "invalid";
+  /** The column the problem is in; null for a duplicate. */
+  field: string | null;
+  message: string;
+};
+
+export type ProspectCompanyImportResult = {
+  created: number;
+  duplicates: number;
+  invalid: number;
+  /** The companies created, in sheet order. */
+  companies: { row: number; id: string; name: string }[];
+  /** Duplicates and invalid rows, in sheet order. */
+  problems: ProspectCompanyImportProblem[];
+};
+
 function contactChanged() {
   return conflict(
     "CONTACT_CHANGED",
@@ -319,6 +348,36 @@ export class ProspectCompanyHandlers {
       ),
     ]);
     return { people, industries };
+  }
+
+  /**
+   * Every Prospect Company the list's filters and the caller's scope give,
+   * A–Z, for the Excel export (ADR CM-0040 §2). Needs Companies read and
+   * export.
+   */
+  async exportRows(
+    access: MemberAccess,
+    filters: Omit<
+      Parameters<ProspectCompanyHandlers["list"]>[1],
+      "limit" | "after"
+    >,
+  ): Promise<{ items: ProspectCompanyListItem[]; timeZone: string }> {
+    assertCan(access, COMPANIES_MENU, "export");
+    let page = await this.list(access, { ...filters, limit: EXPORT_PAGE });
+    const items = [...page.items];
+    for (
+      let last = page.items.at(-1);
+      page.hasMore && last != null;
+      last = page.items.at(-1)
+    ) {
+      page = await this.list(access, {
+        ...filters,
+        limit: EXPORT_PAGE,
+        after: { name: prospectCompanyNameKey(last.name), id: last.id },
+      });
+      items.push(...page.items);
+    }
+    return { items, timeZone: page.timeZone };
   }
 
   async list(
@@ -667,6 +726,90 @@ export class ProspectCompanyHandlers {
       occurredAt: at,
     });
     return id;
+  }
+
+  /**
+   * The Excel import (ADR CM-0040 §11): each valid row is created as a
+   * normal create does (Stage New, the primary Contact, the audit event),
+   * assigned to the importer, source empty. A name repeated earlier in the
+   * sheet, or used by a live company, is a duplicate; a row that breaks a
+   * rule of the form is invalid. Both are reported, not created. Each row
+   * is its own transaction: a large sheet never holds one long
+   * transaction, and a name taken while the import runs makes only that
+   * row a duplicate. Needs Companies read, create and import.
+   */
+  async importSheet(
+    access: MemberAccess,
+    rows: readonly CompanySheetRow[],
+  ): Promise<ProspectCompanyImportResult> {
+    assertCanWrite(access, "create");
+    assertCan(access, COMPANIES_MENU, "import");
+    if (rows.length === 0)
+      throw new DomainError(
+        "IMPORT_EMPTY",
+        "The sheet has no rows under its headers.",
+      );
+    const assignedMemberId = await this.assignee(access, undefined);
+    const firstRowOf = new Map<string, number>();
+    const companies: ProspectCompanyImportResult["companies"] = [];
+    const problems: ProspectCompanyImportProblem[] = [];
+    for (const { row, cells, unreadable } of rows) {
+      let checked: ReturnType<typeof importedCompany>;
+      try {
+        checked = importedCompany(cells, unreadable);
+      } catch (error) {
+        if (!(error instanceof DomainError)) throw error;
+        const field = (error.details as { field?: unknown } | undefined)?.field;
+        problems.push({
+          row,
+          name: optionalText(cells.name),
+          reason: "invalid",
+          field: typeof field === "string" ? field : null,
+          message: error.message,
+        });
+        continue;
+      }
+      const { name } = checked.details;
+      const key = prospectCompanyNameKey(name);
+      const earlier = firstRowOf.get(key);
+      if (earlier != null) {
+        problems.push({
+          row,
+          name,
+          reason: "duplicate",
+          field: null,
+          message: `Row ${String(earlier)} has the same name.`,
+        });
+        continue;
+      }
+      firstRowOf.set(key, row);
+      try {
+        const id = await this.deps.db.$transaction((tx) =>
+          this.createInTx(tx, access, { ...checked, assignedMemberId }),
+        );
+        companies.push({ row, id, name });
+      } catch (error) {
+        const taken =
+          isUniqueViolation(error) ||
+          (error instanceof DomainError &&
+            error.code === "PROSPECT_COMPANY_NAME_IN_USE");
+        if (!taken) throw error;
+        problems.push({
+          row,
+          name,
+          reason: "duplicate",
+          field: null,
+          message: prospectCompanyNameInUse().message,
+        });
+      }
+    }
+    return {
+      created: companies.length,
+      duplicates: problems.filter((item) => item.reason === "duplicate").length,
+      invalid: problems.filter((item) => item.reason === "invalid").length,
+      companies,
+      problems,
+    };
   }
 
   /**

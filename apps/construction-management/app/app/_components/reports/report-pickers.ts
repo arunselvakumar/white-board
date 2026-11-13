@@ -36,6 +36,9 @@ export function pickerOptionsOf(
     funnel_stage: choices(options.funnelStages),
     lost_reason: choices(options.lostReasons),
     assignee: choices(options.assignees),
+    visited_by: choices(options.marketingPeople),
+    assigned_to: choices(options.marketingPeople),
+    prospect_company: choices(options.prospectCompanies),
   };
 }
 

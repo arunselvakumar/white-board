@@ -54,8 +54,11 @@ export type ReportImageRef = { key: string; contentType: string };
 export type ReportHeader = {
   company: string;
   title: string;
-  /** "All projects" for a central report. */
-  project: string;
+  /**
+   * "All projects" for a central report; null for a report that is not
+   * about Projects at all (Marketing), which prints no Project line.
+   */
+  project: string | null;
   address: string | null;
   /** "01 Sep 2026 to 30 Sep 2026" or "September 2026". */
   period: string;

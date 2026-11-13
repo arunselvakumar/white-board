@@ -169,6 +169,13 @@ export const ListConstructionMarketingVisitsRequestModel = z.object({
   after: z.string().max(400).optional(),
 });
 
+/** The Excel export: the list's filters without the paging. */
+export const ExportConstructionMarketingVisitsRequestModel =
+  ListConstructionMarketingVisitsRequestModel.omit({
+    limit: true,
+    after: true,
+  });
+
 // ---------------------------------------------------------------------------
 // Responses
 // ---------------------------------------------------------------------------

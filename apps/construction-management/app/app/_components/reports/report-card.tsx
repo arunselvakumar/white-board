@@ -378,6 +378,51 @@ function requestFor(
           }),
         },
       };
+    // Marketing reports: Company-level, no Project.
+    case "marketing_visit_register":
+      return {
+        kind: definition.kind,
+        projectId: null,
+        params: {
+          ...range,
+          ...(onlySet({
+            memberId: picks.visited_by,
+            prospectCompanyId: picks.prospect_company,
+            status: picks.status,
+            purpose: picks.visit_purpose,
+          }) as Pick<
+            Extract<
+              RequestReportInput,
+              { kind: "marketing_visit_register" }
+            >["params"],
+            "memberId" | "prospectCompanyId" | "status" | "purpose"
+          >),
+        },
+      };
+    case "marketing_person_summary":
+      return {
+        kind: definition.kind,
+        projectId: null,
+        params: { month: period.month },
+      };
+    case "marketing_company_pipeline":
+      return {
+        kind: definition.kind,
+        projectId: null,
+        params: {
+          asOn: period.asOn,
+          ...(onlySet({
+            stage: picks.prospect_stage,
+            memberId: picks.assigned_to,
+          }) as Pick<
+            Extract<
+              RequestReportInput,
+              { kind: "marketing_company_pipeline" }
+            >["params"],
+            "stage" | "memberId"
+          >),
+        },
+      };
     default:
       return null;
   }

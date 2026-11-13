@@ -242,7 +242,7 @@ class PdfWriter {
     this.text(header.title, x, y, { size: 11, bold: true });
     y -= 13;
     const facts = [
-      `Project: ${header.project}`,
+      ...(header.project == null ? [] : [`Project: ${header.project}`]),
       ...(header.address == null ? [] : [`Address: ${header.address}`]),
       `Period: ${header.period}`,
       ...(hasMoney(this.document) ? [`Amounts in ${header.currency}`] : []),
@@ -424,7 +424,9 @@ class PdfWriter {
       const label = `Page ${String(index + 1)} of ${String(total)}`;
       const right = fit(
         this.face.clean(
-          `${header.title} - ${header.project} - ${header.period}`,
+          [header.title, header.project, header.period]
+            .filter((part) => part != null)
+            .join(" - "),
         ),
         this.face,
         size,
@@ -530,7 +532,11 @@ export async function renderPdf(
 ): Promise<Uint8Array> {
   const pdf = await PDFDocument.create();
   pdf.setTitle(
-    printable(`${document.header.title} - ${document.header.project}`),
+    printable(
+      [document.header.title, document.header.project]
+        .filter((part) => part != null)
+        .join(" - "),
+    ),
   );
   pdf.setAuthor(printable(document.header.company));
   pdf.setCreator("Construction Management");

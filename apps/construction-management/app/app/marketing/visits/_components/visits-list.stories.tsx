@@ -244,3 +244,35 @@ export const ArrivalForInactivePerson: Story = {
     );
   },
 };
+
+/** With Visits export: Export downloads the list's current filters as Excel. */
+export const Export: Story = {
+  args: { canExport: true },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await canvas.findByText("4 Visits");
+    const exportLink = canvas.getByRole("link", { name: "Export" });
+    await expect(exportLink).toHaveAttribute(
+      "href",
+      `${MARKETING_VISITS_API}/export`,
+    );
+    await expect(exportLink).toHaveAttribute("download");
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(canvas.getByRole("combobox", { name: "Status" }));
+    await userEvent.click(await body.findByRole("option", { name: "Missed" }));
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(canvas.getByRole("link", { name: "Export" })).toHaveAttribute(
+        "href",
+        `${MARKETING_VISITS_API}/export?status=missed`,
+      ),
+    );
+  },
+};
+
+/** Without Visits export there is no Export. */
+export const NoExport: Story = {
+  play: async ({ canvas }) => {
+    await canvas.findByText("4 Visits");
+    await expect(canvas.queryByRole("link", { name: "Export" })).toBeNull();
+  },
+};

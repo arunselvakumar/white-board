@@ -229,3 +229,28 @@ export const TooMany: Story = {
     );
   },
 };
+
+/**
+ * With Visits export, Export in the calendar takes the days on screen,
+ * not the list's From and To, and follows the calendar as it moves.
+ */
+export const Export: Story = {
+  args: { canExport: true },
+  play: async ({ canvas, userEvent }) => {
+    await canvas.findByRole("heading", { name: "November 2026" });
+    await waitFor(() =>
+      expect(canvas.getByRole("link", { name: "Export" })).toHaveAttribute(
+        "href",
+        `${MARKETING_VISITS_API}/export?from=2026-10-26&to=2026-12-06`,
+      ),
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Week" }));
+    await canvas.findByRole("heading", { name: "9 Nov – 15 Nov 2026" });
+    await waitFor(() =>
+      expect(canvas.getByRole("link", { name: "Export" })).toHaveAttribute(
+        "href",
+        `${MARKETING_VISITS_API}/export?from=2026-11-09&to=2026-11-15`,
+      ),
+    );
+  },
+};

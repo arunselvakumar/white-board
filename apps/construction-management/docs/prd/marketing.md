@@ -195,7 +195,7 @@ Sequential. Update the Status column.
 | 8   | Team page, visit targets, reassign and the "needs reassigning" list                            | done   |
 | 9   | Marketing Dashboard                                                                            | done   |
 | 10  | Won → Create Project, and the Projects shown on the company page                               | done   |
-| 11  | Reports and exports; Prospect Company import                                                   | todo   |
+| 11  | Reports and exports; Prospect Company import                                                   | done   |
 | 12  | e2e tests (`e2e-tests.md`), `modules/` spec for Marketing, README table of contents            | todo   |
 
 ## 7. Questions the owner answered

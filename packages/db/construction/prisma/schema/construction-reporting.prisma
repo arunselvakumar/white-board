@@ -40,6 +40,10 @@ enum ConstructionReportingReportKind {
   /// Sales (CM-0022 §11).
   inquiry_report
   booking_report
+  /// Marketing (CM-0040 §13).
+  marketing_visit_register
+  marketing_person_summary
+  marketing_company_pipeline
 
   @@map("report_kind")
   @@schema("construction_reporting")

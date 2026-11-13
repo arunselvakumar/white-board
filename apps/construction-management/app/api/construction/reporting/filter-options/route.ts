@@ -10,7 +10,7 @@ import type { ReportFilterKey } from "@/src/reporting/domain/report-catalogue";
 import { prismaProjectLookup } from "@/src/reporting/infrastructure/prisma-report-source";
 import { can } from "@/src/shared-kernel/access";
 
-import { requireReportSession } from "../reports/handlers";
+import { marketingScopes, requireReportSession } from "../reports/handlers";
 import {
   ListConstructionReportingFilterOptionsRequestModel,
   toFilterOptionsResponse,
@@ -62,6 +62,9 @@ export async function GET(request: Request): Promise<Response> {
       projectIds:
         session.role === "owner" ? null : [...session.access.projectIds],
       stores: can(session.access, "procurement.central_store", "read"),
+      prospectCompanies: keys.has("prospect_company")
+        ? (await marketingScopes(session, "marketing_visit_register")).companies
+        : "none",
     });
     return Response.json(toFilterOptionsResponse(choices));
   } catch (error) {

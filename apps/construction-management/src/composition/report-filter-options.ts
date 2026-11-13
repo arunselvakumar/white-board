@@ -1,7 +1,11 @@
 import { prisma, type PrismaClient } from "@repo/construction-db";
 
+import { prospectCompanyVisibleWhere } from "@/src/marketing/infrastructure/prisma-prospect-company-store";
 import { userNames } from "@/src/procurement/infrastructure/inventory-locations";
 import type { ReportFilterKey } from "@/src/reporting/domain/report-catalogue";
+import type { MarketingRecordScope } from "@/src/reporting/domain/report-job";
+
+import { marketingTeam } from "./marketing-team";
 
 /** One choice of a report card's picker. */
 export type ReportFilterChoice = { id: string; name: string };
@@ -23,6 +27,10 @@ export type ReportFilterChoices = {
   funnelStages: ReportFilterChoice[];
   lostReasons: ReportFilterChoice[];
   assignees: ReportFilterChoice[];
+  /** Marketing People, inactive ones too (the Marketing reports). */
+  marketingPeople: ReportFilterChoice[];
+  /** The live Prospect Companies the viewer may see (ADR CM-0040 §5). */
+  prospectCompanies: ReportFilterChoice[];
 };
 
 const byName = (a: ReportFilterChoice, b: ReportFilterChoice) =>
@@ -46,6 +54,9 @@ const NAMED = { id: true, name: true } as const;
  * - Labour Categories, Suppliers, Material Categories and Materials:
  *   every live one of the Company.
  * - **Wings**: the Project's live Wings (the Booking Report, CM-1008).
+ * - **Marketing People** (central): everyone whose Role holds Visits
+ *   create, inactive ones marked; **Prospect Companies**: the live ones
+ *   the viewer's Companies scope keeps (ADR CM-0040 §5).
  */
 export async function reportFilterChoices(
   input: {
@@ -57,6 +68,8 @@ export async function reportFilterChoices(
     projectIds: readonly string[] | null;
     /** The viewer may pick a Central Store. */
     stores: boolean;
+    /** The Prospect Companies the viewer may see; `none` by default. */
+    prospectCompanies?: MarketingRecordScope;
   },
   db: PrismaClient = prisma,
 ): Promise<ReportFilterChoices> {
@@ -85,6 +98,8 @@ export async function reportFilterChoices(
     funnelStages,
     lostReasons,
     assignees,
+    marketingPeople,
+    prospectCompanies,
   ] = await Promise.all([
     wants("projects") && input.projectId == null
       ? db.constructionProjectsProject.findMany({
@@ -174,6 +189,31 @@ export async function reportFilterChoices(
           select: NAMED,
         })
       : none,
+    // The Marketing reports (ADR CM-0040 §13).
+    (wants("visited_by") || wants("assigned_to")) && input.projectId == null
+      ? marketingTeam.people(workspaceId).then((people) =>
+          people.map((person) => ({
+            id: person.id,
+            name: person.active ? person.name : `${person.name} (inactive)`,
+          })),
+        )
+      : none,
+    wants("prospect_company") &&
+    input.projectId == null &&
+    input.prospectCompanies != null &&
+    input.prospectCompanies !== "none"
+      ? db.constructionMarketingProspectCompany.findMany({
+          where: {
+            ...live,
+            ...prospectCompanyVisibleWhere(
+              input.prospectCompanies === "all"
+                ? null
+                : input.prospectCompanies,
+            ),
+          },
+          select: NAMED,
+        })
+      : none,
   ]);
   return {
     projects: projects.sort(byName),
@@ -190,6 +230,8 @@ export async function reportFilterChoices(
     funnelStages,
     lostReasons: lostReasons.sort(byName),
     assignees: assignees.sort(byName),
+    marketingPeople: marketingPeople.sort(byName),
+    prospectCompanies: prospectCompanies.sort(byName),
   };
 }
 

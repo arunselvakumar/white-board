@@ -4,6 +4,7 @@ import type { OwnScope } from "@/src/shared-kernel/access";
 import {
   calendarDateFromDb,
   calendarDateToDb,
+  type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
 import { tombstone } from "@/src/shared-kernel/tombstone";
 
@@ -243,6 +244,27 @@ export const prismaFollowUpStore: FollowUpStore = {
       select: SELECT,
     });
     return rows.map(toStored);
+  },
+
+  async nextDueByVisit(db, workspaceId, visitIds, scope) {
+    if (visitIds.length === 0) return new Map();
+    const rows = await db.constructionMarketingFollowUp.groupBy({
+      by: ["visitId"],
+      where: {
+        workspaceId,
+        visitId: { in: [...visitIds] },
+        status: "open",
+        deletedAt: null,
+        ...LIVE_COMPANY,
+        ...followUpVisibleWhere(scope),
+      },
+      _min: { dueDate: true },
+    });
+    const next = new Map<string, CalendarDate>();
+    for (const row of rows)
+      if (row.visitId != null && row._min.dueDate != null)
+        next.set(row.visitId, calendarDateFromDb(row._min.dueDate));
+    return next;
   },
 };
 

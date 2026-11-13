@@ -75,7 +75,9 @@ function addTable(
   const block: [string, string][] = [
     ["Company", header.company],
     ["Report", header.title],
-    ["Project", header.project],
+    ...(header.project == null
+      ? []
+      : ([["Project", header.project]] as [string, string][])),
     ...(header.address == null
       ? []
       : ([["Address", header.address]] as [string, string][])),

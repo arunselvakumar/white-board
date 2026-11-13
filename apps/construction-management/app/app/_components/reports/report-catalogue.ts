@@ -1,3 +1,11 @@
+import {
+  STAGE_LABELS,
+  STAGES,
+  VISIT_PURPOSE_LABELS,
+  VISIT_PURPOSES,
+  VISIT_SHOWN_STATUSES,
+  VISIT_STATUS_LABELS,
+} from "@/src/marketing/domain/marketing-terms";
 import type { ReportJob } from "@/src/queries/reports";
 import type { ReportCatalogueEntry } from "@/src/queries/report-catalogue";
 
@@ -51,6 +59,12 @@ export const PICKER_KEYS = [
   "funnel_stage",
   "lost_reason",
   "assignee",
+  // The Marketing reports.
+  "visited_by",
+  "prospect_company",
+  "visit_purpose",
+  "prospect_stage",
+  "assigned_to",
 ] as const;
 
 export type PickerKey = (typeof PICKER_KEYS)[number];
@@ -71,6 +85,8 @@ const PICKER_KINDS: readonly ReportDefinition["kind"][] = [
   "labour_attendance_central",
   "inquiry_report",
   "booking_report",
+  "marketing_visit_register",
+  "marketing_company_pipeline",
 ];
 
 export const PICKER_COPY: Record<PickerKey, { label: string; all: string }> = {
@@ -89,6 +105,11 @@ export const PICKER_COPY: Record<PickerKey, { label: string; all: string }> = {
   funnel_stage: { label: "Stage", all: "All stages" },
   lost_reason: { label: "Lost Reason", all: "All reasons" },
   assignee: { label: "Assignee", all: "Anyone" },
+  visited_by: { label: "Visited by", all: "Every Marketing Person" },
+  prospect_company: { label: "Prospect Company", all: "All companies" },
+  visit_purpose: { label: "Purpose", all: "Any purpose" },
+  prospect_stage: { label: "Stage", all: "Every Stage" },
+  assigned_to: { label: "Assigned to", all: "Every Marketing Person" },
 };
 
 /** The pickers a card offers, in its catalogue filters' order. */
@@ -142,6 +163,21 @@ const INQUIRY_STATUS_OPTIONS = [
   { value: "lost", label: "Lost" },
 ];
 
+const VISIT_STATUS_OPTIONS = VISIT_SHOWN_STATUSES.map((status) => ({
+  value: status,
+  label: VISIT_STATUS_LABELS[status],
+}));
+
+const VISIT_PURPOSE_OPTIONS = VISIT_PURPOSES.map((purpose) => ({
+  value: purpose,
+  label: VISIT_PURPOSE_LABELS[purpose],
+}));
+
+const STAGE_OPTIONS = STAGES.map((stage) => ({
+  value: stage,
+  label: STAGE_LABELS[stage],
+}));
+
 const INTEREST_TYPE_OPTIONS = [
   { value: "hot", label: "Hot" },
   { value: "warm", label: "Warm" },
@@ -155,7 +191,10 @@ export function pickerStatuses(
 ): { value: string; label: string }[] | null {
   if (key === "transfer_type") return TRANSFER_TYPE_OPTIONS;
   if (key === "interest_type") return INTEREST_TYPE_OPTIONS;
+  if (key === "visit_purpose") return VISIT_PURPOSE_OPTIONS;
+  if (key === "prospect_stage") return STAGE_OPTIONS;
   if (key !== "status") return null;
+  if (kind === "marketing_visit_register") return VISIT_STATUS_OPTIONS;
   if (kind === "booking_report") return BOOKING_STATUS_OPTIONS;
   if (kind === "inquiry_report") return INQUIRY_STATUS_OPTIONS;
   return kind === "material_transfers"
@@ -197,6 +236,11 @@ export const REPORT_GROUP_COPY: Record<
     title: "Sales",
     description:
       "Inquiries and bookings on this Project, as an Excel workbook and a PDF.",
+  },
+  marketing: {
+    title: "Marketing Reports",
+    description:
+      "Visits, each Marketing Person's month and the Prospect Company pipeline, as an Excel workbook and a PDF. They land in Downloads.",
   },
   progress: {
     title: "Progress Reports",

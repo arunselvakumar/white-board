@@ -1,4 +1,4 @@
-import { Unzip, UnzipInflate } from "fflate";
+import { strFromU8, Unzip, UnzipInflate, unzipSync } from "fflate";
 
 /**
  * How much an uploaded .xlsx (a ZIP) unpacks to, checked before any parser
@@ -20,14 +20,16 @@ const CENTRAL = 0x02014b50;
 const EOCD_MIN = 22;
 const MAX_COMMENT = 0xffff;
 
+type ZipEntry = { name: string; size: number };
+
 /**
- * The total uncompressed size of the ZIP's entries, or null when the
- * central directory cannot be trusted: unreadable, ZIP64 (which an import
- * sheet never needs), or its entry count disagrees with the entries it
- * holds. The directory is walked to its own end by signature, so a
- * doctored count cannot hide entries a reader would still inflate.
+ * The ZIP's entries as its central directory lists them, or null when the
+ * directory cannot be trusted: unreadable, ZIP64 (which an import sheet
+ * never needs), or its entry count disagrees with the entries it holds.
+ * The directory is walked to its own end by signature, so a doctored count
+ * cannot hide entries a reader would still inflate.
  */
-export function zipUnpackedBytes(bytes: Uint8Array): number | null {
+function zipEntries(bytes: Uint8Array): ZipEntry[] | null {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const lowest = Math.max(0, bytes.byteLength - EOCD_MIN - MAX_COMMENT);
   let eocd = -1;
@@ -39,28 +41,89 @@ export function zipUnpackedBytes(bytes: Uint8Array): number | null {
   }
   if (eocd < 0) return null;
   const entriesOnDisk = view.getUint16(eocd + 8, true);
-  const entries = view.getUint16(eocd + 10, true);
+  const count = view.getUint16(eocd + 10, true);
   const directorySize = view.getUint32(eocd + 12, true);
   const start = view.getUint32(eocd + 16, true);
   const end = start + directorySize;
-  if (entriesOnDisk !== entries || end > eocd) return null;
+  if (entriesOnDisk !== count || end > eocd) return null;
+  const decoder = new TextDecoder();
+  const entries: ZipEntry[] = [];
   let at = start;
-  let found = 0;
-  let total = 0;
   while (at < end) {
     if (at + 46 > end || view.getUint32(at, true) !== CENTRAL) return null;
     const size = view.getUint32(at + 24, true);
     if (size === 0xffffffff) return null;
-    total += size;
-    found += 1;
+    const nameLength = view.getUint16(at + 28, true);
+    if (at + 46 + nameLength > end) return null;
+    entries.push({
+      name: decoder.decode(bytes.subarray(at + 46, at + 46 + nameLength)),
+      size,
+    });
     at +=
       46 +
-      view.getUint16(at + 28, true) +
+      nameLength +
       view.getUint16(at + 30, true) +
       view.getUint16(at + 32, true);
   }
-  if (at !== end || found !== entries) return null;
-  return total;
+  if (at !== end || entries.length !== count) return null;
+  return entries;
+}
+
+/**
+ * The total uncompressed size of the ZIP's entries, or null when its
+ * central directory cannot be trusted (see `zipEntries`).
+ */
+export function zipUnpackedBytes(bytes: Uint8Array): number | null {
+  const entries = zipEntries(bytes);
+  if (entries == null) return null;
+  return entries.reduce((total, entry) => total + entry.size, 0);
+}
+
+/** The package parts that name a VBA project or macro sheet by type. */
+const PACKAGE_METADATA = new Set([
+  "[content_types].xml",
+  "xl/_rels/workbook.xml.rels",
+]);
+
+/** Room for any real workbook's content types and relationships. */
+const METADATA_MAX_BYTES = 1024 * 1024;
+
+/** Content and relationship types only a macro-enabled workbook uses. */
+const MACRO_TYPES = /vbaproject|macroenabled|macrosheet/i;
+
+/**
+ * Whether the workbook carries a VBA project or macro sheets (an .xlsm
+ * saved as .xlsx, or a doctored file): imports refuse it rather than
+ * store or pass it on. Found by the usual part name and by the package's
+ * content types and workbook relationships, which name the part whatever
+ * it is called. True when the package cannot be read, so an unreadable
+ * file is refused too.
+ */
+export function xlsxHasMacros(bytes: Uint8Array): boolean {
+  const entries = zipEntries(bytes);
+  if (entries == null) return true;
+  if (
+    entries.some((entry) => entry.name.toLowerCase().endsWith("vbaproject.bin"))
+  )
+    return true;
+  const metadata = entries.filter((entry) =>
+    PACKAGE_METADATA.has(entry.name.toLowerCase()),
+  );
+  if (metadata.some((entry) => entry.size > METADATA_MAX_BYTES)) return true;
+  try {
+    const parts = unzipSync(bytes, {
+      filter: (file) =>
+        PACKAGE_METADATA.has(file.name.toLowerCase()) &&
+        file.originalSize <= METADATA_MAX_BYTES,
+    });
+    return Object.values(parts).some(
+      (part) =>
+        part.byteLength > METADATA_MAX_BYTES ||
+        MACRO_TYPES.test(strFromU8(part)),
+    );
+  } catch {
+    return true;
+  }
 }
 
 /**

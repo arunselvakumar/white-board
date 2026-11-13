@@ -157,6 +157,7 @@ Without `view_all` on the record's menu, a member sees:
 - **Delete** is a tombstone, refused while the company has live Visits (`PROSPECT_COMPANY_HAS_VISITS`). Its Contacts and all its Follow-ups, open or closed, are tombstoned with it in the same transaction, and `prospect_company.deleted` lists the Follow-up ids. Every Follow-up read (the list, one Follow-up, the company page, the reminders) also takes only those of a live company.
 - **Reassign** (`transfer`) moves the assigned person and the owner of every Open Follow-up of the company to the new person in one transaction. Past Visits keep their visitors.
 - **Import** reads Excel through the xlsx guard: name, city, phone, primary Contact name and mobile. Valid rows are created, assigned to the importer. Duplicate names, within the file or against live companies, and invalid rows are reported, not created.
+  As built: "assigned to the importer" follows create's rule, so an importer who is not an active Marketing Person leaves the rows unassigned. Each row is its own create and transaction, so a name taken while the import runs makes only that row a duplicate; at most 500 rows, and a workbook with macros is refused.
 
 ### 12. Won → Create Project
 
@@ -167,6 +168,11 @@ Without `view_all` on the record's menu, a member sees:
 
 - Every figure is a query over the marketing tables through §5's `where`, scoped to the member or, with `view_all` on the Dashboard, to the team or one person. Weeks start on Monday in the Company time zone. Nothing is stored.
 - The three Reports run as report jobs (CM-0021) and land in Downloads. They need `report` on Visits and follow the caller's `view_all` on each record's menu. The Visit register is Excel and PDF; the summary and pipeline are Excel and PDF too.
+- As built: the Reports are Company-level report kinds hosted by Marketing → Reports (no Project, no Central Reports Read), and the caller's scope on Visits, Companies and Follow-ups (all, own, or none without read) is fixed with the job. They print the approximate value for everyone (open question 3), so they never need Financial.
+- **Visit register**: filters by visitor, Prospect Company, status (Planned, Missed, Completed, Cancelled; Missed as on the moment the report is made, §7 and §10) and purpose. Its next Follow-up is the earliest Open one made from the Visit that the caller may see.
+- **Marketing Person summary**: a row for every active Marketing Person and for anyone else with a figure in the month; without `view_all` on Visits, only the caller's own row. Follow-ups done are those marked Done in the month; overdue are those due in the month and still Open after their due date; companies won are those assigned to the person now and moved to Won in the month, counted once.
+- **Company pipeline**, as on a day: live companies created by then, their Stage that day (from the Stage changes), the latest Completed Visit up to then, the earliest Follow-up Open that day, and the approximate value of the latest non-cancelled Visit up to then that has one. The assigned person is today's.
+- **Exports** (`export`): the Visits and Companies lists' current filters in the caller's scope; the Visits sheet adds each Visit's next Open Follow-up, the Companies sheet the primary Contact's mobile. Neither has a check-in position (§10).
 
 ### Open questions, as built
 

@@ -57,7 +57,24 @@ describe("the catalogue a viewer may request", () => {
       "material_received",
       "material_transfers",
       "stock_register",
+      "marketing_visit_register",
+      "marketing_person_summary",
+      "marketing_company_pipeline",
     ]);
+  });
+
+  it("offers the Marketing reports with Visits Report, without Central Reports Read (ADR CM-0040 §13)", () => {
+    const marketer = member({ "marketing.visits": ["read", "report"] });
+    const central = viewerCatalogue(marketer, "central", null);
+    expect(kinds(central)).toEqual([
+      "marketing_visit_register",
+      "marketing_person_summary",
+      "marketing_company_pipeline",
+    ]);
+    expect(central.every((entry) => !entry.includesMoney)).toBe(true);
+    expect(viewerCatalogue(marketer, "project", PROJECT)).toEqual([]);
+    const reader = member({ "marketing.visits": ["read", "export"] });
+    expect(viewerCatalogue(reader, "central", null)).toEqual([]);
   });
 
   it("leaves out reports about money without Financial", () => {
