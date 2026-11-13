@@ -4,6 +4,7 @@ import { expect, waitFor, within } from "storybook/test";
 import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 
 import {
+  checkedInVisit,
   KAVERI_ID,
   MARKETING_VISITS_API,
   MISSED_ID,
@@ -210,5 +211,17 @@ export const ReadOnly: Story = {
     await expect(
       await canvas.findByRole("combobox", { name: "Marketing Person" }),
     ).toBeVisible();
+  },
+};
+
+/** A Visit someone checked in at: a small mark beside its status. */
+export const CheckedIn: Story = {
+  beforeEach: serve({ visits: [checkedInVisit()] }),
+  play: async ({ canvas, canvasElement }) => {
+    await canvas.findByText("1 Visit");
+    const [row] = rows(canvasElement);
+    if (row == null) throw new Error("one Visit");
+    await expect(row).toHaveTextContent("MV-0007");
+    await expect(within(row).getByText("Checked in")).toBeVisible();
   },
 };

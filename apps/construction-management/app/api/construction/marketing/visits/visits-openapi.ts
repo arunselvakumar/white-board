@@ -13,6 +13,7 @@ import {
 import {
   AddConstructionMarketingVisitNoteRequestModel,
   CancelConstructionMarketingVisitRequestModel,
+  CheckConstructionMarketingVisitRequestModel,
   CompleteConstructionMarketingVisitRequestModel,
   ConstructionMarketingVisitActionsResponseModel,
   ConstructionMarketingVisitListItemResponseModel,
@@ -44,6 +45,7 @@ export const marketingVisitOpenApiComponents: OpenApiComponents = {
   CancelConstructionMarketingVisitRequestModel,
   AddConstructionMarketingVisitNoteRequestModel,
   DeleteConstructionMarketingVisitRequestModel,
+  CheckConstructionMarketingVisitRequestModel,
   ConstructionMarketingVisitActionsResponseModel,
   ConstructionMarketingVisitListItemResponseModel,
   ListConstructionMarketingVisitsResponseModel,
@@ -132,13 +134,23 @@ export const marketingVisitOpenApiOperations: OpenApiOperation[] = [
   ),
   write(
     `${ITEM}/reschedule`,
-    "Move a planned Visit to a new time",
+    "Move a planned Visit that is not checked in to a new time",
     RescheduleConstructionMarketingVisitRequestModel,
   ),
   write(
     `${ITEM}/cancel`,
     "Cancel a planned Visit",
     CancelConstructionMarketingVisitRequestModel,
+  ),
+  write(
+    `${ITEM}/check-in`,
+    "Check in at the site: one position, or why there is none",
+    CheckConstructionMarketingVisitRequestModel,
+  ),
+  write(
+    `${ITEM}/check-out`,
+    "Check out: one position, or why there is none",
+    CheckConstructionMarketingVisitRequestModel,
   ),
   write(
     `${ITEM}/notes`,

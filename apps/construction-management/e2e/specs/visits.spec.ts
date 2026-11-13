@@ -170,4 +170,44 @@ companyTest.describe("Visits", () => {
       await expect(page.getByRole("dialog")).toBeVisible();
     },
   );
+
+  companyTest(
+    "should find today's Visit on the calendar and check in with the phone's location, when a member on the Marketing Role reaches the site",
+    async ({ newMember }) => {
+      const member = await newMember({ roleName: "Marketing" });
+      const company = await createProspectCompany(member.api);
+      // Noon today in India, the test Companies' time zone.
+      const today = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Kolkata",
+      }).format(new Date());
+      const visit = await createVisit(member.api, {
+        prospectCompanyId: company.id,
+        visitAt: new Date(`${today}T12:00:00+05:30`),
+      });
+      const page = await member.page({
+        geolocation: { latitude: 11.0247, longitude: 77.1258, accuracy: 15 },
+        permissions: ["geolocation"],
+      });
+      const visits = new VisitsPage(page);
+
+      await visits.goto();
+      await page.getByRole("button", { name: "Calendar", exact: true }).click();
+      await expect(
+        page.getByRole("list", { name: /^Visits on / }),
+      ).toContainText(visit.number);
+
+      await page.goto(`${visits.url}/${visit.id}`);
+      await visits.clickAndWaitFor(
+        visits.main.getByRole("button", { name: "Check in", exact: true }),
+        /\/check-in$/,
+      );
+      await expect(
+        visits.main.getByRole("link", { name: "Open in Maps" }),
+      ).toHaveAttribute("href", /11\.0247,77\.1258/);
+      await expect(visits.history).toContainText("Checked in");
+      await expect(
+        visits.main.getByRole("button", { name: "Check out", exact: true }),
+      ).toBeVisible();
+    },
+  );
 });

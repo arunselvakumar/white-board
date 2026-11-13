@@ -3,17 +3,23 @@ import { getRouter } from "@storybook/nextjs-vite/navigation.mock";
 import { expect, waitFor, within } from "storybook/test";
 
 import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
+import { mockGeolocation } from "@/.storybook/mocks/geolocation";
 
 import { mockFollowUpApi } from "../../follow-ups/_components/follow-up-fixtures";
 import { VisitDetail } from "./visit-detail";
+import type { CheckLocation } from "./visit-check-in";
 import {
   BALAJI_ID,
   CANCELLED_ID,
+  CHECKED_IN_ID,
   COMPLETED_ID,
   MARKETING_VISITS_API,
   PLANNED_ID,
+  TODAY_ID,
   cancelledVisit,
+  checkedInVisit,
   mockVisitApi,
+  todayVisit,
   visit,
   type VisitApiOptions,
 } from "./visit-fixtures";
@@ -181,6 +187,8 @@ export const Locked: Story = {
           canReschedule: false,
           canAddNote: true,
           canAddFiles: true,
+          canCheckIn: false,
+          canCheckOut: false,
           canDelete: false,
           locked: true,
         },
@@ -279,5 +287,174 @@ export const WithFollowUps: Story = {
       type: "email",
       dueDate: "2026-11-18",
     });
+  },
+};
+
+/** A Visit's own API and a stand-in for the browser's position. */
+function serveWithPosition(
+  options: VisitApiOptions,
+  result: Parameters<typeof mockGeolocation>[0],
+) {
+  return () => {
+    const restoreApi = serve(options)();
+    const restorePosition = mockGeolocation(result);
+    return () => {
+      restorePosition();
+      restoreApi();
+    };
+  };
+}
+
+/**
+ * Planned for today, to a visitor: Check in reads the position once and
+ * sends it; the line, the map link and History follow, then Check out.
+ */
+export const CheckIn: Story = {
+  args: { id: TODAY_ID },
+  beforeEach: serveWithPosition(
+    { visits: [todayVisit()] },
+    { latitude: 13.0108, longitude: 80.2206, accuracy: 11.6 },
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const panel = within(
+      await canvas.findByRole("region", { name: "Check in" }),
+    );
+    await userEvent.click(panel.getByRole("button", { name: "Check in" }));
+    await expect(
+      await canvas.findByText("Checked in at 12:01 pm, with your location."),
+    ).toHaveAttribute("role", "status");
+    await expect(
+      posts(`${MARKETING_VISITS_API}/${TODAY_ID}/check-in`)[0]?.body,
+    ).toEqual({
+      position: { latitude: 13.0108, longitude: 80.2206, accuracy: 11.6 },
+    });
+
+    const details = within(canvas.getByRole("region", { name: "Details" }));
+    await expect(details.getByText("Check-in").nextSibling).toHaveTextContent(
+      "Checked in at 12:01 pm by Arun Selva Kumar · within 12 m · Open in Maps",
+    );
+    await expect(
+      details.getByRole("link", { name: "Open in Maps" }),
+    ).toHaveAttribute(
+      "href",
+      "https://www.google.com/maps/search/?api=1&query=13.0108,80.2206",
+    );
+    const history = within(canvas.getByRole("list", { name: "History" }));
+    await expect(history.getAllByRole("listitem")[0]).toHaveTextContent(
+      "Checked in · by Arun Selva Kumar",
+    );
+    await expect(
+      canvas.getByRole("button", { name: "Check out" }),
+    ).toBeVisible();
+  },
+};
+
+/**
+ * The browser refuses the position: the check-in is saved with the time,
+ * sent as `refused`, and the page says the location was not shared.
+ */
+export const CheckInRefused: Story = {
+  args: { id: TODAY_ID },
+  beforeEach: serveWithPosition({ visits: [todayVisit()] }, { code: 1 }),
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Check in" }),
+    );
+    await expect(
+      await canvas.findByText(
+        /^Checked in at 12:01 pm with the time only: location was not shared\./,
+      ),
+    ).toHaveAttribute("role", "status");
+    await expect(
+      posts(`${MARKETING_VISITS_API}/${TODAY_ID}/check-in`)[0]?.body,
+    ).toEqual({ location: "refused" });
+    const details = within(canvas.getByRole("region", { name: "Details" }));
+    await expect(details.getByText("Check-in").nextSibling).toHaveTextContent(
+      "Checked in at 12:01 pm by Arun Selva Kumar · location not shared",
+    );
+    await expect(
+      details.queryByRole("link", { name: "Open in Maps" }),
+    ).toBeNull();
+  },
+};
+
+/**
+ * Checked in by Ravi: the time, the accuracy and a map link to open,
+ * never a map on the page; Check out is the action left.
+ */
+export const CheckedInWithMapLink: Story = {
+  args: { id: CHECKED_IN_ID },
+  beforeEach: serve({ visits: [checkedInVisit()] }),
+  play: async ({ canvas, canvasElement }) => {
+    const details = within(
+      await canvas.findByRole("region", { name: "Details" }),
+    );
+    await expect(details.getByText("Check-in").nextSibling).toHaveTextContent(
+      "Checked in at 11:50 am by Ravi Shankar · within 12 m · Open in Maps",
+    );
+    const link = details.getByRole("link", { name: "Open in Maps" });
+    await expect(link).toHaveAttribute(
+      "href",
+      "https://www.google.com/maps/search/?api=1&query=10.7905,78.7047",
+    );
+    await expect(link).toHaveAttribute("target", "_blank");
+    await expect(canvasElement.querySelector("iframe")).toBeNull();
+    await expect(canvas.queryByText("Check-out")).toBeNull();
+    await expect(
+      within(canvas.getByRole("region", { name: "Check out" })).getByRole(
+        "button",
+        { name: "Check out" },
+      ),
+    ).toBeVisible();
+    await expect(canvas.queryByRole("button", { name: "Check in" })).toBeNull();
+  },
+};
+
+/** Answers the Check out story's position request when its play says so. */
+let answerPosition: (value: CheckLocation) => void = () => undefined;
+
+/**
+ * Check out while the position is still being found, then the phone
+ * cannot find one: sent as `unavailable`, saved with the time.
+ */
+export const CheckOut: Story = {
+  args: {
+    id: CHECKED_IN_ID,
+    locate: () =>
+      new Promise<CheckLocation>((resolve) => {
+        answerPosition = resolve;
+      }),
+  },
+  beforeEach: serve({ visits: [checkedInVisit()] }),
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Check out" }),
+    );
+    await expect(
+      await canvas.findByRole("button", { name: "Finding your location…" }),
+    ).toBeDisabled();
+    answerPosition({ location: "unavailable" });
+    await expect(
+      await canvas.findByText(
+        "Checked out at 12:01 pm with the time only: your phone could not find its location.",
+      ),
+    ).toHaveAttribute("role", "status");
+    await expect(
+      posts(`${MARKETING_VISITS_API}/${CHECKED_IN_ID}/check-out`)[0]?.body,
+    ).toEqual({ location: "unavailable" });
+    const details = within(canvas.getByRole("region", { name: "Details" }));
+    await expect(details.getByText("Check-out").nextSibling).toHaveTextContent(
+      "Checked out at 12:01 pm by Arun Selva Kumar · location unavailable",
+    );
+    await expect(
+      canvas.queryByRole("region", { name: "Check out" }),
+    ).toBeNull();
+    await waitFor(() =>
+      expect(
+        within(canvas.getByRole("list", { name: "History" })).getAllByRole(
+          "listitem",
+        )[0],
+      ).toHaveTextContent("Checked out · by Arun Selva Kumar"),
+    );
   },
 };

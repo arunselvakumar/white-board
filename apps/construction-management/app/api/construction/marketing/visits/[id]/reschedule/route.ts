@@ -15,7 +15,8 @@ export const dynamic = "force-dynamic";
 
 /**
  * Moves a planned Visit to a new time; the old one stays in its history.
- * Needs Visits read and update.
+ * A checked-in Visit is completed instead (409 `VISIT_CHECKED_IN`). Needs
+ * Visits read and update.
  */
 export async function POST(
   request: Request,

@@ -163,7 +163,8 @@ export const ListConstructionMarketingVisitsRequestModel = z.object({
   status: commaSeparated.pipe(z.array(shownStatus)).optional(),
   purpose: commaSeparated.pipe(z.array(purpose)).optional(),
   interest: commaSeparated.pipe(z.array(interest)).optional(),
-  limit: z.coerce.number().int().min(1).max(100).default(50),
+  /** Up to 500, for a month on the calendar. */
+  limit: z.coerce.number().int().min(1).max(500).default(50),
   /** `nextCursor` of the previous page. */
   after: z.string().max(400).optional(),
 });
@@ -174,6 +175,28 @@ export const ListConstructionMarketingVisitsRequestModel = z.object({
 
 const Person = z.object({ id: z.uuid(), name: z.string() });
 
+const Position = z.object({
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+  /** Metres. */
+  accuracy: z.number().min(0),
+});
+
+const CheckView = z.object({
+  at: z.iso.datetime(),
+  byName: z.string(),
+  /** `recorded`, or why there is no position: `refused`, `unavailable`. */
+  location: z.enum(["recorded", "refused", "unavailable"]),
+  position: Position.nullable(),
+});
+
+/** Check in or check out: one position from the browser, or why not. */
+export const CheckConstructionMarketingVisitRequestModel = z.object({
+  position: Position.nullable().optional(),
+  /** Without a position: the browser refused it, or could not get one. */
+  location: z.enum(["refused", "unavailable"]).nullable().optional(),
+});
+
 export const ConstructionMarketingVisitActionsResponseModel = z.object({
   canUpdate: z.boolean(),
   canComplete: z.boolean(),
@@ -181,6 +204,9 @@ export const ConstructionMarketingVisitActionsResponseModel = z.object({
   canReschedule: z.boolean(),
   canAddNote: z.boolean(),
   canAddFiles: z.boolean(),
+  /** A visitor, on a Planned Visit dated today, not yet checked in. */
+  canCheckIn: z.boolean(),
+  canCheckOut: z.boolean(),
   canDelete: z.boolean(),
   /** A Completed Visit past its 7 days for this viewer. */
   locked: z.boolean(),
@@ -205,6 +231,8 @@ export const ConstructionMarketingVisitListItemResponseModel = z.object({
   outcome: z.string().nullable(),
   visitors: z.array(Person),
   contactNames: z.array(z.string()),
+  /** Checked in at the site. */
+  checkedIn: z.boolean(),
 });
 
 export const ListConstructionMarketingVisitsResponseModel = z.object({
@@ -265,6 +293,8 @@ export const ConstructionMarketingVisitResponseModel = z.object({
         "note_added",
         "file_added",
         "file_removed",
+        "checked_in",
+        "checked_out",
       ]),
       at: z.iso.datetime(),
       byName: z.string(),
@@ -275,6 +305,12 @@ export const ConstructionMarketingVisitResponseModel = z.object({
       fileName: z.string().nullable(),
     }),
   ),
+  /**
+   * A check-in or check-out: when, who, and one position (or why there is
+   * none). Kept with the Visit only, never in the register or an export.
+   */
+  checkIn: CheckView.nullable(),
+  checkOut: CheckView.nullable(),
   /** Oldest first; served by `…/files/{fileId}` and `…/thumbnail`. */
   files: z.array(
     z.object({
@@ -356,6 +392,24 @@ export function toVisitResponse(
     completedAt: iso(visit.completedAt),
     createdAt: visit.createdAt.toISOString(),
     updatedAt: visit.updatedAt.toISOString(),
+    checkIn:
+      visit.checkIn == null
+        ? null
+        : {
+            at: visit.checkIn.at.toISOString(),
+            byName: visit.checkIn.byName,
+            location: visit.checkIn.location,
+            position: visit.checkIn.position,
+          },
+    checkOut:
+      visit.checkOut == null
+        ? null
+        : {
+            at: visit.checkOut.at.toISOString(),
+            byName: visit.checkOut.byName,
+            location: visit.checkOut.location,
+            position: visit.checkOut.position,
+          },
     files: visit.files.map((file) => ({
       ...file,
       createdAt: file.createdAt.toISOString(),

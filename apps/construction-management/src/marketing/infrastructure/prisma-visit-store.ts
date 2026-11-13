@@ -7,6 +7,7 @@ import type {
   CompanyVisitsReader,
   MarketingTx,
   StoredVisit,
+  VisitCheck,
   VisitRow,
   VisitStore,
 } from "../application/ports";
@@ -32,12 +33,16 @@ export function visitVisibleWhere(scope: OwnScope): Where {
   };
 }
 
+/** As `shownStatus`: a checked-in Visit whose time passed is still Planned. */
 function statusWhere(status: VisitShownStatus, now: Date): Where {
   switch (status) {
     case "planned":
-      return { status: "planned", visitAt: { gte: now } };
+      return {
+        status: "planned",
+        OR: [{ visitAt: { gte: now } }, { checkInAt: { not: null } }],
+      };
     case "missed":
-      return { status: "planned", visitAt: { lt: now } };
+      return { status: "planned", visitAt: { lt: now }, checkInAt: null };
     default:
       return { status };
   }
@@ -75,9 +80,45 @@ const VISIT_SELECT = {
   createdAt: true,
   updatedAt: true,
   createdBy: true,
+  checkInAt: true,
+  checkInBy: true,
+  checkInLatitude: true,
+  checkInLongitude: true,
+  checkInAccuracy: true,
+  checkInLocation: true,
+  checkOutAt: true,
+  checkOutBy: true,
+  checkOutLatitude: true,
+  checkOutLongitude: true,
+  checkOutAccuracy: true,
+  checkOutLocation: true,
   visitors: { select: { memberId: true }, orderBy: { memberId: "asc" } },
   contacts: { select: { contactId: true } },
 } as const satisfies Prisma.ConstructionMarketingVisitSelect;
+
+function checkOf(row: {
+  at: Date | null;
+  by: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  accuracy: number | null;
+  location: "recorded" | "refused" | "unavailable" | null;
+}): VisitCheck | null {
+  if (row.at == null || row.by == null || row.location == null) return null;
+  return {
+    at: row.at,
+    by: row.by,
+    location: row.location,
+    position:
+      row.latitude == null || row.longitude == null
+        ? null
+        : {
+            latitude: row.latitude,
+            longitude: row.longitude,
+            accuracy: row.accuracy ?? 0,
+          },
+  };
+}
 
 type VisitRecord = Prisma.ConstructionMarketingVisitGetPayload<{
   select: typeof VISIT_SELECT;
@@ -89,10 +130,38 @@ function toStored(row: VisitRecord): StoredVisit {
     contacts,
     requirementValue,
     requirementStartMonth,
+    checkInAt,
+    checkInBy,
+    checkInLatitude,
+    checkInLongitude,
+    checkInAccuracy,
+    checkInLocation,
+    checkOutAt,
+    checkOutBy,
+    checkOutLatitude,
+    checkOutLongitude,
+    checkOutAccuracy,
+    checkOutLocation,
     ...rest
   } = row;
   return {
     ...rest,
+    checkIn: checkOf({
+      at: checkInAt,
+      by: checkInBy,
+      latitude: checkInLatitude,
+      longitude: checkInLongitude,
+      accuracy: checkInAccuracy,
+      location: checkInLocation,
+    }),
+    checkOut: checkOf({
+      at: checkOutAt,
+      by: checkOutBy,
+      latitude: checkOutLatitude,
+      longitude: checkOutLongitude,
+      accuracy: checkOutAccuracy,
+      location: checkOutLocation,
+    }),
     requirementValue:
       requirementValue == null ? null : Number(requirementValue),
     requirementStartMonth: monthFromDb(requirementStartMonth),
@@ -216,6 +285,41 @@ export const prismaVisitStore: VisitStore = {
     });
   },
 
+  async setCheck(db, id, which, check) {
+    const position = check.position;
+    const latitude = position?.latitude ?? null;
+    const longitude = position?.longitude ?? null;
+    const accuracy = position?.accuracy ?? null;
+    // The write's own time, so `updatedAt` never moves back behind a write
+    // that committed while this one waited for the lock.
+    const updatedAt = new Date();
+    await db.constructionMarketingVisit.update({
+      where: { id },
+      data:
+        which === "in"
+          ? {
+              checkInAt: check.at,
+              checkInBy: check.by,
+              checkInLatitude: latitude,
+              checkInLongitude: longitude,
+              checkInAccuracy: accuracy,
+              checkInLocation: check.location,
+              updatedAt,
+              updatedBy: check.by,
+            }
+          : {
+              checkOutAt: check.at,
+              checkOutBy: check.by,
+              checkOutLatitude: latitude,
+              checkOutLongitude: longitude,
+              checkOutAccuracy: accuracy,
+              checkOutLocation: check.location,
+              updatedAt,
+              updatedBy: check.by,
+            },
+    });
+  },
+
   async notes(db, workspaceId, visitIds) {
     if (visitIds.length === 0) return [];
     return db.constructionMarketingVisitNote.findMany({
@@ -284,6 +388,7 @@ export const prismaVisitStore: VisitStore = {
           interest: true,
           outcome: true,
           createdBy: true,
+          checkInAt: true,
           prospectCompany: {
             select: {
               id: true,
@@ -304,8 +409,9 @@ export const prismaVisitStore: VisitStore = {
     return {
       items: rows
         .slice(0, params.limit)
-        .map(({ visitors, contacts, ...row }) => ({
+        .map(({ visitors, contacts, checkInAt, ...row }) => ({
           ...row,
+          checkedIn: checkInAt != null,
           visitorIds: visitors.map((item) => item.memberId),
           contactNames: contacts.map((item) => item.contact.name),
         })),
@@ -332,6 +438,7 @@ export const prismaCompanyVisitsReader: CompanyVisitsReader = {
         status: true,
         purpose: true,
         outcome: true,
+        checkInAt: true,
         visitors: { select: { memberId: true }, orderBy: { memberId: "asc" } },
       },
     });
@@ -354,8 +461,9 @@ export const prismaCompanyVisitsReader: CompanyVisitsReader = {
           }),
     ]);
     return {
-      visits: visits.map(({ visitors, ...visit }) => ({
+      visits: visits.map(({ visitors, checkInAt, ...visit }) => ({
         ...visit,
+        checkedIn: checkInAt != null,
         visitorIds: visitors.map((item) => item.memberId),
       })),
       notes,

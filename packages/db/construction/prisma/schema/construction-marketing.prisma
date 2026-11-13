@@ -201,37 +201,52 @@ enum ConstructionMarketingWorkType {
 
 /// One planned or completed visit to a Prospect Company (PRD §3.4).
 model ConstructionMarketingVisit {
-  id                    String                             @id @db.Uuid
-  workspaceId           String                             @map("workspace_id")
+  id                    String                              @id @db.Uuid
+  workspaceId           String                              @map("workspace_id")
   /// `MV-0001`, from the sequence kernel's `marketing_visit` module.
   number                String
   sequence              Int
-  prospectCompanyId     String                             @map("prospect_company_id") @db.Uuid
+  prospectCompanyId     String                              @map("prospect_company_id") @db.Uuid
   /// An instant; entered and shown in the Company time zone.
-  visitAt               DateTime                           @map("visit_at") @db.Timestamptz(3)
-  status                ConstructionMarketingVisitStatus   @default(planned)
+  visitAt               DateTime                            @map("visit_at") @db.Timestamptz(3)
+  status                ConstructionMarketingVisitStatus    @default(planned)
   purpose               ConstructionMarketingVisitPurpose?
   location              String?
   discussion            String?
   outcome               String?
   interest              ConstructionMarketingInterest?
-  requirementWorkType   ConstructionMarketingWorkType?     @map("requirement_work_type")
+  requirementWorkType   ConstructionMarketingWorkType?      @map("requirement_work_type")
   /// Approximate value in whole rupees.
-  requirementValue      BigInt?                            @map("requirement_value")
+  requirementValue      BigInt?                             @map("requirement_value")
   /// The first day of the month the work is expected to start.
-  requirementStartMonth DateTime?                          @map("requirement_start_month") @db.Date
+  requirementStartMonth DateTime?                           @map("requirement_start_month") @db.Date
   /// When it was marked Completed; the edit lock counts from it.
-  completedAt           DateTime?                          @map("completed_at") @db.Timestamptz(3)
-  completedBy           String?                            @map("completed_by")
-  cancelReason          String?                            @map("cancel_reason")
-  cancelledAt           DateTime?                          @map("cancelled_at") @db.Timestamptz(3)
-  cancelledBy           String?                            @map("cancelled_by")
-  createdAt             DateTime                           @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt             DateTime                           @default(now()) @map("updated_at") @db.Timestamptz(3)
-  createdBy             String                             @map("created_by")
-  updatedBy             String                             @map("updated_by")
-  deletedAt             DateTime?                          @map("deleted_at") @db.Timestamptz(3)
-  deletedBy             String?                            @map("deleted_by")
+  completedAt           DateTime?                           @map("completed_at") @db.Timestamptz(3)
+  completedBy           String?                             @map("completed_by")
+  /// Check-in (ADR CM-0040 §10): the time, who, and one position when
+  /// the browser gave one; `check_in_location` says why there is none.
+  checkInAt             DateTime?                           @map("check_in_at") @db.Timestamptz(3)
+  checkInBy             String?                             @map("check_in_by")
+  checkInLatitude       Float?                              @map("check_in_latitude")
+  checkInLongitude      Float?                              @map("check_in_longitude")
+  /// Metres.
+  checkInAccuracy       Float?                              @map("check_in_accuracy")
+  checkInLocation       ConstructionMarketingCheckLocation? @map("check_in_location")
+  checkOutAt            DateTime?                           @map("check_out_at") @db.Timestamptz(3)
+  checkOutBy            String?                             @map("check_out_by")
+  checkOutLatitude      Float?                              @map("check_out_latitude")
+  checkOutLongitude     Float?                              @map("check_out_longitude")
+  checkOutAccuracy      Float?                              @map("check_out_accuracy")
+  checkOutLocation      ConstructionMarketingCheckLocation? @map("check_out_location")
+  cancelReason          String?                             @map("cancel_reason")
+  cancelledAt           DateTime?                           @map("cancelled_at") @db.Timestamptz(3)
+  cancelledBy           String?                             @map("cancelled_by")
+  createdAt             DateTime                            @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime                            @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy             String                              @map("created_by")
+  updatedBy             String                              @map("updated_by")
+  deletedAt             DateTime?                           @map("deleted_at") @db.Timestamptz(3)
+  deletedBy             String?                             @map("deleted_by")
 
   prospectCompany ConstructionMarketingProspectCompany @relation(fields: [prospectCompanyId], references: [id])
   visitors        ConstructionMarketingVisitVisitor[]
@@ -387,5 +402,16 @@ model ConstructionMarketingFollowUp {
   @@index([workspaceId, prospectCompanyId])
   @@index([workspaceId, createdBy])
   @@map("follow_ups")
+  @@schema("construction_marketing")
+}
+
+/// What a check-in or check-out knows of where it happened (ADR CM-0040
+/// §10): a position, or why there is none.
+enum ConstructionMarketingCheckLocation {
+  recorded
+  refused
+  unavailable
+
+  @@map("check_location")
   @@schema("construction_marketing")
 }

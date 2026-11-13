@@ -41,6 +41,8 @@ export const COMPLETED_ID = BALAJI_VISIT_ID;
 export const PLANNED_ID = "0199d000-0000-7000-8000-000000000504";
 export const MISSED_ID = "0199d000-0000-7000-8000-000000000502";
 export const CANCELLED_ID = "0199d000-0000-7000-8000-000000000501";
+export const TODAY_ID = "0199d000-0000-7000-8000-000000000505";
+export const CHECKED_IN_ID = "0199d000-0000-7000-8000-000000000506";
 export const NEW_VISIT_ID = "0199d000-0000-7000-8000-000000000599";
 
 const OWNER = { id: OWNER_MEMBER_ID, name: "Arun Selva Kumar" };
@@ -100,6 +102,8 @@ const ALL_ACTIONS: Visit["actions"] = {
   canReschedule: false,
   canAddNote: true,
   canAddFiles: true,
+  canCheckIn: false,
+  canCheckOut: false,
   canDelete: true,
   locked: false,
 };
@@ -182,6 +186,8 @@ export function visit(overrides: Partial<Visit> = {}): Visit {
         fileName: null,
       },
     ],
+    checkIn: null,
+    checkOut: null,
     files: [],
     createdByName: "Ravi Shankar",
     createdAt: "2026-11-05T04:30:00.000Z",
@@ -335,6 +341,65 @@ export function cancelledVisit(overrides: Partial<Visit> = {}): Visit {
   });
 }
 
+/** MV-0006: planned for today, 12 Nov at 3:00 pm; the viewer may check in. */
+export function todayVisit(overrides: Partial<Visit> = {}): Visit {
+  return plannedVisit({
+    id: TODAY_ID,
+    number: "MV-0006",
+    visitAt: "2026-11-12T09:30:00.000Z",
+    actions: { ...PLANNED_ACTIONS, canCheckIn: true },
+    ...overrides,
+  });
+}
+
+/** Ravi's check-in at Kaveri's site at 11:50 am, within 12 m. */
+export const RAVI_CHECK_IN: NonNullable<Visit["checkIn"]> = {
+  at: "2026-11-12T06:20:00.000Z",
+  byName: "Ravi Shankar",
+  location: "recorded",
+  position: { latitude: 10.7905, longitude: 78.7047, accuracy: 12 },
+};
+
+/** MV-0007 on Kaveri Cement Works today at 12:30 pm: Ravi checked in early. */
+export function checkedInVisit(overrides: Partial<Visit> = {}): Visit {
+  return missedVisit({
+    id: CHECKED_IN_ID,
+    number: "MV-0007",
+    visitAt: "2026-11-12T07:00:00.000Z",
+    status: "planned",
+    // The stories' viewer is the Owner, so they went too: only a visitor
+    // checks out.
+    visitors: [RAVI, OWNER],
+    checkIn: RAVI_CHECK_IN,
+    history: [
+      {
+        id: "0199d000-0000-7000-8000-000000000731",
+        action: "checked_in",
+        at: RAVI_CHECK_IN.at,
+        byName: "Ravi Shankar",
+        from: null,
+        to: null,
+        reason: null,
+        fileName: null,
+      },
+      ...PLAN_HISTORY("2026-11-10T04:00:00.000Z", "Ravi Shankar"),
+    ],
+    // Checked in: Complete it, not Reschedule (ADR CM-0040 §10).
+    actions: { ...PLANNED_ACTIONS, canReschedule: false, canCheckOut: true },
+    ...overrides,
+  });
+}
+
+/** The calendar's Visits: the list's four and two today, one checked in. */
+export const CALENDAR_VISITS: Visit[] = [
+  plannedVisit(),
+  todayVisit(),
+  checkedInVisit(),
+  visit(),
+  missedVisit(),
+  cancelledVisit(),
+];
+
 /** Newest first, as the list answers them. */
 export const VISITS: Visit[] = [
   plannedVisit(),
@@ -359,6 +424,7 @@ export function toListItem(detail: Visit): VisitListItem {
     outcome: detail.outcome,
     visitors: detail.visitors,
     contactNames: detail.contacts.map((contact) => contact.name),
+    checkedIn: detail.checkIn != null,
   };
 }
 
@@ -701,7 +767,7 @@ export function visitHandler(
     if (files != null) return fileCall(files[1] ?? "", files[2], call, body);
 
     const match =
-      /^\/api\/construction\/marketing\/visits\/([^/]+)(?:\/(update|complete|reschedule|cancel|notes|delete))?$/.exec(
+      /^\/api\/construction\/marketing\/visits\/([^/]+)(?:\/(update|complete|reschedule|cancel|notes|delete|check-in|check-out))?$/.exec(
         path,
       );
     if (match == null) return undefined;
@@ -730,6 +796,14 @@ export function visitHandler(
           history: [historyEntry("completed"), ...found.history],
         });
       case "reschedule":
+        if (found.checkIn != null)
+          return json(
+            {
+              code: "VISIT_CHECKED_IN",
+              message: "This Visit is checked in. Complete it instead.",
+            },
+            409,
+          );
         return save({
           ...found,
           visitAt: String(body["visitAt"]),
@@ -769,6 +843,51 @@ export function visitHandler(
         };
         visits = visits.map((item) => (item.id === next.id ? next : item));
         return json(next, 201);
+      }
+      case "check-in":
+      case "check-out": {
+        const checkIn = action === "check-in";
+        if (!(checkIn ? found.actions.canCheckIn : found.actions.canCheckOut))
+          return json(
+            checkIn
+              ? {
+                  code: "VISIT_CHECKED_IN",
+                  message: "This Visit is already checked in.",
+                }
+              : {
+                  code: "VISIT_NOT_CHECKED_IN",
+                  message: "Check in to this Visit first.",
+                },
+            409,
+          );
+        const position = (body["position"] ?? null) as NonNullable<
+          Visit["checkIn"]
+        >["position"];
+        const check: NonNullable<Visit["checkIn"]> = {
+          at: SAVED_AT,
+          byName: "Arun Selva Kumar",
+          location:
+            position == null
+              ? body["location"] === "refused"
+                ? "refused"
+                : "unavailable"
+              : "recorded",
+          position,
+        };
+        return save({
+          ...found,
+          ...(checkIn ? { checkIn: check } : { checkOut: check }),
+          actions: {
+            ...found.actions,
+            canCheckIn: false,
+            canCheckOut: checkIn,
+            canReschedule: checkIn ? false : found.actions.canReschedule,
+          },
+          history: [
+            historyEntry(checkIn ? "checked_in" : "checked_out"),
+            ...found.history,
+          ],
+        });
       }
       case "delete":
         visits = visits.filter((item) => item.id !== id);

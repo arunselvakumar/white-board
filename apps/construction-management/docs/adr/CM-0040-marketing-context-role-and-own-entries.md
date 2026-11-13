@@ -117,8 +117,8 @@ Without `view_all` on the record's menu, a member sees:
 
 - **Visit No.** comes from the sequence kernel with a new module `marketing_visit` (default prefix `MV`, padding 4: `MV-0001`), listed in Settings → Manage Sequence IDs. A Visit has no Project, so only the module's default rule applies. The number is taken when the Visit is created, planned or completed.
 - **Time.** `visit_at` is stored as an instant and entered and shown in the Company time zone. A completed Visit's time cannot be in the future.
-- **Statuses.** Planned → Completed (needs one or more points of contact and the Discussion), Planned → Cancelled (needs a reason), and Reschedule (a Planned Visit's new time, the old one kept in its history). Completed and Cancelled are final.
-- **Missed** is read, never stored: Planned and `visit_at` before now. Lists can filter by it.
+- **Statuses.** Planned → Completed (needs one or more points of contact and the Discussion), Planned → Cancelled (needs a reason), and Reschedule (a Planned Visit's new time, the old one kept in its history; not once it is checked in, §10). Completed and Cancelled are final.
+- **Missed** is read, never stored: Planned, `visit_at` before now, and not checked in (§10). Lists can filter by it.
 - **Back-dated entry.** A new back-dated module `marketing_visit` (menu `marketing.visits`, date field `visit_at`) in a new **Marketing** group, with its own default of **7 days** for create and edit, where every other module defaults to no limit. It applies to the Visit's date whenever a Visit is saved as Completed, including completing a planned one. A Missed Visit older than the limit is cancelled or rescheduled, or completed by someone the Company's setting lets past it.
 - **Lock.** A Completed Visit can be changed by its creator for **7 days** after it was completed, then only by someone with `view_all` and update on Visits (`VISIT_LOCKED`). Notes, files and Follow-ups can be added at any time by anyone who can update and see it. A Planned Visit can be changed by anyone who can update and see it. The lock is a constant in code (open question 2); the back-dated limit is the Company's setting.
 - **Delete** is a tombstone and needs Visits delete; a Completed Visit keeps its lock and the back-dated edit limit; it writes `visit.deleted`. In the same transaction its live files are tombstoned and their `stored_files` rows (file and thumbnail) are marked deleted, so they stop counting towards the Company's storage; `visit.deleted` lists the removed file ids. The objects are deleted after the commit, best effort, and the daily orphan job catches any left.
@@ -142,7 +142,11 @@ Without `view_all` on the record's menu, a member sees:
 
 ### 10. Check-in and check-out
 
-- **Check in** shows on a Planned Visit dated today, to its visitors. It records the time, who checked in, and, if the browser gives one, latitude, longitude and accuracy from a single position request. **Check out** records the end time the same way. Nothing is read in between, and there is no `watchPosition`.
+- **Check in** shows on a Planned Visit dated today, to its visitors. It records the time, who checked in, and, if the browser gives one, latitude, longitude and accuracy from a single position request. **Check out** records the end time the same way. Nothing is read in between, and there is no `watchPosition`. Each request asks for a fresh position (`maximumAge: 0`), never a cached one.
+- **Today** is the Company time zone's date of the moment the request is handled. That one instant decides the day and is saved as the check-in or check-out time.
+- **Check out** is for a visitor, after the check-in, once, and only on the Visit's day, the same as check-in (400 `CHECK_OUT_NOT_TODAY`). A Cancelled Visit cannot be checked out.
+- **A checked-in Visit is never Missed.** It stays Planned until someone completes it (or cancels it), and the list shows it as checked in. There is no separate status for it.
+- **No Reschedule after check-in.** The check-in proves someone was at the site on that day, so moving the Visit to another day would make the record wrong and hide a missed Visit. Reschedule answers 409 `VISIT_CHECKED_IN` ("This Visit is checked in. Complete it instead."), and the screen does not offer it.
 - If the browser refuses or cannot get a position, the check-in is saved with the time only and says why (`location: "refused" | "unavailable"`).
 - The position is kept with the Visit and goes when it goes. It is not in the Visit register or any export. The map link is an ordinary link the person chooses to open.
 

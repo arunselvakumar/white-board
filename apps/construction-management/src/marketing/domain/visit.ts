@@ -180,12 +180,18 @@ export function visitorIds(input: {
   return ids;
 }
 
-/** Shown as Missed: Planned, and its time has passed (never stored). */
+/**
+ * Shown as Missed: Planned, its time has passed, and nobody checked in at
+ * the site (never stored). A checked-in Visit stays Planned until it is
+ * completed.
+ */
 export function shownStatus(
-  visit: { status: VisitStatus; visitAt: Date },
+  visit: { status: VisitStatus; visitAt: Date; checkedIn: boolean },
   now: Date,
 ): VisitShownStatus {
-  return visit.status === "planned" && visit.visitAt.getTime() < now.getTime()
+  return visit.status === "planned" &&
+    !visit.checkedIn &&
+    visit.visitAt.getTime() < now.getTime()
     ? "missed"
     : visit.status;
 }
@@ -268,4 +274,146 @@ export function noteText(raw: string | null | undefined): string {
     throw invalidField("VISIT_NOTE_REQUIRED", "Write the note.", "text");
   limit(text, VISIT_LIMITS.note, "VISIT_NOTE_TOO_LONG", "note", "text");
   return text;
+}
+
+// ---------------------------------------------------------------------------
+// Check-in and check-out (ADR CM-0040 §10)
+// ---------------------------------------------------------------------------
+
+export type CheckLocation = "recorded" | "refused" | "unavailable";
+
+/** One position, read once; never tracked between check-in and check-out. */
+export type CheckPosition = {
+  latitude: number;
+  longitude: number;
+  /** Metres. */
+  accuracy: number;
+};
+
+export type CheckPoint = {
+  position: CheckPosition | null;
+  location: CheckLocation;
+};
+
+/**
+ * A check-in's or check-out's place: the position the browser gave, or why
+ * there is none (`refused`, `unavailable`); the time is saved either way.
+ */
+export function checkPoint(input: {
+  position?: CheckPosition | null;
+  location?: "refused" | "unavailable" | null;
+}): CheckPoint {
+  const position = input.position ?? null;
+  if (position == null) {
+    if (input.location == null)
+      throw invalidField(
+        "CHECK_LOCATION_REQUIRED",
+        "Send the position, or say why there is none.",
+        "location",
+      );
+    return { position: null, location: input.location };
+  }
+  const { latitude, longitude, accuracy } = position;
+  if (
+    !Number.isFinite(latitude) ||
+    !Number.isFinite(longitude) ||
+    !Number.isFinite(accuracy) ||
+    Math.abs(latitude) > 90 ||
+    Math.abs(longitude) > 180 ||
+    accuracy < 0
+  )
+    throw invalidField(
+      "CHECK_POSITION_INVALID",
+      "The position is not valid.",
+      "position",
+    );
+  return { position, location: "recorded" };
+}
+
+function onlyVisitors(): DomainError {
+  return forbidden(
+    "CHECK_IN_VISITORS_ONLY",
+    "Only someone on this Visit can check in or out.",
+  );
+}
+
+/** Check in: a visitor, on a Planned Visit dated today, once. */
+export function assertCanCheckIn(input: {
+  status: VisitStatus;
+  checkedIn: boolean;
+  isVisitor: boolean;
+  visitDate: string;
+  today: string;
+}): void {
+  if (!input.isVisitor) throw onlyVisitors();
+  assertPlanned(input.status, "checked in");
+  if (input.visitDate !== input.today)
+    throw invalidField(
+      "CHECK_IN_NOT_TODAY",
+      "You can check in on the day of the Visit.",
+      "visitAt",
+    );
+  if (input.checkedIn)
+    throw new DomainError(
+      "VISIT_CHECKED_IN",
+      "This Visit is already checked in.",
+      { kind: "conflict" },
+    );
+}
+
+/**
+ * Reschedule moves a Planned Visit that nobody checked in at (ADR CM-0040
+ * §10): the check-in proves someone was at the site on that day, so a
+ * checked-in Visit is completed instead.
+ */
+export function assertCanReschedule(input: {
+  status: VisitStatus;
+  checkedIn: boolean;
+}): void {
+  assertPlanned(input.status, "rescheduled");
+  if (input.checkedIn)
+    throw new DomainError(
+      "VISIT_CHECKED_IN",
+      "This Visit is checked in. Complete it instead.",
+      { kind: "conflict" },
+    );
+}
+
+/**
+ * Check out: a visitor, after the check-in, on the Visit's day, once; not
+ * on a cancelled Visit.
+ */
+export function assertCanCheckOut(input: {
+  status: VisitStatus;
+  checkedIn: boolean;
+  checkedOut: boolean;
+  isVisitor: boolean;
+  visitDate: string;
+  today: string;
+}): void {
+  if (!input.isVisitor) throw onlyVisitors();
+  if (input.status === "cancelled")
+    throw new DomainError(
+      "VISIT_CANCELLED",
+      "A cancelled Visit cannot be checked out.",
+      { kind: "conflict" },
+    );
+  if (!input.checkedIn)
+    throw new DomainError(
+      "VISIT_NOT_CHECKED_IN",
+      "Check in before you check out.",
+      { kind: "conflict" },
+    );
+  if (input.visitDate !== input.today)
+    throw invalidField(
+      "CHECK_OUT_NOT_TODAY",
+      "You can check out on the day of the Visit.",
+      "visitAt",
+    );
+  if (input.checkedOut)
+    throw new DomainError(
+      "VISIT_CHECKED_OUT",
+      "This Visit is already checked out.",
+      { kind: "conflict" },
+    );
 }
