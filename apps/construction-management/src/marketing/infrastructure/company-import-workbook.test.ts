@@ -107,6 +107,7 @@ describe("Prospect Company import sheet (ADR CM-0040 §11)", () => {
           "Salem",
         ],
         [{ error: "#N/A" }],
+        ["Pandian Mills", { formula: "A1" }, "Madurai"],
       ]),
     );
     expect(rows).toEqual([
@@ -116,6 +117,11 @@ describe("Prospect Company import sheet (ADR CM-0040 §11)", () => {
         unreadable: [{ column: "phone", error: "#DIV/0!" }],
       },
       { row: 3, cells: {}, unreadable: [{ column: "name", error: "#N/A" }] },
+      {
+        row: 4,
+        cells: { name: "Pandian Mills", city: "Madurai" },
+        unreadable: [{ column: "phone", error: "a formula without a value" }],
+      },
     ]);
     const [first] = rows;
     expect(() =>

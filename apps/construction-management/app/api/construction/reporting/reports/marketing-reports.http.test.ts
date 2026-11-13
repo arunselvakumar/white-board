@@ -16,6 +16,7 @@ import {
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
 import { companyTimezone } from "@/src/shared-kernel/company-today";
+import { monthBounds } from "@/src/marketing/domain/team";
 import { zoneInstant } from "@/src/shared-kernel/zone-time";
 import { jsonRequest, memberWith, ownerWithCompany } from "@/test/companies";
 import { bytesOf } from "@/test/files";
@@ -292,6 +293,22 @@ describe("the Marketing reports (ADR CM-0040 §13)", () => {
     await logVisit(ravi, kaveri);
     await missedVisit(ravi, kaveri);
     await logVisit(priya, await aCompany(priya, "Pandian Mills"));
+    // A Completed and a Missed Visit a minute before the month and at the
+    // next month's first instant: the month's counts leave them out.
+    const timeZone = await companyTimezone(prisma, owner.workspaceId);
+    const { first, next } = monthBounds(day.slice(0, 7));
+    for (const at of [
+      new Date(zoneInstant(first, 0, timeZone).getTime() - 60_000),
+      zoneInstant(next, 0, timeZone),
+    ])
+      for (const outside of [
+        await logVisit(ravi, kaveri),
+        await missedVisit(ravi, kaveri),
+      ])
+        await prisma.constructionMarketingVisit.update({
+          where: { id: outside.id },
+          data: { visitAt: at },
+        });
     const current =
       await prisma.constructionMarketingProspectCompany.findUniqueOrThrow({
         where: { id: kaveri.id },

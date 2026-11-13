@@ -77,15 +77,17 @@ function text(value: ExcelJS.CellValue): string | null {
 }
 
 /**
- * The error a cell shows (`#N/A`, `#DIV/0!`), typed in or a formula's
- * result; null for any other value.
+ * Why a cell cannot be read: the error it shows (`#N/A`, `#DIV/0!`),
+ * typed in or a formula's result, or a formula saved without its value
+ * (a file written by a tool rather than Excel). Null for any other value.
  */
 function cellError(value: ExcelJS.CellValue): string | null {
   if (value == null || typeof value !== "object") return null;
   if ("error" in value) return value.error;
-  if ("result" in value) {
+  if ("formula" in value || "sharedFormula" in value) {
     const result: unknown = value.result;
-    if (result != null && typeof result === "object" && "error" in result)
+    if (result == null) return "a formula without a value";
+    if (typeof result === "object" && "error" in result)
       return String(result.error);
   }
   return null;
