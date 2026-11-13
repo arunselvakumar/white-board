@@ -103,7 +103,7 @@ export function MarketingReportsPage({
       <div className="w-full max-w-6xl min-w-0 space-y-8">
         <PageHeader
           title={section.title}
-          meta={`${section.description} Only you and the Owner can open the reports you generate; they also land in Downloads.`}
+          meta="Only you and the Owner can open the reports you generate."
         />
         <Suspense
           fallback={<ReportGroupsSkeleton label="Loading Marketing Reports" />}
