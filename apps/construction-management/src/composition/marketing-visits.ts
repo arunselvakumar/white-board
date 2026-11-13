@@ -18,6 +18,7 @@ import {
   companyTimezone,
   companyToday,
 } from "@/src/shared-kernel/company-today";
+import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
 import { zoneInstant } from "@/src/shared-kernel/zone-time";
 import { nextSequenceNumber } from "@/src/shared-kernel/sequence/next-sequence-number";
 
@@ -27,13 +28,15 @@ import { marketingTeam } from "./marketing-team";
 /**
  * Visit handlers (ADR CM-0040 §7) wired to Prisma, the Prospect Company
  * handlers, the team, the `marketing_visit` back-dated limits and sequence,
- * and the audit trail for each Visit's history.
+ * the audit trail for each Visit's history, and storage for the files a
+ * deleted Visit leaves.
  */
 export function createVisitHandlers(): VisitHandlers {
   return new VisitHandlers({
     db: prisma,
     store: prismaVisitStore,
     fileStore: new PrismaVisitFileStore(prisma),
+    storage: objectStorage(),
     companyStore: prismaProspectCompanyStore,
     companies: prospectCompanyHandlers,
     team: marketingTeam,

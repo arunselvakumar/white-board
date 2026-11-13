@@ -121,7 +121,7 @@ Without `view_all` on the record's menu, a member sees:
 - **Missed** is read, never stored: Planned and `visit_at` before now. Lists can filter by it.
 - **Back-dated entry.** A new back-dated module `marketing_visit` (menu `marketing.visits`, date field `visit_at`) in a new **Marketing** group, with its own default of **7 days** for create and edit, where every other module defaults to no limit. It applies to the Visit's date whenever a Visit is saved as Completed, including completing a planned one. A Missed Visit older than the limit is cancelled or rescheduled, or completed by someone the Company's setting lets past it.
 - **Lock.** A Completed Visit can be changed by its creator for **7 days** after it was completed, then only by someone with `view_all` and update on Visits (`VISIT_LOCKED`). Notes, files and Follow-ups can be added at any time by anyone who can update and see it. A Planned Visit can be changed by anyone who can update and see it. The lock is a constant in code (open question 2); the back-dated limit is the Company's setting.
-- **Delete** is a tombstone and needs Visits delete; a Completed Visit keeps its lock and the back-dated edit limit; it writes `visit.deleted`.
+- **Delete** is a tombstone and needs Visits delete; a Completed Visit keeps its lock and the back-dated edit limit; it writes `visit.deleted`. In the same transaction its live files are tombstoned and their `stored_files` rows (file and thumbnail) are marked deleted, so they stop counting towards the Company's storage; `visit.deleted` lists the removed file ids. The objects are deleted after the commit, best effort, and the daily orphan job catches any left.
 - **Completing a Visit**, in one transaction: the Prospect Company moves from **New** to **Contacted** if it is still New, writing a Stage change; a Next Follow-up becomes a Follow-up; the audit event is written.
 - **Audit**: `visit.created`, `.updated`, `.completed`, `.rescheduled`, `.cancelled`, `.note_added`, `.file_added`, `.file_removed`, `.checked_in`, `.checked_out`. A Visit's history reads them through the shared audit reader (CM-0038 §1).
 
@@ -134,10 +134,11 @@ Without `view_all` on the record's menu, a member sees:
 ### 9. Photos and files
 
 - A new attachments purpose, `marketing_visit`, accepts PDF or image. The upload policy gains an optional per-kind limit, so images stop at 10 MB and PDFs at 25 MB, checked at start from the declared type and at complete from the sniffed one.
-- Up to 20 live files per Visit, counted at start and again at complete with the Visit row locked (`VISIT_FILE_LIMIT`). Keys are `companies/<workspaceId>/marketing_visit/<visitId>/…`. `visit_files` rows are written in marketing's transaction with the `stored_files` row and the audit event. Thumbnails are made in the browser.
-- A file and its thumbnail are served by `GET /api/construction/marketing/visits/{id}/files/{fileId}`, which checks read and the scope on the Visit (§5) and then redirects to a short-lived signed URL.
+- Up to 20 live files per Visit, counted at start and again at complete with the live Visit row locked (`VISIT_FILE_LIMIT`; a Visit deleted meanwhile answers `VISIT_NOT_FOUND`, and a key already recorded is a retry, checked before the limit). Keys are `companies/<workspaceId>/marketing_visit/<visitId>/…`. `visit_files` rows are written in marketing's transaction with the `stored_files` row and the audit event. Thumbnails are made in the browser and are taken only while the key awaits completion; once the file is saved, a thumbnail is refused (409 `VISIT_FILE_ALREADY_SAVED`).
+- A file is served by `GET /api/construction/marketing/visits/{id}/files/{fileId}`, which checks read and the scope on the Visit (§5) and then streams the bytes itself, with `Cache-Control: private, no-store`, `X-Content-Type-Options: nosniff` and a strict Content-Security-Policy (`default-src 'none'`). There is no signed download URL. Its thumbnail (`…/thumbnail`) goes through the same checks and is streamed the same way, kept by the browser for at most 5 minutes.
+- Deleting a Visit removes its files with it (§7): tombstones, `stored_files` rows marked deleted, objects deleted after the commit.
 - Marketing raises no `ProjectMediaAttached`: these files are in no Project's Gallery.
-- On a phone the picker offers **Take photo** (the camera) beside **Choose file**.
+- On a touch screen (a phone or a tablet) the picker offers **Take photo** (the camera) beside **Choose file**. Both ask for exactly the accepted types (Take photo: JPEG, PNG, WebP), so iOS hands over a JPEG; HEIC is not converted, and a HEIC photo that still arrives is refused in the browser with a message.
 
 ### 10. Check-in and check-out
 

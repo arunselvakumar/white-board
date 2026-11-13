@@ -57,6 +57,7 @@ import {
   VISIT_FILE_ACCEPT,
   VISIT_FILE_HINT,
   VISIT_FILE_LIMIT,
+  VISIT_PHOTO_ACCEPT,
   checkVisitFile,
   uploadVisitFile,
   useRefreshVisitFiles,
@@ -74,11 +75,17 @@ function byline(file: VisitFile): string {
   return `${file.createdByName} · ${formatBytes(file.bytes)}`;
 }
 
+/** A finished upload's file, and whether reading the Visit again failed. */
+type SavedUpload = { fileId: string; refreshFailed: boolean };
+
+const REFRESH_FAILED =
+  "Saved, but the Visit could not be refreshed. Try again.";
+
 /**
  * A Visit's photos and files: thumbnails that open in the viewer, each
  * with its caption and uploader. With `canAddFiles`, files upload at once
- * with progress, and on a phone **Take photo** opens the camera. The
- * uploader, or View all, can edit a caption or remove a file.
+ * with progress, and on a touch screen **Take photo** opens the camera.
+ * The uploader, or View all, can edit a caption or remove a file.
  */
 export function VisitFiles({ visit }: { visit: Visit }) {
   const refresh = useRefreshVisitFiles(visit.id);
@@ -87,20 +94,50 @@ export function VisitFiles({ visit }: { visit: Visit }) {
   const [opened, setOpened] = useState<VisitFile | null>(null);
   const [captioning, setCaptioning] = useState<VisitFile | null>(null);
   const [removing, setRemoving] = useState<VisitFile | null>(null);
+  const [saved, setSaved] = useState<ReadonlyMap<string, SavedUpload>>(
+    () => new Map(),
+  );
   const { uploads, add, retry, dismiss, canRetry } = useDirectUpload<
     object,
     VisitFile
   >({
     upload: (file, _meta, options) => uploadVisitFile(visit.id, file, options),
     check: checkVisitFile,
-    onUploaded: (_file, item) => {
-      void refresh().then(() => {
-        dismiss(item.id);
-      });
+    onUploaded: (file, item) => {
+      showWhenListed(item.id, file.id);
     },
   });
-  const pending = uploads.filter((upload) => upload.state !== "done");
+
+  function markSaved(uploadId: string, next: SavedUpload | null) {
+    setSaved((current) => {
+      const changed = new Map(current);
+      if (next == null) changed.delete(uploadId);
+      else changed.set(uploadId, next);
+      return changed;
+    });
+  }
+
+  /** Reads the Visit again; the upload stays until its file is listed. */
+  function showWhenListed(uploadId: string, fileId: string) {
+    markSaved(uploadId, { fileId, refreshFailed: false });
+    refresh().then(
+      () => {
+        dismiss(uploadId);
+        markSaved(uploadId, null);
+      },
+      () => {
+        markSaved(uploadId, { fileId, refreshFailed: true });
+      },
+    );
+  }
+
   const files = visit.files;
+  const listed = new Set(files.map((file) => file.id));
+  const pending = uploads.filter((upload) => {
+    if (upload.state !== "done") return true;
+    const done = saved.get(upload.id);
+    return done != null && !listed.has(done.fileId);
+  });
   const full = files.length >= VISIT_FILE_LIMIT;
   const mayAdd = visit.actions.canAddFiles;
 
@@ -216,6 +253,10 @@ export function VisitFiles({ visit }: { visit: Visit }) {
                 <span role="alert" className="text-destructive block text-xs">
                   {upload.error}
                 </span>
+              ) : saved.get(upload.id)?.refreshFailed === true ? (
+                <span role="alert" className="text-destructive block text-xs">
+                  {REFRESH_FAILED}
+                </span>
               ) : (
                 <Progress
                   value={upload.progress}
@@ -224,6 +265,20 @@ export function VisitFiles({ visit }: { visit: Visit }) {
                 />
               )}
               <span className="mt-1 flex gap-1">
+                {saved.get(upload.id)?.refreshFailed === true && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-xs"
+                    aria-label={`Retry ${upload.file.name}`}
+                    onClick={() => {
+                      const done = saved.get(upload.id);
+                      if (done != null) showWhenListed(upload.id, done.fileId);
+                    }}
+                  >
+                    <RotateCw />
+                  </Button>
+                )}
                 {canRetry(upload) && (
                   <Button
                     type="button"
@@ -244,6 +299,7 @@ export function VisitFiles({ visit }: { visit: Visit }) {
                   aria-label={`Dismiss ${upload.file.name}`}
                   onClick={() => {
                     dismiss(upload.id);
+                    markSaved(upload.id, null);
                   }}
                 >
                   <X />
@@ -271,7 +327,7 @@ export function VisitFiles({ visit }: { visit: Visit }) {
           <Input
             ref={camera}
             type="file"
-            accept="image/*"
+            accept={VISIT_PHOTO_ACCEPT}
             capture="environment"
             aria-label="Take a photo with the camera"
             className="sr-only top-0 left-0"
@@ -329,15 +385,16 @@ export function VisitFiles({ visit }: { visit: Visit }) {
         key={captioning?.id ?? "none"}
         visitId={visit.id}
         file={captioning}
-        onClose={() => {
-          setCaptioning(null);
+        onClose={(fileId) => {
+          // A save that finishes late must not close another file's dialog.
+          setCaptioning((current) => (current?.id === fileId ? null : current));
         }}
       />
       <RemoveVisitFileDialog
         visitId={visit.id}
         file={removing}
-        onClose={() => {
-          setRemoving(null);
+        onClose={(fileId) => {
+          setRemoving((current) => (current?.id === fileId ? null : current));
         }}
       />
     </section>
@@ -363,9 +420,13 @@ function CaptionDialog({
 }: {
   visitId: string;
   file: VisitFile | null;
-  onClose: () => void;
+  /** Closes the dialog if `fileId` is still the one open. */
+  onClose: (fileId: string) => void;
 }) {
   const update = useUpdateVisitFileCaption(visitId);
+  const close = () => {
+    if (file != null) onClose(file.id);
+  };
   const [error, setError] = useState<string | null>(null);
   const form = useForm<CaptionValues>({
     resolver: zodResolver(captionSchema),
@@ -381,7 +442,7 @@ function CaptionDialog({
         fileId: file.id,
         caption: values.caption === "" ? null : values.caption,
       });
-      onClose();
+      onClose(file.id);
     } catch (caught) {
       setError(visitErrorMessage(caught));
     }
@@ -391,7 +452,7 @@ function CaptionDialog({
     <Dialog
       open={file != null}
       onOpenChange={(open) => {
-        if (!open) onClose();
+        if (!open) close();
       }}
     >
       <DialogContent className="grid-cols-1 sm:max-w-md">
@@ -421,7 +482,7 @@ function CaptionDialog({
           </div>
           <FormAlert message={error ?? undefined} />
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={close}>
               Cancel
             </Button>
             <Button type="submit" disabled={form.formState.isSubmitting}>
@@ -442,7 +503,8 @@ function RemoveVisitFileDialog({
 }: {
   visitId: string;
   file: VisitFile | null;
-  onClose: () => void;
+  /** Closes the dialog if `fileId` is still the one open. */
+  onClose: (fileId: string) => void;
 }) {
   const removal = useRemoveVisitFile(visitId);
   // Kept after closing so the title stays while the dialog animates out.
@@ -453,9 +515,9 @@ function RemoveVisitFileDialog({
     <AlertDialog
       open={file != null}
       onOpenChange={(open) => {
-        if (!open) {
+        if (!open && file != null) {
           removal.reset();
-          onClose();
+          onClose(file.id);
         }
       }}
     >
@@ -478,10 +540,11 @@ function RemoveVisitFileDialog({
             disabled={removal.isPending}
             onClick={() => {
               if (file == null) return;
-              removal.mutate(file.id, {
+              const fileId = file.id;
+              removal.mutate(fileId, {
                 onSuccess: () => {
                   removal.reset();
-                  onClose();
+                  onClose(fileId);
                 },
               });
             }}

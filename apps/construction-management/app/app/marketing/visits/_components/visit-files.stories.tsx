@@ -1,5 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect, waitFor, within } from "storybook/test";
+import {
+  expect,
+  userEvent as baseUserEvent,
+  waitFor,
+  within,
+} from "storybook/test";
 
 import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import { mockXhrUploads } from "@/.storybook/mocks/xhr";
@@ -148,6 +153,107 @@ export const AddFiles: Story = {
       expect(history.getByText(/Photo added · site\.jpg/)).toBeVisible(),
     );
     await expect(history.getByText(/File added · brochure\.pdf/)).toBeVisible();
+  },
+};
+
+/**
+ * Take photo and the picker ask for exactly the types kept, so iOS hands
+ * over a JPEG. A HEIC photo that still arrives is refused in the browser,
+ * without a request, and says why.
+ */
+export const HeicPhoto: Story = {
+  beforeEach: serve({ visits: [visit()] }, true),
+  play: async ({ canvas }) => {
+    const camera = await canvas.findByLabelText("Take a photo with the camera");
+    await expect(camera).toHaveAttribute(
+      "accept",
+      "image/jpeg,image/png,image/webp",
+    );
+    await expect(
+      canvas.getByLabelText("Choose photos or files"),
+    ).toHaveAttribute(
+      "accept",
+      "image/jpeg,image/png,image/webp,application/pdf",
+    );
+    // A browser that ignores `accept` can still hand one over.
+    const userEvent = baseUserEvent.setup({ applyAccept: false });
+    await userEvent.upload(
+      camera,
+      file("IMG_0042.HEIC", 900_000, "image/heic"),
+    );
+    const list = within(canvas.getByRole("list", { name: "Photos and files" }));
+    await expect(
+      within(
+        list.getByRole("listitem", { name: "Uploading IMG_0042.HEIC" }),
+      ).getByRole("alert"),
+    ).toHaveTextContent("HEIC photos are not supported. Choose a JPEG or PNG.");
+    await expect(
+      list.queryByRole("button", { name: "Retry IMG_0042.HEIC" }),
+    ).toBeNull();
+    await expect(posts(`${FILES}/uploads`)).toEqual([]);
+  },
+};
+
+/**
+ * The photo is saved but the Visit cannot be read again: the upload stays,
+ * says so, and Retry reads the Visit again until the photo shows.
+ */
+export const RefreshFails: Story = {
+  beforeEach: () => {
+    let failNextRead = false;
+    let failed = false;
+    api = mockVisitApi({
+      visits: [visit()],
+      extra: (call) => {
+        if (call.method === "POST" && call.path === FILES && !failed)
+          failNextRead = true;
+        else if (
+          failNextRead &&
+          call.method === "GET" &&
+          call.path === `${MARKETING_VISITS_API}/${COMPLETED_ID}`
+        ) {
+          failNextRead = false;
+          failed = true;
+          return Response.json(
+            { code: "INTERNAL_ERROR", message: "Something went wrong." },
+            { status: 500 },
+          );
+        }
+        return undefined;
+      },
+    });
+    const xhr = mockXhrUploads({ stepMs: 5 });
+    return () => {
+      xhr.restore();
+      api.restore();
+    };
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.upload(
+      await canvas.findByLabelText("Choose photos or files"),
+      file("site.jpg", 800_000, "image/jpeg"),
+    );
+    const list = within(canvas.getByRole("list", { name: "Photos and files" }));
+    const pending = list.getByRole("listitem", { name: "Uploading site.jpg" });
+    await expect(await within(pending).findByRole("alert")).toHaveTextContent(
+      "Saved, but the Visit could not be refreshed. Try again.",
+    );
+    await expect(
+      list.queryByRole("link", { name: "Open site.jpg" }),
+    ).toBeNull();
+    await userEvent.click(
+      within(pending).getByRole("button", { name: "Retry site.jpg" }),
+    );
+    await expect(
+      await list.findByRole("link", { name: "Open site.jpg" }),
+    ).toBeVisible();
+    await waitFor(() =>
+      expect(
+        list.queryByRole("listitem", { name: "Uploading site.jpg" }),
+      ).toBeNull(),
+    );
+    // Saved once: Retry only read the Visit again.
+    await expect(posts(FILES)).toHaveLength(1);
   },
 };
 

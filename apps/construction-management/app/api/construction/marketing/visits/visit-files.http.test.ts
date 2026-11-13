@@ -5,6 +5,9 @@ import { StatusCodes } from "http-status-codes";
 import { describe, expect, it } from "vitest";
 
 import type { PermissionGrants } from "@/src/shared-kernel/access";
+import { thumbnailKeyOf } from "@/src/shared-kernel/attachments/attachment-key";
+import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
+import { storedBytes } from "@/src/shared-kernel/files/stored-files";
 import { jsonRequest, memberWith, ownerWithCompany } from "@/test/companies";
 import { bytesOf, pngBytes } from "@/test/files";
 import { TEST_ORIGIN } from "@/test/sessions";
@@ -16,7 +19,10 @@ import { GET as readFile } from "./[id]/files/[fileId]/route";
 import { POST as captionFile } from "./[id]/files/[fileId]/update/route";
 import { POST as completeUpload } from "./[id]/files/route";
 import { POST as receiveUpload } from "./[id]/files/uploads/app/route";
+import { POST as presignUpload } from "./[id]/files/uploads/presign/route";
 import { POST as startUpload } from "./[id]/files/uploads/route";
+import { POST as receiveThumbnail } from "./[id]/files/uploads/thumbnail/route";
+import { POST as deleteVisit } from "./[id]/delete/route";
 import { GET as getVisit } from "./[id]/route";
 import { POST as createVisit } from "./route";
 
@@ -25,6 +31,11 @@ const COMPANIES = `${TEST_ORIGIN}/api/construction/marketing/companies`;
 const MB = 1024 * 1024;
 
 const PDF = new TextEncoder().encode("%PDF-1.7\nRequirement sheet\n%%EOF");
+/** A RIFF/WEBP header: the app sniffs only the signature. */
+const WEBP = Uint8Array.from([
+  0x52, 0x49, 0x46, 0x46, 0x24, 0, 0, 0, 0x57, 0x45, 0x42, 0x50, 0x56, 0x50,
+  0x38, 0x20,
+]);
 
 type Session = { cookie: string };
 
@@ -86,46 +97,83 @@ function start(
   );
 }
 
-/** The browser's flow through our routes: start, send, finish. */
+/** Raw bytes to one of our upload routes, as the browser sends them. */
+function bytesRequest(
+  who: Session,
+  url: string,
+  bytes: Uint8Array<ArrayBuffer>,
+): Request {
+  return new Request(`${TEST_ORIGIN}${url}`, {
+    method: "POST",
+    headers: { cookie: who.cookie, "content-type": "application/octet-stream" },
+    body: bytes,
+  });
+}
+
+type Started = { key: string; url: string; thumbnailUrl: string };
+
+/** Start and send: the key awaits completion. */
+async function send(
+  who: Session,
+  visitId: string,
+  fileName: string,
+  bytes: Uint8Array<ArrayBuffer>,
+  declared = bytes.byteLength,
+): Promise<Started> {
+  const started = await start(who, visitId, fileName, declared);
+  expect(started.status).toBe(StatusCodes.CREATED);
+  const body = await json<{
+    key: string;
+    upload: { via: string; url: string };
+    thumbnailUrl: string;
+  }>(started);
+  expect(body.upload.via).toBe("app");
+  const sent = await receiveUpload(
+    bytesRequest(who, body.upload.url, bytes),
+    visitParams(visitId),
+  );
+  expect(sent.status).toBe(StatusCodes.NO_CONTENT);
+  return {
+    key: body.key,
+    url: body.upload.url,
+    thumbnailUrl: body.thumbnailUrl,
+  };
+}
+
+function finish(
+  who: Session,
+  visitId: string,
+  key: string,
+  fileName: string,
+  caption: string | null = null,
+): Promise<Response> {
+  return completeUpload(
+    jsonRequest(`${VISITS}/${visitId}/files`, who.cookie, {
+      key,
+      fileName,
+      caption,
+    }),
+    visitParams(visitId),
+  );
+}
+
+/** The browser's flow through our routes: start, send, thumbnail, finish. */
 async function upload(
   who: Session,
   visitId: string,
   fileName: string,
   bytes: Uint8Array<ArrayBuffer>,
-  options: { caption?: string; declared?: number } = {},
+  options: { caption?: string; declared?: number; thumbnail?: boolean } = {},
 ): Promise<Response> {
-  const started = await start(
-    who,
-    visitId,
-    fileName,
-    options.declared ?? bytes.byteLength,
-  );
-  expect(started.status).toBe(StatusCodes.CREATED);
-  const { key, upload: route } = await json<{
-    key: string;
-    upload: { via: string; url: string };
-  }>(started);
-  expect(route.via).toBe("app");
-  const sent = await receiveUpload(
-    new Request(`${TEST_ORIGIN}${route.url}`, {
-      method: "POST",
-      headers: {
-        cookie: who.cookie,
-        "content-type": "application/octet-stream",
-      },
-      body: bytes,
-    }),
-    visitParams(visitId),
-  );
-  expect(sent.status).toBe(StatusCodes.NO_CONTENT);
-  return completeUpload(
-    jsonRequest(`${VISITS}/${visitId}/files`, who.cookie, {
-      key,
-      fileName,
-      caption: options.caption ?? null,
-    }),
-    visitParams(visitId),
-  );
+  const sent = await send(who, visitId, fileName, bytes, options.declared);
+  if (options.thumbnail === true) {
+    const thumb = await receiveThumbnail(
+      bytesRequest(who, sent.thumbnailUrl, WEBP),
+      visitParams(visitId),
+    );
+    expect(thumb.status).toBe(StatusCodes.NO_CONTENT);
+  }
+  return finish(who, visitId, sent.key, fileName, options.caption ?? null);
 }
 
 describe("Visit photos and files (ADR CM-0040 §9)", () => {
@@ -252,15 +300,87 @@ describe("Visit photos and files (ADR CM-0040 §9)", () => {
       await upload(ravi, visitId, "card.png", pngBytes()),
     );
 
-    // Anil is not on it: 404, as for the Visit.
-    const hidden = await readFile(
-      jsonRequest(`${VISITS}/${visitId}/files/${file.id}`, anil.cookie),
-      fileParams(visitId, file.id),
-    );
-    expect(hidden.status).toBe(StatusCodes.NOT_FOUND);
-    expect((await start(anil, visitId, "x.png", 64)).status).toBe(
-      StatusCodes.NOT_FOUND,
-    );
+    // Anil is not on it: 404 on every route, as for the Visit.
+    const waiting = await send(ravi, visitId, "plant.png", pngBytes());
+    const asAnil: [string, Promise<Response>][] = [
+      [
+        "read",
+        readFile(
+          jsonRequest(`${VISITS}/${visitId}/files/${file.id}`, anil.cookie),
+          fileParams(visitId, file.id),
+        ),
+      ],
+      ["start", start(anil, visitId, "x.png", 64)],
+      [
+        "presign",
+        presignUpload(
+          jsonRequest(
+            `${VISITS}/${visitId}/files/uploads/presign`,
+            anil.cookie,
+            {
+              type: "blob.generate-presigned-url",
+              payload: {
+                pathname: waiting.key,
+                multipart: false,
+                clientPayload: null,
+              },
+            },
+          ),
+          visitParams(visitId),
+        ),
+      ],
+      [
+        "app upload",
+        receiveUpload(
+          bytesRequest(anil, waiting.url, pngBytes()),
+          visitParams(visitId),
+        ),
+      ],
+      [
+        "thumbnail",
+        receiveThumbnail(
+          bytesRequest(anil, waiting.thumbnailUrl, WEBP),
+          visitParams(visitId),
+        ),
+      ],
+      ["finish", finish(anil, visitId, waiting.key, "plant.png")],
+      [
+        "caption",
+        captionFile(
+          jsonRequest(
+            `${VISITS}/${visitId}/files/${file.id}/update`,
+            anil.cookie,
+            { caption: "Mine now" },
+          ),
+          fileParams(visitId, file.id),
+        ),
+      ],
+      [
+        "remove",
+        removeFile(
+          jsonRequest(
+            `${VISITS}/${visitId}/files/${file.id}/delete`,
+            anil.cookie,
+            {},
+          ),
+          fileParams(visitId, file.id),
+        ),
+      ],
+    ];
+    for (const [route, answered] of asAnil) {
+      const response = await answered;
+      expect(response.status, route).toBe(StatusCodes.NOT_FOUND);
+      expect(await json(response), route).toMatchObject({
+        code: "VISIT_NOT_FOUND",
+      });
+    }
+
+    // A key minted for another Visit does not finish on this one.
+    const other = await aVisit(ravi);
+    const elsewhere = await send(ravi, other.visitId, "gate.png", pngBytes());
+    const misplaced = await finish(ravi, visitId, elsewhere.key, "gate.png");
+    expect(misplaced.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await json(misplaced)).toMatchObject({ code: "UPLOAD_KEY_INVALID" });
 
     // Priya went on it: she sees and adds, but cannot change Ravi's file.
     const seen = await readFile(
@@ -301,6 +421,15 @@ describe("Visit photos and files (ADR CM-0040 §9)", () => {
       fileParams(visitId, file.id),
     );
     expect(gone.status).toBe(StatusCodes.NOT_FOUND);
+    // A removed file's caption is not changed, and no event is written.
+    const late = await captionFile(
+      jsonRequest(`${VISITS}/${visitId}/files/${file.id}/update`, ravi.cookie, {
+        caption: "Too late",
+      }),
+      fileParams(visitId, file.id),
+    );
+    expect(late.status).toBe(StatusCodes.NOT_FOUND);
+    expect(await json(late)).toMatchObject({ code: "VISIT_FILE_NOT_FOUND" });
     await expect(
       prisma.constructionOrganizationStoredFile.count({
         where: {
@@ -310,6 +439,85 @@ describe("Visit photos and files (ADR CM-0040 §9)", () => {
       }),
     ).resolves.toBe(0);
   });
+
+  it("takes a thumbnail only while its file awaits finishing", async () => {
+    const owner = await ownerWithCompany();
+    const { visitId } = await aVisit(owner);
+    const sent = await send(owner, visitId, "card.png", pngBytes());
+    expect((await finish(owner, visitId, sent.key, "card.png")).status).toBe(
+      StatusCodes.CREATED,
+    );
+    const late = await receiveThumbnail(
+      bytesRequest(owner, sent.thumbnailUrl, WEBP),
+      visitParams(visitId),
+    );
+    expect(late.status).toBe(StatusCodes.CONFLICT);
+    expect(await json(late)).toMatchObject({
+      code: "VISIT_FILE_ALREADY_SAVED",
+    });
+    expect(await objectStorage().head(thumbnailKeyOf(sent.key))).toBeNull();
+  }, 20_000);
+
+  it("removes a deleted Visit's files, so they stop counting towards the Company's storage", async () => {
+    const owner = await ownerWithCompany();
+    const { visitId } = await aVisit(owner);
+    const added = await json<VisitFile>(
+      await upload(owner, visitId, "card.png", pngBytes(2048), {
+        thumbnail: true,
+      }),
+    );
+    const where = { key: { contains: `/marketing_visit/${visitId}/` } };
+    const rows = await prisma.constructionOrganizationStoredFile.findMany({
+      where,
+    });
+    expect(rows).toHaveLength(2);
+    const before = await storedBytes(prisma, owner.workspaceId);
+
+    const visit = await json<{ updatedAt: string }>(
+      await getVisit(
+        jsonRequest(`${VISITS}/${visitId}`, owner.cookie),
+        visitParams(visitId),
+      ),
+    );
+    const deleted = await deleteVisit(
+      jsonRequest(`${VISITS}/${visitId}/delete`, owner.cookie, {
+        expectedUpdatedAt: visit.updatedAt,
+      }),
+      visitParams(visitId),
+    );
+    expect(deleted.status).toBe(StatusCodes.NO_CONTENT);
+
+    const served = await readFile(
+      jsonRequest(`${VISITS}/${visitId}/files/${added.id}`, owner.cookie),
+      fileParams(visitId, added.id),
+    );
+    expect(served.status).toBe(StatusCodes.NOT_FOUND);
+    await expect(
+      prisma.constructionOrganizationStoredFile.count({
+        where: { ...where, deletedAt: null },
+      }),
+    ).resolves.toBe(0);
+    expect(await storedBytes(prisma, owner.workspaceId)).toBe(
+      before - rows.reduce((sum, row) => sum + row.bytes, 0),
+    );
+    await expect(
+      prisma.constructionMarketingVisitFile.findUniqueOrThrow({
+        where: { id: added.id },
+        select: { deletedAt: true },
+      }),
+    ).resolves.toMatchObject({ deletedAt: expect.any(Date) as unknown });
+    for (const row of rows)
+      expect(await objectStorage().head(row.key)).toBeNull();
+    const audit =
+      await prisma.constructionOrganizationAuditEvent.findFirstOrThrow({
+        where: {
+          workspaceId: owner.workspaceId,
+          entityId: visitId,
+          action: "visit.deleted",
+        },
+      });
+    expect(audit.before).toMatchObject({ fileIds: [added.id] });
+  }, 20_000);
 
   it("refuses anything but an image or a PDF, and uploads without Visits update", async () => {
     const owner = await ownerWithCompany();

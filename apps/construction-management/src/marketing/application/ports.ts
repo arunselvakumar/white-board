@@ -461,20 +461,22 @@ export type VisitFileStore = {
   countFiles(workspaceId: string, visitId: string): Promise<number>;
   /**
    * The file, its `stored_files` rows and the audit event in one
-   * transaction with the Visit row locked; 409 `VISIT_FILE_LIMIT` when 20
-   * are live, `"duplicate"` when the key was recorded meanwhile.
+   * transaction with the live Visit row locked: 404 `VISIT_NOT_FOUND` when
+   * the Visit is gone, `"duplicate"` when the key was recorded meanwhile
+   * (checked before the limit), 409 `VISIT_FILE_LIMIT` when 20 are live.
    */
   addFile(input: {
     file: StoredVisitFile;
     storedFiles: NewStoredFile[];
     audit: AuditEvent;
   }): Promise<"added" | "duplicate">;
+  /** The caption and its audit event; false (nothing written) if the file is gone. */
   setCaption(input: {
     file: StoredVisitFile;
     caption: string | null;
     now: Date;
     audit: AuditEvent;
-  }): Promise<void>;
+  }): Promise<boolean>;
   /** A tombstone, its `stored_files` rows marked deleted; false if already gone. */
   removeFile(input: {
     file: StoredVisitFile;
@@ -482,4 +484,12 @@ export type VisitFileStore = {
     now: Date;
     audit: AuditEvent;
   }): Promise<boolean>;
+  /**
+   * Inside the Visit's delete: tombstones its live files and marks their
+   * `stored_files` rows (file and thumbnail) deleted; returns them.
+   */
+  removeFilesOfVisit(
+    tx: MarketingTx,
+    input: { workspaceId: string; visitId: string; by: string; now: Date },
+  ): Promise<Pick<StoredVisitFile, "id" | "fileKey" | "thumbKey">[]>;
 };

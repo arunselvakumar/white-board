@@ -85,7 +85,7 @@ Read first: [CM-0034](../adr/CM-0034-hr-main-menu.md) (main-menu shape), [CM-003
 - A Prospect Company has: name (required; unique among live rows in the Company, ignoring case and spacing), industry, address, city, state, PIN, phone, email, website, GSTIN (optional, format checked), source (Reference, Cold call, Tender notice, Existing client, Exhibition, Online, Other), assigned Marketing Person (defaults to the creator), Stage, remarks.
 - **Contacts**: any number per Prospect Company. Name (required), job title, mobile, email, remarks. Exactly one is primary once any exist.
 - A Prospect Company and a Contact can be created inline from the Visit form, so a first visit is one form.
-- The **company page** has the details, Contacts, and one timeline of every Visit, note, photo and Follow-up, newest first.
+- The **company page** has the details, Contacts, and one timeline of every Visit, note, photo and Follow-up, newest first. The timeline lists only the photos and files a Visit still keeps; a removed file stays in that Visit's own History.
 - **Stage**: New (on creation), Contacted (set on the first completed Visit), Requirement received, Quotation sent, Negotiation, Won, Lost. Moved by hand except the first two. Lost needs a **Lost Reason** (Price, Went to a competitor, No requirement now, Not reachable, Other with text). Every change is kept with who and when. Stages are fixed in code in this round.
 - **Won**: the page offers **Create Project**, which opens the Project wizard with the client name filled in. The Prospect Company stays in Marketing, shows the Projects whose client name matches, and can still be visited.
 - **Reassign** (needs `transfer`): moves a Prospect Company, and its open Follow-ups, to another Marketing Person. Past Visits keep their visitors.
@@ -134,7 +134,7 @@ Read first: [CM-0034](../adr/CM-0034-hr-main-menu.md) (main-menu shape), [CM-003
 
 - A Visit takes up to 20 photos and files: images, and PDF for a visiting card scan, brochure or requirement sheet. Images at most 10 MB, PDFs at most 25 MB.
 - Uploads go through the attachments kernel service with a new purpose, `marketing_visit`; thumbnails are made in the browser. The marketing context keeps its own file rows.
-- On a phone the picker offers the camera.
+- On a touch screen (a phone or a tablet) the picker offers the camera.
 - Each photo can have a caption. A file is served through the Visit's own route, which checks permission on the Visit.
 - These files are not in any Project's Gallery: a Visit belongs to no Project.
 

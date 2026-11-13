@@ -13,6 +13,7 @@ import type { PlanGate } from "@/src/shared-kernel/plan";
 import {
   VISIT_FILE_KIND,
   VISIT_FILE_POLICY,
+  visitFileAlreadySaved,
   visitFileCaption,
   visitFileIdOfKey,
   visitFileLimit,
@@ -188,7 +189,11 @@ export class VisitFiles {
     });
   }
 
-  /** An image's browser-made WebP thumbnail, before completing. */
+  /**
+   * An image's browser-made WebP thumbnail, only while its key awaits
+   * completion: 409 `VISIT_FILE_ALREADY_SAVED` once the file is recorded
+   * (live or removed), so a saved file's thumbnail is never replaced.
+   */
   async receiveThumbnail(input: {
     access: MemberAccess;
     visitId: string;
@@ -196,6 +201,12 @@ export class VisitFiles {
     bytes: Uint8Array;
   }): Promise<void> {
     const visit = await this.assertCanUpload(input.access, input.visitId);
+    const saved = await this.deps.store.fileByKey(
+      visit.workspaceId,
+      visit.id,
+      input.key,
+    );
+    if (saved != null) throw visitFileAlreadySaved();
     await this.uploads.receiveThumbnail(this.target(visit), {
       key: input.key,
       bytes: input.bytes,
@@ -340,12 +351,14 @@ export class VisitFiles {
     if (!this.mayChange(access, file)) throw permissionDenied();
     const now = this.clock();
     const changed = { ...file, caption, updatedAt: now };
-    await this.deps.store.setCaption({
+    const written = await this.deps.store.setCaption({
       file,
       caption,
       now,
       audit: this.audit(visit, changed, access.userId, "file_captioned", now),
     });
+    // Removed since it was read: no caption and no audit event.
+    if (!written) throw visitFileNotFound();
     const names = await this.deps.names(visit.workspaceId, [file.createdBy]);
     return this.view(access, changed, names);
   }

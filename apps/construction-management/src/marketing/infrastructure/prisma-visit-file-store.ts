@@ -7,7 +7,8 @@ import {
 } from "@/src/shared-kernel/files/stored-files";
 import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
-import type { VisitFileStore } from "../application/ports";
+import type { MarketingTx, VisitFileStore } from "../application/ports";
+import { visitNotFound } from "../domain/visit";
 import { VISIT_FILE_LIMIT, visitFileLimit } from "../domain/visit-files";
 
 const FILE_SELECT = {
@@ -63,13 +64,21 @@ export class PrismaVisitFileStore implements VisitFileStore {
   ): Promise<"added" | "duplicate"> {
     const { file } = input;
     try {
-      await this.db.$transaction(async (tx) => {
-        // The Visit's row, so two uploads cannot both take the 20th place.
-        await tx.$queryRaw(Prisma.sql`
+      return await this.db.$transaction(async (tx) => {
+        // The live Visit's row, so two uploads cannot both take the 20th
+        // place and a Visit deleted meanwhile gets no file.
+        const locked = await tx.$queryRaw<{ id: string }[]>(Prisma.sql`
           SELECT id FROM construction_marketing.visits
           WHERE workspace_id = ${file.workspaceId}
             AND id = ${file.visitId}::uuid
+            AND deleted_at IS NULL
           FOR UPDATE`);
+        if (locked.length === 0) throw visitNotFound();
+        // A retry of a key recorded meanwhile is a duplicate, not a 21st.
+        const recorded = await tx.constructionMarketingVisitFile.count({
+          where: { fileKey: file.fileKey },
+        });
+        if (recorded > 0) return "duplicate" as const;
         const live = await tx.constructionMarketingVisitFile.count({
           where: {
             workspaceId: file.workspaceId,
@@ -82,21 +91,30 @@ export class PrismaVisitFileStore implements VisitFileStore {
         for (const stored of input.storedFiles)
           await recordStoredFile(tx, stored);
         await recordAudit(tx, input.audit);
+        return "added" as const;
       });
-      return "added";
     } catch (error) {
       if (isUniqueViolation(error)) return "duplicate";
       throw error;
     }
   }
 
-  async setCaption(input: Parameters<VisitFileStore["setCaption"]>[0]) {
-    await this.db.$transaction(async (tx) => {
-      await tx.constructionMarketingVisitFile.update({
-        where: { id: input.file.id },
+  setCaption(input: Parameters<VisitFileStore["setCaption"]>[0]) {
+    const { file } = input;
+    return this.db.$transaction(async (tx) => {
+      // Only a live file: one removed meanwhile keeps its tombstone as is.
+      const written = await tx.constructionMarketingVisitFile.updateMany({
+        where: {
+          id: file.id,
+          workspaceId: file.workspaceId,
+          visitId: file.visitId,
+          deletedAt: null,
+        },
         data: { caption: input.caption, updatedAt: input.now },
       });
+      if (written.count === 0) return false;
       await recordAudit(tx, input.audit);
+      return true;
     });
   }
 
@@ -133,5 +151,35 @@ export class PrismaVisitFileStore implements VisitFileStore {
       await recordAudit(tx, input.audit);
       return true;
     });
+  }
+
+  async removeFilesOfVisit(
+    tx: MarketingTx,
+    input: Parameters<VisitFileStore["removeFilesOfVisit"]>[1],
+  ) {
+    const where = {
+      workspaceId: input.workspaceId,
+      visitId: input.visitId,
+      deletedAt: null,
+    };
+    const files = await tx.constructionMarketingVisitFile.findMany({
+      where,
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+      select: { id: true, fileKey: true, thumbKey: true },
+    });
+    if (files.length === 0) return [];
+    await tx.constructionMarketingVisitFile.updateMany({
+      where: { ...where, id: { in: files.map((file) => file.id) } },
+      data: {
+        deletedAt: input.now,
+        deletedBy: input.by,
+        updatedAt: input.now,
+      },
+    });
+    for (const file of files)
+      for (const key of [file.fileKey, file.thumbKey])
+        if (key != null)
+          await markStoredFileDeleted(tx, input.workspaceId, key, input.now);
+    return files;
   }
 }

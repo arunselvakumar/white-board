@@ -8,11 +8,8 @@ import {
 import type { AuditRecord } from "@/src/shared-kernel/audit-reader";
 import { recordAudit } from "@/src/shared-kernel/audit";
 import { addDays, type CalendarDate } from "@/src/shared-kernel/calendar-date";
-import {
-  conflict,
-  notFound,
-  type DomainError,
-} from "@/src/shared-kernel/domain-error";
+import { conflict, type DomainError } from "@/src/shared-kernel/domain-error";
+import type { ObjectStorage } from "@/src/shared-kernel/files";
 import { newId } from "@/src/shared-kernel/ids";
 import type { ListCursor } from "@/src/shared-kernel/list-cursor";
 import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
@@ -44,6 +41,7 @@ import {
   shownStatus,
   visitDetails,
   visitLocked,
+  visitNotFound,
   visitorIds,
   type VisitDetails,
   type VisitDetailsInput,
@@ -79,6 +77,8 @@ export type VisitDeps = {
   companyStore: ProspectCompanyStore;
   /** Its photos and files (ADR CM-0040 §9). */
   fileStore: VisitFileStore;
+  /** Where those files are; a deleted Visit's objects go after the commit. */
+  storage: ObjectStorage;
   /** Inline company and Contacts, and New → Contacted. */
   companies: ProspectCompanyHandlers;
   team: MarketingTeam;
@@ -249,10 +249,6 @@ const HISTORY_ACTIONS = new Set([
   "visit.file_added",
   "visit.file_removed",
 ]);
-
-function visitNotFound() {
-  return notFound("VISIT_NOT_FOUND", "This Visit was not found.");
-}
 
 function visitNumberInUse(): DomainError {
   return conflict(
@@ -1151,7 +1147,22 @@ export class VisitHandlers {
     });
   }
 
-  /** A tombstone; a Completed Visit keeps its lock and back-dated limit. */
+  /** Best effort: a leftover object costs storage, and the orphan job takes it. */
+  private async discard(keys: readonly string[]): Promise<void> {
+    for (const key of keys) {
+      try {
+        await this.deps.storage.delete(key);
+      } catch (error) {
+        console.error(`Could not delete ${key} from storage`, error);
+      }
+    }
+  }
+
+  /**
+   * A tombstone; a Completed Visit keeps its lock and back-dated limit. Its
+   * live files are tombstoned in the same transaction and stop counting
+   * towards storage; their objects are deleted after the commit.
+   */
   async delete(
     access: MemberAccess,
     id: string,
@@ -1162,7 +1173,7 @@ export class VisitHandlers {
     const ws = access.workspaceId;
     const timeZone = await this.deps.timeZone(ws);
     const check = await this.deps.backdated(access);
-    await this.deps.db.$transaction(async (tx) => {
+    const removed = await this.deps.db.$transaction(async (tx) => {
       const current = await this.visible(access, (w) =>
         this.deps.store.lock(tx, w, id),
       );
@@ -1171,16 +1182,32 @@ export class VisitHandlers {
       if (current.status === "completed")
         check("edit", this.deps.dateIn(current.visitAt, timeZone));
       await this.deps.store.remove(tx, id, access.userId, now);
+      const files = await this.deps.fileStore.removeFilesOfVisit(tx, {
+        workspaceId: ws,
+        visitId: id,
+        by: access.userId,
+        now,
+      });
       await recordAudit(tx, {
         workspaceId: ws,
         actorUserId: access.userId,
         action: "visit.deleted",
         entityType: "marketing_visit",
         entityId: id,
-        before: { number: current.number, ...snapshot(current) },
+        before: {
+          number: current.number,
+          ...snapshot(current),
+          fileIds: files.map((file) => file.id),
+        },
         occurredAt: now,
       });
+      return files;
     });
+    await this.discard(
+      removed.flatMap((file) =>
+        file.thumbKey == null ? [file.fileKey] : [file.fileKey, file.thumbKey],
+      ),
+    );
   }
 }
 

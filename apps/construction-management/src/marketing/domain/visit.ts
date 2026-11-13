@@ -1,5 +1,9 @@
 import type { OwnScope } from "@/src/shared-kernel/access";
-import { DomainError, forbidden } from "@/src/shared-kernel/domain-error";
+import {
+  DomainError,
+  forbidden,
+  notFound,
+} from "@/src/shared-kernel/domain-error";
 
 import { invalidField } from "./marketing-errors";
 import {
@@ -216,6 +220,11 @@ export function isVisitLocked(
   if (visit.createdBy !== input.userId) return true;
   const since = visit.completedAt?.getTime() ?? 0;
   return input.now.getTime() - since > VISIT_LOCK_DAYS * DAY_MS;
+}
+
+/** 404 for a Visit that is gone or out of the viewer's scope (ADR CM-0040 §5). */
+export function visitNotFound(): DomainError {
+  return notFound("VISIT_NOT_FOUND", "This Visit was not found.");
 }
 
 export function visitLocked(): DomainError {

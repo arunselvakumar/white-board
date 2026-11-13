@@ -2,7 +2,11 @@ import {
   MULTIPART_FROM_BYTES,
   type UploadPolicy,
 } from "@/src/shared-kernel/attachments/upload-policy";
-import { DomainError, notFound } from "@/src/shared-kernel/domain-error";
+import {
+  conflict,
+  DomainError,
+  notFound,
+} from "@/src/shared-kernel/domain-error";
 
 import { invalidField } from "./marketing-errors";
 import { optionalText } from "./prospect-company";
@@ -50,6 +54,14 @@ export function visitFileLimit(): DomainError {
 
 export function visitFileNotFound(): DomainError {
   return notFound("VISIT_FILE_NOT_FOUND", "This file was not found.");
+}
+
+/** A thumbnail sent for a file already saved on the Visit. */
+export function visitFileAlreadySaved(): DomainError {
+  return conflict(
+    "VISIT_FILE_ALREADY_SAVED",
+    "This file is already saved on the Visit, so its thumbnail cannot be sent again.",
+  );
 }
 
 export function visitThumbnailNotFound(): DomainError {
