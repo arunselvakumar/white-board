@@ -119,9 +119,9 @@ function cardButton(
 const meta = {
   title: "Projects/ProjectForm",
   component: NewProjectScreen,
-  render: () => (
+  render: (args) => (
     <StoryQueries>
-      <NewProjectScreen />
+      <NewProjectScreen {...args} />
     </StoryQueries>
   ),
 } satisfies Meta<typeof NewProjectScreen>;
@@ -201,6 +201,43 @@ export const NewValidatesAndSaves: Story = {
       startDate: "2026-10-08",
       endDate: "2027-03-31",
       ...NO_CONTRACT,
+    });
+  },
+};
+
+/**
+ * Create Project from a Won Prospect Company: the client name comes from
+ * the address, filled in with the Client card open, and is saved.
+ */
+export const NewWithClientNameFromAddress: Story = {
+  args: { clientName: "Madurai Steel Structures" },
+  beforeEach: () => api(created),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await expect(await canvas.findByLabelText("Client name")).toHaveValue(
+      "Madurai Steel Structures",
+    );
+    await expect(cardButton(canvas, "Client")).toHaveAttribute(
+      "aria-expanded",
+      "true",
+    );
+    await expect(cardButton(canvas, "Contract")).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
+    await userEvent.type(
+      canvas.getByLabelText("Project name"),
+      "Kappalur PEB Plant",
+    );
+    await chooseType(
+      canvas,
+      within(canvasElement.ownerDocument.body),
+      userEvent,
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Add Project" }));
+    await waitFor(() => expect(posts()).toHaveLength(1));
+    await expect(posts()[0]?.body).toMatchObject({
+      name: "Kappalur PEB Plant",
+      clientName: "Madurai Steel Structures",
     });
   },
 };
