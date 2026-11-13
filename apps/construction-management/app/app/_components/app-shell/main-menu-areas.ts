@@ -5,6 +5,7 @@ import {
   type MarketingMenuAccess,
 } from "@/lib/marketing-nav";
 import { MASTERS_GROUPS } from "@/lib/masters-nav";
+import { APP_HOME } from "@/lib/safe-redirect";
 import { LABOURS_PAGE_PATH } from "@/lib/staff-nav";
 
 import type { AreaNavGroup } from "./area-nav-menu";
@@ -16,6 +17,14 @@ import { WORKSPACE_GROUPS } from "./workspace-nav-menu";
 /** Home (ADR CM-0039): the main menu on one page. */
 export const HOME_PATH = "/app";
 export const HOME_LABEL = "Main menu";
+
+/**
+ * Where Home sends a User in the sidebar layout, which has the menu beside
+ * every page already: the Dashboard, or Projects without Dashboard Read.
+ */
+export function sidebarHomePath(canOpenDashboard: boolean): string {
+  return canOpenDashboard ? "/app/dashboard" : APP_HOME;
+}
 
 /** What the viewer's Role lets the main menu show. */
 export type MainMenuAccess = {

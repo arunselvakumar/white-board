@@ -214,7 +214,8 @@ export const Search: Story = {
 
 /**
  * Sidebar in the top bar goes back to the sidebar layout and keeps the
- * choice; the main menu stays on the page beside it.
+ * choice. The menu is in the sidebar now, so the page of it goes away and
+ * the Dashboard opens.
  */
 export const BackToSidebar: Story = {
   ...homeWith(),
@@ -227,8 +228,47 @@ export const BackToSidebar: Story = {
     );
     await expect(window.localStorage.getItem(MENU_LAYOUT_KEY)).toBe("sidebar");
     await expect(
-      canvas.getByRole("heading", { name: "Main menu", level: 1 }),
-    ).toBeVisible();
+      canvas.queryByRole("heading", { name: "Main menu", level: 1 }),
+    ).toBeNull();
+    await waitFor(() =>
+      expect(getRouter().replace).toHaveBeenCalledWith("/app/dashboard"),
+    );
+  },
+};
+
+/**
+ * Home in the sidebar layout (the default) never shows the menu a second
+ * time beside the sidebar: it opens the Dashboard.
+ */
+export const InSidebarLayout: Story = {
+  ...homeWith(),
+  beforeEach() {
+    setMenuLayout("sidebar");
+  },
+  play: async ({ canvas }) => {
+    await waitFor(() =>
+      expect(getRouter().replace).toHaveBeenCalledWith("/app/dashboard"),
+    );
+    await expect(
+      canvas.queryByRole("heading", { name: "Main menu", level: 1 }),
+    ).toBeNull();
+    await expect(canvas.queryByRole("link", { name: "Menu" })).toBeNull();
+  },
+};
+
+/** Without Dashboard Read, Home in the sidebar layout opens Projects. */
+export const InSidebarLayoutWithoutDashboard: Story = {
+  ...homeWith(false),
+  beforeEach() {
+    setMenuLayout("sidebar");
+  },
+  play: async ({ canvas }) => {
+    await waitFor(() =>
+      expect(getRouter().replace).toHaveBeenCalledWith("/app/projects"),
+    );
+    await expect(
+      canvas.queryByRole("heading", { name: "Main menu", level: 1 }),
+    ).toBeNull();
   },
 };
 

@@ -15,7 +15,11 @@ const listeners = new Set<() => void>();
 /** The choice when storage is blocked (a private window): it lasts until the tab closes. */
 let unsaved: MenuLayout | null = null;
 
-function read(): MenuLayout {
+/**
+ * The stored choice, for code that runs only in the browser. During
+ * hydration `useMenuLayout` still says `sidebar`; this does not.
+ */
+export function readMenuLayout(): MenuLayout {
   if (unsaved != null) return unsaved;
   try {
     return window.localStorage.getItem(MENU_LAYOUT_KEY) === "full"
@@ -52,5 +56,5 @@ export function setMenuLayout(layout: MenuLayout): void {
  * applies right after hydration.
  */
 export function useMenuLayout(): MenuLayout {
-  return useSyncExternalStore(subscribe, read, () => "sidebar");
+  return useSyncExternalStore(subscribe, readMenuLayout, () => "sidebar");
 }

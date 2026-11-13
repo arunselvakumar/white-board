@@ -3,7 +3,8 @@
 import { useActiveCompany } from "@repo/auth/construction/react";
 import { ArrowRight, SearchIcon, type LucideIcon } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Input } from "@repo/ui/components/input";
 
 import { APP_NAV_ICONS } from "./app-nav-icons";
@@ -12,19 +13,42 @@ import {
   HOME_LABEL,
   filterMainMenu,
   mainMenuAreas,
+  sidebarHomePath,
   type MainMenuAccess,
   type MainMenuArea,
 } from "./main-menu-areas";
 import { menuQuery, noMatchMessage } from "./menu-filter";
+import { readMenuLayout, useMenuLayout } from "./menu-layout";
 
 /**
- * Home (ADR CM-0039): the main menu on one page. The one-page areas
- * (Dashboard, Projects, Settings) are cards; Human Resources, Workspace and
- * Masters are blocks with their groups and one tile per entry. It renders
- * the sidebar's list (`mainMenuAreas`) under the sidebar's search rule, so
- * the two never differ. Every tile is a link to its page.
+ * Home (ADR CM-0039): the main menu on one page, in the full-page menu
+ * layout only. In the sidebar layout the menu is already beside the page,
+ * so Home shows nothing and opens the Dashboard (Projects without
+ * Dashboard Read): the User never sees the menu twice.
  */
 export function HomeMenu(access: MainMenuAccess) {
+  const layout = useMenuLayout();
+  const router = useRouter();
+  const sidebarHome = sidebarHomePath(access.canOpenDashboard);
+  useEffect(() => {
+    // The stored choice, not `layout`: while the page hydrates the hook
+    // says `sidebar` for everyone, and a User who picked the full page
+    // must stay here.
+    if (readMenuLayout() === "sidebar") router.replace(sidebarHome);
+  }, [layout, router, sidebarHome]);
+
+  if (layout === "sidebar") return null;
+  return <MainMenuPage {...access} />;
+}
+
+/**
+ * The one-page areas (Dashboard, Projects, Settings) are cards; Human
+ * Resources, Workspace and Masters are blocks with their groups and one
+ * tile per entry. It renders the sidebar's list (`mainMenuAreas`) under the
+ * sidebar's search rule, so the two never differ. Every tile is a link to
+ * its page.
+ */
+function MainMenuPage(access: MainMenuAccess) {
   const { company } = useActiveCompany();
   const [query, setQuery] = useState("");
   const rows = filterMainMenu(mainMenuAreas(access), menuQuery(query));
