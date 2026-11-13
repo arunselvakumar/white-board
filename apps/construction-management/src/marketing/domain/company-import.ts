@@ -43,6 +43,11 @@ export type CompanySheetRow = {
   row: number;
   /** Each cell as text; an empty one is left out. */
   cells: Partial<Record<CompanyImportColumnKey, string>>;
+  /**
+   * Columns whose cell shows a spreadsheet error (`#N/A`, `#REF!`): the
+   * row is refused rather than read as if the cell were blank.
+   */
+  unreadable?: { column: CompanyImportColumnKey; error: string }[];
 };
 
 export type ImportedCompany = {
@@ -53,12 +58,21 @@ export type ImportedCompany = {
 /**
  * One row checked with the company form's rules: a name, a city and a
  * phone as the form takes them, and a primary Contact when the row names
- * one. A Contact mobile needs the Contact's name. Throws the first
- * problem, its `details.field` a column key.
+ * one. A Contact mobile needs the Contact's name, and a cell showing a
+ * spreadsheet error is refused. Throws the first problem, its
+ * `details.field` a column key.
  */
 export function importedCompany(
   cells: CompanySheetRow["cells"],
+  unreadable: CompanySheetRow["unreadable"] = [],
 ): ImportedCompany {
+  const [broken] = unreadable;
+  if (broken != null)
+    throw invalidField(
+      "IMPORT_CELL_ERROR",
+      `This cell shows ${broken.error}. Type the value in instead.`,
+      broken.column,
+    );
   const details = prospectCompanyDetails({
     name: cells.name ?? "",
     city: cells.city ?? null,

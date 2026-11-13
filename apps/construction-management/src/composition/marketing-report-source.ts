@@ -267,6 +267,10 @@ export function createMarketingReportSource(
       const missedTo = filter.now < to ? filter.now : to;
       const overdueTo = today < next ? today : next;
       const liveCompany = { prospectCompany: { deletedAt: null } } as const;
+      // Each figure keeps its own menu's scope: Visits scope picks the rows,
+      // but a Follow-up or Company count never reaches past what the caller
+      // may read in that menu.
+      const followUpScope = followUpWhere(filter.scopes.followUps);
       const [people, completed, missed, created, done, overdue, won] =
         await Promise.all([
           marketingTeam.people(workspaceId),
@@ -300,6 +304,7 @@ export function createMarketingReportSource(
               workspaceId,
               deletedAt: null,
               createdAt: { gte: from, lt: to },
+              AND: [companyWhere(filter.scopes.companies)],
             },
             _count: { _all: true },
           }),
@@ -314,6 +319,7 @@ export function createMarketingReportSource(
                 lt: calendarDateToDb(next),
               },
               ...liveCompany,
+              AND: [followUpScope],
             },
             _count: { _all: true },
           }),
@@ -330,6 +336,7 @@ export function createMarketingReportSource(
                     lt: calendarDateToDb(overdueTo),
                   },
                   ...liveCompany,
+                  AND: [followUpScope],
                 },
                 _count: { _all: true },
               }),
@@ -339,7 +346,10 @@ export function createMarketingReportSource(
               workspaceId,
               toStage: "won",
               changedAt: { gte: from, lt: to },
-              prospectCompany: { deletedAt: null },
+              prospectCompany: {
+                deletedAt: null,
+                AND: [companyWhere(filter.scopes.companies)],
+              },
             },
             distinct: ["prospectCompanyId"],
             select: { prospectCompany: { select: { assignedMemberId: true } } },

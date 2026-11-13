@@ -97,6 +97,55 @@ describe("Prospect Company import sheet (ADR CM-0040 §11)", () => {
     });
   });
 
+  it("keeps a cell that shows an error as unreadable, not blank, and refuses the row", async () => {
+    const rows = await readCompanySheet(
+      await sheetOf([
+        ["Name", "Phone", "City"],
+        [
+          "Kaveri Steel",
+          { formula: "1/0", result: { error: "#DIV/0!" } },
+          "Salem",
+        ],
+        [{ error: "#N/A" }],
+      ]),
+    );
+    expect(rows).toEqual([
+      {
+        row: 2,
+        cells: { name: "Kaveri Steel", city: "Salem" },
+        unreadable: [{ column: "phone", error: "#DIV/0!" }],
+      },
+      { row: 3, cells: {}, unreadable: [{ column: "name", error: "#N/A" }] },
+    ]);
+    const [first] = rows;
+    expect(() =>
+      importedCompany(first?.cells ?? {}, first?.unreadable),
+    ).toThrow("This cell shows #DIV/0!. Type the value in instead.");
+  });
+
+  it("reads a sheet whose merged range covers the whole sheet without building its cells", async () => {
+    const book = new ExcelJS.Workbook();
+    const sheet = book.addWorksheet("Sheet1");
+    sheet.addRow(["Name"]);
+    sheet.addRow(["Kaveri Steel"]);
+    sheet.mergeCells("B3:C4");
+    const bytes = new Uint8Array(await book.xlsx.writeBuffer());
+    const { strFromU8, strToU8, unzipSync, zipSync } = await import("fflate");
+    const entries = unzipSync(bytes);
+    const name = "xl/worksheets/sheet1.xml";
+    entries[name] = strToU8(
+      strFromU8(entries[name] ?? new Uint8Array()).replace(
+        /<mergeCell ref="[^"]+"\/>/,
+        '<mergeCell ref="A5:XFD1048576"/>',
+      ),
+    );
+    expect(strFromU8(entries[name] ?? new Uint8Array())).toContain(
+      "A5:XFD1048576",
+    );
+    const rows = await readCompanySheet(zipSync(entries));
+    expect(rows).toEqual([{ row: 2, cells: { name: "Kaveri Steel" } }]);
+  });
+
   it("refuses a sheet without a Name header, a file that is not an .xlsx, and too many rows", async () => {
     await expect(
       refusal(await sheetOf([["City"], ["Salem"]])),

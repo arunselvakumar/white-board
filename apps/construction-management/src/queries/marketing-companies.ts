@@ -217,7 +217,9 @@ const XLSX =
 
 /**
  * Uploads the filled template: valid rows are created, duplicates and
- * invalid rows come back by row. The lists refresh when any was created.
+ * invalid rows come back by row. The lists refresh when any was created,
+ * and after a failure too: each row is saved on its own, so rows before
+ * the failure may be in.
  */
 export function useImportCompanies() {
   const client = useQueryClient();
@@ -227,8 +229,8 @@ export function useImportCompanies() {
         `${MARKETING_COMPANIES_API}/import`,
         { method: "POST", headers: { "content-type": XLSX }, body: file },
       ),
-    onSuccess: async (result) => {
-      if (result.created > 0)
+    onSettled: async (result) => {
+      if (result == null || result.created > 0)
         await client.invalidateQueries({
           queryKey: MARKETING_COMPANIES_KEY,
           predicate: (query) => query.queryKey[2] !== "detail",

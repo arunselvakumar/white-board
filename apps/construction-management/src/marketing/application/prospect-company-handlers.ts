@@ -753,10 +753,10 @@ export class ProspectCompanyHandlers {
     const firstRowOf = new Map<string, number>();
     const companies: ProspectCompanyImportResult["companies"] = [];
     const problems: ProspectCompanyImportProblem[] = [];
-    for (const { row, cells } of rows) {
+    for (const { row, cells, unreadable } of rows) {
       let checked: ReturnType<typeof importedCompany>;
       try {
-        checked = importedCompany(cells);
+        checked = importedCompany(cells, unreadable);
       } catch (error) {
         if (!(error instanceof DomainError)) throw error;
         const field = (error.details as { field?: unknown } | undefined)?.field;

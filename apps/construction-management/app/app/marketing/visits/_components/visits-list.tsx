@@ -7,7 +7,7 @@ import {
 import { CalendarDays, Download, List, MapPinned } from "lucide-react";
 import Link from "next/link";
 import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
-import { Suspense, useState, useTransition } from "react";
+import { Suspense, useEffect, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import {
   Empty,
@@ -65,6 +65,7 @@ import { VisitButtons } from "../../_components/visit-buttons";
 import { ProspectCompanyPicker } from "./prospect-company-picker";
 import {
   CALENDAR_SPANS,
+  calendarDays,
   chosenDay,
   shiftDay,
   VISIT_VIEWS,
@@ -153,6 +154,14 @@ export function VisitsList({
     });
   };
   const calendar = view === "calendar";
+  // Export takes the days on screen in the calendar, the list's From and
+  // To otherwise; the calendar reports its days once it has them.
+  const [shown, setShown] = useState<{ from: string; to: string } | null>(null);
+  const exported = calendar
+    ? shown == null
+      ? null
+      : { ...filters, ...shown }
+    : filters;
   return (
     <div className="w-full p-6">
       <div className="flex w-full max-w-7xl min-w-0 flex-col gap-6">
@@ -162,9 +171,9 @@ export function VisitsList({
           actions={
             canCreate || canExport ? (
               <div className="flex flex-wrap gap-2">
-                {canExport && (
+                {canExport && exported != null && (
                   <a
-                    href={visitsExportUrl(filters)}
+                    href={visitsExportUrl(exported)}
                     download
                     className={buttonVariants({ variant: "outline" })}
                   >
@@ -261,7 +270,7 @@ export function VisitsList({
         >
           {calendar ? (
             <Suspense fallback={<VisitCalendarSkeleton />}>
-              <CalendarSection filters={filters} now={now} />
+              <CalendarSection filters={filters} now={now} onShown={setShown} />
             </Suspense>
           ) : (
             <Suspense fallback={<VisitRowsSkeleton />}>
@@ -278,13 +287,28 @@ export function VisitsList({
  * The calendar's span and day (`?calendar=week&day=2026-11-12`), "today"
  * in the Company time zone, and the Visits of the days shown.
  */
-function CalendarSection({ filters, now }: { filters: Filters; now?: Date }) {
+function CalendarSection({
+  filters,
+  now,
+  onShown,
+}: {
+  filters: Filters;
+  now?: Date;
+  /** The first and last day on screen, for Export. */
+  onShown: (shown: { from: string; to: string }) => void;
+}) {
   const { data: options } = useSuspenseQuery(visitFormOptionsQuery);
   const today = todayIn(options.timeZone, now ?? new Date());
   const [span, setSpan] = useQueryState("calendar", spanParam);
   const [dayValue, setDayValue] = useQueryState("day", dayParam);
   const [moving, startTransition] = useTransition();
   const day = chosenDay(dayValue, today);
+  const days = calendarDays(span, day);
+  const first = days[0] ?? day;
+  const last = days.at(-1) ?? day;
+  useEffect(() => {
+    onShown({ from: first, to: last });
+  }, [first, last, onShown]);
   const go = (next: { span?: CalendarSpan; day?: string }) => {
     startTransition(() => {
       if (next.span != null)

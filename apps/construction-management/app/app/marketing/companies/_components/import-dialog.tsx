@@ -95,7 +95,9 @@ export function ImportCompaniesDialog({
     setFile(chosen);
   };
 
+  // Closing mid-upload would drop the summary of rows already saved.
   const close = () => {
+    if (upload.isPending) return;
     reset();
     onOpenChange(false);
   };
@@ -104,8 +106,8 @@ export function ImportCompaniesDialog({
     <Dialog
       open={open}
       onOpenChange={(next) => {
-        if (!next) reset();
-        onOpenChange(next);
+        if (next) onOpenChange(true);
+        else close();
       }}
     >
       <DialogContent className="sm:max-w-2xl">
@@ -211,7 +213,12 @@ export function ImportCompaniesDialog({
         <DialogFooter>
           {result == null ? (
             <>
-              <Button type="button" variant="outline" onClick={close}>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={upload.isPending}
+                onClick={close}
+              >
                 Cancel
               </Button>
               <Button

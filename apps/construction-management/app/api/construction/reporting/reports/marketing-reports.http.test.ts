@@ -16,6 +16,7 @@ import {
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
 import { companyTimezone } from "@/src/shared-kernel/company-today";
+import { zoneInstant } from "@/src/shared-kernel/zone-time";
 import { jsonRequest, memberWith, ownerWithCompany } from "@/test/companies";
 import { bytesOf } from "@/test/files";
 import { TEST_ORIGIN } from "@/test/sessions";
@@ -74,6 +75,28 @@ async function aCompany(who: Session, name: string): Promise<Company> {
   return json<Company>(response);
 }
 
+/**
+ * `ago` milliseconds back, but never before the Company's today: a Visit
+ * made in the first minutes after midnight stays in today's register and
+ * this month's summary. Each call is later than the one before, so the
+ * latest Visit stays the latest.
+ */
+async function recently(company: Company, ago: number): Promise<Date> {
+  const { workspaceId } =
+    await prisma.constructionMarketingProspectCompany.findUniqueOrThrow({
+      where: { id: company.id },
+      select: { workspaceId: true },
+    });
+  const timeZone = await companyTimezone(prisma, workspaceId);
+  const now = Date.now();
+  const dayStart = zoneInstant(
+    todayIn(timeZone, new Date(now)),
+    0,
+    timeZone,
+  ).getTime();
+  return new Date(Math.max(now - ago, Math.floor((dayStart + now) / 2)));
+}
+
 /** A Completed Visit a minute ago: in today's month and the register's days. */
 async function logVisit(
   who: Session,
@@ -84,7 +107,7 @@ async function logVisit(
     jsonRequest(`${MARKETING}/visits`, who.cookie, {
       status: "completed",
       prospectCompanyId: company.id,
-      visitAt: new Date(Date.now() - 60_000).toISOString(),
+      visitAt: (await recently(company, 60_000)).toISOString(),
       contactIds: company.contacts.map((contact) => contact.id),
       discussion: "Needs a 40 m PEB shed near Sulur.",
       ...body,
@@ -107,7 +130,7 @@ async function missedVisit(who: Session, company: Company) {
   const visit = await json<{ id: string; number: string }>(response);
   await prisma.constructionMarketingVisit.update({
     where: { id: visit.id },
-    data: { visitAt: new Date(Date.now() - 120_000) },
+    data: { visitAt: await recently(company, 120_000) },
   });
   return visit;
 }
@@ -325,6 +348,23 @@ describe("the Marketing reports (ADR CM-0040 §13)", () => {
       "Marketing Person",
     );
     expect(own.lines.map((line) => line[0])).toEqual(["Ravi"]);
+
+    // Every Visit, but no Follow-ups and only their own companies: each
+    // figure keeps its own menu's scope.
+    const visitsOnly = await named(owner, "Meena", {
+      "marketing.visits": ["read", "report", "view_all"],
+      "marketing.companies": ["read"],
+    });
+    const scoped = await table(
+      visitsOnly,
+      await generate(visitsOnly, body),
+      "Marketing Person",
+    );
+    const ravisRow = scoped.find("Ravi");
+    expect(scoped.cell(ravisRow, "Visits completed")).toBe(2);
+    expect(scoped.cell(ravisRow, "Follow-ups done")).toBe(0);
+    expect(scoped.cell(ravisRow, "New Prospect Companies")).toBe(0);
+    expect(scoped.cell(ravisRow, "Companies won")).toBe(0);
   });
 
   it("reads the pipeline as on a day with the latest Visit's value, a member's own companies without View all", async () => {

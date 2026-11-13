@@ -76,6 +76,21 @@ function text(value: ExcelJS.CellValue): string | null {
   return null;
 }
 
+/**
+ * The error a cell shows (`#N/A`, `#DIV/0!`), typed in or a formula's
+ * result; null for any other value.
+ */
+function cellError(value: ExcelJS.CellValue): string | null {
+  if (value == null || typeof value !== "object") return null;
+  if ("error" in value) return value.error;
+  if ("result" in value) {
+    const result: unknown = value.result;
+    if (result != null && typeof result === "object" && "error" in result)
+      return String(result.error);
+  }
+  return null;
+}
+
 function headerKey(raw: string): string {
   return raw.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
@@ -129,7 +144,11 @@ export async function readCompanySheet(
     );
   const workbook = new ExcelJS.Workbook();
   try {
-    await workbook.xlsx.load(Uint8Array.from(bytes).buffer);
+    // Merged ranges are not read: exceljs builds every cell of each one,
+    // and a tiny file can merge a whole sheet. Nothing here needs them.
+    await workbook.xlsx.load(Uint8Array.from(bytes).buffer, {
+      ignoreNodes: ["mergeCells"],
+    });
   } catch {
     throw fileInvalid("This file could not be read as an Excel workbook.");
   }
@@ -151,18 +170,29 @@ export async function readCompanySheet(
   sheet.eachRow({ includeEmpty: false }, (row, number) => {
     if (number === 1) return;
     const cells: CompanySheetRow["cells"] = {};
+    const unreadable: NonNullable<CompanySheetRow["unreadable"]> = [];
     for (const [column, key] of columns) {
-      const value = text(row.getCell(column).value);
+      const raw = row.getCell(column).value;
+      const error = cellError(raw);
+      if (error != null) {
+        unreadable.push({ column: key, error });
+        continue;
+      }
+      const value = text(raw);
       if (value != null && value.trim() !== "") cells[key] = value;
     }
-    if (Object.keys(cells).length === 0) return;
+    if (Object.keys(cells).length === 0 && unreadable.length === 0) return;
     // Stop at the limit rather than holding every row of a huge sheet.
     if (rows.length >= MAX_COMPANY_IMPORT_ROWS)
       throw new DomainError(
         "IMPORT_TOO_MANY",
         `Import at most ${String(MAX_COMPANY_IMPORT_ROWS)} Prospect Companies at a time.`,
       );
-    rows.push({ row: number, cells });
+    rows.push(
+      unreadable.length === 0
+        ? { row: number, cells }
+        : { row: number, cells, unreadable },
+    );
   });
   return rows;
 }

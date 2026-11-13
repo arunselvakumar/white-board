@@ -1,4 +1,4 @@
-import { Unzip, UnzipInflate } from "fflate";
+import { strFromU8, Unzip, UnzipInflate, unzipSync } from "fflate";
 
 /**
  * How much an uploaded .xlsx (a ZIP) unpacks to, checked before any parser
@@ -79,18 +79,51 @@ export function zipUnpackedBytes(bytes: Uint8Array): number | null {
   return entries.reduce((total, entry) => total + entry.size, 0);
 }
 
+/** The package parts that name a VBA project or macro sheet by type. */
+const PACKAGE_METADATA = new Set([
+  "[content_types].xml",
+  "xl/_rels/workbook.xml.rels",
+]);
+
+/** Room for any real workbook's content types and relationships. */
+const METADATA_MAX_BYTES = 1024 * 1024;
+
+/** Content and relationship types only a macro-enabled workbook uses. */
+const MACRO_TYPES = /vbaproject|macroenabled|macrosheet/i;
+
 /**
- * Whether the workbook carries a VBA project (an .xlsm saved as .xlsx, or
- * a doctored file): imports refuse it rather than store or pass it on.
- * True when the directory cannot be read, so an unreadable file is
- * refused too.
+ * Whether the workbook carries a VBA project or macro sheets (an .xlsm
+ * saved as .xlsx, or a doctored file): imports refuse it rather than
+ * store or pass it on. Found by the usual part name and by the package's
+ * content types and workbook relationships, which name the part whatever
+ * it is called. True when the package cannot be read, so an unreadable
+ * file is refused too.
  */
 export function xlsxHasMacros(bytes: Uint8Array): boolean {
   const entries = zipEntries(bytes);
   if (entries == null) return true;
-  return entries.some((entry) =>
-    entry.name.toLowerCase().endsWith("vbaproject.bin"),
+  if (
+    entries.some((entry) => entry.name.toLowerCase().endsWith("vbaproject.bin"))
+  )
+    return true;
+  const metadata = entries.filter((entry) =>
+    PACKAGE_METADATA.has(entry.name.toLowerCase()),
   );
+  if (metadata.some((entry) => entry.size > METADATA_MAX_BYTES)) return true;
+  try {
+    const parts = unzipSync(bytes, {
+      filter: (file) =>
+        PACKAGE_METADATA.has(file.name.toLowerCase()) &&
+        file.originalSize <= METADATA_MAX_BYTES,
+    });
+    return Object.values(parts).some(
+      (part) =>
+        part.byteLength > METADATA_MAX_BYTES ||
+        MACRO_TYPES.test(strFromU8(part)),
+    );
+  } catch {
+    return true;
+  }
 }
 
 /**
