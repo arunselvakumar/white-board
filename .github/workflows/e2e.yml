@@ -107,6 +107,9 @@ jobs:
       - name: Build for end-to-end tests
         if: steps.fresh.outputs.run == 'true'
         run: bun run test:e2e:build
+        # The webpack compile outgrew Node's default heap (see ci.yml).
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
 
       - name: "@pr tests"
         if: steps.fresh.outputs.run == 'true' && env.NIGHTLY != 'true'

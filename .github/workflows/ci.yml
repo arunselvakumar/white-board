@@ -109,7 +109,11 @@ jobs:
 
       - run: bun install --frozen-lockfile
 
+      # Construction Management's webpack compile outgrew Node's default heap
+      # (about 4 GB) with Marketing; at 8 GB it peaks near 7.4 GB of RAM.
       - run: bun run build
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
 
   # The Storybook play tests got their own job once M7's stories pushed the
   # single job past 20 minutes.
