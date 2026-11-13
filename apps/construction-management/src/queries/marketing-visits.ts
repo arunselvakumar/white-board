@@ -101,6 +101,14 @@ export function visitListParams(filters: VisitFilters = {}, limit = PAGE_SIZE) {
   return params;
 }
 
+/** The Excel of the list with these filters (needs Visits export). */
+export function visitsExportUrl(filters: VisitFilters = {}): string {
+  const params = visitListParams(filters);
+  params.delete("limit");
+  const query = params.toString();
+  return `${MARKETING_VISITS_API}/export${query === "" ? "" : `?${query}`}`;
+}
+
 /** Visits newest first, a page at a time ("Load more"). */
 export function visitsQuery(filters: VisitFilters = {}) {
   const params = visitListParams(filters);

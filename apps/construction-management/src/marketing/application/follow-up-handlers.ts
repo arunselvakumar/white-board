@@ -347,6 +347,23 @@ export class FollowUpHandlers {
     };
   }
 
+  /**
+   * The earliest open due date of each Visit's Follow-ups the viewer may
+   * see (the Visits export's Next Follow-up); none without Follow-ups read.
+   */
+  async nextDueByVisit(
+    access: MemberAccess,
+    visitIds: readonly string[],
+  ): Promise<Map<string, CalendarDate>> {
+    if (!can(access, FOLLOW_UPS_MENU, "read")) return new Map();
+    return this.deps.store.nextDueByVisit(
+      this.deps.db,
+      access.workspaceId,
+      visitIds,
+      await this.scopeOf(access, FOLLOW_UPS_MENU),
+    );
+  }
+
   /** The Follow-up if the viewer may see it, for routes that load first. */
   find(access: MemberAccess, id: string): Promise<StoredFollowUp> {
     return this.visible(access, (ws) =>

@@ -650,6 +650,13 @@ export type FollowUpStore = {
     date: CalendarDate,
     page: { after?: string; limit: number },
   ): Promise<StoredFollowUp[]>;
+  /** The earliest open due date of each Visit's Follow-ups the scope sees. */
+  nextDueByVisit(
+    db: MarketingTx,
+    workspaceId: string,
+    visitIds: readonly string[],
+    scope: OwnScope,
+  ): Promise<Map<string, CalendarDate>>;
 };
 
 /**

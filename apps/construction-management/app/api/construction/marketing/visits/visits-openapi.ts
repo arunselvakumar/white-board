@@ -4,6 +4,7 @@ import type {
   OpenApiComponents,
   OpenApiOperation,
 } from "@/app/api/_lib/openapi";
+import { XLSX_CONTENT_TYPE } from "@/src/marketing/infrastructure/marketing-workbooks";
 
 import {
   MARKETING_READ_ERRORS,
@@ -21,6 +22,7 @@ import {
   ConstructionMarketingVisitResponseModel,
   CreateConstructionMarketingVisitRequestModel,
   DeleteConstructionMarketingVisitRequestModel,
+  ExportConstructionMarketingVisitsRequestModel,
   GetConstructionMarketingVisitFormOptionsResponseModel,
   ListConstructionMarketingVisitsRequestModel,
   ListConstructionMarketingVisitsResponseModel,
@@ -87,6 +89,18 @@ export const marketingVisitOpenApiOperations: OpenApiOperation[] = [
     successStatus: StatusCodes.OK,
     successDescription: "A page of Visits",
     successSchema: ListConstructionMarketingVisitsResponseModel,
+    errors: MARKETING_READ_ERRORS,
+  },
+  {
+    method: "get",
+    path: `${VISITS_PATH}/export`,
+    summary:
+      "The Visits list's filters as an Excel sheet (needs Visits export; your own Visits without View all)",
+    tags: MARKETING_TAGS,
+    query: ExportConstructionMarketingVisitsRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "An .xlsx file",
+    successBinaryContentTypes: [XLSX_CONTENT_TYPE],
     errors: MARKETING_READ_ERRORS,
   },
   {

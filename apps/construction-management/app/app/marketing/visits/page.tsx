@@ -50,7 +50,11 @@ export default async function Page({
     memberId?: string | string[];
   }>;
 }) {
-  const can = await viewerFlags("marketing.visits", ["read", "create"]);
+  const can = await viewerFlags("marketing.visits", [
+    "read",
+    "create",
+    "export",
+  ]);
   if (!can.read) return <MarketingNoAccess what="Visits" />;
   const params = await searchParams;
   const memberId =
@@ -85,7 +89,11 @@ export default async function Page({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <VisitsList canCreate={can.create} memberId={memberId} />
+      <VisitsList
+        canCreate={can.create}
+        canExport={can.export}
+        memberId={memberId}
+      />
     </HydrationBoundary>
   );
 }

@@ -4,6 +4,7 @@ import type {
   OpenApiComponents,
   OpenApiOperation,
 } from "@/app/api/_lib/openapi";
+import { XLSX_CONTENT_TYPE } from "@/src/marketing/infrastructure/marketing-workbooks";
 
 import {
   COMPANIES_PATH,
@@ -18,6 +19,7 @@ import {
   CreateConstructionMarketingProspectCompanyRequestModel,
   DeleteConstructionMarketingContactRequestModel,
   DeleteConstructionMarketingProspectCompanyRequestModel,
+  ExportConstructionMarketingProspectCompaniesRequestModel,
   GetConstructionMarketingProspectCompanyFormOptionsResponseModel,
   ListConstructionMarketingProspectCompaniesRequestModel,
   ListConstructionMarketingProspectCompaniesResponseModel,
@@ -78,6 +80,18 @@ export const marketingCompanyOpenApiOperations: OpenApiOperation[] = [
     successStatus: StatusCodes.OK,
     successDescription: "A page of Prospect Companies",
     successSchema: ListConstructionMarketingProspectCompaniesResponseModel,
+    errors: MARKETING_READ_ERRORS,
+  },
+  {
+    method: "get",
+    path: `${COMPANIES_PATH}/export`,
+    summary:
+      "The Prospect Companies list's search and filters as an Excel sheet (needs Companies export; your own companies without View all)",
+    tags: MARKETING_TAGS,
+    query: ExportConstructionMarketingProspectCompaniesRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "An .xlsx file",
+    successBinaryContentTypes: [XLSX_CONTENT_TYPE],
     errors: MARKETING_READ_ERRORS,
   },
   {

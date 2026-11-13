@@ -76,6 +76,14 @@ export function companyListParams(filters: CompanyFilters = {}) {
   return params;
 }
 
+/** The Excel of the list with this search and filters (needs Companies export). */
+export function companiesExportUrl(filters: CompanyFilters = {}): string {
+  const params = companyListParams(filters);
+  params.delete("limit");
+  const query = params.toString();
+  return `${MARKETING_COMPANIES_API}/export${query === "" ? "" : `?${query}`}`;
+}
+
 /** Prospect Companies A–Z, a page at a time ("Load more"). */
 export function companiesQuery(filters: CompanyFilters = {}) {
   const params = companyListParams(filters);

@@ -362,3 +362,33 @@ export const WithoutTransfer: Story = {
     ).toBe(false);
   },
 };
+
+/** With Companies export: Export downloads the list's search and filters as Excel. */
+export const Export: Story = {
+  args: { canExport: true },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await canvas.findByText("4 Prospect Companies");
+    await expect(canvas.getByRole("link", { name: "Export" })).toHaveAttribute(
+      "href",
+      `${MARKETING_COMPANIES_API}/export`,
+    );
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(canvas.getByRole("combobox", { name: "Stage" }));
+    await userEvent.click(await body.findByRole("option", { name: "Won" }));
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(canvas.getByRole("link", { name: "Export" })).toHaveAttribute(
+        "href",
+        `${MARKETING_COMPANIES_API}/export?stage=won`,
+      ),
+    );
+  },
+};
+
+/** Without Companies export there is no Export. */
+export const NoExport: Story = {
+  play: async ({ canvas }) => {
+    await canvas.findByText("4 Prospect Companies");
+    await expect(canvas.queryByRole("link", { name: "Export" })).toBeNull();
+  },
+};

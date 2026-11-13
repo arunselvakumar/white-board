@@ -6,7 +6,7 @@ import {
   useSuspenseInfiniteQuery,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { ArrowRight, Building, Plus, UserRoundX } from "lucide-react";
+import { ArrowRight, Building, Download, Plus, UserRoundX } from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
@@ -47,6 +47,7 @@ import {
   type Stage,
 } from "@/src/marketing/domain/marketing-terms";
 import {
+  companiesExportUrl,
   companiesQuery,
   companyFormOptionsQuery,
   companyPath,
@@ -104,9 +105,12 @@ function AddButton() {
 export function CompaniesList({
   canCreate,
   canTransfer = false,
+  canExport = false,
   now,
 }: {
   canCreate: boolean;
+  /** Companies export: the list's search and filters as an Excel sheet. */
+  canExport?: boolean;
   /** Companies transfer: the "need reassigning" notice. */
   canTransfer?: boolean;
   /** Fixed in stories; the device's clock otherwise (overdue follow-ups). */
@@ -126,7 +130,23 @@ export function CompaniesList({
         <PageHeader
           title={section.title}
           meta={section.description}
-          actions={canCreate ? <AddButton /> : undefined}
+          actions={
+            canCreate || canExport ? (
+              <div className="flex flex-wrap gap-2">
+                {canExport && (
+                  <a
+                    href={companiesExportUrl(filters)}
+                    download
+                    className={buttonVariants({ variant: "outline" })}
+                  >
+                    <Download aria-hidden="true" />
+                    Export
+                  </a>
+                )}
+                {canCreate && <AddButton />}
+              </div>
+            ) : undefined
+          }
         />
         {canTransfer && <NeedsReassigningNotice />}
         <FilterBar filters={filters} onChange={change} />

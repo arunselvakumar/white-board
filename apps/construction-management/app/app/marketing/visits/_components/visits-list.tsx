@@ -4,11 +4,11 @@ import {
   useSuspenseInfiniteQuery,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { CalendarDays, List, MapPinned } from "lucide-react";
+import { CalendarDays, Download, List, MapPinned } from "lucide-react";
 import Link from "next/link";
 import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
 import { Suspense, useState, useTransition } from "react";
-import { Button } from "@repo/ui/components/button";
+import { Button, buttonVariants } from "@repo/ui/components/button";
 import {
   Empty,
   EmptyContent,
@@ -56,6 +56,7 @@ import { todayIn } from "@/src/shared-kernel/calendar-date";
 import {
   visitFormOptionsQuery,
   visitPath,
+  visitsExportUrl,
   visitsQuery,
   type VisitListItem,
 } from "@/src/queries/marketing-visits";
@@ -127,10 +128,13 @@ function visits(n: number): string {
  */
 export function VisitsList({
   canCreate,
+  canExport = false,
   memberId,
   now,
 }: {
   canCreate: boolean;
+  /** Visits export: the list's filters as an Excel sheet. */
+  canExport?: boolean;
   /** `?memberId=`: the Marketing Person picked on arrival. */
   memberId?: string;
   /** The clock "today" is read from; the stories fix it. */
@@ -155,7 +159,23 @@ export function VisitsList({
         <PageHeader
           title={section.title}
           meta={section.description}
-          actions={canCreate ? <VisitButtons /> : undefined}
+          actions={
+            canCreate || canExport ? (
+              <div className="flex flex-wrap gap-2">
+                {canExport && (
+                  <a
+                    href={visitsExportUrl(filters)}
+                    download
+                    className={buttonVariants({ variant: "outline" })}
+                  >
+                    <Download aria-hidden="true" />
+                    Export
+                  </a>
+                )}
+                {canCreate && <VisitButtons />}
+              </div>
+            ) : undefined
+          }
         />
         <ToggleGroup
           aria-label="Show Visits as"

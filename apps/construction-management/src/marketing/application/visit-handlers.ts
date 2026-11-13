@@ -170,6 +170,14 @@ export type VisitListItem = {
   checkedIn: boolean;
 };
 
+/** A row of the Visits export: the list's, with its next Follow-up. */
+export type VisitExportRow = VisitListItem & {
+  nextFollowUpOn: CalendarDate | null;
+};
+
+/** The export reads the list a page at a time. */
+const EXPORT_PAGE = 500;
+
 export type VisitHistoryItem = {
   id: string;
   action:
@@ -547,6 +555,44 @@ export class VisitHandlers {
         })),
         contactNames: row.contactNames,
         checkedIn: row.checkedIn,
+      })),
+    };
+  }
+
+  /**
+   * Every Visit the list's filters and the caller's scope give, newest
+   * first, for the Excel export (ADR CM-0040 §2), each with the earliest
+   * Open Follow-up made from it that the caller may see. Needs Visits read
+   * and export.
+   */
+  async exportRows(
+    access: MemberAccess,
+    filters: Omit<Parameters<VisitHandlers["list"]>[1], "limit" | "after">,
+  ): Promise<{ items: VisitExportRow[]; timeZone: string }> {
+    assertCan(access, VISITS_MENU, "export");
+    let page = await this.list(access, { ...filters, limit: EXPORT_PAGE });
+    const items = [...page.items];
+    for (
+      let last = page.items.at(-1);
+      page.hasMore && last != null;
+      last = page.items.at(-1)
+    ) {
+      page = await this.list(access, {
+        ...filters,
+        limit: EXPORT_PAGE,
+        after: { createdAt: last.visitAt, id: last.id },
+      });
+      items.push(...page.items);
+    }
+    const next = await this.deps.followUps.nextDueByVisit(
+      access,
+      items.map((item) => item.id),
+    );
+    return {
+      timeZone: page.timeZone,
+      items: items.map((item) => ({
+        ...item,
+        nextFollowUpOn: next.get(item.id) ?? null,
       })),
     };
   }

@@ -61,6 +61,9 @@ const VISITS_MENU = "marketing.visits";
 const FOLLOW_UPS_MENU = "marketing.follow_ups";
 const PROJECTS_MENU = "projects.project";
 
+/** The export reads the list a page at a time. */
+const EXPORT_PAGE = 100;
+
 export type ProspectCompanyDeps = {
   db: MarketingDb;
   store: ProspectCompanyStore;
@@ -319,6 +322,36 @@ export class ProspectCompanyHandlers {
       ),
     ]);
     return { people, industries };
+  }
+
+  /**
+   * Every Prospect Company the list's filters and the caller's scope give,
+   * A–Z, for the Excel export (ADR CM-0040 §2). Needs Companies read and
+   * export.
+   */
+  async exportRows(
+    access: MemberAccess,
+    filters: Omit<
+      Parameters<ProspectCompanyHandlers["list"]>[1],
+      "limit" | "after"
+    >,
+  ): Promise<{ items: ProspectCompanyListItem[]; timeZone: string }> {
+    assertCan(access, COMPANIES_MENU, "export");
+    let page = await this.list(access, { ...filters, limit: EXPORT_PAGE });
+    const items = [...page.items];
+    for (
+      let last = page.items.at(-1);
+      page.hasMore && last != null;
+      last = page.items.at(-1)
+    ) {
+      page = await this.list(access, {
+        ...filters,
+        limit: EXPORT_PAGE,
+        after: { name: prospectCompanyNameKey(last.name), id: last.id },
+      });
+      items.push(...page.items);
+    }
+    return { items, timeZone: page.timeZone };
   }
 
   async list(

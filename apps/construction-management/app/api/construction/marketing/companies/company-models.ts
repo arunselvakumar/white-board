@@ -166,6 +166,13 @@ export const ListConstructionMarketingProspectCompaniesRequestModel = z.object({
   after: z.string().max(400).optional(),
 });
 
+/** The Excel export: the list's search and filters without the paging. */
+export const ExportConstructionMarketingProspectCompaniesRequestModel =
+  ListConstructionMarketingProspectCompaniesRequestModel.omit({
+    limit: true,
+    after: true,
+  });
+
 /** Reassign: the company and its open Follow-ups to another person. */
 export const ReassignConstructionMarketingProspectCompanyRequestModel =
   z.object({
