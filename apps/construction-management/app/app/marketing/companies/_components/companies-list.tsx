@@ -6,7 +6,14 @@ import {
   useSuspenseInfiniteQuery,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { ArrowRight, Building, Download, Plus, UserRoundX } from "lucide-react";
+import {
+  ArrowRight,
+  Building,
+  Download,
+  Plus,
+  Upload,
+  UserRoundX,
+} from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
@@ -62,6 +69,7 @@ import {
 import { zoneFields } from "../../visits/_components/visit-parts";
 import { COMPANY_COLUMNS, CompanyRowsSkeleton } from "./companies-skeletons";
 import { StageBadge } from "./company-parts";
+import { ImportCompaniesDialog } from "./import-dialog";
 
 type Filters = {
   search: string;
@@ -106,11 +114,14 @@ export function CompaniesList({
   canCreate,
   canTransfer = false,
   canExport = false,
+  canImport = false,
   now,
 }: {
   canCreate: boolean;
   /** Companies export: the list's search and filters as an Excel sheet. */
   canExport?: boolean;
+  /** Companies import (with create): add companies from an Excel sheet. */
+  canImport?: boolean;
   /** Companies transfer: the "need reassigning" notice. */
   canTransfer?: boolean;
   /** Fixed in stories; the device's clock otherwise (overdue follow-ups). */
@@ -119,6 +130,8 @@ export function CompaniesList({
   const section = marketingSection("companies");
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [updating, startTransition] = useTransition();
+  const [importing, setImporting] = useState(false);
+  const showImport = canImport && canCreate;
   const change = (next: Partial<Filters>) => {
     startTransition(() => {
       setFilters((current) => ({ ...current, ...next }));
@@ -133,6 +146,18 @@ export function CompaniesList({
           actions={
             canCreate || canExport ? (
               <div className="flex flex-wrap gap-2">
+                {showImport && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setImporting(true);
+                    }}
+                  >
+                    <Upload aria-hidden="true" />
+                    Import
+                  </Button>
+                )}
                 {canExport && (
                   <a
                     href={companiesExportUrl(filters)}
@@ -158,6 +183,9 @@ export function CompaniesList({
           </Suspense>
         </div>
       </div>
+      {showImport && (
+        <ImportCompaniesDialog open={importing} onOpenChange={setImporting} />
+      )}
     </div>
   );
 }

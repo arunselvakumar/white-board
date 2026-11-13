@@ -41,6 +41,7 @@ export default async function Page() {
     "create",
     "transfer",
     "export",
+    "import",
   ]);
   if (!can.read) return <MarketingNoAccess what="Prospect Companies" />;
 
@@ -62,6 +63,7 @@ export default async function Page() {
         canCreate={can.create}
         canTransfer={can.transfer}
         canExport={can.export}
+        canImport={can.import}
       />
     </HydrationBoundary>
   );

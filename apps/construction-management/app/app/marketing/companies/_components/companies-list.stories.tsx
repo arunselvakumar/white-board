@@ -392,3 +392,25 @@ export const NoExport: Story = {
     await expect(canvas.queryByRole("link", { name: "Export" })).toBeNull();
   },
 };
+
+/** With Companies import and create: Import opens the import dialog. */
+export const Import: Story = {
+  args: { canImport: true },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await canvas.findByText("4 Prospect Companies");
+    await userEvent.click(canvas.getByRole("button", { name: "Import" }));
+    const body = within(canvasElement.ownerDocument.body);
+    await expect(
+      await body.findByRole("dialog", { name: "Import Prospect Companies" }),
+    ).toBeVisible();
+  },
+};
+
+/** Import needs create too: without it there is no Import. */
+export const NoImportWithoutCreate: Story = {
+  args: { canImport: true, canCreate: false },
+  play: async ({ canvas }) => {
+    await canvas.findByText("4 Prospect Companies");
+    await expect(canvas.queryByRole("button", { name: "Import" })).toBeNull();
+  },
+};
