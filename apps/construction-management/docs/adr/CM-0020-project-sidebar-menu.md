@@ -24,7 +24,7 @@ The modules sit under seven fixed headings (`PROJECT_NAV_GROUPS`):
 | Heading           | Modules                                                               |
 | ----------------- | --------------------------------------------------------------------- |
 | Overview          | Dashboard (Home until §5)                                             |
-| Setup             | Wings or Locations, Amenities, Resources                              |
+| Setup             | Wings or Locations, Amenities, Teams (Resources until CM-0042)        |
 | Site work         | Attendance, Daily Worksheet, Tasks, Site Diary, Hindrances, Equipment |
 | Materials & money | Materials, Payments                                                   |
 | Quality           | Issues & Snags, Inspections, Testing Reports                          |

@@ -386,7 +386,7 @@ export class SiteEngineerHandlers {
     if (!sameSet(input.expectedIds, currentIds))
       throw conflict(
         "PROJECT_RESOURCES_CHANGED",
-        "Someone else changed this Project's Resources after you opened them. Reload to see their changes.",
+        "Someone else changed this Project's Teams after you opened them. Reload to see their changes.",
       );
     const wanted: string[] = [];
     for (const id of new Set(input.ids)) {

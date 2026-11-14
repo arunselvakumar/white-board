@@ -517,7 +517,7 @@ function PartyForm({
             Projects
           </h2>
           <p className="text-muted-foreground text-sm">
-            The {screen.label} is on these Projects&apos; Resources.
+            The {screen.label} is on these Projects&apos; Teams.
           </p>
         </div>
         <Suspense fallback={<ChecklistSkeleton />}>

@@ -47,11 +47,10 @@ function StepBanner({
   return (
     <Alert>
       <ListChecks aria-hidden="true" />
-      <AlertTitle>Step 2 of 2 · Assign resources</AlertTitle>
+      <AlertTitle>Step 2 of 2 · Teams</AlertTitle>
       <AlertDescription>
         Choose the Site Engineers, Labours, Team Members, Contractors, Suppliers
-        and Vendors on this Project. You can change them any time from
-        Resources.
+        and Vendors on this Project. You can change them any time from Teams.
       </AlertDescription>
       <AlertAction className="static col-span-full mt-2 sm:absolute sm:top-2.5 sm:right-3 sm:mt-0">
         <Link

@@ -72,6 +72,13 @@ const nextConfig: NextConfig = {
         destination: "/app/hrms/:path*",
         permanent: true,
       },
+      // A Project's Resources became Teams (ADR CM-0042). Temporary, so no
+      // browser pins `/resources`, which may one day name a material page.
+      {
+        source: "/app/projects/:id/resources",
+        destination: "/app/projects/:id/teams",
+        permanent: false,
+      },
     ]),
   outputFileTracingRoot: fileURLToPath(new URL("../..", import.meta.url)),
   // Payslip and procurement PDFs embed Noto fonts read from node_modules at

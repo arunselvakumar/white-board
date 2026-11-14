@@ -661,7 +661,7 @@ function GoodsReceiptForm({
             {options.suppliers.length === 0 ? (
               <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-3 text-sm">
                 No Suppliers on this Project. Add one under the Project&apos;s
-                Resources first.
+                Teams first.
               </p>
             ) : (
               <Controller

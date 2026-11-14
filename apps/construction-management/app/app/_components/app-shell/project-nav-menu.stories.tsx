@@ -119,7 +119,7 @@ export const Menu: Story = {
     await waitFor(() =>
       expect(groupsOf(nav)).toEqual([
         ["Overview", ["Dashboard", "Activity"]],
-        ["Setup", ["Wings", "Amenities", "Resources"]],
+        ["Setup", ["Wings", "Amenities", "Teams"]],
         [
           "Site work",
           [

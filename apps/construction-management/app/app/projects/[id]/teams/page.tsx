@@ -2,7 +2,7 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import type { Metadata } from "next";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
-import { ProjectResourcesPage } from "@/app/app/projects/[id]/resources/_components/project-resources-page";
+import { ProjectResourcesPage } from "@/app/app/projects/[id]/teams/_components/project-resources-page";
 import { RESOURCES_STEP } from "@/app/app/projects/_components/resources/resources-step";
 import { GET as listProjectLabours } from "@/app/api/construction/projects/projects/[id]/resources/labours/route";
 import { GET as readResources } from "@/app/api/construction/projects/projects/[id]/resources/route";
@@ -15,13 +15,13 @@ import {
 import { getQueryClient } from "@/src/queries/query-client";
 import { prefetchRoute, routeHandler } from "@/src/queries/route-fetch";
 
-export const metadata: Metadata = { title: "Resources" };
+export const metadata: Metadata = { title: "Teams" };
 
 // The prefetch reads the request's Session cookie.
 export const dynamic = "force-dynamic";
 
 /**
- * The Project's Resources; `?step=resources` right after Add Project shows
+ * The Project's Teams; `?step=teams` right after Add Project shows
  * it as the wizard's second step.
  */
 export default async function ProjectResourcesRoute({

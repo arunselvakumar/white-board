@@ -2,7 +2,7 @@ import { ProjectPage } from "./ProjectPage";
 
 export class ResourcesPage extends ProjectPage {
   public get url() {
-    return `${this.base}/resources`;
+    return `${this.base}/teams`;
   }
 
   public section(

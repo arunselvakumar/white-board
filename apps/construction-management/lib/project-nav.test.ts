@@ -30,7 +30,7 @@ describe("projectNavGroups", () => {
   it("falls back to every module of the structure until the home loads", () => {
     expect(labels(projectNavGroups(undefined, "wings"))).toEqual([
       ["Overview", ["Dashboard", "Activity"]],
-      ["Setup", ["Wings", "Amenities", "Resources"]],
+      ["Setup", ["Wings", "Amenities", "Teams"]],
       [
         "Site work",
         [
@@ -51,7 +51,7 @@ describe("projectNavGroups", () => {
     const locations = projectNavGroups(undefined, "locations");
     expect(labels(locations)[1]).toEqual([
       "Setup",
-      ["Locations", "Amenities", "Resources"],
+      ["Locations", "Amenities", "Teams"],
     ]);
     // A Project without Wings has nothing to book (CM-0022 §1).
     expect(labels(locations)).toContainEqual(["Sales", ["Inquiries"]]);

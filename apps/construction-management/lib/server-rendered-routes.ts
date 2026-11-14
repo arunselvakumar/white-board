@@ -19,7 +19,7 @@ export const SERVER_RENDERED_ROUTES: readonly string[] = [
   "/app/marketing/visits/[id]/complete",
   "/app/projects",
   "/app/projects/[id]/activity",
-  "/app/projects/[id]/resources",
+  "/app/projects/[id]/teams",
   "/app/settings",
 ];
 

@@ -22,9 +22,7 @@ projectFormPageTest.describe("Projects", () => {
       await expect(page).toHaveURL(/\/app\/projects\/[0-9a-f-]{36}/);
       const dashboard = new ProjectDashboardPage(page, "");
       await expect(dashboard.heading(name, { level: 1 })).toBeVisible();
-      await expect(
-        page.getByText("Step 2 of 2 · Assign resources"),
-      ).toBeVisible();
+      await expect(page.getByText("Step 2 of 2 · Teams")).toBeVisible();
       await dashboard.link("Skip").click();
       await expect(dashboard.figure("Project Type")).toHaveText("Residential");
 

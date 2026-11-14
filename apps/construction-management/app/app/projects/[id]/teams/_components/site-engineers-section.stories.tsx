@@ -25,7 +25,7 @@ function posted(): unknown {
 }
 
 const meta = {
-  title: "Projects/Resources/Site Engineers",
+  title: "Projects/Teams/Site Engineers",
   component: SiteEngineersSection,
   args: {
     projectId: PROJECT_ID,
@@ -127,7 +127,7 @@ export const RemoveChangedElsewhere: Story = {
             {
               code: "PROJECT_RESOURCES_CHANGED",
               message:
-                "Someone else changed this Project's Resources after you opened them. Reload to see their changes.",
+                "Someone else changed this Project's Teams after you opened them. Reload to see their changes.",
             },
             { status: 409 },
           ),
@@ -150,7 +150,7 @@ export const RemoveChangedElsewhere: Story = {
     ).toBeVisible();
     await userEvent.click(confirm.getByRole("button", { name: "Remove" }));
     await expect(
-      await canvas.findByText(/Someone else changed this Project's Resources/),
+      await canvas.findByText(/Someone else changed this Project's Teams/),
     ).toBeVisible();
     await expect(posted()).toEqual({
       ids: [ANAND.id],

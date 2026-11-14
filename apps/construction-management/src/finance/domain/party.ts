@@ -92,7 +92,7 @@ export function assertPartyOnPlace(party: PartyFacts, place: PartyPlace): void {
   if (!party.projectIds.includes(place.id))
     throw new DomainError(
       "PARTY_NOT_ON_PROJECT",
-      `This ${PARTY_TYPE_LABELS[party.type]} is not assigned to the Project. Add them under the Project's Resources first.`,
+      `This ${PARTY_TYPE_LABELS[party.type]} is not assigned to the Project. Add them under the Project's Teams first.`,
       { details: { field: "partyId" } },
     );
 }
