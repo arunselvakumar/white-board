@@ -22,7 +22,7 @@ export class PrismaSignInProjectHistory implements SignInProjectHistory {
   async projectChanges(
     workspaceId: string,
     memberIds: readonly string[],
-    projectId: string,
+    projectId: string | null,
   ): Promise<SignInProjectChange[]> {
     const events = await readAuditEvents(this.db, {
       workspaceId,
@@ -37,7 +37,7 @@ export class PrismaSignInProjectHistory implements SignInProjectHistory {
     }
     return [...byMember].flatMap(([memberId, list]) =>
       projectChangesOf(memberId, list).filter(
-        (change) => change.projectId === projectId,
+        (change) => projectId == null || change.projectId === projectId,
       ),
     );
   }

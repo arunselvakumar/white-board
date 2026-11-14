@@ -240,6 +240,7 @@ export class LabourActivityService {
       wants("check_ins")
         ? this.source.checkIns({
             ...window,
+            person: { kind: "labour", id: labourId },
             visibleProjectIds: checkInProjectIds(access),
           })
         : none,

@@ -1,5 +1,8 @@
 import type { AuditRecord } from "@/src/shared-kernel/audit-reader";
-import { teamMemberProjectIdsAfter } from "@/src/shared-kernel/audit-reader";
+import {
+  auditProjectChanges,
+  teamMemberProjectIdsAfter,
+} from "@/src/shared-kernel/audit-reader";
 
 /** A sign-in put on, or taken off, a Project by one audited command. */
 export type SignInProjectChange = {
@@ -23,35 +26,18 @@ export function projectChangesOf(
   memberId: string,
   events: readonly AuditRecord[],
 ): SignInProjectChange[] {
-  const ordered = [...events].sort(
-    (a, b) =>
-      a.occurredAt.getTime() - b.occurredAt.getTime() ||
-      (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
-  );
-  const changes: SignInProjectChange[] = [];
-  let current = new Set<string>();
-  for (const event of ordered) {
-    const next =
-      event.action === "team_member.removed"
-        ? new Set<string>()
-        : new Set(teamMemberProjectIdsAfter(event) ?? current);
-    const change = (projectId: string, kind: "added" | "removed") => {
-      changes.push({
-        memberId,
-        projectId,
-        change: kind,
-        eventId: event.id,
-        occurredAt: event.occurredAt,
-        by: event.actorUserId,
-      });
-    };
-    for (const projectId of next)
-      if (!current.has(projectId)) change(projectId, "added");
-    for (const projectId of current)
-      if (!next.has(projectId)) change(projectId, "removed");
-    current = next;
-  }
-  return changes;
+  return auditProjectChanges(
+    events,
+    teamMemberProjectIdsAfter,
+    (event) => event.action === "team_member.removed",
+  ).map(({ projectId, change, event }) => ({
+    memberId,
+    projectId,
+    change,
+    eventId: event.id,
+    occurredAt: event.occurredAt,
+    by: event.actorUserId,
+  }));
 }
 
 export type SignInProjectHistory = {
@@ -62,10 +48,13 @@ export type SignInProjectHistory = {
   siteEngineerSignIns(
     workspaceId: string,
   ): Promise<{ id: string; name: string }[]>;
-  /** Every Project change of these sign-ins on one Project, oldest first. */
+  /**
+   * Every Project change of these sign-ins, oldest first: on one Project,
+   * or on every Project when `projectId` is null.
+   */
   projectChanges(
     workspaceId: string,
     memberIds: readonly string[],
-    projectId: string,
+    projectId: string | null,
   ): Promise<SignInProjectChange[]>;
 };
