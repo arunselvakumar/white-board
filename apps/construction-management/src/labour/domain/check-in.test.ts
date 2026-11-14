@@ -164,7 +164,7 @@ describe("decideEntry", () => {
         now: new Date(last.occurredAt.getTime() + 119_000),
         today: TODAY,
       }),
-    ).toEqual({ kind: "repeat", entryId: last.id });
+    ).toEqual({ kind: "repeat", entryId: last.id, attendanceDate: TODAY });
     expect(
       codeOf(() =>
         decideEntry({
@@ -187,6 +187,22 @@ describe("decideEntry", () => {
         today: TODAY,
       }),
     ).toEqual({ kind: "record", attendanceDate: TODAY });
+  });
+
+  it("answers a repeated night-shift Check Out with the day it was put on", () => {
+    const last = entry("check_out", "05:00", TODAY, "2026-11-13");
+    expect(
+      decideEntry({
+        action: "check_out",
+        last,
+        now: new Date(last.occurredAt.getTime() + 30_000),
+        today: TODAY,
+      }),
+    ).toEqual({
+      kind: "repeat",
+      entryId: last.id,
+      attendanceDate: "2026-11-13",
+    });
   });
 
   it("puts a Check Out after midnight on the day the Check In began", () => {
@@ -367,6 +383,19 @@ describe("timesFromEntries", () => {
         ZONE,
       ),
     ).toEqual({ checkIn: "10:00", checkOut: null, breakMinutes: 60 });
+  });
+
+  it("leaves the Out for the sheet when a clock set back shows the In's time again", () => {
+    // New York, 1 Nov 2026: 01:30 comes twice, an hour apart.
+    expect(
+      timesFromEntries(
+        [
+          { action: "check_in", occurredAt: new Date("2026-11-01T05:30:00Z") },
+          { action: "check_out", occurredAt: new Date("2026-11-01T06:30:00Z") },
+        ],
+        "America/New_York",
+      ),
+    ).toEqual({ checkIn: "01:30", checkOut: null, breakMinutes: 60 });
   });
 
   it("leaves the Out for the sheet when In to Out is a day or more", () => {

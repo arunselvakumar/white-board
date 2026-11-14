@@ -50,7 +50,7 @@ Per person and Project, from the person's live (not voided) entries:
 - **Check-In** while in: refused, `ALREADY_CHECKED_IN`. **Check-Out** while not in: refused, `NOT_CHECKED_IN`.
 - **The same action again within 2 minutes** (a double tap, a second device) writes nothing and answers with the entry already there (`repeated: true`). The new photo is not stored.
 - **A forgotten Check-Out.** After 16 hours the Check-In no longer counts as open: the next action is a new Check-In, and the earlier day keeps its In with no Out, exactly as a day with only a check-in typed on the sheet (CM-0011). The supervisor types the Out on the marking sheet. Sixteen hours covers a 12-hour watchman's shift with overtime; a longer one closes on the sheet.
-- Entries of one person are serialised in the database (a transaction-scoped advisory lock on the person), so two devices cannot both write "the first Check-In".
+- Entries of one person are serialised in the database (a transaction-scoped advisory lock on the person), so two devices cannot both write "the first Check-In". An entry's time is read once that lock is held, so entries are written in the order their times say, however long a photo took to upload.
 
 ### 3. A Labour's entries write their attendance day
 
@@ -90,7 +90,7 @@ The overtime line from the times is added only when the day has no overtime line
 
 ### 5. Location is recorded and compared, never required
 
-- The browser's location (latitude, longitude, accuracy in metres) is stored with the entry when the person holding the device allows it. No location is not an error.
+- The browser's location (latitude, longitude, accuracy in metres) is stored with the entry when the person holding the device allows it. No location is not an error. The browser is asked with the operator's first tap on the screen (Turn on camera, or Use location), and at once only when it has already answered for the app: a permission prompt never appears before the operator acts.
 - With a location and a Site fence on the Project (HRMS Branches & Sites, CM-0012), the entry is marked **inside** or **outside**, with the metres outside. The rule is the HRMS one: inside when the distance to the centre is at most the radius plus the reported accuracy, the accuracy counting for at most 50 m. No fence, or no location, leaves it unmarked.
 - An entry outside the fence is accepted and flagged. Nothing waits for approval. HRMS Settings' GPS requirement does not apply here: it governs a member's own HRMS check-in.
 - The labour context reads the Project's Site fence through a port (`SiteFenceDirectory`), a plain read of the HRMS table. The haversine distance moves to the shared kernel (`src/shared-kernel/geo.ts`) so both contexts use one.
@@ -128,6 +128,7 @@ The overtime line from the times is added only when the day has no overtime line
 - A Site Engineer in a Company that uses HRMS may be asked to check in twice (question 5). Joining the two registers is a later decision.
 - Photos of workers and their location are personal data. They are private, shown only to members with Attendance Read on the Project, and removed after 90 days. Telling workers that their photo is taken is the Company's duty; the app shows a line on the capture screen saying a photo and the location will be saved.
 - The company backup gains a Check-In log sheet (no photos); deleting a Company removes the entries and their photos with everything else.
+- The overtime line from the times keeps CM-0011's rule on the sheet: it drops out while a day has no Out, and comes back only when the day has no overtime lines or still has that line. A day with overtime typed by hand beside the line from the times, whose Labour then checks in again and out again, gets the typed lines only until a supervisor opens the sheet. Remembering that line across an open day needs new stored state on the day and changes the sheet's rule too; it is left for a decision of its own.
 - A site with no signal cannot check anyone in. The marking sheet is the fallback until offline capture exists.
 
 ## Considered options

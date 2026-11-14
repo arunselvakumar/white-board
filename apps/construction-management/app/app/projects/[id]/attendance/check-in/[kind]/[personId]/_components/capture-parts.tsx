@@ -65,6 +65,8 @@ export function ServerClock({
 }
 
 export type LocationState =
+  /** Not asked yet: the browser would have to prompt. */
+  | { status: "idle" }
   | { status: "finding" }
   | { status: "found"; location: DeviceLocation }
   | { status: "failed"; message: string };
@@ -79,13 +81,19 @@ function failure(error: unknown): LocationState {
   };
 }
 
-/** The device's location, asked for on mount; `retry` asks again. */
-export function useDeviceLocationOnMount(): [LocationState, () => void] {
-  const [state, setState] = useState<LocationState>({ status: "finding" });
+/**
+ * The device's location. It is asked for at once only when the browser has
+ * already answered for this site (allowed, or refused), so no permission
+ * prompt appears before the operator acts; otherwise `ask` runs from a tap
+ * (ADR CM-0043 §5).
+ */
+export function useDeviceLocation(): [LocationState, () => void] {
+  const [state, setState] = useState<LocationState>({ status: "idle" });
   const run = useRef(0);
   const ask = useCallback(() => {
     run.current += 1;
     const current = run.current;
+    setState({ status: "finding" });
     getDeviceLocation().then(
       (location) => {
         if (current === run.current) setState({ status: "found", location });
@@ -96,16 +104,23 @@ export function useDeviceLocationOnMount(): [LocationState, () => void] {
     );
   }, []);
   useEffect(() => {
-    ask();
+    let cancelled = false;
+    const permissions =
+      typeof navigator !== "undefined" && "permissions" in navigator
+        ? navigator.permissions
+        : undefined;
+    permissions
+      ?.query({ name: "geolocation" })
+      .then((permission) => {
+        if (!cancelled && permission.state !== "prompt") ask();
+      })
+      .catch(() => undefined);
     return () => {
+      cancelled = true;
       run.current += 1;
     };
   }, [ask]);
-  const retry = useCallback(() => {
-    setState({ status: "finding" });
-    ask();
-  }, [ask]);
-  return [state, retry];
+  return [state, ask];
 }
 
 /**
@@ -121,6 +136,21 @@ export function LocationLine({
   siteFence: { name: string } | null;
   onRetry: () => void;
 }) {
+  if (state.status === "idle")
+    return (
+      <div className="flex items-center gap-2 text-sm">
+        <MapPinOff
+          aria-hidden="true"
+          className="text-muted-foreground size-4 shrink-0"
+        />
+        <p className="text-muted-foreground min-w-0 flex-1">
+          The location is not on yet.
+        </p>
+        <Button type="button" variant="outline" size="sm" onClick={onRetry}>
+          Use location
+        </Button>
+      </div>
+    );
   if (state.status === "finding")
     return (
       <p

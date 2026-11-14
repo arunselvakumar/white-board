@@ -36,7 +36,8 @@ export function CaptureConfirmation({
   onDone,
 }: {
   result: RecordCheckInResult;
-  photoUrl: string;
+  /** Null when there is no photo to show (a repeat of an entry whose photo is gone). */
+  photoUrl: string | null;
   timeZone: string;
   onDone: () => void;
 }) {
@@ -63,12 +64,14 @@ export function CaptureConfirmation({
         role="status"
         className="motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in-95 pointer-events-none relative mx-auto flex h-full w-full max-w-lg flex-col items-center justify-center gap-4 overflow-y-auto p-6 text-center duration-200"
       >
-        {/* eslint-disable-next-line @next/next/no-img-element -- the frame just taken, a local URL */}
-        <img
-          src={photoUrl}
-          alt={result.person.name}
-          className="bg-sidebar aspect-[4/3] w-full max-w-sm rounded-2xl object-cover"
-        />
+        {photoUrl == null ? null : (
+          // eslint-disable-next-line @next/next/no-img-element -- the frame just taken (a local URL), or the entry's private photo
+          <img
+            src={photoUrl}
+            alt={result.person.name}
+            className="bg-sidebar aspect-[4/3] w-full max-w-sm rounded-2xl object-cover"
+          />
+        )}
         <CircleCheck
           aria-hidden="true"
           className="size-12 text-emerald-700 dark:text-emerald-400"

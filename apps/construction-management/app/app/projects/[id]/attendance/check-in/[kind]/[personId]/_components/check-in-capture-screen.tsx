@@ -32,6 +32,7 @@ import { cn } from "@repo/ui/lib/utils";
 import {
   checkInPersonPhotoUrl,
   checkInPersonQuery,
+  checkInPhotoUrl,
   useRecordCheckIn,
   type CheckInAction,
   type CheckInKind,
@@ -56,7 +57,7 @@ import {
   LocationLine,
   ServerClock,
   TodayEntries,
-  useDeviceLocationOnMount,
+  useDeviceLocation,
 } from "./capture-parts";
 import { useCheckInCamera, type CapturedPhoto } from "./use-camera";
 
@@ -188,7 +189,16 @@ function Capture({
   );
   const { person, timeZone } = data;
   const camera = useCheckInCamera();
-  const [location, retryLocation] = useDeviceLocationOnMount();
+  const [location, askLocation] = useDeviceLocation();
+  // Leaving while a frame is still being encoded must not send an entry
+  // the operator never sees confirmed.
+  const onScreen = useRef(true);
+  useEffect(() => {
+    onScreen.current = true;
+    return () => {
+      onScreen.current = false;
+    };
+  }, []);
   const record = useRecordCheckIn();
   const router = useRouter();
 
@@ -249,6 +259,7 @@ function Capture({
       });
       return;
     }
+    if (!onScreen.current) return;
     setFrozen(photo);
     send(
       {
@@ -302,7 +313,15 @@ function Capture({
 
         <div className="space-y-2 lg:col-start-1 lg:row-span-2 lg:row-start-1">
           <CaptureCameraPanel
-            camera={camera}
+            // Turning the camera on is the operator's first tap: the
+            // location is asked for with it, never before.
+            camera={{
+              ...camera,
+              start: () => {
+                camera.start();
+                if (location.status === "idle") askLocation();
+              },
+            }}
             frozenUrl={frozen?.previewUrl ?? null}
           />
           <p className="text-muted-foreground text-center text-sm">
@@ -349,7 +368,7 @@ function Capture({
           <LocationLine
             state={location}
             siteFence={data.siteFence}
-            onRetry={retryLocation}
+            onRetry={askLocation}
           />
           <TodayEntries entries={data.entries} timeZone={timeZone} />
           <div className="bg-background/95 sticky bottom-0 -mx-4 mt-auto space-y-3 border-t px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur sm:-mx-6 sm:px-6 lg:static lg:mx-0 lg:border-0 lg:bg-transparent lg:px-0 lg:pb-0 lg:backdrop-blur-none">
@@ -388,7 +407,14 @@ function Capture({
       {done == null ? null : (
         <CaptureConfirmation
           result={done.result}
-          photoUrl={done.photo.previewUrl}
+          // A repeat saved nothing: show the photo of the entry it names.
+          photoUrl={
+            done.result.repeated
+              ? done.result.entry.hasPhoto
+                ? checkInPhotoUrl(done.result.entry.id)
+                : null
+              : done.photo.previewUrl
+          }
           timeZone={timeZone}
           onDone={finish}
         />
@@ -408,6 +434,20 @@ function Screen({
   useLockedPageScroll();
   useEffect(() => {
     root.current?.focus();
+  }, []);
+  // The page behind cannot be seen, so it must not take focus or clicks
+  // either. Popups this screen opens are added to `<body>` afterwards and
+  // stay usable.
+  useEffect(() => {
+    const self = root.current;
+    const behind = Array.from(document.body.children).filter(
+      (element): element is HTMLElement =>
+        element instanceof HTMLElement && element !== self && !element.inert,
+    );
+    for (const element of behind) element.inert = true;
+    return () => {
+      for (const element of behind) element.inert = false;
+    };
   }, []);
   return (
     <div
