@@ -54,12 +54,15 @@ export function mapsUrl(location: Location): string {
   return `https://www.google.com/maps?q=${String(location.latitude)},${String(location.longitude)}`;
 }
 
-/** "Inside the site fence", "240 m outside", "Location saved" or "No location". */
+/**
+ * "Inside the site fence", "240 m outside the site fence", "Location
+ * saved" (a location, no Site fence) or "No location" (ADR CM-0044 §2).
+ */
 export function checkInLocation(entry: CheckInPlace): string {
   if (entry.location == null) return "No location";
   if (entry.fence === "inside") return "Inside the site fence";
   if (entry.fence === "outside")
-    return `${(entry.metresOutside ?? 0).toLocaleString("en-IN")} m outside`;
+    return `${(entry.metresOutside ?? 0).toLocaleString("en-IN")} m outside the site fence`;
   return "Location saved";
 }
 
