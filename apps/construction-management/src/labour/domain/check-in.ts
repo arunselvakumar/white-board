@@ -65,11 +65,9 @@ export type PersonState =
 
 /** The last entry when it is a Check In still counted as open. */
 function openEntry(last: LiveEntry | null, now: Date): LiveEntry | null {
-  return last != null &&
-    last.action === "check_in" &&
-    now.getTime() - last.occurredAt.getTime() < OPEN_CHECK_IN_HOURS * HOUR_MS
-    ? last
-    : null;
+  if (last?.action !== "check_in") return null;
+  const age = now.getTime() - last.occurredAt.getTime();
+  return age < OPEN_CHECK_IN_HOURS * HOUR_MS ? last : null;
 }
 
 /**
@@ -89,11 +87,7 @@ export function personState(
       since: open.occurredAt,
       attendanceDate: open.attendanceDate,
     };
-  if (
-    last != null &&
-    last.action === "check_out" &&
-    last.attendanceDate === today
-  )
+  if (last?.action === "check_out" && last.attendanceDate === today)
     return { status: "out", since: last.occurredAt };
   return { status: "none" };
 }
@@ -123,8 +117,7 @@ export function decideEntry(input: {
 }): EntryDecision {
   const { action, last, now } = input;
   if (
-    last != null &&
-    last.action === action &&
+    last?.action === action &&
     now.getTime() - last.occurredAt.getTime() < REPEAT_WINDOW_SECONDS * 1000
   )
     return { kind: "repeat", entryId: last.id };
