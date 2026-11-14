@@ -114,7 +114,7 @@ All under `/api/construction/labour/attendance/check-ins`, checked against `labo
 | `GET /{id}/photo`                        | Read   | The entry's photo                                                                                            |
 | `GET /people/{kind}/{personId}/photo`    | Read   | The Labour's or Vendor's photo from their record (404 when none)                                             |
 
-A member who is not on the Project gets 404, as on every Project route.
+A member who is not on the Project is refused (403), as on every Project route.
 
 ## 4. Not in this round
 
@@ -168,7 +168,7 @@ Work top to bottom. One PR.
 - A Labour's day is created, updated or left alone exactly as ADR §3 says, with the ledger entries to match; two requests at once for the same Labour produce one Check-In and one refusal.
 - `POST /check-ins/{id}/void` voids, works the day out again, and clears a day Check-In created when its last entry goes.
 - Marking a day on the sheet turns `from_check_in` off and keeps `times_from_check_in` only when the times are sent back unchanged.
-- HTTP tests cover each line above, a member not on the Project (404), and no Create or no Delete (403).
+- HTTP tests cover each line above, a member not on the Project and no Create or no Delete (403).
 
 ### 4 — Reads
 
