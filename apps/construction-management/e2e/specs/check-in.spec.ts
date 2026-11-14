@@ -4,6 +4,9 @@ import { createLabour } from "../api/labour";
 import { checkInPageTest } from "../helpers/checkInPageTest";
 import { CheckInLogPage } from "../pages/CheckInLogPage";
 import { LabourAttendancePage } from "../pages/LabourAttendancePage";
+import { LabourPage } from "../pages/LabourPage";
+import { ProjectActivityPage } from "../pages/ProjectActivityPage";
+import { ResourcesPage } from "../pages/ResourcesPage";
 import { WagesPage } from "../pages/WagesPage";
 
 checkInPageTest.describe("Check-In", () => {
@@ -81,6 +84,69 @@ checkInPageTest.describe("Check-In", () => {
       const wagesPage = new WagesPage(page, project.id);
       await wagesPage.goto();
       await expect(wagesPage.amount(labour.name, "To Pay")).toHaveText("₹0.00");
+    },
+  );
+
+  checkInPageTest(
+    "should show the Check In with its photo and place on the Labour's and the Project's Activity, when a Labour is checked in",
+    async ({ owner, project, checkInPage, page }) => {
+      const labour = await createLabour(owner.api, {
+        projectId: project.id,
+      });
+      await checkInPage.goto();
+      await checkInPage.record(labour.name, "Check In");
+      await expect(page.getByText(/^Checked in at /)).toBeVisible();
+
+      const activityPage = new ProjectActivityPage(page, project.id);
+      await activityPage.goto();
+      const entry = activityPage
+        .day("Today")
+        .getByRole("listitem")
+        .filter({ hasText: `${labour.name} checked in` });
+      await expect(entry).toBeVisible();
+      await expect(
+        entry.getByRole("link", { name: "Open in Maps" }),
+      ).toHaveAttribute(
+        "href",
+        "https://www.google.com/maps?q=11.0168,76.9558",
+      );
+      await entry.getByRole("button", { name: /photo/i }).click();
+      // The dialog's title names the photo, so the image itself has no
+      // role; what matters is that the private photo really loads.
+      const photo = activityPage.dialog.locator("img");
+      await expect(photo).toBeVisible();
+      await expect
+        .poll(() =>
+          photo.evaluate((image: HTMLImageElement) => image.naturalWidth),
+        )
+        .toBeGreaterThan(0);
+      await page.keyboard.press("Escape");
+
+      const labourPage = new LabourPage(page, labour.id);
+      await page.goto(`${labourPage.url}?tab=activity`);
+      await expect(
+        labourPage.day("Today").getByText(/^Checked in at /),
+      ).toBeVisible();
+    },
+  );
+
+  checkInPageTest(
+    "should open the Labour's page, when the Owner clicks anywhere on their row on Teams",
+    async ({ owner, project, page }) => {
+      const labour = await createLabour(owner.api, {
+        projectId: project.id,
+      });
+      const teamsPage = new ResourcesPage(page, project.id);
+      await teamsPage.goto();
+      const row = page.getByRole("listitem").filter({ hasText: labour.name });
+      const box = await row.boundingBox();
+      // The far end of the row, well clear of the name and of its Actions.
+      await row.click({
+        position: { x: (box?.width ?? 0) - 16, y: (box?.height ?? 0) / 2 },
+      });
+      await expect(page).toHaveURL(
+        new RegExp(`/app/staff/labours/${labour.id}$`),
+      );
     },
   );
 });

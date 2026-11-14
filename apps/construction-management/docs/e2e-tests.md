@@ -75,17 +75,19 @@ bun run --cwd apps/construction-management test:e2e         # every test
 
 ## Labour and vendors
 
-| Test                                                                                                | Tags            | Spec                     |
-| --------------------------------------------------------------------------------------------------- | --------------- | ------------------------ |
-| should owe the day's wage, when the Owner adds a Labour and marks them Present                      | **@pr** @mobile | `labour.spec.ts`         |
-| should owe half the wage, when a Labour is marked Half Day                                          |                 | `labour.spec.ts`         |
-| should clear the balance, when the Owner pays a Labour what they are owed                           | **@pr**         | `labour.spec.ts`         |
-| should mark the Labour Present and owe the day's wage, when they are checked in with a photo        | **@pr** @mobile | `check-in.spec.ts`       |
-| should clear the day and owe nothing, when the Labour's only check-in entry is voided               |                 | `check-in.spec.ts`       |
-| should move the Labour and keep the history, when the Owner transfers them to another Project       |                 | `labour-records.spec.ts` |
-| should add every row, when the Owner imports Labours from the filled-in sample sheet                |                 | `labour-records.spec.ts` |
-| should leave an inactive Labour off the attendance sheet, when the Owner deactivates them           |                 | `labour-records.spec.ts` |
-| should owe the Vendor heads × rate, when the Owner adds a Vendor with a rate card and records a day |                 | `vendors.spec.ts`        |
+| Test                                                                                                                      | Tags            | Spec                     |
+| ------------------------------------------------------------------------------------------------------------------------- | --------------- | ------------------------ |
+| should owe the day's wage, when the Owner adds a Labour and marks them Present                                            | **@pr** @mobile | `labour.spec.ts`         |
+| should owe half the wage, when a Labour is marked Half Day                                                                |                 | `labour.spec.ts`         |
+| should clear the balance, when the Owner pays a Labour what they are owed                                                 | **@pr**         | `labour.spec.ts`         |
+| should mark the Labour Present and owe the day's wage, when they are checked in with a photo                              | **@pr** @mobile | `check-in.spec.ts`       |
+| should clear the day and owe nothing, when the Labour's only check-in entry is voided                                     |                 | `check-in.spec.ts`       |
+| should show the Check In with its photo and place on the Labour's and the Project's Activity, when a Labour is checked in |                 | `check-in.spec.ts`       |
+| should open the Labour's page, when the Owner clicks anywhere on their row on Teams                                       |                 | `check-in.spec.ts`       |
+| should move the Labour and keep the history, when the Owner transfers them to another Project                             |                 | `labour-records.spec.ts` |
+| should add every row, when the Owner imports Labours from the filled-in sample sheet                                      |                 | `labour-records.spec.ts` |
+| should leave an inactive Labour off the attendance sheet, when the Owner deactivates them                                 |                 | `labour-records.spec.ts` |
+| should owe the Vendor heads × rate, when the Owner adds a Vendor with a rate card and records a day                       |                 | `vendors.spec.ts`        |
 
 ## HRMS
 
