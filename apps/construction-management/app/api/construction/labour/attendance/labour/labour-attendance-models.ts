@@ -182,6 +182,11 @@ export const ConstructionLabourLabourAttendanceDayResponseModel = z.object({
   checkOut: z.string().nullable(),
   /** Unpaid break in minutes; null without a check-in. */
   breakMinutes: z.int().nullable(),
+  /**
+   * The times follow the Check-In log ("From Check-In"); sending other
+   * times on the sheet turns it off (ADR CM-0043).
+   */
+  timesFromCheckIn: z.boolean(),
   /** Snapshot of the Labour's working hours a day (decimal hours). */
   workingHours: z.string(),
   /** check-out − check-in − break, decimal hours; null without both times. */
@@ -364,6 +369,7 @@ export function toLabourAttendanceDayResponse(
     checkIn: day.checkIn,
     checkOut: day.checkOut,
     breakMinutes: day.breakMinutes,
+    timesFromCheckIn: day.timesFromCheckIn,
     workingHours: day.workingHours,
     workedHours: day.workedHours,
     wageType: day.wageType,

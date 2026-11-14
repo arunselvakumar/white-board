@@ -10,18 +10,13 @@ type Db = Pick<
 const byName = (a: Ref, b: Ref) =>
   a.name.localeCompare(b.name) || a.id.localeCompare(b.id);
 
-/**
- * The Site Engineers on each Project (ADR CM-0041): live, enabled Site
- * Engineer rows whose sign-in is assigned to the Project (CM-0038 §3), by
- * name. The Owner is on every Project without being assigned, so never
- * counts. Projects with none are left out of the map. Plain reads of the
- * masters and organization tables, like the other directories.
- */
-export async function siteEngineersOnProjects(
+type Contact = Ref & { mobile: string | null; employeeCode: string | null };
+
+async function engineersOnProjects(
   db: Db,
   workspaceId: string,
   projectIds: readonly string[],
-): Promise<Map<string, Ref[]>> {
+): Promise<Map<string, Contact[]>> {
   const wanted = [...new Set(projectIds)];
   if (wanted.length === 0) return new Map();
   const assignments =
@@ -42,16 +37,27 @@ export async function siteEngineersOnProjects(
         in: [...new Set(assignments.map((row) => row.memberId))],
       },
     },
-    select: { id: true, name: true, teamMemberId: true },
+    select: {
+      id: true,
+      name: true,
+      teamMemberId: true,
+      mobile: true,
+      employeeCode: true,
+    },
   });
-  const byMember = new Map<string, Ref[]>();
+  const byMember = new Map<string, Contact[]>();
   for (const engineer of engineers) {
     if (engineer.teamMemberId == null) continue;
     const list = byMember.get(engineer.teamMemberId) ?? [];
-    list.push({ id: engineer.id, name: engineer.name });
+    list.push({
+      id: engineer.id,
+      name: engineer.name,
+      mobile: engineer.mobile,
+      employeeCode: engineer.employeeCode,
+    });
     byMember.set(engineer.teamMemberId, list);
   }
-  const result = new Map<string, Ref[]>();
+  const result = new Map<string, Contact[]>();
   for (const { memberId, projectId } of assignments) {
     const found = byMember.get(memberId);
     if (found == null) continue;
@@ -60,6 +66,37 @@ export async function siteEngineersOnProjects(
   for (const [projectId, list] of result)
     result.set(projectId, list.sort(byName));
   return result;
+}
+
+/**
+ * The Site Engineers on each Project (ADR CM-0041): live, enabled Site
+ * Engineer rows whose sign-in is assigned to the Project (CM-0038 §3), by
+ * name. The Owner is on every Project without being assigned, so never
+ * counts. Projects with none are left out of the map. Plain reads of the
+ * masters and organization tables, like the other directories.
+ */
+export async function siteEngineersOnProjects(
+  db: Db,
+  workspaceId: string,
+  projectIds: readonly string[],
+): Promise<Map<string, Ref[]>> {
+  const found = await engineersOnProjects(db, workspaceId, projectIds);
+  return new Map(
+    [...found].map(([projectId, list]) => [
+      projectId,
+      list.map((engineer) => ({ id: engineer.id, name: engineer.name })),
+    ]),
+  );
+}
+
+/** The Site Engineers on one Project with their mobile and employee code. */
+export async function siteEngineerContactsOn(
+  db: Db,
+  workspaceId: string,
+  projectId: string,
+): Promise<Contact[]> {
+  const found = await engineersOnProjects(db, workspaceId, [projectId]);
+  return found.get(projectId) ?? [];
 }
 
 /** Everyone on any of `projectIds`, once each, by name. */

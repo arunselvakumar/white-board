@@ -4,6 +4,7 @@ import { Prisma, prisma } from "@repo/construction-db";
 import { describe, expect, it } from "vitest";
 
 import { POST as schedule } from "@/app/api/construction/organization/company-deletion/route";
+import { createCheckInHandlers } from "@/src/labour/infrastructure/check-in-factory";
 import { companyFileKey } from "@/src/shared-kernel/files";
 import { recordStoredFile } from "@/src/shared-kernel/files/stored-files";
 import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
@@ -17,6 +18,7 @@ import {
   ownerWithCompany,
 } from "@/test/companies";
 import { addMaterial, addStore, addSupplier } from "@/test/procurement";
+import { pngBytes } from "@/test/files";
 import { trackingMaster, trackingTaskRow } from "@/test/tracking";
 import { TEST_ORIGIN } from "@/test/sessions";
 
@@ -143,7 +145,38 @@ async function busyCompany(name: string) {
     new Uint8Array([1, 2, 3]),
     "application/pdf",
   );
-  return { owner, member, key, unrecorded };
+  // A check-in entry with its photo (ADR CM-0043).
+  const vendorId = randomUUID();
+  await prisma.constructionLabourVendor.create({
+    data: {
+      id: vendorId,
+      workspaceId: owner.workspaceId,
+      name: "Selvam Gang",
+      joiningDate: new Date("2026-01-01T00:00:00Z"),
+      createdBy: owner.userId,
+      updatedBy: owner.userId,
+      projects: { create: [{ projectId }] },
+    },
+  });
+  await createCheckInHandlers().record({
+    workspaceId: owner.workspaceId,
+    userId: owner.userId,
+    projectId,
+    kind: "vendor",
+    personId: vendorId,
+    action: "check_in",
+    photo: Buffer.from(pngBytes()).toString("base64"),
+  });
+  const checkIn = await prisma.constructionLabourCheckInEvent.findFirstOrThrow({
+    where: { workspaceId: owner.workspaceId },
+  });
+  return {
+    owner,
+    member,
+    key,
+    unrecorded,
+    checkInPhoto: checkIn.photoKey ?? "",
+  };
 }
 
 describe("deletionOrder", () => {
@@ -180,6 +213,7 @@ describe("organization.company_purge (CM-907)", () => {
       "construction_procurement",
       "construction_tracking",
       "construction_messaging",
+      "construction_labour",
     ])
       expect(schemas).toContain(schema);
 
@@ -255,7 +289,9 @@ describe("organization.company_purge (CM-907)", () => {
     const summary = record.summary as Record<string, number>;
     expect(summary["construction_projects.projects"]).toBe(1);
     expect(summary["construction_organization.sequence_counters"]).toBe(1);
-    expect(summary["storage.objects"]).toBe(2);
+    expect(summary["construction_labour.check_in_events"]).toBe(1);
+    expect(summary["storage.objects"]).toBe(3);
+    await expect(objectStorage().head(doomed.checkInPhoto)).resolves.toBeNull();
     // Scheduling added its own audit and code rows since `before`.
     for (const [table, count] of Object.entries(nonZero(before)))
       if (!KEPT_TABLES.has(table))
@@ -264,6 +300,9 @@ describe("organization.company_purge (CM-907)", () => {
     // Another Company is untouched.
     expect(await rowsOf(other.owner.workspaceId)).toEqual(otherBefore);
     await expect(objectStorage().head(other.key)).resolves.not.toBeNull();
+    await expect(
+      objectStorage().head(other.checkInPhoto),
+    ).resolves.not.toBeNull();
     await expect(
       prisma.identityWorkspace.count({
         where: { id: other.owner.workspaceId },

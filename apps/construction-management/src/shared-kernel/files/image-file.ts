@@ -27,6 +27,8 @@ export const IMAGE_LIMITS = {
   project_logo: 2 * MB,
   /** CM-603: one photo per machine in the Equipment register. */
   equipment_photo: 5 * MB,
+  /** A frame taken by the camera at a Check-In (ADR CM-0043 §6). */
+  check_in_photo: 1 * MB,
 } as const;
 
 export type ImageKind = keyof typeof IMAGE_LIMITS;

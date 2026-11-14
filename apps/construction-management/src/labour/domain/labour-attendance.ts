@@ -98,6 +98,13 @@ export type PricedDay = {
   wageRate: number;
   earned: number;
   overtime: PricedOvertime[];
+  /**
+   * The day exists because of a Check-In and the sheet has not saved it
+   * since (ADR CM-0043). `priceDay` leaves it false; the caller sets it.
+   */
+  fromCheckIn: boolean;
+  /** The times follow the Check-In log; needs a check-in time. */
+  timesFromCheckIn: boolean;
 };
 
 /** Statuses that may carry check-in and check-out times. */
@@ -271,6 +278,8 @@ export function priceDay(input: {
       date: input.date,
     }),
     overtime,
+    fromCheckIn: false,
+    timesFromCheckIn: false,
   };
 }
 

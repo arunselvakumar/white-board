@@ -139,37 +139,42 @@ enum ConstructionLabourAttendanceStatus {
 /// overtime. Re-marking a day updates the row and reverses its old ledger
 /// entries.
 model ConstructionLabourAttendance {
-  id             String                             @id @db.Uuid
-  workspaceId    String                             @map("workspace_id")
-  projectId      String                             @map("project_id") @db.Uuid
-  labourId       String                             @map("labour_id") @db.Uuid
-  attendanceDate DateTime                           @map("attendance_date") @db.Date
-  status         ConstructionLabourAttendanceStatus
+  id               String                             @id @db.Uuid
+  workspaceId      String                             @map("workspace_id")
+  projectId        String                             @map("project_id") @db.Uuid
+  labourId         String                             @map("labour_id") @db.Uuid
+  attendanceDate   DateTime                           @map("attendance_date") @db.Date
+  status           ConstructionLabourAttendanceStatus
   /// Only on `on_leave`: the leave day is paid ("Mark Paid Leave").
-  isPaidLeave    Boolean                            @default(false) @map("is_paid_leave")
-  shift          String?
+  isPaidLeave      Boolean                            @default(false) @map("is_paid_leave")
+  shift            String?
   /// The Labour's Site Engineer, saved on days marked before ADR CM-0041;
   /// null on days marked since (a Labour's Site Engineers come from the Project).
-  supervisorId   String?                            @map("supervisor_id") @db.Uuid
+  supervisorId     String?                            @map("supervisor_id") @db.Uuid
   /// `HH:MM`, Company time; only on Present or Half Day (ADR CM-0011).
-  checkIn        String?                            @map("check_in") @db.Char(5)
+  checkIn          String?                            @map("check_in") @db.Char(5)
   /// `HH:MM`; at or before `check_in` means the next day.
-  checkOut       String?                            @map("check_out") @db.Char(5)
+  checkOut         String?                            @map("check_out") @db.Char(5)
   /// Unpaid break in minutes; set when there is a check-in.
-  breakMinutes   Int?                               @map("break_minutes")
+  breakMinutes     Int?                               @map("break_minutes")
   /// The Labour's working hours a day, as on the day it was marked.
-  workingHours   Decimal                            @default(8) @map("working_hours") @db.Decimal(4, 2)
-  wageType       ConstructionLabourWageType         @map("wage_type")
+  workingHours     Decimal                            @default(8) @map("working_hours") @db.Decimal(4, 2)
+  wageType         ConstructionLabourWageType         @map("wage_type")
   /// Paise: wage per day, or wage per month, as on the day it was marked.
-  wageRate       Int                                @map("wage_rate")
+  wageRate         Int                                @map("wage_rate")
   /// Paise the day pays before overtime.
-  earned         Int
-  createdAt      DateTime                           @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt      DateTime                           @default(now()) @map("updated_at") @db.Timestamptz(3)
-  createdBy      String                             @map("created_by")
-  updatedBy      String                             @map("updated_by")
-  deletedAt      DateTime?                          @map("deleted_at") @db.Timestamptz(3)
-  deletedBy      String?                            @map("deleted_by")
+  earned           Int
+  /// The day exists because of a Check-In and the sheet has not saved it
+  /// since (ADR CM-0043): voiding its last check-in entry clears it.
+  fromCheckIn      Boolean                            @default(false) @map("from_check_in")
+  /// The times follow the Check-In log; typing other times turns it off.
+  timesFromCheckIn Boolean                            @default(false) @map("times_from_check_in")
+  createdAt        DateTime                           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime                           @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy        String                             @map("created_by")
+  updatedBy        String                             @map("updated_by")
+  deletedAt        DateTime?                          @map("deleted_at") @db.Timestamptz(3)
+  deletedBy        String?                            @map("deleted_by")
 
   labour   ConstructionLabourLabour     @relation(fields: [labourId], references: [id])
   overtime ConstructionLabourOvertime[]
@@ -198,6 +203,66 @@ model ConstructionLabourOvertime {
 
   @@index([attendanceId])
   @@map("labour_overtime")
+  @@schema("construction_labour")
+}
+
+enum ConstructionLabourCheckInPersonKind {
+  labour
+  vendor
+  /// A Site Engineer row (`construction_masters.supervisors`).
+  site_engineer
+
+  @@map("check_in_person_kind")
+  @@schema("construction_labour")
+}
+
+enum ConstructionLabourCheckInAction {
+  check_in
+  check_out
+
+  @@map("check_in_action")
+  @@schema("construction_labour")
+}
+
+/// One Check In or Check Out of a person at a Project's site (ADR CM-0043):
+/// a photo, the server's time and the device's location. Append-only: a
+/// wrong one is voided, and only the retention job removes the photo. A
+/// Labour's entries write their attendance day; a Vendor's and a Site
+/// Engineer's are a log.
+model ConstructionLabourCheckInEvent {
+  id             String                              @id @db.Uuid
+  workspaceId    String                              @map("workspace_id")
+  projectId      String                              @map("project_id") @db.Uuid
+  personKind     ConstructionLabourCheckInPersonKind @map("person_kind")
+  /// A Labour, a Vendor or a Site Engineer row, by `person_kind`.
+  personId       String                              @map("person_id") @db.Uuid
+  action         ConstructionLabourCheckInAction
+  /// The server's clock when the entry arrived.
+  occurredAt     DateTime                            @map("occurred_at") @db.Timestamptz(3)
+  /// Company time zone: today for a Check In; for a Check Out, the day of
+  /// the Check In it closes.
+  attendanceDate DateTime                            @map("attendance_date") @db.Date
+  /// A `stored_files` row; null once the retention job removed the photo.
+  photoKey       String?                             @map("photo_key")
+  photoRemovedAt DateTime?                           @map("photo_removed_at") @db.Timestamptz(3)
+  latitude       Decimal?                            @db.Decimal(9, 6)
+  longitude      Decimal?                            @db.Decimal(9, 6)
+  /// Metres, as the device reported it.
+  accuracyMetres Decimal?                            @map("accuracy_metres") @db.Decimal(8, 2)
+  /// Against the Project's Site fence; null without a location or a fence.
+  outsideFence   Boolean?                            @map("outside_fence")
+  /// 0 inside the fence; set exactly when `outside_fence` is.
+  metresOutside  Int?                                @map("metres_outside")
+  voidedAt       DateTime?                           @map("voided_at") @db.Timestamptz(3)
+  voidedBy       String?                             @map("voided_by")
+  voidReason     String?                             @map("void_reason")
+  createdAt      DateTime                            @default(now()) @map("created_at") @db.Timestamptz(3)
+  /// The member who held the device.
+  createdBy      String                              @map("created_by")
+
+  @@index([workspaceId, projectId, attendanceDate, occurredAt])
+  @@index([workspaceId, personKind, personId, occurredAt])
+  @@map("check_in_events")
   @@schema("construction_labour")
 }
 

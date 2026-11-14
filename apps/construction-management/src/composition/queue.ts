@@ -23,6 +23,8 @@ import {
 
 import { FOLLOW_UP_REMINDERS_JOB } from "@/src/marketing/application/follow-up-reminders";
 import { BACKUP_RETENTION_JOB_TYPE } from "@/src/reporting/application/backup-queue";
+import { CHECK_IN_PHOTO_RETENTION_JOB_TYPE } from "@/src/labour/application/check-in-retention";
+import { createCheckInPhotoRetentionHandler } from "@/src/labour/infrastructure/check-in-factory";
 
 import { backupQueueHandlersFromEnv } from "./backup-jobs";
 import { COMPANY_PURGE_JOB, companyPurgeQueueHandler } from "./company-purge";
@@ -64,6 +66,8 @@ export function queueHandlers(): QueueHandler[] {
     companyPurgeQueueHandler(),
     // CM-906: backup parts, the zip step and the daily 7-day expiry.
     ...backupQueueHandlersFromEnv(),
+    // ADR CM-0043 §6: check-in photos are kept 90 days.
+    createCheckInPhotoRetentionHandler(),
   ];
 }
 
@@ -88,6 +92,8 @@ export const DAILY_JOB_TYPES: readonly string[] = [
   COMPANY_PURGE_JOB,
   // CM-906
   BACKUP_RETENTION_JOB_TYPE,
+  // ADR CM-0043 §6
+  CHECK_IN_PHOTO_RETENTION_JOB_TYPE,
 ];
 
 export const queueStore = prismaQueueStore(prisma);

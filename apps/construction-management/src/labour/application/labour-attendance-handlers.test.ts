@@ -453,6 +453,131 @@ describe("LabourAttendanceHandlers paid leave and clear", () => {
   });
 });
 
+describe("LabourAttendanceHandlers and Check-In's flags (ADR CM-0043)", () => {
+  /** Marks Dhuresh, then flags the day as Check-In would have written it. */
+  async function checkedInDay(
+    handlers: LabourAttendanceHandlers,
+    store: FakeLabourAttendanceStore,
+    status: "present" | "on_leave" = "present",
+  ) {
+    const timed =
+      status === "present"
+        ? { checkIn: "09:00", checkOut: "18:00", breakMinutes: 45 }
+        : {};
+    const [day] = await handlers.markDay(
+      mark({ marks: [{ labourId: "dhuresh", status, ...timed }] }),
+    );
+    if (day == null) throw new Error("no row");
+    const stored = store.days.get(day.id);
+    if (stored == null) throw new Error("no stored row");
+    stored.fromCheckIn = true;
+    stored.timesFromCheckIn = status === "present";
+    return day;
+  }
+
+  function sheetSave(
+    times: { checkIn?: string; checkOut?: string; breakMinutes?: number },
+    updatedAt: Date | undefined,
+  ): MarkLabourDayInput {
+    return mark({
+      marks: [{ labourId: "dhuresh", status: "half_day", ...times }],
+      expected: { dhuresh: updatedAt ?? new Date(0) },
+    });
+  }
+
+  it("saves a new day from the sheet with neither flag", async () => {
+    const { store, handlers } = setup();
+    const [day] = await handlers.markDay(
+      mark({
+        marks: [{ labourId: "dhuresh", status: "present", checkIn: "09:00" }],
+      }),
+    );
+    expect(day?.timesFromCheckIn).toBe(false);
+    expect(store.days.get(day?.id ?? "")).toMatchObject({
+      fromCheckIn: false,
+      timesFromCheckIn: false,
+    });
+  });
+
+  it("turns fromCheckIn off on a sheet save and keeps the log's times only while sent back unchanged", async () => {
+    const { store, handlers } = setup();
+    const day = await checkedInDay(handlers, store);
+    const [same] = await handlers.markDay(
+      sheetSave(
+        { checkIn: "09:00", checkOut: "18:00", breakMinutes: 45 },
+        day.updatedAt,
+      ),
+    );
+    expect(same?.timesFromCheckIn).toBe(true);
+    expect(store.days.get(day.id)).toMatchObject({
+      status: "half_day",
+      fromCheckIn: false,
+      timesFromCheckIn: true,
+    });
+
+    const [typed] = await handlers.markDay(
+      sheetSave(
+        { checkIn: "09:00", checkOut: "17:30", breakMinutes: 45 },
+        same?.updatedAt,
+      ),
+    );
+    expect(typed?.timesFromCheckIn).toBe(false);
+    expect(store.days.get(day.id)).toMatchObject({
+      fromCheckIn: false,
+      timesFromCheckIn: false,
+    });
+
+    // Once off, the same times sent again do not turn it back on.
+    const [again] = await handlers.markDay(
+      sheetSave(
+        { checkIn: "09:00", checkOut: "17:30", breakMinutes: 45 },
+        typed?.updatedAt,
+      ),
+    );
+    expect(again?.timesFromCheckIn).toBe(false);
+  });
+
+  it("drops the log's times when the sheet sends a different break or no times", async () => {
+    const { store, handlers } = setup();
+    const day = await checkedInDay(handlers, store);
+    // No break sent: the 60-minute default, not the log's 45.
+    const [noBreak] = await handlers.markDay(
+      sheetSave({ checkIn: "09:00", checkOut: "18:00" }, day.updatedAt),
+    );
+    expect(noBreak?.breakMinutes).toBe(60);
+    expect(noBreak?.timesFromCheckIn).toBe(false);
+
+    const stored = store.days.get(day.id);
+    if (stored == null) throw new Error("no stored row");
+    stored.timesFromCheckIn = true;
+    const [none] = await handlers.markDay(sheetSave({}, stored.updatedAt));
+    expect(none?.checkIn).toBeNull();
+    expect(none?.timesFromCheckIn).toBe(false);
+  });
+
+  it("Mark Paid Leave turns fromCheckIn off and carries timesFromCheckIn over", async () => {
+    const { store, handlers } = setup();
+    const day = await checkedInDay(handlers, store, "on_leave");
+    const stored = store.days.get(day.id);
+    if (stored == null) throw new Error("no stored row");
+    // The database refuses this without times; here it shows the flag is
+    // carried over, not reset.
+    stored.timesFromCheckIn = true;
+    const paid = await handlers.setPaidLeave({
+      actor: OWNER,
+      attendanceId: day.id,
+      isPaidLeave: true,
+      expectedUpdatedAt: day.updatedAt,
+    });
+    expect(paid.timesFromCheckIn).toBe(true);
+    expect(store.days.get(day.id)).toMatchObject({
+      isPaidLeave: true,
+      fromCheckIn: false,
+      timesFromCheckIn: true,
+    });
+  });
+});
+
 describe("LabourAttendanceHandlers queries", () => {
   it("builds the sheet with weekly-holiday and yesterday hints", async () => {
     const { handlers } = setup();

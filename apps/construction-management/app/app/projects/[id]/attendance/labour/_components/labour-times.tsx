@@ -18,6 +18,7 @@ import { DEFAULT_BREAK_MINUTES, endsNextDay } from "@/src/labour/domain/wages";
 import type { LabourSheetRow } from "@/src/queries/labour-attendance";
 
 import {
+  breakOf,
   TIMES_FIELDS,
   timesIssues,
   timesSummary,
@@ -85,6 +86,21 @@ function WorkedPreview({
         <span className="text-muted-foreground"> · {summary.extra} h over</span>
       )}
     </p>
+  );
+}
+
+/**
+ * The row's saved times follow the Check-In log and nobody has typed over
+ * them yet (ADR CM-0043). Typing other times and saving stops the log from
+ * changing that day's times.
+ */
+function followsCheckIn(row: LabourSheetRow, draft: LabourRowDraft): boolean {
+  const saved = row.attendance;
+  return (
+    saved?.timesFromCheckIn === true &&
+    draft.checkIn.trim() === (saved.checkIn ?? "") &&
+    draft.checkOut.trim() === (saved.checkOut ?? "") &&
+    breakOf(draft) === saved.breakMinutes
   );
 }
 
@@ -191,8 +207,16 @@ export function RowTimes({
           }}
         />
       </div>
-      <div className="col-span-3 lg:flex lg:h-11 lg:items-center">
+      <div className="col-span-3 lg:flex lg:h-11 lg:items-center lg:gap-3">
         <WorkedPreview row={row} draft={draft} />
+        {followsCheckIn(row, draft) ? (
+          <p
+            aria-label={`${row.name} times are from Check-In`}
+            className="text-muted-foreground text-sm"
+          >
+            From Check-In
+          </p>
+        ) : null}
       </div>
       {messages.length === 0 ? null : (
         <div className="col-span-3 space-y-0.5 lg:basis-full">

@@ -86,7 +86,7 @@ export const PROJECT_MODULES = [
   {
     key: "attendance",
     label: "Attendance",
-    description: "Mark labour and vendor attendance.",
+    description: "Check people in, and mark labour and vendor attendance.",
     segment: "attendance",
     menu: "labour.attendance",
   },

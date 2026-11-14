@@ -180,6 +180,10 @@ import {
   labourAttendanceOpenApiOperations,
 } from "@/app/api/construction/labour/attendance/labour/labour-attendance-openapi";
 import {
+  checkInOpenApiComponents,
+  checkInOpenApiOperations,
+} from "@/app/api/construction/labour/attendance/check-ins/check-in-openapi";
+import {
   paymentOpenApiComponents,
   paymentOpenApiOperations,
 } from "@/app/api/construction/labour/payments/payment-openapi";
@@ -901,6 +905,10 @@ openApiOperations.push(...vendorAttendanceOpenApiOperations);
 // Labour attendance lists its own models and routes.
 Object.assign(openApiComponents, labourAttendanceOpenApiComponents);
 openApiOperations.push(...labourAttendanceOpenApiOperations);
+
+// Check-In lists its own models and routes (ADR CM-0043).
+Object.assign(openApiComponents, checkInOpenApiComponents);
+openApiOperations.push(...checkInOpenApiOperations);
 
 // Wage payments and balances list their own models and routes.
 Object.assign(openApiComponents, paymentOpenApiComponents);

@@ -493,6 +493,86 @@ describe("backups: Project scope (CM-906)", () => {
     expect(lines[1]).toContain("1500.00,12000.50");
   });
 
+  it("holds the Check-In log with Labour Attendance, voided entries too, without photos or their keys", async () => {
+    const owner = await ownerWithCompany();
+    const projectId = await addProject(
+      owner.workspaceId,
+      owner.userId,
+      "Tower A",
+    );
+    const vendorId = randomUUID();
+    await prisma.constructionLabourVendor.create({
+      data: {
+        id: vendorId,
+        workspaceId: owner.workspaceId,
+        name: "Selvam Gang",
+        joiningDate: new Date("2026-01-01T00:00:00Z"),
+        createdBy: owner.userId,
+        updatedBy: owner.userId,
+      },
+    });
+    const photoKey = `companies/${owner.workspaceId}/check-in-photos/${randomUUID()}.jpg`;
+    const entry = {
+      workspaceId: owner.workspaceId,
+      projectId,
+      personKind: "vendor" as const,
+      personId: vendorId,
+      attendanceDate: new Date("2026-09-12T00:00:00Z"),
+      createdBy: owner.userId,
+    };
+    await prisma.constructionLabourCheckInEvent.createMany({
+      data: [
+        {
+          ...entry,
+          id: randomUUID(),
+          action: "check_in",
+          occurredAt: new Date("2026-09-12T03:30:00Z"),
+          photoKey,
+          latitude: "13.082700",
+          longitude: "80.270700",
+          accuracyMetres: "12.50",
+          outsideFence: true,
+          metresOutside: 240,
+        },
+        {
+          ...entry,
+          id: randomUUID(),
+          action: "check_out",
+          occurredAt: new Date("2026-09-12T12:00:00Z"),
+          photoRemovedAt: new Date("2026-12-11T00:00:00Z"),
+          voidedAt: new Date("2026-09-12T12:05:00Z"),
+          voidedBy: owner.userId,
+          voidReason: "Pressed by mistake",
+        },
+      ],
+    });
+    const backup = await done(owner.cookie, {
+      scope: "project",
+      projectId,
+      modules: ["labour.attendance"],
+      from: "2026-09-01",
+      to: "2026-09-30",
+    });
+    const files = await zipOf(owner.cookie, backup);
+    const manifest = JSON.parse(text(files, "manifest.json")) as {
+      modules: { entities: { entity: string; rows: number }[] }[];
+    };
+    expect(manifest.modules[0]?.entities).toEqual([
+      { entity: "labour_attendance", rows: 0 },
+      { entity: "check_in_log", rows: 2 },
+    ]);
+    const lines = csvLines(files, "labour-attendance/check_in_log.csv");
+    expect(lines[0]).toContain(
+      "Date,Person type,Person,Check In / Check Out,Time",
+    );
+    expect(lines).toHaveLength(3);
+    expect(lines.join("\n")).toContain("Selvam Gang");
+    expect(lines.join("\n")).toContain("Pressed by mistake");
+    const all = `${lines.join("\n")}${text(files, "labour-attendance/check_in_log.json")}`;
+    expect(all).not.toContain(photoKey);
+    expect(all).not.toContain("photoKey");
+  });
+
   it("tells the requester only, with the ZIP as the download, and keeps working after the plan has ended", async () => {
     const owner = await ownerWithCompany();
     const { projectId } = await siteOf(owner);

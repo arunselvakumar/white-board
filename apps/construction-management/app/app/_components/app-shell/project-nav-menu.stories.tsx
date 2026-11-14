@@ -245,6 +245,13 @@ export const AttendanceSubmenuFolds: Story = {
     const submenu = within(
       await menu.findByRole("list", { name: "Attendance" }),
     );
+    // Check-In first: opening Attendance lands there (ADR CM-0043).
+    await expect(
+      submenu.getAllByRole("link").map((link) => link.textContent),
+    ).toEqual(["Check-In", "Labour", "Vendor"]);
+    await expect(
+      submenu.getByRole("link", { name: "Check-In" }),
+    ).toHaveAttribute("href", `${PATH}/attendance/check-in`);
     await expect(submenu.getByRole("link", { name: "Labour" })).toHaveAttribute(
       "href",
       `${PATH}/attendance/labour`,

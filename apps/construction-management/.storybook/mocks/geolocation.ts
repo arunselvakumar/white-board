@@ -1,15 +1,18 @@
 /**
- * Stands in for `navigator.geolocation` in one story: a fixed position, or
- * an error by code (1 permission denied, 2 unavailable, 3 timeout).
- * Returns a restore function for `beforeEach`.
+ * Stands in for `navigator.geolocation` in one story: a fixed position, an
+ * error by code (1 permission denied, 2 unavailable, 3 timeout), or
+ * `"pending"` for a device still looking. Returns a restore function for
+ * `beforeEach`.
  */
 export function mockGeolocation(
   result:
     | { latitude: number; longitude: number; accuracy: number }
-    | { code: 1 | 2 | 3 },
+    | { code: 1 | 2 | 3 }
+    | "pending",
 ): () => void {
   const stub: Pick<Geolocation, "getCurrentPosition"> = {
     getCurrentPosition(success, failure) {
+      if (result === "pending") return;
       if ("code" in result) {
         failure?.({
           code: result.code,

@@ -38,6 +38,7 @@ function day(
     checkIn: null,
     checkOut: null,
     breakMinutes: null,
+    timesFromCheckIn: false,
     workingHours: "8",
     workedHours: null,
     wageType: "daily",

@@ -20,6 +20,7 @@ import {
   type PricedDay,
   type WageCard,
 } from "../domain/labour-attendance";
+import { sheetKeepsLogTimes } from "../domain/check-in";
 import { monthOf } from "../domain/ledger";
 import {
   ATTENDANCE_STATUSES,
@@ -205,6 +206,8 @@ export type LabourAttendanceDayReadModel = {
   checkIn: string | null;
   checkOut: string | null;
   breakMinutes: number | null;
+  /** The times follow the Check-In log (ADR CM-0043). */
+  timesFromCheckIn: boolean;
   /** Snapshot of the Labour's working hours a day. */
   workingHours: string;
   /** check-out − check-in − break; null without both times. */
@@ -575,6 +578,7 @@ export class LabourAttendanceHandlers {
         checkIn: day.checkIn,
         checkOut: day.checkOut,
         breakMinutes: day.breakMinutes,
+        timesFromCheckIn: day.timesFromCheckIn,
         workingHours: day.workingHours,
         workedHours: workedHoursOf(day),
         wageType: day.wageType,
@@ -737,9 +741,9 @@ export class LabourAttendanceHandlers {
           ) ?? saved.find(sameCategory);
         return kept == null ? line : { ...line, ratePerHour: kept.ratePerHour };
       });
-      let day: PricedDay;
+      let priced: PricedDay;
       try {
-        day = priceDay({
+        priced = priceDay({
           mark: { ...mark, overtime },
           card: labourer.card,
           projectId: input.projectId,
@@ -752,6 +756,13 @@ export class LabourAttendanceHandlers {
         throw forLabourer(error, mark.labourId);
       }
       const row = existing.get(mark.labourId);
+      // Saved on the sheet, the day is the sheet's; its times still follow
+      // the Check-In log only when sent back unchanged (ADR CM-0043 §3).
+      const day: PricedDay = {
+        ...priced,
+        fromCheckIn: false,
+        timesFromCheckIn: sheetKeepsLogTimes(row ?? null, priced),
+      };
       return {
         id: row?.id ?? newId(now.getTime() + index),
         day,
@@ -887,6 +898,8 @@ export class LabourAttendanceHandlers {
             wageRate: day.wageRate,
             earned: day.earned,
             overtime: day.overtime,
+            fromCheckIn: false,
+            timesFromCheckIn: day.timesFromCheckIn,
           },
           expectedUpdatedAt: input.expectedUpdatedAt,
         },
