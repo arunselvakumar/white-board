@@ -1,4 +1,4 @@
-import type { Locator } from "@playwright/test";
+import { expect, type Locator } from "@playwright/test";
 
 import { ProjectPage } from "./ProjectPage";
 
@@ -42,11 +42,23 @@ export class CheckInPage extends ProjectPage {
     return this.button("Done, back to the search");
   }
 
+  /**
+   * Turns the camera on and waits until it is live. A browser that already
+   * allows the camera starts it without the button.
+   */
+  public async cameraLive(action: "Check In" | "Check Out") {
+    await expect(async () => {
+      if (await this.turnOnCameraButton.isVisible())
+        await this.turnOnCameraButton.click();
+      await expect(this.submitButton(action)).toBeEnabled({ timeout: 1_000 });
+    }).toPass();
+  }
+
   /** Opens `name`, turns the camera on and submits `action`. */
   public async record(name: string, action: "Check In" | "Check Out") {
     await this.person(name).click();
     const capture = this.capture(name);
-    await this.turnOnCameraButton.click();
+    await this.cameraLive(action);
     await this.clickAndWaitFor(
       capture.getByRole("button", { name: action, exact: true }),
       "/attendance/check-ins",

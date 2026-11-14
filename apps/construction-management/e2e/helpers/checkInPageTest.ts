@@ -3,8 +3,8 @@ import { projectTest } from "./projectTest";
 
 /**
  * Check-In needs a camera. Chromium's fake device gives a moving test
- * picture and its fake UI grants the permission prompt; the location is a
- * fixed point in Coimbatore.
+ * picture and its fake UI answers the camera prompt with Allow; the
+ * location is a fixed point in Coimbatore.
  */
 export const checkInPageTest = projectTest.extend<{
   checkInPage: CheckInPage;
@@ -19,7 +19,7 @@ export const checkInPageTest = projectTest.extend<{
       ],
     });
   },
-  permissions: ["camera", "geolocation"],
+  permissions: ["geolocation"],
   geolocation: { latitude: 11.0168, longitude: 76.9558, accuracy: 12 },
   checkInPage: async ({ page, project }, use) => {
     await use(new CheckInPage(page, project.id));

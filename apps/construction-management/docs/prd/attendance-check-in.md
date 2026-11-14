@@ -59,7 +59,7 @@ Decisions and their reasons are in [ADR CM-0043](../adr/CM-0043-site-check-in.md
 
 - The screen covers the whole window, over the sidebar and header, in both menu layouts (ADR CM-0039). **Back** (top left) returns to the search with the typed text kept.
 - Top: the person's name, role, ID and phone, and their photo from their record when they have one (Labours and Vendors), so the operator can compare.
-- **Camera.** A dark panel with **Turn on camera**. After that, the live picture. A **Switch camera** button when the device has more than one; the rear camera is the first choice. The picture is not mirrored for the rear camera and is mirrored for the front one (the saved photo is never mirrored).
+- **Camera.** A dark panel with **Turn on camera**. After that, the live picture. A browser that already allows the camera for the app starts it without the button, so the second person of the morning needs one tap fewer. A **Switch camera** button when the device has more than one; the rear camera is the first choice. The picture is not mirrored for the rear camera and is mirrored for the front one (the saved photo is never mirrored).
   - Permission refused, no camera, or the camera in use by another app: the panel says which, in one sentence, with **Try again**. Submitting stays disabled: a photo is required.
   - The camera stops when the screen is left or the tab is hidden, and starts again when it is back.
 - **Time.** A read-only clock in the Company's time zone, set from the server's time (so a wrong device clock does not mislead), ticking each second, with the date.
@@ -144,16 +144,16 @@ Work top to bottom. One PR.
 
 | #   | Title                                                             | Status | Blocked by | Area        |
 | --- | ----------------------------------------------------------------- | ------ | ---------- | ----------- |
-| 1   | ADR CM-0043, this PRD, glossary and module spec                   | todo   |            | Docs        |
-| 2   | Table, columns and the rules of an entry                          | todo   | 1          | Data+Domain |
-| 3   | Record and void an entry; a Labour's day follows                  | todo   | 2          | Domain+HTTP |
-| 4   | People, person, log and photo reads                               | todo   | 2          | HTTP        |
-| 5   | Photo retention, company backup and deletion                      | todo   | 3          | Data        |
-| 6   | Menu entry and the find screen                                    | todo   | 4          | UI          |
-| 7   | Capture screen: camera, time, location, submit                    | todo   | 3, 4       | UI          |
-| 8   | Log screen and Void                                               | todo   | 3, 4       | UI          |
-| 9   | "From Check-In" on the marking sheet                              | todo   | 3          | UI          |
-| 10  | End-to-end test, browser walkthrough in both layouts, screenshots | todo   | 6, 7, 8    | Test        |
+| 1   | ADR CM-0043, this PRD, glossary and module spec                   | done   |            | Docs        |
+| 2   | Table, columns and the rules of an entry                          | done   | 1          | Data+Domain |
+| 3   | Record and void an entry; a Labour's day follows                  | done   | 2          | Domain+HTTP |
+| 4   | People, person, log and photo reads                               | done   | 2          | HTTP        |
+| 5   | Photo retention, company backup and deletion                      | done   | 3          | Data        |
+| 6   | Menu entry and the find screen                                    | done   | 4          | UI          |
+| 7   | Capture screen: camera, time, location, submit                    | done   | 3, 4       | UI          |
+| 8   | Log screen and Void                                               | done   | 3, 4       | UI          |
+| 9   | "From Check-In" on the marking sheet                              | done   | 3          | UI          |
+| 10  | End-to-end test, browser walkthrough in both layouts, screenshots | done   | 6, 7, 8    | Test        |
 
 ### 2 — Table, columns and the rules of an entry
 

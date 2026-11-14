@@ -160,7 +160,7 @@ function StateChip({
 }
 
 const CARD =
-  "bg-card flex min-h-16 w-full items-center gap-3 rounded-xl border p-3 text-left";
+  "bg-card flex h-full min-h-16 w-full items-center gap-3 rounded-xl border p-3 text-left";
 
 function PersonCard({
   person,
@@ -177,13 +177,11 @@ function PersonCard({
     <>
       <CheckInAvatar name={person.name} />
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-base font-semibold">
+        <span className="block text-base font-semibold break-words">
           {person.name}
         </span>
         {line === "" ? null : (
-          <span className="text-muted-foreground block truncate text-sm">
-            {line}
-          </span>
+          <span className="text-muted-foreground block text-sm">{line}</span>
         )}
       </span>
       <StateChip person={person} timeZone={timeZone} />

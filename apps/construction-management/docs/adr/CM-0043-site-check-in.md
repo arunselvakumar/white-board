@@ -107,7 +107,7 @@ The overtime line from the times is added only when the day has no overtime line
 
 - Attendance folds out into **Check-In**, **Labour** and **Vendor**. Opening Attendance lands on Check-In, the first entry (CM-0020 §3).
 - **Check-In** (`/app/projects/<id>/attendance/check-in`): a large search box and three groups, all open: Site Engineers, Labours, Vendors. Each person shows their name, role (Labour Category, "Site Engineer" or "Vendor"), ID (Labour Id or employee code), phone and today's state ("In since 10:02", "Out since 1:05", or nothing yet). The search filters on name, role, ID and phone.
-- **Capture** (`…/check-in/<kind>/<personId>`) takes the whole window, over the sidebar: the person, the camera, the read-only time, the Check-In / Check-Out choice, the location, and today's entries of that person. After submitting, a confirmation shows for a few seconds and returns to the search.
+- **Capture** (`…/check-in/<kind>/<personId>`) takes the whole window, over the sidebar: the person, the camera, the read-only time, the Check-In / Check-Out choice, the location, and today's entries of that person. After submitting, a confirmation shows for a few seconds and returns to the search. The camera is turned on with a button the first time; once the browser allows it for the app, it starts by itself.
 - **Log** (`…/check-in/log`): every entry of a day, newest first, with the photo, the location and who recorded it; **Void** asks for a reason.
 - The marking sheet shows "From Check-In" beside times that follow the log.
 
