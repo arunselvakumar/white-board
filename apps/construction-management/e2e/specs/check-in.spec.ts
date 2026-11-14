@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test";
 
-import { createLabour } from "../api/labour";
+import { createLabour, todayInIndia } from "../api/labour";
+import { newEmail, newMobile, unique } from "../api/session";
 import { checkInPageTest } from "../helpers/checkInPageTest";
 import { CheckInLogPage } from "../pages/CheckInLogPage";
 import { LabourAttendancePage } from "../pages/LabourAttendancePage";
@@ -147,6 +148,53 @@ checkInPageTest.describe("Check-In", () => {
       await expect(page).toHaveURL(
         new RegExp(`/app/staff/labours/${labour.id}$`),
       );
+    },
+  );
+
+  checkInPageTest(
+    "should show the Check In and the Project on a Vendor's and a Site Engineer's Activity tab, when they are checked in",
+    async ({ owner, project, checkInPage, page }) => {
+      type Created = { item?: { id: string }; id?: string };
+      const vendorName = unique("Selvam Gang");
+      const vendor = await owner.api.post<Created>(
+        "/api/construction/labour/vendors",
+        {
+          name: vendorName,
+          joiningDate: todayInIndia(-30),
+          projectIds: [project.id],
+        },
+      );
+      const engineerName = unique("Sundar Rajan");
+      const engineer = await owner.api.post<Created>(
+        "/api/construction/masters/site-engineers",
+        {
+          name: engineerName,
+          mobile: newMobile(),
+          email: newEmail(),
+          projectIds: [project.id],
+          profile: {},
+          signIn: { invite: false, password: "first-pass-1234" },
+        },
+      );
+      await checkInPage.goto();
+      for (const name of [vendorName, engineerName]) {
+        await checkInPage.record(name, "Check In");
+        await expect(page.getByText(/^Checked in at /)).toBeVisible();
+        await checkInPage.doneButton.click();
+      }
+
+      for (const path of [
+        `/app/staff/vendors/${vendor.item?.id ?? vendor.id ?? ""}`,
+        `/app/staff/site-engineers/${engineer.item?.id ?? engineer.id ?? ""}`,
+      ]) {
+        await page.goto(`${path}?tab=activity`);
+        const today = page.getByRole("region", { name: "Today" });
+        await expect(today.getByText(/^Checked in at /)).toBeVisible();
+        await expect(today.getByText(/^Added to /)).toBeVisible();
+        await expect(
+          today.getByRole("link", { name: "Open in Maps" }),
+        ).toBeVisible();
+      }
     },
   );
 });
