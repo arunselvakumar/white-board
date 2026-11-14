@@ -877,9 +877,7 @@ export class CheckInHandlers {
       projectId,
       kind,
       personId,
-      !(peek instanceof DomainError) && peek.kind === "record"
-        ? peek.attendanceDate
-        : today,
+      peek instanceof DomainError ? today : peek.attendanceDate,
     );
     if (peek instanceof DomainError) throw peek;
     if (peek.kind === "repeat")
@@ -900,11 +898,15 @@ export class CheckInHandlers {
       | { entry: CheckInEntry; day: CheckInDayReadModel | null };
     try {
       outcome = await this.store.inPerson(workspaceId, who, async (tx) => {
+        // The entry's time is read once the person's lock is held, so
+        // entries are written in the order their times say, however long
+        // a photo took to upload.
+        const at = this.clock();
         const decision = decideEntry({
           action,
           last: await tx.lastLive(projectId),
-          now,
-          today,
+          now: at,
+          today: todayIn(timeZone, at),
         });
         if (decision.kind === "repeat") return { repeated: decision.entryId };
         if (
@@ -916,13 +918,13 @@ export class CheckInHandlers {
             `${found.person.name} is not on this Project.`,
           );
         const entry: CheckInEntry = {
-          id: newId(now.getTime()),
+          id: newId(at.getTime()),
           workspaceId,
           projectId,
           kind,
           personId,
           action,
-          occurredAt: now,
+          occurredAt: at,
           attendanceDate: decision.attendanceDate,
           photoKey,
           location: fix,
@@ -939,7 +941,7 @@ export class CheckInHandlers {
             contentType: photo.contentType,
             bytes: photo.bytes.byteLength,
             createdBy: input.userId,
-            createdAt: now,
+            createdAt: at,
           },
           {
             workspaceId,
@@ -956,7 +958,7 @@ export class CheckInHandlers {
               location: fix,
               fence: compared,
             },
-            occurredAt: now,
+            occurredAt: at,
           },
         );
         const day =
@@ -968,7 +970,7 @@ export class CheckInHandlers {
                 cause: action,
                 timeZone,
                 by: input.userId,
-                now,
+                now: at,
               })
             : null;
         return { entry, day };
@@ -990,7 +992,13 @@ export class CheckInHandlers {
     }
     const [entry, person] = await Promise.all([
       this.entryModel(workspaceId, outcome.entry),
-      this.personNow(workspaceId, projectId, found.person, now, today),
+      this.personNow(
+        workspaceId,
+        projectId,
+        found.person,
+        outcome.entry.occurredAt,
+        todayIn(timeZone, outcome.entry.occurredAt),
+      ),
     ]);
     return { entry, repeated: false, person, day: outcome.day };
   }

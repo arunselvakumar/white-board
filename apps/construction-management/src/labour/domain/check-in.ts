@@ -101,7 +101,7 @@ export type EntryDecision =
   /** Write the entry on this attendance day. */
   | { kind: "record"; attendanceDate: CalendarDate }
   /** The same action was just recorded: answer with that entry. */
-  | { kind: "repeat"; entryId: string };
+  | { kind: "repeat"; entryId: string; attendanceDate: CalendarDate };
 
 /**
  * Whether a new entry may be written after the person's last live one
@@ -120,7 +120,11 @@ export function decideEntry(input: {
     last?.action === action &&
     now.getTime() - last.occurredAt.getTime() < REPEAT_WINDOW_SECONDS * 1000
   )
-    return { kind: "repeat", entryId: last.id };
+    return {
+      kind: "repeat",
+      entryId: last.id,
+      attendanceDate: last.attendanceDate,
+    };
   const open = openEntry(last, now);
   if (action === "check_in") {
     if (open != null)
@@ -215,6 +219,15 @@ export function timesFromEntries(
       checkOut: null,
       breakMinutes: gaps > 0 ? recorded : DEFAULT_BREAK_MINUTES,
     };
+  const checkOut = clockTime(lastOut, timeZone);
+  // A clock set back an hour can show the In's time again an hour later;
+  // a day cannot hold an Out equal to its In, so it is left for the sheet.
+  if (checkOut === checkIn)
+    return {
+      checkIn,
+      checkOut: null,
+      breakMinutes: gaps > 0 ? recorded : DEFAULT_BREAK_MINUTES,
+    };
   const wanted =
     gaps > 0
       ? recorded
@@ -223,7 +236,7 @@ export function timesFromEntries(
         : 0;
   return {
     checkIn,
-    checkOut: clockTime(lastOut, timeZone),
+    checkOut,
     breakMinutes: Math.max(0, Math.min(wanted, span - 1)),
   };
 }

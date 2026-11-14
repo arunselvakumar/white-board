@@ -725,6 +725,35 @@ describe("recording a check-in entry (ADR CM-0043)", () => {
     ]);
   });
 
+  it("times an entry once the person's lock is held, not when the request arrived", async () => {
+    const company = await ownerWithCompany();
+    const f = await fixtures(company);
+    // The clock moves on with every reading, as it does while a photo uploads.
+    const arrived = at(TODAY, "10:00");
+    let readings = 0;
+    const handlers = createCheckInHandlers({
+      clock: () => new Date(arrived.getTime() + readings++ * 60_000),
+    });
+    const first = await handlers.record({
+      workspaceId: company.workspaceId,
+      userId: company.userId,
+      projectId: f.tower,
+      kind: "labour",
+      personId: f.dhuresh,
+      action: "check_in",
+      photo: PHOTO,
+    });
+    expect(readings).toBeGreaterThan(1);
+    // The last reading is the one taken under the lock.
+    expect(new Date(first.entry.at).getTime()).toBe(
+      arrived.getTime() + (readings - 1) * 60_000,
+    );
+    expect(first.person.state).toMatchObject({
+      status: "in",
+      since: new Date(first.entry.at),
+    });
+  });
+
   it("keeps a night shift's Check Out on the day it began, and after 16 hours starts a new day", async () => {
     const company = await ownerWithCompany();
     const f = await fixtures(company);
