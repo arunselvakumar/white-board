@@ -71,7 +71,7 @@ The owner asked for it the same day, answering CM-0038's question 4.
 - `/app/staff/site-engineers/<id>` and `/app/staff/vendors/<id>` get **Details** (the form, unchanged) and **Activity** tabs, the tab in the address (`?tab=activity`), as on a Labour's page. Add Site Engineer and Add Vendor have no tabs. Typed changes on Details survive a switch to Activity and back.
 - **What the feed shows**, newest first, by day, 30 at a time:
   - their **check-in entries**, exactly as in the Labour feed ("**Checked in** at **Sky Towers** · 10:02 am", the photo, the place, Open in Maps, a void);
-  - **Added to** and **Removed from** a Project. For a Site Engineer these come from their sign-in's Project history, the source the Project feed already reads (CM-0038 §1). For a Vendor they come from the `vendor.projects_changed` audit events, by comparing each event's set of Projects with the one before.
+  - **Added to** and **Removed from** a Project. For a Site Engineer these come from their sign-in's Project history, the source the Project feed already reads (CM-0038 §1). For a Vendor they come from the Vendor's audit events that carry its Projects (`vendor.created`, `vendor.updated` from the Vendor form, and `vendor.projects_changed` from a Project's Teams), by comparing each event's set of Projects with the one before. Each of those commands already records the whole set after the change; no command needed a new write.
 - A Vendor's **attendance** (the headcount per shift and Labour Category) is not in the feed in this round: it is a day's count for the gang, not something that happened to the Vendor, and the Vendor attendance screen already lists it.
 - **Filters**, in the address: **Type** (All, Projects, Check-In), **Project** and a date range.
 - **Who sees it.** The tab needs Read on the page's own menu (`masters.labours` for a Site Engineer, `masters.vendors` for a Vendor). Entries of a Project the viewer may not open are left out, and check-in entries need Attendance Read on their Project (§4), as in the Labour feed. No amounts are shown.
@@ -84,6 +84,7 @@ The owner asked for it the same day, answering CM-0038's question 4.
 - A feed page costs one more indexed read. `check_in_events` already has an index by Project and day and one by person and time.
 - The photo is served by the Check-In log's route, with its permission and its private caching. The feeds add no second way to a photo.
 - A Site Engineer who has no sign-in has no Project history; their feed has check-in entries only once they are on a Project.
+- A Site Engineer whose sign-in was an Office Staff member before CM-0037 shows that sign-in's whole Project history, including changes from when they were only Office Staff.
 
 ## Considered options
 

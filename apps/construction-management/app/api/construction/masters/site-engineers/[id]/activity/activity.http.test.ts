@@ -232,6 +232,7 @@ async function history(company: Company) {
   await handlers.void({
     workspaceId: company.workspaceId,
     userId: company.userId,
+    role: "owner",
     id: mistaken,
     reason: "Wrong person",
   });
