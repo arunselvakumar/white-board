@@ -75,7 +75,7 @@ Decisions and their reasons are in [ADR CM-0043](../adr/CM-0043-site-check-in.md
 
 - A day's entries (today by default; a date picker, no future dates), newest first, 50 at a time with **Load more**.
 - Filters: the kind of person (All, Site Engineers, Labours, Vendors) and a search on the name. Both in the address.
-- A row: the photo (small; opens large), the person, role, **Check In** or **Check Out**, the time, the location ("Inside the site fence", "240 m outside", "No location") with **Open in Maps** when there is one, who recorded it, and a **Voided** mark with the reason when it was.
+- A row: the photo (small; opens large), the person, role, **Check In** or **Check Out**, the time, the location ("Inside the site fence", "240 m outside the site fence", "Location saved", "No location") with **Open in Maps** when there is one, who recorded it, and a **Voided** mark with the reason when it was.
 - **Void** on a row (Attendance Delete) asks for a reason (required, at most 200 characters) and confirms what it does to a Labour's day when it does anything (see 2.5).
 - After 90 days a row shows "Photo removed" in place of the photo.
 
@@ -99,6 +99,10 @@ The full rules are in ADR CM-0043 §2–§4. In short:
 
 - A Labour's row whose times follow the log shows "From Check-In" under the In and Out boxes. Typing a different time removes it after saving.
 - Nothing else on the sheet changes: a day created by Check-In is a marked day like any other.
+
+### 2.7 In the Activity feeds
+
+Each check-in entry is also an entry of its own in the Labour's Activity and the Project's Activity, with the photo, the location and Open in Maps, to viewers with Attendance Read on its Project. Both feeds gain a Check-In filter. See ADR CM-0044.
 
 ## 3. API
 
@@ -125,7 +129,7 @@ A member who is not on the Project is refused (403), as on every Project route.
 - Writing a Site Engineer's entry into HRMS attendance.
 - Refusing an entry outside the Site fence, or sending it for approval.
 - A report or export of the log (the company backup includes it).
-- A Check-In section on the Project Dashboard or the Activity feeds.
+- A Check-In section on the Project Dashboard.
 
 ## 5. Notes for the implementer
 

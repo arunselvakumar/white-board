@@ -137,11 +137,11 @@ The Client Order's value excluding GST, shown only to Team Members with the Proj
 _Avoid_: contract value, budget (that is the Company's own figure)
 
 **Teams**:
-Who works on a Project: its Site Engineers, Labours, Team Members (the Owner is on every Project), Contractors, Suppliers and Vendors. Each party keeps its Projects in its own master or sign-in; a Project's Teams page shows and changes all six. Assigned on Add Project's second step, or any time after (ADR CM-0013 §6, CM-0038). A Site Engineer is listed only under Site Engineers, not again under Team Members. Called Resources until ADR CM-0042; code and the API still say Resources.
+Who works on a Project: its Site Engineers, Labours, Team Members (the Owner is on every Project), Contractors, Suppliers and Vendors. Each party keeps its Projects in its own master or sign-in; a Project's Teams page shows and changes all six, and each row opens that person's or party's page for a viewer who may read it (ADR CM-0044). Assigned on Add Project's second step, or any time after (ADR CM-0013 §6, CM-0038). A Site Engineer is listed only under Site Engineers, not again under Team Members. Called Resources until ADR CM-0042; code and the API still say Resources.
 _Avoid_: Resources (on a site that means manpower, material and machinery), members (for all six), assignment
 
 **Activity**:
-A read-only feed, newest first, of what happened: on a Labour's page (Projects joined, left and moved between, attendance, marked inactive), and as a Project module (Site Engineers and Labours added and removed). Each entry sits on the day it applies to, not the day it was typed, and says who recorded it and when (ADR CM-0038).
+A read-only feed, newest first, of what happened: on a Labour's page (Projects joined, left and moved between, attendance, each Check In and Check Out, marked inactive), and as a Project module (Site Engineers and Labours added and removed, and everyone's Check In and Check Out). Each entry sits on the day it applies to, not the day it was typed, and says who recorded it and when (ADR CM-0038). A check-in entry shows its photo, where it was taken and Open in Maps, only to viewers with Attendance Read on its Project; a voided one stays, struck through (ADR CM-0044).
 _Avoid_: history (that is the transfer history), log, timeline, audit trail (for the screen)
 
 **Custom Field**:
