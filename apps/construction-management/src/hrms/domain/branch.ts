@@ -1,6 +1,11 @@
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
-import { haversineMetres, isLatitude, isLongitude, type GeoPoint } from "./geo";
+import {
+  haversineMetres,
+  isLatitude,
+  isLongitude,
+  type GeoPoint,
+} from "@/src/shared-kernel/geo";
 
 /**
  * Branches and geo-fences (CM-304, `modules/10` "Branches & Project

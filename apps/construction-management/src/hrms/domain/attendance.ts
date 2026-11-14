@@ -17,7 +17,7 @@ import {
   type Fence,
 } from "./branch";
 import { instantAt, minutesIntoDay, type LocalDateTime } from "./company-time";
-import { isLatitude, isLongitude } from "./geo";
+import { isLatitude, isLongitude } from "@/src/shared-kernel/geo";
 import type { GpsRequirement } from "./hrms-settings";
 import { crossesMidnight, isShiftTime, minutesOf } from "./shift";
 
