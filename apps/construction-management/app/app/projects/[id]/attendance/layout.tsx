@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 
 /**
- * Attendance inside the project shell. Labour and Vendor are in the sidebar
- * (ADR CM-0020).
+ * Attendance inside the project shell. Check-In, Labour and Vendor are in
+ * the sidebar (ADR CM-0020, ADR CM-0043).
  */
 export default function ProjectAttendanceLayout({
   children,
