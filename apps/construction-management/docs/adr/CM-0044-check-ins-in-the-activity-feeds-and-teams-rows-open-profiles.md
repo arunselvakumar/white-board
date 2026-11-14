@@ -2,7 +2,7 @@
 
 - Status: accepted (2026-11-14, the owner's request)
 - Date: 2026-11-14
-- Amends: [CM-0038](CM-0038-project-staffing-and-activity-feeds.md) question 2 ("Is attendance in the Project feed? No") and §1 (the feeds' sources), [CM-0043](CM-0043-site-check-in.md) ("A Check-In section on the Project Dashboard or the Activity feeds" was not in that round)
+- Amends: [CM-0038](CM-0038-project-staffing-and-activity-feeds.md) question 2 ("Is attendance in the Project feed? No"), question 4 ("Does the Site Engineer page get an Activity tab too? Not in this round") and §1 (the feeds' sources), [CM-0043](CM-0043-site-check-in.md) ("A Check-In section on the Project Dashboard or the Activity feeds" was not in that round)
 - Relates to: [CM-0042](CM-0042-project-resources-become-teams.md) (the Teams page), [CM-0036](CM-0036-one-staff-group-and-site-engineers.md) (where each person's page is), [CM-0011](CM-0011-attendance-check-in-out-and-working-hours.md) (a day's In and Out)
 
 After using Check-In (CM-0043), the owner asked for three things (2026-11-14):
@@ -64,13 +64,26 @@ This is one rule for both feeds. In the Labour feed it sits on top of the existi
 
 Both feeds stay read models assembled when they are read (CM-0038 §1). The check-in entries are one more source in the labour context, read with the same keyset as the others (day, recorded time, kind rank, row id) and merged in `src/composition`. No activity table, no migration, no back-fill: entries recorded before this release show the same as those after it.
 
+### 7. A Site Engineer's and a Vendor's page get an Activity tab (the owner, 2026-11-14)
+
+The owner asked for it the same day, answering CM-0038's question 4.
+
+- `/app/staff/site-engineers/<id>` and `/app/staff/vendors/<id>` get **Details** (the form, unchanged) and **Activity** tabs, the tab in the address (`?tab=activity`), as on a Labour's page. Add Site Engineer and Add Vendor have no tabs. Typed changes on Details survive a switch to Activity and back.
+- **What the feed shows**, newest first, by day, 30 at a time:
+  - their **check-in entries**, exactly as in the Labour feed ("**Checked in** at **Sky Towers** · 10:02 am", the photo, the place, Open in Maps, a void);
+  - **Added to** and **Removed from** a Project. For a Site Engineer these come from their sign-in's Project history, the source the Project feed already reads (CM-0038 §1). For a Vendor they come from the `vendor.projects_changed` audit events, by comparing each event's set of Projects with the one before.
+- A Vendor's **attendance** (the headcount per shift and Labour Category) is not in the feed in this round: it is a day's count for the gang, not something that happened to the Vendor, and the Vendor attendance screen already lists it.
+- **Filters**, in the address: **Type** (All, Projects, Check-In), **Project** and a date range.
+- **Who sees it.** The tab needs Read on the page's own menu (`masters.labours` for a Site Engineer, `masters.vendors` for a Vendor). Entries of a Project the viewer may not open are left out, and check-in entries need Attendance Read on their Project (§4), as in the Labour feed. No amounts are shown.
+- Both are read models assembled at read time (§6), each behind its own route: `GET /api/construction/masters/site-engineers/{id}/activity` and `GET /api/construction/labour/vendors/{id}/activity`.
+
 ## Consequences
 
 - CM-0038's answer to question 2 changes for check-in entries only. The day's attendance status is still not in the Project feed.
 - The Project feed's default view is much longer on a Project that uses Check-In. The Type filter is the answer, and its choice is kept in the address so a bookmark opens on Team changes.
 - A feed page costs one more indexed read. `check_in_events` already has an index by Project and day and one by person and time.
 - The photo is served by the Check-In log's route, with its permission and its private caching. The feeds add no second way to a photo.
-- A Site Engineer's and a Vendor's page have no Activity tab yet (CM-0038 question 4); their check-in entries show in the Project feed and the Check-In log.
+- A Site Engineer who has no sign-in has no Project history; their feed has check-in entries only once they are on a Project.
 
 ## Considered options
 
