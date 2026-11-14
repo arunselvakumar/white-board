@@ -53,7 +53,7 @@ import {
   kindFromSegment,
   mapsUrl,
 } from "@/app/app/projects/[id]/attendance/check-in/_components/check-in-format";
-import { CheckInPhoto } from "@/app/app/projects/[id]/attendance/check-in/_components/check-in-photo";
+import { CheckInPhoto } from "@/app/app/_components/check-in/check-in-photo";
 
 import { CheckInLogSkeleton } from "./check-in-log-skeletons";
 import { VoidEntryDialog } from "./void-entry-dialog";

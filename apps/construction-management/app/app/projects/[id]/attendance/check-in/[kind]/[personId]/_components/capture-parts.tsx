@@ -20,7 +20,7 @@ import {
   formatLongDate,
   formatTime,
 } from "@/app/app/projects/[id]/attendance/check-in/_components/check-in-format";
-import { CheckInPhoto } from "@/app/app/projects/[id]/attendance/check-in/_components/check-in-photo";
+import { CheckInPhoto } from "@/app/app/_components/check-in/check-in-photo";
 
 /**
  * The time now on the server's clock, in the Company's time zone, ticking
