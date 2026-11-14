@@ -23,7 +23,6 @@ const LOOKUPS: LabourLookups = {
         { id: "c1", name: "Mason", disabled: false },
         { id: "c2", name: "Welder", disabled: true },
       ],
-      supervisors: [{ id: "s1", name: "Sundar", disabled: false }],
     }),
 };
 
@@ -71,7 +70,6 @@ describe("LabourImport", () => {
     const preview = await importer.preview("w1", [
       row(2, {
         labourCategory: "MASON",
-        supervisor: "sundar",
         labourCode: "X1",
       }),
       row(3, {

@@ -43,7 +43,6 @@ export type AttendanceLabourer = {
   labourCode: string | null;
   isActive: boolean;
   labourCategoryId: string | null;
-  supervisorId: string | null;
   weeklyHolidays: Weekday[];
   /** The current wages; a new or re-marked day is priced from these. */
   card: WageCard;
@@ -75,7 +74,6 @@ export type LabourDayListParams = {
   from?: CalendarDate;
   to?: CalendarDate;
   labourId?: string;
-  supervisorId?: string;
   status?: LabourDayStatusFilter;
   limit: number;
   /** Newest date first; the cursor's `createdAt` carries the attendance date. */
@@ -199,7 +197,11 @@ export type LabourAttendanceDayReadModel = {
   status: AttendanceStatus;
   isPaidLeave: boolean;
   shift: string | null;
-  supervisor: Ref | null;
+  /**
+   * The Site Engineer saved with the day (days marked before ADR CM-0041),
+   * else the Project's Site Engineers today, by name.
+   */
+  siteEngineers: Ref[];
   checkIn: string | null;
   checkOut: string | null;
   breakMinutes: number | null;
@@ -226,7 +228,6 @@ export type LabourSheetRowReadModel = {
   name: string;
   labourCode: string | null;
   labourCategory: Ref | null;
-  supervisor: Ref | null;
   weeklyHolidays: number[];
   wageType: WageCard["wageType"] | null;
   wagePerDay: number | null;
@@ -260,8 +261,6 @@ export type LabourSheetReadModel = {
   labourers: LabourSheetRowReadModel[];
   /** For the overtime line picker. */
   labourCategories: Ref[];
-  /** Supervisors of the listed labourers, for the filter. */
-  supervisors: Ref[];
   totals: {
     marked: number;
     present: number;
@@ -518,13 +517,13 @@ export class LabourAttendanceHandlers {
       );
   }
 
-  /** Read models with labour, category and supervisor names. */
+  /** Read models with labour, category and Site Engineer names. */
   private async readModels(
     workspaceId: string,
     days: readonly StoredLabourDay[],
   ): Promise<LabourAttendanceDayReadModel[]> {
     if (days.length === 0) return [];
-    const [names, categories, supervisors] = await Promise.all([
+    const [names, categories, saved, onProjects] = await Promise.all([
       this.store.labourNames(
         workspaceId,
         days.map((day) => day.labourId),
@@ -545,13 +544,18 @@ export class LabourAttendanceHandlers {
             .filter((id): id is string => id != null),
         ),
       ]),
+      this.supervisors.onProjects(workspaceId, [
+        ...new Set(
+          days
+            .filter((day) => day.supervisorId == null)
+            .map((day) => day.projectId),
+        ),
+      ]),
     ]);
     return days.map((day) => {
       const overtimeAmount = overtimeAmountOf(day);
-      const supervisor =
-        day.supervisorId == null
-          ? undefined
-          : supervisors.get(day.supervisorId);
+      const own =
+        day.supervisorId == null ? undefined : saved.get(day.supervisorId);
       return {
         id: day.id,
         projectId: day.projectId,
@@ -562,10 +566,12 @@ export class LabourAttendanceHandlers {
         status: day.status,
         isPaidLeave: day.isPaidLeave,
         shift: day.shift,
-        supervisor:
-          supervisor == null
-            ? null
-            : { id: supervisor.id, name: supervisor.name },
+        siteEngineers:
+          day.supervisorId == null
+            ? (onProjects.get(day.projectId) ?? [])
+            : own == null
+              ? []
+              : [{ id: own.id, name: own.name }],
         checkIn: day.checkIn,
         checkOut: day.checkOut,
         breakMinutes: day.breakMinutes,
@@ -641,21 +647,14 @@ export class LabourAttendanceHandlers {
         );
     }
 
-    // Overtime categories and explicit supervisors must be live.
+    // Overtime categories must be live.
     const categoryIds = new Set<string>();
-    const supervisorIds = new Set<string>();
-    for (const mark of input.marks) {
+    for (const mark of input.marks)
       for (const line of mark.overtime ?? [])
         if (line.labourCategoryId != null)
           categoryIds.add(line.labourCategoryId);
-      if (mark.supervisorId != null) supervisorIds.add(mark.supervisorId);
-      const own = labourers.get(mark.labourId)?.supervisorId;
-      if (mark.supervisorId === undefined && own != null)
-        supervisorIds.add(own);
-    }
-    const [categories, supervisors] = await Promise.all([
-      this.labourCategories.find(workspaceId, [...categoryIds]),
-      this.supervisors.find(workspaceId, [...supervisorIds]),
+    const categories = await this.labourCategories.find(workspaceId, [
+      ...categoryIds,
     ]);
     for (const mark of input.marks) {
       for (const line of mark.overtime ?? [])
@@ -672,13 +671,6 @@ export class LabourAttendanceHandlers {
               labourCategoryId: line.labourCategoryId,
             },
           );
-      if (mark.supervisorId != null && !supervisors.has(mark.supervisorId))
-        throw rowError(
-          "SUPERVISOR_NOT_FOUND",
-          "This Site Engineer was not found.",
-          "invalid",
-          { labourId: mark.labourId, supervisorId: mark.supervisorId },
-        );
     }
 
     // Concurrency and the create/update split, per row.
@@ -729,11 +721,6 @@ export class LabourAttendanceHandlers {
     const writes: LabourDayWrite[] = input.marks.map((mark, index) => {
       const labourer = labourers.get(mark.labourId);
       if (labourer == null) throw new Error("unreachable");
-      // The supervisor snapshot defaults to the labourer's own, when live.
-      const own =
-        labourer.supervisorId != null && supervisors.has(labourer.supervisorId)
-          ? labourer.supervisorId
-          : null;
       // A line sent without a rate (a member without Financial cannot see
       // it) keeps the rate the saved day had for that category, so a
       // re-mark never silently resets a custom overtime rate. The line from
@@ -753,15 +740,13 @@ export class LabourAttendanceHandlers {
       let day: PricedDay;
       try {
         day = priceDay({
-          mark: {
-            ...mark,
-            overtime,
-            supervisorId:
-              mark.supervisorId === undefined ? own : mark.supervisorId,
-          },
+          mark: { ...mark, overtime },
           card: labourer.card,
           projectId: input.projectId,
           date,
+          // A new day saves no Site Engineer; a re-mark keeps the one it
+          // was saved with (ADR CM-0041).
+          supervisorId: existing.get(mark.labourId)?.supervisorId ?? null,
         });
       } catch (error) {
         throw forLabourer(error, mark.labourId);
@@ -964,21 +949,12 @@ export class LabourAttendanceHandlers {
     ]);
     const yesterday = new Map(yesterdayDays.map((day) => [day.labourId, day]));
     const today = new Map(models.map((model) => [model.labourId, model]));
-    const [categories, supervisors] = await Promise.all([
-      this.labourCategories.find(workspaceId, [
-        ...new Set(
-          everyone
-            .map((entry) => entry.labourer?.labourCategoryId)
-            .filter((id): id is string => id != null),
-        ),
-      ]),
-      this.supervisors.find(workspaceId, [
-        ...new Set(
-          everyone
-            .map((entry) => entry.labourer?.supervisorId)
-            .filter((id): id is string => id != null),
-        ),
-      ]),
+    const categories = await this.labourCategories.find(workspaceId, [
+      ...new Set(
+        everyone
+          .map((entry) => entry.labourer?.labourCategoryId)
+          .filter((id): id is string => id != null),
+      ),
     ]);
     const weekday = weekdayOf(date);
 
@@ -993,20 +969,12 @@ export class LabourAttendanceHandlers {
         labourer?.labourCategoryId == null
           ? undefined
           : categories.get(labourer.labourCategoryId);
-      const supervisor =
-        labourer?.supervisorId == null
-          ? undefined
-          : supervisors.get(labourer.supervisorId);
       return {
         labourId,
         name: labourer?.name ?? attendance?.labourName ?? "",
         labourCode: labourer?.labourCode ?? attendance?.labourCode ?? null,
         labourCategory:
           category == null ? null : { id: category.id, name: category.name },
-        supervisor:
-          supervisor == null
-            ? (attendance?.supervisor ?? null)
-            : { id: supervisor.id, name: supervisor.name },
         weeklyHolidays,
         wageType: labourer?.card.wageType ?? attendance?.wageType ?? null,
         wagePerDay: labourer?.card.wagePerDay ?? null,
@@ -1033,10 +1001,6 @@ export class LabourAttendanceHandlers {
       };
     });
 
-    const supervisorRefs = new Map<string, Ref>();
-    for (const row of rows)
-      if (row.supervisor != null)
-        supervisorRefs.set(row.supervisor.id, row.supervisor);
     const totals = {
       marked: models.length,
       present: 0,
@@ -1056,18 +1020,11 @@ export class LabourAttendanceHandlers {
       totals.earned += model.earned;
       totals.overtimeAmount += model.overtimeAmount;
     }
-    const collator = new Intl.Collator("en", {
-      sensitivity: "base",
-      numeric: true,
-    });
     return {
       projectId,
       date,
       labourers: rows,
       labourCategories: categoryOptions,
-      supervisors: [...supervisorRefs.values()].sort((a, b) =>
-        collator.compare(a.name, b.name),
-      ),
       totals,
     };
   }

@@ -8,7 +8,6 @@ import {
   CATEGORY_LIST,
   DHURESH,
   PROJECT_OPTIONS,
-  SUPERVISOR_LIST,
   TOWER,
   listOf,
 } from "../../_components/labour-fixtures";
@@ -34,10 +33,6 @@ const PAGE: MockRoute[] = [
   {
     path: "/api/construction/masters/labour-categories",
     respond: () => Response.json(CATEGORY_LIST),
-  },
-  {
-    path: "/api/construction/masters/supervisors",
-    respond: () => Response.json(SUPERVISOR_LIST),
   },
   { path: LABOURS, respond: () => Response.json(listOf([DHURESH])) },
   {

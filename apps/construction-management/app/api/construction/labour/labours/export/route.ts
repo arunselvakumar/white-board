@@ -34,7 +34,6 @@ export async function GET(request: Request): Promise<Response> {
       projectId: model.projectId,
       active: queryBoolean(model.active),
       search: model.q,
-      supervisorId: model.supervisorId,
       labourCategoryId: model.categoryId,
     });
     const bytes = await labourExport(

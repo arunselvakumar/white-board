@@ -39,7 +39,7 @@ type Day = {
   status: string;
   isPaidLeave: boolean;
   shift: string | null;
-  supervisor: { id: string; name: string } | null;
+  siteEngineers: { id: string; name: string }[];
   checkIn: string | null;
   checkOut: string | null;
   breakMinutes: number | null;
@@ -96,21 +96,48 @@ async function seedCategory(workspaceId: string, name: string) {
   return id;
 }
 
-async function seedSupervisor(workspaceId: string, name: string) {
+/** A Site Engineer whose sign-in is on `projectIds` (ADR CM-0038 §3). */
+async function seedSiteEngineer(
+  workspaceId: string,
+  name: string,
+  projectIds: readonly string[] = [],
+) {
   const id = newId();
+  const memberId = newId();
+  await prisma.constructionOrganizationTeamMember.create({
+    data: {
+      id: memberId,
+      workspaceId,
+      name,
+      email: `${memberId}@site.test`,
+      siteEngineer: true,
+      status: "active",
+      createdBy: "test",
+      updatedBy: "test",
+      projects: { create: projectIds.map((projectId) => ({ projectId })) },
+    },
+  });
   await prisma.constructionMastersSupervisor.create({
-    data: { id, workspaceId, name, createdBy: "test", updatedBy: "test" },
+    data: {
+      id,
+      workspaceId,
+      name,
+      teamMemberId: memberId,
+      createdBy: "test",
+      updatedBy: "test",
+    },
   });
   return id;
 }
 
 async function fixtures(company: Company) {
-  const [tower, villa, mason, sundar] = await Promise.all([
+  const [tower, villa, mason] = await Promise.all([
     addProject(company.workspaceId, company.userId, "Tower A"),
     addProject(company.workspaceId, company.userId, "Villa"),
     seedCategory(company.workspaceId, "Mason"),
-    seedSupervisor(company.workspaceId, "Sundar"),
   ]);
+  // Tower A's Site Engineer: its Labours answer to them (ADR CM-0041).
+  const sundar = await seedSiteEngineer(company.workspaceId, "Sundar", [tower]);
   const labour = async (body: Record<string, unknown>) => {
     const response = await createLabour(
       jsonRequest(LABOURS, company.cookie, {
@@ -118,7 +145,6 @@ async function fixtures(company: Company) {
         overtimeWagePerHour: OT,
         weeklyHolidays: [],
         projectIds: [tower],
-        supervisorId: sundar,
         labourCategoryId: mason,
         ...body,
       }),
@@ -215,6 +241,41 @@ function body(f: Fixtures, overrides: Record<string, unknown> = {}) {
 }
 
 describe("labour attendance HTTP", () => {
+  it("saves no Site Engineer on a new day, and keeps one saved before ADR CM-0041", async () => {
+    const company = await ownerWithCompany();
+    const f = await fixtures(company);
+    const [dhuresh] = await marked(company.cookie, body(f));
+    if (dhuresh == null) throw new Error("not marked");
+    const row = await prisma.constructionLabourAttendance.findUniqueOrThrow({
+      where: { id: dhuresh.id },
+    });
+    expect(row.supervisorId).toBeNull();
+
+    // A day marked before the change carries the Labour's own Site Engineer.
+    const ravi = await seedSiteEngineer(company.workspaceId, "Ravi");
+    await prisma.constructionLabourAttendance.update({
+      where: { id: dhuresh.id },
+      data: { supervisorId: ravi },
+    });
+    const [again] = await marked(company.cookie, {
+      projectId: f.tower,
+      date: YESTERDAY,
+      // Sent by a screen from before the change: ignored.
+      marks: [
+        { labourId: f.dhuresh, status: "half_day", supervisorId: f.sundar },
+      ],
+      expected: { [f.dhuresh]: row.updatedAt.toISOString() },
+    });
+    expect(again).toMatchObject({
+      status: "half_day",
+      siteEngineers: [{ id: ravi, name: "Ravi" }],
+    });
+    const kept = await prisma.constructionLabourAttendance.findUniqueOrThrow({
+      where: { id: dhuresh.id },
+    });
+    expect(kept.supervisorId).toBe(ravi);
+  });
+
   it("marks many Labours, posts earned and overtime, re-marks with expected and clears", async () => {
     const company = await ownerWithCompany();
     const f = await fixtures(company);
@@ -223,7 +284,8 @@ describe("labour attendance HTTP", () => {
       labourId: f.dhuresh,
       status: "present",
       shift: "Shift 1",
-      supervisor: { id: f.sundar, name: "Sundar" },
+      // None saved: the Project's Site Engineers (ADR CM-0041).
+      siteEngineers: [{ id: f.sundar, name: "Sundar" }],
       wageRate: DAILY,
       earned: DAILY,
       overtimeHours: "1.5",
@@ -654,7 +716,6 @@ describe("labour attendance HTTP", () => {
         labourCategory: { id: string } | null;
       }[];
       labourCategories: { id: string }[];
-      supervisors: { id: string; name: string }[];
     }>(await sheet(company.cookie, f.tower, TODAY));
     const dhureshRow = today.labourers.find(
       (row) => row.labourId === f.dhuresh,
@@ -673,7 +734,7 @@ describe("labour attendance HTTP", () => {
       isWeeklyHoliday: true,
     });
     expect(today.labourCategories.map((item) => item.id)).toContain(f.mason);
-    expect(today.supervisors).toEqual([{ id: f.sundar, name: "Sundar" }]);
+    expect(today).not.toHaveProperty("supervisors");
 
     const twoDaysAgo = addDays(TODAY, -2);
     await marked(company.cookie, {
@@ -735,7 +796,7 @@ describe("labour attendance HTTP", () => {
     const byLabour = await json<{ total: number }>(
       await listDays(
         jsonRequest(
-          `${BASE}?projectId=${f.tower}&labourId=${f.kavitha}&from=${YESTERDAY}&to=${YESTERDAY}&supervisorId=${f.sundar}`,
+          `${BASE}?projectId=${f.tower}&labourId=${f.kavitha}&from=${YESTERDAY}&to=${YESTERDAY}`,
           company.cookie,
         ),
       ),

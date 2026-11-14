@@ -51,7 +51,7 @@ function day(
     status: "present",
     isPaidLeave: false,
     shift: null,
-    supervisor: null,
+    siteEngineers: null,
     checkIn: null,
     checkOut: null,
     breakMinutes: null,
@@ -106,7 +106,7 @@ function august(): ReportLabourDay[] {
           breakMinutes: 60,
           overtimeHundredths: 125,
           overtimeAmount: 12_500,
-          supervisor: "Murugan",
+          siteEngineers: "Murugan",
           shift: "Shift 1",
         }),
       );

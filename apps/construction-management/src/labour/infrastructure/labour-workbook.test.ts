@@ -12,21 +12,15 @@ async function sheetWith(headers: string[], row: (string | null)[]) {
 }
 
 describe("readLabourSheet", () => {
-  it("reads the Site Engineer column", async () => {
-    const rows = await readLabourSheet(
-      await sheetWith(["Labour Name*", "Site Engineer"], ["Murugan", "Ganesh"]),
-    );
-    expect(rows).toEqual([
-      { row: 2, cells: { name: "Murugan", supervisor: "Ganesh" } },
-    ]);
-  });
-
-  it("still reads a template from before ADR CM-0036, where the column says Supervisor", async () => {
-    const rows = await readLabourSheet(
-      await sheetWith(["Labour Name*", "Supervisor"], ["Murugan", "Ganesh"]),
-    );
-    expect(rows).toEqual([
-      { row: 2, cells: { name: "Murugan", supervisor: "Ganesh" } },
-    ]);
-  });
+  // A Labour's Site Engineers come from their Projects (ADR CM-0041), so
+  // older templates import with that column ignored.
+  it.each(["Site Engineer", "Supervisor"])(
+    "ignores a %s column from an older template",
+    async (header) => {
+      const rows = await readLabourSheet(
+        await sheetWith(["Labour Name*", header], ["Murugan", "Ganesh"]),
+      );
+      expect(rows).toEqual([{ row: 2, cells: { name: "Murugan" } }]);
+    },
+  );
 });

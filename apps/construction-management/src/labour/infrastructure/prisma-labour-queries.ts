@@ -20,6 +20,10 @@ import type {
 } from "../application/labour-ports";
 import { workingHours, type Weekday } from "../domain/wages";
 import { prismaLedger } from "./prisma-ledger";
+import {
+  siteEngineersOf,
+  siteEngineersOnProjects,
+} from "./project-site-engineers";
 
 /** The labourer's Projects, oldest first (ADR CM-0033). */
 const WITH_PROJECTS = {
@@ -59,8 +63,6 @@ function whereOf(
   if (filter.projectId != null)
     filters.push({ projects: { some: { projectId: filter.projectId } } });
   if (filter.active != null) filters.push({ isActive: filter.active });
-  if (filter.supervisorId != null)
-    filters.push({ supervisorId: filter.supervisorId });
   if (filter.labourCategoryId != null)
     filters.push({ labourCategoryId: filter.labourCategoryId });
   const search = filter.search?.trim() ?? "";
@@ -94,19 +96,13 @@ export class PrismaLabourQueries implements LabourQueries {
       ...new Set(values.filter((value): value is string => value != null)),
     ];
     const today = await companyToday(this.db, workspaceId, this.clock());
-    const [projects, categories, supervisors, managers, openings, balances] =
+    const projectIds = unique(
+      rows.flatMap((row) => row.projects.map((project) => project.projectId)),
+    );
+    const [projects, categories, engineers, managers, openings, balances] =
       await Promise.all([
         this.db.constructionProjectsProject.findMany({
-          where: {
-            workspaceId,
-            id: {
-              in: unique(
-                rows.flatMap((row) =>
-                  row.projects.map((project) => project.projectId),
-                ),
-              ),
-            },
-          },
+          where: { workspaceId, id: { in: projectIds } },
           select: { id: true, name: true },
         }),
         this.db.constructionMastersLabourCategory.findMany({
@@ -116,13 +112,7 @@ export class PrismaLabourQueries implements LabourQueries {
           },
           select: { id: true, name: true },
         }),
-        this.db.constructionMastersSupervisor.findMany({
-          where: {
-            workspaceId,
-            id: { in: unique(rows.map((row) => row.supervisorId)) },
-          },
-          select: { id: true, name: true },
-        }),
+        siteEngineersOnProjects(this.db, workspaceId, projectIds),
         this.db.constructionLabourLabour.findMany({
           where: {
             workspaceId,
@@ -138,7 +128,6 @@ export class PrismaLabourQueries implements LabourQueries {
       new Map(items.map((item) => [item.id, item]));
     const projectNames = byId(projects);
     const categoryNames = byId(categories);
-    const supervisorNames = byId(supervisors);
     const managerNames = byId(managers);
     return rows.map((row) => ({
       id: row.id,
@@ -156,7 +145,6 @@ export class PrismaLabourQueries implements LabourQueries {
         uanNumber: row.uanNumber,
         esicNumber: row.esicNumber,
         labourCategoryId: row.labourCategoryId,
-        supervisorId: row.supervisorId,
         reportsToId: row.reportsToId,
         contactNumber: row.contactNumber,
         gender: row.gender,
@@ -174,10 +162,10 @@ export class PrismaLabourQueries implements LabourQueries {
         row.labourCategoryId == null
           ? null
           : (categoryNames.get(row.labourCategoryId) ?? null),
-      supervisor:
-        row.supervisorId == null
-          ? null
-          : (supervisorNames.get(row.supervisorId) ?? null),
+      siteEngineers: siteEngineersOf(
+        row.projects.map(({ projectId }) => projectId),
+        engineers,
+      ),
       reportsTo:
         row.reportsToId == null
           ? null
@@ -443,7 +431,6 @@ export class PrismaLabourQueries implements LabourQueries {
       name: row.name,
       labourCode: row.labourCode,
       labourCategoryId: row.labourCategoryId,
-      supervisorId: row.supervisorId,
       wageType: row.wageType,
       weeklyHolidays: row.weeklyHolidays,
       workingHoursPerDay: workingHours(row.workingHoursPerDay.toString()),
@@ -453,9 +440,9 @@ export class PrismaLabourQueries implements LabourQueries {
     }));
   }
 
-  /** Every live Project, Labour Category and Supervisor (import, template). */
+  /** Every live Project and Labour Category (import, template). */
   async lookups(workspaceId: string) {
-    const [projects, labourCategories, supervisors] = await Promise.all([
+    const [projects, labourCategories] = await Promise.all([
       this.db.constructionProjectsProject.findMany({
         where: { workspaceId, deletedAt: null },
         select: { id: true, name: true },
@@ -466,20 +453,10 @@ export class PrismaLabourQueries implements LabourQueries {
         select: { id: true, name: true, disabledAt: true },
         orderBy: { name: "asc" },
       }),
-      this.db.constructionMastersSupervisor.findMany({
-        where: { workspaceId, deletedAt: null },
-        select: { id: true, name: true, disabledAt: true },
-        orderBy: { name: "asc" },
-      }),
     ]);
     return {
       projects,
       labourCategories: labourCategories.map((row) => ({
-        id: row.id,
-        name: row.name,
-        disabled: row.disabledAt != null,
-      })),
-      supervisors: supervisors.map((row) => ({
         id: row.id,
         name: row.name,
         disabled: row.disabledAt != null,

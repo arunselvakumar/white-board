@@ -12,8 +12,8 @@ export const dynamic = "force-dynamic";
 
 /**
  * The sample Excel sheet for the labour import: headers, one
- * example row, and a Lists sheet with the Company's Projects, Labour
- * Categories and Supervisors.
+ * example row, and a Lists sheet with the Company's Projects and Labour
+ * Categories.
  */
 export async function GET(request: Request): Promise<Response> {
   try {
@@ -23,9 +23,6 @@ export async function GET(request: Request): Promise<Response> {
     const bytes = await labourTemplate({
       projects: lookups.projects.map((item) => item.name),
       labourCategories: lookups.labourCategories
-        .filter((item) => !item.disabled)
-        .map((item) => item.name),
-      supervisors: lookups.supervisors
         .filter((item) => !item.disabled)
         .map((item) => item.name),
     });

@@ -11,7 +11,6 @@ import {
   PROJECT_OPTIONS,
   DHURESH,
   MEENA,
-  SUPERVISOR_LIST,
   TOWER,
   VILLA,
   listOf,
@@ -31,10 +30,6 @@ const LOOKUPS = [
   {
     path: "/api/construction/masters/labour-categories",
     respond: () => Response.json(CATEGORY_LIST),
-  },
-  {
-    path: "/api/construction/masters/supervisors",
-    respond: () => Response.json(SUPERVISOR_LIST),
   },
 ];
 

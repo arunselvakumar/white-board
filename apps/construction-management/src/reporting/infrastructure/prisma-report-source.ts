@@ -74,6 +74,51 @@ export function prismaReportSource(db: PrismaClient): ReportSource {
   }
 
   /**
+   * The Site Engineers on each Project, comma-separated by name (ADR
+   * CM-0041): live, enabled Site Engineers whose sign-in (not the Owner's) is
+   * on the Project. Projects with none are left out.
+   */
+  async function siteEngineerNames(
+    workspaceId: string,
+    projectIds: Iterable<string>,
+  ): Promise<Map<string, string>> {
+    const wanted = [...new Set(projectIds)];
+    if (wanted.length === 0) return new Map();
+    const assignments =
+      await db.constructionOrganizationTeamMemberProject.findMany({
+        where: {
+          projectId: { in: wanted },
+          member: { workspaceId, deletedAt: null, isOwner: false },
+        },
+        select: { memberId: true, projectId: true },
+      });
+    if (assignments.length === 0) return new Map();
+    const engineers = await db.constructionMastersSupervisor.findMany({
+      where: {
+        workspaceId,
+        deletedAt: null,
+        disabledAt: null,
+        teamMemberId: { in: assignments.map((row) => row.memberId) },
+      },
+      select: { name: true, teamMemberId: true },
+    });
+    const names = new Map<string, Set<string>>();
+    for (const { memberId, projectId } of assignments)
+      for (const engineer of engineers)
+        if (engineer.teamMemberId === memberId)
+          names.set(
+            projectId,
+            (names.get(projectId) ?? new Set()).add(engineer.name),
+          );
+    return new Map(
+      [...names].map(([projectId, set]) => [
+        projectId,
+        [...set].sort((a, b) => a.localeCompare(b)).join(", "),
+      ]),
+    );
+  }
+
+  /**
    * The requester's Team Member name in the Company (a member who left
    * keeps theirs), else their account name; null when neither is known.
    */
@@ -149,11 +194,21 @@ export function prismaReportSource(db: PrismaClient): ReportSource {
       include: { overtime: { select: { hours: true, amount: true } } },
       orderBy: [{ attendanceDate: "asc" }],
     });
-    const supervisors = await namesOf(
-      "supervisor",
-      workspaceId,
-      rows.map((row) => row.supervisorId),
-    );
+    // A day keeps the Site Engineer it was saved with; days marked since
+    // ADR CM-0041 show the Project's Site Engineers.
+    const [saved, onProjects] = await Promise.all([
+      namesOf(
+        "supervisor",
+        workspaceId,
+        rows.map((row) => row.supervisorId),
+      ),
+      siteEngineerNames(
+        workspaceId,
+        rows
+          .filter((row) => row.supervisorId == null)
+          .map((row) => row.projectId),
+      ),
+    ]);
     return rows.map((row) => ({
       projectId: row.projectId,
       labourId: row.labourId,
@@ -161,10 +216,10 @@ export function prismaReportSource(db: PrismaClient): ReportSource {
       status: row.status,
       isPaidLeave: row.isPaidLeave,
       shift: row.shift,
-      supervisor:
+      siteEngineers:
         row.supervisorId == null
-          ? null
-          : (supervisors.get(row.supervisorId) ?? null),
+          ? (onProjects.get(row.projectId) ?? null)
+          : (saved.get(row.supervisorId) ?? null),
       checkIn: row.checkIn,
       checkOut: row.checkOut,
       breakMinutes: row.breakMinutes,

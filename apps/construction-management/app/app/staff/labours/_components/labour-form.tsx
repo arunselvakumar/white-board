@@ -42,7 +42,7 @@ import {
   useUpdateLabour,
   type LabourResponse,
 } from "@/src/queries/labours";
-import { lookupListQuery, supervisorsQuery } from "@/src/queries/masters";
+import { lookupListQuery } from "@/src/queries/masters";
 import { projectOptionsQuery } from "@/src/queries/projects";
 
 import { LabourCategorySheet } from "./labour-category-sheet";
@@ -183,7 +183,6 @@ export function LabourForm({
   } | null>(null);
 
   const categories = useQuery(lookupListQuery("labour-categories"));
-  const supervisors = useQuery(supervisorsQuery);
   const projects = useQuery(projectOptionsQuery);
   const categoryChoices = useChoices(
     categories.data?.items,
@@ -197,10 +196,6 @@ export function LabourForm({
       value: addedCategory.id,
       label: addedCategory.name,
     });
-  const supervisorChoices = useChoices(
-    supervisors.data?.items,
-    labour?.supervisor,
-  );
   // Live Projects, plus any saved one no longer live, so it stays ticked.
   const projectChoices: MultiSelectOption[] = [
     ...(projects.data?.items ?? []).map(({ id, name }) => ({ id, name })),
@@ -401,15 +396,6 @@ export function LabourForm({
               </Button>
             }
           />
-          <ChoiceField
-            id="labour-supervisor"
-            label="Site Engineer"
-            name="supervisorId"
-            control={form.control}
-            choices={supervisorChoices}
-            placeholder="Choose a Site Engineer"
-            error={errors.supervisorId?.message}
-          />
           <div className="space-y-1.5">
             <Label htmlFor="labour-reports-to">Reports To</Label>
             <Controller
@@ -491,6 +477,9 @@ export function LabourForm({
             )}
           />
           <FieldError message={errors.projectIds?.message} />
+          <p className="text-muted-foreground text-xs">
+            {siteEngineersLine(labour)}
+          </p>
         </div>
         {projects.data?.items.length === 0 && (
           <p className="text-muted-foreground text-sm">
@@ -583,6 +572,21 @@ export function EditLabourScreen({ id }: { id: string }) {
       <EditLabourDetails labour={data} />
     </FormPage>
   );
+}
+
+/**
+ * Who the Labour answers to (ADR CM-0041): the Site Engineers on their saved
+ * Projects. There is no Site Engineer field; Site Engineers are put on a
+ * Project from the Project.
+ */
+export function siteEngineersLine(labour: LabourResponse | null): string {
+  if (labour == null || labour.projects.length === 0)
+    return "They answer to the Site Engineers on their Projects.";
+  if (labour.siteEngineers.length === 0)
+    return "None of their Projects has a Site Engineer yet. Add one on the Project.";
+  return `Site Engineers on their Projects: ${labour.siteEngineers
+    .map((engineer) => engineer.name)
+    .join(", ")}.`;
 }
 
 /** Under Edit Labour's title: the Projects and an Inactive mark. */

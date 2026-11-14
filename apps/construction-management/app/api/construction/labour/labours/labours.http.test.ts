@@ -54,7 +54,7 @@ type Labour = {
   contactNumber: string | null;
   projects: { id: string; name: string }[];
   labourCategory: { id: string; name: string } | null;
-  supervisor: { id: string; name: string } | null;
+  siteEngineers: { id: string; name: string }[];
   reportsTo: { id: string; name: string } | null;
   isActive: boolean;
   photoUrl: string | null;
@@ -106,23 +106,59 @@ async function seedCategory(
   return id;
 }
 
-async function seedSupervisor(workspaceId: string, name: string) {
+/**
+ * A Site Engineer whose sign-in is on `projectIds` (ADR CM-0038 §3): the
+ * Site Engineer row, and the Team Member it points at with those Projects.
+ */
+async function seedSiteEngineer(
+  workspaceId: string,
+  name: string,
+  projectIds: readonly string[] = [],
+  options: { disabled?: boolean } = {},
+) {
   const id = newId();
+  const memberId = newId();
+  await prisma.constructionOrganizationTeamMember.create({
+    data: {
+      id: memberId,
+      workspaceId,
+      name,
+      email: `${memberId}@site.test`,
+      siteEngineer: true,
+      status: "active",
+      createdBy: "test",
+      updatedBy: "test",
+      projects: { create: projectIds.map((projectId) => ({ projectId })) },
+    },
+  });
   await prisma.constructionMastersSupervisor.create({
-    data: { id, workspaceId, name, createdBy: "test", updatedBy: "test" },
+    data: {
+      id,
+      workspaceId,
+      name,
+      teamMemberId: memberId,
+      disabledAt: options.disabled === true ? new Date() : null,
+      createdBy: "test",
+      updatedBy: "test",
+    },
   });
   return id;
 }
 
 async function fixtures(company: Company) {
   const suffix = newId().slice(-6);
-  const [tower, villa, mason, welder, supervisor] = await Promise.all([
+  const [tower, villa, mason, welder] = await Promise.all([
     seedProject(company.workspaceId, `Tower A ${suffix}`),
     seedProject(company.workspaceId, `Villa ${suffix}`),
     seedCategory(company.workspaceId, `Mason ${suffix}`),
     seedCategory(company.workspaceId, `Welder ${suffix}`, true),
-    seedSupervisor(company.workspaceId, `Sundar ${suffix}`),
   ]);
+  // On Tower A, so every Labour there answers to them (ADR CM-0041).
+  const supervisor = await seedSiteEngineer(
+    company.workspaceId,
+    `Sundar ${suffix}`,
+    [tower],
+  );
   return { tower, villa, mason, welder, supervisor, suffix };
 }
 
@@ -260,7 +296,8 @@ describe("Labour register (CM-205 – CM-207)", () => {
         aadhaar: "2341 2341 2346",
         contactNumber: "77081 65767",
         labourCategoryId: mason,
-        supervisorId: supervisor,
+        // Before ADR CM-0041 the form sent one; it is ignored now.
+        supervisorId: newId(),
         uanNumber: "100123456789",
       }),
     );
@@ -277,7 +314,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
       contactNumber: "+917708165767",
       projects: [{ id: tower }],
       labourCategory: { id: mason },
-      supervisor: { id: supervisor },
+      siteEngineers: [{ id: supervisor }],
       isActive: true,
     });
     const entries = await openingEntries(labour.id);
@@ -452,7 +489,6 @@ describe("Labour register (CM-205 – CM-207)", () => {
       [{ joiningDate: "2026-13-01" }, "JOINING_DATE_INVALID"],
       [{ projectIds: [newId()] }, "PROJECT_NOT_FOUND"],
       [{ labourCategoryId: welder }, "LABOUR_CATEGORY_NOT_FOUND"],
-      [{ supervisorId: newId() }, "SUPERVISOR_NOT_FOUND"],
     ];
     for (const [extra, code] of cases) {
       const response = await create(company.cookie, labourBody(tower, extra));
@@ -508,16 +544,53 @@ describe("Labour register (CM-205 – CM-207)", () => {
     );
   });
 
+  it("reads a Labour's Site Engineers from their Projects, never stores one (ADR CM-0041)", async () => {
+    const company = await ownerWithCompany();
+    const { tower, villa, supervisor, suffix } = await fixtures(company);
+    const [anand, off] = await Promise.all([
+      seedSiteEngineer(company.workspaceId, `Anand ${suffix}`, [villa]),
+      // Disabled: no one's Site Engineer, though still on the Project.
+      seedSiteEngineer(company.workspaceId, `Off ${suffix}`, [villa], {
+        disabled: true,
+      }),
+      // Not on any Project.
+      seedSiteEngineer(company.workspaceId, `Benched ${suffix}`),
+    ]);
+    const labour = await created(
+      company.cookie,
+      labourBody(tower, { projectIds: [tower, villa] }),
+    );
+    expect(labour.siteEngineers.map((item) => item.id)).toEqual([
+      anand,
+      supervisor,
+    ]);
+    expect(labour.siteEngineers.map((item) => item.id)).not.toContain(off);
+
+    // Off Tower A: only Villa's Site Engineer is left.
+    const moved = await json<Labour>(
+      await update(company.cookie, labour, { projectIds: [villa] }),
+    );
+    expect(moved.siteEngineers).toEqual([
+      { id: anand, name: `Anand ${suffix}` },
+    ]);
+
+    // Nothing on the row: the column is gone.
+    const row = await prisma.constructionLabourLabour.findUniqueOrThrow({
+      where: { id: labour.id },
+    });
+    expect(row).not.toHaveProperty("supervisorId");
+  });
+
   it("lists with filters and pages", async () => {
     const company = await ownerWithCompany();
-    const { tower, villa, mason, supervisor } = await fixtures(company);
+    const { tower, villa, mason } = await fixtures(company);
     const a = await created(
       company.cookie,
       labourBody(tower, { name: "Anbu", labourCategoryId: mason }),
     );
     const b = await created(
       company.cookie,
-      labourBody(villa, { name: "Bhim", supervisorId: supervisor }),
+      labourBody(villa, { name: "Bhim" }),
     );
     await created(company.cookie, labourBody(tower, { name: "Chetan" }));
     await deactivateLabour(
@@ -547,9 +620,8 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect(
       (await page(`categoryId=${mason}`)).items.map((item) => item.id),
     ).toEqual([a.id]);
-    expect(
-      (await page(`supervisorId=${supervisor}`)).items.map((item) => item.id),
-    ).toEqual([b.id]);
+    // The Site Engineer filter is gone (ADR CM-0041): ignored if sent.
+    expect((await page(`supervisorId=${newId()}`)).total).toBe(3);
 
     const first = await page("limit=2");
     expect(first.items).toHaveLength(2);
@@ -1026,6 +1098,10 @@ describe("Labour register (CM-205 – CM-207)", () => {
     const listed: unknown[] = [];
     lists?.getColumn(1).eachCell((cell) => listed.push(cell.value));
     expect(listed).toContain(`Tower A ${suffix}`);
+    // No Site Engineer column or list (ADR CM-0041).
+    const listTitles: unknown[] = [];
+    lists?.getRow(1).eachCell((cell) => listTitles.push(cell.value));
+    expect(listTitles).not.toContain("Site Engineers");
 
     if (sheet == null) throw new Error("No Labours sheet");
     const headers: string[] = [];
@@ -1150,7 +1226,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
 
   it("exports the filtered register; amounts only with Financial", async () => {
     const company = await ownerWithCompany();
-    const { tower, villa } = await fixtures(company);
+    const { tower, villa, suffix } = await fixtures(company);
     await created(
       company.cookie,
       labourBody(tower, { name: "Tower man", aadhaar: VALID_AADHAAR }),
@@ -1171,6 +1247,9 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect(cell("Wage per Day (₹)")).toBe(700);
     expect(cell("Aadhaar Number")).toBe("XXXXXXXX2346");
     expect(cell("Working Hours per Day")).toBe(8);
+    // From the Labour's Projects (ADR CM-0041).
+    expect(cell("Site Engineers")).toBe(`Sundar ${suffix}`);
+    expect(headers).not.toContain("Site Engineer");
 
     const clerk = await memberOn(company, { "masters.labours": ["read"] });
     const hidden = (

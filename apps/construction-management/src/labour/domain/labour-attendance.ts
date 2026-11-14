@@ -45,7 +45,6 @@ export type DayMark = {
   status: AttendanceStatus;
   isPaidLeave?: boolean;
   shift?: string | null;
-  supervisorId?: string | null;
   /** `HH:MM`, Company time; only on Present or Half Day. */
   checkIn?: string | null;
   /** `HH:MM`; needs a check-in. At or before the check-in is the next day. */
@@ -82,6 +81,10 @@ export type PricedDay = {
   status: AttendanceStatus;
   isPaidLeave: boolean;
   shift: string | null;
+  /**
+   * The Labour's Site Engineer, saved on days marked before ADR CM-0041;
+   * null on days marked since. A re-mark keeps it.
+   */
   supervisorId: string | null;
   checkIn: string | null;
   checkOut: string | null;
@@ -162,6 +165,8 @@ export function priceDay(input: {
   card: WageCard;
   projectId: string;
   date: CalendarDate;
+  /** The Site Engineer a re-marked day was saved with (ADR CM-0041). */
+  supervisorId?: string | null;
 }): PricedDay {
   const { mark, card } = input;
   const isPaidLeave = mark.isPaidLeave ?? false;
@@ -249,7 +254,7 @@ export function priceDay(input: {
     status: mark.status,
     isPaidLeave,
     shift: shift.length === 0 ? null : shift,
-    supervisorId: mark.supervisorId ?? null,
+    supervisorId: input.supervisorId ?? null,
     checkIn: times.checkIn,
     checkOut: times.checkOut,
     breakMinutes: times.breakMinutes,

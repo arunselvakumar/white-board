@@ -2,7 +2,7 @@
 
 - Status: accepted (2026-11-10, the owner's request)
 - Date: 2026-11-10
-- Amended by: [CM-0037](CM-0037-site-engineer-page-sign-in-and-default-roles.md) (a Site Engineer has a page, a full profile and a sign-in)
+- Amended by: [CM-0037](CM-0037-site-engineer-page-sign-in-and-default-roles.md) (a Site Engineer has a page, a full profile and a sign-in), [CM-0041](CM-0041-labour-site-engineers-come-from-the-project.md) (a Labour's Site Engineers come from their Projects)
 - Supersedes: the Staff and Labour groups of Human Resources in [CM-0034](CM-0034-hr-main-menu.md) §2 and [CM-0035](CM-0035-labour-reports-to-and-labour-categories-in-masters.md), and CM-0034's choice to keep the old page addresses
 - Relates to: [CM-0030](CM-0030-users-and-roles.md) (Team Members or Role Management Read gates Staff and Roles), [CM-0032](CM-0032-staff-and-salary.md) (screens say Staff), `modules/08`
 

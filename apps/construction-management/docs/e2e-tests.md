@@ -62,16 +62,16 @@ bun run --cwd apps/construction-management test:e2e         # every test
 
 ## Masters
 
-| Test                                                                                             | Tags | Spec                   |
-| ------------------------------------------------------------------------------------------------ | ---- | ---------------------- |
-| should offer the new Labour Category and Site Engineer on a Labour, when the Owner adds them     |      | `masters.spec.ts`      |
-| should list the Supplier with its GSTIN and the Material with its unit, when the Owner adds them |      | `masters.spec.ts`      |
-| should list the new entry, when the Owner adds one to Departments                                |      | `master-lists.spec.ts` |
-| should list the new entry, when the Owner adds one to Material Categories                        |      | `master-lists.spec.ts` |
-| should list the new entry, when the Owner adds one to Measurement Units                          |      | `master-lists.spec.ts` |
-| should list the new entry, when the Owner adds one to Tags                                       |      | `master-lists.spec.ts` |
-| should list the new entry, when the Owner adds one to Amenities                                  |      | `master-lists.spec.ts` |
-| should list the new entry, when the Owner adds one to Common Developments                        |      | `master-lists.spec.ts` |
+| Test                                                                                                      | Tags | Spec                   |
+| --------------------------------------------------------------------------------------------------------- | ---- | ---------------------- |
+| should offer the new Labour Category on a Labour and list the new Site Engineer, when the Owner adds them |      | `masters.spec.ts`      |
+| should list the Supplier with its GSTIN and the Material with its unit, when the Owner adds them          |      | `masters.spec.ts`      |
+| should list the new entry, when the Owner adds one to Departments                                         |      | `master-lists.spec.ts` |
+| should list the new entry, when the Owner adds one to Material Categories                                 |      | `master-lists.spec.ts` |
+| should list the new entry, when the Owner adds one to Measurement Units                                   |      | `master-lists.spec.ts` |
+| should list the new entry, when the Owner adds one to Tags                                                |      | `master-lists.spec.ts` |
+| should list the new entry, when the Owner adds one to Amenities                                           |      | `master-lists.spec.ts` |
+| should list the new entry, when the Owner adds one to Common Developments                                 |      | `master-lists.spec.ts` |
 
 ## Labour and vendors
 

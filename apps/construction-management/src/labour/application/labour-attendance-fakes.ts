@@ -175,8 +175,6 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
           (params.from == null || day.date >= params.from) &&
           (params.to == null || day.date <= params.to) &&
           (params.labourId == null || day.labourId === params.labourId) &&
-          (params.supervisorId == null ||
-            day.supervisorId === params.supervisorId) &&
           (params.status == null ||
             (params.status === "paid_leave"
               ? day.status === "on_leave" && day.isPaidLeave
@@ -318,9 +316,29 @@ export class FakeLabourBackdatedGuard implements LabourAttendanceBackdatedGuard 
   }
 }
 
-/** A directory over a fixed id → name table (Projects, categories, supervisors). */
-export function fakeDirectory(names: Record<string, string>) {
+/**
+ * A directory over a fixed id → name table (Projects, categories, Site
+ * Engineers). `onProjects` lists the Site Engineer ids on each Project.
+ */
+export function fakeDirectory(
+  names: Record<string, string>,
+  onProjects: Record<string, string[]> = {},
+) {
   return {
+    onProjects: (_workspaceId: string, projectIds: readonly string[]) =>
+      Promise.resolve(
+        new Map(
+          projectIds
+            .filter((id) => (onProjects[id] ?? []).length > 0)
+            .map((id) => [
+              id,
+              (onProjects[id] ?? []).map((engineer) => ({
+                id: engineer,
+                name: names[engineer] ?? "",
+              })),
+            ]),
+        ),
+      ),
     find: (_workspaceId: string, ids: readonly string[]) =>
       Promise.resolve(
         new Map(

@@ -58,7 +58,6 @@ const baseSchema = z.object({
       message: "Enter a valid 12-digit Aadhaar number",
     }),
   labourCategoryId: z.string(),
-  supervisorId: z.string(),
   /** Another Labour's id, or "" for none (ADR CM-0035). */
   reportsToId: z.string(),
   contactNumber: z
@@ -114,7 +113,6 @@ export function labourFormDefaults(
       esicNumber: "",
       aadhaar: "",
       labourCategoryId: "",
-      supervisorId: "",
       reportsToId: "",
       contactNumber: "",
       gender: "",
@@ -141,7 +139,6 @@ export function labourFormDefaults(
     esicNumber: labour.esicNumber ?? "",
     aadhaar: "",
     labourCategoryId: labour.labourCategory?.id ?? "",
-    supervisorId: labour.supervisor?.id ?? "",
     reportsToId: labour.reportsTo?.id ?? "",
     contactNumber: labour.contactNumber?.replace(/^\+91/, "") ?? "",
     gender: labour.gender ?? "",
@@ -164,7 +161,6 @@ function details(values: LabourFormValues) {
     uanNumber: blank(values.uanNumber),
     esicNumber: blank(values.esicNumber),
     labourCategoryId: blank(values.labourCategoryId),
-    supervisorId: blank(values.supervisorId),
     reportsToId: blank(values.reportsToId),
     contactNumber:
       values.contactNumber.trim() === ""
@@ -231,7 +227,6 @@ export const LABOUR_ERROR_FIELDS: Record<string, LabourField> = {
   MOBILE_INVALID: "contactNumber",
   GENDER_INVALID: "gender",
   LABOUR_CATEGORY_NOT_FOUND: "labourCategoryId",
-  SUPERVISOR_NOT_FOUND: "supervisorId",
   REPORTS_TO_NOT_FOUND: "reportsToId",
   REPORTS_TO_SELF: "reportsToId",
   REPORTS_TO_LOOP: "reportsToId",

@@ -83,7 +83,7 @@ import {
   type LabourListFilter,
   type LabourResponse,
 } from "@/src/queries/labours";
-import { lookupListQuery, supervisorsQuery } from "@/src/queries/masters";
+import { lookupListQuery } from "@/src/queries/masters";
 import { projectOptionsQuery } from "@/src/queries/projects";
 
 import { ImportDialog } from "./import-dialog";
@@ -153,20 +153,17 @@ export function LaboursPage() {
   const [status, setStatus] = useState<LabourListFilter["status"]>("all");
   const [projectId, setProjectId] = useState<string | null>(null);
   const [categoryId, setCategoryId] = useState<string | null>(null);
-  const [supervisorId, setSupervisorId] = useState<string | null>(null);
   const [cursor, setCursor] = useState<LabourListFilter["cursor"]>(null);
   const [importing, setImporting] = useState(false);
   const deferredSearch = useDeferredValue(search);
   const projects = useQuery(projectOptionsQuery);
   const categories = useQuery(lookupListQuery("labour-categories"));
-  const supervisors = useQuery(supervisorsQuery);
 
   const filter = {
     search: deferredSearch,
     status,
     projectId,
     categoryId,
-    supervisorId,
   };
   // Filter and page changes keep the old rows on screen, dimmed (ADR-0047).
   const [isPending, startTransition] = useTransition();
@@ -255,13 +252,6 @@ export function LaboursPage() {
             value={categoryId}
             items={categories.data?.items ?? []}
             onChange={set(setCategoryId)}
-          />
-          <FilterSelect
-            label="Site Engineer"
-            allLabel="All Site Engineers"
-            value={supervisorId}
-            items={supervisors.data?.items ?? []}
-            onChange={set(setSupervisorId)}
           />
         </div>
         <Suspense fallback={<LabourRowsSkeleton />}>
@@ -352,8 +342,7 @@ function LabourRows({
     filter.search.trim().length > 0 ||
     filter.status !== "all" ||
     filter.projectId != null ||
-    filter.categoryId != null ||
-    filter.supervisorId != null;
+    filter.categoryId != null;
   if (data.items.length === 0)
     return (
       <Empty className="bg-card border">

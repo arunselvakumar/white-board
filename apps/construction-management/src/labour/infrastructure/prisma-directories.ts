@@ -6,6 +6,7 @@ import type {
   SupervisorDirectory,
   TeamMemberDirectory,
 } from "../application/directories";
+import { siteEngineersOnProjects } from "./project-site-engineers";
 
 type Db = Pick<
   PrismaClient,
@@ -13,6 +14,7 @@ type Db = Pick<
   | "constructionMastersLabourCategory"
   | "constructionMastersSupervisor"
   | "constructionOrganizationTeamMember"
+  | "constructionOrganizationTeamMemberProject"
 >;
 
 function unique(ids: readonly string[]): string[] {
@@ -64,6 +66,8 @@ export class PrismaDirectories {
         ]),
       );
     },
+    onProjects: (workspaceId, projectIds) =>
+      siteEngineersOnProjects(this.db, workspaceId, projectIds),
   };
 
   readonly teamMembers: TeamMemberDirectory = {

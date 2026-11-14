@@ -1,7 +1,7 @@
 # CM-0035 — Reports To on a Labour, Labour Categories back in Masters, and Add Labour Category from the Labour form
 
 - Status: accepted (2026-11-03, the owner's request)
-- Amended by: [CM-0036](CM-0036-one-staff-group-and-site-engineers.md) (the Labour group folds into Staff; Supervisors are shown as Site Engineers)
+- Amended by: [CM-0036](CM-0036-one-staff-group-and-site-engineers.md) (the Labour group folds into Staff; Supervisors are shown as Site Engineers), [CM-0041](CM-0041-labour-site-engineers-come-from-the-project.md) (no Site Engineer on the Labour)
 - Date: 2026-11-03
 - Supersedes: the Labour group of Human Resources in [CM-0034](CM-0034-hr-main-menu.md) §2 (Labours, Vendors, Labour Categories, Supervisors), and the Permission Matrix category of Labour Categories in CM-0034 §5
 - Relates to: [CM-0033](CM-0033-one-page-staff-no-designations-labours-on-many-projects.md) (the one-page Labour form), [CM-0016](CM-0016-daily-site-work-product-decisions.md) §6 (a Labour Category's skill), [CM-0028](CM-0028-settings-main-menu.md) (redirects when a page moves), `modules/08`

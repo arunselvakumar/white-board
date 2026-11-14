@@ -24,6 +24,15 @@ export type SupervisorDirectory = {
     workspaceId: string,
     ids: readonly string[],
   ): Promise<Map<string, { id: string; name: string; disabled: boolean }>>;
+  /**
+   * The Site Engineers on each of `projectIds`, by name (ADR CM-0041):
+   * enabled ones whose sign-in is on the Project. Projects with none are
+   * left out.
+   */
+  onProjects(
+    workspaceId: string,
+    projectIds: readonly string[],
+  ): Promise<Map<string, { id: string; name: string }[]>>;
 };
 
 export type TeamMemberDirectory = {

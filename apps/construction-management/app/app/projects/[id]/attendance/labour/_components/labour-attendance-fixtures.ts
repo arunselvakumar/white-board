@@ -34,7 +34,7 @@ function day(
     status: "present",
     isPaidLeave: false,
     shift: "General",
-    supervisor: { id: SUNDAR, name: "Sundar" },
+    siteEngineers: [{ id: SUNDAR, name: "Sundar" }],
     checkIn: null,
     checkOut: null,
     breakMinutes: null,
@@ -63,7 +63,6 @@ function row(
     name,
     labourCode: null,
     labourCategory: { id: MASON, name: "Mason" },
-    supervisor: { id: SUNDAR, name: "Sundar" },
     weeklyHolidays: [0],
     wageType: "daily",
     wagePerDay: 70_000,
@@ -114,7 +113,6 @@ export const SHEET: LabourSheet = {
       weeklyHolidays: [4],
       isWeeklyHoliday: true,
       suggestedStatus: "holiday",
-      supervisor: null,
     }),
     row(DHURESH, "Dhuresh Nawin", {
       labourCode: "L-07",
@@ -145,7 +143,6 @@ export const SHEET: LabourSheet = {
     }),
   ],
   labourCategories: [{ id: MASON, name: "Mason" }],
-  supervisors: [{ id: SUNDAR, name: "Sundar" }],
   totals: {
     marked: 2,
     present: 2,
@@ -161,7 +158,6 @@ export const SHEET: LabourSheet = {
 export const EMPTY_SHEET: LabourSheet = {
   ...SHEET,
   labourers: [],
-  supervisors: [],
   totals: {
     ...SHEET.totals,
     marked: 0,
@@ -198,7 +194,7 @@ export const RECORDED: LabourAttendanceList = {
       checkOut: "06:00",
       breakMinutes: 30,
       workedHours: "8.5",
-      supervisor: null,
+      siteEngineers: [],
     }),
     DHURESH_SAVED,
     day(DHURESH, "Dhuresh Nawin", {

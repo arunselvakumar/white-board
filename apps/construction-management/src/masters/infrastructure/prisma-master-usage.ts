@@ -49,13 +49,9 @@ export function prismaMasterUsage(db: PrismaClient): MasterUsage {
                 AND a.deleted_at IS NULL
             ) AS used
           `
-        : await db.$queryRaw<{ used: boolean }[]>`
+        : // Labours no longer name one (ADR CM-0041); days marked before do.
+          await db.$queryRaw<{ used: boolean }[]>`
             SELECT EXISTS (
-              SELECT 1 FROM construction_labour.labours
-              WHERE workspace_id = ${workspaceId}
-                AND supervisor_id = ${id}::uuid
-                AND deleted_at IS NULL
-            ) OR EXISTS (
               SELECT 1 FROM construction_labour.labour_attendance
               WHERE workspace_id = ${workspaceId}
                 AND supervisor_id = ${id}::uuid
