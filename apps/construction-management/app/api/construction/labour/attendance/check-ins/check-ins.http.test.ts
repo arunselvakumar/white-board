@@ -19,9 +19,11 @@ import {
 import { gifBytes, pngBytes } from "@/test/files";
 import { TEST_ORIGIN } from "@/test/sessions";
 
+import { POST as voidCheckIn } from "./[id]/void/route";
 import type {
   ConstructionLabourCheckInDayResponseModel as DayEffect,
   RecordConstructionLabourCheckInResponseModel as Recorded,
+  VoidConstructionLabourCheckInResponseModel as Voided,
 } from "./check-in-models";
 import { POST as recordCheckIn } from "./route";
 
@@ -215,6 +217,12 @@ async function recorded(
       `check-in: ${String(response.status)} ${await response.text()}`,
     );
   return json<Recorded>(response);
+}
+
+function voidEntry(cookie: string, id: string, reason: string) {
+  return voidCheckIn(jsonRequest(`${BASE}/${id}/void`, cookie, { reason }), {
+    params: Promise.resolve({ id }),
+  });
 }
 
 /** Handlers on a clock of the test's choosing, as the routes build them. */
@@ -1000,5 +1008,236 @@ describe("recording a check-in entry (ADR CM-0043)", () => {
     expect(result.day?.effect).toBe("created");
     expect(await ledgerSum(f.dhuresh)).toBe(DAILY);
     expect(await photoFiles(company.workspaceId)).toHaveLength(1);
+  });
+});
+
+describe("voiding a check-in entry (ADR CM-0043)", () => {
+  it("voids the only entry of a day Check-In made: the day is cleared and the wage reversed; the photo stays", async () => {
+    const company = await ownerWithCompany();
+    const f = await fixtures(company);
+    const entry = (await recorded(company.cookie, entryBody(f))).entry;
+    expect(await ledgerSum(f.dhuresh)).toBe(DAILY);
+
+    const response = await voidEntry(
+      company.cookie,
+      entry.id,
+      "  Checked in the wrong person  ",
+    );
+    expect(response.status).toBe(StatusCodes.OK);
+    const voided = await json<Voided>(response);
+    expect(voided.entry).toMatchObject({
+      id: entry.id,
+      hasPhoto: true,
+      voided: {
+        by: { id: company.userId },
+        reason: "Checked in the wrong person",
+      },
+    });
+    expect(voided.person).toMatchObject({
+      state: { status: "none", since: null },
+      entriesToday: 0,
+    });
+    expect(voided.day).toEqual({
+      effect: "cleared",
+      status: null,
+      checkIn: null,
+      checkOut: null,
+      breakMinutes: null,
+      note: null,
+    });
+    expect(await liveDays(f.dhuresh)).toHaveLength(0);
+    expect(await ledgerSum(f.dhuresh)).toBe(0);
+    expect(await audits(company.workspaceId, "labour_attendance.")).toEqual([
+      "labour_attendance.marked",
+      "labour_attendance.cleared",
+    ]);
+    expect(await audits(company.workspaceId, "check_in.")).toEqual([
+      "check_in.recorded",
+      "check_in.voided",
+    ]);
+    // Evidence of what was voided: the photo stays until retention.
+    const [file] = await photoFiles(company.workspaceId);
+    expect(file?.deletedAt).toBeNull();
+    expect(await photoObjects(company.workspaceId)).toBe(1);
+
+    expect(
+      await failure(await voidEntry(company.cookie, entry.id, "Again")),
+    ).toMatchObject({
+      status: StatusCodes.CONFLICT,
+      code: "CHECK_IN_ALREADY_VOIDED",
+    });
+    // The Labour can be checked in again; a new day is made.
+    const again = await recorded(company.cookie, entryBody(f));
+    expect(again.day?.effect).toBe("created");
+    expect(await ledgerSum(f.dhuresh)).toBe(DAILY);
+  });
+
+  it("voids one of several entries and works the day out again", async () => {
+    const company = await ownerWithCompany();
+    const f = await fixtures(company);
+    const clock = { now: at(TODAY, "09:00") };
+    const handlers = handlersAt(clock);
+    const record = async (time: string, action: "check_in" | "check_out") => {
+      clock.now = at(TODAY, time);
+      return (
+        await handlers.record({
+          workspaceId: company.workspaceId,
+          userId: company.userId,
+          projectId: f.tower,
+          kind: "labour",
+          personId: f.dhuresh,
+          action,
+          photo: PHOTO,
+        })
+      ).entry;
+    };
+    await record("09:00", "check_in");
+    const lunch = await record("13:00", "check_out");
+    await record("13:30", "check_in");
+    const evening = await record("18:00", "check_out");
+    expect((await liveDays(f.dhuresh))[0]).toMatchObject({
+      checkOut: "18:00",
+      breakMinutes: 30,
+    });
+
+    // Without the lunch Check Out there is no gap: the default break.
+    const noLunch = await json<Voided>(
+      await voidEntry(company.cookie, lunch.id, "Wrong button"),
+    );
+    expect(noLunch.day).toEqual({
+      effect: "updated",
+      status: "present",
+      checkIn: "09:00",
+      checkOut: "18:00",
+      breakMinutes: 60,
+      note: null,
+    });
+    // Without the last Check Out the Labour reads as still in.
+    const noOut = await json<Voided>(
+      await voidEntry(company.cookie, evening.id, "Not yet gone"),
+    );
+    expect(noOut.day).toMatchObject({
+      effect: "updated",
+      checkIn: "09:00",
+      checkOut: null,
+    });
+    const [day] = await liveDays(f.dhuresh);
+    expect(day).toMatchObject({
+      status: "present",
+      checkOut: null,
+      fromCheckIn: true,
+      timesFromCheckIn: true,
+    });
+    expect(day?.overtime).toEqual([]);
+    expect(await ledgerSum(f.dhuresh)).toBe(DAILY);
+  });
+
+  it("voids the last entry of a day the sheet saved: the times from Check-In go, the status stays", async () => {
+    const company = await ownerWithCompany();
+    const f = await fixtures(company);
+    const entry = (await recorded(company.cookie, entryBody(f))).entry;
+    const logged = await sheetDay(company, f);
+    await markOnSheet(
+      company,
+      f,
+      {
+        status: "present",
+        checkIn: logged?.checkIn,
+        checkOut: null,
+        breakMinutes: 60,
+      },
+      logged?.updatedAt,
+    );
+    const voided = await json<Voided>(
+      await voidEntry(company.cookie, entry.id, "Wrong person"),
+    );
+    expect(voided.day).toEqual({
+      effect: "updated",
+      status: "present",
+      checkIn: null,
+      checkOut: null,
+      breakMinutes: null,
+      note: null,
+    });
+    expect((await liveDays(f.dhuresh))[0]).toMatchObject({
+      status: "present",
+      checkIn: null,
+      fromCheckIn: false,
+      timesFromCheckIn: false,
+    });
+    expect(await ledgerSum(f.dhuresh)).toBe(DAILY);
+  });
+
+  it("voids a Vendor's entry as a log only, and needs a reason", async () => {
+    const company = await ownerWithCompany();
+    const f = await fixtures(company);
+    const entry = (
+      await recorded(
+        company.cookie,
+        entryBody(f, { kind: "vendor", personId: f.vendor }),
+      )
+    ).entry;
+    expect(
+      await failure(await voidEntry(company.cookie, entry.id, "   ")),
+    ).toMatchObject({
+      status: StatusCodes.BAD_REQUEST,
+      code: "VOID_REASON_REQUIRED",
+      details: { field: "reason" },
+    });
+    expect(
+      (await failure(await voidEntry(company.cookie, entry.id, ""))).code,
+    ).toBe("VALIDATION_ERROR");
+    const voided = await json<Voided>(
+      await voidEntry(company.cookie, entry.id, "Came yesterday"),
+    );
+    expect(voided.day).toBeNull();
+    expect(voided.person.state.status).toBe("none");
+  });
+
+  it("needs Attendance Delete on the entry's Project, and hides another Company's entry", async () => {
+    const company = await ownerWithCompany();
+    const f = await fixtures(company);
+    const entry = (await recorded(company.cookie, entryBody(f))).entry;
+    const creator = await member(
+      company,
+      { "labour.attendance": ["read", "create"] },
+      [f.tower],
+    );
+    expect(
+      await failure(await voidEntry(creator.cookie, entry.id, "Wrong")),
+    ).toMatchObject({
+      status: StatusCodes.FORBIDDEN,
+      code: "PERMISSION_DENIED",
+    });
+    const offProject = await member(
+      company,
+      { "labour.attendance": ["read", "create", "delete"] },
+      [f.villa],
+    );
+    expect(
+      (await failure(await voidEntry(offProject.cookie, entry.id, "Wrong")))
+        .status,
+    ).toBe(StatusCodes.FORBIDDEN);
+    const other = await ownerWithCompany("Other Builders");
+    expect(
+      await failure(await voidEntry(other.cookie, entry.id, "Wrong")),
+    ).toMatchObject({
+      status: StatusCodes.NOT_FOUND,
+      code: "CHECK_IN_NOT_FOUND",
+    });
+    const voider = await member(
+      company,
+      { "labour.attendance": ["read", "delete"] },
+      [f.tower],
+    );
+    const voided = await json<Voided>(
+      await voidEntry(voider.cookie, entry.id, "Wrong"),
+    );
+    expect(voided.entry.voided?.by).toEqual({
+      id: voider.userId,
+      name: "Member",
+    });
+    expect(voided.day?.effect).toBe("cleared");
+    expect(await ledgerSum(f.dhuresh)).toBe(0);
   });
 });
