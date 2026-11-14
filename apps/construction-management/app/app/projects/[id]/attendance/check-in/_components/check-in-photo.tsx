@@ -12,6 +12,7 @@ export function CheckInPhoto({
   src,
   className,
   removedLabel = "Photo removed",
+  showLabel = false,
 }: {
   /** Null when the entry has no photo any more. */
   src: string | null;
@@ -19,21 +20,30 @@ export function CheckInPhoto({
   className?: string;
   /** Read by screen readers in place of the photo. */
   removedLabel?: string;
+  /** Write `removedLabel` under the icon, for a box large enough. */
+  showLabel?: boolean;
 }) {
   const [failed, setFailed] = useState<string | null>(null);
-  if (src == null || failed === src)
+  if (src == null || failed === src) {
+    const label = src == null ? removedLabel : "Photo not available";
     return (
       <span
         role="img"
-        aria-label={removedLabel}
+        aria-label={label}
         className={cn(
-          "bg-muted text-muted-foreground flex shrink-0 items-center justify-center rounded-lg",
+          "bg-muted text-muted-foreground flex shrink-0 flex-col items-center justify-center gap-0.5 rounded-lg p-1 text-center",
           className,
         )}
       >
         <ImageOff aria-hidden="true" className="size-1/3 max-h-6 max-w-6" />
+        {showLabel ? (
+          <span aria-hidden="true" className="text-[11px] leading-tight">
+            {label}
+          </span>
+        ) : null}
       </span>
     );
+  }
   return (
     // eslint-disable-next-line @next/next/no-img-element -- a private, signed-in route
     <img
