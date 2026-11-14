@@ -2,6 +2,7 @@ import type { Preview } from "@storybook/nextjs-vite";
 import { Geist_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 import { SatoshiStylesheet } from "@repo/ui/components/satoshi-stylesheet";
+import { PAGE_WATERMARK_HOST_CLASS } from "@repo/ui/components/page-watermark";
 import { ThemeProvider } from "@repo/ui/components/theme-provider";
 import { TooltipProvider } from "@repo/ui/components/tooltip";
 
@@ -35,9 +36,9 @@ function PreviewShell({
       {dynamicTheme && <ThemePreferenceSync />}
       <TooltipProvider>
         <QueryProvider>
-          {/* isolate, overflow-x-clip: as the shell's <main> does for PageWatermark. */}
+          {/* As on the shell's <main>, so a story paints the watermark as a page does. */}
           <div
-            className={`typeface-satoshi ${fontMono.variable} bg-background text-foreground isolate overflow-x-clip font-sans antialiased`}
+            className={`typeface-satoshi ${fontMono.variable} ${PAGE_WATERMARK_HOST_CLASS} bg-background text-foreground font-sans antialiased`}
           >
             <SatoshiStylesheet />
             {children}

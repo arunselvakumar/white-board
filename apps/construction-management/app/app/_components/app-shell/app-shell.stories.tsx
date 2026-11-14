@@ -114,6 +114,10 @@ async function expectArea(
   ).toBeVisible();
   await expect(canvas.getByText("Nothing here yet")).toBeVisible();
   await expect(canvas.getByText(current.description)).toBeVisible();
+  // <main> hosts the page's watermark.
+  const main = canvas.getByRole("main");
+  await expect(getComputedStyle(main).isolation).toBe("isolate");
+  await expect(getComputedStyle(main).overflowX).toBe("clip");
   if (isPhone(canvasElement))
     await expect(
       canvas.getByRole("button", { name: /^Notifications/ }),

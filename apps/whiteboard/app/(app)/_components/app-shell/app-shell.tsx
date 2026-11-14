@@ -6,6 +6,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState, type CSSProperties, type ReactNode } from "react";
 import { SkipLink } from "@repo/ui/components/skip-link";
+import { PAGE_WATERMARK_HOST_CLASS } from "@repo/ui/components/page-watermark";
 import {
   Sidebar,
   SidebarContent,
@@ -158,12 +159,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           <AppBreadcrumbs />
         </div>
         {/* tabIndex -1: Skip to content can move focus here without adding a Tab stop. */}
-        {/* isolate, overflow-x-clip: PageWatermark paints below the page's
-            content but above this background, and is cut at the edge. */}
         <main
           id="main-content"
           tabIndex={-1}
-          className="isolate flex min-w-0 flex-1 flex-col overflow-x-clip outline-none"
+          className={`${PAGE_WATERMARK_HOST_CLASS} flex min-w-0 flex-1 flex-col outline-none`}
         >
           {children}
         </main>
