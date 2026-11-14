@@ -171,6 +171,13 @@ export function useCamera(): Camera {
         stopTracks(next);
         return;
       }
+      // The tab was hidden while the camera opened: release it until it is back.
+      if (document.visibilityState === "hidden") {
+        stopTracks(next);
+        resume.current = true;
+        setStatus("idle");
+        return;
+      }
       stream.current = next;
       const track = next.getVideoTracks()[0];
       const actual = facingOf(
