@@ -29,7 +29,7 @@ export const ListConstructionLabourLabourActivityRequestModel = z
       .enum(LABOUR_ACTIVITY_TYPES)
       .default("all")
       .describe(
-        "projects: added to, removed from, transferred; attendance: the days and their changes; profile: added to Labours, marked inactive or active.",
+        "projects: added to, removed from, transferred; attendance: the days and their changes; check_ins: each Check In and Check Out (Attendance Read on the Project); profile: added to Labours, marked inactive or active.",
       ),
     /** Only entries about this Project. */
     projectId: z.uuid().optional(),
@@ -63,6 +63,31 @@ const base = {
 };
 
 const remark = z.string().nullable();
+
+/** A check-in entry's own fields (ADR CM-0044 §2); no amounts. */
+export const checkInActivityFields = {
+  action: z.enum(["check_in", "check_out"]),
+  /** When it happened; the same instant as `recordedAt`. */
+  at: z.iso.datetime(),
+  /** The check-in entry: its photo is `/api/construction/labour/attendance/check-ins/{entryId}/photo`. */
+  entryId: z.uuid(),
+  /** False once the photo was removed (90 days). */
+  hasPhoto: z.boolean(),
+  location: z
+    .object({
+      latitude: z.number(),
+      longitude: z.number(),
+      /** Metres, as the device reported it. */
+      accuracyMetres: z.number().nullable(),
+    })
+    .nullable(),
+  /** Against the Project's Site fence; null without a location or a fence. */
+  fence: z.enum(["inside", "outside"]).nullable(),
+  /** Set with `fence`; 0 inside. */
+  metresOutside: z.number().int().nullable(),
+  /** A voided entry stays in the feed, struck through. */
+  voided: z.object({ reason: z.string() }).nullable(),
+};
 
 export const ConstructionLabourLabourActivityEntryResponseModel =
   z.discriminatedUnion("kind", [
@@ -113,6 +138,12 @@ export const ConstructionLabourLabourActivityEntryResponseModel =
       /** What the day was before it was cleared. */
       status,
     }),
+    z.object({
+      ...base,
+      kind: z.literal("check_in"),
+      project,
+      ...checkInActivityFields,
+    }),
   ]);
 
 export const ListConstructionLabourLabourActivityResponseModel = z.object({
@@ -132,10 +163,15 @@ export function toLabourActivityResponse(
   page: ActivityPage<LabourActivityEntry>,
 ): ListConstructionLabourLabourActivityResponseModel {
   return {
-    items: page.items.map((entry) => ({
-      ...entry,
-      recordedAt: entry.recordedAt.toISOString(),
-    })),
+    items: page.items.map((entry) =>
+      entry.kind === "check_in"
+        ? {
+            ...entry,
+            at: entry.at.toISOString(),
+            recordedAt: entry.recordedAt.toISOString(),
+          }
+        : { ...entry, recordedAt: entry.recordedAt.toISOString() },
+    ),
     nextCursor: page.nextCursor,
     timeZone: page.timeZone,
   };

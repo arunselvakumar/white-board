@@ -157,3 +157,76 @@ export function attendanceDays(
     };
   });
 }
+
+/**
+ * A night shift at Tower A on 10 Nov 2026: in at 10:02 pm inside the
+ * fence, out at 6:05 am on the 11th outside it (still the 10th's day),
+ * a Check In voided by mistake, and an older one whose photo was removed
+ * and that had no location.
+ */
+export const CHECK_IN_ENTRIES: LabourActivityEntry[] = [
+  {
+    id: "check_in:0199a1b2-0000-7000-8000-00000000c003",
+    kind: "check_in",
+    date: "2026-11-10",
+    recordedAt: at("2026-11-11", "06:05"),
+    by: "Karthik Raja",
+    project: tower,
+    action: "check_out",
+    at: at("2026-11-11", "06:05"),
+    entryId: "0199a1b2-0000-7000-8000-00000000c003",
+    hasPhoto: true,
+    location: { latitude: 13.0841, longitude: 80.2705, accuracyMetres: 12 },
+    fence: "outside",
+    metresOutside: 240,
+    voided: null,
+  },
+  {
+    id: "check_in:0199a1b2-0000-7000-8000-00000000c002",
+    kind: "check_in",
+    date: "2026-11-10",
+    recordedAt: at("2026-11-10", "22:04"),
+    by: "Karthik Raja",
+    project: tower,
+    action: "check_in",
+    at: at("2026-11-10", "22:04"),
+    entryId: "0199a1b2-0000-7000-8000-00000000c002",
+    hasPhoto: true,
+    location: { latitude: 13.0827, longitude: 80.2707, accuracyMetres: 8 },
+    fence: null,
+    metresOutside: null,
+    voided: { reason: "Checked in twice by mistake" },
+  },
+  {
+    id: "check_in:0199a1b2-0000-7000-8000-00000000c001",
+    kind: "check_in",
+    date: "2026-11-10",
+    recordedAt: at("2026-11-10", "22:02"),
+    by: "Karthik Raja",
+    project: tower,
+    action: "check_in",
+    at: at("2026-11-10", "22:02"),
+    entryId: "0199a1b2-0000-7000-8000-00000000c001",
+    hasPhoto: true,
+    location: { latitude: 13.0827, longitude: 80.2707, accuracyMetres: 8 },
+    fence: "inside",
+    metresOutside: 0,
+    voided: null,
+  },
+  {
+    id: "check_in:0199a1b2-0000-7000-8000-00000000c000",
+    kind: "check_in",
+    date: "2026-08-01",
+    recordedAt: at("2026-08-01", "09:00"),
+    by: "Karthik Raja",
+    project: tower,
+    action: "check_in",
+    at: at("2026-08-01", "09:00"),
+    entryId: "0199a1b2-0000-7000-8000-00000000c000",
+    hasPhoto: false,
+    location: null,
+    fence: null,
+    metresOutside: null,
+    voided: null,
+  },
+];

@@ -343,7 +343,11 @@ const STANDING_WINDOW_MS = 48 * 3_600_000;
 
 const PHOTO_FOLDER = "check-in-photos";
 
-const ROLE_WORDS: Record<Exclude<CheckInPersonKind, "labour">, string> = {
+/** The role a Site Engineer or Vendor shows with; a Labour shows their Labour Category. */
+export const ROLE_WORDS: Record<
+  Exclude<CheckInPersonKind, "labour">,
+  string
+> = {
   site_engineer: "Site Engineer",
   vendor: "Vendor",
 };

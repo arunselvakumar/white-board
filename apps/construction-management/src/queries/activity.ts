@@ -18,6 +18,7 @@ export const LABOUR_ACTIVITY_TYPES = [
   "all",
   "projects",
   "attendance",
+  "check_ins",
   "profile",
 ] as const;
 export type LabourActivityType = (typeof LABOUR_ACTIVITY_TYPES)[number];

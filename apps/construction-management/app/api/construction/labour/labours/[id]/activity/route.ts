@@ -15,9 +15,10 @@ const activity = createLabourActivity();
 
 /**
  * The Labour's Activity (ADR CM-0038 §1, §5): Project moves, attendance
- * and its changes, and profile entries, 30 a page, newest effective date
- * first. Entries for Projects the viewer is not on are left out. No
- * amounts.
+ * and its changes, check-in entries (ADR CM-0044) and profile entries, 30
+ * a page, newest effective date first. Entries for Projects the viewer is
+ * not on are left out, and check-in entries of Projects without Attendance
+ * Read. No amounts.
  */
 export async function GET(
   request: Request,

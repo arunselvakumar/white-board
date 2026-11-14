@@ -1,6 +1,8 @@
 import type { ActivityKey } from "@/src/shared-kernel/activity-key";
 import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 
+import type { CheckInAction, CheckInPersonKind } from "../domain/check-in";
+
 /**
  * What the labour context gives the Activity feeds (ADR CM-0038 §1): rows
  * read from its own history (transfers, attendance and the labourer's audit
@@ -22,15 +24,21 @@ export const LABOUR_ACTIVITY_RANK = {
   attendance: 5,
   attendance_changed: 6,
   attendance_cleared: 7,
+  check_in: 8,
 } as const;
 
-/** The Project feed's Labour entries rank below its Site Engineer ones. */
+/**
+ * The Project feed's Labour entries rank below its Site Engineer ones
+ * (6 and 7, in the composition), and check-in entries above both.
+ */
 export const PROJECT_LABOUR_ACTIVITY_RANK = {
   labour_added: 2,
   transferred_in: 3,
   transferred_out: 4,
   labour_removed: 5,
 } as const;
+
+export const PROJECT_CHECK_IN_ACTIVITY_RANK = 8;
 
 /** An attendance status as the sheet shows it; On Leave that is paid reads Paid Leave. */
 export type AttendanceLabel =
@@ -92,11 +100,40 @@ export type LabourProfileRow = {
   by: string;
 };
 
+/**
+ * One check-in entry (ADR CM-0044 §2, §3), voided or not: dated by its
+ * attendance day, so a night shift's Check Out sits on the day it began,
+ * and recorded at the instant it happened.
+ */
+export type CheckInActivityRow = {
+  key: ActivityKey;
+  kind: "check_in";
+  action: CheckInAction;
+  projectId: string;
+  person: { kind: CheckInPersonKind; id: string };
+  /** False once retention removed the photo. */
+  hasPhoto: boolean;
+  location: {
+    latitude: number;
+    longitude: number;
+    /** Metres, as the device reported it. */
+    accuracyMetres: number | null;
+  } | null;
+  /** Against the Project's Site fence; null without a location or a fence. */
+  fence: "inside" | "outside" | null;
+  /** Set with `fence`; 0 inside. */
+  metresOutside: number | null;
+  voided: { reason: string } | null;
+  /** The member who held the device. */
+  by: string;
+};
+
 export type LabourActivityRow =
   | LabourMoveRow
   | LabourAttendanceRow
   | LabourAttendanceChangeRow
-  | LabourProfileRow;
+  | LabourProfileRow
+  | CheckInActivityRow;
 
 export type ProjectLabourMoveKind = keyof typeof PROJECT_LABOUR_ACTIVITY_RANK;
 
@@ -124,6 +161,19 @@ export type ProjectActivityWindow = {
   to: CalendarDate | null;
 };
 
+/** Whose check-in entries the Project feed reads. */
+export type ProjectCheckInWindow = ProjectActivityWindow & {
+  kinds: readonly CheckInPersonKind[];
+};
+
+/** A person a check-in entry names, as the Project feed shows them. */
+export type ActivityCheckInPerson = {
+  name: string;
+  /** The Labour Category, "Site Engineer" or "Vendor". */
+  role: string | null;
+  deleted: boolean;
+};
+
 export type ActivityLabour = {
   id: string;
   name: string;
@@ -149,7 +199,20 @@ export type LabourActivitySource = {
   profile(
     window: LabourActivityWindow & { timeZone: string },
   ): Promise<LabourProfileRow[]>;
+  /**
+   * The Labour's check-in entries on `visibleProjectIds`, which the
+   * composition sets to the Projects where the viewer has Attendance Read
+   * (ADR CM-0044 §4).
+   */
+  checkIns(window: LabourActivityWindow): Promise<CheckInActivityRow[]>;
   projectMoves(window: ProjectActivityWindow): Promise<ProjectLabourMoveRow[]>;
+  /** Everyone's check-in entries on the Project, of these kinds of people. */
+  projectCheckIns(window: ProjectCheckInWindow): Promise<CheckInActivityRow[]>;
+  /** The people check-in entries name, by `kind:id`, deleted ones too. */
+  checkInPeople(
+    workspaceId: string,
+    people: readonly { kind: CheckInPersonKind; id: string }[],
+  ): Promise<Map<string, ActivityCheckInPerson>>;
   /** Labourers by id, deleted ones included, with their Labour Category's name. */
   labours(
     workspaceId: string,

@@ -30,6 +30,11 @@ import {
   parseAsCalendarDate,
   parseAsUuid,
 } from "@/app/app/_components/activity/activity-search-params";
+import {
+  checkInActivityParts,
+  type ActivityCheckInEntry,
+} from "@/app/app/_components/check-in/check-in-activity";
+import { formatTime } from "@/app/app/_components/check-in/check-in-entry-parts";
 import { projectBasePath } from "@/lib/project-nav";
 import {
   LABOUR_ACTIVITY_TYPES,
@@ -57,6 +62,7 @@ const TYPE_ITEMS: { value: LabourActivityType; label: string }[] = [
   { value: "all", label: "All" },
   { value: "projects", label: "Projects" },
   { value: "attendance", label: "Attendance" },
+  { value: "check_ins", label: "Check-In" },
   { value: "profile", label: "Profile" },
 ];
 
@@ -99,9 +105,16 @@ function attendanceDetail(
   return parts.length === 0 ? undefined : parts.join(" · ");
 }
 
-/** One Labour Activity entry in words. */
+/** How a check-in entry's line starts (ADR CM-0044 §2). */
+const CHECKED_START: Record<ActivityCheckInEntry["action"], string> = {
+  check_in: "Checked in",
+  check_out: "Checked out",
+};
+
+/** One Labour Activity entry in words; times in the Company's time zone. */
 export function labourActivityItem(
   entry: LabourActivityEntry,
+  timeZone: string,
 ): ActivityFeedItem {
   const base = {
     id: entry.id,
@@ -200,6 +213,24 @@ export function labourActivityItem(
         ),
         detail: `It was ${STATUS_LABELS[entry.status]}.`,
       };
+    case "check_in": {
+      const time = formatTime(entry.at, timeZone);
+      return {
+        ...base,
+        ...checkInActivityParts(
+          entry,
+          `${CHECKED_START[entry.action]} at ${entry.project.name} · ${time}`,
+        ),
+        title: (
+          <>
+            <strong className="font-medium">
+              {CHECKED_START[entry.action]}
+            </strong>{" "}
+            at <ProjectName project={entry.project} /> · {time}
+          </>
+        ),
+      };
+    }
   }
 }
 
@@ -213,13 +244,14 @@ function LabourActivityList({
   now?: Date;
 }) {
   const query = useSuspenseInfiniteQuery(labourActivityQuery(labourId, filter));
+  const timeZone = query.data.pages[0]?.timeZone ?? "Asia/Kolkata";
   const items = query.data.pages.flatMap((page) =>
-    page.items.map(labourActivityItem),
+    page.items.map((entry) => labourActivityItem(entry, timeZone)),
   );
   return (
     <ActivityFeed
       items={items}
-      timeZone={query.data.pages[0]?.timeZone ?? "Asia/Kolkata"}
+      timeZone={timeZone}
       emptyMessage={LABOUR_ACTIVITY_EMPTY}
       now={now}
       {...feedPaging(query)}
@@ -229,8 +261,8 @@ function LabourActivityList({
 
 /**
  * The Labour page's Activity tab (ADR CM-0038 §5): Project moves,
- * attendance and profile entries, filtered by Type, Project and dates
- * kept in the address.
+ * attendance, check-in entries (ADR CM-0044) and profile entries,
+ * filtered by Type, Project and dates kept in the address.
  */
 export function LabourActivity({
   labourId,

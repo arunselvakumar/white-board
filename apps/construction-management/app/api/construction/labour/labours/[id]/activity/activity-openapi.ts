@@ -23,7 +23,7 @@ export const labourActivityOpenApiOperations: OpenApiOperation[] = [
     method: "get",
     path: `${LABOURS_PATH}/{id}/activity`,
     summary:
-      "The Labour's Activity: Project moves, attendance and its changes, profile entries (ADR CM-0038); 400 INVALID_CURSOR",
+      "The Labour's Activity: Project moves, attendance and its changes, check-in entries, profile entries (ADR CM-0038, CM-0044); 400 INVALID_CURSOR",
     tags: ["Construction · Labour"],
     params: LabourIdParamsModel,
     query: ListConstructionLabourLabourActivityRequestModel,
