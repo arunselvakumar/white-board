@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { POST as markDays } from "@/app/api/construction/labour/attendance/labour/mark/route";
 import { GET as getSheet } from "@/app/api/construction/labour/attendance/labour/sheet/route";
 import { POST as createLabour } from "@/app/api/construction/labour/labours/route";
+import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import { createCheckInHandlers } from "@/src/labour/infrastructure/check-in-factory";
 import type { Flag } from "@/src/shared-kernel/access";
 import { addDays, todayIn } from "@/src/shared-kernel/calendar-date";
@@ -1673,5 +1674,22 @@ describe("Check-In reads (ADR CM-0043)", () => {
     expect(
       (await recordPhoto("labour", f.dhuresh, offProject.cookie)).status,
     ).toBe(StatusCodes.FORBIDDEN);
+  });
+});
+
+describe("Check-In in the OpenAPI document", () => {
+  it("lists every route", async () => {
+    const document = await json<{ paths: Record<string, unknown> }>(
+      getOpenApi(),
+    );
+    for (const path of [
+      "/api/construction/labour/attendance/check-ins",
+      "/api/construction/labour/attendance/check-ins/people",
+      "/api/construction/labour/attendance/check-ins/person",
+      "/api/construction/labour/attendance/check-ins/{id}/void",
+      "/api/construction/labour/attendance/check-ins/{id}/photo",
+      "/api/construction/labour/attendance/check-ins/people/{kind}/{personId}/photo",
+    ])
+      expect(document.paths).toHaveProperty([path]);
   });
 });
