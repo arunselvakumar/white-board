@@ -46,6 +46,7 @@ Each spec has the same sections: Legacy behaviour · Entities & fields · Workfl
 | [prd/handoff/](./prd/handoff/)                                                 | One handoff per milestone (`M0.md` … `M10.md`): what shipped and what is left for later                                        |
 | [prd/project-staffing-and-activity.md](./prd/project-staffing-and-activity.md) | Site Engineers and Labours on a Project, and the Project and Labour Activity feeds (ADR CM-0038)                               |
 | [prd/marketing.md](./prd/marketing.md)                                         | The Marketing main menu and Role: Prospect Companies, Visits, Follow-ups, Team, Dashboard and Reports (ADR CM-0040, module 14) |
+| [prd/attendance-check-in.md](./prd/attendance-check-in.md)                     | Check-In under a Project's Attendance: a photo, time and location log for Labours, Site Engineers and Vendors (ADR CM-0043)    |
 
 ### Testing
 

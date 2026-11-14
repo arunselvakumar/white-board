@@ -322,7 +322,15 @@ _Avoid_: license, package
 
 **Attendance**:
 Labour attendance is one status per Labour per day (Present, Half Day, Absent, On Leave, Holiday) in the Project they were on that day. Vendor attendance is a headcount per shift and Labour Category (Full day, Half day, OT hours).
-_Avoid_: muster (for the daily entry), check-in (that is HRMS)
+_Avoid_: muster (for the daily entry)
+
+**Check-In** (a Project's):
+The screen under a Project's Attendance where the member holding the phone or tablet checks in a Labour, a Site Engineer or a Vendor of that Project: a photo from the camera, the server's time and the location (ADR CM-0043). Each **Check In** or **Check Out** is one **check-in entry** in the Project's **Check-In log**; a person may have several a day. A Labour's entries write their day's In, Out and break, and the first one marks them Present. A Vendor's and a Site Engineer's entries are a log only. Not HRMS check-in, which a member does for themselves on their own phone.
+_Avoid_: punch, kiosk, Attendance Mode, face attendance (nothing compares faces)
+
+**Void** (a check-in entry):
+Striking out a wrong check-in entry with a reason. Entries are never edited or deleted; a Labour's day is worked out again from the entries left.
+_Avoid_: delete, cancel (for an entry)
 
 **Paid Leave**:
 An On Leave day that is paid. The only way a daily-wage Labour is paid for a day off.

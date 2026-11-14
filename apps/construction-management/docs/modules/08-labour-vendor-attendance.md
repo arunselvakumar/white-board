@@ -566,11 +566,20 @@ These settle the open questions below for M2. Where this section and the legacy 
   - **Paid** = payments in the period.
   - **Final Amount** = Previous + To Pay − Advance − Paid.
 
+**Check-In** ([ADR CM-0043](../adr/CM-0043-site-check-in.md), [PRD](../prd/attendance-check-in.md))
+
+- Attendance has a third entry, **Check-In**, first in the submenu. The member holding the device finds a Labour, a Site Engineer or a Vendor of the Project, turns on the camera and records a **Check In** or **Check Out**: a photo taken on submitting, the server's time, and the location when the browser gives one. Each is a row of `construction_labour.check_in_events`, never edited; a wrong one is voided with a reason.
+- A person is in when their last live entry is a Check In less than 16 hours old. A second Check In, or a Check Out while not in, is refused; the same action within 2 minutes writes nothing.
+- **A Labour's entries write their day.** The first Check In of an unmarked day creates it Present and posts the wage. In is the first Check In, Out the last Check Out while they are out, and the break is the gaps between (60 minutes by default when there is none and the day is longer than an hour). Times typed on the sheet win: the log then leaves that day's times alone. A day marked Absent, On Leave or Holiday is left as it is. Voiding the only entry of a day Check-In created clears the day.
+- A Vendor's and a Site Engineer's entries are a log only: no headcount, no pay, no HRMS entry.
+- The location is compared with the Project's Site fence (inside, or the metres outside) and never refused. Photos are private, at most 1 MB, and removed after 90 days.
+- Permission: `labour.attendance` Read (list, log, photos), Create (record), Delete (void).
+
 **Out of M2**
 
 - Minimum-wage warnings, PF/ESI computation, BOCW tracking (M11).
 - Named vendor headcount.
-- GPS or face check-in.
+- GPS or face check-in (a photo and location log came later, ADR CM-0043; nothing compares faces).
 - WhatsApp attendance.
 - Offline marking (M12).
 
