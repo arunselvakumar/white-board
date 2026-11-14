@@ -68,6 +68,8 @@ function toStored(row: Row): StoredLabourDay {
       amount: line.amount,
       fromTimes: line.fromTimes,
     })),
+    fromCheckIn: row.fromCheckIn,
+    timesFromCheckIn: row.timesFromCheckIn,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
     createdBy: row.createdBy,
@@ -131,6 +133,8 @@ function snapshot(day: PricedDay) {
     wageRate: day.wageRate,
     earned: day.earned,
     overtime: day.overtime,
+    fromCheckIn: day.fromCheckIn,
+    timesFromCheckIn: day.timesFromCheckIn,
   };
 }
 
@@ -148,6 +152,8 @@ function rowData(day: PricedDay) {
     wageType: day.wageType,
     wageRate: day.wageRate,
     earned: day.earned,
+    fromCheckIn: day.fromCheckIn,
+    timesFromCheckIn: day.timesFromCheckIn,
   };
 }
 
