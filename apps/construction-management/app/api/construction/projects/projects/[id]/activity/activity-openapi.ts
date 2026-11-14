@@ -23,7 +23,7 @@ export const projectActivityOpenApiOperations: OpenApiOperation[] = [
     method: "get",
     path: "/api/construction/projects/projects/{id}/activity",
     summary:
-      "The Project's Activity: Site Engineers and Labours added and removed, Labours transferred in and out, a batch as one entry (ADR CM-0038); 400 INVALID_CURSOR, 404 PROJECT_NOT_FOUND",
+      "The Project's Activity: Site Engineers and Labours added and removed, Labours transferred in and out (a batch as one entry), each Check In and Check Out (ADR CM-0038, CM-0044); 400 INVALID_CURSOR, 404 PROJECT_NOT_FOUND",
     tags: ["Construction · Projects"],
     params: ConstructionProjectsProjectParamsModel,
     query: ListConstructionProjectsProjectActivityRequestModel,

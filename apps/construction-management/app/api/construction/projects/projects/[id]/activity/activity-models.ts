@@ -1,7 +1,9 @@
 import { z } from "zod";
 
+import { checkInActivityFields } from "@/app/api/construction/labour/labours/[id]/activity/activity-models";
 import type { ActivityPage } from "@/src/composition/labour-activity";
 import {
+  PROJECT_ACTIVITY_TYPES,
   PROJECT_ACTIVITY_WHO,
   type ProjectActivityEntry,
 } from "@/src/composition/project-activity";
@@ -10,7 +12,18 @@ const calendarDate = z.iso.date().describe("Calendar date, YYYY-MM-DD.");
 
 export const ListConstructionProjectsProjectActivityRequestModel = z
   .object({
-    who: z.enum(PROJECT_ACTIVITY_WHO).default("all"),
+    type: z
+      .enum(PROJECT_ACTIVITY_TYPES)
+      .default("all")
+      .describe(
+        "team: Labours and Site Engineers added, removed, transferred; check_ins: each Check In and Check Out (Attendance Read on the Project).",
+      ),
+    who: z
+      .enum(PROJECT_ACTIVITY_WHO)
+      .default("all")
+      .describe(
+        "Whose entries, team changes and check-in entries alike; Vendors have check-in entries only.",
+      ),
     /** Effective dates, inclusive. */
     from: calendarDate.optional(),
     to: calendarDate.optional(),
@@ -90,6 +103,22 @@ export const ConstructionProjectsProjectActivityEntryResponseModel =
         canOpen: z.boolean(),
       }),
     }),
+    z.object({
+      ...base,
+      kind: z.literal("check_in"),
+      /** Who was checked in or out. */
+      person: z.object({
+        kind: z.enum(["labour", "site_engineer", "vendor"]),
+        id: z.uuid(),
+        /** Kept after they were deleted. */
+        name: z.string(),
+        /** The Labour Category, "Site Engineer" or "Vendor". */
+        role: z.string().nullable(),
+        /** The viewer may open their page (Labours Read; Vendors Read for a Vendor) and they are not deleted. */
+        canOpen: z.boolean(),
+      }),
+      ...checkInActivityFields,
+    }),
   ]);
 
 export const ListConstructionProjectsProjectActivityResponseModel = z.object({
@@ -109,10 +138,15 @@ export function toProjectActivityResponse(
   page: ActivityPage<ProjectActivityEntry>,
 ): ListConstructionProjectsProjectActivityResponseModel {
   return {
-    items: page.items.map((entry) => ({
-      ...entry,
-      recordedAt: entry.recordedAt.toISOString(),
-    })),
+    items: page.items.map((entry) =>
+      entry.kind === "check_in"
+        ? {
+            ...entry,
+            at: entry.at.toISOString(),
+            recordedAt: entry.recordedAt.toISOString(),
+          }
+        : { ...entry, recordedAt: entry.recordedAt.toISOString() },
+    ),
     nextCursor: page.nextCursor,
     timeZone: page.timeZone,
   };

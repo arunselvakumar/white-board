@@ -27,8 +27,12 @@ export const PROJECT_ACTIVITY_WHO = [
   "all",
   "site_engineers",
   "labours",
+  "vendors",
 ] as const;
 export type ProjectActivityWho = (typeof PROJECT_ACTIVITY_WHO)[number];
+
+export const PROJECT_ACTIVITY_TYPES = ["all", "team", "check_ins"] as const;
+export type ProjectActivityType = (typeof PROJECT_ACTIVITY_TYPES)[number];
 
 export type LabourActivityFilter = {
   type: LabourActivityType;
@@ -39,6 +43,7 @@ export type LabourActivityFilter = {
 };
 
 export type ProjectActivityFilter = {
+  type: ProjectActivityType;
   who: ProjectActivityWho;
   from: string | null;
   to: string | null;
@@ -82,6 +87,7 @@ export function projectActivityQuery(
   filter: ProjectActivityFilter,
 ) {
   const params = new URLSearchParams();
+  if (filter.type !== "all") params.set("type", filter.type);
   if (filter.who !== "all") params.set("who", filter.who);
   if (filter.from != null) params.set("from", filter.from);
   if (filter.to != null) params.set("to", filter.to);
