@@ -1,10 +1,13 @@
 import { prisma, type PrismaClient } from "@repo/construction-db";
 
 import type { ObjectStorage } from "@/src/shared-kernel/files";
+import type { QueueHandler } from "@/src/shared-kernel/queue";
 import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
 
 import { CheckInHandlers } from "../application/check-in-handlers";
+import { checkInPhotoRetentionHandler } from "../application/check-in-retention";
 import {
+  PrismaCheckInRetentionStore,
   PrismaCheckInStore,
   PrismaSiteEngineerDirectory,
   PrismaSiteFenceDirectory,
@@ -28,4 +31,17 @@ export function createCheckInHandlers(deps?: {
     deps?.storage ?? objectStorage(),
     deps?.clock,
   );
+}
+
+/** The daily check-in photo retention job over Prisma and object storage. */
+export function createCheckInPhotoRetentionHandler(deps?: {
+  prisma?: PrismaClient;
+  storage?: ObjectStorage;
+  clock?: () => Date;
+}): QueueHandler {
+  return checkInPhotoRetentionHandler({
+    store: new PrismaCheckInRetentionStore(deps?.prisma ?? prisma),
+    storage: deps?.storage ?? objectStorage(),
+    clock: deps?.clock,
+  });
 }

@@ -810,6 +810,49 @@ const SPECS: Record<string, EntitySpec> = {
       ...stamps(),
     ],
   },
+  // The Check-In log (ADR CM-0043): every entry, voided ones too, without
+  // the photos or their keys.
+  check_in_log: {
+    from: `${LB}.check_in_events t`,
+    workspace: "t.workspace_id",
+    project: "t.project_id",
+    date: "t.attendance_date",
+    live: [],
+    id: "t.id",
+    number: null,
+    columns: [
+      id(),
+      projectName(),
+      col("attendanceDate", "Date", "t.attendance_date", "date"),
+      col("personKind", "Person type", "t.person_kind::text", "enum"),
+      col(
+        "person",
+        "Person",
+        `CASE t.person_kind
+          WHEN 'labour' THEN ${nameIn(`${LB}.labours`, "t.person_id")}
+          WHEN 'vendor' THEN ${nameIn(`${LB}.vendors`, "t.person_id")}
+          ELSE ${nameIn(`${MS}.supervisors`, "t.person_id")}
+        END`,
+      ),
+      col("action", "Check In / Check Out", "t.action::text", "enum"),
+      col("occurredAt", "Time", "t.occurred_at", "datetime"),
+      col("latitude", "Latitude", "t.latitude", "number"),
+      col("longitude", "Longitude", "t.longitude", "number"),
+      col("accuracyMetres", "Accuracy (m)", "t.accuracy_metres", "number"),
+      col("outsideFence", "Outside the site fence", "t.outside_fence", "bool"),
+      col("metresOutside", "Metres outside", "t.metres_outside", "number"),
+      col(
+        "photoRemovedAt",
+        "Photo removed on",
+        "t.photo_removed_at",
+        "datetime",
+      ),
+      col("recordedBy", "Recorded by", who("t.created_by")),
+      col("voidedAt", "Voided on", "t.voided_at", "datetime"),
+      col("voidedBy", "Voided by", who("t.voided_by")),
+      col("voidReason", "Void reason", "t.void_reason"),
+    ],
+  },
   labour_payments: {
     from: `${LB}.wage_payments t`,
     workspace: "t.workspace_id",

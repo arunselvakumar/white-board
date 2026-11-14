@@ -8,7 +8,10 @@ import {
 } from "@/src/shared-kernel/calendar-date";
 import { companyTimezone } from "@/src/shared-kernel/company-today";
 import { DomainError } from "@/src/shared-kernel/domain-error";
-import { recordStoredFile } from "@/src/shared-kernel/files/stored-files";
+import {
+  markStoredFileDeleted,
+  recordStoredFile,
+} from "@/src/shared-kernel/files/stored-files";
 import { userNamesInCompany } from "@/src/shared-kernel/user-names";
 
 import type {
@@ -21,6 +24,10 @@ import type {
   SiteEngineerDirectory,
   SiteFenceDirectory,
 } from "../application/check-in-handlers";
+import type {
+  CheckInRetentionStore,
+  ExpiredCheckInPhoto,
+} from "../application/check-in-retention";
 import type {
   CheckInAction,
   CheckInPersonKind,
@@ -657,5 +664,42 @@ export class PrismaSiteFenceDirectory implements SiteFenceDirectory {
       longitude: Number(row.longitude.toString()),
       radiusMetres: row.radiusMetres,
     };
+  }
+}
+
+/** The retention job's reads and writes (ADR CM-0043 §6). */
+export class PrismaCheckInRetentionStore implements CheckInRetentionStore {
+  constructor(private readonly db: PrismaClient) {}
+
+  async expired(cutoff: Date, limit: number): Promise<ExpiredCheckInPhoto[]> {
+    const rows = await this.db.constructionLabourCheckInEvent.findMany({
+      where: { occurredAt: { lt: cutoff }, photoKey: { not: null } },
+      orderBy: OLDEST_FIRST,
+      take: limit,
+      select: { id: true, workspaceId: true, photoKey: true },
+    });
+    return rows.flatMap((row) =>
+      row.photoKey == null
+        ? []
+        : [
+            {
+              id: row.id,
+              workspaceId: row.workspaceId,
+              photoKey: row.photoKey,
+            },
+          ],
+    );
+  }
+
+  async removePhoto(entry: ExpiredCheckInPhoto, at: Date): Promise<boolean> {
+    return this.db.$transaction(async (tx) => {
+      const updated = await tx.constructionLabourCheckInEvent.updateMany({
+        where: { id: entry.id, photoKey: entry.photoKey },
+        data: { photoKey: null, photoRemovedAt: at },
+      });
+      if (updated.count === 0) return false;
+      await markStoredFileDeleted(tx, entry.workspaceId, entry.photoKey, at);
+      return true;
+    });
   }
 }

@@ -170,7 +170,7 @@ const PROJECT_MODULES: readonly BackupModule[] = [
     menu: "labour.attendance",
     money: { menu: "labour.labour", flag: "financial" },
     folder: "labour-attendance",
-    entities: ["labour_attendance"],
+    entities: ["labour_attendance", "check_in_log"],
     media: false,
   },
   {
