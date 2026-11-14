@@ -18,7 +18,7 @@ export function CentralStoreWorkspaceTile() {
   return (
     <Item
       variant="outline"
-      className="bg-card w-full"
+      className="w-full"
       render={<Link href={CENTRAL_STORE_PATH} />}
     >
       <ItemMedia variant="icon">
@@ -42,7 +42,7 @@ export function CentralInventoryWorkspaceTile() {
   return (
     <Item
       variant="outline"
-      className="bg-card w-full"
+      className="w-full"
       render={<Link href={CENTRAL_INVENTORY_PATH} />}
     >
       <ItemMedia variant="icon">

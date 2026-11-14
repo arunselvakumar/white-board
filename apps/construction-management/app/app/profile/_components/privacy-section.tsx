@@ -30,7 +30,7 @@ export function PrivacyAction({
   action: ReactNode;
 }) {
   return (
-    <Item variant="outline" role="listitem" className="bg-card flex-wrap">
+    <Item variant="outline" role="listitem" className="flex-wrap">
       <ItemMedia variant="icon">{icon}</ItemMedia>
       <ItemContent className="min-w-0">
         <ItemTitle>{title}</ItemTitle>
