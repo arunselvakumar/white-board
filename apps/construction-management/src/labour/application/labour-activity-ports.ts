@@ -44,9 +44,9 @@ export const PROJECT_CHECK_IN_ACTIVITY_RANK = 8;
 export type AttendanceLabel =
   "present" | "half_day" | "absent" | "on_leave" | "paid_leave" | "holiday";
 
-export type LabourActivityWindow = {
+/** One person's feed: a Labour's, a Site Engineer's or a Vendor's. */
+export type PersonActivityWindow = {
   workspaceId: string;
-  labourId: string;
   before: ActivityKey | null;
   limit: number;
   /** Only entries about this Project. */
@@ -56,6 +56,23 @@ export type LabourActivityWindow = {
   /** Effective dates, inclusive. */
   from: CalendarDate | null;
   to: CalendarDate | null;
+};
+
+export type LabourActivityWindow = PersonActivityWindow & { labourId: string };
+
+/** Whose check-in entries one person's feed reads. */
+export type PersonCheckInWindow = PersonActivityWindow & {
+  person: { kind: CheckInPersonKind; id: string };
+};
+
+/** A Vendor put on, or taken off, one Project by one audited command. */
+export type VendorProjectChange = {
+  projectId: string;
+  change: "added" | "removed";
+  /** The audit event's id. */
+  eventId: string;
+  occurredAt: Date;
+  by: string;
 };
 
 export type LabourMoveRow = {
@@ -200,11 +217,21 @@ export type LabourActivitySource = {
     window: LabourActivityWindow & { timeZone: string },
   ): Promise<LabourProfileRow[]>;
   /**
-   * The Labour's check-in entries on `visibleProjectIds`, which the
+   * One person's check-in entries on `visibleProjectIds`, which the
    * composition sets to the Projects where the viewer has Attendance Read
    * (ADR CM-0044 §4).
    */
-  checkIns(window: LabourActivityWindow): Promise<CheckInActivityRow[]>;
+  checkIns(window: PersonCheckInWindow): Promise<CheckInActivityRow[]>;
+  /** The live Vendor, or null. */
+  vendor(workspaceId: string, vendorId: string): Promise<{ id: string } | null>;
+  /**
+   * Every Project the Vendor was added to and removed from, oldest first,
+   * from its `vendor.*` audit events (ADR CM-0044 §7).
+   */
+  vendorProjectChanges(
+    workspaceId: string,
+    vendorId: string,
+  ): Promise<VendorProjectChange[]>;
   projectMoves(window: ProjectActivityWindow): Promise<ProjectLabourMoveRow[]>;
   /** Everyone's check-in entries on the Project, of these kinds of people. */
   projectCheckIns(window: ProjectCheckInWindow): Promise<CheckInActivityRow[]>;

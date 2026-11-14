@@ -172,6 +172,14 @@ import {
   labourActivityOpenApiOperations,
 } from "@/app/api/construction/labour/labours/[id]/activity/activity-openapi";
 import {
+  vendorActivityOpenApiComponents,
+  vendorActivityOpenApiOperations,
+} from "@/app/api/construction/labour/vendors/[id]/activity/activity-openapi";
+import {
+  siteEngineerActivityOpenApiComponents,
+  siteEngineerActivityOpenApiOperations,
+} from "@/app/api/construction/masters/site-engineers/[id]/activity/activity-openapi";
+import {
   vendorAttendanceOpenApiComponents,
   vendorAttendanceOpenApiOperations,
 } from "@/app/api/construction/labour/attendance/vendors/vendor-attendance-openapi";
@@ -893,6 +901,12 @@ openApiOperations.push(...labourOpenApiOperations);
 // The Labour Activity feed (ADR CM-0038).
 Object.assign(openApiComponents, labourActivityOpenApiComponents);
 openApiOperations.push(...labourActivityOpenApiOperations);
+
+// A Site Engineer's and a Vendor's Activity feeds (ADR CM-0044 §7).
+Object.assign(openApiComponents, siteEngineerActivityOpenApiComponents);
+openApiOperations.push(...siteEngineerActivityOpenApiOperations);
+Object.assign(openApiComponents, vendorActivityOpenApiComponents);
+openApiOperations.push(...vendorActivityOpenApiOperations);
 
 // The project labour summary lists its own model and route.
 Object.assign(openApiComponents, labourSummaryOpenApiComponents);

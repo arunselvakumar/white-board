@@ -3,8 +3,11 @@ import { Prisma, prisma, type PrismaClient } from "@repo/construction-db";
 import { pageAfter, type ActivityKey } from "@/src/shared-kernel/activity-key";
 import {
   attendanceAuditDay,
+  auditProjectChanges,
   readAuditEvents,
   readLabourImports,
+  VENDOR_PROJECT_ACTIONS,
+  vendorProjectIdsAfter,
   type AttendanceAuditDay,
 } from "@/src/shared-kernel/audit-reader";
 import {
@@ -27,10 +30,12 @@ import {
   type LabourAttendanceRow,
   type LabourMoveRow,
   type LabourProfileRow,
+  type PersonCheckInWindow,
   type ProjectActivityWindow,
   type ProjectCheckInWindow,
   type ProjectLabourMoveKind,
   type ProjectLabourMoveRow,
+  type VendorProjectChange,
 } from "../application/labour-activity-ports";
 import {
   ROLE_WORDS,
@@ -201,8 +206,9 @@ function checkInSql(
 
 /**
  * The labour context's reads for the Activity feeds (ADR CM-0038 §1):
- * `labour_transfers`, `labour_attendance`, and the labourer's and their
- * attendance rows' audit events through the shared-kernel reader.
+ * `labour_transfers`, `labour_attendance`, `check_in_events`, and the
+ * labourer's, their attendance rows' and a Vendor's audit events through
+ * the shared-kernel reader.
  */
 export class PrismaLabourActivity implements LabourActivitySource {
   private readonly directories: PrismaDirectories;
@@ -459,21 +465,49 @@ export class PrismaLabourActivity implements LabourActivitySource {
     );
   }
 
-  async checkIns(window: LabourActivityWindow): Promise<CheckInActivityRow[]> {
-    const { visibleProjectIds: visible, projectId } = window;
+  async checkIns(window: PersonCheckInWindow): Promise<CheckInActivityRow[]> {
+    const { visibleProjectIds: visible, projectId, person } = window;
     if (visible?.length === 0) return [];
     const rows = await this.db.$queryRaw<CheckInSqlRow[]>(
       checkInSql(
         LABOUR_ACTIVITY_RANK.check_in,
         Prisma.sql`e.workspace_id = ${window.workspaceId}
-          AND e.person_kind = 'labour'
-          AND e.person_id = ${window.labourId}::uuid
+          AND e.person_kind = ${person.kind}::construction_labour.check_in_person_kind
+          AND e.person_id = ${person.id}::uuid
           ${projectId == null ? Prisma.empty : Prisma.sql`AND e.project_id = ${projectId}::uuid`}
           ${visible == null ? Prisma.empty : Prisma.sql`AND e.project_id = ANY(${visible}::uuid[])`}`,
         window,
       ),
     );
     return rows.map(checkInRow);
+  }
+
+  async vendor(workspaceId: string, vendorId: string) {
+    return this.db.constructionLabourVendor.findFirst({
+      where: { id: vendorId, workspaceId, deletedAt: null },
+      select: { id: true },
+    });
+  }
+
+  async vendorProjectChanges(
+    workspaceId: string,
+    vendorId: string,
+  ): Promise<VendorProjectChange[]> {
+    const events = await readAuditEvents(this.db, {
+      workspaceId,
+      entityType: "vendor",
+      entityIds: [vendorId],
+      actions: VENDOR_PROJECT_ACTIONS,
+    });
+    return auditProjectChanges(events, vendorProjectIdsAfter).map(
+      ({ projectId, change, event }) => ({
+        projectId,
+        change,
+        eventId: event.id,
+        occurredAt: event.occurredAt,
+        by: event.actorUserId,
+      }),
+    );
   }
 
   async projectCheckIns(
