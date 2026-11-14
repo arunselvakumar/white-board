@@ -184,9 +184,9 @@ export const ConstructionLabourLabourAttendanceDayResponseModel = z.object({
   breakMinutes: z.int().nullable(),
   /**
    * The times follow the Check-In log ("From Check-In"); sending other
-   * times on the sheet turns it off (ADR CM-0043). Always sent.
+   * times on the sheet turns it off (ADR CM-0043).
    */
-  timesFromCheckIn: z.boolean().optional(),
+  timesFromCheckIn: z.boolean(),
   /** Snapshot of the Labour's working hours a day (decimal hours). */
   workingHours: z.string(),
   /** check-out − check-in − break, decimal hours; null without both times. */

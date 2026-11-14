@@ -6,6 +6,7 @@ import { formatPaise } from "@/components/money/money-input";
 import { mockApi, StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import {
   ANBU,
+  ANBU_SAVED,
   AT,
   DATE,
   EMPTY_SHEET,
@@ -574,6 +575,46 @@ export const TimesServerError: Story = {
     await expect(
       canvas.getByText("Not saved: see Dhuresh Nawin."),
     ).toBeVisible();
+  },
+};
+
+/**
+ * Times that follow the Check-In log say so (ADR CM-0043). Typing another
+ * time takes the line away: once saved, the log leaves that day's times
+ * alone.
+ */
+export const TimesFromCheckIn: Story = {
+  beforeEach: () => {
+    api = mockApi((call) => {
+      if (call.method === "GET" && call.path === SHEET_PATH)
+        return Response.json({
+          ...SHEET,
+          labourers: SHEET.labourers.map((labourer) =>
+            labourer.labourId === ANBU
+              ? {
+                  ...labourer,
+                  attendance: { ...ANBU_SAVED, timesFromCheckIn: true },
+                }
+              : labourer,
+          ),
+        });
+      return undefined;
+    });
+    return api.restore;
+  },
+  play: async ({ canvas, userEvent }) => {
+    const anbu = within(
+      await canvas.findByRole("listitem", { name: "Anbu Selvan" }),
+    );
+    await expect(
+      anbu.getByLabelText("Anbu Selvan times are from Check-In"),
+    ).toHaveTextContent("From Check-In");
+    // A row whose times were typed on the sheet has no such line.
+    await expect(canvas.getAllByText("From Check-In")).toHaveLength(1);
+    await setTime(canvas, userEvent, "Anbu Selvan check-in", "08:30");
+    await expect(canvas.queryByText("From Check-In")).not.toBeInTheDocument();
+    await setTime(canvas, userEvent, "Anbu Selvan check-in", "08:00");
+    await expect(anbu.getByText("From Check-In")).toBeVisible();
   },
 };
 
