@@ -41,6 +41,10 @@ export type ActivityFeedItem = {
   detail?: ReactNode;
   /** Shown when the entry is opened, e.g. the names in a batch. */
   more?: { label: string; content: ReactNode };
+  /** At the entry's end, e.g. a check-in entry's photo. */
+  preview?: ReactNode;
+  /** A voided entry stays, struck through, with why (ADR CM-0044 §2). */
+  voided?: { reason: string };
 };
 
 const TONES: Record<NonNullable<ActivityFeedItem["tone"]>, string> = {
@@ -116,6 +120,7 @@ function Entry({
   timeZone: string;
 }) {
   const Icon = item.icon;
+  const struck = item.voided != null;
   return (
     <li className="flex min-w-0 gap-3 py-3">
       <span
@@ -128,10 +133,27 @@ function Entry({
         <Icon />
       </span>
       <div className="min-w-0 flex-1 space-y-0.5">
-        <p className="text-sm break-words">{item.title}</p>
+        <p
+          className={cn(
+            "text-sm break-words",
+            struck && "text-muted-foreground line-through",
+          )}
+        >
+          {item.title}
+        </p>
         {item.detail == null ? null : (
-          <p className="text-muted-foreground text-sm break-words">
+          <p
+            className={cn(
+              "text-muted-foreground text-sm break-words",
+              struck && "line-through opacity-70",
+            )}
+          >
             {item.detail}
+          </p>
+        )}
+        {item.voided == null ? null : (
+          <p className="text-destructive text-sm break-words">
+            Voided: {item.voided.reason}
           </p>
         )}
         {item.more == null ? null : (
@@ -164,6 +186,9 @@ function Entry({
           </time>
         </p>
       </div>
+      {item.preview == null ? null : (
+        <div className="shrink-0">{item.preview}</div>
+      )}
     </li>
   );
 }

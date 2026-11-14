@@ -2,13 +2,14 @@ import { prisma, type PrismaClient } from "@repo/construction-db";
 
 import type {
   AttendanceLabel,
+  CheckInActivityRow,
   LabourActivityRow,
   LabourActivitySource,
   LabourActivityWindow,
 } from "@/src/labour/application/labour-activity-ports";
 import { PrismaLabourActivity } from "@/src/labour/infrastructure/prisma-labour-activity";
 import { projectNames } from "@/src/projects/infrastructure/prisma-project-names";
-import type { MemberAccess } from "@/src/shared-kernel/access";
+import { can, type MemberAccess } from "@/src/shared-kernel/access";
 import {
   ACTIVITY_PAGE_SIZE,
   decodeActivityCursor,
@@ -43,6 +44,39 @@ type EntryBase = {
   /** Who recorded it; null when the name is unknown. */
   by: string | null;
 };
+
+/**
+ * What a feed says about a check-in entry (ADR CM-0044 §2), without money.
+ * The photo is served by the Check-In log's route, by `entryId`.
+ */
+export type ActivityCheckIn = {
+  action: CheckInActivityRow["action"];
+  /** The instant it happened; also `recordedAt`. */
+  at: Date;
+  /** The check-in entry, for its photo. */
+  entryId: string;
+  hasPhoto: boolean;
+  location: CheckInActivityRow["location"];
+  fence: CheckInActivityRow["fence"];
+  metresOutside: number | null;
+  voided: { reason: string } | null;
+};
+
+/** Check-in entries need Attendance Read on their Project (ADR CM-0044 §4). */
+export const CHECK_IN_MENU = "labour.attendance";
+
+export function activityCheckIn(row: CheckInActivityRow): ActivityCheckIn {
+  return {
+    action: row.action,
+    at: row.key.recordedAt,
+    entryId: row.key.id,
+    hasPhoto: row.hasPhoto,
+    location: row.location,
+    fence: row.fence,
+    metresOutside: row.metresOutside,
+    voided: row.voided,
+  };
+}
 
 export type LabourActivityEntry = EntryBase &
   (
@@ -79,12 +113,14 @@ export type LabourActivityEntry = EntryBase &
         project: ActivityProject;
         status: AttendanceLabel;
       }
+    | ({ kind: "check_in"; project: ActivityProject } & ActivityCheckIn)
   );
 
 export const LABOUR_ACTIVITY_TYPES = [
   "all",
   "projects",
   "attendance",
+  "check_ins",
   "profile",
 ] as const;
 export type LabourActivityType = (typeof LABOUR_ACTIVITY_TYPES)[number];
@@ -122,6 +158,16 @@ export function visibleProjectIds(
   return access.role === "owner" ? null : [...access.projectIds];
 }
 
+/**
+ * The Projects whose check-in entries the viewer may see: those they have
+ * Attendance Read on, which is project-scoped, so the Projects they are on
+ * when they hold it (ADR CM-0044 §4). Null for every one (the Owner).
+ */
+export function checkInProjectIds(access: MemberAccess): string[] | null {
+  if (!can(access, CHECK_IN_MENU, "read")) return [];
+  return visibleProjectIds(access);
+}
+
 /** Names the Projects of a page and says which the viewer may open. */
 export async function resolveProjects(
   names: ProjectNames,
@@ -149,11 +195,12 @@ const MORE = 1;
 
 /**
  * A Labour's Activity feed (ADR CM-0038 §1, §5): Project moves, attendance
- * and its changes, and the profile entries, read from the labour context's
- * history and merged here. Entries for Projects the viewer may not open
- * are left out at the source; entries with no Project always show. A
- * transfer shows when the viewer may open either Project; the other one is
- * named without a link. No amounts are returned.
+ * and its changes, check-in entries (ADR CM-0044) and the profile entries,
+ * read from the labour context's history and merged here. Entries for
+ * Projects the viewer may not open are left out at the source, and
+ * check-in entries of Projects without Attendance Read too; entries with
+ * no Project always show. A transfer shows when the viewer may open either
+ * Project; the other one is named without a link. No amounts are returned.
  */
 export class LabourActivityService {
   constructor(
@@ -187,14 +234,21 @@ export class LabourActivityService {
     const wants = (type: LabourActivityType) =>
       filter.type === "all" || filter.type === type;
     const none = Promise.resolve([]);
-    const [moves, attendance, profile] = await Promise.all([
+    const [moves, attendance, checkIns, profile] = await Promise.all([
       wants("projects") ? this.source.moves(window) : none,
       wants("attendance") ? this.source.attendance(window) : none,
+      wants("check_ins")
+        ? this.source.checkIns({
+            ...window,
+            person: { kind: "labour", id: labourId },
+            visibleProjectIds: checkInProjectIds(access),
+          })
+        : none,
       wants("profile") ? this.source.profile({ ...window, timeZone }) : none,
     ]);
     // A change dated before the page's last entry so far cannot be on it.
     const sofar = mergeActivity<LabourActivityRow>(
-      [moves, attendance, profile],
+      [moves, attendance, checkIns, profile],
       window.limit,
     );
     const since =
@@ -299,6 +353,13 @@ function toEntry(
         kind: row.kind,
         project: project(row.projectId),
         status: row.from,
+      };
+    case "check_in":
+      return {
+        ...base,
+        kind: row.kind,
+        project: project(row.projectId),
+        ...activityCheckIn(row),
       };
   }
 }

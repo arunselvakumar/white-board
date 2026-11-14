@@ -1,12 +1,15 @@
 import { formatMobile } from "@repo/auth/construction/mobile";
 
 import { projectBasePath } from "@/lib/project-nav";
+import { formatTime } from "@/app/app/_components/check-in/check-in-entry-parts";
 import type {
   CheckInAction,
   CheckInEntry,
   CheckInKind,
   CheckInPerson,
 } from "@/src/queries/check-ins";
+
+export { formatTime };
 
 /** `site_engineer` in the API is `site-engineer` in the address. */
 export const KIND_SEGMENTS: Record<CheckInKind, string> = {
@@ -81,17 +84,6 @@ function plain(text: string): string {
   return text.replace(/\s+/g, " ").toLowerCase();
 }
 
-/** `10:02 am` in the Company's time zone. */
-export function formatTime(at: string | number, timeZone: string): string {
-  return plain(
-    format(timeZone, "time", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    }).format(new Date(at)),
-  );
-}
-
 /** `10:02:15 am`, for the clock. */
 export function formatClockTime(at: number, timeZone: string): string {
   return plain(
@@ -156,12 +148,4 @@ export function fenceSentence(
   if (entry.fence === "outside")
     return `About ${(entry.metresOutside ?? 0).toLocaleString("en-IN")} m outside the site fence`;
   return null;
-}
-
-/** Google Maps at a point, for "Open in Maps". */
-export function mapsUrl(location: {
-  latitude: number;
-  longitude: number;
-}): string {
-  return `https://www.google.com/maps?q=${String(location.latitude)},${String(location.longitude)}`;
 }

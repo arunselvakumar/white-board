@@ -25,6 +25,9 @@ export function viewerOf(
   return {
     canCheckIn: can(access, "labour.attendance", "create", { projectId }),
     canVoid: can(access, "labour.attendance", "delete", { projectId }),
+    canVoidLabour:
+      can(access, "labour.attendance", "delete", { projectId }) &&
+      can(access, "labour.attendance", "update", { projectId }),
   };
 }
 
@@ -36,6 +39,7 @@ export function toContextResponse(context: CheckInContext & CheckInViewer) {
     siteFence: context.siteFence,
     canCheckIn: context.canCheckIn,
     canVoid: context.canVoid,
+    canVoidLabour: context.canVoidLabour,
   };
 }
 

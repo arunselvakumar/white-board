@@ -12,6 +12,7 @@ import {
   listOf,
 } from "../../_components/labour-fixtures";
 import {
+  CHECK_IN_ENTRIES,
   MIXED_ENTRIES,
   STORY_NOW,
   activityPage,
@@ -197,6 +198,92 @@ export const ActivityFilters: Story = {
     await userEvent.type(canvas.getByLabelText("From"), "2026-11-01");
     await waitFor(async () => {
       await expect(activityCalls().at(-1)).toContain("from=2026-11-01");
+    });
+  },
+};
+
+export const ActivityCheckIns: Story = {
+  parameters: { searchParams: "?tab=activity" },
+  beforeEach: withActivity(() => Response.json(activityPage(CHECK_IN_ENTRIES))),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    // The night shift's Check Out sits on the day the shift began.
+    const yesterday = within(
+      await canvas.findByRole("region", { name: "Yesterday" }),
+    );
+    const [out, voided, inside] = yesterday.getAllByRole("listitem");
+    if (out == null || voided == null || inside == null)
+      throw new Error("three check-in entries yesterday");
+    const outEntry = within(out);
+    await expect(
+      outEntry.getByText("Checked out").closest("p"),
+    ).toHaveTextContent("Checked out at Tower A · 6:05 am");
+    await expect(
+      outEntry.getByRole("link", { name: TOWER.name }),
+    ).toHaveAttribute("href", `/app/projects/${TOWER.id}`);
+    await expect(
+      outEntry.getByText(/240 m outside the site fence/),
+    ).toBeVisible();
+    const maps = outEntry.getByRole("link", { name: "Open in Maps" });
+    await expect(maps).toHaveAttribute(
+      "href",
+      "https://www.google.com/maps?q=13.0841,80.2705",
+    );
+    await expect(maps).toHaveAttribute("target", "_blank");
+    await expect(outEntry.getByText(/^by Karthik Raja ·/)).toHaveTextContent(
+      "by Karthik Raja · 11 Nov 2026, 6:05 am",
+    );
+
+    await expect(
+      within(inside).getByText(/Inside the site fence/),
+    ).toBeVisible();
+    // A location without a Site fence; a void stays, struck through.
+    await expect(within(voided).getByText(/Location saved/)).toBeVisible();
+    await expect(
+      within(voided).getByText("Voided: Checked in twice by mistake"),
+    ).toBeVisible();
+    await expect(
+      within(voided).getByText("Checked in").closest("p"),
+    ).toHaveClass("line-through");
+
+    // The removed photo and the missing location.
+    const august = within(canvas.getByRole("region", { name: /Aug/ }));
+    await expect(
+      august.getByRole("img", { name: "Photo removed" }),
+    ).toBeVisible();
+    await expect(august.getByText("No location")).toBeVisible();
+    await expect(
+      august.queryByRole("link", { name: "Open in Maps" }),
+    ).toBeNull();
+
+    await userEvent.click(
+      outEntry.getByRole("button", {
+        name: "Open the photo: Checked out at Tower A · 6:05 am",
+      }),
+    );
+    const dialog = within(await body.findByRole("dialog"));
+    await expect(
+      dialog.getByText("Checked out at Tower A · 6:05 am"),
+    ).toBeVisible();
+    await expect(
+      dialog.getByText("240 m outside the site fence · by Karthik Raja"),
+    ).toBeVisible();
+  },
+};
+
+export const ActivityTypeCheckIn: Story = {
+  parameters: { searchParams: "?tab=activity" },
+  beforeEach: withActivity(() => Response.json(activityPage(MIXED_ENTRIES))),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await canvas.findByText("Marked inactive");
+    await userEvent.click(canvas.getByRole("combobox", { name: "Type" }));
+    await expect(
+      (await body.findAllByRole("option")).map((option) => option.textContent),
+    ).toEqual(["All", "Projects", "Attendance", "Check-In", "Profile"]);
+    await userEvent.click(body.getByRole("option", { name: "Check-In" }));
+    await waitFor(async () => {
+      await expect(activityCalls().at(-1)).toContain("type=check_ins");
     });
   },
 };

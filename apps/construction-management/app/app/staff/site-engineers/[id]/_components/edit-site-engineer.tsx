@@ -3,16 +3,26 @@
 import { useActiveCompany } from "@repo/auth/construction/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { History, UserRound } from "lucide-react";
 import Link from "next/link";
+import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Badge } from "@repo/ui/components/badge";
 import { Button, buttonVariants } from "@repo/ui/components/button";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@repo/ui/components/tabs";
 
+import { PersonActivity } from "@/app/app/_components/activity/person-activity";
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";
 import { SITE_ENGINEERS_PATH } from "@/lib/staff-nav";
+import { siteEngineerActivityQuery } from "@/src/queries/activity";
 import { QueryHttpError } from "@/src/queries/http";
 import {
   siteEngineerQueries,
@@ -67,20 +77,32 @@ function modeOf(
   };
 }
 
+const TABS = ["details", "activity"] as const;
+
 /**
- * Edit Site Engineer (ADR CM-0037): Add's cards, the sign-in status in
- * place of the Sign-in choice once they have one, and one Save. One who is
- * Office Staff keeps their email, KYC, salary and Projects there.
+ * A Site Engineer's page: Details is Edit Site Engineer (ADR CM-0037),
+ * Add's cards, the sign-in status in place of the Sign-in choice once they
+ * have one, and one Save; one who is Office Staff keeps their email, KYC,
+ * salary and Projects there. Activity is their feed (ADR CM-0044 §7). The
+ * tab is kept in the address (`?tab=activity`), and Details stays mounted
+ * while Activity shows, so typed changes survive a tab switch.
  */
 export function EditSiteEngineer({
   id,
   canSeeSalary,
+  now,
 }: {
   id: string;
   /** Financial on Labours: the Salary and Bank cards. */
   canSeeSalary: boolean;
+  /** For stories: what "Today" is in the feed. */
+  now?: Date;
 }) {
   const { data: engineer } = useSuspenseQuery(siteEngineerQueries.detail(id));
+  const [tab, setTab] = useQueryState(
+    "tab",
+    parseAsStringLiteral(TABS).withDefault("details"),
+  );
   // Kept here: adding a sign-in starts the form over.
   const [saved, setSaved] = useState(false);
 
@@ -101,14 +123,39 @@ export function EditSiteEngineer({
             </span>
           }
         />
-        {/* A new sign-in changes which cards show, so the form starts over. */}
-        <EditSiteEngineerForm
-          key={engineer.signIn.kind}
-          engineer={engineer}
-          canSeeSalary={canSeeSalary}
-          saved={saved}
-          onSaved={setSaved}
-        />
+        <Tabs
+          value={tab}
+          onValueChange={(next: (typeof TABS)[number]) => {
+            void setTab(next === "details" ? null : next);
+          }}
+        >
+          <TabsList>
+            <TabsTrigger value="details">
+              <UserRound aria-hidden="true" />
+              Details
+            </TabsTrigger>
+            <TabsTrigger value="activity">
+              <History aria-hidden="true" />
+              Activity
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="details" keepMounted className="pt-4">
+            {/* A new sign-in changes which cards show, so the form starts over. */}
+            <EditSiteEngineerForm
+              key={engineer.signIn.kind}
+              engineer={engineer}
+              canSeeSalary={canSeeSalary}
+              saved={saved}
+              onSaved={setSaved}
+            />
+          </TabsContent>
+          <TabsContent value="activity" className="pt-4">
+            <PersonActivity
+              query={(filter) => siteEngineerActivityQuery(id, filter)}
+              now={now}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

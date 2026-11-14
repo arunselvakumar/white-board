@@ -1,6 +1,7 @@
 import { prisma, type PrismaClient } from "@repo/construction-db";
 
 import type {
+  CheckInActivityRow,
   LabourActivitySource,
   ProjectActivityWindow,
   ProjectLabourMoveRow,
@@ -31,8 +32,11 @@ import { todayIn, type CalendarDate } from "@/src/shared-kernel/calendar-date";
 import { companyTimezone } from "@/src/shared-kernel/company-today";
 
 import {
+  activityCheckIn,
+  CHECK_IN_MENU,
   companyActorNames,
   resolveProjects,
+  type ActivityCheckIn,
   type ActivityPage,
   type ActivityProject,
   type ActorNames,
@@ -44,6 +48,28 @@ const SITE_ENGINEER_RANK = { added: 6, removed: 7 } as const;
 
 /** Opens the Labour and Site Engineer pages (both under the Labours menu). */
 const PEOPLE_MENU = "masters.labours";
+/** Opens a Vendor's page. */
+const VENDORS_MENU = "masters.vendors";
+
+type CheckInPersonKind = CheckInActivityRow["person"]["kind"];
+
+/** Shown for a person whose row is gone. */
+const DELETED_PERSON: Record<CheckInPersonKind, string> = {
+  labour: "Deleted Labour",
+  site_engineer: "Deleted Site Engineer",
+  vendor: "Deleted Vendor",
+};
+
+/** Who a check-in entry names (ADR CM-0044 §2). */
+export type ActivityCheckInPerson = {
+  kind: CheckInPersonKind;
+  id: string;
+  name: string;
+  /** The Labour Category, "Site Engineer" or "Vendor". */
+  role: string | null;
+  /** The viewer may open their page, and they were not deleted. */
+  canOpen: boolean;
+};
 
 export type ActivityLabourPerson = {
   id: string;
@@ -91,16 +117,31 @@ export type ProjectActivityEntry = EntryBase &
         kind: "site_engineer_added" | "site_engineer_removed";
         siteEngineer: ActivitySiteEngineer;
       }
+    | ({ kind: "check_in"; person: ActivityCheckInPerson } & ActivityCheckIn)
   );
 
 export const PROJECT_ACTIVITY_WHO = [
   "all",
   "site_engineers",
   "labours",
+  "vendors",
 ] as const;
 export type ProjectActivityWho = (typeof PROJECT_ACTIVITY_WHO)[number];
 
+/** Team changes: added, removed, transferred (ADR CM-0044 §5). */
+export const PROJECT_ACTIVITY_TYPES = ["all", "team", "check_ins"] as const;
+export type ProjectActivityType = (typeof PROJECT_ACTIVITY_TYPES)[number];
+
+/** Whose check-in entries each Who reads. */
+const CHECK_IN_KINDS: Record<ProjectActivityWho, CheckInPersonKind[]> = {
+  all: ["labour", "site_engineer", "vendor"],
+  site_engineers: ["site_engineer"],
+  labours: ["labour"],
+  vendors: ["vendor"],
+};
+
 export type ProjectActivityFilter = {
+  type: ProjectActivityType;
   who: ProjectActivityWho;
   from: CalendarDate | null;
   to: CalendarDate | null;
@@ -114,7 +155,7 @@ type SiteEngineerRow = {
   by: string;
 };
 
-type Row = ProjectLabourMoveRow | SiteEngineerRow;
+type Row = ProjectLabourMoveRow | SiteEngineerRow | CheckInActivityRow;
 
 /** Where Site Engineers' sign-ins are found, and who they are (masters). */
 export type SiteEngineerLinks = (
@@ -123,10 +164,12 @@ export type SiteEngineerLinks = (
 
 /**
  * A Project's Activity feed (ADR CM-0038 §1, §4): Labours added, removed
- * and transferred in or out (labour context, a batch as one entry), and
- * Site Engineers added or removed (their sign-in's history in the
- * organization context, named by the masters context). The viewer must be
- * on the Project; attendance is not in this feed.
+ * and transferred in or out (labour context, a batch as one entry), Site
+ * Engineers added or removed (their sign-in's history in the organization
+ * context, named by the masters context), and everyone's check-in entries,
+ * one each (labour context, ADR CM-0044), only with Attendance Read on the
+ * Project. The viewer must be on the Project; the day's attendance status
+ * is not in this feed.
  */
 export class ProjectActivityService {
   constructor(
@@ -160,24 +203,40 @@ export class ProjectActivityService {
       from: filter.from,
       to: filter.to,
     };
-    const [moves, engineers] = await Promise.all([
-      filter.who === "site_engineers"
-        ? Promise.resolve([])
-        : this.labour.projectMoves(window),
-      filter.who === "labours"
-        ? Promise.resolve({
+    const team = filter.type !== "check_ins";
+    const checkIns =
+      filter.type !== "team" &&
+      can(access, CHECK_IN_MENU, "read", { projectId });
+    const [moves, engineers, entries] = await Promise.all([
+      team && (filter.who === "all" || filter.who === "labours")
+        ? this.labour.projectMoves(window)
+        : Promise.resolve([]),
+      team && (filter.who === "all" || filter.who === "site_engineers")
+        ? this.siteEngineerRows(window, timeZone)
+        : Promise.resolve({
             rows: [],
             people: new Map<string, ActivitySiteEngineerSource>(),
+          }),
+      checkIns
+        ? this.labour.projectCheckIns({
+            ...window,
+            kinds: CHECK_IN_KINDS[filter.who],
           })
-        : this.siteEngineerRows(window, timeZone),
+        : Promise.resolve([]),
     ]);
-    const page = mergeActivity<Row>([moves, engineers.rows]);
+    const page = mergeActivity<Row>([moves, engineers.rows, entries]);
 
     const labourIds = page.items.flatMap((row) =>
       "labourIds" in row ? row.labourIds : [],
     );
-    const [labours, project, names] = await Promise.all([
+    const [labours, checkInPeople, project, names] = await Promise.all([
       this.labour.labours(workspaceId, labourIds),
+      this.labour.checkInPeople(
+        workspaceId,
+        page.items.flatMap((row) =>
+          row.kind === "check_in" ? [row.person] : [],
+        ),
+      ),
       resolveProjects(
         this.projectNames,
         access,
@@ -191,6 +250,23 @@ export class ProjectActivityService {
       ),
     ]);
     const mayOpenPeople = can(access, PEOPLE_MENU, "read");
+    const mayOpen: Record<CheckInPersonKind, boolean> = {
+      labour: mayOpenPeople,
+      site_engineer: mayOpenPeople,
+      vendor: can(access, VENDORS_MENU, "read"),
+    };
+    const checkInPerson = (
+      ref: CheckInActivityRow["person"],
+    ): ActivityCheckInPerson => {
+      const found = checkInPeople.get(`${ref.kind}:${ref.id}`);
+      return {
+        kind: ref.kind,
+        id: ref.id,
+        name: found?.name ?? DELETED_PERSON[ref.kind],
+        role: found?.role ?? null,
+        canOpen: mayOpen[ref.kind] && found != null && !found.deleted,
+      };
+    };
     const person = (id: string): ActivityLabourPerson => {
       const found = labours.get(id);
       return {
@@ -212,6 +288,13 @@ export class ProjectActivityService {
           recordedAt: row.key.recordedAt,
           by: names.get(row.by) ?? null,
         };
+        if (row.kind === "check_in")
+          return {
+            ...base,
+            kind: row.kind,
+            person: checkInPerson(row.person),
+            ...activityCheckIn(row),
+          };
         if ("memberId" in row) {
           const found = engineers.people.get(row.memberId);
           return {

@@ -25,6 +25,7 @@ import { projectPath } from "@/app/app/projects/_components/projects-home";
 import {
   projectResourcesQuery,
   type ProjectResources,
+  type ResourceSection,
 } from "@/src/queries/project-resources";
 
 import { LaboursSection } from "./labours-section";
@@ -34,6 +35,7 @@ import {
   type ResourceSectionInfo,
 } from "./resource-sections";
 import { SiteEngineersSection } from "./site-engineers-section";
+import { TeamRow } from "./team-row";
 
 type Line = ProjectResources["teamMembers"][number];
 
@@ -69,23 +71,25 @@ function StepBanner({
 
 function ResourceLine({
   line,
+  href,
 }: {
   line: Line | ProjectResources["contractors"][number];
+  href: string | null;
 }) {
   const owner = "isOwner" in line && line.isOwner;
   return (
-    <li className="flex min-w-0 items-center gap-3 px-4 py-3">
-      <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm font-medium">{line.name}</span>
-        {line.detail != null && (
-          <span className="text-muted-foreground block truncate text-xs">
-            {line.detail}
-          </span>
-        )}
-      </span>
-      {owner && <Badge variant="secondary">Owner</Badge>}
-      {!line.isActive && <Badge variant="outline">Inactive</Badge>}
-    </li>
+    <TeamRow
+      name={line.name}
+      // The Owner has no Office Staff page (ADR CM-0044 §1).
+      href={owner ? null : href}
+      detail={line.detail}
+      badges={
+        <>
+          {owner && <Badge variant="secondary">Owner</Badge>}
+          {!line.isActive && <Badge variant="outline">Inactive</Badge>}
+        </>
+      }
+    />
   );
 }
 
@@ -94,11 +98,14 @@ function ResourceCard({
   section,
   lines,
   canEdit,
+  canOpen,
 }: {
   projectId: string;
   section: ResourceSectionInfo;
   lines: readonly (Line | ProjectResources["contractors"][number])[];
   canEdit: boolean;
+  /** The viewer may read the menu the section's pages belong to. */
+  canOpen: boolean;
 }) {
   const [editing, setEditing] = useState(false);
   const assigned = lines.filter((line) => !("isOwner" in line && line.isOwner));
@@ -163,10 +170,14 @@ function ResourceCard({
       ) : (
         <ul
           aria-label={section.title}
-          className="bg-card divide-y rounded-lg border"
+          className="bg-card divide-y overflow-hidden rounded-lg border"
         >
           {lines.map((line) => (
-            <ResourceLine key={line.id} line={line} />
+            <ResourceLine
+              key={line.id}
+              line={line}
+              href={canOpen ? section.pagePath(line.id) : null}
+            />
           ))}
         </ul>
       )}
@@ -189,6 +200,11 @@ export type ResourcesAccess = {
   canEdit: boolean;
   /** Labours Read: the Add Labours picker, Labour and Site Engineer pages. */
   canReadLabours?: boolean;
+  /**
+   * Read on the menu of each section's pages (Team Members, Contractors,
+   * Suppliers, Vendors): their rows open those pages.
+   */
+  canOpenSections?: Partial<Record<ResourceSection, boolean>>;
   /** Labour Transfer on this Project. */
   canTransfer?: boolean;
 };
@@ -204,6 +220,7 @@ export function ProjectResourcesPage({
   projectId,
   canEdit,
   canReadLabours = false,
+  canOpenSections = {},
   canTransfer = false,
   wizard = false,
 }: ResourcesAccess & {
@@ -245,6 +262,7 @@ export function ProjectResourcesPage({
             section={section}
             lines={data[section.key]}
             canEdit={canEdit}
+            canOpen={canOpenSections[section.key] ?? false}
           />
         ))}
       </div>

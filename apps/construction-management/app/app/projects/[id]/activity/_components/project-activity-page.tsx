@@ -26,12 +26,22 @@ import {
   projectActivityFilter,
 } from "@/app/app/_components/activity/activity-search-params";
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
+import {
+  CHECKED,
+  checkInActivityParts,
+} from "@/app/app/_components/check-in/check-in-activity";
+import { formatTime } from "@/app/app/_components/check-in/check-in-entry-parts";
 import { projectBasePath } from "@/lib/project-nav";
-import { LABOURS_PAGE_PATH, SITE_ENGINEERS_PATH } from "@/lib/staff-nav";
+import {
+  LABOURS_PAGE_PATH,
+  SITE_ENGINEERS_PATH,
+  VENDORS_PATH,
+} from "@/lib/staff-nav";
 import {
   projectActivityQuery,
   type ProjectActivityEntry,
   type ProjectActivityFilter,
+  type ProjectActivityType,
   type ProjectActivityWho,
 } from "@/src/queries/activity";
 
@@ -42,15 +52,42 @@ type LabourPerson = Extract<
   { labours: unknown }
 >["labours"][number];
 type Project = { id: string; name: string; canOpen: boolean };
+type CheckInPerson = Extract<
+  ProjectActivityEntry,
+  { kind: "check_in" }
+>["person"];
 
 export const PROJECT_ACTIVITY_EMPTY =
   "Nothing yet. Adding Site Engineers or Labours to this Project will show here.";
+
+export const PROJECT_CHECK_INS_EMPTY =
+  "No check-in entries. People checked in or out on Check-In will show here.";
+
+const TYPE_ITEMS: { value: ProjectActivityType; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "team", label: "Team changes" },
+  { value: "check_ins", label: "Check-In" },
+];
 
 const WHO_ITEMS: { value: ProjectActivityWho; label: string }[] = [
   { value: "all", label: "Everyone" },
   { value: "site_engineers", label: "Site Engineers" },
   { value: "labours", label: "Labours" },
+  { value: "vendors", label: "Vendors" },
 ];
+
+/** Each kind of person's page (ADR CM-0036). */
+const PERSON_PAGES: Record<CheckInPerson["kind"], string> = {
+  labour: LABOURS_PAGE_PATH,
+  site_engineer: SITE_ENGINEERS_PATH,
+  vendor: VENDORS_PATH,
+};
+
+function personHref(person: CheckInPerson): string | null {
+  return person.canOpen
+    ? `${PERSON_PAGES[person.kind]}/${encodeURIComponent(person.id)}`
+    : null;
+}
 
 const LINK = "font-medium underline-offset-4 hover:underline";
 
@@ -131,9 +168,10 @@ function withRemark(parts: Lines, remark: string | null): Lines {
   };
 }
 
-/** One Project Activity entry in words. */
+/** One Project Activity entry in words; times in the Company's time zone. */
 export function projectActivityItem(
   entry: ProjectActivityEntry,
+  timeZone: string,
 ): ActivityFeedItem {
   const base = {
     id: entry.id,
@@ -204,6 +242,23 @@ export function projectActivityItem(
         ),
         ...withRemark(batch(entry.labours), entry.remark),
       };
+    case "check_in": {
+      const { person } = entry;
+      const time = formatTime(entry.at, timeZone);
+      const said = `${CHECKED[entry.action]} · ${time}`;
+      return {
+        ...base,
+        ...checkInActivityParts(entry, `${person.name} ${said}`),
+        title: (
+          <>
+            <Named href={personHref(person)} name={person.name} /> {said}
+            {person.role == null ? null : (
+              <span className="text-muted-foreground"> · {person.role}</span>
+            )}
+          </>
+        ),
+      };
+    }
   }
 }
 
@@ -219,14 +274,19 @@ function ProjectActivityList({
   const query = useSuspenseInfiniteQuery(
     projectActivityQuery(projectId, filter),
   );
+  const timeZone = query.data.pages[0]?.timeZone ?? "Asia/Kolkata";
   const items = query.data.pages.flatMap((page) =>
-    page.items.map(projectActivityItem),
+    page.items.map((entry) => projectActivityItem(entry, timeZone)),
   );
   return (
     <ActivityFeed
       items={items}
-      timeZone={query.data.pages[0]?.timeZone ?? "Asia/Kolkata"}
-      emptyMessage={PROJECT_ACTIVITY_EMPTY}
+      timeZone={timeZone}
+      emptyMessage={
+        filter.type === "check_ins"
+          ? PROJECT_CHECK_INS_EMPTY
+          : PROJECT_ACTIVITY_EMPTY
+      }
       now={now}
       {...feedPaging(query)}
     />
@@ -234,8 +294,9 @@ function ProjectActivityList({
 }
 
 /**
- * Project → Activity (ADR CM-0038 §4): Site Engineers and Labours added,
- * removed and transferred, filtered by Who and dates kept in the address.
+ * A Project's Activity (ADR CM-0038 §4): Site Engineers and Labours added,
+ * removed and transferred, and each Check In and Check Out (ADR CM-0044),
+ * filtered by Type, Who and dates kept in the address.
  */
 export function ProjectActivityPage({
   projectId,
@@ -251,9 +312,17 @@ export function ProjectActivityPage({
     <div className="w-full max-w-4xl space-y-6 p-6">
       <PageHeader
         title="Activity"
-        meta="Site Engineers and Labours added, removed and transferred."
+        meta="Site Engineers and Labours added, removed and transferred, and who checked in and out."
       />
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <ActivityFilterSelect
+          label="Type"
+          value={search.type}
+          items={TYPE_ITEMS}
+          onChange={(value) => {
+            void setSearch({ type: value === "all" ? null : value });
+          }}
+        />
         <ActivityFilterSelect
           label="Who"
           value={search.who}

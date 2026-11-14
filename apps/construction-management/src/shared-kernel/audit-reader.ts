@@ -123,6 +123,12 @@ export function attendanceAuditDay(value: unknown): AttendanceAuditDay | null {
   };
 }
 
+function projectIdsIn(value: unknown): string[] | null {
+  const projectIds = record(value)?.["projectIds"];
+  if (!Array.isArray(projectIds)) return null;
+  return projectIds.filter((id): id is string => typeof id === "string");
+}
+
 /**
  * The Team Member's Projects after a `team_member.*` event
  * (`team-member-handlers.ts` `audit`), or null when the event does not
@@ -131,7 +137,63 @@ export function attendanceAuditDay(value: unknown): AttendanceAuditDay | null {
 export function teamMemberProjectIdsAfter(
   event: Pick<AuditRecord, "after">,
 ): string[] | null {
-  const projectIds = record(event.after)?.["projectIds"];
-  if (!Array.isArray(projectIds)) return null;
-  return projectIds.filter((id): id is string => typeof id === "string");
+  return projectIdsIn(event.after);
+}
+
+/**
+ * The `vendor.*` events that carry the Vendor's whole set of Projects in
+ * `after.projectIds` (`prisma-vendor-store.ts`): Add Vendor, Edit Vendor,
+ * and a Project's Teams save.
+ */
+export const VENDOR_PROJECT_ACTIONS = [
+  "vendor.created",
+  "vendor.updated",
+  "vendor.projects_changed",
+] as const;
+
+/** The Vendor's Projects after one of `VENDOR_PROJECT_ACTIONS`, or null. */
+export function vendorProjectIdsAfter(
+  event: Pick<AuditRecord, "after">,
+): string[] | null {
+  return projectIdsIn(event.after);
+}
+
+/** One Project an audited command put an entity on, or took it off. */
+export type AuditProjectChange = {
+  projectId: string;
+  change: "added" | "removed";
+  event: AuditRecord;
+};
+
+/**
+ * One entity's Project history (ADR CM-0038 §1): its events oldest first,
+ * each event's set of Projects compared with the set before it (empty
+ * before the first). An event whose set is null changes nothing; one that
+ * `clears` takes the entity off every Project it was on.
+ */
+export function auditProjectChanges(
+  events: readonly AuditRecord[],
+  projectIdsAfter: (event: AuditRecord) => string[] | null,
+  clears: (event: AuditRecord) => boolean = () => false,
+): AuditProjectChange[] {
+  const ordered = [...events].sort(
+    (a, b) =>
+      a.occurredAt.getTime() - b.occurredAt.getTime() ||
+      (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
+  );
+  const changes: AuditProjectChange[] = [];
+  let current = new Set<string>();
+  for (const event of ordered) {
+    const next = clears(event)
+      ? new Set<string>()
+      : new Set(projectIdsAfter(event) ?? current);
+    for (const projectId of next)
+      if (!current.has(projectId))
+        changes.push({ projectId, change: "added", event });
+    for (const projectId of current)
+      if (!next.has(projectId))
+        changes.push({ projectId, change: "removed", event });
+    current = next;
+  }
+  return changes;
 }

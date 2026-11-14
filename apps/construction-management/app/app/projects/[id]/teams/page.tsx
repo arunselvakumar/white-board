@@ -37,10 +37,22 @@ export default async function ProjectResourcesRoute({
     [RESOURCES_API]: routeHandler(readResources),
     [PROJECT_LABOURS_API]: routeHandler(listProjectLabours),
   };
-  const [canEdit, canReadLabours, canTransfer] = await Promise.all([
+  const [
+    canEdit,
+    canReadLabours,
+    canTransfer,
+    teamMembers,
+    contractors,
+    suppliers,
+    vendors,
+  ] = await Promise.all([
     viewerCan("projects.project", "update", { projectId: id }),
     viewerCan("masters.labours", "read"),
     viewerCan("labour.labour", "transfer", { projectId: id }),
+    viewerCan("organization.team_members", "read"),
+    viewerCan("masters.contractors", "read"),
+    viewerCan("masters.suppliers", "read"),
+    viewerCan("masters.vendors", "read"),
     prefetchRoute(queryClient, projectResourcesQuery(id), routes),
     prefetchRoute(queryClient, projectLaboursQuery(id), routes),
   ]);
@@ -50,6 +62,7 @@ export default async function ProjectResourcesRoute({
         projectId={id}
         canEdit={canEdit}
         canReadLabours={canReadLabours}
+        canOpenSections={{ teamMembers, contractors, suppliers, vendors }}
         canTransfer={canTransfer}
         wizard={step === RESOURCES_STEP}
       />

@@ -52,6 +52,7 @@ import {
 } from "@/src/queries/project-resources";
 
 import { ResourcePickerSkeleton } from "./resources-skeletons";
+import { TeamRow } from "./team-row";
 
 const ADD_SITE_ENGINEER_PATH = "/app/staff/site-engineers/new";
 
@@ -351,36 +352,20 @@ export function SiteEngineersSection({
       ) : (
         <ul
           aria-label="Site Engineers"
-          className="bg-card grid divide-y rounded-lg border sm:grid-cols-2 sm:divide-y-0"
+          className="bg-card grid divide-y overflow-hidden rounded-lg border sm:grid-cols-2 sm:divide-y-0"
         >
-          {engineers.map((engineer) => {
-            const detail = detailOf(engineer);
-            return (
-              <li
-                key={engineer.id}
-                className="flex min-w-0 items-center gap-3 border-b px-4 py-3 last:border-b-0 sm:[&:nth-last-child(-n+2):nth-child(odd)]:border-b-0"
-              >
-                <span className="min-w-0 flex-1">
-                  {canOpenPages ? (
-                    <Link
-                      href={siteEngineerPath(engineer.id)}
-                      className="block truncate text-sm font-medium hover:underline"
-                    >
-                      {engineer.name}
-                    </Link>
-                  ) : (
-                    <span className="block truncate text-sm font-medium">
-                      {engineer.name}
-                    </span>
-                  )}
-                  {detail != null && (
-                    <span className="text-muted-foreground block truncate text-xs">
-                      {detail}
-                    </span>
-                  )}
-                </span>
-                {engineer.disabled && <Badge variant="outline">Disabled</Badge>}
-                {canEdit && (
+          {engineers.map((engineer) => (
+            <TeamRow
+              key={engineer.id}
+              className="border-b last:border-b-0 sm:[&:nth-last-child(-n+2):nth-child(odd)]:border-b-0"
+              name={engineer.name}
+              href={canOpenPages ? siteEngineerPath(engineer.id) : null}
+              detail={detailOf(engineer)}
+              badges={
+                engineer.disabled && <Badge variant="outline">Disabled</Badge>
+              }
+              actions={
+                canEdit && (
                   <Button
                     type="button"
                     variant="ghost"
@@ -392,10 +377,10 @@ export function SiteEngineersSection({
                   >
                     Remove
                   </Button>
-                )}
-              </li>
-            );
-          })}
+                )
+              }
+            />
+          ))}
         </ul>
       )}
       {canEdit && (

@@ -1,36 +1,26 @@
 "use client";
 
-import { useQuery, useSuspenseInfiniteQuery } from "@tanstack/react-query";
+import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import {
   ArrowRightLeft,
   CalendarCheck,
   CalendarClock,
   CalendarX,
-  LogIn,
-  LogOut,
   UserCheck,
   UserPlus,
   UserX,
 } from "lucide-react";
-import Link from "next/link";
-import { parseAsStringLiteral, useQueryStates } from "nuqs";
 
 import {
-  ActivityFeed,
-  ActivityFeedBoundary,
   feedPaging,
   type ActivityFeedItem,
 } from "@/app/app/_components/activity/activity-feed";
 import {
-  ActivityDateRange,
-  ActivityFilterSelect,
-} from "@/app/app/_components/activity/activity-filters";
-import {
-  orderedRange,
-  parseAsCalendarDate,
-  parseAsUuid,
-} from "@/app/app/_components/activity/activity-search-params";
-import { projectBasePath } from "@/lib/project-nav";
+  ActivityPages,
+  PersonActivityTab,
+  ProjectName,
+  personActivityItem,
+} from "@/app/app/_components/activity/person-activity";
 import {
   LABOUR_ACTIVITY_TYPES,
   labourActivityQuery,
@@ -38,9 +28,7 @@ import {
   type LabourActivityFilter,
   type LabourActivityType,
 } from "@/src/queries/activity";
-import { projectOptionsQuery } from "@/src/queries/projects";
 
-type ActivityProject = { id: string; name: string; canOpen: boolean };
 type Status = Extract<LabourActivityEntry, { kind: "attendance" }>["status"];
 
 /** As on the attendance sheet. */
@@ -57,34 +45,12 @@ const TYPE_ITEMS: { value: LabourActivityType; label: string }[] = [
   { value: "all", label: "All" },
   { value: "projects", label: "Projects" },
   { value: "attendance", label: "Attendance" },
+  { value: "check_ins", label: "Check-In" },
   { value: "profile", label: "Profile" },
 ];
 
-const ALL_PROJECTS = "all";
-
 export const LABOUR_ACTIVITY_EMPTY =
   "Nothing yet. Adding this Labour to a Project or marking attendance will show here.";
-
-/** The Activity tab's filters, kept in the address. */
-const FILTERS = {
-  type: parseAsStringLiteral(LABOUR_ACTIVITY_TYPES).withDefault("all"),
-  projectId: parseAsUuid,
-  from: parseAsCalendarDate,
-  to: parseAsCalendarDate,
-};
-
-function ProjectName({ project }: { project: ActivityProject }) {
-  return project.canOpen ? (
-    <Link
-      href={projectBasePath(project.id)}
-      className="font-medium underline-offset-4 hover:underline"
-    >
-      {project.name}
-    </Link>
-  ) : (
-    <strong className="font-medium">{project.name}</strong>
-  );
-}
 
 function attendanceDetail(
   entry: Extract<LabourActivityEntry, { kind: "attendance" }>,
@@ -99,9 +65,10 @@ function attendanceDetail(
   return parts.length === 0 ? undefined : parts.join(" · ");
 }
 
-/** One Labour Activity entry in words. */
+/** One Labour Activity entry in words; times in the Company's time zone. */
 export function labourActivityItem(
   entry: LabourActivityEntry,
+  timeZone: string,
 ): ActivityFeedItem {
   const base = {
     id: entry.id,
@@ -128,29 +95,9 @@ export function labourActivityItem(
         title: "Marked inactive",
       };
     case "project_added":
-      return {
-        ...base,
-        icon: LogIn,
-        tone: "added",
-        title: (
-          <>
-            Added to <ProjectName project={entry.project} />
-          </>
-        ),
-        detail: entry.remark ?? undefined,
-      };
     case "project_removed":
-      return {
-        ...base,
-        icon: LogOut,
-        tone: "removed",
-        title: (
-          <>
-            Removed from <ProjectName project={entry.project} />
-          </>
-        ),
-        detail: entry.remark ?? undefined,
-      };
+    case "check_in":
+      return personActivityItem(entry, timeZone);
     case "transferred":
       return {
         ...base,
@@ -213,24 +160,21 @@ function LabourActivityList({
   now?: Date;
 }) {
   const query = useSuspenseInfiniteQuery(labourActivityQuery(labourId, filter));
-  const items = query.data.pages.flatMap((page) =>
-    page.items.map(labourActivityItem),
-  );
   return (
-    <ActivityFeed
-      items={items}
-      timeZone={query.data.pages[0]?.timeZone ?? "Asia/Kolkata"}
+    <ActivityPages
+      pages={query.data.pages}
+      item={labourActivityItem}
+      paging={feedPaging(query)}
       emptyMessage={LABOUR_ACTIVITY_EMPTY}
       now={now}
-      {...feedPaging(query)}
     />
   );
 }
 
 /**
  * The Labour page's Activity tab (ADR CM-0038 §5): Project moves,
- * attendance and profile entries, filtered by Type, Project and dates
- * kept in the address.
+ * attendance, check-in entries (ADR CM-0044) and profile entries,
+ * filtered by Type, Project and dates kept in the address.
  */
 export function LabourActivity({
   labourId,
@@ -240,61 +184,11 @@ export function LabourActivity({
   /** For stories: what "Today" is. */
   now?: Date;
 }) {
-  const [filters, setFilters] = useQueryStates(FILTERS);
-  const projects = useQuery(projectOptionsQuery);
-  const projectItems = [
-    { value: ALL_PROJECTS, label: "All Projects" },
-    ...(projects.data?.items ?? []).map((project) => ({
-      value: project.id,
-      label: project.name,
-    })),
-  ];
-  if (
-    filters.projectId != null &&
-    !projectItems.some((item) => item.value === filters.projectId)
-  )
-    projectItems.push({ value: filters.projectId, label: "This Project" });
-  const range = orderedRange(filters.from, filters.to);
-  const filter: LabourActivityFilter = {
-    type: filters.type,
-    projectId: filters.projectId,
-    from: range.from,
-    to: range.to,
-  };
-
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <ActivityFilterSelect
-          label="Type"
-          value={filters.type}
-          items={TYPE_ITEMS}
-          onChange={(type) => {
-            void setFilters({ type: type === "all" ? null : type });
-          }}
-        />
-        <ActivityFilterSelect
-          label="Project"
-          value={filters.projectId ?? ALL_PROJECTS}
-          items={projectItems}
-          onChange={(projectId) => {
-            void setFilters({
-              projectId: projectId === ALL_PROJECTS ? null : projectId,
-            });
-          }}
-        />
-        <ActivityDateRange
-          from={filters.from}
-          to={filters.to}
-          onChange={(next) => {
-            void setFilters(next);
-          }}
-        />
-      </div>
-      {/* A new filter starts with a fresh error state. */}
-      <ActivityFeedBoundary key={JSON.stringify(filter)}>
+    <PersonActivityTab types={LABOUR_ACTIVITY_TYPES} typeItems={TYPE_ITEMS}>
+      {(filter) => (
         <LabourActivityList labourId={labourId} filter={filter} now={now} />
-      </ActivityFeedBoundary>
-    </div>
+      )}
+    </PersonActivityTab>
   );
 }

@@ -3,8 +3,11 @@ import { Prisma, prisma, type PrismaClient } from "@repo/construction-db";
 import { pageAfter, type ActivityKey } from "@/src/shared-kernel/activity-key";
 import {
   attendanceAuditDay,
+  auditProjectChanges,
   readAuditEvents,
   readLabourImports,
+  VENDOR_PROJECT_ACTIONS,
+  vendorProjectIdsAfter,
   type AttendanceAuditDay,
 } from "@/src/shared-kernel/audit-reader";
 import {
@@ -15,8 +18,11 @@ import {
 
 import {
   LABOUR_ACTIVITY_RANK,
+  PROJECT_CHECK_IN_ACTIVITY_RANK,
   PROJECT_LABOUR_ACTIVITY_RANK,
+  type ActivityCheckInPerson,
   type ActivityLabour,
+  type CheckInActivityRow,
   type AttendanceLabel,
   type LabourActivitySource,
   type LabourActivityWindow,
@@ -24,10 +30,18 @@ import {
   type LabourAttendanceRow,
   type LabourMoveRow,
   type LabourProfileRow,
+  type PersonCheckInWindow,
   type ProjectActivityWindow,
+  type ProjectCheckInWindow,
   type ProjectLabourMoveKind,
   type ProjectLabourMoveRow,
+  type VendorProjectChange,
 } from "../application/labour-activity-ports";
+import {
+  ROLE_WORDS,
+  type CheckInAction,
+  type CheckInPersonKind,
+} from "../domain/check-in";
 import { PrismaDirectories } from "./prisma-directories";
 
 type Sql = Prisma.Sql;
@@ -104,10 +118,97 @@ type ProjectMoveSqlRow = {
   created_by: string;
 };
 
+type CheckInSqlRow = {
+  id: string;
+  eff: string;
+  recorded_at: Date;
+  rank: number;
+  project_id: string;
+  person_kind: CheckInPersonKind;
+  person_id: string;
+  action: CheckInAction;
+  has_photo: boolean;
+  latitude: number | null;
+  longitude: number | null;
+  accuracy_metres: number | null;
+  outside_fence: boolean | null;
+  metres_outside: number | null;
+  voided: boolean;
+  void_reason: string | null;
+  created_by: string;
+};
+
+function checkInRow(row: CheckInSqlRow): CheckInActivityRow {
+  return {
+    key: {
+      date: row.eff,
+      recordedAt: row.recorded_at,
+      rank: row.rank,
+      id: row.id,
+    },
+    kind: "check_in",
+    action: row.action,
+    projectId: row.project_id,
+    person: { kind: row.person_kind, id: row.person_id },
+    hasPhoto: row.has_photo,
+    location:
+      row.latitude == null || row.longitude == null
+        ? null
+        : {
+            latitude: row.latitude,
+            longitude: row.longitude,
+            accuracyMetres: row.accuracy_metres,
+          },
+    fence:
+      row.outside_fence == null
+        ? null
+        : row.outside_fence
+          ? "outside"
+          : "inside",
+    metresOutside: row.outside_fence == null ? null : (row.metres_outside ?? 0),
+    voided: row.voided ? { reason: row.void_reason ?? "" } : null,
+    by: row.created_by,
+  };
+}
+
+/**
+ * `check_in_events` in feed order (ADR CM-0044 §3): the attendance day,
+ * the instant, the kind's rank, the row id; voided entries included.
+ */
+function checkInSql(
+  rank: number,
+  where: Sql,
+  window: {
+    before: ActivityKey | null;
+    from: CalendarDate | null;
+    to: CalendarDate | null;
+    limit: number;
+  },
+): Sql {
+  return Prisma.sql`
+    SELECT e.id::text AS id, to_char(e.attendance_date, 'YYYY-MM-DD') AS eff,
+      e.occurred_at AS recorded_at, ${rank}::int AS rank,
+      e.project_id::text AS project_id, e.person_kind::text AS person_kind,
+      e.person_id::text AS person_id, e.action::text AS action,
+      e.photo_key IS NOT NULL AS has_photo,
+      e.latitude::float8 AS latitude, e.longitude::float8 AS longitude,
+      e.accuracy_metres::float8 AS accuracy_metres,
+      e.outside_fence, e.metres_outside,
+      e.voided_at IS NOT NULL AS voided, e.void_reason, e.created_by
+    FROM construction_labour.check_in_events e
+    WHERE ${where}
+      ${dateRange("e.attendance_date", window.from, window.to)}
+      ${afterCursor(window.before, { date: "e.attendance_date", recordedAt: "e.occurred_at", rank: String(rank), id: "e.id" })}
+    ORDER BY e.attendance_date DESC, e.occurred_at DESC, e.id DESC
+    LIMIT ${window.limit}
+  `;
+}
+
 /**
  * The labour context's reads for the Activity feeds (ADR CM-0038 §1):
- * `labour_transfers`, `labour_attendance`, and the labourer's and their
- * attendance rows' audit events through the shared-kernel reader.
+ * `labour_transfers`, `labour_attendance`, `check_in_events`, and the
+ * labourer's, their attendance rows' and a Vendor's audit events through
+ * the shared-kernel reader.
  */
 export class PrismaLabourActivity implements LabourActivitySource {
   private readonly directories: PrismaDirectories;
@@ -362,6 +463,119 @@ export class PrismaLabourActivity implements LabourActivitySource {
       window.before,
       window.limit,
     );
+  }
+
+  async checkIns(window: PersonCheckInWindow): Promise<CheckInActivityRow[]> {
+    const { visibleProjectIds: visible, projectId, person } = window;
+    if (visible?.length === 0) return [];
+    const rows = await this.db.$queryRaw<CheckInSqlRow[]>(
+      checkInSql(
+        LABOUR_ACTIVITY_RANK.check_in,
+        Prisma.sql`e.workspace_id = ${window.workspaceId}
+          AND e.person_kind = ${person.kind}::construction_labour.check_in_person_kind
+          AND e.person_id = ${person.id}::uuid
+          ${projectId == null ? Prisma.empty : Prisma.sql`AND e.project_id = ${projectId}::uuid`}
+          ${visible == null ? Prisma.empty : Prisma.sql`AND e.project_id = ANY(${visible}::uuid[])`}`,
+        window,
+      ),
+    );
+    return rows.map(checkInRow);
+  }
+
+  async vendor(workspaceId: string, vendorId: string) {
+    return this.db.constructionLabourVendor.findFirst({
+      where: { id: vendorId, workspaceId, deletedAt: null },
+      select: { id: true },
+    });
+  }
+
+  async vendorProjectChanges(
+    workspaceId: string,
+    vendorId: string,
+  ): Promise<VendorProjectChange[]> {
+    const events = await readAuditEvents(this.db, {
+      workspaceId,
+      entityType: "vendor",
+      entityIds: [vendorId],
+      actions: VENDOR_PROJECT_ACTIONS,
+    });
+    return auditProjectChanges(events, vendorProjectIdsAfter).map(
+      ({ projectId, change, event }) => ({
+        projectId,
+        change,
+        eventId: event.id,
+        occurredAt: event.occurredAt,
+        by: event.actorUserId,
+      }),
+    );
+  }
+
+  async projectCheckIns(
+    window: ProjectCheckInWindow,
+  ): Promise<CheckInActivityRow[]> {
+    if (window.kinds.length === 0) return [];
+    const kinds = [...window.kinds];
+    const rows = await this.db.$queryRaw<CheckInSqlRow[]>(
+      checkInSql(
+        PROJECT_CHECK_IN_ACTIVITY_RANK,
+        Prisma.sql`e.workspace_id = ${window.workspaceId}
+          AND e.project_id = ${window.projectId}::uuid
+          AND e.person_kind::text = ANY(${kinds}::text[])`,
+        window,
+      ),
+    );
+    return rows.map(checkInRow);
+  }
+
+  async checkInPeople(
+    workspaceId: string,
+    people: readonly { kind: CheckInPersonKind; id: string }[],
+  ): Promise<Map<string, ActivityCheckInPerson>> {
+    const ids = (kind: CheckInPersonKind) => [
+      ...new Set(
+        people
+          .filter((person) => person.kind === kind)
+          .map((person) => person.id),
+      ),
+    ];
+    const vendorIds = ids("vendor");
+    const engineerIds = ids("site_engineer");
+    const [labours, vendors, engineers] = await Promise.all([
+      this.labours(workspaceId, ids("labour")),
+      vendorIds.length === 0
+        ? []
+        : this.db.constructionLabourVendor.findMany({
+            where: { workspaceId, id: { in: vendorIds } },
+            select: { id: true, name: true, deletedAt: true },
+          }),
+      // Site Engineers are masters rows, read by id like the Check-In directory does.
+      engineerIds.length === 0
+        ? []
+        : this.db.constructionMastersSupervisor.findMany({
+            where: { workspaceId, id: { in: engineerIds } },
+            select: { id: true, name: true, deletedAt: true },
+          }),
+    ]);
+    const found = new Map<string, ActivityCheckInPerson>();
+    for (const labour of labours.values())
+      found.set(`labour:${labour.id}`, {
+        name: labour.name,
+        role: labour.labourCategory,
+        deleted: labour.deleted,
+      });
+    for (const vendor of vendors)
+      found.set(`vendor:${vendor.id}`, {
+        name: vendor.name,
+        role: ROLE_WORDS.vendor,
+        deleted: vendor.deletedAt != null,
+      });
+    for (const engineer of engineers)
+      found.set(`site_engineer:${engineer.id}`, {
+        name: engineer.name,
+        role: ROLE_WORDS.site_engineer,
+        deleted: engineer.deletedAt != null,
+      });
+    return found;
   }
 
   async projectMoves(

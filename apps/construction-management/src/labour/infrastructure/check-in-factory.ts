@@ -12,6 +12,9 @@ import {
   PrismaSiteEngineerDirectory,
   PrismaSiteFenceDirectory,
 } from "./prisma-check-in-store";
+import { companyToday } from "@/src/shared-kernel/company-today";
+
+import { PrismaLabourAttendanceBackdatedGuard } from "./labour-attendance-store";
 import { PrismaDirectories } from "./prisma-directories";
 
 /** Check-In handlers over Prisma and the Company's object storage (ADR CM-0043). */
@@ -29,6 +32,9 @@ export function createCheckInHandlers(deps?: {
     new PrismaSiteEngineerDirectory(db),
     new PrismaSiteFenceDirectory(db),
     deps?.storage ?? objectStorage(),
+    new PrismaLabourAttendanceBackdatedGuard(db, (workspaceId) =>
+      companyToday(db, workspaceId),
+    ),
     deps?.clock,
   );
 }

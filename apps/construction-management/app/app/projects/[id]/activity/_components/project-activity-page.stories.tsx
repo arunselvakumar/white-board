@@ -5,6 +5,7 @@ import { StoryQueryClient } from "@/app/app/_components/masters/masters-story-su
 
 import { mockFetch, type MockRoute } from "@/.storybook/mock-fetch";
 import {
+  CHECK_IN_ENTRIES,
   PROJECT_ENTRIES,
   PROJECT_ID,
   STORY_NOW,
@@ -144,6 +145,107 @@ export const FilterByWho: Story = {
     );
     await waitFor(async () => {
       await expect(activityCalls().at(-1)).toContain("who=site_engineers");
+    });
+  },
+};
+
+export const CheckIns: Story = {
+  beforeEach: serve(() =>
+    Response.json(
+      projectActivityPage([...CHECK_IN_ENTRIES, ...PROJECT_ENTRIES]),
+    ),
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    const today = within(await canvas.findByRole("region", { name: "Today" }));
+    const rows = today.getAllByRole("listitem");
+    const [out, vendor, engineer, murugan] = rows;
+    if (out == null || vendor == null || engineer == null || murugan == null)
+      throw new Error("four check-in entries today");
+
+    // One entry each, never grouped; the name opens their page.
+    const first = within(murugan);
+    await expect(
+      first.getByRole("link", { name: "Murugan Ganesan" }).closest("p"),
+    ).toHaveTextContent("Murugan Ganesan checked in · 10:02 am · Mason");
+    await expect(
+      first.getByRole("link", { name: "Murugan Ganesan" }),
+    ).toHaveAttribute(
+      "href",
+      "/app/staff/labours/0199a1b2-0000-7000-8000-0000000c0001",
+    );
+    await expect(first.getByText(/Inside the site fence/)).toBeVisible();
+    await expect(
+      first.getByRole("link", { name: "Open in Maps" }),
+    ).toHaveAttribute("href", "https://www.google.com/maps?q=13.0827,80.2707");
+    await expect(first.getByText(/^by Karthik Raja ·/)).toHaveTextContent(
+      "by Karthik Raja · 11 Nov 2026, 10:02 am",
+    );
+
+    await expect(
+      within(engineer).getByRole("link", { name: "Sundar" }),
+    ).toHaveAttribute(
+      "href",
+      "/app/staff/site-engineers/0199a1b2-0000-7000-8000-0000000c0002",
+    );
+    await expect(
+      within(engineer).getByText(/1,240 m outside the site fence/),
+    ).toBeVisible();
+
+    // Not the viewer's to open: named without a link; a void stays.
+    await expect(
+      within(vendor).queryByRole("link", { name: "Selvam Gang" }),
+    ).toBeNull();
+    await expect(
+      within(vendor).getByText("Selvam Gang").closest("p"),
+    ).toHaveClass("line-through");
+    await expect(within(vendor).getByText("Voided: Wrong gang")).toBeVisible();
+
+    await expect(
+      within(out).getByRole("img", { name: "Photo removed" }),
+    ).toBeVisible();
+    await expect(within(out).getByText("No location")).toBeVisible();
+    await expect(
+      within(out).queryByRole("link", { name: "Open in Maps" }),
+    ).toBeNull();
+
+    await userEvent.click(
+      within(engineer).getByRole("button", {
+        name: "Open the photo: Sundar checked in · 10:10 am",
+      }),
+    );
+    const dialog = within(await body.findByRole("dialog"));
+    await expect(
+      dialog.getByText("1,240 m outside the site fence · by Karthik Raja"),
+    ).toBeVisible();
+    await expect(
+      dialog.getByRole("heading", {
+        name: "Sundar checked in · 10:10 am",
+      }),
+    ).toBeVisible();
+  },
+};
+
+export const FilterByTypeAndVendors: Story = {
+  parameters: { searchParams: "?type=team" },
+  beforeEach: serve(() => Response.json(projectActivityPage(PROJECT_ENTRIES))),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await canvas.findByRole("region", { name: "Today" });
+    // The Type kept in the address is what the first read asks for.
+    await expect(activityCalls()[0]).toContain("type=team");
+    await userEvent.click(canvas.getByRole("combobox", { name: "Type" }));
+    await expect(
+      (await body.findAllByRole("option")).map((option) => option.textContent),
+    ).toEqual(["All", "Team changes", "Check-In"]);
+    await userEvent.click(body.getByRole("option", { name: "Check-In" }));
+    await waitFor(async () => {
+      await expect(activityCalls().at(-1)).toContain("type=check_ins");
+    });
+    await userEvent.click(canvas.getByRole("combobox", { name: "Who" }));
+    await userEvent.click(await body.findByRole("option", { name: "Vendors" }));
+    await waitFor(async () => {
+      await expect(activityCalls().at(-1)).toContain("who=vendors");
     });
   },
 };

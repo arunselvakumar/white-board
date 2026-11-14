@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  activityPartId,
   compareActivityKeys,
   decodeActivityCursor,
   encodeActivityCursor,
@@ -10,6 +11,7 @@ import {
   type ActivityKey,
 } from "./activity-key";
 import { DomainError } from "./domain-error";
+import { isUuid } from "./ids";
 
 const ID = (n: number) =>
   `0199c4a0-0000-7000-8000-${String(n).padStart(12, "0")}`;
@@ -67,6 +69,15 @@ describe("activity cursor", () => {
       Buffer.from('["2026-02-30",1,1,"x"]').toString("base64url"),
     ])
       expect(() => decodeActivityCursor(raw)).toThrow(DomainError);
+  });
+
+  it("takes a part id, which is a uuid, the same on every read, and differs by part", () => {
+    const first = activityPartId(ID(1), ID(2));
+    expect(isUuid(first)).toBe(true);
+    expect(activityPartId(ID(1), ID(2))).toBe(first);
+    expect(activityPartId(ID(1), ID(3))).not.toBe(first);
+    const cursor = key("2026-11-01", 5, 2, first).key;
+    expect(decodeActivityCursor(encodeActivityCursor(cursor))).toEqual(cursor);
   });
 });
 

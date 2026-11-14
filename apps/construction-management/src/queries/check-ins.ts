@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-query";
 
 import {
+  CHECK_IN_NAME_SEARCH_MAX,
   CHECK_INS_PATH,
   type ConstructionLabourCheckInEntryResponseModel,
   type ConstructionLabourCheckInPersonResponseModel,
@@ -21,7 +22,7 @@ import {
 import { apiJson, QueryHttpError } from "./http";
 import { LABOUR_ATTENDANCE_KEY } from "./labour-attendance";
 
-export { CHECK_INS_PATH };
+export { CHECK_IN_NAME_SEARCH_MAX, CHECK_INS_PATH };
 
 export type CheckInPeople = ListConstructionLabourCheckInPeopleResponseModel;
 export type CheckInPerson = ConstructionLabourCheckInPersonResponseModel;

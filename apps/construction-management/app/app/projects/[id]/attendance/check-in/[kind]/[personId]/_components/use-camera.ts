@@ -143,6 +143,29 @@ export function useCamera(): Camera {
     if (video != null) video.srcObject = null;
   }, []);
 
+  /**
+   * Stops the camera and disowns whatever is still on its way: a
+   * `getUserMedia` answer or a list of cameras that arrives later finds a
+   * newer generation and opens nothing. Every way out of a live camera
+   * goes through here.
+   */
+  const cancelPending = useCallback(() => {
+    generation.current += 1;
+    release();
+    setCanSwitch(false);
+  }, [release]);
+
+  /**
+   * The page or tab went away with the camera on: release it, and
+   * remember to start it again when it is back.
+   */
+  const pause = useCallback(() => {
+    if (stream.current == null) return;
+    resume.current = true;
+    cancelPending();
+    setStatus("idle");
+  }, [cancelPending]);
+
   const open = useCallback(
     async (video: MediaTrackConstraints, want: Facing) => {
       generation.current += 1;
@@ -151,6 +174,7 @@ export function useCamera(): Camera {
       setStatus("starting");
       const media = mediaDevices();
       if (media == null) {
+        setCanSwitch(false);
         setStatus("unavailable");
         return;
       }
@@ -164,7 +188,10 @@ export function useCamera(): Camera {
             return media.getUserMedia({ video: true, audio: false });
           });
       } catch (error) {
-        if (run === generation.current) setStatus(cameraFailureOf(error));
+        if (run === generation.current) {
+          setCanSwitch(false);
+          setStatus(cameraFailureOf(error));
+        }
         return;
       }
       if (run !== generation.current) {
@@ -189,7 +216,7 @@ export function useCamera(): Camera {
       setFacing(actual);
       track?.addEventListener("ended", () => {
         if (stream.current !== next) return;
-        release();
+        cancelPending();
         setStatus("error");
       });
       const element = videoRef.current;
@@ -204,7 +231,7 @@ export function useCamera(): Camera {
       const inputs = await videoInputs(media);
       if (run === generation.current) setCanSwitch(inputs.length > 1);
     },
-    [release],
+    [release, cancelPending],
   );
 
   const start = useCallback(() => {
@@ -215,11 +242,10 @@ export function useCamera(): Camera {
   }, [open]);
 
   const stop = useCallback(() => {
-    generation.current += 1;
     resume.current = false;
-    release();
+    cancelPending();
     setStatus("idle");
-  }, [release]);
+  }, [cancelPending]);
 
   const switchCamera = useCallback(() => {
     const media = mediaDevices();
@@ -289,41 +315,40 @@ export function useCamera(): Camera {
 
   // The tab hidden: release the camera; back: start it again if it was on.
   useEffect(() => {
-    const onVisibility = () => {
-      if (document.visibilityState === "hidden") {
-        if (stream.current == null) return;
-        resume.current = true;
-        generation.current += 1;
-        release();
-        setStatus("idle");
-      } else if (resume.current) {
-        resume.current = false;
-        start();
-      }
+    const back = () => {
+      if (!resume.current) return;
+      resume.current = false;
+      start();
     };
-    const onPageHide = () => {
-      generation.current += 1;
-      release();
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") pause();
+      else back();
+    };
+    // A page kept in the back/forward cache comes back as it was left: with
+    // the camera released, so it must not still say it is live.
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) back();
     };
     document.addEventListener("visibilitychange", onVisibility);
-    window.addEventListener("pagehide", onPageHide);
+    window.addEventListener("pagehide", pause);
+    window.addEventListener("pageshow", onPageShow);
     return () => {
       document.removeEventListener("visibilitychange", onVisibility);
-      window.removeEventListener("pagehide", onPageHide);
+      window.removeEventListener("pagehide", pause);
+      window.removeEventListener("pageshow", onPageShow);
     };
-  }, [release, start]);
+  }, [pause, start]);
 
   // Leaving the screen stops every track and frees the photos taken.
   useEffect(() => {
     const taken = previews.current;
     return () => {
-      generation.current += 1;
-      release();
+      cancelPending();
       taken.forEach((url) => {
         URL.revokeObjectURL(url);
       });
     };
-  }, [release]);
+  }, [cancelPending]);
 
   return {
     videoRef,

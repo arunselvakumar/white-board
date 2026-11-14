@@ -21,6 +21,7 @@ import {
 } from "./resource-fixtures";
 import {
   ANAND,
+  ARUMUGAM,
   FEW_LABOURS,
   LABOURS_API,
   labourPage,
@@ -332,6 +333,130 @@ export const SiteEngineersAndLaboursFirst: Story = {
     ]);
     await expect(
       region(canvas, "Site Engineers 1").getByText(ANAND.name),
+    ).toBeVisible();
+  },
+};
+
+const ALL_SECTIONS_OPEN = {
+  teamMembers: true,
+  contractors: true,
+  suppliers: true,
+  vendors: true,
+};
+
+/** Each row of a list, with the links inside it. */
+function rowLinks(list: HTMLElement): HTMLAnchorElement[][] {
+  return within(list)
+    .getAllByRole("listitem")
+    .map((row) => [...row.querySelectorAll("a")]);
+}
+
+export const RowsOpenEachPage: Story = {
+  args: { canReadLabours: true, canOpenSections: ALL_SECTIONS_OPEN },
+  beforeEach: () => {
+    api = mockFetch([
+      laboursRoute(FEW_LABOURS),
+      {
+        path: RESOURCES_API,
+        respond: () =>
+          Response.json({
+            ...RESOURCES,
+            siteEngineers: [ANAND],
+            labours: { total: FEW_LABOURS.length },
+          }),
+      },
+      {
+        path: `/api/construction/projects/projects/${PROJECT_ID}`,
+        respond: () => Response.json({ id: PROJECT_ID, name: "Sky Towers" }),
+      },
+    ]);
+    return api.restore;
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await canvas.findByRole("region", { name: "Labours 3" });
+    const expected: [string, string, string][] = [
+      ["Site Engineers 1", ANAND.name, `/app/staff/site-engineers/${ANAND.id}`],
+      ["Labours 3", ARUMUGAM.name, `/app/staff/labours/${ARUMUGAM.id}`],
+      ["Team Members 2", PRABHU.name, `/app/staff/office-staff/${PRABHU.id}`],
+      ["Contractors 2", BALAJI.name, `/app/masters/contractors/${BALAJI.id}`],
+      ["Suppliers 1", KAVERI.name, `/app/masters/suppliers/${KAVERI.id}`],
+      ["Vendors 1", MUTHU.name, `/app/staff/vendors/${MUTHU.id}`],
+    ];
+    for (const [section, name, href] of expected) {
+      const link = region(canvas, section).getByRole("link", { name });
+      await expect(link).toHaveAttribute("href", href);
+    }
+    // One link per row, named by the person alone; the Owner has no page.
+    for (const list of canvas.getAllByRole("list")) {
+      for (const links of rowLinks(list))
+        await expect(links.length).toBeLessThanOrEqual(1);
+    }
+    const team = region(canvas, "Team Members 2");
+    await expect(team.queryByRole("link", { name: OWNER.name })).toBeNull();
+    await expect(team.getByText(OWNER.name)).toBeVisible();
+    const inactive = region(canvas, "Contractors 2").getByRole("link", {
+      name: RAMCO.name,
+    });
+    await expect(inactive).toHaveAttribute(
+      "href",
+      `/app/masters/contractors/${RAMCO.id}`,
+    );
+
+    // A row's own controls stay outside the link and still work.
+    const labours = region(canvas, "Labours 3");
+    const actions = labours.getByRole("button", {
+      name: `Actions for ${ARUMUGAM.name}`,
+    });
+    const labourLink = labours.getByRole("link", { name: ARUMUGAM.name });
+    await expect(labourLink.contains(actions)).toBe(false);
+    await userEvent.click(actions);
+    await expect(
+      await body.findByRole("menuitem", { name: "Remove from Project" }),
+    ).toBeVisible();
+    await userEvent.keyboard("{Escape}");
+    const remove = region(canvas, "Site Engineers 1").getByRole("button", {
+      name: `Remove ${ANAND.name}`,
+    });
+    await userEvent.click(remove);
+    await expect(
+      await body.findByRole("alertdialog", {
+        name: `Remove ${ANAND.name} from this Project?`,
+      }),
+    ).toBeVisible();
+  },
+};
+
+export const RowsPlainWithoutAccess: Story = {
+  args: { canEdit: false },
+  beforeEach: () => {
+    api = mockFetch([
+      laboursRoute(FEW_LABOURS),
+      {
+        path: RESOURCES_API,
+        respond: () =>
+          Response.json({
+            ...RESOURCES,
+            siteEngineers: [ANAND],
+            labours: { total: FEW_LABOURS.length },
+          }),
+      },
+    ]);
+    return api.restore;
+  },
+  play: async ({ canvas }) => {
+    await canvas.findByRole("region", { name: "Labours 3" });
+    for (const section of [
+      "Site Engineers 1",
+      "Labours 3",
+      "Team Members 2",
+      "Contractors 2",
+      "Suppliers 1",
+      "Vendors 1",
+    ])
+      await expect(region(canvas, section).queryAllByRole("link")).toEqual([]);
+    await expect(
+      region(canvas, "Vendors 1").getByText(MUTHU.name),
     ).toBeVisible();
   },
 };

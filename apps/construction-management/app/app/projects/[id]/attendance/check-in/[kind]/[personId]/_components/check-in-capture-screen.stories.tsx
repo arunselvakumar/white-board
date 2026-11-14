@@ -82,7 +82,7 @@ function serve(
     post?: (call: ApiCall) => Response;
     geolocation?: Parameters<typeof mockGeolocation>[0];
     /** What the browser says about the location before anyone is asked. */
-    permission?: PermissionState;
+    permission?: PermissionState | "unknown";
   } = {},
 ) {
   return () => {
@@ -286,6 +286,22 @@ export const LocationNotAskedYet: Story = {
     const body = await opened(context, "Dhuresh Nawin");
     await expect(body.getByText("The location is not on yet.")).toBeVisible();
     await expect(body.getByRole("button", { name: "Check In" })).toBeEnabled();
+    await context.userEvent.click(
+      body.getByRole("button", { name: "Use location" }),
+    );
+    await expect(await body.findByText(/^Location found/)).toBeVisible();
+  },
+};
+
+/**
+ * A browser that cannot say whether the location is allowed is treated as
+ * one that would have to ask: nothing is asked on arrival.
+ */
+export const LocationPermissionUnknown: Story = {
+  beforeEach: serve([personView(DHURESH)], { permission: "unknown" }),
+  play: async (context) => {
+    const body = await opened(context, "Dhuresh Nawin");
+    await expect(body.getByText("The location is not on yet.")).toBeVisible();
     await context.userEvent.click(
       body.getByRole("button", { name: "Use location" }),
     );

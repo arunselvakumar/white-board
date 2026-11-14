@@ -1,6 +1,7 @@
 import { createLoader, createParser, parseAsStringLiteral } from "nuqs/server";
 
 import {
+  PROJECT_ACTIVITY_TYPES,
   PROJECT_ACTIVITY_WHO,
   type ProjectActivityFilter,
 } from "@/src/queries/activity";
@@ -37,8 +38,9 @@ export function orderedRange(
     : { from, to };
 }
 
-/** Project Activity: Who, From and To. */
+/** Project Activity: Type, Who, From and To. */
 export const PROJECT_ACTIVITY_SEARCH = {
+  type: parseAsStringLiteral(PROJECT_ACTIVITY_TYPES).withDefault("all"),
   who: parseAsStringLiteral(PROJECT_ACTIVITY_WHO).withDefault("all"),
   from: parseAsCalendarDate,
   to: parseAsCalendarDate,
@@ -48,9 +50,14 @@ export const loadProjectActivitySearch = createLoader(PROJECT_ACTIVITY_SEARCH);
 
 /** The Project feed's filter from what the address holds. */
 export function projectActivityFilter(search: {
+  type: ProjectActivityFilter["type"];
   who: ProjectActivityFilter["who"];
   from: string | null;
   to: string | null;
 }): ProjectActivityFilter {
-  return { who: search.who, ...orderedRange(search.from, search.to) };
+  return {
+    type: search.type,
+    who: search.who,
+    ...orderedRange(search.from, search.to),
+  };
 }

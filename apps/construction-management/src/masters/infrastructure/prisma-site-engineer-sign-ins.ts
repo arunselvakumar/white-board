@@ -35,3 +35,18 @@ export async function siteEngineerSignInLinks(
         ],
   );
 }
+
+/**
+ * A live Site Engineer and the sign-in their row points at (null without
+ * one), or null when there is no such Site Engineer in the Company.
+ */
+export async function siteEngineerSignIn(
+  workspaceId: string,
+  id: string,
+  db: Pick<PrismaClient, "constructionMastersSupervisor"> = prisma,
+): Promise<{ id: string; teamMemberId: string | null } | null> {
+  return db.constructionMastersSupervisor.findFirst({
+    where: { id, workspaceId, deletedAt: null },
+    select: { id: true, teamMemberId: true },
+  });
+}

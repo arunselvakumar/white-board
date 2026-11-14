@@ -124,7 +124,9 @@ export const Loaded: Story = {
       canvas.getByRole("heading", { name: "Saturday, 14 Nov 2026" }),
     ).toBeVisible();
     const outside = row(canvas, "Kavitha Murugan, Check In 9:00 am");
-    await expect(outside.getByText("240 m outside")).toBeVisible();
+    await expect(
+      outside.getByText("240 m outside the site fence"),
+    ).toBeVisible();
     const maps = outside.getByRole("link", { name: "Open in Maps" });
     await expect(maps).toHaveAttribute(
       "href",
@@ -292,10 +294,36 @@ export const VoidDialogValidatesReason: Story = {
 
 /** Without Attendance Delete there is no Void. */
 export const NoVoid: Story = {
-  beforeEach: serve(() => logPage(TODAY_ENTRIES, { canVoid: false })),
+  beforeEach: serve(() =>
+    logPage(TODAY_ENTRIES, { canVoid: false, canVoidLabour: false }),
+  ),
   play: async ({ canvas }) => {
     await canvas.findByRole("list", { name: "Check-In log" });
     await expect(canvas.queryByRole("button", { name: /^Void/ })).toBeNull();
+  },
+};
+
+/**
+ * Delete without Update: a Labour's entry cannot be voided, because that
+ * changes their attendance day; a Vendor's and a Site Engineer's can.
+ */
+export const VoidOnlyLogEntries: Story = {
+  beforeEach: serve(() =>
+    logPage(TODAY_ENTRIES, { canVoid: true, canVoidLabour: false }),
+  ),
+  play: async ({ canvas }) => {
+    const log = within(
+      await canvas.findByRole("list", { name: "Check-In log" }),
+    );
+    const buttons = log
+      .getAllByRole("button", { name: /^Void/ })
+      .map((button) => button.getAttribute("aria-label") ?? "");
+    await expect(buttons.length).toBeGreaterThan(0);
+    for (const entry of TODAY_ENTRIES) {
+      const offered = buttons.some((label) => label.includes(entry.personName));
+      if (entry.voided != null) continue;
+      await expect(offered).toBe(entry.kind !== "labour");
+    }
   },
 };
 

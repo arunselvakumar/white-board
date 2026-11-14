@@ -130,3 +130,76 @@ export function additions(count: number, offset = 0): ProjectActivityEntry[] {
     };
   });
 }
+
+const MURUGAN = {
+  kind: "labour" as const,
+  id: "0199a1b2-0000-7000-8000-0000000c0001",
+  name: "Murugan Ganesan",
+  role: "Mason",
+  canOpen: true,
+};
+
+const SUNDAR = {
+  kind: "site_engineer" as const,
+  id: "0199a1b2-0000-7000-8000-0000000c0002",
+  name: "Sundar",
+  role: "Site Engineer",
+  canOpen: true,
+};
+
+const SELVAM = {
+  kind: "vendor" as const,
+  id: "0199a1b2-0000-7000-8000-0000000c0003",
+  name: "Selvam Gang",
+  role: "Vendor",
+  canOpen: false,
+};
+
+function checkIn(
+  n: number,
+  person: Extract<ProjectActivityEntry, { kind: "check_in" }>["person"],
+  action: "check_in" | "check_out",
+  time: string,
+  extra: Partial<Extract<ProjectActivityEntry, { kind: "check_in" }>> = {},
+): ProjectActivityEntry {
+  const entryId = `0199a1b2-0000-7000-8000-0000000d${String(n).padStart(4, "0")}`;
+  return {
+    id: `check_in:${entryId}`,
+    kind: "check_in",
+    date: "2026-11-11",
+    recordedAt: at("2026-11-11", time),
+    by: "Karthik Raja",
+    person,
+    action,
+    at: at("2026-11-11", time),
+    entryId,
+    hasPhoto: true,
+    location: { latitude: 13.0827, longitude: 80.2707, accuracyMetres: 10 },
+    fence: "inside",
+    metresOutside: 0,
+    voided: null,
+    ...extra,
+  };
+}
+
+/**
+ * Today's check-in entries at the Project: a Labour in and out, a Site
+ * Engineer in outside the fence, a Vendor the viewer may not open, voided,
+ * and one with no location whose photo was removed.
+ */
+export const CHECK_IN_ENTRIES: ProjectActivityEntry[] = [
+  checkIn(5, MURUGAN, "check_out", "11:40", {
+    hasPhoto: false,
+    location: null,
+    fence: null,
+    metresOutside: null,
+  }),
+  checkIn(4, SELVAM, "check_in", "10:30", {
+    voided: { reason: "Wrong gang" },
+  }),
+  checkIn(3, SUNDAR, "check_in", "10:10", {
+    fence: "outside",
+    metresOutside: 1240,
+  }),
+  checkIn(2, MURUGAN, "check_in", "10:02"),
+];

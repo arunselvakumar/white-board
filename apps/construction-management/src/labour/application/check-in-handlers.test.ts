@@ -131,6 +131,7 @@ function setup() {
     },
     { ofProject: () => Promise.resolve(null) },
     storage,
+    { assert: () => Promise.resolve() },
     () => new Date("2026-11-14T04:30:00Z"),
   );
   return { handlers, put, deleted };

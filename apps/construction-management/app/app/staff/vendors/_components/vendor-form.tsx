@@ -283,7 +283,7 @@ function VendorForm({
   );
 }
 
-function FormPage({
+export function FormPage({
   title,
   watermark,
   children,
@@ -319,19 +319,26 @@ export function NewVendorScreen() {
   );
 }
 
+/** Edit Vendor's form: the Vendor page's Details tab. */
+export function EditVendorDetails({ vendor }: { vendor: VendorResponse }) {
+  const update = useUpdateVendor(vendor.id);
+  return (
+    <VendorForm
+      key={vendor.updatedAt}
+      vendor={vendor}
+      saving={update.isPending}
+      onSave={(payload) =>
+        update.mutateAsync({ ...payload, expectedUpdatedAt: vendor.updatedAt })
+      }
+    />
+  );
+}
+
 export function EditVendorScreen({ id }: { id: string }) {
   const { data } = useSuspenseQuery(vendorQuery(id));
-  const update = useUpdateVendor(id);
   return (
     <FormPage title={`Edit ${data.name}`} watermark="Vendors">
-      <VendorForm
-        key={data.updatedAt}
-        vendor={data}
-        saving={update.isPending}
-        onSave={(payload) =>
-          update.mutateAsync({ ...payload, expectedUpdatedAt: data.updatedAt })
-        }
-      />
+      <EditVendorDetails vendor={data} />
     </FormPage>
   );
 }

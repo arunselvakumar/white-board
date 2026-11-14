@@ -1,24 +1,11 @@
 "use client";
 
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
-import {
-  ChevronLeft,
-  ChevronRight,
-  ExternalLink,
-  ListX,
-  Search,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, ListX, Search } from "lucide-react";
 import { parseAsString, parseAsStringLiteral, useQueryStates } from "nuqs";
 import { Suspense, useDeferredValue, useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@repo/ui/components/dialog";
 import {
   Empty,
   EmptyDescription,
@@ -37,10 +24,16 @@ import { Label } from "@repo/ui/components/label";
 import { cn } from "@repo/ui/lib/utils";
 
 import { parseAsCalendarDate } from "@/app/app/_components/activity/activity-search-params";
+import {
+  CheckInPhotoButton,
+  CheckInPhotoDialog,
+  checkInLocation,
+  OpenInMaps,
+} from "@/app/app/_components/check-in/check-in-entry-parts";
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import {
+  CHECK_IN_NAME_SEARCH_MAX,
   checkInLogQuery,
-  checkInPhotoUrl,
   type CheckInEntry,
   type CheckInLogFilter,
 } from "@/src/queries/check-ins";
@@ -51,9 +44,7 @@ import {
   formatCalendarDate,
   formatTime,
   kindFromSegment,
-  mapsUrl,
 } from "@/app/app/projects/[id]/attendance/check-in/_components/check-in-format";
-import { CheckInPhoto } from "@/app/app/projects/[id]/attendance/check-in/_components/check-in-photo";
 
 import { CheckInLogSkeleton } from "./check-in-log-skeletons";
 import { VoidEntryDialog } from "./void-entry-dialog";
@@ -91,15 +82,6 @@ function deviceToday(): string {
 function shiftDate(date: string, days: number): string {
   const time = Date.parse(`${date}T00:00:00Z`) + days * 86_400_000;
   return new Date(time).toISOString().slice(0, 10);
-}
-
-/** "Inside the site fence", "240 m outside", "Location saved" or "No location". */
-export function logLocation(entry: CheckInEntry): string {
-  if (entry.location == null) return "No location";
-  if (entry.fence === "inside") return "Inside the site fence";
-  if (entry.fence === "outside")
-    return `${(entry.metresOutside ?? 0).toLocaleString("en-IN")} m outside`;
-  return "Location saved";
 }
 
 function entryName(entry: CheckInEntry, timeZone: string): string {
@@ -142,22 +124,12 @@ function EntryRow({
       aria-label={name}
       className="bg-card flex items-start gap-3 rounded-xl border p-3 sm:items-center"
     >
-      {entry.hasPhoto ? (
-        <Button
-          type="button"
-          variant="ghost"
-          aria-label={`Open the photo: ${name}`}
-          className="size-16 shrink-0 overflow-hidden rounded-lg p-0"
-          onClick={onOpenPhoto}
-        >
-          <CheckInPhoto
-            src={checkInPhotoUrl(entry.id)}
-            className="size-full rounded-none"
-          />
-        </Button>
-      ) : (
-        <CheckInPhoto src={null} showLabel className="size-16" />
-      )}
+      <CheckInPhotoButton
+        entryId={entry.id}
+        hasPhoto={entry.hasPhoto}
+        label={name}
+        onOpen={onOpenPhoto}
+      />
       <div className="min-w-0 flex-1 space-y-1">
         <p
           className={cn(
@@ -184,17 +156,11 @@ function EntryRow({
           <span className="font-medium tabular-nums">
             {formatTime(entry.at, timeZone)}
           </span>
-          <span className="text-muted-foreground">{logLocation(entry)}</span>
+          <span className="text-muted-foreground">
+            {checkInLocation(entry)}
+          </span>
           {entry.location == null ? null : (
-            <a
-              href={mapsUrl(entry.location)}
-              target="_blank"
-              rel="noreferrer"
-              className="text-primary inline-flex items-center gap-1 font-medium underline-offset-4 hover:underline"
-            >
-              Open in Maps
-              <ExternalLink aria-hidden="true" className="size-3.5" />
-            </a>
+            <OpenInMaps location={entry.location} />
           )}
         </p>
         <p className="text-muted-foreground text-xs">
@@ -218,44 +184,6 @@ function EntryRow({
         </Button>
       ) : null}
     </li>
-  );
-}
-
-function PhotoDialog({
-  entry,
-  timeZone,
-  onClose,
-}: {
-  entry: CheckInEntry | null;
-  timeZone: string;
-  onClose: () => void;
-}) {
-  return (
-    <Dialog
-      open={entry != null}
-      onOpenChange={(open) => {
-        if (!open) onClose();
-      }}
-    >
-      <DialogContent className="grid-cols-1 sm:max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>
-            {entry == null ? "Photo" : entryName(entry, timeZone)}
-          </DialogTitle>
-          <DialogDescription>
-            {entry == null
-              ? null
-              : `${logLocation(entry)} · Recorded by ${entry.recordedBy.name}`}
-          </DialogDescription>
-        </DialogHeader>
-        {entry == null ? null : (
-          <CheckInPhoto
-            src={checkInPhotoUrl(entry.id)}
-            className="aspect-[4/3] max-h-[70vh] w-full rounded-xl"
-          />
-        )}
-      </DialogContent>
-    </Dialog>
   );
 }
 
@@ -331,7 +259,7 @@ function Filters({
             aria-label="Search by name"
             placeholder="Search by name"
             autoComplete="off"
-            maxLength={NAME_SEARCH_MAX}
+            maxLength={CHECK_IN_NAME_SEARCH_MAX}
             className="h-full text-base [&::-webkit-search-cancel-button]:appearance-none"
             value={search.q}
             onChange={(event) => {
@@ -344,15 +272,12 @@ function Filters({
   );
 }
 
-/** The log's name search takes at most this many characters. */
-const NAME_SEARCH_MAX = 100;
-
 function filterOf(projectId: string, search: Search): CheckInLogFilter {
   return {
     projectId,
     date: search.date,
     kind: search.kind === "all" ? null : kindFromSegment(search.kind),
-    q: search.q.slice(0, NAME_SEARCH_MAX),
+    q: search.q.slice(0, CHECK_IN_NAME_SEARCH_MAX),
   };
 }
 
@@ -375,6 +300,7 @@ function LogBody({
   const items = data.pages.flatMap((page) => page.items);
   const timeZone = first?.timeZone ?? "Asia/Kolkata";
   const canVoid = first?.canVoid ?? false;
+  const canVoidLabour = first?.canVoidLabour ?? false;
   const today = first?.today ?? deviceToday();
   const total = first?.total ?? 0;
   const [photo, setPhoto] = useState<CheckInEntry | null>(null);
@@ -436,7 +362,7 @@ function LogBody({
                 key={entry.id}
                 entry={entry}
                 timeZone={timeZone}
-                canVoid={canVoid}
+                canVoid={entry.kind === "labour" ? canVoidLabour : canVoid}
                 onOpenPhoto={() => {
                   setPhoto(entry);
                 }}
@@ -464,9 +390,14 @@ function LogBody({
           </div>
         ) : null}
       </div>
-      <PhotoDialog
-        entry={photo}
-        timeZone={timeZone}
+      <CheckInPhotoDialog
+        entryId={photo?.id ?? null}
+        title={photo == null ? null : entryName(photo, timeZone)}
+        description={
+          photo == null
+            ? null
+            : `${checkInLocation(photo)} · Recorded by ${photo.recordedBy.name}`
+        }
         onClose={() => {
           setPhoto(null);
         }}

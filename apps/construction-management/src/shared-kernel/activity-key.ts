@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 import { isCalendarDate, type CalendarDate } from "./calendar-date";
 import { DomainError } from "./domain-error";
 import { isUuid } from "./ids";
@@ -36,6 +38,21 @@ export function isAfterCursor(
   cursor: ActivityKey | null,
 ): boolean {
   return cursor == null || compareActivityKeys(key, cursor) > 0;
+}
+
+/**
+ * The key id of an entry that is one part of a source row, such as one of
+ * the Projects an audit event added: a uuid (version 8, RFC 9562) hashed
+ * from the row's id and the part, so it is the same on every read and two
+ * parts of one row never tie.
+ */
+export function activityPartId(sourceId: string, part: string): string {
+  const hex = createHash("sha256")
+    .update(`${sourceId}:${part}`)
+    .digest("hex")
+    .slice(0, 32);
+  const variant = ((parseInt(hex.charAt(16), 16) & 0x3) | 0x8).toString(16);
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-8${hex.slice(13, 16)}-${variant}${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
 }
 
 export function encodeActivityCursor(key: ActivityKey): string {

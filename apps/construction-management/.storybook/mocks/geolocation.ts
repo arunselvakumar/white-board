@@ -3,7 +3,8 @@
  * error by code (1 permission denied, 2 unavailable, 3 timeout), or
  * `"pending"` for a device still looking. The Permissions API answers for
  * the location too: `denied` after code 1 and `granted` otherwise, unless
- * `permission` says the browser would still have to ask (`"prompt"`).
+ * `permission` says the browser would still have to ask (`"prompt"`) or
+ * cannot say at all (`"unknown"`: the query is rejected).
  * Returns a restore function for `beforeEach`.
  */
 export function mockGeolocation(
@@ -11,9 +12,9 @@ export function mockGeolocation(
     | { latitude: number; longitude: number; accuracy: number }
     | { code: 1 | 2 | 3 }
     | "pending",
-  options: { permission?: PermissionState } = {},
+  options: { permission?: PermissionState | "unknown" } = {},
 ): () => void {
-  const state: PermissionState =
+  const state: PermissionState | "unknown" =
     options.permission ??
     (typeof result === "object" && "code" in result && result.code === 1
       ? "denied"
@@ -23,9 +24,12 @@ export function mockGeolocation(
   Object.defineProperty(permissions, "query", {
     configurable: true,
     value: (descriptor: PermissionDescriptor) =>
-      descriptor.name === "geolocation"
-        ? Promise.resolve({ state } as PermissionStatus)
-        : realQuery(descriptor),
+      descriptor.name !== "geolocation"
+        ? realQuery(descriptor)
+        : state === "unknown"
+          ? // Some browsers cannot say: the query itself fails.
+            Promise.reject(new TypeError("geolocation is not a permission"))
+          : Promise.resolve({ state } as PermissionStatus),
   });
   const stub: Pick<Geolocation, "getCurrentPosition"> = {
     getCurrentPosition(success, failure) {

@@ -27,6 +27,15 @@ export const CHECK_IN_PERSON_KINDS = [
 /** `site_engineer` is a Site Engineer row, not their sign-in. */
 export type CheckInPersonKind = (typeof CHECK_IN_PERSON_KINDS)[number];
 
+/** The role a Site Engineer or Vendor shows with; a Labour shows their Labour Category. */
+export const ROLE_WORDS: Record<
+  Exclude<CheckInPersonKind, "labour">,
+  string
+> = {
+  site_engineer: "Site Engineer",
+  vendor: "Vendor",
+};
+
 export const CHECK_IN_ACTIONS = ["check_in", "check_out"] as const;
 
 export type CheckInAction = (typeof CHECK_IN_ACTIONS)[number];
