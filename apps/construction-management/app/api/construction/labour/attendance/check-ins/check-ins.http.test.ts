@@ -16,16 +16,23 @@ import {
   memberWith,
   ownerWithCompany,
 } from "@/test/companies";
-import { gifBytes, pngBytes } from "@/test/files";
+import { bytesOf, gifBytes, pngBytes } from "@/test/files";
 import { TEST_ORIGIN } from "@/test/sessions";
 
+import { GET as getEntryPhoto } from "./[id]/photo/route";
 import { POST as voidCheckIn } from "./[id]/void/route";
 import type {
   ConstructionLabourCheckInDayResponseModel as DayEffect,
+  GetConstructionLabourCheckInPersonResponseModel as PersonPage,
+  ListConstructionLabourCheckInEntriesResponseModel as LogPage,
+  ListConstructionLabourCheckInPeopleResponseModel as PeoplePage,
   RecordConstructionLabourCheckInResponseModel as Recorded,
   VoidConstructionLabourCheckInResponseModel as Voided,
 } from "./check-in-models";
-import { POST as recordCheckIn } from "./route";
+import { GET as getRecordPhoto } from "./people/[kind]/[personId]/photo/route";
+import { GET as listPeople } from "./people/route";
+import { GET as getPerson } from "./person/route";
+import { GET as listEntries, POST as recordCheckIn } from "./route";
 
 const BASE = `${TEST_ORIGIN}/api/construction/labour/attendance/check-ins`;
 const LABOURS = `${TEST_ORIGIN}/api/construction/labour/labours`;
@@ -1239,5 +1246,432 @@ describe("voiding a check-in entry (ADR CM-0043)", () => {
     });
     expect(voided.day?.effect).toBe("cleared");
     expect(await ledgerSum(f.dhuresh)).toBe(0);
+  });
+});
+
+describe("Check-In reads (ADR CM-0043)", () => {
+  /** Records on the handlers' clock, as `who` at `time` today. */
+  function recorder(company: Company, f: Fixtures, clock: { now: Date }) {
+    const handlers = handlersAt(clock);
+    return async (
+      kind: "labour" | "vendor" | "site_engineer",
+      personId: string,
+      action: "check_in" | "check_out",
+      when: Date,
+    ) => {
+      clock.now = when;
+      return (
+        await handlers.record({
+          workspaceId: company.workspaceId,
+          userId: company.userId,
+          projectId: f.tower,
+          kind,
+          personId,
+          action,
+          photo: PHOTO,
+        })
+      ).entry;
+    };
+  }
+
+  it("lists the Project's people by group and name, with where each stands today", async () => {
+    const company = await ownerWithCompany();
+    const f = await fixtures(company);
+    await seedFence(company.workspaceId, f.tower);
+    const anbu = await f.labour("Anbu Selvan");
+    const resting = await f.labour("Arul");
+    await prisma.constructionLabourLabour.update({
+      where: { id: resting },
+      data: { isActive: false },
+    });
+    await f.labour("Murugan", [f.villa]);
+    await seedVendor(company.workspaceId, "Idle Gang", [f.tower], {
+      inactive: true,
+    });
+    await seedVendor(company.workspaceId, "Villa Gang", [f.villa]);
+    await seedSiteEngineer(company.workspaceId, "Kumar", [f.tower], {
+      disabled: true,
+    });
+    await seedSiteEngineer(company.workspaceId, "Ravi", [f.villa]);
+    const arjun = await seedSiteEngineer(company.workspaceId, "Arjun", [
+      f.tower,
+    ]);
+    await prisma.constructionLabourLabour.update({
+      where: { id: f.dhuresh },
+      data: {
+        photoKey: `companies/${company.workspaceId}/labour-photos/x.png`,
+      },
+    });
+
+    const clock = { now: at(TODAY, "08:00") };
+    const record = recorder(company, f, clock);
+    await record("labour", f.dhuresh, "check_in", at(TODAY, "09:00"));
+    await record("vendor", f.vendor, "check_in", at(TODAY, "08:00"));
+    await record("vendor", f.vendor, "check_out", at(TODAY, "09:30"));
+    const voided = await record(
+      "site_engineer",
+      f.engineer,
+      "check_in",
+      at(TODAY, "08:30"),
+    );
+    await voidEntry(company.cookie, voided.id, "Wrong person");
+    // Yesterday's Check Out reads as nothing today.
+    await record("site_engineer", arjun, "check_in", at(YESTERDAY, "09:00"));
+    await record("site_engineer", arjun, "check_out", at(YESTERDAY, "17:00"));
+
+    clock.now = at(TODAY, "10:00");
+    const people = await handlersAt(clock).people(
+      company.workspaceId,
+      f.tower,
+      { canCheckIn: true, canVoid: false },
+    );
+    expect(people).toMatchObject({
+      now: at(TODAY, "10:00"),
+      timeZone: "Asia/Kolkata",
+      today: TODAY,
+      siteFence: { name: "Tower A site" },
+      canCheckIn: true,
+      canVoid: false,
+    });
+    expect(people.labours.map((person) => person.name)).toEqual([
+      "Anbu Selvan",
+      "Dhuresh Nawin",
+    ]);
+    expect(people.labours[1]).toMatchObject({
+      kind: "labour",
+      id: f.dhuresh,
+      hasPhoto: true,
+      state: { status: "in", since: at(TODAY, "09:00") },
+      entriesToday: 1,
+    });
+    expect(people.labours[1]?.role).toMatch(/^Mason /);
+    expect(people.labours[0]).toMatchObject({
+      id: anbu,
+      hasPhoto: false,
+      state: { status: "none", since: null },
+      entriesToday: 0,
+    });
+    expect(people.vendors).toEqual([
+      {
+        kind: "vendor",
+        id: f.vendor,
+        name: "Selvam Gang",
+        role: "Vendor",
+        code: null,
+        phone: "+919876500022",
+        hasPhoto: false,
+        state: { status: "out", since: at(TODAY, "09:30") },
+        entriesToday: 2,
+      },
+    ]);
+    expect(people.siteEngineers.map((person) => person.name)).toEqual([
+      "Arjun",
+      "Sundar",
+    ]);
+    expect(people.siteEngineers[0]).toMatchObject({
+      role: "Site Engineer",
+      phone: "+919876500011",
+      state: { status: "none" },
+      entriesToday: 0,
+    });
+    expect(people.siteEngineers[0]?.code).toMatch(/^SE-/);
+    // A voided entry does not count.
+    expect(people.siteEngineers[1]).toMatchObject({
+      state: { status: "none", since: null },
+      entriesToday: 0,
+    });
+
+    // Through the route, with what the member may do.
+    const reader = await member(company, { "labour.attendance": ["read"] }, [
+      f.tower,
+    ]);
+    const response = await listPeople(
+      jsonRequest(`${BASE}/people?projectId=${f.tower}`, reader.cookie),
+    );
+    expect(response.status).toBe(StatusCodes.OK);
+    const body = await json<PeoplePage>(response);
+    expect(body).toMatchObject({
+      timeZone: "Asia/Kolkata",
+      today: TODAY,
+      siteFence: { name: "Tower A site" },
+      canCheckIn: false,
+      canVoid: false,
+    });
+    expect(body.labours).toHaveLength(2);
+    expect(body.labours[1]?.state.since).toBe(at(TODAY, "09:00").toISOString());
+    const owner = await json<PeoplePage>(
+      await listPeople(
+        jsonRequest(`${BASE}/people?projectId=${f.tower}`, company.cookie),
+      ),
+    );
+    expect(owner).toMatchObject({ canCheckIn: true, canVoid: true });
+    const offProject = await member(
+      company,
+      { "labour.attendance": ["read", "create"] },
+      [f.villa],
+    );
+    expect(
+      (
+        await listPeople(
+          jsonRequest(`${BASE}/people?projectId=${f.tower}`, offProject.cookie),
+        )
+      ).status,
+    ).toBe(StatusCodes.FORBIDDEN);
+  });
+
+  it("opens one person with today's entries and a night shift still open from yesterday", async () => {
+    const company = await ownerWithCompany();
+    const f = await fixtures(company);
+    const clock = { now: at(YESTERDAY, "22:00") };
+    const record = recorder(company, f, clock);
+    const night = await record(
+      "labour",
+      f.dhuresh,
+      "check_in",
+      at(YESTERDAY, "22:00"),
+    );
+    clock.now = at(TODAY, "02:00");
+    const page = await handlersAt(clock).capture(
+      company.workspaceId,
+      f.tower,
+      "labour",
+      f.dhuresh,
+      { canCheckIn: true, canVoid: true },
+    );
+    expect(page.person).toMatchObject({
+      name: "Dhuresh Nawin",
+      state: { status: "in", since: at(YESTERDAY, "22:00") },
+      // The open entry belongs to yesterday's attendance day.
+      entriesToday: 0,
+    });
+    expect(page.entries.map((entry) => [entry.id, entry.date])).toEqual([
+      [night.id, YESTERDAY],
+    ]);
+
+    const morning = await record(
+      "vendor",
+      f.vendor,
+      "check_in",
+      at(TODAY, "08:00"),
+    );
+    const wrong = await record(
+      "vendor",
+      f.vendor,
+      "check_out",
+      at(TODAY, "09:00"),
+    );
+    await voidEntry(company.cookie, wrong.id, "Pressed by mistake");
+    const response = await getPerson(
+      jsonRequest(
+        `${BASE}/person?projectId=${f.tower}&kind=vendor&personId=${f.vendor}`,
+        company.cookie,
+      ),
+    );
+    expect(response.status).toBe(StatusCodes.OK);
+    const vendor = await json<PersonPage>(response);
+    expect(vendor.person).toMatchObject({ kind: "vendor", entriesToday: 1 });
+    expect(
+      vendor.entries.map((entry) => [entry.id, entry.voided?.reason ?? null]),
+    ).toEqual([
+      [morning.id, null],
+      [wrong.id, "Pressed by mistake"],
+    ]);
+    expect(vendor.entries[1]?.voided?.by).toEqual({
+      id: company.userId,
+      name: expect.any(String) as string,
+    });
+
+    // The same refusals as recording.
+    const resting = await f.labour("Anbu");
+    await prisma.constructionLabourLabour.update({
+      where: { id: resting },
+      data: { isActive: false },
+    });
+    const elsewhere = await f.labour("Murugan", [f.villa]);
+    for (const [kind, personId, code] of [
+      ["labour", resting, "LABOUR_INACTIVE"],
+      ["labour", elsewhere, "LABOUR_NOT_ON_PROJECT"],
+      ["labour", newId(), "LABOUR_NOT_FOUND"],
+      ["site_engineer", newId(), "SITE_ENGINEER_NOT_FOUND"],
+    ] as const)
+      expect(
+        (
+          await failure(
+            await getPerson(
+              jsonRequest(
+                `${BASE}/person?projectId=${f.tower}&kind=${kind}&personId=${personId}`,
+                company.cookie,
+              ),
+            ),
+          )
+        ).code,
+      ).toBe(code);
+  });
+
+  it("lists a day's log newest first, by kind and name, a page at a time", async () => {
+    const company = await ownerWithCompany();
+    const f = await fixtures(company);
+    const clock = { now: at(TODAY, "08:00") };
+    const record = recorder(company, f, clock);
+    const yesterday = await record(
+      "vendor",
+      f.vendor,
+      "check_in",
+      at(YESTERDAY, "08:00"),
+    );
+    await record("vendor", f.vendor, "check_out", at(YESTERDAY, "18:00"));
+    const a = await record("labour", f.dhuresh, "check_in", at(TODAY, "08:00"));
+    const b = await record("vendor", f.vendor, "check_in", at(TODAY, "08:10"));
+    const c = await record(
+      "site_engineer",
+      f.engineer,
+      "check_in",
+      at(TODAY, "08:20"),
+    );
+    const d = await record(
+      "labour",
+      f.dhuresh,
+      "check_out",
+      at(TODAY, "12:00"),
+    );
+    await voidEntry(company.cookie, d.id, "Too early");
+    const e = await record("vendor", f.vendor, "check_out", at(TODAY, "17:00"));
+
+    const page = (query: string, cookie = company.cookie) =>
+      listEntries(jsonRequest(`${BASE}?projectId=${f.tower}&${query}`, cookie));
+    const first = await json<LogPage>(await page(`date=${TODAY}&limit=2`));
+    expect(first.date).toBe(TODAY);
+    expect(first.total).toBe(5);
+    expect(first.items.map((item) => item.id)).toEqual([e.id, d.id]);
+    expect(first.items[1]?.voided?.reason).toBe("Too early");
+    expect(first.prevCursor).toBeNull();
+    expect(first.nextCursor).not.toBeNull();
+    const second = await json<LogPage>(
+      await page(`date=${TODAY}&limit=2&after=${first.nextCursor ?? ""}`),
+    );
+    expect(second.items.map((item) => item.id)).toEqual([c.id, b.id]);
+    const third = await json<LogPage>(
+      await page(`date=${TODAY}&limit=2&after=${second.nextCursor ?? ""}`),
+    );
+    expect(third.items.map((item) => item.id)).toEqual([a.id]);
+    expect(third.nextCursor).toBeNull();
+    const back = await json<LogPage>(
+      await page(`date=${TODAY}&limit=2&before=${third.prevCursor ?? ""}`),
+    );
+    expect(back.items.map((item) => item.id)).toEqual([c.id, b.id]);
+
+    const vendors = await json<LogPage>(
+      await page(`date=${TODAY}&kind=vendor`),
+    );
+    expect(vendors.items.map((item) => item.id)).toEqual([e.id, b.id]);
+    expect(vendors.total).toBe(2);
+    const named = await json<LogPage>(await page(`date=${TODAY}&q=DHUR`));
+    expect(named.items.map((item) => item.id)).toEqual([d.id, a.id]);
+    expect(named.items[0]).toMatchObject({
+      personName: "Dhuresh Nawin",
+      recordedBy: { id: company.userId },
+    });
+    const engineer = await json<LogPage>(await page(`date=${TODAY}&q=sund`));
+    expect(engineer.items.map((item) => item.id)).toEqual([c.id]);
+    const nobody = await json<LogPage>(await page(`date=${TODAY}&q=zzz`));
+    expect(nobody).toMatchObject({ items: [], total: 0, nextCursor: null });
+    const earlier = await json<LogPage>(await page(`date=${YESTERDAY}`));
+    expect(earlier.items.map((item) => item.id)).toHaveLength(2);
+    expect(earlier.items.at(-1)?.id).toBe(yesterday.id);
+    expect((await failure(await page(`date=${addDays(TODAY, 2)}`))).code).toBe(
+      "DATE_IN_FUTURE",
+    );
+
+    const offProject = await member(
+      company,
+      { "labour.attendance": ["read"] },
+      [f.villa],
+    );
+    expect((await page(`date=${TODAY}`, offProject.cookie)).status).toBe(
+      StatusCodes.FORBIDDEN,
+    );
+  });
+
+  it("serves an entry's photo and a person's record photo privately", async () => {
+    const company = await ownerWithCompany();
+    const f = await fixtures(company);
+    const photo = pngBytes(2048);
+    const entry = (
+      await recorded(
+        company.cookie,
+        entryBody(f, { photo: Buffer.from(photo).toString("base64") }),
+      )
+    ).entry;
+    const get = (id: string, cookie = company.cookie) =>
+      getEntryPhoto(jsonRequest(`${BASE}/${id}/photo`, cookie), {
+        params: Promise.resolve({ id }),
+      });
+    const served = await get(entry.id);
+    expect(served.status).toBe(StatusCodes.OK);
+    expect(served.headers.get("content-type")).toBe("image/png");
+    expect(served.headers.get("cache-control")).toMatch(/^private/);
+    expect(await bytesOf(served)).toEqual(photo);
+
+    const offProject = await member(
+      company,
+      { "labour.attendance": ["read"] },
+      [f.villa],
+    );
+    expect((await get(entry.id, offProject.cookie)).status).toBe(
+      StatusCodes.FORBIDDEN,
+    );
+    const other = await ownerWithCompany("Other Builders");
+    expect((await failure(await get(entry.id, other.cookie))).code).toBe(
+      "CHECK_IN_NOT_FOUND",
+    );
+    await prisma.constructionLabourCheckInEvent.update({
+      where: { id: entry.id },
+      data: { photoKey: null, photoRemovedAt: new Date() },
+    });
+    expect(await failure(await get(entry.id))).toMatchObject({
+      status: StatusCodes.NOT_FOUND,
+      code: "PHOTO_NOT_FOUND",
+    });
+
+    // A record photo, as the Labours page stores it.
+    const key = `companies/${company.workspaceId}/labour-photos/${newId()}.png`;
+    await objectStorage().put(key, photo, "image/png");
+    await prisma.constructionLabourLabour.update({
+      where: { id: f.dhuresh },
+      data: { photoKey: key },
+    });
+    const elsewhere = await f.labour("Murugan", [f.villa]);
+    await prisma.constructionLabourLabour.update({
+      where: { id: elsewhere },
+      data: { photoKey: key },
+    });
+    const recordPhoto = (
+      kind: string,
+      personId: string,
+      cookie = company.cookie,
+    ) =>
+      getRecordPhoto(
+        jsonRequest(
+          `${BASE}/people/${kind}/${personId}/photo?projectId=${f.tower}`,
+          cookie,
+        ),
+        { params: Promise.resolve({ kind, personId }) },
+      );
+    const labour = await recordPhoto("labour", f.dhuresh);
+    expect(labour.status).toBe(StatusCodes.OK);
+    expect(labour.headers.get("cache-control")).toMatch(/^private/);
+    expect(await bytesOf(labour)).toEqual(photo);
+    for (const [kind, personId] of [
+      ["vendor", f.vendor],
+      ["site_engineer", f.engineer],
+      ["labour", elsewhere],
+    ] as const)
+      expect(await failure(await recordPhoto(kind, personId))).toMatchObject({
+        status: StatusCodes.NOT_FOUND,
+        code: "PHOTO_NOT_FOUND",
+      });
+    expect(
+      (await recordPhoto("labour", f.dhuresh, offProject.cookie)).status,
+    ).toBe(StatusCodes.FORBIDDEN);
   });
 });
