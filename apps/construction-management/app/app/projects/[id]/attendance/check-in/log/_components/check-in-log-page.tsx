@@ -32,6 +32,7 @@ import {
 } from "@/app/app/_components/check-in/check-in-entry-parts";
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import {
+  CHECK_IN_NAME_SEARCH_MAX,
   checkInLogQuery,
   type CheckInEntry,
   type CheckInLogFilter,
@@ -258,7 +259,7 @@ function Filters({
             aria-label="Search by name"
             placeholder="Search by name"
             autoComplete="off"
-            maxLength={NAME_SEARCH_MAX}
+            maxLength={CHECK_IN_NAME_SEARCH_MAX}
             className="h-full text-base [&::-webkit-search-cancel-button]:appearance-none"
             value={search.q}
             onChange={(event) => {
@@ -271,15 +272,12 @@ function Filters({
   );
 }
 
-/** The log's name search takes at most this many characters. */
-const NAME_SEARCH_MAX = 100;
-
 function filterOf(projectId: string, search: Search): CheckInLogFilter {
   return {
     projectId,
     date: search.date,
     kind: search.kind === "all" ? null : kindFromSegment(search.kind),
-    q: search.q.slice(0, NAME_SEARCH_MAX),
+    q: search.q.slice(0, CHECK_IN_NAME_SEARCH_MAX),
   };
 }
 

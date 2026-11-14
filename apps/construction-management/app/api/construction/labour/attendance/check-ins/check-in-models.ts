@@ -3,6 +3,9 @@ import { z } from "zod";
 /** A Project's Check-In: people, entries and the log (ADR CM-0043). */
 export const CHECK_INS_PATH = "/api/construction/labour/attendance/check-ins";
 
+/** The log's name search takes at most this many characters. */
+export const CHECK_IN_NAME_SEARCH_MAX = 100;
+
 const KINDS = ["labour", "vendor", "site_engineer"] as const;
 const ACTIONS = ["check_in", "check_out"] as const;
 const STATUSES = [
@@ -43,7 +46,7 @@ export const ListConstructionLabourCheckInEntriesRequestModel = z
     date: z.iso.date().optional(),
     kind: kind.optional(),
     /** Part of the person's name. */
-    q: z.string().trim().max(100).optional(),
+    q: z.string().trim().max(CHECK_IN_NAME_SEARCH_MAX).optional(),
     limit: z.coerce.number().int().min(1).max(200).optional().default(50),
     after: z.string().min(1).optional(),
     before: z.string().min(1).optional(),
