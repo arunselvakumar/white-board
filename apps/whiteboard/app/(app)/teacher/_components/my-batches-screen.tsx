@@ -3,6 +3,7 @@
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useAuth } from "@repo/auth/react";
 import Link from "next/link";
+import { PageWatermark } from "@repo/ui/components/page-watermark";
 
 import { UpcomingDemosCard } from "@/app/(app)/teacher/_components/upcoming-demos-card";
 import { myBatchQueries } from "@/src/queries/teachers";
@@ -46,7 +47,10 @@ function MyBatchesContent({
   return (
     <div className="w-full p-6">
       <div className="max-w-4xl space-y-6">
-        <h1 className="text-2xl font-semibold">My Batches</h1>
+        <div className="relative">
+          <PageWatermark text="My Batches" />
+          <h1 className="text-2xl font-semibold">My Batches</h1>
+        </div>
         {data.items.length === 0 ? (
           <p className="text-muted-foreground">No Batches assigned yet.</p>
         ) : (

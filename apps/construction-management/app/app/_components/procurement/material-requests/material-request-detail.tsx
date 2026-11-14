@@ -217,6 +217,7 @@ export function MaterialRequestDetail({
       <PageHeader
         back={back}
         title={request.number}
+        watermark="Material Requests"
         leading={<MaterialRequestStatusBadge status={request.status} />}
         meta={`${formatDate(request.requestDate)} · ${request.projectName ?? "Project"} → ${request.storeName ?? "store"}`}
         actions={

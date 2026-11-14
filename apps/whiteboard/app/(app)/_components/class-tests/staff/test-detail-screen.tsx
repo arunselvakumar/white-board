@@ -97,6 +97,7 @@ export function TestDetailContent({
         <PageHeader
           back={{ label: "Tests", href: testsPath }}
           title={test.name}
+          watermark="Tests"
           meta={`${batch.courseName} · ${batch.name}`}
           actions={
             <>

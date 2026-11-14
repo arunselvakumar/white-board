@@ -44,8 +44,9 @@ function PreviewShell({
         <QueryProvider>
           {/* Query-string state (nuqs) starts from the story's `searchParams`. */}
           <NuqsTestingAdapter hasMemory searchParams={searchParams}>
+            {/* isolate, overflow-x-clip: as the shell's <main> does for PageWatermark. */}
             <div
-              className={`typeface-satoshi ${fontMono.variable} bg-background text-foreground font-sans antialiased`}
+              className={`typeface-satoshi ${fontMono.variable} bg-background text-foreground isolate overflow-x-clip font-sans antialiased`}
             >
               <SatoshiStylesheet />
               {children}

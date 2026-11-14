@@ -66,6 +66,7 @@ export function HomeworkSubmissionsContent({
         <PageHeader
           back={{ label: "Homework and Study Material", href: basePath }}
           title={homework.title}
+          watermark="Homework"
           meta={`${view.batch.courseName} · ${view.batch.name}`}
           actions={
             removed ? (

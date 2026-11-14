@@ -623,13 +623,22 @@ export function MaterialForm({
   );
 }
 
-function FormPage({ title, children }: { title: string; children: ReactNode }) {
+function FormPage({
+  title,
+  watermark,
+  children,
+}: {
+  title: string;
+  watermark?: string;
+  children: ReactNode;
+}) {
   return (
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader
           back={{ label: "Materials", href: MATERIALS_PATH }}
           title={title}
+          watermark={watermark}
         />
         {children}
       </div>
@@ -671,7 +680,7 @@ export function EditMaterialScreen({ id }: { id: string }) {
   const { data } = useSuspenseQuery(materialMasterQuery("materials", id));
   const update = useUpdateMaterial(id);
   return (
-    <FormPage title={`Edit ${data.name}`}>
+    <FormPage title={`Edit ${data.name}`} watermark="Materials">
       <MaterialForm
         key={data.updatedAt}
         material={data}

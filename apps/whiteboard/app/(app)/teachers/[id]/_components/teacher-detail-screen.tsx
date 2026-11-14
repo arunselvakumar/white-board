@@ -107,6 +107,7 @@ export function TeacherDetailScreen({ id }: { id: string }) {
         <PageHeader
           back={{ href: "/teachers", label: "Teachers" }}
           title={teacher.name}
+          watermark="Teachers"
         />
         <div className="space-y-2 rounded-xl border p-5">
           <div className="flex items-center gap-3">

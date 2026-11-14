@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Input } from "@repo/ui/components/input";
+import { PageWatermark } from "@repo/ui/components/page-watermark";
 
 import { APP_NAV_ICONS } from "./app-nav-icons";
 import type { AreaNavGroup } from "./area-nav-menu";
@@ -59,7 +60,8 @@ function MainMenuPage(access: MainMenuAccess) {
     <div className="w-full p-6">
       <div className="mx-auto w-full max-w-6xl space-y-8">
         <header className="flex flex-wrap items-end justify-between gap-4">
-          <div className="min-w-0 space-y-1">
+          <div className="relative min-w-0 space-y-1">
+            <PageWatermark text={HOME_LABEL} />
             <h1 className="text-3xl font-semibold tracking-tight">
               {HOME_LABEL}
             </h1>

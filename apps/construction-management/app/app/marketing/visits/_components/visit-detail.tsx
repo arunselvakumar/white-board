@@ -352,6 +352,7 @@ export function VisitDetail({
         <PageHeader
           back={{ label: "Visits", href: visitPath() }}
           title={visit.number}
+          watermark="Visits"
           meta={
             <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
               <VisitStatusBadge status={visit.status} />

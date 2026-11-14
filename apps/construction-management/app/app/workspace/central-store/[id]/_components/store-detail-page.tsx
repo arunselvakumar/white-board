@@ -93,6 +93,7 @@ export function StoreDetailPage({ storeId }: { storeId: string }) {
         <PageHeader
           back={{ label: "Central Store", href: centralStoreHref.stores }}
           title={store.name}
+          watermark="Central Store"
           meta={[store.address, store.stateName].filter(Boolean).join(" · ")}
           actions={
             <div className="flex flex-wrap gap-2">

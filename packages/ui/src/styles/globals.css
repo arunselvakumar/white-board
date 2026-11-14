@@ -207,6 +207,18 @@
     }
   }
 
+  /* Page watermark: the page's name drifts in behind its heading. Only
+     `transform` and `opacity` move, so the compositor runs it. */
+  --animate-page-watermark: page-watermark 1.6s cubic-bezier(0.16, 1, 0.3, 1)
+    both;
+
+  @keyframes page-watermark {
+    from {
+      opacity: 0;
+      transform: translateX(-24px);
+    }
+  }
+
   /* Select (React Bits' Glide Select): the menu pops out of the trigger's
      corner (180 ms in, 120 ms out; fades only with reduced motion), and the
      trigger label settles in after a pointer pick. Keyframes rather than

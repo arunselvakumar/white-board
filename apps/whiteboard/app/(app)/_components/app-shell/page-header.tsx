@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { Button } from "@repo/ui/components/button";
+import { PageWatermark } from "@repo/ui/components/page-watermark";
 
 export type PageHeaderBack =
   { label: string; href: string } | { label: string; onClick: () => void };
@@ -43,12 +44,18 @@ function PageHeaderBackLink({ back }: { back: PageHeaderBack }) {
 export function PageHeader({
   back,
   title,
+  watermark = title,
   meta,
   leading,
   actions,
 }: {
   back?: PageHeaderBack;
   title: string;
+  /**
+   * Drawn large and faint behind the heading. Where the title is a record's
+   * name or number, pass the name of the list it belongs to ("Students").
+   */
+  watermark?: string;
   meta?: ReactNode;
   leading?: ReactNode;
   actions?: ReactNode;
@@ -57,7 +64,8 @@ export function PageHeader({
     <header className="space-y-4">
       {back == null ? null : <PageHeaderBackLink back={back} />}
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex min-w-0 items-center gap-4">
+        <div className="relative flex min-w-0 items-center gap-4">
+          <PageWatermark key={watermark} text={watermark} />
           {leading}
           <div className="min-w-0 space-y-1">
             <h1 className="text-3xl font-semibold tracking-tight break-words">

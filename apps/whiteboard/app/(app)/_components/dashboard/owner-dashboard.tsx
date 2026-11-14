@@ -16,6 +16,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Button } from "@repo/ui/components/button";
 import { MetricCard } from "@repo/ui/components/metric-card";
+import { PageWatermark } from "@repo/ui/components/page-watermark";
 
 import { classModeLabel } from "@/lib/class-mode";
 import { paiseToRupees } from "@/lib/money";
@@ -114,7 +115,8 @@ export function OwnerDashboard({
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-6 p-4 sm:p-6">
       <header className="flex flex-wrap items-end justify-between gap-4">
-        <div className="space-y-1">
+        <div className="relative space-y-1">
+          <PageWatermark text="Owner Dashboard" />
           <h1 className="text-3xl font-semibold tracking-tight">
             Owner Dashboard
           </h1>

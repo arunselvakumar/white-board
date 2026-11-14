@@ -535,10 +535,12 @@ export function LabourForm({
 
 export function FormPage({
   title,
+  watermark,
   meta,
   children,
 }: {
   title: string;
+  watermark?: string;
   meta?: ReactNode;
   children: ReactNode;
 }) {
@@ -548,6 +550,7 @@ export function FormPage({
         <PageHeader
           back={{ label: "Labours", href: LABOURS_PAGE_PATH }}
           title={title}
+          watermark={watermark}
           meta={meta}
         />
         {children}
@@ -572,7 +575,11 @@ export function NewLabourScreen() {
 export function EditLabourScreen({ id }: { id: string }) {
   const { data } = useSuspenseQuery(labourQuery(id));
   return (
-    <FormPage title={`Edit ${data.name}`} meta={editLabourMeta(data)}>
+    <FormPage
+      title={`Edit ${data.name}`}
+      watermark="Labours"
+      meta={editLabourMeta(data)}
+    >
       <EditLabourDetails labour={data} />
     </FormPage>
   );

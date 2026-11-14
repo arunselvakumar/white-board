@@ -46,6 +46,7 @@ export function OtherExpenseEdit({
           href: otherExpensesPath(projectId, `/${id}`),
         }}
         title={`Edit ${data.number}`}
+        watermark="Other Expenses"
       />
       <OtherExpenseForm
         key={data.updatedAt}

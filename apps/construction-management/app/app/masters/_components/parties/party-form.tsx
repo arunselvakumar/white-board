@@ -555,10 +555,12 @@ function PartyForm({
 function FormPage({
   screen,
   title,
+  watermark,
   children,
 }: {
   screen: PartyScreen;
   title: string;
+  watermark?: string;
   children: ReactNode;
 }) {
   return (
@@ -567,6 +569,7 @@ function FormPage({
         <PageHeader
           back={{ label: screen.plural, href: screen.path }}
           title={title}
+          watermark={watermark}
         />
         {children}
       </div>
@@ -614,7 +617,11 @@ export function EditPartyScreen({ list, id }: { list: PartyList; id: string }) {
   const { data } = useSuspenseQuery(partyQuery(list, id));
   const update = useUpdateParty(list, id);
   return (
-    <FormPage screen={screen} title={`Edit ${data.name}`}>
+    <FormPage
+      screen={screen}
+      title={`Edit ${data.name}`}
+      watermark={screen.plural}
+    >
       <PartyForm
         key={data.updatedAt}
         screen={screen}

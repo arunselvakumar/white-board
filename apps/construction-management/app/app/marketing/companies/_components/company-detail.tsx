@@ -680,6 +680,7 @@ export function CompanyDetail({
         <PageHeader
           back={{ label: "Prospect Companies", href: companyPath() }}
           title={company.name}
+          watermark="Prospect Companies"
           meta={
             <span className="flex flex-wrap items-center gap-2">
               <StageBadge stage={company.stage} />

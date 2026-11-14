@@ -196,6 +196,7 @@ function DetailBody({
       <PageHeader
         back={back}
         title={item.number}
+        watermark="Transactions"
         meta={
           item.type === "transaction"
             ? DIRECTION_LABELS[item.direction]

@@ -178,6 +178,7 @@ export function DeliveryNoteDetail({ noteId }: { noteId: string }) {
           href: centralStoreHref.request(note.materialRequestId),
         }}
         title={note.number}
+        watermark="Delivery Notes"
         leading={<DeliveryNoteStatusBadge status={note.status} />}
         meta={`${formatDate(note.deliveryDate)} · ${note.storeName ?? "Store"} → ${note.projectName ?? "Project"}`}
         actions={

@@ -912,11 +912,13 @@ function TextFieldDate({
 function FormPage({
   projectId,
   title,
+  watermark,
   backTo,
   children,
 }: {
   projectId: string;
   title: string;
+  watermark?: string;
   backTo?: { label: string; href: string };
   children: ReactNode;
 }) {
@@ -930,6 +932,7 @@ function FormPage({
           }
         }
         title={title}
+        watermark={watermark}
       />
       {children}
     </div>
@@ -996,6 +999,7 @@ export function EditGoodsReceiptScreen({
     <FormPage
       projectId={projectId}
       title={`Edit ${receipt.number}`}
+      watermark="Goods Received"
       backTo={{
         label: receipt.number,
         href: goodsReceivedPath(projectId, `/${receipt.id}`),

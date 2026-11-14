@@ -62,6 +62,7 @@ export function BatchEditScreen({ batchId }: { batchId: string }) {
         <PageHeader
           back={{ href: "/batches", label: "Batches" }}
           title={batch.name}
+          watermark="Batches"
           meta={`${course?.name ?? "Course"} · ${batch.closedAt == null ? "Open" : "Closed"}`}
           actions={
             batch.closedAt == null ? (

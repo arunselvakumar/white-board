@@ -13,6 +13,7 @@ import {
   EmptyDescription,
   EmptyHeader,
 } from "@repo/ui/components/empty";
+import { PageWatermark } from "@repo/ui/components/page-watermark";
 import { Download } from "lucide-react";
 import Link from "next/link";
 
@@ -337,7 +338,10 @@ export function FamilyHome({
   return (
     <div className="w-full p-6">
       <div className="max-w-5xl space-y-6">
-        <h1 className="text-2xl tracking-tight">{title}</h1>
+        <div className="relative">
+          <PageWatermark text={title} />
+          <h1 className="text-2xl tracking-tight">{title}</h1>
+        </div>
         {home.students.length === 0 ? (
           <Empty className="border">
             <EmptyHeader>

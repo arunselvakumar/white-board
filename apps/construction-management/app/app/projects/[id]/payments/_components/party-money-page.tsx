@@ -69,6 +69,7 @@ export function PartyMoneyPage({
       <PageHeader
         back={{ label: screen.plural, href: paths.tab }}
         title={statement.party.name ?? screen.label}
+        watermark={screen.plural}
         meta={
           <span className="text-sm">
             Balance{" "}

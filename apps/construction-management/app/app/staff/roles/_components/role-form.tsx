@@ -199,10 +199,12 @@ function RoleForm({
 
 function FormPage({
   title,
+  watermark,
   meta,
   children,
 }: {
   title: string;
+  watermark?: string;
   meta?: ReactNode;
   children: ReactNode;
 }) {
@@ -212,6 +214,7 @@ function FormPage({
         <PageHeader
           back={{ label: "Role Management", href: ROLES_PATH }}
           title={title}
+          watermark={watermark}
           meta={meta}
         />
         {children}
@@ -272,6 +275,7 @@ export function EditRoleScreen({
   return (
     <FormPage
       title={canUpdate ? `Edit ${data.name}` : data.name}
+      watermark="Role Management"
       meta={
         <span className="inline-flex items-center gap-1.5">
           <Users aria-hidden="true" className="size-4" />

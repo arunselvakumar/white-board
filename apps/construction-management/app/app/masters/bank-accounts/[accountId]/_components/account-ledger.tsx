@@ -152,6 +152,7 @@ function LedgerBody({
       <PageHeader
         back={back}
         title={`${data.account.name} — Ledger`}
+        watermark="Ledger"
         meta={
           data.account.holderName == null
             ? kind

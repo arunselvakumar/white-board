@@ -53,6 +53,7 @@ export function EditEquipmentPage({
         <PageHeader
           back={{ label: data.name, href: detailHref }}
           title={`Edit ${data.name}`}
+          watermark="Equipments"
         />
         <EquipmentFormScreen
           equipment={data}

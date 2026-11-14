@@ -383,6 +383,7 @@ export function EquipmentDetailView({
         <PageHeader
           back={back}
           title={equipment.name}
+          watermark="Equipments"
           meta={`${equipment.equipmentNumber} · ${OWNERSHIP_LABELS[equipment.ownership]}`}
           leading={
             equipment.photo == null ? (

@@ -13,6 +13,7 @@ import {
   EmptyDescription,
   EmptyHeader,
 } from "@repo/ui/components/empty";
+import { PageWatermark } from "@repo/ui/components/page-watermark";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import type { FamilyHomeRole } from "@/app/(app)/_components/home/family-home";
@@ -128,7 +129,10 @@ export function FamilyResults({
   return (
     <div className="w-full p-6">
       <div className="max-w-3xl space-y-6">
-        <h1 className="text-2xl tracking-tight">Results</h1>
+        <div className="relative">
+          <PageWatermark text="Results" />
+          <h1 className="text-2xl tracking-tight">Results</h1>
+        </div>
         {results.students.length === 0 ? (
           <EmptyText>
             {role === "parent"

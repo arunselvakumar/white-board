@@ -11,16 +11,18 @@ import { VisitForm } from "./visit-form";
 function Frame({
   back,
   title,
+  watermark,
   children,
 }: {
   back: { label: string; href: string };
   title: string;
+  watermark?: string;
   children: ReactNode;
 }) {
   return (
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
-        <PageHeader back={back} title={title} />
+        <PageHeader back={back} title={title} watermark={watermark} />
         {children}
       </div>
     </div>
@@ -73,6 +75,7 @@ export function VisitEdit({ id, now }: { id: string; now?: Date }) {
     <Frame
       back={{ label: visit.number, href: visitPath(visit.id) }}
       title={`Edit ${visit.number}`}
+      watermark="Visits"
     >
       {visit.actions.canUpdate ? (
         <VisitForm mode={{ kind: "edit", visit }} now={now} />
@@ -103,6 +106,7 @@ export function VisitComplete({
     <Frame
       back={{ label: visit.number, href: visitPath(visit.id) }}
       title={`Complete ${visit.number}`}
+      watermark="Visits"
     >
       {visit.actions.canComplete ? (
         <VisitForm
