@@ -60,6 +60,9 @@ type CheckInPerson = Extract<
 export const PROJECT_ACTIVITY_EMPTY =
   "Nothing yet. Adding Site Engineers or Labours to this Project will show here.";
 
+export const PROJECT_CHECK_INS_EMPTY =
+  "No check-in entries. People checked in or out on Check-In will show here.";
+
 const TYPE_ITEMS: { value: ProjectActivityType; label: string }[] = [
   { value: "all", label: "All" },
   { value: "team", label: "Team changes" },
@@ -279,7 +282,11 @@ function ProjectActivityList({
     <ActivityFeed
       items={items}
       timeZone={timeZone}
-      emptyMessage={PROJECT_ACTIVITY_EMPTY}
+      emptyMessage={
+        filter.type === "check_ins"
+          ? PROJECT_CHECK_INS_EMPTY
+          : PROJECT_ACTIVITY_EMPTY
+      }
       now={now}
       {...feedPaging(query)}
     />
