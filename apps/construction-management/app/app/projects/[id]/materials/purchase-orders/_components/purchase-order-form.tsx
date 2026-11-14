@@ -462,7 +462,7 @@ function PurchaseOrderFields({
             {options.suppliers.length === 0 && (
               <p className="text-muted-foreground text-xs">
                 No active Supplier is assigned to this Project. Add one under
-                Resources.
+                Teams.
               </p>
             )}
             <FieldError message={errors.supplierId?.message} />

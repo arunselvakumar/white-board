@@ -46,7 +46,7 @@ function refused(code: string, message: string, details: unknown) {
 }
 
 const meta = {
-  title: "Projects/Resources/Labours",
+  title: "Projects/Teams/Labours",
   component: LaboursSection,
   args: {
     projectId: PROJECT_ID,

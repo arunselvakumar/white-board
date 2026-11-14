@@ -439,7 +439,7 @@ export class VendorHandlers {
     )
       throw conflict(
         "PROJECT_RESOURCES_CHANGED",
-        "Someone else changed this Project's Resources after you opened them. Reload to see their changes.",
+        "Someone else changed this Project's Teams after you opened them. Reload to see their changes.",
       );
     const wanted = new Set(input.ids);
     const addedIds = [...wanted].filter((id) => !currentIds.has(id));

@@ -75,10 +75,12 @@ export const PROJECT_MODULES = [
     menu: "projects.project",
   },
   {
+    // Shown as Teams since ADR CM-0042; the stored key stays.
     key: "resources",
-    label: "Resources",
-    description: "Team Members, Contractors, Suppliers and Vendors on it.",
-    segment: "resources",
+    label: "Teams",
+    description:
+      "Site Engineers, Labours, Team Members, Contractors, Suppliers and Vendors on it.",
+    segment: "teams",
     menu: "projects.project",
   },
   {

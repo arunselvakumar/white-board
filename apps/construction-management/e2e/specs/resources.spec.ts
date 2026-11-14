@@ -7,7 +7,7 @@ import { LabourPage } from "../pages/LabourPage";
 import { ProjectActivityPage } from "../pages/ProjectActivityPage";
 import { ProjectsPage } from "../pages/ProjectsPage";
 
-resourcesPageTest.describe("Project resources", () => {
+resourcesPageTest.describe("Project Teams", () => {
   resourcesPageTest(
     "should let a member see the Project, when the Owner puts them on its Team Members",
     async ({ resourcesPage, project, newMember }) => {
@@ -50,7 +50,7 @@ resourcesPageTest.describe("Project resources", () => {
   );
 
   resourcesPageTest(
-    "should show a Labour in both Activity feeds, when the Owner adds them on the Project's Resources",
+    "should show a Labour in both Activity feeds, when the Owner adds them on the Project's Teams",
     { tag: ["@pr"] },
     async ({ resourcesPage, project, owner, page }) => {
       const labour = await createLabour(owner.api, { projectId: null });

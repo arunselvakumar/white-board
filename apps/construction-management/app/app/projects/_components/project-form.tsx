@@ -756,7 +756,7 @@ function ProjectForm({
 /**
  * New Project (`/app/projects/new`). The logo and the files picked under
  * Contract wait until the Project exists, then upload; the Project opens
- * either way, on its Resources as step 2 of 2, and its Overview says what
+ * either way, on its Teams as step 2 of 2, and its Overview says what
  * did not make it.
  */
 export function NewProjectScreen({

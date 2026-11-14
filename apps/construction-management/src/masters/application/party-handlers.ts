@@ -519,6 +519,6 @@ export class PartyHandlers {
 export function resourcesChanged(): DomainError {
   return conflict(
     "PROJECT_RESOURCES_CHANGED",
-    "Someone else changed this Project's Resources after you opened them. Reload to see their changes.",
+    "Someone else changed this Project's Teams after you opened them. Reload to see their changes.",
   );
 }

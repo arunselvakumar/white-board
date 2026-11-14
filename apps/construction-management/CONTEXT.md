@@ -136,9 +136,9 @@ _Avoid_: purchase order (alone), work order (alone), order
 The Client Order's value excluding GST, shown only to Team Members with the Project menu's Financial flag.
 _Avoid_: contract value, budget (that is the Company's own figure)
 
-**Resources**:
-Who works on a Project: its Site Engineers, Labours, Team Members (the Owner is on every Project), Contractors, Suppliers and Vendors. Each party keeps its Projects in its own master or sign-in; a Project's Resources section shows and changes all six. Assigned on Add Project's second step, or any time after (ADR CM-0013 §6, CM-0038). A Site Engineer is listed only under Site Engineers, not again under Team Members.
-_Avoid_: team, members (for all four), assignment
+**Teams**:
+Who works on a Project: its Site Engineers, Labours, Team Members (the Owner is on every Project), Contractors, Suppliers and Vendors. Each party keeps its Projects in its own master or sign-in; a Project's Teams page shows and changes all six. Assigned on Add Project's second step, or any time after (ADR CM-0013 §6, CM-0038). A Site Engineer is listed only under Site Engineers, not again under Team Members. Called Resources until ADR CM-0042; code and the API still say Resources.
+_Avoid_: Resources (on a site that means manpower, material and machinery), members (for all six), assignment
 
 **Activity**:
 A read-only feed, newest first, of what happened: on a Labour's page (Projects joined, left and moved between, attendance, marked inactive), and as a Project module (Site Engineers and Labours added and removed). Each entry sits on the day it applies to, not the day it was typed, and says who recorded it and when (ADR CM-0038).
@@ -335,7 +335,7 @@ Moving a Labour to another Project from a date. Their balance goes with them.
 _Avoid_: shift (for this), reassign
 
 **From / Last day**:
-A Labour's first and last working day on a Project, asked when they are added to it or removed from it on the Project's Resources. The history is dated the first day on (From) and the first day off (the day after the Last day) (ADR CM-0038).
+A Labour's first and last working day on a Project, asked when they are added to it or removed from it on the Project's Teams. The history is dated the first day on (From) and the first day off (the day after the Last day) (ADR CM-0038).
 _Avoid_: end date, relieving date
 
 **Ledger / Balance**:

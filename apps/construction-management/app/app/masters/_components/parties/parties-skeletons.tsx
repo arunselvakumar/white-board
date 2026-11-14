@@ -116,7 +116,7 @@ export function PartyFormSkeleton({ screen }: { screen: PartyScreen }) {
         ) : null}
         <FormSectionSkeleton
           title="Projects"
-          description={`The ${screen.label} is on these Projects' Resources.`}
+          description={`The ${screen.label} is on these Projects' Teams.`}
         >
           <ChecklistSkeleton />
         </FormSectionSkeleton>

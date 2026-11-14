@@ -55,7 +55,7 @@ function region(
 }
 
 const meta = {
-  title: "Projects/Resources",
+  title: "Projects/Teams",
   component: ProjectResourcesPage,
   args: { projectId: PROJECT_ID, canEdit: true },
   render: (args) => (
@@ -160,7 +160,7 @@ export const EditTeamMembersChangedElsewhere: Story = {
             {
               code: "PROJECT_RESOURCES_CHANGED",
               message:
-                "Someone else changed this Project's Resources after you opened them. Reload to see their changes.",
+                "Someone else changed this Project's Teams after you opened them. Reload to see their changes.",
             },
             { status: 409 },
           ),
@@ -187,7 +187,7 @@ export const EditTeamMembersChangedElsewhere: Story = {
     );
     await userEvent.click(dialog.getByRole("button", { name: "Save" }));
     await expect(
-      await dialog.findByText(/Someone else changed this Project's Resources/),
+      await dialog.findByText(/Someone else changed this Project's Teams/),
     ).toBeVisible();
     await expect(sent(`${RESOURCES_API}/team-members`)).toEqual({
       ids: [PRABHU.id, DEVI.id],
@@ -274,9 +274,7 @@ export const AddProjectStepOnAPhone: Story = {
     return api.restore;
   },
   play: async ({ canvas, canvasElement }) => {
-    await expect(
-      await canvas.findByText("Step 2 of 2 · Assign resources"),
-    ).toBeVisible();
+    await expect(await canvas.findByText("Step 2 of 2 · Teams")).toBeVisible();
     await expect(canvas.getByRole("link", { name: "Skip" })).toHaveAttribute(
       "href",
       `/app/projects/${PROJECT_ID}`,

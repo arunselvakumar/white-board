@@ -333,7 +333,7 @@ export function worksheetContent(
   if (!contractor.onProject && !sameContractor)
     throw invalid(
       "CONTRACTOR_NOT_ON_PROJECT",
-      "This Contractor is not assigned to the Project. Add them under Resources first.",
+      "This Contractor is not assigned to the Project. Add them under Teams first.",
       { field: "contractorId" },
     );
   if (blank(input.departmentId))

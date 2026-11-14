@@ -100,7 +100,7 @@ export function PartyBalances({
           <EmptyDescription>
             {screen.plural} assigned to the Project, and any with invoices or
             payments here, show with their balances. Assign them under the
-            Project&apos;s Resources.
+            Project&apos;s Teams.
           </EmptyDescription>
         </EmptyHeader>
       </Empty>

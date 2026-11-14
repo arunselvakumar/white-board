@@ -846,7 +846,7 @@ export class GoodsReceiptHandlers {
       throw new DomainError(
         "SUPPLIER_NOT_ON_LOCATION",
         location.location.kind === "project"
-          ? "This Supplier is not on the Project. Add it under Resources first."
+          ? "This Supplier is not on the Project. Add it under Teams first."
           : "This Supplier is not on the Store. Add it to the Store first.",
         { details: { field: "supplierId" } },
       );
