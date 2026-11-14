@@ -302,6 +302,7 @@ function LogBody({
   const items = data.pages.flatMap((page) => page.items);
   const timeZone = first?.timeZone ?? "Asia/Kolkata";
   const canVoid = first?.canVoid ?? false;
+  const canVoidLabour = first?.canVoidLabour ?? false;
   const today = first?.today ?? deviceToday();
   const total = first?.total ?? 0;
   const [photo, setPhoto] = useState<CheckInEntry | null>(null);
@@ -363,7 +364,7 @@ function LogBody({
                 key={entry.id}
                 entry={entry}
                 timeZone={timeZone}
-                canVoid={canVoid}
+                canVoid={entry.kind === "labour" ? canVoidLabour : canVoid}
                 onOpenPhoto={() => {
                   setPhoto(entry);
                 }}

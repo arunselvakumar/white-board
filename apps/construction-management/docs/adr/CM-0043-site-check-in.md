@@ -78,7 +78,7 @@ Two columns on `labour_attendance` carry this:
 
 Marking the day on the sheet (or Mark Paid Leave) sets `from_check_in` false. It keeps `times_from_check_in` only when it sends back the same In, Out and break; typing different times turns it off, and the log no longer touches that day's times.
 
-A day written this way is the operator's doing with **Attendance Create** alone: it does not need Update, and the Back-dated Entry check does not apply, because the day is today (or the night shift that began yesterday). It is priced like any re-marked day, from the Labour's current wage. The Labour must be active and on the Project that day, as on the sheet.
+A day written by recording an entry is the operator's doing with **Attendance Create** alone: it does not need Update, and the Back-dated Entry check does not apply, because the day is today (or the night shift that began yesterday). It is priced like any re-marked day, from the Labour's current wage. The Labour must be active and on the Project that day, as on the sheet.
 
 The overtime line from the times is added only when the day has no overtime lines or already has that line. A day whose overtime the supervisor typed by hand keeps exactly those lines.
 
@@ -114,6 +114,13 @@ The overtime line from the times is added only when the day has no overtime line
 ### 8. Permissions
 
 `labour.attendance` on the Project: **Read** for the list, the log and the photos; **Create** to record an entry; **Delete** to void one. No Permission Matrix row is added, so CM-0024's grant migration has nothing to do. Financial plays no part: no amount is shown or returned.
+
+**Voiding a Labour's entry is an edit of their attendance day** (the owner's review, 2026-11-14). It works the day out again and can clear it and reverse its wage, so it is held to what the marking sheet asks for an edit of that day:
+
+- It needs Attendance **Update** as well as Delete. Delete alone voids a Vendor's or a Site Engineer's entry, which changes no day.
+- It passes the **Back-dated Entry** check (`labour_attendance`, edit) for the entry's attendance day. A member who may not edit a day that old on the sheet may not void its entries either (`BACKDATED_EDIT_BLOCKED`); the Owner always may. An entry of today, or of last night's shift inside the window, voids as before.
+
+Question 9's answer ("Delete to void") stands for the log itself; this is the part of it that touches pay.
 
 ### 9. Words
 

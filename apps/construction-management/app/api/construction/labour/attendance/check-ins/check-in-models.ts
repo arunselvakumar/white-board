@@ -135,8 +135,10 @@ const context = {
   siteFence: z.object({ name: z.string() }).nullable(),
   /** Attendance Create on the Project. */
   canCheckIn: z.boolean(),
-  /** Attendance Delete on the Project. */
+  /** Attendance Delete on the Project: a Vendor's or a Site Engineer's entry. */
   canVoid: z.boolean(),
+  /** Attendance Delete and Update: a Labour's entry, whose void changes their day. */
+  canVoidLabour: z.boolean(),
 };
 
 export const ListConstructionLabourCheckInPeopleResponseModel = z.object({

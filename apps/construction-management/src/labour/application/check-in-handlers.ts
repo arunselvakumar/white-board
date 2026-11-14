@@ -46,6 +46,7 @@ import type { AttendanceStatus } from "../domain/wages";
 import type { LabourCategoryDirectory, ProjectDirectory } from "./directories";
 import type {
   AttendanceLabourer,
+  LabourAttendanceBackdatedGuard,
   LabourDayWrite,
   StoredLabourDay,
 } from "./labour-attendance-handlers";
@@ -321,7 +322,16 @@ export type CheckInContext = {
 };
 
 /** What the viewer may do, from their access on the Project. */
-export type CheckInViewer = { canCheckIn: boolean; canVoid: boolean };
+export type CheckInViewer = {
+  canCheckIn: boolean;
+  /** Attendance Delete: a Vendor's or a Site Engineer's entry. */
+  canVoid: boolean;
+  /**
+   * Attendance Delete and Update: a Labour's entry, whose void changes an
+   * attendance day (ADR CM-0043 §8).
+   */
+  canVoidLabour: boolean;
+};
 
 export type RecordCheckInInput = {
   workspaceId: string;
@@ -424,6 +434,7 @@ export class CheckInHandlers {
     private readonly siteEngineers: SiteEngineerDirectory,
     private readonly fences: SiteFenceDirectory,
     private readonly storage: ObjectStorage,
+    private readonly backdated: LabourAttendanceBackdatedGuard,
     private readonly clock: () => Date = () => new Date(),
   ) {}
 
@@ -1036,6 +1047,7 @@ export class CheckInHandlers {
   async void(input: {
     workspaceId: string;
     userId: string;
+    role: "owner" | "member";
     id: string;
     reason: string;
   }): Promise<{
@@ -1047,6 +1059,16 @@ export class CheckInHandlers {
     const found = await this.find(workspaceId, input.id);
     const reason = voidReason(input.reason);
     if (found.voided != null) throw alreadyVoided();
+    // A Labour's void works their day out again, and can clear it and
+    // reverse its wage: it is an edit of that day, so the Back-dated Entry
+    // check of the marking sheet applies. A Vendor's and a Site Engineer's
+    // entries change no day.
+    if (found.kind === "labour")
+      await this.backdated.assert(
+        "edit",
+        { workspaceId, userId: input.userId, role: input.role },
+        found.attendanceDate,
+      );
     const { now, timeZone, today } = await this.context(
       workspaceId,
       found.projectId,

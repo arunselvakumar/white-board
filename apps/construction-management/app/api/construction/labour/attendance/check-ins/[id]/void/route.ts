@@ -5,6 +5,9 @@ import {
   requireCompanySession,
 } from "@/app/api/_lib/require-session";
 
+import { can } from "@/src/shared-kernel/access";
+import { forbidden } from "@/src/shared-kernel/domain-error";
+
 import {
   ConstructionLabourCheckInParamsModel,
   VoidConstructionLabourCheckInRequestModel,
@@ -25,6 +28,12 @@ export const dynamic = "force-dynamic";
  * and cleared (its wage reversed) when Check-In made it and this was its
  * last entry. 404 for another Company's entry; needs Attendance delete on
  * the entry's Project.
+ *
+ * A Labour's entry changes their attendance day, so its void is an edit of
+ * that day: it also needs Attendance update, and passes the Back-dated
+ * Entry check (`labour_attendance`) for the entry's attendance day, as an
+ * edit on the marking sheet does (ADR CM-0043 §8). A Vendor's and a Site
+ * Engineer's entries change no day and need delete alone.
  */
 export async function POST(
   request: Request,
@@ -47,9 +56,20 @@ export async function POST(
       { projectId: entry.projectId },
     );
     if (isResponse(session)) return session;
+    if (
+      entry.kind === "labour" &&
+      !can(session.access, "labour.attendance", "update", {
+        projectId: entry.projectId,
+      })
+    )
+      throw forbidden(
+        "PERMISSION_DENIED",
+        "Voiding a Labour's entry changes their attendance day, so it needs permission to change marked attendance.",
+      );
     const voided = await handlers.void({
       workspaceId: session.workspaceId,
       userId: session.userId,
+      role: session.role,
       id,
       reason: model.reason,
     });

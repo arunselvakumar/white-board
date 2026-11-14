@@ -121,6 +121,7 @@ export const CONTEXT = {
   siteFence: { name: "Kumari Heights site" },
   canCheckIn: true,
   canVoid: true,
+  canVoidLabour: true,
 } satisfies Omit<CheckInPeople, "siteEngineers" | "labours" | "vendors">;
 
 export function peopleResponse(

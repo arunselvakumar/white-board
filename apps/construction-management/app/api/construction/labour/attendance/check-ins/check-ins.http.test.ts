@@ -1231,6 +1231,114 @@ describe("voiding a check-in entry (ADR CM-0043)", () => {
     expect(voided.person.state.status).toBe("none");
   });
 
+  it("applies the back-dated guard to voiding a Labour's old entry; today's still voids, and the Owner passes", async () => {
+    const company = await ownerWithCompany();
+    const f = await fixtures(company);
+    await prisma.constructionOrganizationBackdatedEntryPolicy.create({
+      data: {
+        id: newId(),
+        workspaceId: company.workspaceId,
+        createDays: 2,
+        createOverrideRoleIds: [],
+        editDays: 2,
+        editOverrideRoleIds: [],
+        modules: {},
+        createdBy: company.userId,
+        updatedBy: company.userId,
+      },
+    });
+    const clerk = await member(
+      company,
+      { "labour.attendance": ["read", "create", "update", "delete"] },
+      [f.tower],
+    );
+    // An entry of five days ago, and the day and wage it made.
+    const old = addDays(TODAY, -5);
+    const clock = { now: at(old, "09:00") };
+    const past = await handlersAt(clock).record({
+      workspaceId: company.workspaceId,
+      userId: company.userId,
+      projectId: f.tower,
+      kind: "labour",
+      personId: f.dhuresh,
+      action: "check_in",
+      photo: PHOTO,
+    });
+    expect(past.entry.date).toBe(old);
+    expect(await ledgerSum(f.dhuresh)).toBe(DAILY);
+
+    expect(
+      await failure(await voidEntry(clerk.cookie, past.entry.id, "Wrong")),
+    ).toMatchObject({
+      status: StatusCodes.FORBIDDEN,
+      code: "BACKDATED_EDIT_BLOCKED",
+    });
+    // Refused before anything was written: the entry, the day and the wage stand.
+    expect(await liveDays(f.dhuresh)).toHaveLength(1);
+    expect(await ledgerSum(f.dhuresh)).toBe(DAILY);
+
+    // A Vendor's entry changes no day, so its age does not matter.
+    const gang = await handlersAt(clock).record({
+      workspaceId: company.workspaceId,
+      userId: company.userId,
+      projectId: f.tower,
+      kind: "vendor",
+      personId: f.vendor,
+      action: "check_in",
+      photo: PHOTO,
+    });
+    expect(
+      (await voidEntry(clerk.cookie, gang.entry.id, "Came the day after"))
+        .status,
+    ).toBe(StatusCodes.OK);
+
+    // Today is inside the window.
+    const anbu = await f.labour("Anbu Selvan");
+    const today = (
+      await recorded(
+        clerk.cookie,
+        entryBody(f, { kind: "labour", personId: anbu }),
+      )
+    ).entry;
+    expect(
+      (await voidEntry(clerk.cookie, today.id, "Wrong person")).status,
+    ).toBe(StatusCodes.OK);
+
+    // The Owner is never held by the policy.
+    const voided = await json<Voided>(
+      await voidEntry(company.cookie, past.entry.id, "Wrong person"),
+    );
+    expect(voided.day).toMatchObject({ effect: "cleared" });
+    expect(await ledgerSum(f.dhuresh)).toBe(0);
+  });
+
+  it("needs Attendance Update as well to void a Labour's entry, since it changes their day", async () => {
+    const company = await ownerWithCompany();
+    const f = await fixtures(company);
+    const remover = await member(
+      company,
+      { "labour.attendance": ["read", "create", "delete"] },
+      [f.tower],
+    );
+    const labour = (await recorded(company.cookie, entryBody(f))).entry;
+    expect(
+      await failure(await voidEntry(remover.cookie, labour.id, "Wrong")),
+    ).toMatchObject({
+      status: StatusCodes.FORBIDDEN,
+      code: "PERMISSION_DENIED",
+    });
+    expect(await liveDays(f.dhuresh)).toHaveLength(1);
+    const gang = (
+      await recorded(
+        company.cookie,
+        entryBody(f, { kind: "vendor", personId: f.vendor }),
+      )
+    ).entry;
+    expect(
+      (await voidEntry(remover.cookie, gang.id, "Wrong gang")).status,
+    ).toBe(StatusCodes.OK);
+  });
+
   it("needs Attendance Delete on the entry's Project, and hides another Company's entry", async () => {
     const company = await ownerWithCompany();
     const f = await fixtures(company);
@@ -1264,7 +1372,7 @@ describe("voiding a check-in entry (ADR CM-0043)", () => {
     });
     const voider = await member(
       company,
-      { "labour.attendance": ["read", "delete"] },
+      { "labour.attendance": ["read", "update", "delete"] },
       [f.tower],
     );
     const voided = await json<Voided>(
@@ -1353,7 +1461,7 @@ describe("Check-In reads (ADR CM-0043)", () => {
     const people = await handlersAt(clock).people(
       company.workspaceId,
       f.tower,
-      { canCheckIn: true, canVoid: false },
+      { canCheckIn: true, canVoid: false, canVoidLabour: false },
     );
     expect(people).toMatchObject({
       now: at(TODAY, "10:00"),
@@ -1434,7 +1542,11 @@ describe("Check-In reads (ADR CM-0043)", () => {
         jsonRequest(`${BASE}/people?projectId=${f.tower}`, company.cookie),
       ),
     );
-    expect(owner).toMatchObject({ canCheckIn: true, canVoid: true });
+    expect(owner).toMatchObject({
+      canCheckIn: true,
+      canVoid: true,
+      canVoidLabour: true,
+    });
     const offProject = await member(
       company,
       { "labour.attendance": ["read", "create"] },
@@ -1466,7 +1578,7 @@ describe("Check-In reads (ADR CM-0043)", () => {
       f.tower,
       "labour",
       f.dhuresh,
-      { canCheckIn: true, canVoid: true },
+      { canCheckIn: true, canVoid: true, canVoidLabour: true },
     );
     expect(page.person).toMatchObject({
       name: "Dhuresh Nawin",
