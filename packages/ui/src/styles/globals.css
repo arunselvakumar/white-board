@@ -56,7 +56,7 @@
   --destructive: #dc4a3a;
   --border: #e2e4ef;
   --input: #e2e4ef;
-  /* Text box, Select and Combobox fill: opaque, so a field never takes the colour of the page behind it. */
+  /* Text box, Select, Combobox, outline Button and outline Toggle fill: opaque, so a control never takes the colour of the page behind it. */
   --field: #ffffff;
   --ring: #595fae;
   --chart-1: #595fae;

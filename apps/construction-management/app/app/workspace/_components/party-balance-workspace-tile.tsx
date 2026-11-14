@@ -17,7 +17,7 @@ export function PartyBalanceWorkspaceTile() {
   return (
     <Item
       variant="outline"
-      className="bg-card w-full"
+      className="w-full"
       render={<Link href="/app/workspace/party-balance" />}
     >
       <ItemMedia variant="icon">

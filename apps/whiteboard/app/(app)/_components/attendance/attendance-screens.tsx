@@ -75,7 +75,7 @@ export function AttendanceBatchesScreen() {
                 {batches.data.items.map((batch) => (
                   <li key={batch.id}>
                     <Link
-                      className="hover:bg-muted block rounded-xl border p-5"
+                      className="bg-card hover:bg-muted block rounded-xl border p-5"
                       href={`/attendance/batches/${batch.id}`}
                     >
                       <strong>{batch.name}</strong>
