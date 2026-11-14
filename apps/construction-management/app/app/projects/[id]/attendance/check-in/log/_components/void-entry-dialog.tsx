@@ -95,8 +95,10 @@ export function VoidEntryDialog({
   return (
     <Dialog
       open={entry != null}
+      // Closing while the request is out would let its answer land on the
+      // next entry's dialog.
       onOpenChange={(open) => {
-        if (!open) onClose();
+        if (!open && !voiding.isPending) onClose();
       }}
     >
       <DialogContent className="grid-cols-1 sm:max-w-md">
@@ -142,7 +144,12 @@ export function VoidEntryDialog({
           </div>
           <FormAlert message={errors.root?.message} />
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={voiding.isPending}
+              onClick={onClose}
+            >
               Cancel
             </Button>
             <Button

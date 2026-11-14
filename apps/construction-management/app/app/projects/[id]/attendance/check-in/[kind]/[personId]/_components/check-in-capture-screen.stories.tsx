@@ -81,6 +81,8 @@ function serve(
   options: {
     post?: (call: ApiCall) => Response;
     geolocation?: Parameters<typeof mockGeolocation>[0];
+    /** What the browser says about the location before anyone is asked. */
+    permission?: PermissionState;
   } = {},
 ) {
   return () => {
@@ -88,7 +90,10 @@ function serve(
     cameraEvents.mockClear();
     let index = 0;
     const first = views[0];
-    const restoreGeo = mockGeolocation(options.geolocation ?? POSITION);
+    const restoreGeo = mockGeolocation(
+      options.geolocation ?? POSITION,
+      options.permission == null ? {} : { permission: options.permission },
+    );
     const api = mockApi((call) => {
       calls.push(call);
       if (
@@ -158,6 +163,8 @@ export const LiveCheckIn: Story = {
     await expect(
       body.getByRole("dialog", { name: "Dhuresh Nawin" }),
     ).toBeVisible();
+    // The page behind the screen takes no focus and no clicks.
+    await expect(context.canvasElement.closest("[inert]")).not.toBeNull();
     await expect(
       body.getByText("Carpenter · L-0051 · +91 77088 99001"),
     ).toBeVisible();
@@ -265,6 +272,40 @@ export const LocationFinding: Story = {
     await expect(
       body.getByText("Finding this device's location…"),
     ).toBeVisible();
+    await expect(body.getByRole("button", { name: "Check In" })).toBeEnabled();
+  },
+};
+
+/**
+ * A browser that would have to ask is not asked on arrival: the line offers
+ * Use location, and one tap finds it.
+ */
+export const LocationNotAskedYet: Story = {
+  beforeEach: serve([personView(DHURESH)], { permission: "prompt" }),
+  play: async (context) => {
+    const body = await opened(context, "Dhuresh Nawin");
+    await expect(body.getByText("The location is not on yet.")).toBeVisible();
+    await expect(body.getByRole("button", { name: "Check In" })).toBeEnabled();
+    await context.userEvent.click(
+      body.getByRole("button", { name: "Use location" }),
+    );
+    await expect(await body.findByText(/^Location found/)).toBeVisible();
+  },
+};
+
+/** Turn on camera is the first tap: the location is asked for with it. */
+export const TurnOnCameraAsksLocation: Story = {
+  parameters: {
+    camera: fakeCamera({ initial: "idle", onEvent: cameraEvents }),
+  },
+  beforeEach: serve([personView(DHURESH)], { permission: "prompt" }),
+  play: async (context) => {
+    const body = await opened(context, "Dhuresh Nawin");
+    await expect(body.getByText("The location is not on yet.")).toBeVisible();
+    await context.userEvent.click(
+      body.getByRole("button", { name: "Turn on camera" }),
+    );
+    await expect(await body.findByText(/^Location found/)).toBeVisible();
     await expect(body.getByRole("button", { name: "Check In" })).toBeEnabled();
   },
 };
@@ -441,9 +482,15 @@ export const RepeatedEntry: Story = {
     await context.userEvent.click(
       body.getByRole("button", { name: "Check In" }),
     );
+    const title = await body.findByText("Already recorded at 1:59 pm");
+    await expect(title).toBeVisible();
+    // Nothing was saved this time, so the photo is the earlier entry's.
     await expect(
-      await body.findByText("Already recorded at 1:59 pm"),
-    ).toBeVisible();
+      title.closest('[role="status"]')?.querySelector("img"),
+    ).toHaveAttribute(
+      "src",
+      expect.stringMatching(/\/check-ins\/[^/]+\/photo$/),
+    );
   },
 };
 

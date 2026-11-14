@@ -228,7 +228,11 @@ export function useCamera(): Camera {
     const currentId = stream.current
       ?.getVideoTracks()[0]
       ?.getSettings().deviceId;
+    const run = generation.current;
     void videoInputs(media).then((inputs) => {
+      // Stopped, left or started again while the cameras were listed: a
+      // stream opened now would outlive the screen.
+      if (run !== generation.current) return;
       const others = inputs.filter((input) => input.deviceId !== currentId);
       // A phone has several rear lenses: prefer one labelled as facing the
       // other way, then any other camera, then ask by facing.

@@ -331,6 +331,7 @@ function Filters({
             aria-label="Search by name"
             placeholder="Search by name"
             autoComplete="off"
+            maxLength={NAME_SEARCH_MAX}
             className="h-full text-base [&::-webkit-search-cancel-button]:appearance-none"
             value={search.q}
             onChange={(event) => {
@@ -343,12 +344,15 @@ function Filters({
   );
 }
 
+/** The log's name search takes at most this many characters. */
+const NAME_SEARCH_MAX = 100;
+
 function filterOf(projectId: string, search: Search): CheckInLogFilter {
   return {
     projectId,
     date: search.date,
     kind: search.kind === "all" ? null : kindFromSegment(search.kind),
-    q: search.q,
+    q: search.q.slice(0, NAME_SEARCH_MAX),
   };
 }
 
