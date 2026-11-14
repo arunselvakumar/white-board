@@ -39,16 +39,15 @@ export function checkInActivityParts(
     icon: MapPin,
     tone:
       entry.action === "check_in" && entry.voided == null ? "added" : "default",
+    // No dot between the two: on a phone the link wraps to its own line,
+    // and a dot would be left hanging at the end of the first.
     detail: (
-      <>
-        {place}
+      <span className="inline-flex flex-wrap items-center gap-x-2">
+        <span>{place}</span>
         {entry.location == null ? null : (
-          <>
-            {" · "}
-            <OpenInMaps location={entry.location} />
-          </>
+          <OpenInMaps location={entry.location} />
         )}
-      </>
+      </span>
     ),
     preview: (
       <CheckInPhotoPreview
