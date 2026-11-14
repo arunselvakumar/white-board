@@ -256,25 +256,28 @@ export function OverTimeSection({ overTime }: { overTime: OverTime }) {
           />
         </BarChart>
       </ChartContainer>
-      <table className="sr-only">
-        <caption>Visits over time</caption>
-        <thead>
-          <tr>
-            <th scope="col">{bucket === "day" ? "Day" : "Week of"}</th>
-            <th scope="col">Completed</th>
-            <th scope="col">Missed</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((point) => (
-            <tr key={point.start}>
-              <th scope="row">{point.label}</th>
-              <td>{point.completed}</td>
-              <td>{point.missed}</td>
+      {/* sr-only goes on a wrapper: on the table itself it does not clip the caption, which renders outside the table box. */}
+      <div className="sr-only">
+        <table>
+          <caption>Visits over time</caption>
+          <thead>
+            <tr>
+              <th scope="col">{bucket === "day" ? "Day" : "Week of"}</th>
+              <th scope="col">Completed</th>
+              <th scope="col">Missed</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {data.map((point) => (
+              <tr key={point.start}>
+                <th scope="row">{point.label}</th>
+                <td>{point.completed}</td>
+                <td>{point.missed}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </Section>
   );
 }
