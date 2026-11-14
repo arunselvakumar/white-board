@@ -728,6 +728,9 @@ export class CheckInHandlers {
     const { labourId, projectId, date, by, now } = input;
     const entries = await tx.liveEntriesOn(projectId, date);
     const times = timesFromEntries(entries, input.timeZone);
+    // The labourer's share lock before the day's row lock, the order the
+    // sheet's save takes them in.
+    const labourer = await tx.labourer(labourId);
     const stored = await tx.day(labourId, projectId, date);
     const effect: DayEffect = dayEffect({
       day:
@@ -773,7 +776,7 @@ export class CheckInHandlers {
         };
       }
       case "create": {
-        const labourer = await this.labourerIn(tx, labourId);
+        if (labourer == null) throw labourNotFound();
         const day: PricedDay = {
           ...priceDay({
             mark: createdDayMark({
@@ -807,7 +810,7 @@ export class CheckInHandlers {
       }
       case "set_times": {
         if (stored == null) throw new Error("unreachable");
-        const labourer = await this.labourerIn(tx, labourId);
+        if (labourer == null) throw labourNotFound();
         const day: PricedDay = {
           ...priceDay({
             mark: timesDayMark({
@@ -831,16 +834,6 @@ export class CheckInHandlers {
         return saved(day, "updated");
       }
     }
-  }
-
-  private async labourerIn(
-    tx: CheckInTransaction,
-    labourId: string,
-  ): Promise<AttendanceLabourer> {
-    const labourer = await tx.labourer(labourId);
-    if (labourer == null)
-      throw notFound("LABOUR_NOT_FOUND", "This Labour was not found.");
-    return labourer;
   }
 
   /**
@@ -1409,6 +1402,10 @@ export class CheckInHandlers {
     if (object == null) throw photoNotFound();
     return object;
   }
+}
+
+function labourNotFound(): DomainError {
+  return notFound("LABOUR_NOT_FOUND", "This Labour was not found.");
 }
 
 function alreadyVoided(): DomainError {
