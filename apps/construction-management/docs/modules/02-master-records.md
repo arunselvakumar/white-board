@@ -717,6 +717,10 @@ Project-side flags that touch masters: **Labour #58** (transfer = move labour be
 
 ## Decisions for the build
 
+### A Site Engineer's page
+
+- `/app/staff/site-engineers/<id>` has **Details** (Edit Site Engineer) and **Activity** tabs, the tab in the address, as a Labour's page has (ADR CM-0044 §7); Add Site Engineer has none. Activity lists the Projects their sign-in was added to and removed from (its `team_member.*` history, as the Project feed reads it) and their check-in entries, filtered by Type, Project and dates. `GET /api/construction/masters/site-engineers/{id}/activity` needs `masters.labours` Read; a Site Engineer without a sign-in has check-in entries only.
+
 ### CM-406
 
 Minimal Contractor and Supplier masters ([ADR CM-0013 §6](../adr/CM-0013-projects-structure-product-decisions.md)); Project Resources rules are in [`modules/03`](./03-projects-structure-drawings-gallery.md) → "Decisions for the build".
