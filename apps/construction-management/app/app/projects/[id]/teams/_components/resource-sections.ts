@@ -12,8 +12,14 @@ export type ResourceSectionInfo = {
   addPath: string;
   /** The main-menu area that page is in, for the empty states. */
   area: string;
+  /** The page of one of them, which a row opens (ADR CM-0044 §1). */
+  pagePath: (id: string) => string;
   icon: LucideIcon;
 };
+
+function pageUnder(base: string): (id: string) => string {
+  return (id) => `${base}/${encodeURIComponent(id)}`;
+}
 
 /** The four sections of a Project's Resources, in screen order. */
 export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
@@ -24,6 +30,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
     description:
       "Team Members on a Project see it and work on it. The Owner is on every Project.",
     addPath: "/app/staff/office-staff/new",
+    pagePath: pageUnder("/app/staff/office-staff"),
     area: "Human Resources",
     icon: Users,
   },
@@ -33,6 +40,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
     singular: "Contractor",
     description: "Parties that execute work on this Project.",
     addPath: "/app/masters/contractors/new",
+    pagePath: pageUnder("/app/masters/contractors"),
     area: "Masters",
     icon: Hammer,
   },
@@ -42,6 +50,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
     singular: "Supplier",
     description: "Parties that sell material for this Project.",
     addPath: "/app/masters/suppliers/new",
+    pagePath: pageUnder("/app/masters/suppliers"),
     area: "Masters",
     icon: Truck,
   },
@@ -52,6 +61,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
     description:
       "Labour gangs on this Project; they appear on its attendance screen.",
     addPath: "/app/staff/vendors/new",
+    pagePath: pageUnder("/app/staff/vendors"),
     area: "Human Resources",
     icon: Handshake,
   },

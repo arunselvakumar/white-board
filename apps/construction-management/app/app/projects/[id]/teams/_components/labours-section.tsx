@@ -2,7 +2,6 @@
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { MoreHorizontal, Plus, Search, UsersRound } from "lucide-react";
-import Link from "next/link";
 import { useDeferredValue, useState, useTransition } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
@@ -37,6 +36,7 @@ import { projectQuery } from "@/src/queries/projects";
 import { AddLaboursDialog } from "./add-labours-dialog";
 import { labourDetail, labourPath, sinceLabel } from "./labour-lines";
 import { RemoveLabourDialog } from "./remove-labour-dialog";
+import { TeamRow } from "./team-row";
 
 type Position = { after?: string; before?: string; page: number };
 
@@ -57,56 +57,45 @@ function LabourRow({
   onRemove: () => void;
   onTransfer: () => void;
 }) {
-  const detail = labourDetail(labour);
   return (
-    <li className="flex min-w-0 items-center gap-3 px-4 py-3">
-      <span className="min-w-0 flex-1">
-        {canOpenLabours ? (
-          <Link
-            href={labourPath(labour.id)}
-            className="block truncate text-sm font-medium hover:underline"
-          >
-            {labour.name}
-          </Link>
-        ) : (
-          <span className="block truncate text-sm font-medium">
-            {labour.name}
-          </span>
-        )}
-        <span className="text-muted-foreground block truncate text-xs">
-          {[detail, sinceLabel(labour.since)].filter(Boolean).join(" · ")}
-        </span>
-      </span>
-      {!labour.isActive && <Badge variant="outline">Inactive</Badge>}
-      {(canEdit || canTransfer) && (
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                aria-label={`Actions for ${labour.name}`}
-              />
-            }
-          >
-            <MoreHorizontal />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            {canTransfer && (
-              <DropdownMenuItem onClick={onTransfer}>
-                Transfer to another Project
-              </DropdownMenuItem>
-            )}
-            {canEdit && (
-              <DropdownMenuItem variant="destructive" onClick={onRemove}>
-                Remove from Project
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
-    </li>
+    <TeamRow
+      name={labour.name}
+      href={canOpenLabours ? labourPath(labour.id) : null}
+      detail={[labourDetail(labour), sinceLabel(labour.since)]
+        .filter(Boolean)
+        .join(" · ")}
+      badges={!labour.isActive && <Badge variant="outline">Inactive</Badge>}
+      actions={
+        (canEdit || canTransfer) && (
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  aria-label={`Actions for ${labour.name}`}
+                />
+              }
+            >
+              <MoreHorizontal />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              {canTransfer && (
+                <DropdownMenuItem onClick={onTransfer}>
+                  Transfer to another Project
+                </DropdownMenuItem>
+              )}
+              {canEdit && (
+                <DropdownMenuItem variant="destructive" onClick={onRemove}>
+                  Remove from Project
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      }
+    />
   );
 }
 
@@ -239,7 +228,7 @@ export function LaboursSection({
         <ul
           aria-label="Labours"
           aria-busy={stale}
-          className={`bg-card divide-y rounded-lg border transition-opacity ${stale ? "opacity-60" : ""}`}
+          className={`bg-card divide-y overflow-hidden rounded-lg border transition-opacity ${stale ? "opacity-60" : ""}`}
         >
           {data.items.map((labour) => (
             <LabourRow
