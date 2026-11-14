@@ -29,7 +29,7 @@ export function AdvancedSettings() {
           <div key={section.href} role="listitem" className="flex">
             <Item
               variant="outline"
-              className="bg-card w-full"
+              className="w-full"
               render={<Link href={section.href} />}
             >
               <ItemMedia variant="icon">
