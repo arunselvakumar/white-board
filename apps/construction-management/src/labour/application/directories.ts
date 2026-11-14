@@ -19,6 +19,11 @@ export type LabourCategoryDirectory = {
   ): Promise<Map<string, { id: string; name: string; disabled: boolean }>>;
 };
 
+/**
+ * Site Engineers (`supervisors` in code, ADR CM-0036). A Labour has none of
+ * their own since ADR CM-0041: `find` names the one an old attendance day was
+ * saved with, and `onProjects` gives the Site Engineers a Labour answers to.
+ */
 export type SupervisorDirectory = {
   find(
     workspaceId: string,

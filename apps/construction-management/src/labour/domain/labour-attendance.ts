@@ -83,7 +83,9 @@ export type PricedDay = {
   shift: string | null;
   /**
    * The Labour's Site Engineer, saved on days marked before ADR CM-0041;
-   * null on days marked since. A re-mark keeps it.
+   * null on days marked since. A re-mark keeps it. History only: a Labour
+   * has no Site Engineer of their own any more, they answer to the Site
+   * Engineers on their Projects.
    */
   supervisorId: string | null;
   checkIn: string | null;
