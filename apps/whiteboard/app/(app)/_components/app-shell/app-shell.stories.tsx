@@ -44,6 +44,10 @@ export const Default: Story = {
     await expect(canvas.queryAllByRole("banner")).toHaveLength(
       isMobile ? 1 : 0,
     );
+    // <main> hosts the page's watermark.
+    const main = canvas.getByRole("main");
+    await expect(getComputedStyle(main).isolation).toBe("isolate");
+    await expect(getComputedStyle(main).overflowX).toBe("clip");
     await expectAppShell(canvas, canvasElement, userEvent, APP_NAV[0]);
   },
 };

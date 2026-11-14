@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { useState } from "react";
 import { expect } from "storybook/test";
 
 import { Button } from "@repo/ui/components/button";
@@ -77,5 +78,71 @@ export const LongTitle: Story = {
     await expect(canvas.getByTestId("phone").scrollWidth).toBeLessThanOrEqual(
       375,
     );
+  },
+};
+
+/** A page that loads, is left for one with no watermark, and is opened again. */
+function LeaveAndComeBack() {
+  const [view, setView] = useState<"loading" | "loaded" | "away">("loading");
+  return (
+    <div className="space-y-6">
+      {view === "loading" && <PageHeader title="Students" />}
+      {view === "loaded" && <PageHeader title="Students" meta="5 Students" />}
+      {view === "away" && <p>A page with no watermark.</p>}
+      <div className="flex gap-2">
+        <Button
+          variant="outline"
+          onClick={() => {
+            setView("loaded");
+          }}
+        >
+          Finish loading
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setView("away");
+          }}
+        >
+          Leave
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setView("loading");
+          }}
+        >
+          Come back
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The name drifts in each time the page appears, and never again while the
+ * page stays: the loaded screen joins the drift its skeleton began, and a
+ * page opened again starts a new one.
+ */
+export const ComesBack: Story = {
+  render: () => <LeaveAndComeBack />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    /** How far into its drift the watermark was when it mounted, in ms. */
+    const joinedAt = () => {
+      const watermark = watermarkOf(canvasElement);
+      if (!(watermark instanceof HTMLElement)) throw new Error("No watermark");
+      return -parseFloat(watermark.style.animationDelay);
+    };
+
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Finish loading" }),
+    );
+    await expect(joinedAt()).toBeGreaterThanOrEqual(250);
+
+    await userEvent.click(canvas.getByRole("button", { name: "Leave" }));
+    await expect(watermarkOf(canvasElement)).toBeNull();
+    await userEvent.click(canvas.getByRole("button", { name: "Come back" }));
+    await expect(joinedAt()).toBeLessThan(100);
   },
 };

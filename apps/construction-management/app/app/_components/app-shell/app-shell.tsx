@@ -13,6 +13,7 @@ import {
   SidebarSectionLabel,
 } from "@repo/ui/components/sidebar-chrome";
 import { Button } from "@repo/ui/components/button";
+import { PAGE_WATERMARK_HOST_CLASS } from "@repo/ui/components/page-watermark";
 import { SidebarGlide } from "@repo/ui/components/sidebar-glide";
 import { SkipLink } from "@repo/ui/components/skip-link";
 import {
@@ -59,6 +60,9 @@ import { WorkspaceNavMenu } from "./workspace-nav-menu";
 
 /** From package.json at build time (next.config.ts), so the browser never gets the dependency list. */
 const VERSION = `v${process.env["NEXT_PUBLIC_APP_VERSION"] ?? "0.0.0"}`;
+
+/** The page's `<main>`, the same in the sidebar and the full-page menu layout. */
+const MAIN_CLASS = `${PAGE_WATERMARK_HOST_CLASS} flex min-w-0 flex-1 flex-col outline-none`;
 
 /**
  * Authenticated chrome (ADR-0049, ADR-0050): the ink sidebar carries it
@@ -112,11 +116,7 @@ export function AppShell({
         <MenuTopBar pathname={pathname} />
         <PlanBanner />
         <CompanyDeletionBanner />
-        <main
-          id="main-content"
-          tabIndex={-1}
-          className="flex min-w-0 flex-1 flex-col outline-none"
-        >
+        <main id="main-content" tabIndex={-1} className={MAIN_CLASS}>
           {children}
         </main>
         <ReadyDownloadToast />
@@ -205,13 +205,7 @@ export function AppShell({
         <PlanBanner />
         <CompanyDeletionBanner />
         {/* tabIndex -1: Skip to content can move focus here without adding a Tab stop. */}
-        {/* isolate, overflow-x-clip: PageWatermark paints below the page's
-            content but above this background, and is cut at the edge. */}
-        <main
-          id="main-content"
-          tabIndex={-1}
-          className="isolate flex min-w-0 flex-1 flex-col overflow-x-clip outline-none"
-        >
+        <main id="main-content" tabIndex={-1} className={MAIN_CLASS}>
           {children}
         </main>
         <ReadyDownloadToast />

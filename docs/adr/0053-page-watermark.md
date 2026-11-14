@@ -22,11 +22,17 @@ That app draws the name as a second text node and moves it with GSAP. Here that 
 **Where it paints.** Behind the page's content and in front of the page's background:
 
 - The span is `-z-10` inside the heading's box, which is `relative`.
-- `<main>` in both shells is a stacking context (`isolate`), so "behind" stops at the page and the name does not fall under the shell's background.
+- Every shell layout's `<main>` is a stacking context (`isolate`), so "behind" stops at the page and the name does not fall under the shell's background.
 - The span has `contain: layout`, so its overflow is paint only: it never adds a scrollbar or widens a parent.
 - `<main>` clips horizontally (`overflow-x: clip`), which cuts a long name at the page's edge. `clip` does not make `<main>` a scroll container, so sticky elements inside keep working.
+- The two classes on `<main>` are one constant, `PAGE_WATERMARK_HOST_CLASS`, exported beside the component. Whiteboard's shell uses it, and so do both of Construction Management's layouts (the sidebar and the full-page menu of CM-0039).
 
-**Motion.** A CSS keyframe: 24px from the left and from transparent, over 1.6 seconds. Only `transform` and `opacity` change. There is no motion under reduced motion, and the name is hidden in print. When a skeleton header is replaced by the loaded one on the same path, the second watermark joins the drift where the first one was.
+**Motion.** A CSS keyframe: 24px from the left and from transparent, over 1.6 seconds. Only `transform` and `opacity` change. There is no motion under reduced motion, and the name is hidden in print.
+
+The name drifts in each time the page appears, and never again while the page stays:
+
+- When a skeleton header is replaced by the loaded one on the same path, the second watermark joins the drift where the first one was.
+- When the last watermark on a page unmounts, its drift ends. Coming back to the page later, even through a page that has no watermark, starts a new drift.
 
 **Where it is left out.** Whiteboard's Calendar (its heading sits on a coloured banner), Online Classes and the class pre-join screen; the headings inside a Construction Management Project's own shell.
 
@@ -34,5 +40,6 @@ That app draws the name as a second text node and moves it with GSAP. Here that 
 
 - A new record page passes `watermark` with its list's name. A screen that writes its own `<h1>` gives the heading's box `relative` and renders `PageWatermark` in it.
 - Anything inside `<main>` that should paint past its left or right edge is cut. Menus, dialogs and sheets render in a portal outside `<main>`, so they are not affected.
-- The Storybook preview wrappers in both apps mirror `<main>` (`isolate`, `overflow-x-clip`), so stories show the page as the shell does.
+- A new shell layout puts `PAGE_WATERMARK_HOST_CLASS` on its `<main>`. Without it the name is not seen. The shell stories check the computed style of `<main>` in each layout.
+- The Storybook preview wrappers in both apps carry the same constant, so stories show the page as the shell does.
 - A test that needs the watermark finds `[data-slot="page-watermark"]` and reads `data-text`.

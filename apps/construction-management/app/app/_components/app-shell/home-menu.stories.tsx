@@ -76,6 +76,15 @@ export const Home: Story = {
     await expect(
       canvasElement.querySelector("[data-sidebar=sidebar]"),
     ).toBeNull();
+    // This layout's <main> hosts the watermark as the sidebar layout's
+    // does: without a stacking context the name paints under the shell's
+    // background and is not seen.
+    const main = canvas.getByRole("main");
+    await expect(getComputedStyle(main).isolation).toBe("isolate");
+    await expect(getComputedStyle(main).overflowX).toBe("clip");
+    await expect(
+      main.querySelector('[data-slot="page-watermark"]'),
+    ).toHaveAttribute("data-text", "Main menu");
     await expect(
       canvas.getByRole("button", {
         name: "Switch Company. Active Company: Anugraha Engineers",
