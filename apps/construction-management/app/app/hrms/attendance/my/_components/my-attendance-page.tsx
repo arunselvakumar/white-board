@@ -34,15 +34,17 @@ import {
   AttendanceRead,
   EntryBadges,
   LIVE_STATE_LABELS,
-  LocationError,
   formatClock,
   formatDuration,
   formatTimer,
   formatWeekdayDate,
-  getDeviceLocation,
   hoursText,
   sourceLabel,
 } from "@/app/app/hrms/_components/attendance-parts";
+import {
+  LocationError,
+  getDeviceLocation,
+} from "@/app/app/_components/device-location";
 import { BackdatedAttendanceDialog } from "./backdated-attendance-dialog";
 import { HrmsPage } from "@/app/app/hrms/_components/hrms-parts";
 import { MissedCheckoutDialog } from "./missed-checkout-dialog";
