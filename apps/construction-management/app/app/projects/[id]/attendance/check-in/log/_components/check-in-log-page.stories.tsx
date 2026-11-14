@@ -124,7 +124,9 @@ export const Loaded: Story = {
       canvas.getByRole("heading", { name: "Saturday, 14 Nov 2026" }),
     ).toBeVisible();
     const outside = row(canvas, "Kavitha Murugan, Check In 9:00 am");
-    await expect(outside.getByText("240 m outside the site fence")).toBeVisible();
+    await expect(
+      outside.getByText("240 m outside the site fence"),
+    ).toBeVisible();
     const maps = outside.getByRole("link", { name: "Open in Maps" });
     await expect(maps).toHaveAttribute(
       "href",
