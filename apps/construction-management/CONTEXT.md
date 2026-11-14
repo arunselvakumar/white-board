@@ -84,7 +84,7 @@ An individual worker on the Company's own roll, with a daily or monthly wage and
 _Avoid_: worker, employee, staff
 
 **Reports To**:
-The Labour a Labour answers to on site, like a helper to the mason. Optional, another active Labour of the Company, never themselves and never a loop. Not the Supervisor, who is a Supervisor record, not a Labour.
+The Labour a Labour answers to on site, like a helper to the mason. Optional, another active Labour of the Company, never themselves and never a loop. Not a Site Engineer: a Labour answers to the Site Engineers on their Projects (ADR CM-0041).
 _Avoid_: manager, reporting manager, boss
 
 **Labour Category**:
@@ -92,7 +92,7 @@ The trade a Labour or a Vendor's headcount is booked under (Mason, Carpenter, He
 _Avoid_: skill, trade (for this list)
 
 **Supervisor**:
-The person on site who looks after a group of Labours, shown as **Site Engineer** (ADR CM-0036). A new Site Engineer signs in on the default Site Engineer Role, through a sign-in of their own that Office Staff does not list (ADR CM-0037); older ones may have none, or be an Office Staff member.
+The person on site who looks after a Project's Labours, shown as **Site Engineer** (ADR CM-0036). Put on a Project from the Project; a Labour answers to the Site Engineers on the Projects they work on, and has no Site Engineer of their own (ADR CM-0041). A new Site Engineer signs in on the default Site Engineer Role, through a sign-in of their own that Office Staff does not list (ADR CM-0037); older ones may have none, or be an Office Staff member.
 _Avoid_: foreman, mukadam (that is a Vendor)
 
 **Rate Card**:

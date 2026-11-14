@@ -234,7 +234,11 @@ function Results({
                 <TableCell className="font-medium">{day.labourName}</TableCell>
                 <TableCell>{statusText(day)}</TableCell>
                 <TableCell>{day.shift ?? "—"}</TableCell>
-                <TableCell>{day.supervisor?.name ?? "—"}</TableCell>
+                <TableCell>
+                  {day.siteEngineers.length === 0
+                    ? "—"
+                    : day.siteEngineers.map((item) => item.name).join(", ")}
+                </TableCell>
                 <TableCell className="tabular-nums">
                   {day.checkIn ?? "—"}
                 </TableCell>
@@ -302,7 +306,6 @@ export function LabourRecordedList({
   const [from, setFrom] = useState(initialFrom);
   const [to, setTo] = useState(initialTo);
   const [labourId, setLabourId] = useState(ALL);
-  const [supervisorId, setSupervisorId] = useState(ALL);
   const [status, setStatus] = useState(ALL);
   const [cursor, setCursor] =
     useState<LabourAttendanceListFilter["cursor"]>(null);
@@ -311,14 +314,13 @@ export function LabourRecordedList({
   // ones arrive.
   const shownFrom = useDeferredValue(from);
   const shownTo = useDeferredValue(to);
-  // Labourers and supervisors on the Project, for the pickers.
+  // Labourers on the Project, for the picker.
   const options = useQuery(labourSheetQuery(projectId, initialTo));
   const filter: LabourAttendanceListFilter = {
     projectId,
     from: shownFrom || undefined,
     to: shownTo || undefined,
     labourId: labourId === ALL ? undefined : labourId,
-    supervisorId: supervisorId === ALL ? undefined : supervisorId,
     status: status === ALL ? undefined : status,
     cursor,
   };
@@ -372,18 +374,6 @@ export function LabourRecordedList({
             })),
           ]}
           onChange={reset(setLabourId)}
-        />
-        <FilterSelect
-          label="Site Engineer"
-          value={supervisorId}
-          items={[
-            { value: ALL, label: "Every Site Engineer" },
-            ...(options.data?.supervisors ?? []).map((item) => ({
-              value: item.id,
-              label: item.name,
-            })),
-          ]}
-          onChange={reset(setSupervisorId)}
         />
         <FilterSelect
           label="Status"

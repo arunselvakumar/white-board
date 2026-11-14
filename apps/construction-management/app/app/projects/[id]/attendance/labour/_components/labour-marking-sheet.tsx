@@ -77,7 +77,6 @@ import {
 } from "./labour-sheet-form";
 import { RowTimes, SetTimesDialog, workingDayLabel } from "./labour-times";
 
-const ALL = "all";
 const NO_CATEGORY = "none";
 
 function categoryValue(id: string | undefined): string {
@@ -438,7 +437,6 @@ function SheetRow({
             <p className="text-muted-foreground text-xs">
               {[
                 row.labourCategory?.name,
-                row.supervisor?.name,
                 row.wageType === "monthly" ? "Monthly" : "Daily",
                 workingDayLabel(row),
               ]
@@ -709,7 +707,6 @@ export function LabourMarkingSheet({
   const rows = useWatch({ control, name: "rows" });
   const mark = useMarkLabourDay();
   const [search, setSearch] = useState("");
-  const [supervisorId, setSupervisorId] = useState(ALL);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [rowErrors, setRowErrors] = useState<Record<string, RowError>>({});
   const [formError, setFormError] = useState<string>();
@@ -723,12 +720,11 @@ export function LabourMarkingSheet({
       .map((row, index) => ({ row, index }))
       .filter(
         ({ row }) =>
-          (supervisorId === ALL || row.supervisor?.id === supervisorId) &&
-          (term === "" ||
-            row.name.toLowerCase().includes(term) ||
-            (row.labourCode ?? "").toLowerCase().includes(term)),
+          term === "" ||
+          row.name.toLowerCase().includes(term) ||
+          (row.labourCode ?? "").toLowerCase().includes(term),
       );
-  }, [sheet.labourers, search, supervisorId]);
+  }, [sheet.labourers, search]);
   const markable = visible.filter(({ row }) => row.canMark);
   const dirtyCount = sheet.labourers.filter((row, index) => {
     const draft = rows[index];
@@ -862,21 +858,6 @@ export function LabourMarkingSheet({
             }}
           />
         </div>
-        {sheet.supervisors.length > 0 ? (
-          <SimpleSelect
-            label="Site Engineer"
-            className="h-10 sm:w-52"
-            value={supervisorId}
-            items={[
-              { value: ALL, label: "All Site Engineers" },
-              ...sheet.supervisors.map((item) => ({
-                value: item.id,
-                label: item.name,
-              })),
-            ]}
-            onChange={setSupervisorId}
-          />
-        ) : null}
         <div className="flex flex-wrap gap-2 sm:ml-auto">
           <Button
             type="button"

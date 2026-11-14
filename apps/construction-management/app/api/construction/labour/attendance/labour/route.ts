@@ -32,7 +32,7 @@ function cursorOf(day: { date: string; id: string }): string {
 
 /**
  * Marked labour days of a Project, newest date first: filter by
- * dates, labourer, Supervisor and status, with bidirectional cursors and a
+ * dates, labourer and status, with bidirectional cursors and a
  * total. Needs Attendance read on the Project.
  */
 export async function GET(request: Request): Promise<Response> {
@@ -60,7 +60,6 @@ export async function GET(request: Request): Promise<Response> {
       from: model.from,
       to: model.to,
       labourId: model.labourId,
-      supervisorId: model.supervisorId,
       status: model.status,
       limit: model.limit,
       after: model.after == null ? undefined : decode(model.after),

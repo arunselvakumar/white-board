@@ -29,7 +29,11 @@ export type ReportLabourDay = {
   status: AttendanceStatus;
   isPaidLeave: boolean;
   shift: string | null;
-  supervisor: string | null;
+  /**
+   * The Site Engineer saved with the day (days marked before ADR CM-0041),
+   * else the Project's Site Engineers, comma-separated; null for none.
+   */
+  siteEngineers: string | null;
   /** `HH:MM`, Company time (ADR CM-0011); null when not recorded. */
   checkIn: string | null;
   /** `HH:MM`; at or before `checkIn` is the next day. */

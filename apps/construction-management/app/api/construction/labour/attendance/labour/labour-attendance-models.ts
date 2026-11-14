@@ -48,8 +48,6 @@ export const MarkConstructionLabourLabourAttendanceRequestModel = z.object({
         isPaidLeave: z.boolean().optional(),
         /** Free label: General, Shift 1, Shift 2, Shift 3. */
         shift: z.string().max(40).nullable().optional(),
-        /** Snapshot; leave out to use the labourer's own Supervisor. */
-        supervisorId: z.uuid().nullable().optional(),
         /** `HH:MM` (24-hour, Company time); only on `present` or `half_day`. */
         checkIn: timeOfDay.nullable().optional(),
         /** `HH:MM`; needs `checkIn`. At or before `checkIn` is the next day. */
@@ -128,8 +126,6 @@ export const ListConstructionLabourLabourAttendanceRequestModel = z
     from: z.iso.date().optional(),
     to: z.iso.date().optional(),
     labourId: z.uuid().optional(),
-    /** The Supervisor snapshot on the day. */
-    supervisorId: z.uuid().optional(),
     /** `on_leave` is every leave day; `paid_leave` only the paid ones. */
     status: z.enum([...STATUSES, "paid_leave"]).optional(),
     limit: z.coerce.number().int().min(1).max(200).optional().default(50),
@@ -175,7 +171,11 @@ export const ConstructionLabourLabourAttendanceDayResponseModel = z.object({
   status,
   isPaidLeave: z.boolean(),
   shift: z.string().nullable(),
-  supervisor: ref.nullable(),
+  /**
+   * The Site Engineer saved with the day (days marked before ADR CM-0041),
+   * else the Project's Site Engineers today, by name.
+   */
+  siteEngineers: z.array(ref),
   /** `HH:MM`, or null. */
   checkIn: z.string().nullable(),
   /** `HH:MM`, or null; at or before `checkIn` is the next day. */
@@ -222,7 +222,6 @@ export const GetConstructionLabourLabourAttendanceSheetResponseModel = z.object(
         name: z.string(),
         labourCode: z.string().nullable(),
         labourCategory: ref.nullable(),
-        supervisor: ref.nullable(),
         /** 0 = Sunday … 6 = Saturday. */
         weeklyHolidays: z.array(z.int()),
         wageType: z.enum(["daily", "monthly"]).nullable(),
@@ -254,7 +253,6 @@ export const GetConstructionLabourLabourAttendanceSheetResponseModel = z.object(
       }),
     ),
     labourCategories: z.array(ref),
-    supervisors: z.array(ref),
     totals: z.object({
       marked: z.int(),
       present: z.int(),
@@ -362,7 +360,7 @@ export function toLabourAttendanceDayResponse(
     status: day.status,
     isPaidLeave: day.isPaidLeave,
     shift: day.shift,
-    supervisor: day.supervisor,
+    siteEngineers: day.siteEngineers,
     checkIn: day.checkIn,
     checkOut: day.checkOut,
     breakMinutes: day.breakMinutes,
@@ -405,7 +403,6 @@ export function toLabourAttendanceSheetResponse(
           : toLabourAttendanceDayResponse(row.attendance, financial),
     })),
     labourCategories: sheet.labourCategories,
-    supervisors: sheet.supervisors,
     totals: {
       ...sheet.totals,
       earned: amount(sheet.totals.earned, financial),

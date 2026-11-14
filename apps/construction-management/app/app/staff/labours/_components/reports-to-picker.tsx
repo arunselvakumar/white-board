@@ -79,7 +79,6 @@ export function ReportsToPicker({
       search,
       status: "active",
       projectId: null,
-      supervisorId: null,
       categoryId: null,
       cursor: null,
     }),

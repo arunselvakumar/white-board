@@ -78,7 +78,6 @@ export type LabourAttendanceListFilter = {
   from?: string;
   to?: string;
   labourId?: string;
-  supervisorId?: string;
   status?: string;
   cursor?: { after: string } | { before: string } | null;
 };
@@ -89,7 +88,6 @@ export function labourAttendanceListQuery(filter: LabourAttendanceListFilter) {
     from: filter.from,
     to: filter.to,
     labourId: filter.labourId,
-    supervisorId: filter.supervisorId,
     status: filter.status,
     limit: "25",
     after:

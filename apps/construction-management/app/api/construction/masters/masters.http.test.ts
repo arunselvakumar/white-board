@@ -81,10 +81,10 @@ async function listOf<T>(
   return body.items;
 }
 
-/** A labourer row in the labour context pointing at a category and a Supervisor. */
+/** A labourer row in the labour context pointing at a category. */
 async function labourUsing(
   workspaceId: string,
-  refs: { labourCategoryId?: string; supervisorId?: string },
+  refs: { labourCategoryId?: string },
 ): Promise<string> {
   const id = newId();
   await prisma.constructionLabourLabour.create({
@@ -417,7 +417,7 @@ describe("Masters HTTP (CM-203)", () => {
     expect(missing.status).toBe(StatusCodes.BAD_REQUEST);
   });
 
-  it("will not delete a Labour Category or Supervisor a Labour uses", async () => {
+  it("will not delete a Labour Category a Labour uses, or a Site Engineer a marked day names", async () => {
     const owner = await ownerWithCompany();
     const category = await json<Lookup>(
       await createCategory(
@@ -431,7 +431,25 @@ describe("Masters HTTP (CM-203)", () => {
     );
     const labourId = await labourUsing(owner.workspaceId, {
       labourCategoryId: category.id,
-      supervisorId: supervisor.id,
+    });
+    // Labours have no Site Engineer of their own (ADR CM-0041); a day marked
+    // before that change kept the one it was saved with.
+    const dayId = newId();
+    await prisma.constructionLabourAttendance.create({
+      data: {
+        id: dayId,
+        workspaceId: owner.workspaceId,
+        projectId: newId(),
+        labourId,
+        attendanceDate: new Date("2026-10-02"),
+        status: "present",
+        supervisorId: supervisor.id,
+        wageType: "daily",
+        wageRate: 80_000,
+        earned: 80_000,
+        createdBy: "test",
+        updatedBy: "test",
+      },
     });
 
     const refusedCategory = await deleteCategory(
@@ -451,10 +469,14 @@ describe("Masters HTTP (CM-203)", () => {
       code: "SUPERVISOR_IN_USE",
     });
 
-    // Once the labourer is gone (a tombstone), both can be deleted.
+    // Once the labourer and the day are gone (tombstones), both can be deleted.
     await prisma.constructionLabourLabour.update({
       where: { id: labourId },
       data: { deletedAt: new Date(), deletedBy: "test" },
+    });
+    await prisma.constructionLabourAttendance.update({
+      where: { id: dayId },
+      data: { deletedAt: new Date() },
     });
     const deletedCategory = await deleteCategory(
       jsonRequest(`${CATEGORIES}/${category.id}/delete`, owner.cookie, {}),

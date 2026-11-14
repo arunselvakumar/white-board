@@ -34,7 +34,6 @@ function labourer(
     labourCode: null,
     isActive: true,
     labourCategoryId: "mason",
-    supervisorId: "sundar",
     weeklyHolidays: [0],
     card: options.monthly
       ? {
@@ -70,7 +69,7 @@ function setup() {
     store,
     fakeDirectory({ p1: "Tower A", p2: "Villa" }),
     fakeDirectory({ mason: "Mason" }),
-    fakeDirectory({ sundar: "Sundar" }),
+    fakeDirectory({ sundar: "Sundar", ravi: "Ravi" }, { p1: ["sundar"] }),
     guard,
     () => new Date(NOW.getTime() + tick++),
   );
@@ -121,8 +120,13 @@ describe("LabourAttendanceHandlers.markDay", () => {
       overtimeHours: "1.5",
       overtimeAmount: 15_000,
       total: 85_000,
-      supervisor: { id: "sundar", name: "Sundar" },
+      // Nothing saved: the Project's Site Engineers (ADR CM-0041).
+      siteEngineers: [{ id: "sundar", name: "Sundar" }],
     });
+    expect([...store.days.values()].map((day) => day.supervisorId)).toEqual([
+      null,
+      null,
+    ]);
     // Monthly: 31,000 ÷ 31 days × ½.
     expect(saved[1]?.earned).toBe(50_000);
     expect(store.balance("dhuresh")).toBe(85_000);
@@ -178,7 +182,7 @@ describe("LabourAttendanceHandlers.markDay", () => {
     expect(unknown.kind).toBe("not_found");
   });
 
-  it("refuses overtime on an absent day, unknown categories and supervisors, and future dates", async () => {
+  it("refuses overtime on an absent day, unknown categories and future dates", async () => {
     const { handlers } = setup();
     const absent = await failure(
       handlers.markDay(
@@ -211,17 +215,6 @@ describe("LabourAttendanceHandlers.markDay", () => {
       ),
     );
     expect(category.code).toBe("LABOUR_CATEGORY_NOT_FOUND");
-
-    const supervisor = await failure(
-      handlers.markDay(
-        mark({
-          marks: [
-            { labourId: "dhuresh", status: "present", supervisorId: "x" },
-          ],
-        }),
-      ),
-    );
-    expect(supervisor.code).toBe("SUPERVISOR_NOT_FOUND");
 
     const future = await failure(
       handlers.markDay(mark({ date: "2026-10-09" })),
@@ -490,7 +483,30 @@ describe("LabourAttendanceHandlers queries", () => {
       labourCategory: { id: "mason", name: "Mason" },
     });
     expect(today.labourCategories).toEqual([{ id: "mason", name: "Mason" }]);
-    expect(today.supervisors).toEqual([{ id: "sundar", name: "Sundar" }]);
+    expect(today).not.toHaveProperty("supervisors");
+    expect(today.labourers[0]).not.toHaveProperty("supervisor");
+  });
+
+  it("keeps the Site Engineer a day was saved with before ADR CM-0041, through a re-mark", async () => {
+    const { store, handlers } = setup();
+    const [first] = await handlers.markDay(
+      mark({ marks: [{ labourId: "dhuresh", status: "present" }] }),
+    );
+    if (first == null) throw new Error("not marked");
+    // A day marked before the change carries the Labour's own Site Engineer.
+    const stored = store.days.get(first.id);
+    if (stored == null) throw new Error("not stored");
+    stored.supervisorId = "ravi";
+
+    const [again] = await handlers.markDay(
+      mark({
+        marks: [{ labourId: "dhuresh", status: "half_day" }],
+        expected: { dhuresh: stored.updatedAt },
+      }),
+    );
+    expect(again?.status).toBe("half_day");
+    expect(store.days.get(first.id)?.supervisorId).toBe("ravi");
+    expect(again?.siteEngineers).toEqual([{ id: "ravi", name: "Ravi" }]);
   });
 
   it("shows working hours and yesterday's times on the sheet", async () => {

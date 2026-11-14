@@ -20,8 +20,8 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The Labour register, newest first: filter by Project, Active,
- * Supervisor and Labour Category, and search name, Labour Id or contact.
+ * The Labour register, newest first: filter by Project, Active and Labour
+ * Category, and search name, Labour Id or contact.
  */
 export async function GET(request: Request): Promise<Response> {
   try {
@@ -40,7 +40,6 @@ export async function GET(request: Request): Promise<Response> {
       projectId: model.projectId,
       active: queryBoolean(model.active),
       search: model.q,
-      supervisorId: model.supervisorId,
       labourCategoryId: model.categoryId,
     });
     const first = page.items[0];

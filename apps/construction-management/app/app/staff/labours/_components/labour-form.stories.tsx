@@ -13,7 +13,6 @@ import {
   DHURESH,
   MEENA,
   RAVI,
-  SUPERVISOR_LIST,
   listOf,
   TOWER,
   VILLA,
@@ -46,10 +45,6 @@ const LOOKUPS = [
   {
     path: "/api/construction/masters/labour-categories",
     respond: () => Response.json(CATEGORY_LIST),
-  },
-  {
-    path: "/api/construction/masters/supervisors",
-    respond: () => Response.json(SUPERVISOR_LIST),
   },
   // Reports To searches the active Labours (ADR CM-0035).
   {
@@ -155,6 +150,13 @@ export const AddValidatesAndSaves: Story = {
 
     await choose(canvas, body, userEvent, "Labour Category", "Mason");
     await expect(body.queryByRole("option", { name: "Welder" })).toBeNull();
+    // No Site Engineer to pick: they come from the Projects (ADR CM-0041).
+    await expect(
+      canvas.queryByRole("combobox", { name: "Site Engineer" }),
+    ).toBeNull();
+    await expect(
+      canvas.getByText("They answer to the Site Engineers on their Projects."),
+    ).toBeVisible();
     await userEvent.click(canvas.getByRole("combobox", { name: "Projects" }));
     await userEvent.click(await body.findByRole("option", { name: "Tower A" }));
     await userEvent.click(body.getByRole("option", { name: "Mall Block C" }));
@@ -180,6 +182,7 @@ export const AddValidatesAndSaves: Story = {
       projectIds: [TOWER.id, MALL.id],
       aadhaar: null,
     });
+    await expect(sent(LABOURS)).not.toHaveProperty("supervisorId");
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith("/app/staff/labours"),
     );
@@ -424,6 +427,9 @@ export const EditProjects: Story = {
       await canvas.findByRole("heading", { name: "Edit Dhuresh Nawin" }),
     ).toBeVisible();
     await expect(canvas.getByText(/counts from today/)).toBeVisible();
+    await expect(
+      canvas.getByText("Site Engineers on their Projects: Sundar Rajan."),
+    ).toBeVisible();
     await userEvent.click(canvas.getByRole("combobox", { name: "Projects" }));
     await userEvent.click(
       await body.findByRole("option", { name: "Villa Phase 2" }),

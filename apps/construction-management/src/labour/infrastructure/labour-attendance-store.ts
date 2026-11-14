@@ -81,7 +81,6 @@ function toLabourer(row: {
   labourCode: string | null;
   isActive?: boolean;
   labourCategoryId: string | null;
-  supervisorId: string | null;
   weeklyHolidays: number[];
   wageType: LabourRow["wageType"];
   wagePerDay: number | null;
@@ -95,7 +94,6 @@ function toLabourer(row: {
     labourCode: row.labourCode,
     isActive: row.isActive ?? true,
     labourCategoryId: row.labourCategoryId,
-    supervisorId: row.supervisorId,
     weeklyHolidays: row.weeklyHolidays as Weekday[],
     card: {
       wageType: row.wageType,
@@ -271,8 +269,6 @@ export class PrismaLabourAttendanceStore implements LabourAttendanceStore {
     if (params.to != null)
       filters.push({ attendanceDate: { lte: calendarDateToDb(params.to) } });
     if (params.labourId != null) filters.push({ labourId: params.labourId });
-    if (params.supervisorId != null)
-      filters.push({ supervisorId: params.supervisorId });
     if (params.status === "paid_leave")
       filters.push({ status: "on_leave", isPaidLeave: true });
     else if (params.status != null) filters.push({ status: params.status });

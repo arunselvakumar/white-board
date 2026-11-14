@@ -60,13 +60,13 @@ async function toBytes(
 
 /**
  * The sample sheet (CM-206): the header row, one example row, and a second
- * sheet listing the Company's Projects, Labour Categories and Supervisors
- * with drop-downs pointing at them.
+ * sheet listing the Company's Projects and Labour Categories with
+ * drop-downs pointing at them. There is no Site Engineer column: a Labour's
+ * Site Engineers come from their Projects (ADR CM-0041).
  */
 export async function labourTemplate(lists: {
   projects: string[];
   labourCategories: string[];
-  supervisors: string[];
 }): Promise<Uint8Array<ArrayBuffer>> {
   const workbook = new ExcelJS.Workbook();
   workbook.creator = "Construction Management";
@@ -89,7 +89,6 @@ export async function labourTemplate(lists: {
   const listColumns: [string, string[]][] = [
     ["Projects", lists.projects],
     ["Labour Categories", lists.labourCategories],
-    ["Site Engineers", lists.supervisors],
     ["Wage Types", ["Daily", "Monthly"]],
     ["Genders", ["Male", "Female", "Other"]],
     ["Weekdays", WEEKDAY_NAMES],
@@ -109,9 +108,8 @@ export async function labourTemplate(lists: {
   // none: a cell may name several, separated by ";".
   const dropDowns: [LabourColumnKey, number][] = [
     ["labourCategory", 1],
-    ["supervisor", 2],
-    ["wageType", 3],
-    ["gender", 4],
+    ["wageType", 2],
+    ["gender", 3],
   ];
   for (const [key, listIndex] of dropDowns) {
     const values = listColumns[listIndex]?.[1] ?? [];
@@ -134,8 +132,8 @@ const WEEKDAYS = (days: readonly number[]) =>
   days.map((day) => WEEKDAY_NAMES[day] ?? "").join(", ");
 
 /**
- * The register as a sheet (CM-206): the template's columns plus Status and
- * Balance, so an export reads like the import. Without Financial the
+ * The register as a sheet (CM-206): the template's columns plus Site
+ * Engineers (from their Projects, ADR CM-0041), Status and Balance, so an export reads like the import. Without Financial the
  * amounts are blank; Aadhaar is always masked.
  */
 export async function labourExport(
@@ -148,12 +146,14 @@ export async function labourExport(
   setColumns(sheet);
   addHeader(sheet, [
     ...LABOUR_COLUMNS.map((column) => column.header.replace("*", "")),
+    "Site Engineers",
     "Status",
     "Balance (₹)",
   ]);
-  sheet.getColumn(LABOUR_COLUMNS.length + 1).width = 10;
-  sheet.getColumn(LABOUR_COLUMNS.length + 2).width = 16;
-  sheet.getColumn(LABOUR_COLUMNS.length + 2).numFmt = "#,##0.00";
+  sheet.getColumn(LABOUR_COLUMNS.length + 1).width = 26;
+  sheet.getColumn(LABOUR_COLUMNS.length + 2).width = 10;
+  sheet.getColumn(LABOUR_COLUMNS.length + 3).width = 16;
+  sheet.getColumn(LABOUR_COLUMNS.length + 3).numFmt = "#,##0.00";
   const money = (paise: number | null) => (financial ? rupees(paise) : null);
   for (const labour of labours) {
     const { details } = labour;
@@ -174,7 +174,6 @@ export async function labourExport(
         .map((project) => project.name)
         .join(`${PROJECT_SEPARATOR} `),
       labourCategory: labour.labourCategory?.name ?? null,
-      supervisor: labour.supervisor?.name ?? null,
       contactNumber: details.contactNumber,
       gender:
         details.gender == null
@@ -186,6 +185,7 @@ export async function labourExport(
     };
     sheet.addRow([
       ...LABOUR_COLUMNS.map((column) => values[column.key]),
+      labour.siteEngineers.map((engineer) => engineer.name).join(", "),
       labour.isActive ? "Active" : "Inactive",
       money(labour.balance),
     ]);
@@ -223,8 +223,6 @@ const KEYS_BY_HEADER = new Map<string, LabourColumnKey>([
   ),
   // Sheets from the template before ADR CM-0033 had one "Project*".
   ["project", "projects"],
-  // Sheets from the template before ADR CM-0036 say "Supervisor".
-  ["supervisor", "supervisor"],
 ]);
 
 function fileInvalid(message: string): DomainError {

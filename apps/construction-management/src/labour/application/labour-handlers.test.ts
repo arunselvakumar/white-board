@@ -20,7 +20,6 @@ function setup() {
     fakeDirectories({
       projects: ["p1", "p2"],
       labourCategories: ["mason", "welder"],
-      supervisors: ["sundar"],
       disabled: ["welder"],
     }),
     () => NOW,
@@ -66,7 +65,7 @@ describe("LabourHandlers", () => {
     expect(JSON.stringify(repository.audits)).not.toContain("234123412346");
   });
 
-  it("checks Projects, categories, supervisors and the Labour Id", async () => {
+  it("checks Projects, categories and the Labour Id", async () => {
     const { handlers } = setup();
     const create = (extra: Partial<CreateLabourInput>) =>
       handlers.create({
@@ -79,9 +78,6 @@ describe("LabourHandlers", () => {
     );
     expect(await codeOf(() => create({ labourCategoryId: "welder" }))).toBe(
       "LABOUR_CATEGORY_NOT_FOUND",
-    );
-    expect(await codeOf(() => create({ supervisorId: "nobody" }))).toBe(
-      "SUPERVISOR_NOT_FOUND",
     );
     await create({ labourCode: "A-1" });
     expect(await codeOf(() => create({ labourCode: "a-1" }))).toBe(

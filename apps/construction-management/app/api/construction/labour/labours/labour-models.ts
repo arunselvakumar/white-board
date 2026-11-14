@@ -40,7 +40,11 @@ export const ConstructionLabourLabourResponseModel = z.object({
   /** `XXXXXXXX9012`; the number itself is never returned. */
   aadhaarMasked: z.string().nullable(),
   labourCategory: ref.nullable(),
-  supervisor: ref.nullable(),
+  /**
+   * The Site Engineers on their current Projects, by name (ADR CM-0041).
+   * Read from the Projects; a Labour has no Site Engineer of their own.
+   */
+  siteEngineers: z.array(ref),
   /** The Labour they report to (ADR CM-0035). */
   reportsTo: ref.nullable(),
   /** E.164. */
@@ -85,7 +89,7 @@ export function toLabourResponse(
     esicNumber: details.esicNumber,
     aadhaarMasked: item.aadhaarMasked,
     labourCategory: item.labourCategory,
-    supervisor: item.supervisor,
+    siteEngineers: item.siteEngineers,
     reportsTo: item.reportsTo,
     contactNumber: details.contactNumber,
     gender: details.gender,
@@ -121,7 +125,6 @@ const labourFields = {
   uanNumber: optionalText,
   esicNumber: optionalText,
   labourCategoryId: z.uuid().nullable().optional(),
-  supervisorId: z.uuid().nullable().optional(),
   /**
    * Another live, active Labour (ADR CM-0035); never this one, never a
    * loop. Null for none; omit on update to keep.
@@ -189,7 +192,6 @@ export const ListConstructionLabourLaboursRequestModel = z
     projectId: z.uuid().optional(),
     active: booleanQuery.optional(),
     q: z.string().trim().max(100).optional(),
-    supervisorId: z.uuid().optional(),
     categoryId: z.uuid().optional(),
   })
   .refine((value) => value.after == null || value.before == null, {
@@ -201,7 +203,6 @@ export const ExportConstructionLabourLaboursRequestModel = z.object({
   projectId: z.uuid().optional(),
   active: booleanQuery.optional(),
   q: z.string().trim().max(100).optional(),
-  supervisorId: z.uuid().optional(),
   categoryId: z.uuid().optional(),
 });
 
@@ -264,7 +265,6 @@ export const ConstructionLabourLabourOptionResponseModel = z.object({
   name: z.string(),
   labourCode: z.string().nullable(),
   labourCategoryId: z.uuid().nullable(),
-  supervisorId: z.uuid().nullable(),
   wageType: z.enum(["daily", "monthly"]),
   weeklyHolidays: z.array(z.int()),
   /** Decimal hours a day (ADR CM-0011). */
@@ -300,7 +300,6 @@ const importValues = z.object({
   /** The Projects cell as typed: names separated by ";". */
   projects: z.string().nullable(),
   labourCategory: z.string().nullable(),
-  supervisor: z.string().nullable(),
 });
 
 export const ImportConstructionLabourLaboursResponseModel = z.object({

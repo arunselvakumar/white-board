@@ -275,7 +275,7 @@ export function fakeQueries(repository: FakeLabourRepository): LabourQueries {
         name: projectId,
       })),
       labourCategory: null,
-      supervisor: null,
+      siteEngineers: [],
       reportsTo:
         details.reportsToId == null
           ? null
@@ -309,7 +309,6 @@ export function fakeQueries(repository: FakeLabourRepository): LabourQueries {
 export function fakeDirectories(input: {
   projects?: string[];
   labourCategories?: string[];
-  supervisors?: string[];
   disabled?: string[];
 }): LabourDirectories {
   const find =
@@ -328,7 +327,6 @@ export function fakeDirectories(input: {
   return {
     projects: { find: find(input.projects) },
     labourCategories: { find: find(input.labourCategories) },
-    supervisors: { find: find(input.supervisors) },
   };
 }
 

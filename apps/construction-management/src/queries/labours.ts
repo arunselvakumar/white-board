@@ -35,7 +35,6 @@ export type LabourListFilter = {
   search: string;
   status: "all" | "active" | "inactive";
   projectId: string | null;
-  supervisorId: string | null;
   categoryId: string | null;
   cursor: { after: string } | { before: string } | null;
 };
@@ -49,8 +48,6 @@ export function labourFilterParams(
   if (filter.status !== "all")
     params.set("active", filter.status === "active" ? "true" : "false");
   if (filter.projectId != null) params.set("projectId", filter.projectId);
-  if (filter.supervisorId != null)
-    params.set("supervisorId", filter.supervisorId);
   if (filter.categoryId != null) params.set("categoryId", filter.categoryId);
   return params;
 }

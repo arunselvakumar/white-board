@@ -24,11 +24,7 @@ import {
   type LabourDetailsInput,
   type ProjectChanges,
 } from "../domain/labour";
-import type {
-  LabourCategoryDirectory,
-  ProjectDirectory,
-  SupervisorDirectory,
-} from "./directories";
+import type { LabourCategoryDirectory, ProjectDirectory } from "./directories";
 import type {
   LabourListFilter,
   LabourListPage,
@@ -71,7 +67,6 @@ export type UpdateLabourInput = Omit<
 export type LabourDirectories = {
   projects: ProjectDirectory;
   labourCategories: LabourCategoryDirectory;
-  supervisors: SupervisorDirectory;
 };
 
 export const labourNotFound = () =>
@@ -170,15 +165,14 @@ export class LabourHandlers {
     };
   }
 
-  /** Projects must be live; categories and supervisors live and enabled when newly chosen. */
+  /** Projects must be live; a category live and enabled when newly chosen. */
   async assertReferences(
     workspaceId: string,
     refs: {
       projectIds?: readonly string[];
       labourCategoryId: string | null;
-      supervisorId: string | null;
     },
-    previous?: Pick<LabourDetails, "labourCategoryId" | "supervisorId">,
+    previous?: Pick<LabourDetails, "labourCategoryId">,
   ): Promise<void> {
     if (refs.projectIds != null && refs.projectIds.length > 0) {
       const projects = await this.directories.projects.find(
@@ -207,24 +201,6 @@ export class LabourHandlers {
             "This Labour Category was not found or is disabled.",
           ),
           "labourCategoryId",
-        );
-    }
-    if (
-      refs.supervisorId != null &&
-      refs.supervisorId !== previous?.supervisorId
-    ) {
-      const found = (
-        await this.directories.supervisors.find(workspaceId, [
-          refs.supervisorId,
-        ])
-      ).get(refs.supervisorId);
-      if (found == null || found.disabled)
-        throw withField(
-          notFound(
-            "SUPERVISOR_NOT_FOUND",
-            "This Site Engineer was not found or is disabled.",
-          ),
-          "supervisorId",
         );
     }
   }
@@ -312,7 +288,6 @@ export class LabourHandlers {
     await this.assertReferences(input.workspaceId, {
       projectIds,
       labourCategoryId: details.labourCategoryId,
-      supervisorId: details.supervisorId,
     });
     await this.assertReportsTo(input.workspaceId, null, details.reportsToId);
     await this.assertCodeFree(input.workspaceId, details.labourCode);
@@ -379,7 +354,6 @@ export class LabourHandlers {
       {
         projectIds: wantedProjects?.filter((id) => !labour.isOn(id)),
         labourCategoryId: details.labourCategoryId,
-        supervisorId: details.supervisorId,
       },
       current,
     );
@@ -566,7 +540,6 @@ export class LabourHandlers {
     await this.assertReferences(input.workspaceId, {
       projectIds: [input.toProjectId],
       labourCategoryId: null,
-      supervisorId: null,
     });
     const labours = await this.labours.findMany(input.workspaceId, ids);
     if (labours.length !== ids.length) throw labourNotFound();
@@ -733,7 +706,6 @@ export class LabourHandlers {
     await this.assertReferences(input.workspaceId, {
       projectIds: [input.projectId],
       labourCategoryId: null,
-      supervisorId: null,
     });
     const labours = await this.labours.findMany(input.workspaceId, ids);
     const found = new Set(labours.map((labour) => labour.id));

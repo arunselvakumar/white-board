@@ -8,7 +8,7 @@ import { MasterListPage } from "../pages/MasterListPage";
 
 projectTest.describe("Masters", () => {
   projectTest(
-    "should offer the new Labour Category and Site Engineer on a Labour, when the Owner adds them",
+    "should offer the new Labour Category on a Labour and list the new Site Engineer, when the Owner adds them",
     async ({ page }) => {
       const category = unique("Bar Bender");
       const supervisor = unique("Selvam");
@@ -56,13 +56,17 @@ projectTest.describe("Masters", () => {
       const addLabourPage = new AddLabourPage(page);
       await addLabourPage.goto();
       await addLabourPage.choose("Labour Category", category);
-      await addLabourPage.choose("Site Engineer", supervisor);
       await expect(
         page.getByRole("combobox", { name: "Labour Category" }),
       ).toContainText(category);
+      // A Labour answers to the Site Engineers on their Projects; there is
+      // no Site Engineer to pick (ADR CM-0041).
       await expect(
         page.getByRole("combobox", { name: "Site Engineer" }),
-      ).toContainText(supervisor);
+      ).toHaveCount(0);
+      await expect(
+        page.getByText("They answer to the Site Engineers on their Projects."),
+      ).toBeVisible();
     },
   );
 

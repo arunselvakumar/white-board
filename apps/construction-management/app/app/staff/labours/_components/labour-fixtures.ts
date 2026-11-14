@@ -60,20 +60,6 @@ export const CATEGORY_LIST = {
   total: 3,
 };
 
-export const SUPERVISOR_LIST = {
-  items: [
-    {
-      ...SUNDAR,
-      mobile: null,
-      teamMember: null,
-      disabled: false,
-      createdAt: AT,
-      updatedAt: AT,
-    },
-  ],
-  total: 1,
-};
-
 export const DHURESH: LabourResponse = {
   id: "0199a1b2-0000-7000-8000-00000000b001",
   name: "Dhuresh Nawin",
@@ -92,7 +78,8 @@ export const DHURESH: LabourResponse = {
   esicNumber: null,
   aadhaarMasked: "XXXXXXXX2346",
   labourCategory: MASON,
-  supervisor: SUNDAR,
+  // On Tower A, where Sundar is the Site Engineer (ADR CM-0041).
+  siteEngineers: [SUNDAR],
   reportsTo: null,
   contactNumber: "+917708165767",
   gender: "male",
@@ -116,7 +103,7 @@ export const MEENA: LabourResponse = {
   balance: -50_000,
   aadhaarMasked: null,
   labourCategory: HELPER,
-  supervisor: null,
+  siteEngineers: [],
   // A helper who answers to the mason (ADR CM-0035).
   reportsTo: { id: DHURESH.id, name: DHURESH.name },
   gender: "female",
@@ -170,7 +157,6 @@ const values = (name: string, project: string | null) => ({
   openingBalance: null,
   projects: project,
   labourCategory: "Mason",
-  supervisor: null,
 });
 
 export const PREVIEW_WITH_ERRORS: LabourImportPreview = {

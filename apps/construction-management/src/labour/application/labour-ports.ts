@@ -132,7 +132,11 @@ export type LabourReadModel = {
   /** The Projects they work on now, by name (ADR CM-0033). */
   projects: { id: string; name: string }[];
   labourCategory: { id: string; name: string } | null;
-  supervisor: { id: string; name: string } | null;
+  /**
+   * The Site Engineers on their current Projects, by name (ADR CM-0041):
+   * nothing is stored on the Labour.
+   */
+  siteEngineers: { id: string; name: string }[];
   /** The Labour they report to (ADR CM-0035). */
   reportsTo: { id: string; name: string } | null;
   isActive: boolean;
@@ -149,7 +153,6 @@ export type LabourListFilter = {
   projectId?: string;
   active?: boolean;
   search?: string;
-  supervisorId?: string;
   labourCategoryId?: string;
 };
 
@@ -165,7 +168,6 @@ export type LabourOption = {
   name: string;
   labourCode: string | null;
   labourCategoryId: string | null;
-  supervisorId: string | null;
   wageType: LabourDetails["wageType"];
   weeklyHolidays: number[];
   /** Decimal hours a day (ADR CM-0011). */
@@ -246,6 +248,5 @@ export type LabourLookups = {
   all(workspaceId: string): Promise<{
     projects: { id: string; name: string }[];
     labourCategories: { id: string; name: string; disabled: boolean }[];
-    supervisors: { id: string; name: string; disabled: boolean }[];
   }>;
 };

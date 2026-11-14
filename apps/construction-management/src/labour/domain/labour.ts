@@ -54,7 +54,6 @@ export type LabourDetails = {
   /** Plain while in memory; stored encrypted. */
   aadhaar: string | null;
   labourCategoryId: string | null;
-  supervisorId: string | null;
   /** Another Labour of the Company (ADR CM-0035); optional. */
   reportsToId: string | null;
   /** E.164. */
@@ -78,7 +77,6 @@ export type LabourDetailsInput = {
   esicNumber?: string | null;
   aadhaar?: string | null;
   labourCategoryId?: string | null;
-  supervisorId?: string | null;
   reportsToId?: string | null;
   contactNumber?: string | null;
   gender?: string | null;
@@ -263,7 +261,6 @@ export function checkLabourDetails(
       esicNumber,
       aadhaar,
       labourCategoryId: optional(input.labourCategoryId),
-      supervisorId: optional(input.supervisorId),
       reportsToId: optional(input.reportsToId),
       contactNumber,
       gender,

@@ -73,7 +73,6 @@ export function labourFromRow(
           ? null
           : cipher().decrypt(row.aadhaarEncrypted),
       labourCategoryId: row.labourCategoryId,
-      supervisorId: row.supervisorId,
       reportsToId: row.reportsToId,
       contactNumber: row.contactNumber,
       gender: row.gender,
@@ -197,7 +196,6 @@ export class PrismaLabourRepository implements LabourRepository {
         details.aadhaar == null ? null : this.cipher().encrypt(details.aadhaar),
       aadhaarLast4: details.aadhaar?.slice(-4) ?? null,
       labourCategoryId: details.labourCategoryId,
-      supervisorId: details.supervisorId,
       reportsToId: details.reportsToId,
       contactNumber: details.contactNumber,
       gender: details.gender,

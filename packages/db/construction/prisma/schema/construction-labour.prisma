@@ -49,7 +49,6 @@ model ConstructionLabourLabour {
   aadhaarEncrypted    String?                    @map("aadhaar_encrypted")
   aadhaarLast4        String?                    @map("aadhaar_last4") @db.Char(4)
   labourCategoryId    String?                    @map("labour_category_id") @db.Uuid
-  supervisorId        String?                    @map("supervisor_id") @db.Uuid
   /// The Labour this labourer reports to, if any (ADR CM-0035): another
   /// live labourer of the same Company, never themselves, never a loop.
   reportsToId         String?                    @map("reports_to_id") @db.Uuid
@@ -149,6 +148,8 @@ model ConstructionLabourAttendance {
   /// Only on `on_leave`: the leave day is paid ("Mark Paid Leave").
   isPaidLeave    Boolean                            @default(false) @map("is_paid_leave")
   shift          String?
+  /// The Labour's Site Engineer, saved on days marked before ADR CM-0041;
+  /// null on days marked since (a Labour's Site Engineers come from the Project).
   supervisorId   String?                            @map("supervisor_id") @db.Uuid
   /// `HH:MM`, Company time; only on Present or Half Day (ADR CM-0011).
   checkIn        String?                            @map("check_in") @db.Char(5)

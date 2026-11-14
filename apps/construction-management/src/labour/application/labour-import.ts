@@ -45,7 +45,6 @@ export type ImportRowValues = {
   openingBalance: number | null;
   projects: string | null;
   labourCategory: string | null;
-  supervisor: string | null;
 };
 
 export type ImportRow = {
@@ -126,8 +125,9 @@ export function sheetWeekdays(value: string): number[] | undefined {
 /**
  * The labour Excel import (CM-206): every row is checked and previewed;
  * nothing is written unless every row is valid, and then all rows are
- * written in one transaction. Names of Projects, Labour Categories and
- * Supervisors match case-insensitively.
+ * written in one transaction. Names of Projects and Labour Categories match
+ * case-insensitively. A Site Engineer column (templates before ADR CM-0041)
+ * is not read: a Labour's Site Engineers come from their Projects.
  */
 export class LabourImport {
   constructor(
@@ -156,7 +156,6 @@ export class LabourImport {
       new Map(items.map((item) => [item.name.trim().toLowerCase(), item]));
     const projects = byName(lookups.projects);
     const categories = byName(lookups.labourCategories);
-    const supervisors = byName(lookups.supervisors);
 
     const codes = sheet
       .map((row) => text(row.cells.labourCode))
@@ -237,12 +236,6 @@ export class LabourImport {
         "LABOUR_CATEGORY_NOT_FOUND",
         "No live Labour Category has this name.",
       );
-      const supervisorId = lookup(
-        "supervisor",
-        supervisors,
-        "SUPERVISOR_NOT_FOUND",
-        "No live Site Engineer has this name.",
-      );
 
       const genderText = text(cells.gender).toLowerCase();
       const checked = checkLabourDetails({
@@ -261,7 +254,6 @@ export class LabourImport {
         esicNumber: text(cells.esicNumber),
         aadhaar: text(cells.aadhaar),
         labourCategoryId,
-        supervisorId,
         contactNumber: text(cells.contactNumber),
         gender: genderText === "" ? null : genderText,
       });
@@ -304,7 +296,6 @@ export class LabourImport {
           openingBalance,
           projects: projectsText || null,
           labourCategory: text(cells.labourCategory) || null,
-          supervisor: text(cells.supervisor) || null,
         },
         details: ok && "details" in checked ? checked.details : null,
         projectIds,
