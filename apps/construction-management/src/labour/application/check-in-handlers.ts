@@ -23,6 +23,7 @@ import { newId } from "@/src/shared-kernel/ids";
 import type { ListCursor } from "@/src/shared-kernel/list-cursor";
 
 import {
+  ROLE_WORDS,
   compareWithFence,
   dayEffect,
   dayKeptNote,
@@ -342,15 +343,6 @@ export type RecordCheckInInput = {
 const STANDING_WINDOW_MS = 48 * 3_600_000;
 
 const PHOTO_FOLDER = "check-in-photos";
-
-/** The role a Site Engineer or Vendor shows with; a Labour shows their Labour Category. */
-export const ROLE_WORDS: Record<
-  Exclude<CheckInPersonKind, "labour">,
-  string
-> = {
-  site_engineer: "Site Engineer",
-  vendor: "Vendor",
-};
 
 function key(kind: CheckInPersonKind, id: string): string {
   return `${kind}:${id}`;

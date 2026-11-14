@@ -13,7 +13,6 @@ import {
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
 
-import { ROLE_WORDS } from "../application/check-in-handlers";
 import {
   LABOUR_ACTIVITY_RANK,
   PROJECT_CHECK_IN_ACTIVITY_RANK,
@@ -33,7 +32,11 @@ import {
   type ProjectLabourMoveKind,
   type ProjectLabourMoveRow,
 } from "../application/labour-activity-ports";
-import type { CheckInAction, CheckInPersonKind } from "../domain/check-in";
+import {
+  ROLE_WORDS,
+  type CheckInAction,
+  type CheckInPersonKind,
+} from "../domain/check-in";
 import { PrismaDirectories } from "./prisma-directories";
 
 type Sql = Prisma.Sql;
