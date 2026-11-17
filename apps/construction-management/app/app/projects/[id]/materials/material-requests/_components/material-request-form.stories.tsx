@@ -11,6 +11,7 @@ import {
 
 import { MaterialRequestForm } from "./material-request-form";
 import { pickMaterial } from "@/app/app/_components/procurement/material-options-fixtures";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockCentralStoreApi>;
 
@@ -76,7 +77,10 @@ export const RaiseRequest: Story = {
     );
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
-        `/app/projects/${IDS.tower}/materials/material-requests/${IDS.request}`,
+        pageHref("/app/projects/[id]/materials/material-requests/[requestId]", {
+          id: IDS.tower,
+          requestId: IDS.request,
+        }),
       ),
     );
     await expect(posts()[0]?.body).toMatchObject({

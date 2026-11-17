@@ -36,6 +36,7 @@ import {
   formatDate,
   localToday,
 } from "@/app/app/_components/procurement/inventory/inventory-format";
+import { pageHref } from "@/lib/page-href";
 import { HINDRANCE_CAUSE_LABELS } from "@/src/site-work/domain/hindrance";
 import { QueryHttpError } from "@/src/queries/http";
 import {
@@ -276,7 +277,10 @@ export function HindranceDetail({
             )}
             {hindrance.actions.edit && (
               <Link
-                href={`${hindrancesPath(projectId, hindrance.id)}/edit`}
+                href={pageHref(
+                  "/app/projects/[id]/hindrances/[hindranceId]/edit",
+                  { id: projectId, hindranceId: hindrance.id },
+                )}
                 className={buttonVariants({ size: "sm", variant: "outline" })}
               >
                 <Pencil aria-hidden="true" />

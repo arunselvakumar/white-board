@@ -15,6 +15,7 @@ import {
   type IssueApiOptions,
 } from "@/app/app/projects/[id]/issues/_components/issue-fixtures";
 import { IssueDetail } from "./issue-detail";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockIssueApi>;
 
@@ -31,7 +32,7 @@ function issueApi(options: IssueApiOptions = {}) {
   };
 }
 
-const BASE = `/app/projects/${ISSUE_PROJECT_ID}/issues`;
+const BASE = pageHref("/app/projects/[id]/issues", { id: ISSUE_PROJECT_ID });
 
 const meta = {
   title: "Tracking/Issues/Detail",
@@ -150,7 +151,10 @@ export const ClosedFromInspection: Story = {
       await canvas.findByRole("link", { name: "IR/26-27/00007" }),
     ).toHaveAttribute(
       "href",
-      `/app/projects/${ISSUE_PROJECT_ID}/inspections/${INSPECTION_ID}`,
+      pageHref("/app/projects/[id]/inspections/[inspectionId]", {
+        id: ISSUE_PROJECT_ID,
+        inspectionId: INSPECTION_ID,
+      }),
     );
     await userEvent.click(canvas.getByRole("button", { name: "Reopen" }));
     const dialog = within(

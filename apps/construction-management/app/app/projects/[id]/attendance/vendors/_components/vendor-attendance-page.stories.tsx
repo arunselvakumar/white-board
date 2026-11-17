@@ -22,6 +22,7 @@ import {
   YESTERDAY,
 } from "./vendor-attendance-fixtures";
 import { VendorAttendancePage } from "./vendor-attendance-page";
+import { pageHref } from "@/lib/page-href";
 
 const API = "/api/construction/labour/attendance/vendors";
 
@@ -82,7 +83,10 @@ export const DayGrid: Story = {
     // The vendor without a rate card links to Masters instead.
     await expect(
       canvas.getByRole("link", { name: "Add rate card" }),
-    ).toHaveAttribute("href", `/app/staff/vendors/${ANBU_NO_CARD.vendorId}`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/staff/vendors/[id]", { id: ANBU_NO_CARD.vendorId }),
+    );
     // Nothing recorded yesterday, so there is nothing to copy.
     await expect(
       canvas.queryByRole("button", { name: "Copy yesterday" }),

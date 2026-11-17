@@ -26,9 +26,9 @@ import {
   ApprovalChip,
   DIRECTION_LABELS,
   MODE_LABELS,
-  transactionsPath,
 } from "./transaction-format";
 import { TransferDialog } from "./transfer-form";
+import { pageHref } from "@/lib/page-href";
 
 const ACCOUNT_KIND = {
   cash: "Cash",
@@ -190,7 +190,12 @@ function DetailBody({
       canInFinance(access, "finance.transactions", "update"));
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState<string | undefined>();
-  const back = { label: "Transactions", href: transactionsPath(projectId) };
+  const back = {
+    label: "Transactions",
+    href: pageHref("/app/projects/[id]/payments/transactions", {
+      id: projectId,
+    }),
+  };
   return (
     <div className="space-y-5">
       <PageHeader

@@ -29,10 +29,7 @@ import {
 } from "@/src/queries/procurement-access";
 import { purchaseRequestQuery } from "@/src/queries/purchase-requests";
 
-import {
-  purchaseRequestsPath,
-  PurchaseRequestActions,
-} from "@/app/app/projects/[id]/materials/_components/purchase-request-actions";
+import { PurchaseRequestActions } from "@/app/app/projects/[id]/materials/_components/purchase-request-actions";
 import { ScrollTable } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/scroll-table";
 import {
   APPROVAL_LABELS,
@@ -41,6 +38,7 @@ import {
   quantityText,
 } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/purchase-request-format";
 import { FactValueSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
+import { pageHref } from "@/lib/page-href";
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -88,7 +86,9 @@ export function PurchaseRequestDetailPage({
     <div className="w-full max-w-4xl space-y-6">
       <div className="space-y-3">
         <Link
-          href={purchaseRequestsPath(projectId)}
+          href={pageHref("/app/projects/[id]/materials/purchase-requests", {
+            id: projectId,
+          })}
           className="text-muted-foreground inline-flex items-center gap-1 text-sm hover:underline"
         >
           <ArrowLeft aria-hidden="true" className="size-4" />
@@ -107,7 +107,11 @@ export function PurchaseRequestDetailPage({
             variant="buttons"
             onError={setError}
             onDeleted={() => {
-              router.push(purchaseRequestsPath(projectId));
+              router.push(
+                pageHref("/app/projects/[id]/materials/purchase-requests", {
+                  id: projectId,
+                }),
+              );
             }}
           />
         </div>
@@ -232,7 +236,10 @@ export function PurchaseRequestDetailPage({
                 className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-sm"
               >
                 <Link
-                  href={`/app/projects/${encodeURIComponent(projectId)}/materials/purchase-orders/${po.id}`}
+                  href={pageHref(
+                    "/app/projects/[id]/materials/purchase-orders/[poId]",
+                    { id: projectId, poId: po.id },
+                  )}
                   className="font-medium hover:underline"
                 >
                   {po.number}

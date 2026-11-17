@@ -2,10 +2,8 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-import {
-  equipmentSheetQuery,
-  equipmentSheetsPath,
-} from "@/src/queries/equipment-sheets";
+import { type AppHref, pageHref } from "@/lib/page-href";
+import { equipmentSheetQuery } from "@/src/queries/equipment-sheets";
 
 import { EquipmentSheetForm } from "./equipment-sheet-form";
 
@@ -14,12 +12,14 @@ function savedPath(
   projectId: string,
   id: string,
   failed: readonly string[] = [],
-): string {
-  const query =
+): AppHref {
+  return pageHref(
+    "/app/projects/[id]/equipment/usage-sheets/[sheetId]",
+    { id: projectId, sheetId: id },
     failed.length === 0
       ? ""
-      : `?uploadFailed=${encodeURIComponent(failed.slice(0, 20).join("\n"))}`;
-  return equipmentSheetsPath(projectId, `/${id}${query}`);
+      : `?uploadFailed=${encodeURIComponent(failed.slice(0, 20).join("\n"))}`,
+  );
 }
 
 /**

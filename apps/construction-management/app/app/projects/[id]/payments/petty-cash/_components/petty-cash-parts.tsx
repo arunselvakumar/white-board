@@ -17,11 +17,6 @@ export const APPROVAL_LABELS: Record<ApprovalStatus, string> = {
   rejected: "Rejected",
 };
 
-/** `/app/projects/<id>/payments/petty-cash[/rest]`. */
-export function pettyCashPath(projectId: string, rest = ""): string {
-  return `/app/projects/${encodeURIComponent(projectId)}/payments/petty-cash${rest}`;
-}
-
 export function VoucherStatusBadge({ status }: { status: ApprovalStatus }) {
   return (
     <Badge

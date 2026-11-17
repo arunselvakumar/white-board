@@ -9,6 +9,7 @@ import type {
   NotificationPreferences,
 } from "./notification-queries";
 import { MESSAGING_API } from "./notification-queries";
+import { pageHref } from "@/lib/page-href";
 
 const MINUTE = 60_000;
 const PROJECT_ID = "0199c4a0-0000-7000-8000-00000000a001";
@@ -26,7 +27,7 @@ export function notification(extra: Partial<Notification> = {}): Notification {
     projectId: PROJECT_ID,
     title: "Task assigned to you",
     body: "T-2 Ground floor columns · Green Meadows",
-    href: `/app/projects/${PROJECT_ID}/tasks`,
+    href: pageHref("/app/projects/[id]/tasks", { id: PROJECT_ID }),
     attachment: null,
     readAt: null,
     createdAt: ago(5),
@@ -43,7 +44,9 @@ export const PR_WAITING = notification({
   group: "materials",
   title: "Purchase Request waiting for your approval",
   body: "PR/26-27/P1/00012 · 40 bags of cement",
-  href: `/app/projects/${PROJECT_ID}/purchase-requests`,
+  href: pageHref("/app/projects/[id]/materials/purchase-requests", {
+    id: PROJECT_ID,
+  }),
   createdAt: ago(42),
 });
 
@@ -54,7 +57,7 @@ export const REPORT_READY = notification({
   group: "downloads",
   title: "Your Labour Attendance report is ready",
   body: "1 Oct – 15 Oct 2026",
-  href: `/app/projects/${PROJECT_ID}/reports`,
+  href: pageHref("/app/projects/[id]/reports", { id: PROJECT_ID }),
   attachment: {
     kind: "report",
     id: "0199c4a0-0000-7000-8000-00000000c001",
@@ -73,7 +76,7 @@ export const ISSUE_SOLVED = notification({
   group: "project_management",
   title: "Issue marked solved",
   body: "IS-7 Seepage in basement wall",
-  href: `/app/projects/${PROJECT_ID}/issues`,
+  href: pageHref("/app/projects/[id]/issues", { id: PROJECT_ID }),
   readAt: ago(60),
   createdAt: ago(3 * 60),
 });

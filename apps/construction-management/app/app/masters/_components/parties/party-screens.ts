@@ -1,12 +1,15 @@
 import { Hammer, Truck, type LucideIcon } from "lucide-react";
 
 import type { PartyList } from "@/src/queries/parties";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 export type PartyScreen = {
   list: PartyList;
   label: string;
   plural: string;
-  path: string;
+  path: AppHref;
+  /** Add Contractor / Add Supplier. */
+  newPath: AppHref;
   /** Under the list's title. */
   meta: string;
   /** The empty list's message. */
@@ -23,6 +26,7 @@ export const PARTY_SCREENS: Record<PartyList, PartyScreen> = {
     label: "Contractor",
     plural: "Contractors",
     path: "/app/masters/contractors",
+    newPath: "/app/masters/contractors/new",
     meta: "Parties that execute work on your Projects, by Department.",
     empty:
       "Add the Contractors you give work to, with the Departments they work in and their Projects.",
@@ -34,6 +38,7 @@ export const PARTY_SCREENS: Record<PartyList, PartyScreen> = {
     label: "Supplier",
     plural: "Suppliers",
     path: "/app/masters/suppliers",
+    newPath: "/app/masters/suppliers/new",
     meta: "Parties you buy material from.",
     empty:
       "Add the Suppliers you buy cement, steel, bricks and other material from, and their Projects.",
@@ -42,6 +47,8 @@ export const PARTY_SCREENS: Record<PartyList, PartyScreen> = {
   },
 };
 
-export function partyEditPath(screen: PartyScreen, id: string): string {
-  return `${screen.path}/${encodeURIComponent(id)}`;
+export function partyEditPath(screen: PartyScreen, id: string): AppHref {
+  return screen.list === "contractors"
+    ? pageHref("/app/masters/contractors/[id]", { id })
+    : pageHref("/app/masters/suppliers/[id]", { id });
 }

@@ -6,6 +6,7 @@ import { StoryQueryClient } from "@/app/app/_components/masters/masters-story-su
 import { mockFetch } from "@/.storybook/mock-fetch";
 import { PartiesPage } from "./parties-page";
 import { BALAJI, KAVERI, RAMCO, page } from "./party-fixtures";
+import { pageHref } from "@/lib/page-href";
 
 const CONTRACTORS = "/api/construction/masters/contractors";
 const SUPPLIERS = "/api/construction/masters/suppliers";
@@ -62,7 +63,10 @@ export const Contractors: Story = {
     const rows = within(table);
     await expect(
       rows.getByRole("link", { name: "Sri Balaji Constructions" }),
-    ).toHaveAttribute("href", `/app/masters/contractors/${BALAJI.id}`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/masters/contractors/[id]", { id: BALAJI.id }),
+    );
     await expect(rows.getByText("Murugan · +91 77081 65767")).toBeVisible();
     // The GST state column shows from md up; story tests run phone-wide.
     await expect(rows.getByText("Tamil Nadu")).toBeInTheDocument();

@@ -7,6 +7,7 @@ import { Button, buttonVariants } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
 
 import { timeAgo } from "@/lib/notification-format";
+import { uncheckedHref } from "@/lib/page-href";
 
 import type { Notification } from "./notification-queries";
 
@@ -97,7 +98,9 @@ export function NotificationBellItem({
     );
   return (
     <Link
-      href={notification.href}
+      // Stored with the Notification when it was sent: server data, so
+      // nothing here can check it.
+      href={uncheckedHref(notification.href)}
       aria-label={itemName(notification)}
       className={className}
       onClick={() => {
@@ -166,7 +169,8 @@ export function NotificationRow({
       </span>
     ) : (
       <Link
-        href={notification.href}
+        // Stored with the Notification: server data, nothing to check.
+        href={uncheckedHref(notification.href)}
         aria-label={itemName(notification)}
         className="focus-visible:outline-ring -m-1 block space-y-1 rounded-lg p-1 hover:underline focus-visible:outline-2"
         onClick={() => {

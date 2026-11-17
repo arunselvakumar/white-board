@@ -11,6 +11,7 @@ import {
   KAVERI_QUOTATION,
 } from "@/app/app/masters/_components/parties/party-fixtures";
 import { QuotationsPage } from "./quotations-page";
+import { pageHref } from "@/lib/page-href";
 
 const LIST = "/api/construction/masters/quotations";
 
@@ -96,7 +97,10 @@ export const List: Story = {
     await expect(first.getByText("1.2 MB")).toBeVisible();
     await expect(
       first.getByRole("link", { name: BALAJI.name }),
-    ).toHaveAttribute("href", `/app/masters/contractors/${BALAJI.id}`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/masters/contractors/[id]", { id: BALAJI.id }),
+    );
     await expect(first.getByText("Contractor")).toBeVisible();
     await expect(first.getByText("8 Oct 2026")).toBeVisible();
     await expect(first.getByText("Karthik R")).toBeVisible();
@@ -112,7 +116,10 @@ export const List: Story = {
     );
     await expect(
       supplier.getByRole("link", { name: KAVERI.name }),
-    ).toHaveAttribute("href", `/app/masters/suppliers/${KAVERI.id}`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/masters/suppliers/[id]", { id: KAVERI.id }),
+    );
     await expect(supplier.getByText("Supplier")).toBeVisible();
     // No uploader name.
     await expect(

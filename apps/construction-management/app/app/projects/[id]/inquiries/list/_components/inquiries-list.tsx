@@ -73,6 +73,7 @@ import {
   InquiryFilterBarSkeleton,
   InquiryRowsSkeleton,
 } from "./inquiries-skeletons";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 type Filters = {
   statuses: InquiryStatus[];
@@ -150,7 +151,9 @@ export function InquiriesList({
       setCursor(null);
     });
   };
-  const newHref = `${inquiriesPath(projectId)}/new`;
+  const newHref = pageHref("/app/projects/[id]/inquiries/list/new", {
+    id: projectId,
+  });
   return (
     <div className="flex w-full max-w-6xl min-w-0 flex-col gap-4 p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -356,7 +359,7 @@ function InquiryRows({
   cursor: InquiryFilters["cursor"];
   today: string;
   canCreate: boolean;
-  newHref: string;
+  newHref: AppHref;
   onPage: (cursor: InquiryFilters["cursor"]) => void;
 }) {
   const { data } = useSuspenseQuery(

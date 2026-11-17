@@ -17,6 +17,7 @@ import {
   ownDashboard,
 } from "./marketing-dashboard-fixtures";
 import { MarketingDashboardSkeleton } from "./marketing-dashboard-skeletons";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockDashboardApi>;
 
@@ -127,13 +128,19 @@ export const Team: Story = {
 
     await expect(
       canvas.getByRole("link", { name: "Completed MV-0040" }),
-    ).toHaveAttribute("href", `/app/marketing/visits/${BALAJI_VISIT_ID}`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/marketing/visits/[id]", { id: BALAJI_VISIT_ID }),
+    );
     const hot = within(
       canvas.getByRole("list", { name: "Hot companies with no Follow-up" }),
     );
     await expect(
       hot.getByRole("link", { name: "Madurai Steel Structures" }),
-    ).toHaveAttribute("href", `/app/marketing/companies/${STEEL_ID}`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/marketing/companies/[id]", { id: STEEL_ID }),
+    );
     // The last Visit is a day in the Company time zone.
     await expect(hot.getByText("Last Visit 12 Nov")).toBeVisible();
     await expect(
@@ -189,7 +196,7 @@ export const OwnFigures: Story = {
     if (first == null) throw new Error("No Visit today");
     await expect(first).toHaveAttribute(
       "href",
-      `/app/marketing/visits/${CHECKED_IN_VISIT_ID}`,
+      pageHref("/app/marketing/visits/[id]", { id: CHECKED_IN_VISIT_ID }),
     );
     await expect(first).toHaveTextContent("10:00 am");
     await expect(first).toHaveTextContent("Sri Balaji Infra Projects");

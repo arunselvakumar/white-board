@@ -8,6 +8,7 @@ const { version } = createRequire(import.meta.url)("./package.json") as {
 };
 
 const nextConfig: NextConfig = {
+  typedRoutes: true,
   // The sidebar's version line (ADR-0049) reads this instead of importing
   // package.json into client code, which would ship the dependency list.
   env: { NEXT_PUBLIC_APP_VERSION: version },

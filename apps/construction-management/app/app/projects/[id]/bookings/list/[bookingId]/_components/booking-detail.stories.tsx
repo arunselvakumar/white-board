@@ -14,6 +14,7 @@ import {
   type BookingApiOptions,
 } from "@/app/app/projects/[id]/bookings/list/_components/booking-fixtures";
 import { BookingDetail } from "./booking-detail";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockBookingApi>;
 function bookingApi(options: BookingApiOptions = {}) {
@@ -42,7 +43,10 @@ const meta = {
   parameters: {
     nextjs: {
       navigation: {
-        pathname: `/app/projects/${PROJECT_ID}/bookings/list/${HOLD_ID}`,
+        pathname: pageHref("/app/projects/[id]/bookings/list/[bookingId]", {
+          id: PROJECT_ID,
+          bookingId: HOLD_ID,
+        }),
       },
     },
   },

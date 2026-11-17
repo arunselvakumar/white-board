@@ -38,6 +38,7 @@ import {
 import { cn } from "@repo/ui/lib/utils";
 
 import { LocationLabel } from "@/app/app/_components/locations/location-picker";
+import { uncheckedHref } from "@/lib/page-href";
 import type { StockLocation } from "@/src/procurement/domain/stock-location";
 import {
   inventoryHistoryQuery,
@@ -61,7 +62,8 @@ function Source({ entry }: { entry: StockEntry }) {
     <span>{source.number}</span>
   ) : (
     <Link
-      href={source.href}
+      // Built by the server and sent as text with the stock entry.
+      href={uncheckedHref(source.href)}
       className="text-primary underline underline-offset-2"
     >
       {source.number}

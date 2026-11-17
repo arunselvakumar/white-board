@@ -10,6 +10,7 @@ import {
   mockIssueApi,
 } from "@/app/app/projects/[id]/issues/_components/issue-fixtures";
 import { IssueReopenDialog } from "./issue-reopen-dialog";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockIssueApi>;
 
@@ -34,7 +35,10 @@ const meta = {
   parameters: {
     nextjs: {
       navigation: {
-        pathname: `/app/projects/${ISSUE_PROJECT_ID}/issues/${CLOSED_ID}`,
+        pathname: pageHref("/app/projects/[id]/issues/[issueId]", {
+          id: ISSUE_PROJECT_ID,
+          issueId: CLOSED_ID,
+        }),
       },
     },
   },

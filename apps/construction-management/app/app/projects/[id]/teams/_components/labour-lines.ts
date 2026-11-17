@@ -15,7 +15,3 @@ export function labourDetail(labour: {
 export function sinceLabel(since: string): string {
   return `Since ${formatCalendarDate(since)}`;
 }
-
-export function labourPath(id: string): string {
-  return `/app/staff/labours/${encodeURIComponent(id)}`;
-}

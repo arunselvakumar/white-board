@@ -19,6 +19,7 @@ import {
   visitFiles,
   type VisitApiOptions,
 } from "./visit-fixtures";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockVisitApi>;
 
@@ -55,7 +56,9 @@ const meta = {
   beforeEach: serve({ visits: [visit({ files: visitFiles() })] }),
   parameters: {
     nextjs: {
-      navigation: { pathname: `/app/marketing/visits/${COMPLETED_ID}` },
+      navigation: {
+        pathname: pageHref("/app/marketing/visits/[id]", { id: COMPLETED_ID }),
+      },
     },
   },
   render: (args) => (

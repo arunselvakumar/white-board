@@ -49,11 +49,7 @@ import {
   type CompanyDashboard as Dashboard,
   type CompanyDashboardProject,
 } from "@/src/queries/company-dashboard";
-
-/** A Project's Dashboard, where each row leads. */
-export function projectDashboardPath(id: string): string {
-  return `/app/projects/${encodeURIComponent(id)}/dashboard`;
-}
+import { pageHref } from "@/lib/page-href";
 
 /** `₹1,25,000` without `.00` on whole rupees. */
 function rupees(paise: number): string {
@@ -218,7 +214,7 @@ function ProjectsTable({ data }: { data: Dashboard }) {
           <tr key={row.id} className="hover:bg-secondary/60">
             <th scope="row" className="px-3 py-3 text-left font-medium">
               <Link
-                href={projectDashboardPath(row.id)}
+                href={pageHref("/app/projects/[id]/dashboard", { id: row.id })}
                 className="focus-visible:ring-ring/50 block truncate rounded-sm underline-offset-4 outline-none hover:underline focus-visible:ring-3"
               >
                 {row.name}
@@ -273,7 +269,7 @@ function ProjectCards({ data }: { data: Dashboard }) {
       {data.projects.map((row) => (
         <li key={row.id}>
           <Link
-            href={projectDashboardPath(row.id)}
+            href={pageHref("/app/projects/[id]/dashboard", { id: row.id })}
             aria-label={row.name}
             className="bg-card hover:bg-secondary/60 focus-visible:ring-ring/50 block min-w-0 space-y-3 rounded-xl border p-4 transition-colors outline-none focus-visible:ring-3"
           >

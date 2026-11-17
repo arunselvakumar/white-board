@@ -17,6 +17,7 @@ import {
   materialNameOf,
   pickMaterial,
 } from "@/app/app/_components/procurement/material-options-fixtures";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockInventoryApi>;
 
@@ -44,7 +45,11 @@ const meta = {
   beforeEach: inventoryApi(),
   parameters: {
     nextjs: {
-      navigation: { pathname: `/app/projects/${SITE.id}/materials/inventory` },
+      navigation: {
+        pathname: pageHref("/app/projects/[id]/materials/inventory", {
+          id: SITE.id,
+        }),
+      },
     },
   },
   render: (args) => (
@@ -304,7 +309,7 @@ export const RaiseFromSelection: Story = {
       canvas.getByRole("region", { name: "Selected materials" }),
     );
     await expect(region.getByText("2 selected")).toBeVisible();
-    const base = `/app/projects/${SITE.id}/materials`;
+    const base = pageHref("/app/projects/[id]/materials", { id: SITE.id });
     await expect(
       region.getByRole("link", { name: "Purchase Request" }),
     ).toHaveAttribute(

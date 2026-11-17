@@ -8,6 +8,7 @@ import {
   mockCentralStoreApi,
 } from "@/app/app/_components/procurement/stores/central-store-fixtures";
 import { StoresPage } from "./stores-page";
+import { pageHref } from "@/lib/page-href";
 
 const meta = {
   title: "Procurement/Central Store/Stores",
@@ -34,7 +35,7 @@ export const Stores: Story = {
     });
     await expect(link).toHaveAttribute(
       "href",
-      `/app/workspace/central-store/${IDS.store}`,
+      pageHref("/app/workspace/central-store/[id]", { id: IDS.store }),
     );
     await expect(
       canvas.getByText("Tamil Nadu · 2 Projects · 1 store keeper"),

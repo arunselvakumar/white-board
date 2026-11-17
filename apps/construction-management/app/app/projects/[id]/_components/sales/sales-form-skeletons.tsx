@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import { SkeletonText } from "@repo/ui/components/skeleton-kit";
 import { cn } from "@repo/ui/lib/utils";
+import type { AppHref } from "@/lib/page-href";
 
 /*
  * Pieces Sales forms share while they load (ADR-0047). The kit's
@@ -54,7 +55,7 @@ export function RecordHeaderSkeleton({
   back,
   title,
 }: {
-  back: { label?: string; href: string };
+  back: { label?: string; href: AppHref };
   title?: string;
 }) {
   return (

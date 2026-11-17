@@ -51,6 +51,7 @@ import {
   type BookingDisplayStatus,
 } from "@/src/sales/domain/booking";
 import { BOOKING_COLUMNS, BookingRowsSkeleton } from "./bookings-skeletons";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 type Filters = {
   statuses: BookingDisplayStatus[];
@@ -109,7 +110,9 @@ export function BookingsList({ projectId }: { projectId: string }) {
     });
   };
   const wings = useQuery(unitChartQuery(projectId)).data?.wings ?? [];
-  const newHref = `${bookingsPath(projectId)}/new`;
+  const newHref = pageHref("/app/projects/[id]/bookings/list/new", {
+    id: projectId,
+  });
   return (
     <div className="flex min-w-0 flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -193,7 +196,7 @@ function BookingRows({
   projectId: string;
   filters: Filters;
   cursor: BookingFilters["cursor"];
-  newHref: string | null;
+  newHref: AppHref | null;
   onPage: (cursor: BookingFilters["cursor"]) => void;
 }) {
   const { data } = useSuspenseQuery(

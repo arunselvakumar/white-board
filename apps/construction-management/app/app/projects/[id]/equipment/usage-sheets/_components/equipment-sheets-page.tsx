@@ -43,7 +43,6 @@ import {
 import { fieldForCode } from "@/lib/server-errors";
 import {
   equipmentSheetSettingsQuery,
-  equipmentSheetsPath,
   equipmentSheetsQuery,
   useBulkDecideEquipmentSheets,
   type EquipmentSheet,
@@ -75,6 +74,7 @@ import {
 import { trimDecimal } from "./equipment-sheet-live";
 import { EquipmentSheetSettingsDialog } from "./equipment-sheet-settings-dialog";
 import { EquipmentSheetRowsSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
+import { pageHref } from "@/lib/page-href";
 
 type Filters = {
   date: DateFilterValue;
@@ -181,7 +181,9 @@ export function EquipmentSheetsPage({
           )}
           {may("create") && (
             <Link
-              href={equipmentSheetsPath(projectId, "/new")}
+              href={pageHref("/app/projects/[id]/equipment/usage-sheets/new", {
+                id: projectId,
+              })}
               className={buttonVariants({ size: "sm" })}
             >
               <Plus aria-hidden="true" />
@@ -384,7 +386,10 @@ function SheetRows({
           {!filtered && canCreate && (
             <EmptyContent>
               <Link
-                href={equipmentSheetsPath(projectId, "/new")}
+                href={pageHref(
+                  "/app/projects/[id]/equipment/usage-sheets/new",
+                  { id: projectId },
+                )}
                 className={buttonVariants({ size: "sm" })}
               >
                 Add usage sheet
@@ -407,7 +412,10 @@ function SheetRows({
       />
     ) : null;
   const itemPath = (sheet: EquipmentSheet) =>
-    equipmentSheetsPath(projectId, `/${sheet.id}`);
+    pageHref("/app/projects/[id]/equipment/usage-sheets/[sheetId]", {
+      id: projectId,
+      sheetId: sheet.id,
+    });
 
   return (
     <div className={cn("space-y-3", className)}>

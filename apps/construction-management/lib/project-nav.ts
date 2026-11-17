@@ -4,6 +4,7 @@ import {
 } from "@/src/projects/domain/project-modules";
 import { PROJECT_NAV_GROUPS } from "@/src/projects/domain/project-nav-groups";
 import type { ProjectStructure } from "@/src/projects/domain/project-type";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 export type ProjectNavSection = {
   key: ProjectModuleKey;
@@ -39,8 +40,47 @@ export function projectIdFromPath(pathname: string): string | null {
   }
 }
 
-export function projectBasePath(id: string): string {
-  return `/app/projects/${encodeURIComponent(id)}`;
+/**
+ * Each module's page, by key (ADR CM-0045). A Record, so a new module fails
+ * `check-types` until its page is named here, and each entry names the page
+ * by its folder, so a moved page fails too. The page is the module's
+ * `segment` under the Project.
+ */
+const MODULE_PAGES: Record<ProjectModuleKey, (id: string) => AppHref> = {
+  dashboard: (id) => pageHref("/app/projects/[id]/dashboard", { id }),
+  activity: (id) => pageHref("/app/projects/[id]/activity", { id }),
+  wings: (id) => pageHref("/app/projects/[id]/wings", { id }),
+  locations: (id) => pageHref("/app/projects/[id]/locations", { id }),
+  amenities: (id) => pageHref("/app/projects/[id]/amenities", { id }),
+  drawings: (id) => pageHref("/app/projects/[id]/drawings", { id }),
+  testing_reports: (id) =>
+    pageHref("/app/projects/[id]/testing-reports", { id }),
+  gallery: (id) => pageHref("/app/projects/[id]/gallery", { id }),
+  documents: (id) => pageHref("/app/projects/[id]/documents", { id }),
+  resources: (id) => pageHref("/app/projects/[id]/teams", { id }),
+  attendance: (id) => pageHref("/app/projects/[id]/attendance", { id }),
+  payments: (id) => pageHref("/app/projects/[id]/payments", { id }),
+  materials: (id) => pageHref("/app/projects/[id]/materials", { id }),
+  daily_worksheet: (id) => pageHref("/app/projects/[id]/worksheets", { id }),
+  equipment_usage: (id) => pageHref("/app/projects/[id]/equipment", { id }),
+  site_diary: (id) => pageHref("/app/projects/[id]/site-diary", { id }),
+  hindrances: (id) => pageHref("/app/projects/[id]/hindrances", { id }),
+  tasks: (id) => pageHref("/app/projects/[id]/tasks", { id }),
+  issues: (id) => pageHref("/app/projects/[id]/issues", { id }),
+  inspections: (id) => pageHref("/app/projects/[id]/inspections", { id }),
+  inquiries: (id) => pageHref("/app/projects/[id]/inquiries", { id }),
+  bookings: (id) => pageHref("/app/projects/[id]/bookings", { id }),
+  progress_reports: (id) =>
+    pageHref("/app/projects/[id]/progress-reports", { id }),
+  reports: (id) => pageHref("/app/projects/[id]/reports", { id }),
+};
+
+/** A module's page in a Project: `/app/projects/<id>/<segment>`. */
+export function projectModuleHref(
+  projectId: string,
+  key: ProjectModuleKey,
+): AppHref {
+  return MODULE_PAGES[key](projectId);
 }
 
 /**
@@ -79,11 +119,9 @@ export function projectNavGroups(
 export function firstProjectModulePath(
   projectId: string,
   groups: readonly ProjectNavGroup[],
-): string | null {
+): AppHref | null {
   const first = groups[0]?.sections[0];
-  return first == null
-    ? null
-    : `${projectBasePath(projectId)}/${first.segment}`;
+  return first == null ? null : projectModuleHref(projectId, first.key);
 }
 
 /**
@@ -95,7 +133,7 @@ export function activeProjectSegment(
   projectId: string,
   segments: readonly string[],
 ): string | null {
-  const base = projectBasePath(projectId);
+  const base = pageHref("/app/projects/[id]", { id: projectId });
   const rest = pathname.startsWith(base) ? pathname.slice(base.length) : "";
   const segment = rest.split("/").find(Boolean);
   return segment != null && segments.includes(segment) ? segment : null;

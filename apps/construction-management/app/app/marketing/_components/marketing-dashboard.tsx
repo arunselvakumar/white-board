@@ -59,6 +59,7 @@ import {
   MARKETING_TOTALS_GRID,
   MarketingDashboardSkeleton,
 } from "./marketing-dashboard-skeletons";
+import type { AppHref } from "@/lib/page-href";
 
 const PERIODS: { value: DashboardPeriodKind; label: string }[] = [
   { value: "this_week", label: "This week" },
@@ -240,10 +241,10 @@ type Total = {
   caption: string;
   /** Red when above zero. */
   alarming?: boolean;
-  href?: string;
+  href?: AppHref;
 };
 
-function totalsOf(data: Dashboard, followUpsHref: string | null): Total[] {
+function totalsOf(data: Dashboard, followUpsHref: AppHref | null): Total[] {
   const { totals } = data;
   const all: (Omit<Total, "value"> & { value: number | null })[] = [
     {
@@ -307,7 +308,10 @@ function totalsOf(data: Dashboard, followUpsHref: string | null): Total[] {
  * Follow-ups due and overdue on the Follow-ups list, which opens on the
  * viewer's own or, with `?owner=`, one person's; the team has no address.
  */
-function followUpsHref(data: Dashboard, memberId: string | undefined) {
+function followUpsHref(
+  data: Dashboard,
+  memberId: string | undefined,
+): AppHref | null {
   if (data.scope === "own") return MARKETING_FOLLOW_UPS_PATH;
   if (data.scope === "person" && memberId != null)
     return `${MARKETING_FOLLOW_UPS_PATH}?owner=${encodeURIComponent(memberId)}`;

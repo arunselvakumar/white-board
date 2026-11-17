@@ -2,6 +2,7 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 
+import { pageHref } from "@/lib/page-href";
 import {
   projectTransfersPath,
   transferQuery,
@@ -16,7 +17,9 @@ export function ProjectTransfersList({ projectId }: { projectId: string }) {
     <TransfersList
       location={{ kind: "project", id: projectId }}
       hrefFor={(id) => projectTransfersPath(projectId, id)}
-      newHref={`${projectTransfersPath(projectId)}/new`}
+      newHref={pageHref("/app/projects/[id]/materials/transfers/new", {
+        id: projectId,
+      })}
     />
   );
 }
@@ -51,7 +54,10 @@ export function ProjectTransferDetail({
     <TransferDetail
       id={transferId}
       backHref={projectTransfersPath(projectId)}
-      editHref={`${projectTransfersPath(projectId, transferId)}/edit`}
+      editHref={pageHref(
+        "/app/projects/[id]/materials/transfers/[transferId]/edit",
+        { id: projectId, transferId },
+      )}
       afterDeleteHref={projectTransfersPath(projectId)}
     />
   );

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { buttonVariants } from "@repo/ui/components/button";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import { SkeletonGroup, SkeletonText } from "@repo/ui/components/skeleton-kit";
+import { pageHref } from "@/lib/page-href";
 
 /* Testing reports while they load (ADR-0047): real headings, shaped rows. */
 
@@ -42,7 +43,7 @@ export function TestingItemSkeleton({ projectId }: { projectId: string }) {
   return (
     <div className="w-full max-w-5xl space-y-5 p-6">
       <Link
-        href={`/app/projects/${encodeURIComponent(projectId)}/testing-reports`}
+        href={pageHref("/app/projects/[id]/testing-reports", { id: projectId })}
         className={buttonVariants({
           variant: "link",
           className:

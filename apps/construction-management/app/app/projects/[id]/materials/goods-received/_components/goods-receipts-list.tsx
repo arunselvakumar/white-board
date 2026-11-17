@@ -41,13 +41,9 @@ import {
   procurementAccessQuery,
 } from "@/src/queries/procurement-access";
 
-import {
-  ChoiceSelect,
-  formatDate,
-  goodsReceivedPath,
-  money,
-} from "./goods-receipt-parts";
+import { ChoiceSelect, formatDate, money } from "./goods-receipt-parts";
 import { GoodsReceiptRowsSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
+import { pageHref } from "@/lib/page-href";
 
 const PO_FILTERS = [
   { value: "all", label: "All", icon: LayoutGrid },
@@ -87,7 +83,9 @@ export function GoodsReceiptsList({ projectId }: { projectId: string }) {
         <h1 className="text-lg font-semibold">Goods Received</h1>
         {canCreate && (
           <Link
-            href={goodsReceivedPath(projectId, "/new")}
+            href={pageHref("/app/projects/[id]/materials/goods-received/new", {
+              id: projectId,
+            })}
             className={buttonVariants()}
           >
             <Plus aria-hidden="true" />
@@ -257,7 +255,10 @@ function ReceiptRows({
               <TableRow key={item.id}>
                 <TableCell className="font-medium whitespace-nowrap">
                   <Link
-                    href={goodsReceivedPath(projectId, `/${item.id}`)}
+                    href={pageHref(
+                      "/app/projects/[id]/materials/goods-received/[grnId]",
+                      { id: projectId, grnId: item.id },
+                    )}
                     className="text-primary hover:underline"
                   >
                     {item.number}

@@ -11,6 +11,7 @@ import {
   PROJECT_ID,
 } from "./goods-receipt-fixtures";
 import { GoodsReceiptsList } from "./goods-receipts-list";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockApi>;
 
@@ -57,7 +58,9 @@ export const WithReceipts: Story = {
       canvas.getByRole("link", { name: "Record Goods Receipt" }),
     ).toHaveAttribute(
       "href",
-      `/app/projects/${PROJECT_ID}/materials/goods-received/new`,
+      pageHref("/app/projects/[id]/materials/goods-received/new", {
+        id: PROJECT_ID,
+      }),
     );
 
     await userEvent.click(canvas.getByRole("tab", { name: "Without PO" }));

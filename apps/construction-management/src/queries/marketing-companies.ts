@@ -22,6 +22,7 @@ import { MARKETING_COMPANIES_PATH } from "@/lib/marketing-nav";
 import type { Stage } from "@/src/marketing/domain/marketing-terms";
 
 import { apiJson, QueryHttpError } from "./http";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 export type ProspectCompany = ConstructionMarketingProspectCompanyResponse;
 export type ProspectCompanyListItem =
@@ -130,10 +131,10 @@ export function companyQuery(id: string) {
 }
 
 /** The company page, or the list without an id. */
-export function companyPath(id?: string): string {
+export function companyPath(id?: string): AppHref {
   return id == null
     ? MARKETING_COMPANIES_PATH
-    : `${MARKETING_COMPANIES_PATH}/${encodeURIComponent(id)}`;
+    : pageHref("/app/marketing/companies/[id]", { id });
 }
 
 function post<T>(path: string, body: unknown): Promise<T> {

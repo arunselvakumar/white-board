@@ -14,9 +14,10 @@ import type { ProjectHome } from "@/src/queries/project-home";
 
 import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import { signInAs } from "@/.storybook/mocks/auth";
+import { pageHref } from "@/lib/page-href";
 
 const BASE = "/api/construction/projects/projects";
-const PATH = `/app/projects/${KUMARI.id}`;
+const PATH = pageHref("/app/projects/[id]", { id: KUMARI.id });
 
 /** Only Labour payments readable: Payments shows one tab. */
 function labourOnlyAccess() {

@@ -13,6 +13,7 @@ import {
   type IssueApiOptions,
 } from "./issue-fixtures";
 import { IssuesList } from "./issues-list";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockIssueApi>;
 
@@ -29,7 +30,7 @@ function issueApi(options: IssueApiOptions = {}) {
   };
 }
 
-const BASE = `/app/projects/${ISSUE_PROJECT_ID}/issues`;
+const BASE = pageHref("/app/projects/[id]/issues", { id: ISSUE_PROJECT_ID });
 
 const meta = {
   title: "Tracking/Issues/List",

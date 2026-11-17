@@ -19,6 +19,7 @@ import {
   type EquipmentSheetApiOptions,
 } from "./equipment-sheet-fixtures";
 import { EquipmentSheetForm } from "./equipment-sheet-form";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockEquipmentSheetApi>;
 
@@ -35,7 +36,9 @@ function withApi(options: EquipmentSheetApiOptions = {}) {
   };
 }
 
-const BASE = `/app/projects/${PROJECT_ID}/equipment/usage-sheets`;
+const BASE = pageHref("/app/projects/[id]/equipment/usage-sheets", {
+  id: PROJECT_ID,
+});
 
 const meta = {
   title: "Site work/Equipment Usage/Form",
@@ -43,7 +46,11 @@ const meta = {
   args: {
     projectId: PROJECT_ID,
     today: TODAY,
-    hrefFor: (id: string) => `${BASE}/${id}`,
+    hrefFor: (id: string) =>
+      pageHref("/app/projects/[id]/equipment/usage-sheets/[sheetId]", {
+        id: PROJECT_ID,
+        sheetId: id,
+      }),
   },
   beforeEach: withApi(),
   parameters: { nextjs: { navigation: { pathname: `${BASE}/new` } } },

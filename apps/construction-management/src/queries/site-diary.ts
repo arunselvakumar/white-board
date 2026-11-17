@@ -15,6 +15,7 @@ import type {
 
 import { apiJson } from "./http";
 import { SITE_WORK_API, SITE_WORK_KEY } from "./site-work-access";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 export type SiteDiary = ConstructionSiteWorkSiteDiaryResponse;
 export type SiteDiaryOnDate = GetConstructionSiteWorkSiteDiaryByDateResponse;
@@ -103,7 +104,10 @@ export function useDeleteSiteDiary(id: string) {
 }
 
 /** The Project's Site Diary page, on a date when given. */
-export function siteDiaryPath(projectId: string, date?: string): string {
-  const base = `/app/projects/${encodeURIComponent(projectId)}/site-diary`;
-  return date == null ? base : `${base}?date=${encodeURIComponent(date)}`;
+export function siteDiaryPath(projectId: string, date?: string): AppHref {
+  return pageHref(
+    "/app/projects/[id]/site-diary",
+    { id: projectId },
+    date == null ? "" : `?date=${encodeURIComponent(date)}`,
+  );
 }

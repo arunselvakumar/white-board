@@ -13,6 +13,7 @@ import {
   type TaskApiOptions,
 } from "@/app/app/projects/[id]/tasks/_components/task-fixtures";
 import { TaskDetail } from "./task-detail";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockTaskApi>;
 
@@ -29,7 +30,7 @@ function taskApi(options: TaskApiOptions = {}) {
   };
 }
 
-const BASE = `/app/projects/${TASK_PROJECT_ID}/tasks`;
+const BASE = pageHref("/app/projects/[id]/tasks", { id: TASK_PROJECT_ID });
 
 const meta = {
   title: "Tracking/Tasks/Detail",

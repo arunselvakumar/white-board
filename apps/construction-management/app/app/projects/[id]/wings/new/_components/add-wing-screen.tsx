@@ -44,7 +44,6 @@ import {
 import {
   SectionHeader,
   saveProblem,
-  wingsPath,
 } from "@/app/app/projects/[id]/_components/structure/structure-parts";
 import {
   FIELD_BOUNDS,
@@ -67,6 +66,7 @@ import {
   toFloorInputs,
   type EditorFloor,
 } from "@/app/app/projects/[id]/_components/structure/wing-editor-state";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 function phaseItems(phases: readonly PhaseWithWings[]) {
   return phases.map((phase) => ({ value: phase.id, label: phase.name }));
@@ -89,7 +89,7 @@ function WingDetailsForm({
     values: WingDetailsValues,
     type: WingType,
   ) => { field: keyof WingDetailsValues | null; message: string } | null;
-  cancelHref: string;
+  cancelHref: AppHref;
   /** A refused Save's name error (409 `WING_NAME_IN_USE`); stable identity. */
   serverErrors?: FieldErrors<WingDetailsValues>;
 }) {
@@ -334,7 +334,7 @@ export function AddWingScreen({
   const router = useRouter();
   const { data } = useSuspenseQuery(wingsQuery(projectId));
   const create = useCreateWing(projectId);
-  const back = wingsPath(projectId);
+  const back = pageHref("/app/projects/[id]/wings", { id: projectId });
   const firstPhase =
     data.phases.find((phase) => phase.id === phaseId)?.id ??
     data.phases[0]?.id ??

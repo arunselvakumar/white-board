@@ -31,7 +31,6 @@ import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { formatPaise } from "@/components/money/money-input";
 import { fieldForCode } from "@/lib/server-errors";
-import { VENDORS_PATH } from "@/lib/staff-nav";
 import {
   useClearVendorDay,
   useRecordVendorDay,
@@ -51,9 +50,10 @@ import {
   type RateRow,
   type VendorDayFormValues,
 } from "./vendor-day-form";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
-function vendorEditPath(id: string): string {
-  return `${VENDORS_PATH}/${encodeURIComponent(id)}`;
+function vendorEditPath(id: string): AppHref {
+  return pageHref("/app/staff/vendors/[id]", { id });
 }
 
 function money(paise: number | null): string {

@@ -91,6 +91,7 @@ import { ProjectChips } from "./labour-projects";
 import { TransferDialog, type TransferTarget } from "./transfer-dialog";
 import { TransferHistorySheet } from "./transfer-history-sheet";
 import { LabourRowsSkeleton } from "./labours-skeletons";
+import type { AppHref } from "@/lib/page-href";
 
 const STATUS_FILTERS: FilterTab<LabourListFilter["status"]>[] = [
   { value: "all", label: "All", icon: LayoutGrid },
@@ -100,7 +101,7 @@ const STATUS_FILTERS: FilterTab<LabourListFilter["status"]>[] = [
 
 const ALL = "all";
 
-function editPath(id: string): string {
+function editPath(id: string): AppHref {
   return `${LABOURS_PAGE_PATH}/${encodeURIComponent(id)}`;
 }
 

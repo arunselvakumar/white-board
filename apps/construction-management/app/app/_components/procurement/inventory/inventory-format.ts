@@ -1,4 +1,5 @@
 import type { StockLocation } from "@/src/procurement/domain/stock-location";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 const QUANTITY = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 3 });
 
@@ -35,12 +36,18 @@ export function localToday(now: Date = new Date()): string {
 /** A quantity a user typed: digits with at most 3 decimals. */
 export const QUANTITY_PATTERN = /^\d{1,11}(\.\d{1,3})?$/;
 
-/** Pages of a location's Current Inventory. */
+/**
+ * Pages of a location's Current Inventory: a Project's, or null for a
+ * Central Store, whose pages pass their own.
+ */
 export function inventoryPath(
   location: StockLocation,
   page?: "register",
-): string {
-  if (location.kind !== "project") return "";
-  const base = `/app/projects/${encodeURIComponent(location.id)}/materials/inventory`;
-  return page == null ? base : `${base}/${page}`;
+): AppHref | null {
+  if (location.kind !== "project") return null;
+  return page == null
+    ? pageHref("/app/projects/[id]/materials/inventory", { id: location.id })
+    : pageHref("/app/projects/[id]/materials/inventory/register", {
+        id: location.id,
+      });
 }

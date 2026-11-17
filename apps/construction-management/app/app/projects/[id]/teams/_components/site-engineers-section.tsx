@@ -53,12 +53,9 @@ import {
 
 import { ResourcePickerSkeleton } from "./resources-skeletons";
 import { TeamRow } from "./team-row";
+import { pageHref } from "@/lib/page-href";
 
 const ADD_SITE_ENGINEER_PATH = "/app/staff/site-engineers/new";
-
-export function siteEngineerPath(id: string): string {
-  return `/app/staff/site-engineers/${encodeURIComponent(id)}`;
-}
 
 /** "SE-001 · +91 98400 12345", or null when they have neither. */
 function detailOf(engineer: ProjectSiteEngineer): string | null {
@@ -241,7 +238,7 @@ function OptionLine({
       {!item.hasSignIn &&
         (canOpenPages ? (
           <Link
-            href={siteEngineerPath(item.id)}
+            href={pageHref("/app/staff/site-engineers/[id]", { id: item.id })}
             className="text-primary shrink-0 text-xs font-medium underline-offset-4 hover:underline"
             aria-label={`${item.name} needs a sign-in: open their page`}
           >
@@ -359,7 +356,13 @@ export function SiteEngineersSection({
               key={engineer.id}
               className="border-b last:border-b-0 sm:[&:nth-last-child(-n+2):nth-child(odd)]:border-b-0"
               name={engineer.name}
-              href={canOpenPages ? siteEngineerPath(engineer.id) : null}
+              href={
+                canOpenPages
+                  ? pageHref("/app/staff/site-engineers/[id]", {
+                      id: engineer.id,
+                    })
+                  : null
+              }
               detail={detailOf(engineer)}
               badges={
                 engineer.disabled && <Badge variant="outline">Disabled</Badge>

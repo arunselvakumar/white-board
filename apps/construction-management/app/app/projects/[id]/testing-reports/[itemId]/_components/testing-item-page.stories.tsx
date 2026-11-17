@@ -12,6 +12,7 @@ import {
   TESTING_PROJECT_ID,
   mockTestingReportsApi,
 } from "@/app/app/projects/[id]/testing-reports/_components/testing-report-fixtures";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockTestingReportsApi>;
 let xhr: ReturnType<typeof mockXhrUploads>;
@@ -49,7 +50,9 @@ function file(name: string, size: number, type = "") {
   return made;
 }
 
-const PATH = `/app/projects/${TESTING_PROJECT_ID}/testing-reports`;
+const PATH = pageHref("/app/projects/[id]/testing-reports", {
+  id: TESTING_PROJECT_ID,
+});
 
 type Play = NonNullable<Story["play"]>;
 type PlayContext = Parameters<Play>[0];

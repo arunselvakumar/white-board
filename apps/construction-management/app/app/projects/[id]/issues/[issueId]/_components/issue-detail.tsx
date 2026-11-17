@@ -36,6 +36,7 @@ import { SiteRecordHeader } from "@/app/app/projects/[id]/_components/site-work/
 import { TrackingDocumentFiles } from "@/app/app/projects/[id]/_components/tracking/documents/tracking-document-files";
 import { TrackingEntryFilesField } from "@/app/app/projects/[id]/_components/tracking/documents/tracking-entry-files-field";
 import { TrackingFileStrip } from "@/app/app/projects/[id]/_components/tracking/documents/tracking-file-strip";
+import { pageHref } from "@/lib/page-href";
 import { trackingRecordPath } from "@/lib/tracking-paths";
 import { QueryHttpError } from "@/src/queries/http";
 import {
@@ -410,7 +411,10 @@ export function IssueDetail({
             )}
             {issue.actions.edit && (
               <Link
-                href={`${issuesPath(projectId, issue.id)}/edit`}
+                href={pageHref("/app/projects/[id]/issues/[issueId]/edit", {
+                  id: projectId,
+                  issueId: issue.id,
+                })}
                 className={buttonVariants({ size: "sm", variant: "outline" })}
               >
                 <Pencil aria-hidden="true" />

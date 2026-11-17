@@ -31,6 +31,7 @@ import { QueryHttpError } from "@/src/queries/http";
 import { useDeleteSiteDiary, type SiteDiary } from "@/src/queries/site-diary";
 
 import { formatRainfall, WeatherChip } from "./site-diary-parts";
+import type { AppHref } from "@/lib/page-href";
 
 function Fact({
   label,
@@ -65,7 +66,7 @@ export function SiteDiaryView({
   onDeleted = () => undefined,
 }: {
   diary: SiteDiary;
-  editHref: string;
+  editHref: AppHref;
   /** Create or Update on the Site Diary: may add and remove photos. */
   canAttach: boolean;
   /** After a delete; the date's read refetches on its own. */

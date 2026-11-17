@@ -80,10 +80,6 @@ export function localToday(now: Date = new Date()): string {
   return new Date(now.getTime() - offset).toISOString().slice(0, 10);
 }
 
-export function goodsReceivedPath(projectId: string, rest = ""): string {
-  return `/app/projects/${encodeURIComponent(projectId)}/materials/goods-received${rest}`;
-}
-
 /** A labelled `Select` over `{ value, label }` choices. */
 export function ChoiceSelect({
   id,

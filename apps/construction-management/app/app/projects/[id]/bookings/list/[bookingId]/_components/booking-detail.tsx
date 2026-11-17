@@ -45,6 +45,7 @@ import {
   type BookingDetail as Booking,
 } from "@/src/queries/sales-bookings";
 import { inquiriesPath } from "@/src/queries/sales-inquiries";
+import { pageHref } from "@/lib/page-href";
 
 import { BookingActionDialog, type BookingDialogKind } from "./booking-dialogs";
 import { uploadFailedNotice } from "@/app/app/projects/[id]/_components/sales/documents/upload-failed";
@@ -158,7 +159,10 @@ export function BookingDetail({
             )}
             {booking.actions.edit && (
               <Link
-                href={`${bookingsPath(projectId, booking.id)}/edit`}
+                href={pageHref(
+                  "/app/projects/[id]/bookings/list/[bookingId]/edit",
+                  { id: projectId, bookingId: booking.id },
+                )}
                 className={buttonVariants({ size: "sm", variant: "outline" })}
               >
                 <Pencil aria-hidden="true" />

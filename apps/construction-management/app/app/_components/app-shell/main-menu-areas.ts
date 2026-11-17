@@ -13,6 +13,7 @@ import { humanResourcesGroups } from "./human-resources-nav-menu";
 import { marketingGroups } from "./marketing-nav-menu";
 import { filterMenuArea, labelMatches, type AreaMatch } from "./menu-filter";
 import { WORKSPACE_GROUPS } from "./workspace-nav-menu";
+import type { AppHref } from "@/lib/page-href";
 
 /** Home (ADR CM-0039): the main menu on one page. */
 export const HOME_PATH = "/app";
@@ -22,7 +23,7 @@ export const HOME_LABEL = "Main menu";
  * Where Home sends a User in the sidebar layout, which has the menu beside
  * every page already: the Dashboard, or Projects without Dashboard Read.
  */
-export function sidebarHomePath(canOpenDashboard: boolean): string {
+export function sidebarHomePath(canOpenDashboard: boolean): AppHref {
   return canOpenDashboard ? "/app/dashboard" : APP_HOME;
 }
 
@@ -42,7 +43,7 @@ export type MainMenuArea = {
    * Where the area's own link goes (Human Resources opens on Labour or
    * HRMS, Marketing on the first entry the viewer may open).
    */
-  href: string;
+  href: AppHref;
   /** The submenu; undefined for an area that is one page. */
   groups?: readonly AreaNavGroup[];
 };

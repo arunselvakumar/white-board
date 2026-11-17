@@ -40,7 +40,6 @@ import { useUploadPendingTrackingFiles } from "@/app/app/projects/[id]/_componen
 import { QueryHttpError } from "@/src/queries/http";
 import {
   inspectionFormOptionsQuery,
-  inspectionsPath,
   useCreateInspection,
   useUpdateInspection,
   type CreateInspectionInput,
@@ -51,6 +50,7 @@ import {
 import type { LocationRef } from "@/src/shared-kernel/location-ref";
 import { INSPECTION_LIMITS } from "@/src/tracking/domain/inspection";
 import { LocationPickerSkeleton } from "@/app/app/_components/locations/locations-skeletons";
+import { pageHref } from "@/lib/page-href";
 
 const NONE = "none";
 
@@ -379,11 +379,21 @@ export function InspectionForm({
           setError(
             `${result.number} was saved, but ${String(failed.length)} ${failed.length === 1 ? "file" : "files"} did not upload (${failed.join(", ")}). Add them on the request.`,
           );
-          router.push(inspectionsPath(projectId, `/${result.id}`));
+          router.push(
+            pageHref("/app/projects/[id]/inspections/[inspectionId]", {
+              id: projectId,
+              inspectionId: result.id,
+            }),
+          );
           return;
         }
       }
-      router.push(inspectionsPath(projectId, `/${result.id}`));
+      router.push(
+        pageHref("/app/projects/[id]/inspections/[inspectionId]", {
+          id: projectId,
+          inspectionId: result.id,
+        }),
+      );
     } catch (caught) {
       setSaved(false);
       if (caught instanceof QueryHttpError) {

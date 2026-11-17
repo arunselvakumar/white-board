@@ -19,9 +19,10 @@ import {
   Wrench,
   type LucideIcon,
 } from "lucide-react";
+import type { AppHref } from "@/lib/page-href";
 
 export type MastersSection = {
-  href: string;
+  href: AppHref;
   /** Sidebar label; short enough for the submenu. */
   label: string;
   title: string;

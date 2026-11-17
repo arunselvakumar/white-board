@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { ProjectTransferDetail } from "@/app/app/projects/[id]/materials/transfers/_components/project-transfer-pages";
 import { TransferDetailSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
+import { pageHref } from "@/lib/page-href";
 
 export const metadata: Metadata = { title: "Material Transfer" };
 
@@ -17,7 +18,7 @@ export default async function ProjectTransferRoute({
     <QuerySuspense
       fallback={
         <TransferDetailSkeleton
-          backHref={`/app/projects/${encodeURIComponent(id)}/materials/transfers`}
+          backHref={pageHref("/app/projects/[id]/materials/transfers", { id })}
         />
       }
     >

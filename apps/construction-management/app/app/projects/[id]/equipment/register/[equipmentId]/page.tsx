@@ -5,6 +5,7 @@ import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no
 import { ProjectEquipmentDetailPage } from "@/app/app/_components/site-work/equipment/equipment-pages";
 import { EquipmentDetailSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
+import { pageHref } from "@/lib/page-href";
 
 export const metadata: Metadata = { title: "Equipment" };
 
@@ -27,7 +28,7 @@ export default async function ProjectEquipmentDetailRoute({
         <EquipmentDetailSkeleton
           back={{
             label: "Equipment",
-            href: `/app/projects/${encodeURIComponent(id)}/equipment/register`,
+            href: pageHref("/app/projects/[id]/equipment/register", { id }),
           }}
         />
       }

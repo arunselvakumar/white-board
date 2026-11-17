@@ -27,9 +27,10 @@ import {
 import { CloseAccountButton } from "./close-account-button";
 import { ExportReceiptsDialog } from "./export-receipts-dialog";
 import { OpenAccountDialog } from "./open-account-dialog";
-import { Amount, pettyCashPath } from "./petty-cash-parts";
+import { Amount } from "./petty-cash-parts";
 import { PettyCashVouchers } from "./petty-cash-vouchers";
 import { PettyCashVouchersSkeleton } from "./petty-cash-skeletons";
+import { pageHref } from "@/lib/page-href";
 
 function AccountCard({
   account,
@@ -116,7 +117,10 @@ function AccountPanel({
         </div>
         <div className="flex flex-wrap gap-2">
           <Link
-            href={pettyCashPath(projectId, `/statement/${account.id}`)}
+            href={pageHref(
+              "/app/projects/[id]/payments/petty-cash/statement/[accountId]",
+              { id: projectId, accountId: account.id },
+            )}
             className={buttonVariants({ variant: "outline", size: "sm" })}
           >
             <ScrollText aria-hidden="true" />
@@ -140,9 +144,10 @@ function AccountPanel({
           ) : null}
           {canCreate ? (
             <Link
-              href={pettyCashPath(
-                projectId,
-                `/new?account=${encodeURIComponent(account.id)}`,
+              href={pageHref(
+                "/app/projects/[id]/payments/petty-cash/new",
+                { id: projectId },
+                `?account=${encodeURIComponent(account.id)}`,
               )}
               className={buttonVariants({ size: "sm" })}
             >

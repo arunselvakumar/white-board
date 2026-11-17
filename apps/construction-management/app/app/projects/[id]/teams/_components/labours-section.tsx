@@ -34,9 +34,10 @@ import {
 import { projectQuery } from "@/src/queries/projects";
 
 import { AddLaboursDialog } from "./add-labours-dialog";
-import { labourDetail, labourPath, sinceLabel } from "./labour-lines";
+import { labourDetail, sinceLabel } from "./labour-lines";
 import { RemoveLabourDialog } from "./remove-labour-dialog";
 import { TeamRow } from "./team-row";
+import { pageHref } from "@/lib/page-href";
 
 type Position = { after?: string; before?: string; page: number };
 
@@ -60,7 +61,11 @@ function LabourRow({
   return (
     <TeamRow
       name={labour.name}
-      href={canOpenLabours ? labourPath(labour.id) : null}
+      href={
+        canOpenLabours
+          ? pageHref("/app/staff/labours/[id]", { id: labour.id })
+          : null
+      }
       detail={[labourDetail(labour), sinceLabel(labour.since)]
         .filter(Boolean)
         .join(" · ")}

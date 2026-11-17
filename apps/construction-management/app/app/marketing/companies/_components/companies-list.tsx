@@ -94,7 +94,7 @@ function companies(n: number): string {
   return `${String(n)} ${n === 1 ? "Prospect Company" : "Prospect Companies"}`;
 }
 
-const NEW_HREF = `${companyPath()}/new`;
+const NEW_HREF = "/app/marketing/companies/new";
 
 function AddButton() {
   return (

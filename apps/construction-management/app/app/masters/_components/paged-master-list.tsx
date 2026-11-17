@@ -40,6 +40,7 @@ import {
   MasterSearch,
 } from "@/app/app/_components/masters/master-list-parts";
 import { MasterRowsSkeleton } from "@/app/app/_components/masters/masters-skeletons";
+import type { AppHref } from "@/lib/page-href";
 
 const STATUS_FILTERS: FilterTab<MaterialMasterFilter["status"]>[] = [
   { value: "all", label: "All", icon: LayoutGrid },
@@ -64,7 +65,7 @@ export type PagedMasterScreen<L extends MaterialMasterList> = {
   isSeed?: (item: MaterialMasterItem<L>) => boolean;
   editLabel: string;
   /** Add and edit on their own pages (Materials) instead of a dialog. */
-  pages?: { newHref: string; editHref: (id: string) => string };
+  pages?: { newHref: AppHref; editHref: (id: string) => AppHref };
   /** The add / edit dialog; `item` null adds. */
   dialog?: (props: {
     item: MaterialMasterItem<L> | null;

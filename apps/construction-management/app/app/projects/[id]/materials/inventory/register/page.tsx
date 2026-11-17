@@ -5,6 +5,7 @@ import { StockRegisterPage } from "@/app/app/_components/procurement/inventory/s
 import { ProjectNoAccess } from "@/app/app/_components/projects/files/project-no-access";
 import { StockRegisterSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
+import { pageHref } from "@/lib/page-href";
 
 export const metadata: Metadata = { title: "Stock Register" };
 
@@ -25,7 +26,7 @@ export default async function ProjectStockRegisterRoute({
     <QuerySuspense
       fallback={
         <StockRegisterSkeleton
-          backHref={`/app/projects/${encodeURIComponent(id)}/materials/inventory`}
+          backHref={pageHref("/app/projects/[id]/materials/inventory", { id })}
         />
       }
     >

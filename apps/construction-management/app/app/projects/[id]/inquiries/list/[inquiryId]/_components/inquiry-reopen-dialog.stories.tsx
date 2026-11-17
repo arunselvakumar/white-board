@@ -12,6 +12,7 @@ import {
   mockInquiryApi,
   type InquiryApiOptions,
 } from "@/app/app/projects/[id]/inquiries/list/_components/inquiry-fixtures";
+import { pageHref } from "@/lib/page-href";
 
 const LOST = INQUIRIES.find((item) => item.id === DEEPAK_ID) ?? INQUIRIES[0];
 if (LOST == null) throw new Error("fixtures");
@@ -85,7 +86,10 @@ export const BookingActive: Story = {
       dialog.getByRole("link", { name: "Open the booking" }),
     ).toHaveAttribute(
       "href",
-      `/app/projects/${INQUIRY_PROJECT_ID}/bookings/list/${CONVERTED_BOOKING_ID}`,
+      pageHref("/app/projects/[id]/bookings/list/[bookingId]", {
+        id: INQUIRY_PROJECT_ID,
+        bookingId: CONVERTED_BOOKING_ID,
+      }),
     );
   },
 };

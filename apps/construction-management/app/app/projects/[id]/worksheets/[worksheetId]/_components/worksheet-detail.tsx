@@ -32,9 +32,9 @@ import {
   quantityText,
   SheetApprovalBadge,
   shiftLabel,
-  worksheetsPath,
 } from "@/app/app/projects/[id]/_components/site-work/worksheets/worksheet-format";
 import { FactValueSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
+import { pageHref } from "@/lib/page-href";
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -88,7 +88,7 @@ export function WorksheetDetailPage({
     <div className="w-full max-w-4xl space-y-6">
       <div className="space-y-3">
         <Link
-          href={worksheetsPath(projectId)}
+          href={pageHref("/app/projects/[id]/worksheets", { id: projectId })}
           className="text-muted-foreground inline-flex items-center gap-1 text-sm hover:underline"
         >
           <ArrowLeft aria-hidden="true" className="size-4" />
@@ -107,7 +107,9 @@ export function WorksheetDetailPage({
             variant="buttons"
             onError={setError}
             onDeleted={() => {
-              router.push(worksheetsPath(projectId));
+              router.push(
+                pageHref("/app/projects/[id]/worksheets", { id: projectId }),
+              );
             }}
           />
         </div>

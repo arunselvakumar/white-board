@@ -13,6 +13,7 @@ import {
   mockGalleryApi,
 } from "./gallery-fixtures";
 import { GalleryPage } from "./gallery-page";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockGalleryApi>;
 
@@ -45,7 +46,7 @@ function lastFilters(): Record<string, string> {
   return params;
 }
 
-const PATH = `/app/projects/${GALLERY_PROJECT_ID}/gallery`;
+const PATH = pageHref("/app/projects/[id]/gallery", { id: GALLERY_PROJECT_ID });
 
 type Play = NonNullable<Story["play"]>;
 type PlayContext = Parameters<Play>[0];

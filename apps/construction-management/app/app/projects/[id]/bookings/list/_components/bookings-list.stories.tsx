@@ -11,6 +11,7 @@ import {
   type BookingApiOptions,
 } from "./booking-fixtures";
 import { BookingsList } from "./bookings-list";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockBookingApi>;
 function bookingApi(options: BookingApiOptions = {}) {
@@ -20,7 +21,7 @@ function bookingApi(options: BookingApiOptions = {}) {
   };
 }
 
-const BASE = `/app/projects/${PROJECT_ID}/bookings/list`;
+const BASE = pageHref("/app/projects/[id]/bookings/list", { id: PROJECT_ID });
 
 const meta = {
   title: "Sales/Bookings/List",

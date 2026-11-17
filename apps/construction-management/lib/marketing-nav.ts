@@ -7,6 +7,7 @@ import {
   MapPinned,
   type LucideIcon,
 } from "lucide-react";
+import type { AppHref } from "@/lib/page-href";
 
 /** Marketing (ADR CM-0040 §1): every page of the area lives under it. */
 export const MARKETING_PATH = "/app/marketing";
@@ -53,7 +54,7 @@ export const FULL_MARKETING_ACCESS: MarketingMenuAccess = {
 
 export type MarketingSection = {
   key: keyof MarketingMenuAccess;
-  href: string;
+  href: AppHref;
   /** Sidebar label. */
   label: string;
   title: string;

@@ -7,10 +7,11 @@ import {
   MapPinned,
   type LucideIcon,
 } from "lucide-react";
+import type { AppHref } from "@/lib/page-href";
 
 /** The Company rules under Settings → Advanced Settings (`modules/12`). */
 export const SETTINGS_SECTIONS: readonly {
-  href: string;
+  href: AppHref;
   title: string;
   description: string;
   icon: LucideIcon;

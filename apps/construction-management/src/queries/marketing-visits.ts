@@ -29,6 +29,7 @@ import type {
 import { apiJson, QueryHttpError } from "./http";
 import { MARKETING_COMPANIES_KEY } from "./marketing-companies";
 import { MARKETING_FOLLOW_UPS_KEY } from "./marketing-follow-ups";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 export type Visit = ConstructionMarketingVisitResponse;
 export type VisitListItem = z.infer<
@@ -174,10 +175,10 @@ export function visitQuery(id: string) {
 }
 
 /** The Visit page, or the list without an id. */
-export function visitPath(id?: string): string {
+export function visitPath(id?: string): AppHref {
   return id == null
     ? MARKETING_VISITS_PATH
-    : `${MARKETING_VISITS_PATH}/${encodeURIComponent(id)}`;
+    : pageHref("/app/marketing/visits/[id]", { id });
 }
 
 /**
@@ -191,7 +192,7 @@ export function newVisitPath(
     contactIds?: readonly string[];
     visitorIds?: readonly string[];
   } = {},
-): string {
+): AppHref {
   const params = new URLSearchParams({ status });
   if (prospectCompanyId != null)
     params.set("prospectCompanyId", prospectCompanyId);

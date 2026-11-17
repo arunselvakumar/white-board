@@ -66,9 +66,9 @@ import {
   type LineValue,
   type PurchaseOrderFormValues,
 } from "./purchase-order-form-schema";
-import { purchaseOrdersPath } from "./purchase-order-format";
 import { PurchaseOrderLineSheet } from "./purchase-order-line-sheet";
 import { LocationPickerSkeleton } from "@/app/app/_components/locations/locations-skeletons";
+import { pageHref } from "@/lib/page-href";
 
 const NONE = "__none";
 
@@ -328,7 +328,10 @@ function PurchaseOrderFields({
             failed += 1;
           }
         }
-        const path = purchaseOrdersPath(projectId, `/${saved.id}`);
+        const path = pageHref(
+          "/app/projects/[id]/materials/purchase-orders/[poId]",
+          { id: projectId, poId: saved.id },
+        );
         router.push(
           failed > 0 ? `${path}?uploadFailed=${String(failed)}` : path,
         );

@@ -58,6 +58,7 @@ import { FileThumbnail } from "@/app/app/_components/projects/files/file-thumbna
 import { FileViewer } from "@/app/app/_components/projects/files/file-viewer";
 import { TestingReportSheet } from "./testing-report-sheet";
 import { reportCountLabel } from "@/app/app/projects/[id]/testing-reports/_components/testing-reports-page";
+import { pageHref } from "@/lib/page-href";
 
 const SEARCH_DELAY_MS = 300;
 
@@ -326,7 +327,9 @@ export function TestingItemPage({
     }),
   );
   const item = data.item;
-  const listHref = `/app/projects/${encodeURIComponent(projectId)}/testing-reports`;
+  const listHref = pageHref("/app/projects/[id]/testing-reports", {
+    id: projectId,
+  });
   const searching = shownQuery.length > 0;
 
   const addButton = (

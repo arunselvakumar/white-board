@@ -17,6 +17,7 @@ import {
   type TaskApiOptions,
 } from "./task-fixtures";
 import { TaskForm } from "./task-form";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockTaskApi>;
 
@@ -33,7 +34,7 @@ function taskApi(options: TaskApiOptions = {}) {
   };
 }
 
-const BASE = `/app/projects/${TASK_PROJECT_ID}/tasks`;
+const BASE = pageHref("/app/projects/[id]/tasks", { id: TASK_PROJECT_ID });
 
 const meta = {
   title: "Tracking/Tasks/Form",

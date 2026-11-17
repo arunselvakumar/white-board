@@ -23,10 +23,10 @@ import {
 import {
   SectionHeader,
   saveProblem,
-  wingsPath,
 } from "@/app/app/projects/[id]/_components/structure/structure-parts";
 import { editorTotals } from "@/app/app/projects/[id]/_components/structure/wing-editor-state";
 import type { WingsAccess } from "@/app/app/projects/[id]/wings/_components/wings-page";
+import { pageHref } from "@/lib/page-href";
 
 type ChartFloor = {
   id: string;
@@ -124,7 +124,7 @@ export function WingChartScreen({
   const removal = useDeleteWing(projectId);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | undefined>();
-  const back = wingsPath(projectId);
+  const back = pageHref("/app/projects/[id]/wings", { id: projectId });
   const phase = overview.phases.find((item) => item.id === wing.phaseId);
   const type = wing.type;
 
@@ -144,7 +144,10 @@ export function WingChartScreen({
           <>
             {access.update ? (
               <Link
-                href={`${back}/${encodeURIComponent(wing.id)}/edit`}
+                href={pageHref("/app/projects/[id]/wings/[wingId]/edit", {
+                  id: projectId,
+                  wingId: wing.id,
+                })}
                 className={buttonVariants({ variant: "outline" })}
               >
                 <Pencil aria-hidden="true" />

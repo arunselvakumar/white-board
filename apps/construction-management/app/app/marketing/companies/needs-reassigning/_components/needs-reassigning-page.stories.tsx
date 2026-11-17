@@ -17,6 +17,7 @@ import {
   TEXTILES_ID,
 } from "../../_components/company-fixtures";
 import { NeedsReassigningPage } from "./needs-reassigning-page";
+import { pageHref } from "@/lib/page-href";
 
 const MANI = { id: MANI_MEMBER_ID, name: "Mani Kandan" };
 function listed(index: number) {
@@ -103,7 +104,10 @@ export const BothLists: Story = {
     if (kaveri == null) throw new Error("Kaveri");
     await expect(
       within(kaveri).getByRole("link", { name: "Kaveri Cement Works" }),
-    ).toHaveAttribute("href", `/app/marketing/companies/${KAVERI_ID}`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/marketing/companies/[id]", { id: KAVERI_ID }),
+    );
     await expect(kaveri).toHaveTextContent(
       "Tiruchirappalli · Assigned to Mani Kandan",
     );

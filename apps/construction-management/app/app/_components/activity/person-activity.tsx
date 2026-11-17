@@ -23,7 +23,6 @@ import {
 } from "@/app/app/_components/activity/activity-search-params";
 import { checkInActivityParts } from "@/app/app/_components/check-in/check-in-activity";
 import { formatTime } from "@/app/app/_components/check-in/check-in-entry-parts";
-import { projectBasePath } from "@/lib/project-nav";
 import {
   PERSON_ACTIVITY_TYPES,
   type PersonActivityEntry,
@@ -31,6 +30,7 @@ import {
   type siteEngineerActivityQuery,
 } from "@/src/queries/activity";
 import { projectOptionsQuery } from "@/src/queries/projects";
+import { pageHref } from "@/lib/page-href";
 
 /**
  * What a Labour's, a Site Engineer's and a Vendor's Activity tabs share
@@ -49,7 +49,7 @@ export const PERSON_ACTIVITY_EMPTY =
 export function ProjectName({ project }: { project: ActivityProject }) {
   return project.canOpen ? (
     <Link
-      href={projectBasePath(project.id)}
+      href={pageHref("/app/projects/[id]", { id: project.id })}
       className="font-medium underline-offset-4 hover:underline"
     >
       {project.name}

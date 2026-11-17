@@ -63,12 +63,12 @@ import {
   Amount,
   VOUCHER_TYPE_LABELS,
   VoucherStatusBadge,
-  pettyCashPath,
   voucherParty,
   voucherSign,
   voucherSummary,
 } from "./petty-cash-parts";
 import { VOUCHER_COLUMNS, VoucherRowsSkeleton } from "./petty-cash-skeletons";
+import { pageHref } from "@/lib/page-href";
 
 type Scope = "project" | "all";
 
@@ -225,9 +225,10 @@ function VoucherRows({
         {!filtered && canCreate ? (
           <EmptyContent>
             <Link
-              href={pettyCashPath(
-                projectId,
-                `/new?account=${encodeURIComponent(account.id)}`,
+              href={pageHref(
+                "/app/projects/[id]/payments/petty-cash/new",
+                { id: projectId },
+                `?account=${encodeURIComponent(account.id)}`,
               )}
               className={buttonVariants({ size: "sm" })}
             >
@@ -250,7 +251,10 @@ function VoucherRows({
       />
     ) : null;
   const href = (voucher: PettyCashVoucher) =>
-    pettyCashPath(projectId, `/${voucher.id}`);
+    pageHref("/app/projects/[id]/payments/petty-cash/[voucherId]", {
+      id: projectId,
+      voucherId: voucher.id,
+    });
 
   return (
     <div className="space-y-3">

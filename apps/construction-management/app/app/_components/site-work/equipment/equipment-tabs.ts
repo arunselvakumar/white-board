@@ -1,4 +1,5 @@
 import type { SiteWorkAccessMenu } from "@/app/api/construction/site-work/access/access-models";
+import { type AppHref, type HrefSuffix, pageHref } from "@/lib/page-href";
 
 /**
  * The tabs of a Project's Equipment module, in order. `segment` is the path
@@ -25,24 +26,39 @@ export const EQUIPMENT_TABS = [
 
 export type EquipmentTabSegment = (typeof EQUIPMENT_TABS)[number]["segment"];
 
+/** Each tab's page, named by its folder (ADR CM-0045). */
+const EQUIPMENT_TAB_PAGES: Record<
+  EquipmentTabSegment,
+  (id: string) => AppHref
+> = {
+  "usage-sheets": (id) =>
+    pageHref("/app/projects/[id]/equipment/usage-sheets", { id }),
+  register: (id) => pageHref("/app/projects/[id]/equipment/register", { id }),
+};
+
 export function equipmentModulePath(
   projectId: string,
   segment: EquipmentTabSegment,
-): string {
-  return `/app/projects/${encodeURIComponent(projectId)}/equipment/${segment}`;
+): AppHref {
+  return EQUIPMENT_TAB_PAGES[segment](projectId);
 }
 
 /** A machine's detail page inside a Project's Equipment module. */
 export function projectEquipmentPath(
   projectId: string,
   equipmentId: string,
-): string {
-  return `${equipmentModulePath(projectId, "register")}/${encodeURIComponent(equipmentId)}`;
+  suffix: HrefSuffix = "",
+): AppHref {
+  return pageHref(
+    "/app/projects/[id]/equipment/register/[equipmentId]",
+    { id: projectId, equipmentId },
+    suffix,
+  );
 }
 
 /** The register's pages, under Masters. */
 export const EQUIPMENTS_PATH = "/app/masters/equipments";
 
-export function equipmentPath(id: string): string {
-  return `${EQUIPMENTS_PATH}/${encodeURIComponent(id)}`;
+export function equipmentPath(id: string, suffix: HrefSuffix = ""): AppHref {
+  return pageHref("/app/masters/equipments/[id]", { id }, suffix);
 }

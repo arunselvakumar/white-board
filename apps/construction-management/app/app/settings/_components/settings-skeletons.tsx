@@ -7,7 +7,10 @@ import {
 } from "@repo/ui/components/skeleton-kit";
 import { cn } from "@repo/ui/lib/utils";
 
-import { PageHeader } from "@/app/app/_components/app-shell/page-header";
+import {
+  PageHeader,
+  type PageHeaderBack,
+} from "@/app/app/_components/app-shell/page-header";
 import {
   BACKDATED_MODULE_GROUPS,
   BACKDATED_MODULES,
@@ -23,7 +26,7 @@ import {
  * section headings; bars only where the saved values appear.
  */
 
-const BACK = { label: "Settings", href: "/app/settings" };
+const BACK: PageHeaderBack = { label: "Settings", href: "/app/settings" };
 
 function SettingsPage({
   title,

@@ -116,8 +116,3 @@ export function useSalesListCommand(projectId: string) {
       queryClient.invalidateQueries({ queryKey: [...SALES_KEY] }),
   });
 }
-
-/** The Settings tab of a Project's Inquiries module. */
-export function salesSettingsPath(projectId: string): string {
-  return `/app/projects/${encodeURIComponent(projectId)}/inquiries/settings`;
-}

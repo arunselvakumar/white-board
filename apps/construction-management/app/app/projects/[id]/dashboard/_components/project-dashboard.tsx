@@ -42,8 +42,6 @@ import {
 } from "@/src/queries/project-dashboard";
 import { procurementDashboardQuery } from "@/src/queries/procurement-dashboard";
 
-import { materialsPath } from "@/app/app/_components/procurement/materials-hub/materials-tabs";
-
 import { AttendanceTrend } from "./attendance-trend";
 import { Fact, Rupees, Section, Unit, denied } from "./dashboard-parts";
 import {
@@ -70,6 +68,7 @@ import {
   PendingIssuesTile,
   TaskSection,
 } from "./tracking-sections";
+import { pageHref } from "@/lib/page-href";
 
 /**
  * What each stub section will show once its milestone lands, and the
@@ -296,11 +295,17 @@ function MaterialApprovalsTile({
     approvals == null
       ? null
       : (approvals.purchaseRequests ?? 0) > 0
-        ? materialsPath(projectId, "purchase-requests")
+        ? pageHref("/app/projects/[id]/materials/purchase-requests", {
+            id: projectId,
+          })
         : (approvals.purchaseOrders ?? 0) > 0
-          ? materialsPath(projectId, "purchase-orders")
+          ? pageHref("/app/projects/[id]/materials/purchase-orders", {
+              id: projectId,
+            })
           : (approvals.transfers ?? 0) > 0
-            ? materialsPath(projectId, "transfers")
+            ? pageHref("/app/projects/[id]/materials/transfers", {
+                id: projectId,
+              })
             : null;
   return (
     <li className="flex min-w-0">
@@ -374,7 +379,9 @@ function MaterialsSection({
       title="Materials"
       aside={
         <Link
-          href={`${materialsPath(projectId, "inventory")}/register`}
+          href={pageHref("/app/projects/[id]/materials/inventory/register", {
+            id: projectId,
+          })}
           className="text-primary text-sm font-medium underline-offset-4 hover:underline"
         >
           Stock Register

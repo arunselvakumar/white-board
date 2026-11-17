@@ -24,10 +24,7 @@ import {
   SheetApprovalBadge,
   shiftLabel,
 } from "@/app/app/projects/[id]/_components/site-work/worksheets/worksheet-format";
-import {
-  equipmentSheetQuery,
-  equipmentSheetsPath,
-} from "@/src/queries/equipment-sheets";
+import { equipmentSheetQuery } from "@/src/queries/equipment-sheets";
 import { newHindranceFromUsageSheetPath } from "@/src/queries/hindrances";
 import {
   canInSiteWork,
@@ -52,6 +49,7 @@ import {
 } from "@/app/app/projects/[id]/equipment/usage-sheets/_components/equipment-sheet-format";
 import { trimDecimal } from "@/app/app/projects/[id]/equipment/usage-sheets/_components/equipment-sheet-live";
 import { FactValueSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
+import { pageHref } from "@/lib/page-href";
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -120,7 +118,9 @@ export function EquipmentSheetDetailPage({
     <div className="w-full max-w-4xl space-y-6">
       <div className="space-y-3">
         <Link
-          href={equipmentSheetsPath(projectId)}
+          href={pageHref("/app/projects/[id]/equipment/usage-sheets", {
+            id: projectId,
+          })}
           className="text-muted-foreground inline-flex items-center gap-1 text-sm hover:underline"
         >
           <ArrowLeft aria-hidden="true" className="size-4" />
@@ -157,7 +157,11 @@ export function EquipmentSheetDetailPage({
               variant="buttons"
               onError={setError}
               onDeleted={() => {
-                router.push(equipmentSheetsPath(projectId));
+                router.push(
+                  pageHref("/app/projects/[id]/equipment/usage-sheets", {
+                    id: projectId,
+                  }),
+                );
               }}
             />
           </div>

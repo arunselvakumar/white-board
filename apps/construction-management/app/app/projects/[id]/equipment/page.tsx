@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { equipmentModulePath } from "@/app/app/_components/site-work/equipment/equipment-tabs";
+import { pageHref } from "@/lib/page-href";
 
 /** The Equipment module opens on its usage sheets. */
 export default async function EquipmentPage({
@@ -9,5 +9,5 @@ export default async function EquipmentPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  redirect(equipmentModulePath(id, "usage-sheets"));
+  redirect(pageHref("/app/projects/[id]/equipment/usage-sheets", { id }));
 }

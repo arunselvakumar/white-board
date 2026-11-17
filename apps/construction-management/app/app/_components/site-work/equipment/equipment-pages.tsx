@@ -11,10 +11,10 @@ import { EquipmentDetailScreen } from "./equipment-detail";
 import { EquipmentFormScreen } from "./equipment-form";
 import {
   EQUIPMENTS_PATH,
-  equipmentModulePath,
   equipmentPath,
   projectEquipmentPath,
 } from "./equipment-tabs";
+import { type HrefSuffix, pageHref } from "@/lib/page-href";
 
 export function NewEquipmentPage() {
   return (
@@ -45,8 +45,11 @@ export function EditEquipmentPage({
   projectId?: string;
 }) {
   const { data } = useSuspenseQuery(equipmentQuery(id));
-  const detailHref =
-    projectId == null ? equipmentPath(id) : projectEquipmentPath(projectId, id);
+  const detailPath = (suffix: HrefSuffix = "") =>
+    projectId == null
+      ? equipmentPath(id, suffix)
+      : projectEquipmentPath(projectId, id, suffix);
+  const detailHref = detailPath();
   return (
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
@@ -58,7 +61,7 @@ export function EditEquipmentPage({
         <EquipmentFormScreen
           equipment={data}
           backHref={detailHref}
-          hrefFor={() => detailHref}
+          hrefFor={(_saved, suffix) => detailPath(suffix)}
         />
       </div>
     </div>
@@ -67,7 +70,9 @@ export function EditEquipmentPage({
 
 /** Add equipment from a Project: it starts at this Project. */
 export function ProjectNewEquipmentPage({ projectId }: { projectId: string }) {
-  const listHref = equipmentModulePath(projectId, "register");
+  const listHref = pageHref("/app/projects/[id]/equipment/register", {
+    id: projectId,
+  });
   return (
     <div className="w-full space-y-6">
       <PageHeader
@@ -79,7 +84,7 @@ export function ProjectNewEquipmentPage({ projectId }: { projectId: string }) {
         <EquipmentFormScreen
           fixedProjectId={projectId}
           backHref={listHref}
-          hrefFor={(id) => projectEquipmentPath(projectId, id)}
+          hrefFor={(id, suffix) => projectEquipmentPath(projectId, id, suffix)}
         />
       </Suspense>
     </div>
@@ -91,7 +96,7 @@ export function MastersEquipmentDetailPage({ id }: { id: string }) {
     <EquipmentDetailScreen
       id={id}
       back={{ label: "Equipments", href: EQUIPMENTS_PATH }}
-      editHref={`${equipmentPath(id)}/edit`}
+      editHref={pageHref("/app/masters/equipments/[id]/edit", { id })}
       afterDeleteHref={EQUIPMENTS_PATH}
     />
   );
@@ -104,12 +109,17 @@ export function ProjectEquipmentDetailPage({
   projectId: string;
   id: string;
 }) {
-  const listHref = equipmentModulePath(projectId, "register");
+  const listHref = pageHref("/app/projects/[id]/equipment/register", {
+    id: projectId,
+  });
   return (
     <EquipmentDetailScreen
       id={id}
       back={{ label: "Equipment", href: listHref }}
-      editHref={`${projectEquipmentPath(projectId, id)}/edit`}
+      editHref={pageHref(
+        "/app/projects/[id]/equipment/register/[equipmentId]/edit",
+        { id: projectId, equipmentId: id },
+      )}
       afterDeleteHref={listHref}
     />
   );

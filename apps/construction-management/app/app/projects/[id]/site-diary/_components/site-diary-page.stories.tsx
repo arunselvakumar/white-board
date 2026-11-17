@@ -12,6 +12,7 @@ import {
   type SiteDiaryApiOptions,
 } from "@/app/app/projects/[id]/_components/site-work/site-diary/site-diary-fixtures";
 import { SiteDiaryPage } from "./site-diary-page";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockSiteDiaryApi>;
 
@@ -28,7 +29,9 @@ function diaryApi(options: SiteDiaryApiOptions = {}) {
   };
 }
 
-const BASE = `/app/projects/${DIARY_PROJECT_ID}/site-diary`;
+const BASE = pageHref("/app/projects/[id]/site-diary", {
+  id: DIARY_PROJECT_ID,
+});
 
 const meta = {
   title: "Site work/Site Diary/Page",

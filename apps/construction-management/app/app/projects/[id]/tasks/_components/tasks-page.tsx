@@ -17,7 +17,8 @@ import {
   canInTracking,
   trackingAccessQuery,
 } from "@/src/queries/tracking-access";
-import { tasksPath, type TaskFilters } from "@/src/queries/tracking-tasks";
+import { pageHref } from "@/lib/page-href";
+import type { TaskFilters } from "@/src/queries/tracking-tasks";
 
 import { ImportTasksDialog } from "./import-tasks-dialog";
 import { TaskFilterBar } from "./task-filters";
@@ -69,7 +70,9 @@ export function TasksPage({
               Import
             </Button>
             <Link
-              href={`${tasksPath(projectId)}/new`}
+              href={pageHref("/app/projects/[id]/tasks/new", {
+                id: projectId,
+              })}
               className={buttonVariants({ size: "sm" })}
             >
               <Plus aria-hidden="true" />

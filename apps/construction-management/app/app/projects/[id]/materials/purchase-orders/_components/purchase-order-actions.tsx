@@ -29,7 +29,7 @@ import {
   type PurchaseOrder,
 } from "@/src/queries/purchase-orders";
 
-import { purchaseOrdersPath } from "./purchase-order-format";
+import { pageHref } from "@/lib/page-href";
 
 type Item = {
   key: string;
@@ -91,7 +91,12 @@ export function PurchaseOrderActions({
       key: "view",
       label: "View",
       run: () => {
-        router.push(purchaseOrdersPath(projectId, `/${po.id}`));
+        router.push(
+          pageHref("/app/projects/[id]/materials/purchase-orders/[poId]", {
+            id: projectId,
+            poId: po.id,
+          }),
+        );
       },
     });
   if (actions.approve)
@@ -137,7 +142,12 @@ export function PurchaseOrderActions({
       key: "edit",
       label: "Edit",
       run: () => {
-        router.push(purchaseOrdersPath(projectId, `/${po.id}/edit`));
+        router.push(
+          pageHref("/app/projects/[id]/materials/purchase-orders/[poId]/edit", {
+            id: projectId,
+            poId: po.id,
+          }),
+        );
       },
     });
   if (actions.print)

@@ -26,6 +26,7 @@ import {
   LABOURS_API,
   labourPage,
 } from "./staffing-fixtures";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockFetch>;
 
@@ -278,7 +279,7 @@ export const AddProjectStepOnAPhone: Story = {
     await expect(await canvas.findByText("Step 2 of 2 · Teams")).toBeVisible();
     await expect(canvas.getByRole("link", { name: "Skip" })).toHaveAttribute(
       "href",
-      `/app/projects/${PROJECT_ID}`,
+      pageHref("/app/projects/[id]", { id: PROJECT_ID }),
     );
     const html = canvasElement.ownerDocument.documentElement;
     await expect(html.scrollWidth).toBeLessThanOrEqual(html.clientWidth);
@@ -297,7 +298,10 @@ export const AddProjectStepDone: Story = {
   play: async ({ canvas }) => {
     await expect(
       await canvas.findByRole("link", { name: "Done" }),
-    ).toHaveAttribute("href", `/app/projects/${PROJECT_ID}`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/projects/[id]", { id: PROJECT_ID }),
+    );
   },
 };
 
@@ -376,12 +380,36 @@ export const RowsOpenEachPage: Story = {
     const body = within(canvasElement.ownerDocument.body);
     await canvas.findByRole("region", { name: "Labours 3" });
     const expected: [string, string, string][] = [
-      ["Site Engineers 1", ANAND.name, `/app/staff/site-engineers/${ANAND.id}`],
-      ["Labours 3", ARUMUGAM.name, `/app/staff/labours/${ARUMUGAM.id}`],
-      ["Team Members 2", PRABHU.name, `/app/staff/office-staff/${PRABHU.id}`],
-      ["Contractors 2", BALAJI.name, `/app/masters/contractors/${BALAJI.id}`],
-      ["Suppliers 1", KAVERI.name, `/app/masters/suppliers/${KAVERI.id}`],
-      ["Vendors 1", MUTHU.name, `/app/staff/vendors/${MUTHU.id}`],
+      [
+        "Site Engineers 1",
+        ANAND.name,
+        pageHref("/app/staff/site-engineers/[id]", { id: ANAND.id }),
+      ],
+      [
+        "Labours 3",
+        ARUMUGAM.name,
+        pageHref("/app/staff/labours/[id]", { id: ARUMUGAM.id }),
+      ],
+      [
+        "Team Members 2",
+        PRABHU.name,
+        pageHref("/app/staff/office-staff/[id]", { id: PRABHU.id }),
+      ],
+      [
+        "Contractors 2",
+        BALAJI.name,
+        pageHref("/app/masters/contractors/[id]", { id: BALAJI.id }),
+      ],
+      [
+        "Suppliers 1",
+        KAVERI.name,
+        pageHref("/app/masters/suppliers/[id]", { id: KAVERI.id }),
+      ],
+      [
+        "Vendors 1",
+        MUTHU.name,
+        pageHref("/app/staff/vendors/[id]", { id: MUTHU.id }),
+      ],
     ];
     for (const [section, name, href] of expected) {
       const link = region(canvas, section).getByRole("link", { name });
@@ -400,7 +428,7 @@ export const RowsOpenEachPage: Story = {
     });
     await expect(inactive).toHaveAttribute(
       "href",
-      `/app/masters/contractors/${RAMCO.id}`,
+      pageHref("/app/masters/contractors/[id]", { id: RAMCO.id }),
     );
 
     // A row's own controls stay outside the link and still work.

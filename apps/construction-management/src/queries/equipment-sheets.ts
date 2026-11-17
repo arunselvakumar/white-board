@@ -253,8 +253,3 @@ export function useSaveEquipmentSheetSettings() {
     onSuccess: invalidate,
   });
 }
-
-/** Pages of a Project's Equipment Usage sheets. */
-export function equipmentSheetsPath(projectId: string, rest = ""): string {
-  return `/app/projects/${encodeURIComponent(projectId)}/equipment/usage-sheets${rest}`;
-}

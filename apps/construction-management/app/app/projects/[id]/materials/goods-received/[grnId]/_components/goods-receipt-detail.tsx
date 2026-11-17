@@ -50,7 +50,6 @@ import {
 import {
   DELIVERY_FIELDS,
   formatDate,
-  goodsReceivedPath,
   GRN_FIELD_LABELS,
   money,
   qty,
@@ -58,6 +57,7 @@ import {
   SUPPLY_TYPE_LABELS,
   type GrnField,
 } from "@/app/app/projects/[id]/materials/goods-received/_components/goods-receipt-parts";
+import { pageHref } from "@/lib/page-href";
 
 function Fact({ label, value }: { label: string; value: string }) {
   return (
@@ -273,7 +273,10 @@ export function GoodsReceiptDetail({
       )}
       {can("update") && !receipt.paid && (
         <Link
-          href={goodsReceivedPath(projectId, `/${receipt.id}/edit`)}
+          href={pageHref(
+            "/app/projects/[id]/materials/goods-received/[grnId]/edit",
+            { id: projectId, grnId: receipt.id },
+          )}
           className={buttonVariants({ variant: "outline" })}
         >
           <Pencil aria-hidden="true" />
@@ -299,7 +302,12 @@ export function GoodsReceiptDetail({
   return (
     <div className="w-full space-y-8">
       <PageHeader
-        back={{ label: "Goods Received", href: goodsReceivedPath(projectId) }}
+        back={{
+          label: "Goods Received",
+          href: pageHref("/app/projects/[id]/materials/goods-received", {
+            id: projectId,
+          }),
+        }}
         title={receipt.number}
         watermark="Goods Received"
         meta={
@@ -382,7 +390,12 @@ export function GoodsReceiptDetail({
                   {
                     onSuccess: () => {
                       setConfirming(false);
-                      router.push(goodsReceivedPath(projectId));
+                      router.push(
+                        pageHref(
+                          "/app/projects/[id]/materials/goods-received",
+                          { id: projectId },
+                        ),
+                      );
                     },
                     onError: (error) => {
                       setConfirming(false);

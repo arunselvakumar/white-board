@@ -22,6 +22,7 @@ import {
   type WorksheetApiOptions,
 } from "@/app/app/projects/[id]/equipment/usage-sheets/_components/worksheet-fixtures";
 import { WorksheetForm } from "./worksheet-form";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockWorksheetApi>;
 
@@ -38,7 +39,7 @@ function withApi(options: WorksheetApiOptions = {}) {
   };
 }
 
-const BASE = `/app/projects/${PROJECT_ID}/worksheets`;
+const BASE = pageHref("/app/projects/[id]/worksheets", { id: PROJECT_ID });
 
 const meta = {
   title: "Site work/Daily Worksheet/Form",
@@ -46,7 +47,11 @@ const meta = {
   args: {
     projectId: PROJECT_ID,
     today: TODAY,
-    hrefFor: (id: string) => `${BASE}/${id}`,
+    hrefFor: (id: string) =>
+      pageHref("/app/projects/[id]/worksheets/[worksheetId]", {
+        id: PROJECT_ID,
+        worksheetId: id,
+      }),
   },
   beforeEach: withApi({ stock: { [CEMENT.id]: "30.000" } }),
   parameters: { nextjs: { navigation: { pathname: `${BASE}/new` } } },

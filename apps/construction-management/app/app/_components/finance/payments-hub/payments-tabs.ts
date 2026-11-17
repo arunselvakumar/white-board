@@ -1,4 +1,5 @@
 import type { FinanceAccessMenu } from "@/app/api/construction/finance/access/access-models";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 /**
  * The tabs of a Project's Payments module, in order. `segment` is the path
@@ -41,9 +42,27 @@ export const PAYMENTS_TABS = [
 
 export type PaymentsTabSegment = (typeof PAYMENTS_TABS)[number]["segment"];
 
+/** Each tab's page, named by its folder (ADR CM-0045). */
+const PAYMENTS_TAB_PAGES: Record<PaymentsTabSegment, (id: string) => AppHref> =
+  {
+    contractors: (id) =>
+      pageHref("/app/projects/[id]/payments/contractors", { id }),
+    suppliers: (id) =>
+      pageHref("/app/projects/[id]/payments/suppliers", { id }),
+    "other-parties": (id) =>
+      pageHref("/app/projects/[id]/payments/other-parties", { id }),
+    wages: (id) => pageHref("/app/projects/[id]/payments/wages", { id }),
+    transactions: (id) =>
+      pageHref("/app/projects/[id]/payments/transactions", { id }),
+    "petty-cash": (id) =>
+      pageHref("/app/projects/[id]/payments/petty-cash", { id }),
+    "other-expenses": (id) =>
+      pageHref("/app/projects/[id]/payments/other-expenses", { id }),
+  };
+
 export function paymentsPath(
   projectId: string,
   segment: PaymentsTabSegment,
-): string {
-  return `/app/projects/${encodeURIComponent(projectId)}/payments/${segment}`;
+): AppHref {
+  return PAYMENTS_TAB_PAGES[segment](projectId);
 }

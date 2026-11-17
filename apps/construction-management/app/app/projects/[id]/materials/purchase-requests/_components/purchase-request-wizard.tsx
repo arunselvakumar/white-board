@@ -40,13 +40,13 @@ import {
 } from "@/src/queries/purchase-requests";
 import type { LocationRef } from "@/src/shared-kernel/location-ref";
 
-import { purchaseRequestsPath } from "@/app/app/projects/[id]/materials/_components/purchase-request-actions";
 import {
   quantityText,
   siteLocationInput,
 } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/purchase-request-format";
 import { LocationPickerSkeleton } from "@/app/app/_components/locations/locations-skeletons";
 import { StockLineSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
+import { pageHref } from "@/lib/page-href";
 
 const QUANTITY_RE = /^\d{1,11}(\.\d{1,3})?$/;
 
@@ -292,7 +292,10 @@ export function PurchaseRequestWizard({
             failed.push(file.name);
           }
         }
-        const path = purchaseRequestsPath(projectId, `/${saved.id}`);
+        const path = pageHref(
+          "/app/projects/[id]/materials/purchase-requests/[prId]",
+          { id: projectId, prId: saved.id },
+        );
         router.push(
           failed.length > 0
             ? `${path}?uploadFailed=${String(failed.length)}`

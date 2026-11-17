@@ -19,7 +19,6 @@ import { useUploadPendingSalesFiles } from "@/app/app/projects/[id]/_components/
 import { QueryHttpError } from "@/src/queries/http";
 import {
   duplicateMatches,
-  inquiriesPath,
   inquiryFormOptionsQuery,
   useCreateInquiry,
   useUpdateInquiry,
@@ -36,7 +35,8 @@ import {
 
 import { InquiryDuplicatePrompt } from "./inquiry-duplicate-prompt";
 import { InquirySelect, withCurrentOption } from "./inquiry-select";
-import { withUploadFailed } from "@/app/app/projects/[id]/_components/sales/documents/upload-failed";
+import { uploadFailedQuery } from "@/app/app/projects/[id]/_components/sales/documents/upload-failed";
+import { pageHref } from "@/lib/page-href";
 
 const max = (limit: number, words: string) =>
   z
@@ -246,7 +246,11 @@ export function InquiryForm({
               ])
             : { failed: [] };
         router.push(
-          withUploadFailed(inquiriesPath(projectId, saved.id), failed),
+          pageHref(
+            "/app/projects/[id]/inquiries/list/[inquiryId]",
+            { id: projectId, inquiryId: saved.id },
+            uploadFailedQuery(failed),
+          ),
         );
       } catch (caught) {
         setLeaving(false);

@@ -11,6 +11,7 @@ import {
   type UnitsApiOptions,
 } from "@/app/app/projects/[id]/bookings/_components/units-fixtures";
 import { UnitsTab } from "./units-tab";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockUnitsApi>;
 
@@ -29,7 +30,9 @@ const meta = {
   parameters: {
     nextjs: {
       navigation: {
-        pathname: `/app/projects/${SALES_PROJECT_ID}/bookings/units`,
+        pathname: pageHref("/app/projects/[id]/bookings/units", {
+          id: SALES_PROJECT_ID,
+        }),
       },
     },
   },

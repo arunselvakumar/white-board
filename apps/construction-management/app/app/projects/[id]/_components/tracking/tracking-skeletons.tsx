@@ -14,6 +14,7 @@ import {
   ResponsiveListSkeleton,
 } from "@/app/app/_components/procurement/procurement-skeletons";
 import { SiteRecordHeaderSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 /*
  * Tracking while it loads (ADR-0047): Issues & Snags, Inspection
@@ -184,9 +185,6 @@ function FactsSkeleton({
   );
 }
 
-const trackingHref = (projectId: string, segment: string) =>
-  `/app/projects/${encodeURIComponent(projectId)}/${segment}`;
-
 /** An issue's page: number and dates, its facts, then Progress. */
 export function IssueDetailSkeleton({ projectId }: { projectId: string }) {
   return (
@@ -195,7 +193,7 @@ export function IssueDetailSkeleton({ projectId }: { projectId: string }) {
         size="detail"
         back={{
           label: "Issues & Snags",
-          href: trackingHref(projectId, "issues"),
+          href: pageHref("/app/projects/[id]/issues", { id: projectId }),
         }}
       />
       <SkeletonGroup
@@ -229,7 +227,7 @@ export function InspectionDetailSkeleton({ projectId }: { projectId: string }) {
         size="detail"
         back={{
           label: "Inspection Requests",
-          href: trackingHref(projectId, "inspections"),
+          href: pageHref("/app/projects/[id]/inspections", { id: projectId }),
         }}
       />
       <SkeletonGroup
@@ -258,7 +256,10 @@ export function TaskDetailSkeleton({ projectId }: { projectId: string }) {
     <div className="flex w-full max-w-6xl min-w-0 flex-col gap-6 p-6">
       <SiteRecordHeaderSkeleton
         size="detail"
-        back={{ label: "Tasks", href: trackingHref(projectId, "tasks") }}
+        back={{
+          label: "Tasks",
+          href: pageHref("/app/projects/[id]/tasks", { id: projectId }),
+        }}
       />
       <SkeletonGroup label="Loading task" className="block space-y-6">
         <section className="bg-card min-w-0 space-y-4 rounded-lg border p-4">
@@ -443,11 +444,29 @@ const FORM_FIELDS = {
   task: TASK_FIELDS,
 };
 
-const FORM_BACK = {
-  issue: { label: "Issues & Snags", segment: "issues" },
-  inspection: { label: "Inspection Requests", segment: "inspections" },
-  task: { label: "Tasks", segment: "tasks" },
-};
+/** The list a tracking form goes back to. */
+function formBack(
+  kind: keyof typeof FORM_FIELDS,
+  projectId: string,
+): { label: string; href: AppHref } {
+  switch (kind) {
+    case "issue":
+      return {
+        label: "Issues & Snags",
+        href: pageHref("/app/projects/[id]/issues", { id: projectId }),
+      };
+    case "inspection":
+      return {
+        label: "Inspection Requests",
+        href: pageHref("/app/projects/[id]/inspections", { id: projectId }),
+      };
+    case "task":
+      return {
+        label: "Tasks",
+        href: pageHref("/app/projects/[id]/tasks", { id: projectId }),
+      };
+  }
+}
 
 /**
  * Add or Edit an issue, Inspection Request or task while its options
@@ -463,17 +482,11 @@ export function TrackingFormSkeleton({
   /** "Add Issue"; left out on Edit, where it carries the number. */
   title?: string;
 }) {
-  const back = FORM_BACK[kind];
+  const back = formBack(kind, projectId);
   return (
     <div className="flex w-full flex-col gap-4 p-6">
       <div className="flex w-full max-w-4xl flex-col gap-4">
-        <SiteRecordHeaderSkeleton
-          back={{
-            label: back.label,
-            href: trackingHref(projectId, back.segment),
-          }}
-          title={title}
-        />
+        <SiteRecordHeaderSkeleton back={back} title={title} />
         <FormSkeleton
           className="bg-card rounded-xl border p-4 sm:p-5"
           columns={2}

@@ -99,6 +99,7 @@ import {
   PROJECT_STATUS_ORDER,
   projectInitials,
 } from "@/app/app/_components/projects/project-status";
+import type { AppHref } from "@/lib/page-href";
 
 const STATUS_ITEMS = PROJECT_STATUS_ORDER.map((status) => ({
   value: status,
@@ -256,7 +257,7 @@ function ProjectForm({
   /** The button while saving; "Saving…" unless the screen says more. */
   savingLabel?: string;
   submitLabel: string;
-  cancelHref: string;
+  cancelHref: AppHref;
   onSave: (
     input: ProjectFormInput,
     held: HeldFile[],

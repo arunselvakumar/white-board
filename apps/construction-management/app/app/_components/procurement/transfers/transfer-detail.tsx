@@ -55,6 +55,7 @@ import {
 } from "@/src/queries/material-transfers";
 
 import { TransferStatusBadge, useTransferSideCan } from "./transfer-parts";
+import type { AppHref } from "@/lib/page-href";
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -247,9 +248,9 @@ export function TransferDetail({
   afterDeleteHref,
 }: {
   id: string;
-  backHref: string;
-  editHref: string;
-  afterDeleteHref: string;
+  backHref: AppHref;
+  editHref: AppHref;
+  afterDeleteHref: AppHref;
 }) {
   const router = useRouter();
   const { data: transfer } = useSuspenseQuery(transferQuery(id));

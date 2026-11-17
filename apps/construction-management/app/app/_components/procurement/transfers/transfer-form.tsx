@@ -29,6 +29,7 @@ import {
 } from "@/app/app/_components/procurement/inventory/inventory-format";
 import { StockErrorAlert } from "@/app/app/_components/procurement/inventory/stock-error-alert";
 import { MaterialPicker } from "@/app/app/_components/procurement/material-picker";
+import type { AppHref } from "@/lib/page-href";
 import type { StockLocation } from "@/src/procurement/domain/stock-location";
 import { QueryHttpError } from "@/src/queries/http";
 import { materialOptionsQuery } from "@/src/queries/material-options";
@@ -125,7 +126,7 @@ export function TransferForm({
   /** Lines to start with (`?materials=` from Current Inventory). */
   materialIds?: readonly string[];
   /** Where to go after saving. */
-  hrefFor: (id: string) => string;
+  hrefFor: (id: string) => AppHref;
 }) {
   const router = useRouter();
   const { data: places } = useSuspenseQuery(transferLocationsQuery);

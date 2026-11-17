@@ -69,6 +69,7 @@ import {
   PROJECT_STATUS_LABELS,
   PROJECT_STATUS_ORDER,
 } from "@/app/app/_components/projects/project-status";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 export const PROJECTS_PATH = "/app/projects";
 
@@ -99,13 +100,13 @@ const statusFilter = parseAsStringLiteral([
   ...PROJECT_STATUS_ORDER,
 ] as const).withDefault("all");
 
-export function projectPath(id: string): string {
-  return `${PROJECTS_PATH}/${encodeURIComponent(id)}`;
+export function projectPath(id: string): AppHref {
+  return pageHref("/app/projects/[id]", { id });
 }
 
 function newProjectLink(label = "New Project") {
   return (
-    <Link href={`${PROJECTS_PATH}/new`} className={buttonVariants()}>
+    <Link href="/app/projects/new" className={buttonVariants()}>
       <Plus aria-hidden="true" />
       {label}
     </Link>
@@ -189,7 +190,9 @@ function ProjectFolderMenu({
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
-              router.push(`${projectPath(project.id)}/edit`);
+              router.push(
+                pageHref("/app/projects/[id]/edit", { id: project.id }),
+              );
             }}
           >
             <Pencil aria-hidden="true" />

@@ -59,12 +59,12 @@ import {
 
 import { PurchaseOrderActions } from "./purchase-order-actions";
 import {
-  purchaseOrdersPath,
   RECEIPT_LABELS,
   ReceiptBadge,
   StageBadge,
 } from "./purchase-order-format";
 import { PurchaseOrderRowsSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
+import { pageHref } from "@/lib/page-href";
 
 const APPROVAL_CHIPS = [
   { value: "all", label: "All", icon: LayoutGrid },
@@ -135,7 +135,10 @@ export function PurchaseOrdersPage({
           )}
           {may("create") && (
             <Link
-              href={purchaseOrdersPath(projectId, "/new")}
+              href={pageHref(
+                "/app/projects/[id]/materials/purchase-orders/new",
+                { id: projectId },
+              )}
               className={buttonVariants({ size: "sm" })}
             >
               <Plus aria-hidden="true" />
@@ -305,7 +308,10 @@ function PurchaseOrderRows({
           {!filtered && canCreate && (
             <EmptyContent>
               <Link
-                href={purchaseOrdersPath(projectId, "/new")}
+                href={pageHref(
+                  "/app/projects/[id]/materials/purchase-orders/new",
+                  { id: projectId },
+                )}
                 className={buttonVariants({ size: "sm" })}
               >
                 Add Purchase Order
@@ -412,7 +418,10 @@ function PurchaseOrderRows({
                 {bulk && <TableCell>{check(po)}</TableCell>}
                 <TableCell className="font-medium whitespace-nowrap">
                   <Link
-                    href={purchaseOrdersPath(projectId, `/${po.id}`)}
+                    href={pageHref(
+                      "/app/projects/[id]/materials/purchase-orders/[poId]",
+                      { id: projectId, poId: po.id },
+                    )}
                     className="hover:underline"
                   >
                     {po.number}
@@ -459,7 +468,10 @@ function PurchaseOrderRows({
               {check(po)}
               <div className="min-w-0 flex-1">
                 <Link
-                  href={purchaseOrdersPath(projectId, `/${po.id}`)}
+                  href={pageHref(
+                    "/app/projects/[id]/materials/purchase-orders/[poId]",
+                    { id: projectId, poId: po.id },
+                  )}
                   className="font-medium hover:underline"
                 >
                   {po.number}

@@ -11,6 +11,7 @@ import {
   WINGS_API,
   mockStructureApi,
 } from "@/app/app/projects/[id]/_components/structure/structure-fixtures";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockStructureApi>;
 
@@ -71,7 +72,9 @@ const meta = {
   parameters: {
     nextjs: {
       navigation: {
-        pathname: `/app/projects/${KUMARI_HEIGHTS.id}/wings/new`,
+        pathname: pageHref("/app/projects/[id]/wings/new", {
+          id: KUMARI_HEIGHTS.id,
+        }),
       },
     },
   },
@@ -283,7 +286,7 @@ export const EditUnits: Story = {
     ]);
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
-        `/app/projects/${KUMARI_HEIGHTS.id}/wings`,
+        pageHref("/app/projects/[id]/wings", { id: KUMARI_HEIGHTS.id }),
       ),
     );
   },

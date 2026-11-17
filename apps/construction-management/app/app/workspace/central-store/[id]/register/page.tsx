@@ -4,6 +4,7 @@ import { StockRegisterPage } from "@/app/app/_components/procurement/inventory/s
 import { centralStoreHref } from "@/app/app/_components/procurement/stores/central-store-parts";
 import { StockRegisterSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
+import { pageHref } from "@/lib/page-href";
 
 export const metadata: Metadata = { title: "Stock Register" };
 
@@ -19,7 +20,7 @@ export default async function StoreStockRegisterRoute({
       <QuerySuspense
         fallback={
           <StockRegisterSkeleton
-            backHref={`/app/workspace/central-store/${encodeURIComponent(id)}`}
+            backHref={pageHref("/app/workspace/central-store/[id]", { id })}
           />
         }
       >

@@ -30,6 +30,7 @@ import type {
 
 import { apiJson, QueryHttpError } from "./http";
 import { SALES_API, SALES_KEY } from "./sales-access";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 export type Inquiry = ConstructionSalesInquiryResponse;
 export type InquiryDetail = ConstructionSalesInquiryDetailResponse;
@@ -166,8 +167,8 @@ export function duplicateMatches(
 }
 
 /** Pages of a Project's inquiries. */
-export function inquiriesPath(projectId: string, id?: string): string {
-  const base = `/app/projects/${encodeURIComponent(projectId)}/inquiries/list`;
+export function inquiriesPath(projectId: string, id?: string): AppHref {
+  const base = pageHref("/app/projects/[id]/inquiries/list", { id: projectId });
   return id == null ? base : `${base}/${encodeURIComponent(id)}`;
 }
 

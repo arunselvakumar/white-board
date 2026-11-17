@@ -60,10 +60,10 @@ import {
   headcountText,
   SheetApprovalBadge,
   shiftLabel,
-  worksheetsPath,
 } from "@/app/app/projects/[id]/_components/site-work/worksheets/worksheet-format";
 import { WorksheetSettingsDialog } from "./worksheet-settings-dialog";
 import { WorksheetRowsSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
+import { pageHref } from "@/lib/page-href";
 
 type Filters = {
   date: DateFilterValue;
@@ -163,7 +163,9 @@ export function WorksheetsPage({
           )}
           {may("create") && (
             <Link
-              href={worksheetsPath(projectId, "/new")}
+              href={pageHref("/app/projects/[id]/worksheets/new", {
+                id: projectId,
+              })}
               className={buttonVariants({ size: "sm" })}
             >
               <Plus aria-hidden="true" />
@@ -361,7 +363,9 @@ function WorksheetRows({
           {!filtered && canCreate && (
             <EmptyContent>
               <Link
-                href={worksheetsPath(projectId, "/new")}
+                href={pageHref("/app/projects/[id]/worksheets/new", {
+                  id: projectId,
+                })}
                 className={buttonVariants({ size: "sm" })}
               >
                 Add Worksheet
@@ -465,7 +469,10 @@ function WorksheetRows({
                 {bulk && <TableCell>{check(sheet)}</TableCell>}
                 <TableCell className="font-medium whitespace-nowrap">
                   <Link
-                    href={worksheetsPath(projectId, `/${sheet.id}`)}
+                    href={pageHref(
+                      "/app/projects/[id]/worksheets/[worksheetId]",
+                      { id: projectId, worksheetId: sheet.id },
+                    )}
                     className="hover:underline"
                   >
                     {sheet.number}
@@ -526,7 +533,10 @@ function WorksheetRows({
               {check(sheet)}
               <div className="min-w-0 flex-1">
                 <Link
-                  href={worksheetsPath(projectId, `/${sheet.id}`)}
+                  href={pageHref(
+                    "/app/projects/[id]/worksheets/[worksheetId]",
+                    { id: projectId, worksheetId: sheet.id },
+                  )}
                   className="font-medium hover:underline"
                 >
                   {sheet.number}

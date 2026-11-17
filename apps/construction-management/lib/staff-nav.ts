@@ -6,9 +6,10 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react";
+import { pageHref, type AppHref } from "@/lib/page-href";
 
 export type StaffSection = {
-  href: string;
+  href: AppHref;
   /** Sidebar label. */
   label: string;
   title: string;
@@ -98,12 +99,12 @@ export function activeStaffSection(pathname: string): StaffSection | undefined {
   );
 }
 
-export function staffPath(id: string): string {
-  return `${STAFF_PATH}/${encodeURIComponent(id)}`;
+export function staffPath(id: string): AppHref {
+  return pageHref("/app/staff/office-staff/[id]", { id });
 }
 
-export function rolePath(id: string): string {
-  return `${ROLES_PATH}/${encodeURIComponent(id)}`;
+export function rolePath(id: string): AppHref {
+  return pageHref("/app/staff/roles/[id]", { id });
 }
 
 /** "1 Staff member", "3 Staff": list totals and Role counts. */

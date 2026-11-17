@@ -16,6 +16,7 @@ import type {
   UpdateConstructionMarketingFollowUpRequestModel,
 } from "@/app/api/construction/marketing/follow-ups/follow-up-models";
 import { MARKETING_FOLLOW_UPS_PATH } from "@/lib/marketing-nav";
+import type { AppHref } from "@/lib/page-href";
 import type { FollowUpStatus } from "@/src/marketing/domain/marketing-terms";
 
 import { apiJson, QueryHttpError } from "./http";
@@ -140,7 +141,7 @@ export function followUpQuery(id: string) {
 }
 
 /** The Follow-ups page. */
-export function followUpsPath(): string {
+export function followUpsPath(): AppHref {
   return MARKETING_FOLLOW_UPS_PATH;
 }
 

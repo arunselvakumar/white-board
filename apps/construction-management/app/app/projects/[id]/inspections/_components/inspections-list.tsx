@@ -49,7 +49,6 @@ import {
 } from "@/src/queries/tracking-access";
 import {
   inspectionFormOptionsQuery,
-  inspectionsPath,
   inspectionsQuery,
   useBulkDecideInspections,
   type Inspection,
@@ -73,6 +72,7 @@ import {
   InspectionFiltersSkeleton,
   InspectionRowsSkeleton,
 } from "@/app/app/projects/[id]/_components/tracking/tracking-skeletons";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 const MENU = "tracking.inspection_requests" as const;
 const ALL = "all";
@@ -164,7 +164,9 @@ export function InspectionsList({
       setCursor(null);
     });
   };
-  const newHref = inspectionsPath(projectId, "/new");
+  const newHref = pageHref("/app/projects/[id]/inspections/new", {
+    id: projectId,
+  });
   return (
     <div className="flex min-w-0 flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -352,7 +354,7 @@ function Rows({
   canApprove: boolean;
   canReject: boolean;
   canRaiseSnag: boolean;
-  newHref: string | null;
+  newHref: AppHref | null;
   onStatus: (status: InspectionStatus | null) => void;
   onPage: (cursor: InspectionFilters["cursor"]) => void;
   className?: string;
@@ -472,7 +474,11 @@ function Rows({
         }}
       />
     ) : null;
-  const href = (row: Inspection) => inspectionsPath(projectId, `/${row.id}`);
+  const href = (row: Inspection) =>
+    pageHref("/app/projects/[id]/inspections/[inspectionId]", {
+      id: projectId,
+      inspectionId: row.id,
+    });
 
   return (
     <div className={cn("min-w-0 space-y-3", className)}>

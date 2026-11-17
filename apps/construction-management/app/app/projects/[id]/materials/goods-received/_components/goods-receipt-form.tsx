@@ -70,7 +70,6 @@ import {
   DELIVERY_FIELDS,
   formatDate,
   GoodsReceiptNoAccess,
-  goodsReceivedPath,
   GRN_FIELD_LABELS,
   localToday,
   money,
@@ -79,6 +78,7 @@ import {
   SUPPLY_TYPE_LABELS,
   type GrnField,
 } from "./goods-receipt-parts";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 type FieldName = keyof GoodsReceiptFormValues;
 
@@ -574,8 +574,13 @@ function GoodsReceiptForm({
   const deliveryFields = DELIVERY_FIELDS.filter((field) => !hidden.has(field));
   const back =
     receipt == null
-      ? goodsReceivedPath(projectId)
-      : goodsReceivedPath(projectId, `/${receipt.id}`);
+      ? pageHref("/app/projects/[id]/materials/goods-received", {
+          id: projectId,
+        })
+      : pageHref("/app/projects/[id]/materials/goods-received/[grnId]", {
+          id: projectId,
+          grnId: receipt.id,
+        });
 
   const choosePurchaseOrder = (value: string) => {
     const order =
@@ -612,7 +617,12 @@ function GoodsReceiptForm({
       const saved = await onSave(
         goodsReceiptPayload(values, { financial, hidden }),
       );
-      router.push(goodsReceivedPath(projectId, `/${saved.id}`));
+      router.push(
+        pageHref("/app/projects/[id]/materials/goods-received/[grnId]", {
+          id: projectId,
+          grnId: saved.id,
+        }),
+      );
     } catch (error) {
       setFailure(error);
       const code = error instanceof QueryHttpError ? error.code : "";
@@ -919,7 +929,7 @@ function FormPage({
   projectId: string;
   title: string;
   watermark?: string;
-  backTo?: { label: string; href: string };
+  backTo?: { label: string; href: AppHref };
   children: ReactNode;
 }) {
   return (
@@ -928,7 +938,9 @@ function FormPage({
         back={
           backTo ?? {
             label: "Goods Received",
-            href: goodsReceivedPath(projectId),
+            href: pageHref("/app/projects/[id]/materials/goods-received", {
+              id: projectId,
+            }),
           }
         }
         title={title}
@@ -1002,7 +1014,10 @@ export function EditGoodsReceiptScreen({
       watermark="Goods Received"
       backTo={{
         label: receipt.number,
-        href: goodsReceivedPath(projectId, `/${receipt.id}`),
+        href: pageHref("/app/projects/[id]/materials/goods-received/[grnId]", {
+          id: projectId,
+          grnId: receipt.id,
+        }),
       }}
     >
       {receipt.paid ? (

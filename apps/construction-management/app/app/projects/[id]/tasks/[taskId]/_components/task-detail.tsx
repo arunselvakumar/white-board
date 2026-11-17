@@ -67,6 +67,7 @@ import {
   FeedSkeleton,
   UpdatesSkeleton,
 } from "@/app/app/projects/[id]/_components/tracking/tracking-skeletons";
+import { pageHref } from "@/lib/page-href";
 
 function problemOf(caught: unknown): string {
   return caught instanceof QueryHttpError
@@ -218,7 +219,10 @@ function ProgressList({
                     <>
                       From Daily Worksheet{" "}
                       <Link
-                        href={`/app/projects/${encodeURIComponent(projectId)}/worksheets/${encodeURIComponent(item.worksheet.id)}`}
+                        href={pageHref(
+                          "/app/projects/[id]/worksheets/[worksheetId]",
+                          { id: projectId, worksheetId: item.worksheet.id },
+                        )}
                         className="hover:underline"
                       >
                         {item.worksheet.number ?? ""}
@@ -430,7 +434,10 @@ export function TaskDetail({
             )}
             {a.edit && (
               <Link
-                href={`${tasksPath(projectId, task.id)}/edit`}
+                href={pageHref("/app/projects/[id]/tasks/[taskId]/edit", {
+                  id: projectId,
+                  taskId: task.id,
+                })}
                 className={buttonVariants({ size: "sm", variant: "outline" })}
               >
                 <Pencil aria-hidden="true" />
@@ -439,7 +446,11 @@ export function TaskDetail({
             )}
             {a.addSubTask && (
               <Link
-                href={`${tasksPath(projectId)}/new?parentId=${task.id}`}
+                href={pageHref(
+                  "/app/projects/[id]/tasks/new",
+                  { id: projectId },
+                  `?parentId=${task.id}`,
+                )}
                 className={buttonVariants({ size: "sm", variant: "outline" })}
               >
                 <ListPlus aria-hidden="true" />

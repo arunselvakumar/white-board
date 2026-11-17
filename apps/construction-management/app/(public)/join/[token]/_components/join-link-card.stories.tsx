@@ -6,6 +6,7 @@ import { PublicShell } from "@/components/auth/public-shell";
 import { mockFetch } from "@/.storybook/mock-fetch";
 import { authMocks, signInAs } from "@/.storybook/mocks/auth";
 import { JoinLinkCard, type JoinLinkPreview } from "./join-link-card";
+import { pageHref } from "@/lib/page-href";
 
 const TOKEN = "Zt0kenZt0kenZt0kenZt0kenZt0ken12";
 const PREVIEW: JoinLinkPreview = {
@@ -99,7 +100,9 @@ export const SignedInWithAnotherEmail: Story = {
         canvas.getByRole("button", { name: "Sign out and use that email" }),
       );
       await waitFor(() =>
-        expect(authMocks.signOut).toHaveBeenCalledWith(`/join/${TOKEN}`),
+        expect(authMocks.signOut).toHaveBeenCalledWith(
+          pageHref("/join/[token]", { token: TOKEN }),
+        ),
       );
     } finally {
       restore();

@@ -31,12 +31,6 @@ import {
   checkInActivityParts,
 } from "@/app/app/_components/check-in/check-in-activity";
 import { formatTime } from "@/app/app/_components/check-in/check-in-entry-parts";
-import { projectBasePath } from "@/lib/project-nav";
-import {
-  LABOURS_PAGE_PATH,
-  SITE_ENGINEERS_PATH,
-  VENDORS_PATH,
-} from "@/lib/staff-nav";
 import {
   projectActivityQuery,
   type ProjectActivityEntry,
@@ -44,6 +38,7 @@ import {
   type ProjectActivityType,
   type ProjectActivityWho,
 } from "@/src/queries/activity";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 type Lines = { detail?: string; more?: ActivityFeedItem["more"] };
 
@@ -77,21 +72,24 @@ const WHO_ITEMS: { value: ProjectActivityWho; label: string }[] = [
 ];
 
 /** Each kind of person's page (ADR CM-0036). */
-const PERSON_PAGES: Record<CheckInPerson["kind"], string> = {
-  labour: LABOURS_PAGE_PATH,
-  site_engineer: SITE_ENGINEERS_PATH,
-  vendor: VENDORS_PATH,
-};
+function personPage(kind: CheckInPerson["kind"], id: string): AppHref {
+  switch (kind) {
+    case "labour":
+      return pageHref("/app/staff/labours/[id]", { id });
+    case "site_engineer":
+      return pageHref("/app/staff/site-engineers/[id]", { id });
+    case "vendor":
+      return pageHref("/app/staff/vendors/[id]", { id });
+  }
+}
 
-function personHref(person: CheckInPerson): string | null {
-  return person.canOpen
-    ? `${PERSON_PAGES[person.kind]}/${encodeURIComponent(person.id)}`
-    : null;
+function personHref(person: CheckInPerson): AppHref | null {
+  return person.canOpen ? personPage(person.kind, person.id) : null;
 }
 
 const LINK = "font-medium underline-offset-4 hover:underline";
 
-function Named({ href, name }: { href: string | null; name: string }) {
+function Named({ href, name }: { href: AppHref | null; name: string }) {
   return href == null ? (
     <strong className="font-medium">{name}</strong>
   ) : (
@@ -101,9 +99,9 @@ function Named({ href, name }: { href: string | null; name: string }) {
   );
 }
 
-function labourHref(labour: LabourPerson): string | null {
+function labourHref(labour: LabourPerson): AppHref | null {
   return labour.canOpen
-    ? `${LABOURS_PAGE_PATH}/${encodeURIComponent(labour.id)}`
+    ? pageHref("/app/staff/labours/[id]", { id: labour.id })
     : null;
 }
 
@@ -111,7 +109,11 @@ function ProjectName({ project }: { project: Project | null }) {
   if (project == null) return <strong className="font-medium">—</strong>;
   return (
     <Named
-      href={project.canOpen ? projectBasePath(project.id) : null}
+      href={
+        project.canOpen
+          ? pageHref("/app/projects/[id]", { id: project.id })
+          : null
+      }
       name={project.name}
     />
   );
@@ -185,7 +187,7 @@ export function projectActivityItem(
       const person = entry.siteEngineer;
       const href =
         person.canOpen && person.id != null
-          ? `${SITE_ENGINEERS_PATH}/${encodeURIComponent(person.id)}`
+          ? pageHref("/app/staff/site-engineers/[id]", { id: person.id })
           : null;
       const added = entry.kind === "site_engineer_added";
       return {

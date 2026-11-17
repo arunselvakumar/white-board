@@ -49,7 +49,6 @@ import { MaterialPicker } from "@/app/app/_components/procurement/material-picke
 import { siteLocationInput } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/purchase-request-format";
 import { PendingFilesField } from "@/app/app/projects/[id]/_components/site-work/documents/pending-files-field";
 import { useUploadPendingFiles } from "@/app/app/projects/[id]/_components/site-work/documents/use-upload-pending-files";
-import { equipmentModulePath } from "@/app/app/_components/site-work/equipment/equipment-tabs";
 import { RadioCard } from "@/app/app/_components/site-work/equipment/radio-card";
 import { quantityText } from "@/app/app/projects/[id]/_components/site-work/worksheets/worksheet-format";
 import {
@@ -103,6 +102,7 @@ import {
   typesHours,
   type SheetMachine,
 } from "./equipment-sheet-live";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 type Settings = EquipmentSheetFormOptions["settings"];
 type OptionItem = EquipmentSheetOptions["items"][number];
@@ -517,7 +517,7 @@ export function EquipmentSheetForm({
   /** `YYYY-MM-DD`; the device's today unless a story fixes it. */
   today?: string;
   /** Where to go after saving; `failed` names files that did not upload. */
-  hrefFor: (id: string, failed?: readonly string[]) => string;
+  hrefFor: (id: string, failed?: readonly string[]) => AppHref;
 }) {
   const router = useRouter();
   const { data: options } = useSuspenseQuery(
@@ -922,7 +922,9 @@ export function EquipmentSheetForm({
         <p className="text-muted-foreground text-sm">
           Not listed?{" "}
           <Link
-            href={`${equipmentModulePath(projectId, "register")}/new`}
+            href={pageHref("/app/projects/[id]/equipment/register/new", {
+              id: projectId,
+            })}
             className="text-primary hover:underline"
           >
             Add equipment to this Project

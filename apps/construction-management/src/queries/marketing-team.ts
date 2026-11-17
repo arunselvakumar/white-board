@@ -24,6 +24,7 @@ import {
   type ProspectCompany,
 } from "./marketing-companies";
 import { MARKETING_FOLLOW_UPS_KEY } from "./marketing-follow-ups";
+import type { AppHref } from "@/lib/page-href";
 
 export type MarketingTeam = z.infer<
   typeof GetConstructionMarketingTeamResponseModel
@@ -61,18 +62,18 @@ export const needsReassigningQuery = queryOptions({
 });
 
 /** Add Staff, with the Marketing Role picked when there is one. */
-export function addMarketingPersonPath(roleId: string | null): string {
+export function addMarketingPersonPath(roleId: string | null): AppHref {
   const base = "/app/staff/office-staff/new";
   return roleId == null ? base : `${base}?roleId=${encodeURIComponent(roleId)}`;
 }
 
 /** A person's Visits, filtered to them. */
-export function personVisitsPath(memberId: string): string {
+export function personVisitsPath(memberId: string): AppHref {
   return `${MARKETING_VISITS_PATH}?memberId=${encodeURIComponent(memberId)}`;
 }
 
 /** A person's Follow-ups, Everyone filtered to them (View all only). */
-export function personFollowUpsPath(memberId: string): string {
+export function personFollowUpsPath(memberId: string): AppHref {
   return `${MARKETING_FOLLOW_UPS_PATH}?owner=${encodeURIComponent(memberId)}`;
 }
 

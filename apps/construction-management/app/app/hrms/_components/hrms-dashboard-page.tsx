@@ -36,6 +36,7 @@ import {
 } from "./attendance-parts";
 import { HrmsEmpty, HrmsPage } from "./hrms-parts";
 import { formatDay, formatDays, STATUS_LABELS } from "./leave-format";
+import type { AppHref } from "@/lib/page-href";
 
 type Team = NonNullable<HrmsDashboardModel["team"]>;
 type Counts = Team["breakdown"];
@@ -135,7 +136,7 @@ function Section({
   );
 }
 
-function SeeAll({ href, label }: { href: string; label: string }) {
+function SeeAll({ href, label }: { href: AppHref; label: string }) {
   return (
     <Link
       href={href}
@@ -159,7 +160,7 @@ function Tile({
   value: number;
   caption: string;
   icon: LucideIcon;
-  href?: string;
+  href?: AppHref;
   className?: string;
 }) {
   return (
@@ -174,7 +175,7 @@ function Tile({
   );
 }
 
-function approvalsHref(data: HrmsDashboardModel): string {
+function approvalsHref(data: HrmsDashboardModel): AppHref {
   const approvals = data.approvals;
   if (approvals == null) return ATTENDANCE_APPROVALS;
   if ((approvals.attendance ?? 0) > 0) return ATTENDANCE_APPROVALS;
@@ -446,7 +447,7 @@ function range(from: string, to: string): string {
     : `${formatDay(from)} – ${formatDay(to)}`;
 }
 
-function itemHref(item: ApprovalItem): string {
+function itemHref(item: ApprovalItem): AppHref {
   return item.kind === "attendance" ? ATTENDANCE_APPROVALS : LEAVE_APPROVALS;
 }
 

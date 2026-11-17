@@ -15,6 +15,7 @@ import {
   type HindranceApiOptions,
 } from "./hindrance-fixtures";
 import { HindranceForm } from "./hindrance-form";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockHindranceApi>;
 
@@ -31,7 +32,9 @@ function hindranceApi(options: HindranceApiOptions = {}) {
   };
 }
 
-const BASE = `/app/projects/${HINDRANCE_PROJECT_ID}/hindrances`;
+const BASE = pageHref("/app/projects/[id]/hindrances", {
+  id: HINDRANCE_PROJECT_ID,
+});
 
 const meta = {
   title: "Site work/Hindrances/Form",

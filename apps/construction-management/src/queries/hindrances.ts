@@ -21,6 +21,7 @@ import type {
 
 import { apiJson } from "./http";
 import { SITE_WORK_API, SITE_WORK_KEY } from "./site-work-access";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 export type Hindrance = ConstructionSiteWorkHindranceResponse;
 export type HindrancePage = ListConstructionSiteWorkHindrancesResponse;
@@ -147,9 +148,13 @@ export function useDeleteHindrance(id: string) {
 }
 
 /** Pages of a Project's Hindrance register. */
-export function hindrancesPath(projectId: string, id?: string): string {
-  const base = `/app/projects/${encodeURIComponent(projectId)}/hindrances`;
-  return id == null ? base : `${base}/${encodeURIComponent(id)}`;
+export function hindrancesPath(projectId: string, id?: string): AppHref {
+  return id == null
+    ? pageHref("/app/projects/[id]/hindrances", { id: projectId })
+    : pageHref("/app/projects/[id]/hindrances/[hindranceId]", {
+        id: projectId,
+        hindranceId: id,
+      });
 }
 
 /**
@@ -160,7 +165,7 @@ export function hindrancesPath(projectId: string, id?: string): string {
 export function newHindranceFromUsageSheetPath(
   projectId: string,
   sheet: { id: string; date: string; activity?: string | null },
-): string {
+): AppHref {
   const params = new URLSearchParams({
     cause: "equipment_breakdown",
     date: sheet.date,
@@ -168,5 +173,9 @@ export function newHindranceFromUsageSheetPath(
   });
   if (sheet.activity != null && sheet.activity !== "")
     params.set("activity", sheet.activity);
-  return `${hindrancesPath(projectId)}/new?${params}`;
+  return pageHref(
+    "/app/projects/[id]/hindrances/new",
+    { id: projectId },
+    `?${params.toString()}`,
+  );
 }

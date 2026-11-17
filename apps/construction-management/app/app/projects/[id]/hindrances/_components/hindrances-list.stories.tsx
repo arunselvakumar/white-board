@@ -9,12 +9,15 @@ import {
   type HindranceApiOptions,
 } from "./hindrance-fixtures";
 import { HindrancesList } from "./hindrances-list";
+import { pageHref } from "@/lib/page-href";
 
 function hindranceApi(options: HindranceApiOptions = {}) {
   return () => mockHindranceApi(options).restore;
 }
 
-const BASE = `/app/projects/${HINDRANCE_PROJECT_ID}/hindrances`;
+const BASE = pageHref("/app/projects/[id]/hindrances", {
+  id: HINDRANCE_PROJECT_ID,
+});
 
 const meta = {
   title: "Site work/Hindrances/List",

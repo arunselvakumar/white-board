@@ -8,12 +8,13 @@ import type {
   OtherPartyInput,
 } from "@/src/queries/finance-other-parties";
 import { isValidGstin, isValidPan } from "@/src/shared-kernel/tax-ids";
+import type { AppHref } from "@/lib/page-href";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const OTHER_PARTIES_PATH = "/app/masters/other-parties";
 
-export function otherPartyEditPath(id: string): string {
+export function otherPartyEditPath(id: string): AppHref {
   return `${OTHER_PARTIES_PATH}/${encodeURIComponent(id)}`;
 }
 

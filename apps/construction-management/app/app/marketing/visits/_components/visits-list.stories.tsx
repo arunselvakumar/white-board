@@ -14,6 +14,7 @@ import {
   type VisitApiOptions,
 } from "./visit-fixtures";
 import { VisitsList } from "./visits-list";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockVisitApi>;
 
@@ -86,7 +87,10 @@ export const WithData: Story = {
     await expect(within(missed).getByText("Missed")).toBeVisible();
     await expect(
       within(missed).getByRole("link", { name: "Kaveri Cement Works" }),
-    ).toHaveAttribute("href", `/app/marketing/companies/${KAVERI_ID}`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/marketing/companies/[id]", { id: KAVERI_ID }),
+    );
     await expect(missed).toHaveTextContent("8 Nov 2026, 10:00 am");
     await expect(missed).toHaveTextContent("Murugan P");
 

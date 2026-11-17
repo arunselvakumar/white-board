@@ -33,6 +33,7 @@ import {
   type StockRegisterFigures,
 } from "../domain/stock-register";
 import { userNames } from "./inventory-locations";
+import { pageHref } from "@/lib/page-href";
 
 type Db = Prisma.TransactionClient;
 
@@ -500,12 +501,27 @@ function documentHref(
   id: string,
 ): string | null {
   if (location.kind !== "project") return null;
-  const base = `/app/projects/${encodeURIComponent(location.id)}/materials`;
-  if (type === "goods_receipt") return `${base}/goods-received/${id}`;
-  if (type === "material_transfer") return `${base}/transfers/${id}`;
-  const project = `/app/projects/${encodeURIComponent(location.id)}`;
-  if (type === "daily_worksheet") return `${project}/worksheets/${id}`;
-  if (type === "equipment_usage") return `${project}/equipment/sheets/${id}`;
+  const projectId = location.id;
+  if (type === "goods_receipt")
+    return pageHref("/app/projects/[id]/materials/goods-received/[grnId]", {
+      id: projectId,
+      grnId: id,
+    });
+  if (type === "material_transfer")
+    return pageHref("/app/projects/[id]/materials/transfers/[transferId]", {
+      id: projectId,
+      transferId: id,
+    });
+  if (type === "daily_worksheet")
+    return pageHref("/app/projects/[id]/worksheets/[worksheetId]", {
+      id: projectId,
+      worksheetId: id,
+    });
+  if (type === "equipment_usage")
+    return pageHref("/app/projects/[id]/equipment/usage-sheets/[sheetId]", {
+      id: projectId,
+      sheetId: id,
+    });
   return null;
 }
 

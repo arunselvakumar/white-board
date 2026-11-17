@@ -6,6 +6,7 @@ import { addDays } from "@/src/shared-kernel/calendar-date";
 
 import { TaskGanttChart } from "./task-gantt";
 import { task, TASK_PROJECT_ID, TASKS } from "./task-fixtures";
+import { pageHref } from "@/lib/page-href";
 
 const meta = {
   title: "Tracking/Tasks/Gantt",
@@ -13,7 +14,9 @@ const meta = {
   args: { projectId: TASK_PROJECT_ID, items: TASKS, today: localToday() },
   parameters: {
     nextjs: {
-      navigation: { pathname: `/app/projects/${TASK_PROJECT_ID}/tasks` },
+      navigation: {
+        pathname: pageHref("/app/projects/[id]/tasks", { id: TASK_PROJECT_ID }),
+      },
     },
   },
 } satisfies Meta<typeof TaskGanttChart>;
@@ -29,7 +32,10 @@ export const Chart: Story = {
       rows.getByRole("link", { name: /T-2 Ground floor columns/ }),
     ).toHaveAttribute(
       "href",
-      `/app/projects/${TASK_PROJECT_ID}/tasks/${TASKS[1]?.id ?? ""}`,
+      pageHref("/app/projects/[id]/tasks/[taskId]", {
+        id: TASK_PROJECT_ID,
+        taskId: TASKS[1]?.id ?? "",
+      }),
     );
     const legend = within(canvas.getByRole("list", { name: "Legend" }));
     for (const label of [

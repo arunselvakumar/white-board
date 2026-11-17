@@ -17,6 +17,7 @@ import {
   materialNameOf,
   pickMaterial,
 } from "@/app/app/_components/procurement/material-options-fixtures";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockTransferApi>;
 
@@ -33,14 +34,20 @@ function transferApi(options: TransferApiOptions = {}) {
   };
 }
 
-const BASE = `/app/projects/${TOWER.id}/materials/transfers`;
+const BASE = pageHref("/app/projects/[id]/materials/transfers", {
+  id: TOWER.id,
+});
 
 const meta = {
   title: "Procurement/Material Transfers/Form",
   component: TransferForm,
   args: {
     defaultFrom: { kind: "project", id: TOWER.id },
-    hrefFor: (id: string) => `${BASE}/${id}`,
+    hrefFor: (id: string) =>
+      pageHref("/app/projects/[id]/materials/transfers/[transferId]", {
+        id: TOWER.id,
+        transferId: id,
+      }),
   },
   beforeEach: transferApi({
     stock: { [CEMENT_ID]: "42.000", [STEEL_ID]: "2450.500" },

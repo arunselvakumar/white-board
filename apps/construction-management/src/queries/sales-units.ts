@@ -11,6 +11,7 @@ import type {
   MarkConstructionSalesUnitUnavailableRequestModel,
   SetConstructionSalesUnitDetailsRequestModel,
 } from "@/app/api/construction/sales/units/unit-models";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 import { apiJson } from "./http";
 import { SALES_API, SALES_KEY } from "./sales-access";
@@ -36,11 +37,18 @@ export const BOOKINGS_TABS = [
 ] as const;
 export type BookingsTabSegment = (typeof BOOKINGS_TABS)[number]["segment"];
 
+/** Each tab's page, named by its folder (ADR CM-0045). */
+const BOOKINGS_TAB_PAGES: Record<BookingsTabSegment, (id: string) => AppHref> =
+  {
+    units: (id) => pageHref("/app/projects/[id]/bookings/units", { id }),
+    list: (id) => pageHref("/app/projects/[id]/bookings/list", { id }),
+  };
+
 export function bookingsModulePath(
   projectId: string,
   segment: BookingsTabSegment,
-): string {
-  return `/app/projects/${encodeURIComponent(projectId)}/bookings/${segment}`;
+): AppHref {
+  return BOOKINGS_TAB_PAGES[segment](projectId);
 }
 
 /** The Units chart: every Wing's counts and one Wing's floors × units. */

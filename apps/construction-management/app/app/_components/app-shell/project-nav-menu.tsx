@@ -35,9 +35,10 @@ import { EQUIPMENT_TABS } from "@/app/app/_components/site-work/equipment/equipm
 import { bookingsNavLinks } from "@/app/app/_components/sales/bookings/bookings-nav";
 import { useInquiryNavLinks } from "@/app/app/_components/sales/inquiries/inquiry-nav";
 import { INQUIRY_TABS } from "@/app/app/_components/sales/inquiries/inquiry-tabs";
+import type { AppHref } from "@/lib/page-href";
 import {
   activeProjectSegment,
-  projectBasePath,
+  projectModuleHref,
   projectNavGroups,
   type ProjectNavGroup,
   type ProjectNavSection,
@@ -64,7 +65,7 @@ import {
   noMatchMessage,
 } from "./menu-filter";
 
-type SubLink = { href: string; label: string };
+type SubLink = { href: AppHref; label: string };
 
 /**
  * Under a menu search query: `all` when the module (or its heading)
@@ -382,8 +383,7 @@ function ProjectNavItem({
     links: readonly SubLink[];
   };
 }) {
-  const base = projectBasePath(projectId);
-  const href = `${base}/${section.segment}`;
+  const href = projectModuleHref(projectId, section.key);
   const Icon = PROJECT_MODULE_ICONS[section.key];
   const currentLink = submenu?.links.find((link) => isOn(pathname, link.href));
 

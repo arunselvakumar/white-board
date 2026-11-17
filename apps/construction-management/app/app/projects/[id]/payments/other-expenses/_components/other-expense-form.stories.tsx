@@ -16,6 +16,7 @@ import {
   TODAY,
 } from "./other-expense-fixtures";
 import { OtherExpenseForm } from "./other-expense-form";
+import { pageHref } from "@/lib/page-href";
 
 const API = "/api/construction/finance/other-expenses";
 
@@ -114,7 +115,10 @@ export const AddAndApprove: Story = {
     );
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
-        `/app/projects/${PROJECT_ID}/payments/other-expenses/${DIESEL_EXPENSE.id}`,
+        pageHref("/app/projects/[id]/payments/other-expenses/[expenseId]", {
+          id: PROJECT_ID,
+          expenseId: DIESEL_EXPENSE.id,
+        }),
       ),
     );
     await expect(posted(API)).toEqual({

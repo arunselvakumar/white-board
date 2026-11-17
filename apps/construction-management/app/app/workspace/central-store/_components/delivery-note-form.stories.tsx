@@ -10,6 +10,7 @@ import {
 } from "@/app/app/_components/procurement/stores/central-store-fixtures";
 
 import { DeliveryNoteForm } from "./delivery-note-form";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockCentralStoreApi>;
 
@@ -70,7 +71,9 @@ export const SaveAndApprove: Story = {
     );
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
-        `/app/workspace/central-store/delivery-notes/${IDS.note}`,
+        pageHref("/app/workspace/central-store/delivery-notes/[id]", {
+          id: IDS.note,
+        }),
       ),
     );
     await expect(posts()[0]?.body).toMatchObject({

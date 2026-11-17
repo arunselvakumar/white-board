@@ -2,6 +2,7 @@ import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { cn } from "@repo/ui/lib/utils";
+import type { AppHref } from "@/lib/page-href";
 
 /**
  * One person or party in a Teams section. With `href` the whole row opens
@@ -20,7 +21,7 @@ export function TeamRow({
 }: {
   name: string;
   /** Null when the viewer may not open the page. */
-  href: string | null;
+  href: AppHref | null;
   detail?: string | null;
   badges?: ReactNode;
   actions?: ReactNode;

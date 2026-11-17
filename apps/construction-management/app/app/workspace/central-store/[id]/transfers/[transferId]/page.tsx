@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { StoreTransferDetail } from "@/app/app/workspace/central-store/[id]/transfers/_components/store-transfer-pages";
 import { TransferDetailSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
+import { pageHref } from "@/lib/page-href";
 
 export const metadata: Metadata = { title: "Material Transfer" };
 
@@ -18,7 +19,7 @@ export default async function StoreTransferRoute({
       <QuerySuspense
         fallback={
           <TransferDetailSkeleton
-            backHref={`/app/workspace/central-store/${encodeURIComponent(id)}`}
+            backHref={pageHref("/app/workspace/central-store/[id]", { id })}
           />
         }
       >

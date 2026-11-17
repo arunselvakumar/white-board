@@ -13,6 +13,7 @@ import {
   ProjectStatusBadge,
   projectDates,
 } from "@/app/app/_components/projects/project-status";
+import type { AppHref } from "@/lib/page-href";
 
 type ProjectItem = ProjectList["items"][number];
 
@@ -51,7 +52,7 @@ export function ProjectFolderCard({
   menu,
 }: {
   project: ProjectItem;
-  href: string;
+  href: AppHref;
   menu?: (chipClassName: string) => ReactNode;
 }) {
   const tint = PROJECT_FOLDER_TINTS[project.color];

@@ -20,6 +20,7 @@ import {
 } from "./labour-activity-fixtures";
 import { LABOUR_ACTIVITY_EMPTY } from "./labour-activity";
 import { LabourPage } from "./labour-page";
+import { pageHref } from "@/lib/page-href";
 
 const LABOURS = "/api/construction/labour/labours";
 const ACTIVITY = `${LABOURS}/${DHURESH.id}/activity`;
@@ -137,7 +138,7 @@ export const ActivityMixed: Story = {
     // A Project the viewer may open is a link; one they may not is not.
     await expect(
       canvas.getAllByRole("link", { name: "Tower A" })[0],
-    ).toHaveAttribute("href", `/app/projects/${TOWER.id}`);
+    ).toHaveAttribute("href", pageHref("/app/projects/[id]", { id: TOWER.id }));
     await expect(canvas.queryByRole("link", { name: "Old Mall" })).toBeNull();
     await expect(canvas.getByText("Old Mall")).toBeVisible();
     await expect(
@@ -220,7 +221,7 @@ export const ActivityCheckIns: Story = {
     ).toHaveTextContent("Checked out at Tower A · 6:05 am");
     await expect(
       outEntry.getByRole("link", { name: TOWER.name }),
-    ).toHaveAttribute("href", `/app/projects/${TOWER.id}`);
+    ).toHaveAttribute("href", pageHref("/app/projects/[id]", { id: TOWER.id }));
     await expect(
       outEntry.getByText(/240 m outside the site fence/),
     ).toBeVisible();
