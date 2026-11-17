@@ -50,6 +50,8 @@ The first argument is the page's folder pattern, checked against `AppRoutes` fro
 
 `pageHref`'s types import `.next/types/routes.d.ts`. CI lints a clean checkout, so `lint` is now `next typegen && eslint`. `check-types` already ran typegen.
 
+The build folder varies (`.next`, `.next/dev` under `next dev`, `.next-e2e` for the e2e build), so `lib/page-href.ts` imports `next-route-types/routes`, a tsconfig `paths` alias that tries each folder in turn. With a fixed `.next` path the e2e build found no route list and every link failed to type-check.
+
 ## How it was migrated
 
 A codemod rewrote 302 template literals and one-line path helpers into pageHref calls, matching each against the generated page list. A second pass followed each remaining "`string` is not a route" error back to its declaration and retyped it as `AppHref`. The rest were fixed by hand. URLs are unchanged, except that every param is now encoded (the ids are UUIDs, so in practice nothing changes).

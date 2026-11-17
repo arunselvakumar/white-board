@@ -3,7 +3,13 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./*"],
-      "@repo/ui/*": ["../../packages/ui/src/*"]
+      "@repo/ui/*": ["../../packages/ui/src/*"],
+      "next-route-types/*": [
+        "./.next/types/*",
+        "./.next/dev/types/*",
+        "./.next-e2e/types/*",
+        "./.next-verify/types/*"
+      ]
     },
     "plugins": [
       {
