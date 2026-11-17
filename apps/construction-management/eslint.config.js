@@ -110,15 +110,36 @@ const sharedKernelBoundary = {
 // Under `next dev --webpack` a Prisma error can come from another copy of
 // the generated client, so `instanceof` is false and a conflict became a 500
 // (#98). Match Prisma errors by name and code with the shared helper.
+const prismaInstanceofSelector = {
+  selector:
+    "BinaryExpression[operator='instanceof'][right.object.name='Prisma'][right.property.name=/^PrismaClient.*Error$/]",
+  message:
+    "Use isPrismaError / isUniqueViolation from @/src/shared-kernel/prisma-errors; instanceof fails across copies of the Prisma client (#98).",
+};
+
 const prismaErrorGuard = {
+  rules: { "no-restricted-syntax": ["error", prismaInstanceofSelector] },
+};
+
+// A page address with a dynamic segment is built with pageHref (ADR
+// CM-0045). Typed routes accept `/app/projects/${id}/resources` even after
+// the page moved, because a dynamic segment matches any text; pageHref names
+// the page by its folder, so a moved page fails check-types. This catches a
+// template whose path, before any `?` or `#`, holds an expression. Tests
+// and stories build addresses to assert on, so they may. The rule has to
+// repeat the Prisma selector: a later config replaces the rule's options.
+const pageHrefGuard = {
+  files: ["{app,components,lib,src}/**/*.{ts,tsx}"],
+  ignores: ["**/*.test.{ts,tsx}", "**/*.stories.tsx", "app/api/**"],
   rules: {
     "no-restricted-syntax": [
       "error",
+      prismaInstanceofSelector,
       {
         selector:
-          "BinaryExpression[operator='instanceof'][right.object.name='Prisma'][right.property.name=/^PrismaClient.*Error$/]",
+          "TemplateLiteral[expressions.length>0][quasis.0.value.cooked=/^[/](app|join)([/][^?#]*)?$/]",
         message:
-          "Use isPrismaError / isUniqueViolation from @/src/shared-kernel/prisma-errors; instanceof fails across copies of the Prisma client (#98).",
+          'Build a page address with pageHref("/app/…/[id]/…", { id }) from @/lib/page-href (ADR CM-0045), so a moved page fails check-types.',
       },
     ],
   },
@@ -146,6 +167,7 @@ export default [
   sharedKernelBoundary,
   skeletonGuard,
   prismaErrorGuard,
+  pageHrefGuard,
   ...storybook.configs["flat/recommended"],
   {
     // Playwright fixtures hand their value to `use`, which is not React's.
