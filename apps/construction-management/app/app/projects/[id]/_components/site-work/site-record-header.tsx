@@ -2,6 +2,7 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { cn } from "@repo/ui/lib/utils";
+import type { AppHref } from "@/lib/page-href";
 
 /**
  * The module heading of a Site Diary or Hindrance page, in the style of the
@@ -15,7 +16,7 @@ export function SiteRecordHeader({
   actions,
   size = "form",
 }: {
-  back: { label: string; href: string };
+  back: { label: string; href: AppHref };
   title: string;
   meta?: ReactNode;
   actions?: ReactNode;

@@ -8,8 +8,8 @@ import {
   type VoucherType,
 } from "@/src/queries/finance-petty-cash";
 
-import { pettyCashPath } from "./petty-cash-parts";
 import { VoucherForm } from "./voucher-form";
+import { pageHref } from "@/lib/page-href";
 
 /** New voucher: `?account=<id>&type=receipt` start it. */
 export function VoucherNew({
@@ -26,8 +26,9 @@ export function VoucherNew({
       <SiteRecordHeader
         back={{
           label: "Petty Cash",
-          href: pettyCashPath(
-            projectId,
+          href: pageHref(
+            "/app/projects/[id]/payments/petty-cash",
+            { id: projectId },
             accountId == null
               ? ""
               : `?account=${encodeURIComponent(accountId)}`,
@@ -57,7 +58,10 @@ export function VoucherEdit({
       <SiteRecordHeader
         back={{
           label: data.number,
-          href: pettyCashPath(projectId, `/${voucherId}`),
+          href: pageHref("/app/projects/[id]/payments/petty-cash/[voucherId]", {
+            id: projectId,
+            voucherId,
+          }),
         }}
         title={`Edit ${data.number}`}
       />

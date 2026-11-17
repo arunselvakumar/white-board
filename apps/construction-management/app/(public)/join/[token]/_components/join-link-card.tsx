@@ -15,6 +15,7 @@ import {
   acceptJoinRequest,
   rejectJoinRequest,
 } from "@/src/queries/join-requests";
+import { pageHref } from "@/lib/page-href";
 
 export type JoinLinkPreview = {
   id: string;
@@ -70,7 +71,7 @@ export function JoinLinkCard({
       />
     );
 
-  const redirect = encodeURIComponent(`/join/${token}`);
+  const redirect = encodeURIComponent(pageHref("/join/[token]", { token }));
   const failure = acceptance.error ?? rejection.error;
   const notForYou =
     failure instanceof QueryHttpError &&
@@ -119,7 +120,7 @@ export function JoinLinkCard({
             variant="outline"
             className="h-10 w-full"
             onClick={() => {
-              void signOut(`/join/${token}`);
+              void signOut(pageHref("/join/[token]", { token }));
             }}
           >
             Sign out and use that {noun}

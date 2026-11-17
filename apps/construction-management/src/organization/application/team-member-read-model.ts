@@ -11,6 +11,7 @@ import type {
   TeamMember,
   TeamMemberStatus,
 } from "../domain/team-member";
+import { pageHref } from "@/lib/page-href";
 
 export type TeamMemberReadModel = {
   id: string;
@@ -105,7 +106,7 @@ export function toTeamMemberReadModel(
         !lookups.usersInOtherCompanies.has(member.userId)),
     invitePath:
       member.status === "joining_pending" && member.inviteToken != null
-        ? `/join/${member.inviteToken}`
+        ? pageHref("/join/[token]", { token: member.inviteToken })
         : null,
     invitedAt: member.invitedAt,
     joinedAt: member.joinedAt,

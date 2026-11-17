@@ -23,6 +23,7 @@ import type { InspectionStatus } from "@/src/tracking/domain/inspection";
 import { apiJson } from "./http";
 import { TRACKING_API, TRACKING_KEY } from "./tracking-access";
 import { trackingDocumentKey } from "./tracking-documents";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 export type Inspection = ConstructionTrackingInspectionResponse;
 export type InspectionPage = ListConstructionTrackingInspectionsResponse;
@@ -299,22 +300,11 @@ export function useAddRemark(id: string) {
   });
 }
 
-/** Pages of a Project's Inspection Requests. */
-export function inspectionsPath(projectId: string, rest = ""): string {
-  return `/app/projects/${encodeURIComponent(projectId)}/inspections${rest}`;
-}
-
 /** **Raise re-inspection**: the Add page prefilled from a rejected request. */
-export function reinspectionPath(projectId: string, id: string): string {
-  return inspectionsPath(projectId, `/new?reinspect=${encodeURIComponent(id)}`);
-}
-
-/** The Issue & Snag a rejection raised (CM-803's page). */
-export function snagPath(projectId: string, issueId: string): string {
-  return `/app/projects/${encodeURIComponent(projectId)}/issues/${encodeURIComponent(issueId)}`;
-}
-
-/** A linked drawing opens its album in Project Drawings. */
-export function drawingAlbumPath(projectId: string, albumId: string): string {
-  return `/app/projects/${encodeURIComponent(projectId)}/drawings/${encodeURIComponent(albumId)}`;
+export function reinspectionPath(projectId: string, id: string): AppHref {
+  return pageHref(
+    "/app/projects/[id]/inspections/new",
+    { id: projectId },
+    `?reinspect=${encodeURIComponent(id)}`,
+  );
 }

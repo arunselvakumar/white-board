@@ -17,7 +17,8 @@ import type { BookingDisplayStatus } from "@/src/sales/domain/booking";
 
 import { apiJson } from "./http";
 import { SALES_API, SALES_KEY } from "./sales-access";
-import { bookingsModulePath, UNITS_KEY } from "./sales-units";
+import { UNITS_KEY } from "./sales-units";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 export type Booking = ConstructionSalesBookingResponse;
 export type BookingDetail = ConstructionSalesBookingDetailResponse;
@@ -35,8 +36,8 @@ export const BOOKINGS_API = `${SALES_API}/bookings`;
 export const BOOKINGS_KEY = [...SALES_KEY, "bookings"] as const;
 
 /** Pages of the Bookings tab: the list, a booking, its edit page. */
-export function bookingsPath(projectId: string, id?: string): string {
-  const base = bookingsModulePath(projectId, "list");
+export function bookingsPath(projectId: string, id?: string): AppHref {
+  const base = pageHref("/app/projects/[id]/bookings/list", { id: projectId });
   return id == null ? base : `${base}/${encodeURIComponent(id)}`;
 }
 

@@ -67,6 +67,7 @@ import {
   targetLabel,
   unavailableBanner,
 } from "./equipment-format";
+import type { AppHref } from "@/lib/page-href";
 
 type Maintenance = EquipmentDetail["maintenance"][number];
 
@@ -274,8 +275,8 @@ export function EquipmentDetailView({
 }: {
   equipment: EquipmentDetail;
   back: PageHeaderBack;
-  editHref: string;
-  afterDeleteHref: string;
+  editHref: AppHref;
+  afterDeleteHref: AppHref;
   /** The machine saved but its photo did not upload (`?photoFailed=1`). */
   photoFailed?: boolean;
 }) {
@@ -597,8 +598,8 @@ export function EquipmentDetailScreen({
 }: {
   id: string;
   back: PageHeaderBack;
-  editHref: string;
-  afterDeleteHref: string;
+  editHref: AppHref;
+  afterDeleteHref: AppHref;
 }) {
   const { data } = useSuspenseQuery(equipmentQuery(id));
   const photoFailed = useSearchParams().get("photoFailed") === "1";

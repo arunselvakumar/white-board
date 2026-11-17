@@ -10,6 +10,7 @@ import {
   STORE,
 } from "@/app/app/_components/procurement/stores/central-store-fixtures";
 import { StoreForm } from "./store-form";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockCentralStoreApi>;
 
@@ -66,7 +67,7 @@ export const AddStore: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Add store" }));
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
-        `/app/workspace/central-store/${IDS.store}`,
+        pageHref("/app/workspace/central-store/[id]", { id: IDS.store }),
       ),
     );
     await expect(posts(`${API}/stores`)[0]?.body).toEqual({

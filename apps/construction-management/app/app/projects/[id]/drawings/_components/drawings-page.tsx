@@ -33,6 +33,7 @@ import {
 
 import { AlbumFormDialog } from "./album-form-dialog";
 import { DeleteAlbumDialog } from "./delete-album-dialog";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 /** "No drawings", "1 drawing", "3 drawings". */
 export function drawingCount(count: number): string {
@@ -41,9 +42,13 @@ export function drawingCount(count: number): string {
 }
 
 /** `/app/projects/{id}/drawings`, or an album's page under it. */
-export function drawingsHref(projectId: string, albumId?: string): string {
-  const base = `/app/projects/${encodeURIComponent(projectId)}/drawings`;
-  return albumId == null ? base : `${base}/${encodeURIComponent(albumId)}`;
+export function drawingsHref(projectId: string, albumId?: string): AppHref {
+  return albumId == null
+    ? pageHref("/app/projects/[id]/drawings", { id: projectId })
+    : pageHref("/app/projects/[id]/drawings/[albumId]", {
+        id: projectId,
+        albumId,
+      });
 }
 
 function AlbumCard({

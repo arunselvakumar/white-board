@@ -18,6 +18,7 @@ import {
   type InspectionApiOptions,
 } from "@/app/app/projects/[id]/inspections/_components/inspection-fixtures";
 import { InspectionDetail } from "./inspection-detail";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockInspectionApi>;
 
@@ -34,7 +35,7 @@ function posts(path: string): ApiCall[] {
     .filter((call) => call.method === "POST" && call.path === path);
 }
 
-const PROJECT = `/app/projects/${INSPECTION_PROJECT_ID}`;
+const PROJECT = pageHref("/app/projects/[id]", { id: INSPECTION_PROJECT_ID });
 const BASE = `${PROJECT}/inspections`;
 
 const meta = {

@@ -26,8 +26,11 @@ import { CAMERA_MESSAGES } from "./capture-camera-panel";
 import { CheckInCaptureScreen, PRIVACY_LINE } from "./check-in-capture-screen";
 import { fakeCamera, type FakeCameraEvent } from "./fake-camera";
 import { CameraContext, type Camera } from "./use-camera";
+import { pageHref } from "@/lib/page-href";
 
-const FIND = `/app/projects/${PROJECT_ID}/attendance/check-in`;
+const FIND = pageHref("/app/projects/[id]/attendance/check-in", {
+  id: PROJECT_ID,
+});
 const POSITION = { latitude: 8.1833, longitude: 77.4119, accuracy: 12 };
 
 let calls: ApiCall[] = [];

@@ -12,6 +12,7 @@ import {
   mockStructureApi,
 } from "@/app/app/projects/[id]/_components/structure/structure-fixtures";
 import { WingsPage } from "./wings-page";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockStructureApi>;
 
@@ -37,7 +38,11 @@ const meta = {
   beforeEach: structureApi(),
   parameters: {
     nextjs: {
-      navigation: { pathname: `/app/projects/${KUMARI_HEIGHTS.id}/wings` },
+      navigation: {
+        pathname: pageHref("/app/projects/[id]/wings", {
+          id: KUMARI_HEIGHTS.id,
+        }),
+      },
     },
   },
   render: (args) => (
@@ -70,7 +75,10 @@ export const ByPhase: Story = {
     ).toBeVisible();
     await expect(phase1.getByRole("link", { name: "Tower A" })).toHaveAttribute(
       "href",
-      `/app/projects/${KUMARI_HEIGHTS.id}/wings/${TOWER_A.id}`,
+      pageHref("/app/projects/[id]/wings/[wingId]", {
+        id: KUMARI_HEIGHTS.id,
+        wingId: TOWER_A.id,
+      }),
     );
     const phase2 = within(canvas.getByRole("region", { name: "Phase 2" }));
     await expect(phase2.getByText("Plotting scheme · 24 plots")).toBeVisible();
@@ -78,7 +86,11 @@ export const ByPhase: Story = {
       phase2.getByRole("link", { name: "Add Wing" }),
     ).toHaveAttribute(
       "href",
-      `/app/projects/${KUMARI_HEIGHTS.id}/wings/new?phase=0199c4a0-0000-7000-8000-0000000000f2`,
+      pageHref(
+        "/app/projects/[id]/wings/new",
+        { id: KUMARI_HEIGHTS.id },
+        "?phase=0199c4a0-0000-7000-8000-0000000000f2",
+      ),
     );
   },
 };
@@ -92,7 +104,10 @@ export const Empty: Story = {
     ).toBeVisible();
     await expect(
       canvas.getByRole("link", { name: "Add Wing" }),
-    ).toHaveAttribute("href", `/app/projects/${KUMARI_HEIGHTS.id}/wings/new`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/projects/[id]/wings/new", { id: KUMARI_HEIGHTS.id }),
+    );
     await expect(
       canvas.getByRole("button", { name: "Add Phase" }),
     ).toBeVisible();

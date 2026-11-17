@@ -3,12 +3,10 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
-import {
-  otherExpenseQuery,
-  otherExpensesPath,
-} from "@/src/queries/finance-other-expenses";
+import { otherExpenseQuery } from "@/src/queries/finance-other-expenses";
 
 import { OtherExpenseForm } from "./other-expense-form";
+import { pageHref } from "@/lib/page-href";
 
 export function OtherExpenseNew({
   projectId,
@@ -20,7 +18,12 @@ export function OtherExpenseNew({
   return (
     <div className="w-full min-w-0 space-y-6">
       <PageHeader
-        back={{ label: "Other Expenses", href: otherExpensesPath(projectId) }}
+        back={{
+          label: "Other Expenses",
+          href: pageHref("/app/projects/[id]/payments/other-expenses", {
+            id: projectId,
+          }),
+        }}
         title="Add Other Expense"
       />
       <OtherExpenseForm projectId={projectId} expense={null} today={today} />
@@ -43,7 +46,10 @@ export function OtherExpenseEdit({
       <PageHeader
         back={{
           label: data.number,
-          href: otherExpensesPath(projectId, `/${id}`),
+          href: pageHref(
+            "/app/projects/[id]/payments/other-expenses/[expenseId]",
+            { id: projectId, expenseId: id },
+          ),
         }}
         title={`Edit ${data.number}`}
         watermark="Other Expenses"

@@ -14,6 +14,7 @@ import {
   mockStructureApi,
 } from "@/app/app/projects/[id]/_components/structure/structure-fixtures";
 import { WingChartScreen } from "./wing-chart";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockStructureApi>;
 
@@ -40,7 +41,10 @@ const meta = {
   parameters: {
     nextjs: {
       navigation: {
-        pathname: `/app/projects/${KUMARI_HEIGHTS.id}/wings/${TOWER_A.id}`,
+        pathname: pageHref("/app/projects/[id]/wings/[wingId]", {
+          id: KUMARI_HEIGHTS.id,
+          wingId: TOWER_A.id,
+        }),
       },
     },
   },
@@ -80,7 +84,10 @@ export const Chart: Story = {
       canvas.getByRole("link", { name: "Edit Wing" }),
     ).toHaveAttribute(
       "href",
-      `/app/projects/${KUMARI_HEIGHTS.id}/wings/${TOWER_A.id}/edit`,
+      pageHref("/app/projects/[id]/wings/[wingId]/edit", {
+        id: KUMARI_HEIGHTS.id,
+        wingId: TOWER_A.id,
+      }),
     );
   },
 };
@@ -136,7 +143,7 @@ export const DeleteWing: Story = {
     );
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
-        `/app/projects/${KUMARI_HEIGHTS.id}/wings`,
+        pageHref("/app/projects/[id]/wings", { id: KUMARI_HEIGHTS.id }),
       ),
     );
   },
@@ -196,7 +203,10 @@ export const EditWing: Story = {
     });
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
-        `/app/projects/${KUMARI_HEIGHTS.id}/wings/${TOWER_A.id}`,
+        pageHref("/app/projects/[id]/wings/[wingId]", {
+          id: KUMARI_HEIGHTS.id,
+          wingId: TOWER_A.id,
+        }),
       ),
     );
   },

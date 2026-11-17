@@ -55,6 +55,7 @@ import {
   HINDRANCE_STATUS_TABS,
   HindranceRowsSkeleton,
 } from "@/app/app/_components/site-work/site-work-skeletons";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 const ALL = "all";
 
@@ -63,7 +64,7 @@ function HindranceItem({
   href,
 }: {
   hindrance: Hindrance;
-  href: string;
+  href: AppHref;
 }) {
   return (
     <li className="bg-card hover:bg-muted/40 relative rounded-lg border p-3 transition-colors">
@@ -98,7 +99,7 @@ function Hindrances({
 }: {
   projectId: string;
   filters: HindranceFilters;
-  newHref: string | null;
+  newHref: AppHref | null;
   onPage: (cursor: HindranceFilters["cursor"]) => void;
   className?: string;
 }) {
@@ -235,7 +236,9 @@ export function HindrancesList({ projectId }: { projectId: string }) {
     setFilters((current) => ({ ...current, ...next, cursor: null }));
   };
   const canCreate = canInSiteWork(access, "site_work.hindrances", "create");
-  const newHref = `${hindrancesPath(projectId)}/new`;
+  const newHref = pageHref("/app/projects/[id]/hindrances/new", {
+    id: projectId,
+  });
 
   return (
     <div className="flex w-full max-w-6xl flex-col gap-4 p-6">

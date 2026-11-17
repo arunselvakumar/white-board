@@ -35,11 +35,8 @@ import {
   trackingAccessQuery,
 } from "@/src/queries/tracking-access";
 import {
-  drawingAlbumPath,
   inspectionQuery,
-  inspectionsPath,
   reinspectionPath,
-  snagPath,
   useInspectionCommand,
   type Inspection,
 } from "@/src/queries/tracking-inspections";
@@ -53,6 +50,7 @@ import {
 } from "@/app/app/projects/[id]/inspections/_components/inspection-format";
 import { InspectionObservations, InspectionRemarks } from "./inspection-thread";
 import { FactValueSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
+import { pageHref } from "@/lib/page-href";
 
 function Fact({
   label,
@@ -176,7 +174,10 @@ function Links({
           <RotateCcw aria-hidden="true" className="size-4" />
           Re-inspection of{" "}
           <Link
-            href={inspectionsPath(projectId, `/${reinspectionOf.id}`)}
+            href={pageHref("/app/projects/[id]/inspections/[inspectionId]", {
+              id: projectId,
+              inspectionId: reinspectionOf.id,
+            })}
             className="font-medium underline-offset-4 hover:underline"
           >
             {reinspectionOf.number}
@@ -189,7 +190,10 @@ function Links({
           <RotateCcw aria-hidden="true" className="size-4" />
           Inspected again as{" "}
           <Link
-            href={inspectionsPath(projectId, `/${item.id}`)}
+            href={pageHref("/app/projects/[id]/inspections/[inspectionId]", {
+              id: projectId,
+              inspectionId: item.id,
+            })}
             className="font-medium underline-offset-4 hover:underline"
           >
             {item.number}
@@ -202,7 +206,10 @@ function Links({
           <TriangleAlert aria-hidden="true" className="size-4" />
           Snag raised:{" "}
           <Link
-            href={snagPath(projectId, snag.id)}
+            href={pageHref("/app/projects/[id]/issues/[issueId]", {
+              id: projectId,
+              issueId: snag.id,
+            })}
             className="font-medium underline-offset-4 hover:underline"
           >
             {snag.number}
@@ -246,7 +253,10 @@ function Drawings({
                     </p>
                   ) : (
                     <Link
-                      href={drawingAlbumPath(projectId, drawing.albumId)}
+                      href={pageHref("/app/projects/[id]/drawings/[albumId]", {
+                        id: projectId,
+                        albumId: drawing.albumId,
+                      })}
                       className="block truncate text-sm font-medium underline-offset-4 hover:underline"
                     >
                       {drawing.name}
@@ -293,7 +303,9 @@ export function InspectionDetail({
   const [dialog, setDialog] = useState<"reject" | "delete" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [leaving, setLeaving] = useState(false);
-  const listHref = inspectionsPath(projectId);
+  const listHref = pageHref("/app/projects/[id]/inspections", {
+    id: projectId,
+  });
   const { actions } = inspection;
   const pending = inspection.status === "pending";
 
@@ -334,7 +346,10 @@ export function InspectionDetail({
             )}
             {actions.edit && (
               <Link
-                href={inspectionsPath(projectId, `/${inspection.id}/edit`)}
+                href={pageHref(
+                  "/app/projects/[id]/inspections/[inspectionId]/edit",
+                  { id: projectId, inspectionId: inspection.id },
+                )}
                 className={buttonVariants({ size: "sm", variant: "outline" })}
               >
                 <Pencil aria-hidden="true" />

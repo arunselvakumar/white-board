@@ -11,6 +11,7 @@ import {
   mockTestingReportsApi,
 } from "./testing-report-fixtures";
 import { TestingReportsPage } from "./testing-reports-page";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockTestingReportsApi>;
 
@@ -27,7 +28,9 @@ function testingApi(options: Parameters<typeof mockTestingReportsApi>[0] = {}) {
   };
 }
 
-const PATH = `/app/projects/${TESTING_PROJECT_ID}/testing-reports`;
+const PATH = pageHref("/app/projects/[id]/testing-reports", {
+  id: TESTING_PROJECT_ID,
+});
 
 type Play = NonNullable<Story["play"]>;
 type PlayContext = Parameters<Play>[0];

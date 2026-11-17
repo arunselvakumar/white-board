@@ -113,7 +113,7 @@ export function PartiesPage({ list }: { list: PartyList }) {
   const [isPending, startTransition] = useTransition();
 
   const addLink = (
-    <Link href={`${screen.path}/new`} className={buttonVariants()}>
+    <Link href={screen.newPath} className={buttonVariants()}>
       <Plus aria-hidden="true" />
       Add {screen.label}
     </Link>

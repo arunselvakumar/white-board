@@ -33,7 +33,7 @@ export function StoreTransferDetail({
     <TransferDetail
       id={transferId}
       backHref={centralStoreHref.store(storeId)}
-      editHref={`${centralStoreHref.transfer(storeId, transferId)}/edit`}
+      editHref={centralStoreHref.editTransfer(storeId, transferId)}
       afterDeleteHref={centralStoreHref.store(storeId)}
     />
   );

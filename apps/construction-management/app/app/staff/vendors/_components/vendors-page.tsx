@@ -76,6 +76,7 @@ import {
 } from "@/src/queries/vendors";
 
 import { ProjectFilterSkeleton, VendorRowsSkeleton } from "./vendors-skeletons";
+import type { AppHref } from "@/lib/page-href";
 
 const STATUS_FILTERS: FilterTab<VendorListFilter["status"]>[] = [
   { value: "all", label: "All", icon: LayoutGrid },
@@ -85,7 +86,7 @@ const STATUS_FILTERS: FilterTab<VendorListFilter["status"]>[] = [
 
 const ALL_PROJECTS = "all";
 
-function editPath(id: string): string {
+function editPath(id: string): AppHref {
   return `${VENDORS_PATH}/${encodeURIComponent(id)}`;
 }
 

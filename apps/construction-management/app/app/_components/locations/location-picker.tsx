@@ -36,6 +36,7 @@ import {
   SelectValue,
 } from "@repo/ui/components/select";
 
+import { pageHref } from "@/lib/page-href";
 import {
   locationNames,
   locationOptionsQuery,
@@ -285,7 +286,11 @@ function EmptyLocations({
       </EmptyHeader>
       <EmptyContent>
         <Link
-          href={`/app/projects/${encodeURIComponent(projectId)}/${wings ? "wings" : "locations"}`}
+          href={
+            wings
+              ? pageHref("/app/projects/[id]/wings", { id: projectId })
+              : pageHref("/app/projects/[id]/locations", { id: projectId })
+          }
           className={buttonVariants({ variant: "outline" })}
         >
           {wings ? "Open Wings" : "Open Locations"}

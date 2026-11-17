@@ -16,6 +16,7 @@ import {
   mockDrawingsApi,
 } from "@/app/app/projects/[id]/drawings/_components/drawing-fixtures";
 import { DrawingAlbumPage } from "./drawing-album-page";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockDrawingsApi>;
 let xhr: ReturnType<typeof mockXhrUploads>;
@@ -51,7 +52,9 @@ function file(name: string, size: number, type = "") {
 }
 
 const MB = 1024 * 1024;
-const DRAWINGS_PATH = `/app/projects/${ANUGRAHA.id}/drawings`;
+const DRAWINGS_PATH = pageHref("/app/projects/[id]/drawings", {
+  id: ANUGRAHA.id,
+});
 const PATH = `${DRAWINGS_PATH}/${ALBUM_IDS.architect}`;
 
 /** The viewer's PDF frame (the dialog title carries the same title). */

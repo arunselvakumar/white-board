@@ -10,7 +10,8 @@ import {
   SkeletonText,
 } from "@repo/ui/components/skeleton-kit";
 
-import { SectionHeader, wingPath, wingsPath } from "./structure-parts";
+import { SectionHeader, wingPath } from "./structure-parts";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 /*
  * Wings and Locations while they load (ADR-0047): the real section
@@ -68,7 +69,10 @@ export function WingChartSkeleton({ projectId }: { projectId: string }) {
   return (
     <div className="w-full max-w-5xl space-y-5 p-6">
       <WingHeaderSkeleton
-        back={{ label: "Wings", href: wingsPath(projectId) }}
+        back={{
+          label: "Wings",
+          href: pageHref("/app/projects/[id]/wings", { id: projectId }),
+        }}
       />
       <SkeletonGroup label="Loading the Wing">
         <div className="bg-card w-full overflow-auto rounded-xl border">
@@ -101,7 +105,7 @@ export function WingChartSkeleton({ projectId }: { projectId: string }) {
 function WingHeaderSkeleton({
   back,
 }: {
-  back: { label?: string; href: string };
+  back: { label?: string; href: AppHref };
 }) {
   return (
     <div className="space-y-3">
@@ -134,7 +138,10 @@ export function AddWingSkeleton({ projectId }: { projectId: string }) {
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-6">
         <SectionHeader
-          back={{ label: "Wings", href: wingsPath(projectId) }}
+          back={{
+            label: "Wings",
+            href: pageHref("/app/projects/[id]/wings", { id: projectId }),
+          }}
           title="Add Wing"
           meta="Step 1 of 2 · Wing details"
         />

@@ -10,6 +10,7 @@ import {
   TRANSFERS_API,
   type TransferApiOptions,
 } from "./transfer-fixtures";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockTransferApi>;
 
@@ -26,7 +27,9 @@ function transferApi(options: TransferApiOptions = {}) {
   };
 }
 
-const BASE = `/app/projects/${TOWER.id}/materials/transfers`;
+const BASE = pageHref("/app/projects/[id]/materials/transfers", {
+  id: TOWER.id,
+});
 const [PENDING, IN_TRANSIT, DELIVERED] = TRANSFERS;
 
 const meta = {
@@ -35,7 +38,10 @@ const meta = {
   args: {
     id: PENDING?.id ?? "",
     backHref: BASE,
-    editHref: `${BASE}/${PENDING?.id ?? ""}/edit`,
+    editHref: pageHref(
+      "/app/projects/[id]/materials/transfers/[transferId]/edit",
+      { id: TOWER.id, transferId: PENDING?.id ?? "" },
+    ),
     afterDeleteHref: BASE,
   },
   beforeEach: transferApi(),

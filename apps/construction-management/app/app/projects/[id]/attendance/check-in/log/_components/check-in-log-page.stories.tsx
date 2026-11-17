@@ -22,6 +22,7 @@ import {
 } from "./check-in-log-fixtures";
 import { CheckInLogPage } from "./check-in-log-page";
 import { VOID_EXPLAINED, VOID_LABOUR_DAY } from "./void-entry-dialog";
+import { pageHref } from "@/lib/page-href";
 
 let calls: ApiCall[] = [];
 
@@ -154,7 +155,7 @@ export const Loaded: Story = {
       canvas.getByRole("link", { name: "Back to Check-In" }),
     ).toHaveAttribute(
       "href",
-      `/app/projects/${PROJECT_ID}/attendance/check-in`,
+      pageHref("/app/projects/[id]/attendance/check-in", { id: PROJECT_ID }),
     );
     await expect(
       canvas.getByRole("button", { name: "Next day" }),

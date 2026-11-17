@@ -13,6 +13,7 @@ import {
   DURAI,
   SITE_ENGINEERS_API,
 } from "./staffing-fixtures";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockFetch>;
 
@@ -64,7 +65,10 @@ export const AFew: Story = {
     );
     await expect(
       section.getByRole("link", { name: ANAND.name }),
-    ).toHaveAttribute("href", `/app/staff/site-engineers/${ANAND.id}`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/staff/site-engineers/[id]", { id: ANAND.id }),
+    );
     await expect(section.getByText("SE-001 · +91 98400 12345")).toBeVisible();
     await expect(section.getByText("Disabled")).toBeVisible();
   },
@@ -103,7 +107,10 @@ export const AddSiteEngineers: Story = {
       dialog.getByRole("link", {
         name: "Durai Murugan needs a sign-in: open their page",
       }),
-    ).toHaveAttribute("href", `/app/staff/site-engineers/${DURAI.id}`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/staff/site-engineers/[id]", { id: DURAI.id }),
+    );
     await userEvent.click(
       dialog.getByRole("checkbox", { name: /Chandran Pillai/ }),
     );

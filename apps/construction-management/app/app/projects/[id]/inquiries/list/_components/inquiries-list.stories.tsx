@@ -12,6 +12,7 @@ import {
   mockInquiryApi,
   type InquiryApiOptions,
 } from "./inquiry-fixtures";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockInquiryApi>;
 
@@ -28,7 +29,9 @@ function inquiryApi(options: InquiryApiOptions = {}) {
   };
 }
 
-const BASE = `/app/projects/${INQUIRY_PROJECT_ID}/inquiries/list`;
+const BASE = pageHref("/app/projects/[id]/inquiries/list", {
+  id: INQUIRY_PROJECT_ID,
+});
 
 const meta = {
   title: "Sales/Inquiries/List",

@@ -1,4 +1,5 @@
 import type { Flag, MenuKey } from "@/src/shared-kernel/access";
+import { pageHref } from "@/lib/page-href";
 
 /**
  * The notifications M9 delivers (ADR CM-0021 §6): each type, the menu
@@ -110,18 +111,13 @@ export type ApprovalDocument = {
   ownerOnlyWithoutProject?: boolean;
 };
 
-function inProject(path: string) {
+/**
+ * A link inside the document's Project, built with pageHref so a moved page
+ * fails check-types (ADR CM-0045). None at a Store.
+ */
+function inProject(href: (projectId: string, documentId: string) => string) {
   return (document: DocumentRef): string | null =>
-    document.projectId == null
-      ? null
-      : `/app/projects/${document.projectId}/${path}/${document.id}`;
-}
-
-function projectPage(path: string) {
-  return (document: DocumentRef): string | null =>
-    document.projectId == null
-      ? null
-      : `/app/projects/${document.projectId}/${path}`;
+    document.projectId == null ? null : href(document.projectId, document.id);
 }
 
 function same(href: (document: DocumentRef) => string | null) {
@@ -137,44 +133,93 @@ export const APPROVAL_DOCUMENTS: Record<string, ApprovalDocument> = {
   worksheet: {
     menu: "site_work.daily_worksheet",
     label: "Daily Worksheet",
-    ...same(inProject("worksheets")),
+    ...same(
+      inProject((id, worksheetId) =>
+        pageHref("/app/projects/[id]/worksheets/[worksheetId]", {
+          id,
+          worksheetId,
+        }),
+      ),
+    ),
   },
   equipment_usage: {
     menu: "site_work.equipment_usage",
     label: "Equipment Usage sheet",
-    ...same(inProject("equipment/usage-sheets")),
+    ...same(
+      inProject((id, sheetId) =>
+        pageHref("/app/projects/[id]/equipment/usage-sheets/[sheetId]", {
+          id,
+          sheetId,
+        }),
+      ),
+    ),
   },
   purchase_request: {
     menu: "procurement.purchase_requests",
     label: "Purchase Request",
-    ...same(inProject("materials/purchase-requests")),
+    ...same(
+      inProject((id, prId) =>
+        pageHref("/app/projects/[id]/materials/purchase-requests/[prId]", {
+          id,
+          prId,
+        }),
+      ),
+    ),
   },
   purchase_order: {
     menu: "procurement.purchase_orders",
     label: "Purchase Order",
-    ...same(inProject("materials/purchase-orders")),
+    ...same(
+      inProject((id, poId) =>
+        pageHref("/app/projects/[id]/materials/purchase-orders/[poId]", {
+          id,
+          poId,
+        }),
+      ),
+    ),
   },
   transaction: {
     menu: "finance.transactions",
     label: "Transaction",
-    ...same(inProject("payments/transactions")),
+    ...same(
+      inProject((id, transactionId) =>
+        pageHref("/app/projects/[id]/payments/transactions/[transactionId]", {
+          id,
+          transactionId,
+        }),
+      ),
+    ),
   },
   petty_cash_voucher: {
     menu: "finance.petty_cash",
     label: "Petty Cash voucher",
-    ...same(inProject("payments/petty-cash")),
+    ...same(
+      inProject((id, voucherId) =>
+        pageHref("/app/projects/[id]/payments/petty-cash/[voucherId]", {
+          id,
+          voucherId,
+        }),
+      ),
+    ),
   },
   invoice_settlement: {
     menu: "finance.parties",
     label: "Invoice settlement",
-    ...same(projectPage("payments")),
+    ...same(inProject((id) => pageHref("/app/projects/[id]/payments", { id }))),
     // A Store's supplier invoices are the Owner's alone (`canOnPlace`).
     ownerOnlyWithoutProject: true,
   },
   other_expense: {
     menu: "finance.other_expenses",
     label: "Other Expense",
-    ...same(inProject("payments/other-expenses")),
+    ...same(
+      inProject((id, expenseId) =>
+        pageHref("/app/projects/[id]/payments/other-expenses/[expenseId]", {
+          id,
+          expenseId,
+        }),
+      ),
+    ),
   },
   leave_request: {
     menu: "hrms.leaves",
@@ -215,38 +260,70 @@ export const LINKS = {
   notifications: "/app/notifications",
   downloads: "/app/downloads",
   task: (projectId: string, id: string) =>
-    `/app/projects/${projectId}/tasks/${id}`,
+    pageHref("/app/projects/[id]/tasks/[taskId]", {
+      id: projectId,
+      taskId: id,
+    }),
   issue: (projectId: string, id: string) =>
-    `/app/projects/${projectId}/issues/${id}`,
+    pageHref("/app/projects/[id]/issues/[issueId]", {
+      id: projectId,
+      issueId: id,
+    }),
   inspection: (projectId: string, id: string) =>
-    `/app/projects/${projectId}/inspections/${id}`,
+    pageHref("/app/projects/[id]/inspections/[inspectionId]", {
+      id: projectId,
+      inspectionId: id,
+    }),
   equipmentSheet: (projectId: string, id: string) =>
-    `/app/projects/${projectId}/equipment/usage-sheets/${id}`,
+    pageHref("/app/projects/[id]/equipment/usage-sheets/[sheetId]", {
+      id: projectId,
+      sheetId: id,
+    }),
   transfer: (
     location: { kind: string; id: string },
     transferId: string,
   ): string =>
     location.kind === "project"
-      ? `/app/projects/${location.id}/materials/transfers/${transferId}`
-      : `/app/workspace/central-store/${location.id}/transfers/${transferId}`,
+      ? pageHref("/app/projects/[id]/materials/transfers/[transferId]", {
+          id: location.id,
+          transferId,
+        })
+      : pageHref("/app/workspace/central-store/[id]/transfers/[transferId]", {
+          id: location.id,
+          transferId,
+        }),
   centralMaterialRequest: (id: string) =>
-    `/app/workspace/central-store/material-requests/${id}`,
+    pageHref("/app/workspace/central-store/material-requests/[id]", { id }),
   projectMaterialRequest: (projectId: string, id: string) =>
-    `/app/projects/${projectId}/materials/material-requests/${id}`,
+    pageHref("/app/projects/[id]/materials/material-requests/[requestId]", {
+      id: projectId,
+      requestId: id,
+    }),
   inventory: (location: { kind: string; id: string }): string =>
     location.kind === "project"
-      ? `/app/projects/${location.id}/materials/inventory`
-      : `/app/workspace/central-store/${location.id}`,
+      ? pageHref("/app/projects/[id]/materials/inventory", { id: location.id })
+      : pageHref("/app/workspace/central-store/[id]", { id: location.id }),
   mySalary: "/app/hrms/salary/my",
   // Sales (CM-1006)
   booking: (projectId: string, id: string) =>
-    `/app/projects/${projectId}/bookings/list/${id}`,
+    pageHref("/app/projects/[id]/bookings/list/[bookingId]", {
+      id: projectId,
+      bookingId: id,
+    }),
   // Sales (CM-1004)
   inquiry: (projectId: string, id: string) =>
-    `/app/projects/${projectId}/inquiries/list/${id}`,
-  inquiries: (projectId: string) => `/app/projects/${projectId}/inquiries/list`,
+    pageHref("/app/projects/[id]/inquiries/list/[inquiryId]", {
+      id: projectId,
+      inquiryId: id,
+    }),
+  inquiries: (projectId: string) =>
+    pageHref("/app/projects/[id]/inquiries/list", { id: projectId }),
   inquiriesDue: (projectId: string, due: "overdue" | "today") =>
-    `/app/projects/${projectId}/inquiries/list?due=${due}`,
+    pageHref(
+      "/app/projects/[id]/inquiries/list",
+      { id: projectId },
+      `?due=${due}`,
+    ),
 } as const;
 
 // ---------------------------------------------------------------------------

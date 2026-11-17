@@ -13,12 +13,15 @@ import {
   mockInquiryApi,
   type InquiryApiOptions,
 } from "@/app/app/projects/[id]/inquiries/list/_components/inquiry-fixtures";
+import { pageHref } from "@/lib/page-href";
 
 function inquiryApi(options: InquiryApiOptions = {}) {
   return () => mockInquiryApi(options).restore;
 }
 
-const BASE = `/app/projects/${INQUIRY_PROJECT_ID}/inquiries/list`;
+const BASE = pageHref("/app/projects/[id]/inquiries/list", {
+  id: INQUIRY_PROJECT_ID,
+});
 
 const meta = {
   title: "Sales/Inquiries/Detail",

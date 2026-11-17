@@ -24,6 +24,7 @@ import type { TrackingPriority } from "@/src/tracking/domain/tracking-documents"
 
 import { apiJson } from "./http";
 import { TRACKING_API, TRACKING_KEY } from "./tracking-access";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 export type Task = ConstructionTrackingTaskResponse;
 export type TaskDetail = ConstructionTrackingTaskDetailResponse;
@@ -289,7 +290,7 @@ export function useImportTasks(projectId: string) {
 }
 
 /** Pages of a Project's tasks. */
-export function tasksPath(projectId: string, id?: string): string {
-  const base = `/app/projects/${encodeURIComponent(projectId)}/tasks`;
+export function tasksPath(projectId: string, id?: string): AppHref {
+  const base = pageHref("/app/projects/[id]/tasks", { id: projectId });
   return id == null ? base : `${base}/${encodeURIComponent(id)}`;
 }

@@ -11,6 +11,7 @@ import {
   mockTestingReportsApi,
 } from "@/app/app/projects/[id]/testing-reports/_components/testing-report-fixtures";
 import { TestingReportSheet } from "./testing-report-sheet";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockTestingReportsApi>;
 let xhr: ReturnType<typeof mockXhrUploads>;
@@ -71,7 +72,10 @@ const meta = {
   parameters: {
     nextjs: {
       navigation: {
-        pathname: `/app/projects/${TESTING_PROJECT_ID}/testing-reports/${BRICKS_ID}`,
+        pathname: pageHref("/app/projects/[id]/testing-reports/[itemId]", {
+          id: TESTING_PROJECT_ID,
+          itemId: BRICKS_ID,
+        }),
       },
     },
   },

@@ -35,7 +35,6 @@ import {
   CALL_ACTIVITY_PERIODS,
   type CallActivityPeriod,
 } from "@/src/sales/application/sales-dashboard";
-import { bookingsModulePath } from "@/src/queries/sales-units";
 import {
   FOLLOW_UP_ACTIVITY_LABELS,
   UNIT_SALES_STATUS_LABELS,
@@ -45,6 +44,7 @@ import {
 import { Fact, Section, denied } from "./dashboard-parts";
 import { SectionSkeleton } from "./dashboard-skeletons";
 import { CountBars, Legend, StackedBar } from "./tracking-charts";
+import { pageHref } from "@/lib/page-href";
 
 /** "1 inquiry", "3 inquiries". */
 function count(n: number, one: string, many: string): string {
@@ -180,7 +180,9 @@ export function BookingSection({ projectId }: { projectId: string }) {
       title="Booking"
       aside={
         <Link
-          href={bookingsModulePath(projectId, "units")}
+          href={pageHref("/app/projects/[id]/bookings/units", {
+            id: projectId,
+          })}
           className="text-primary text-sm font-medium underline-offset-4 hover:underline"
         >
           Units
@@ -399,7 +401,7 @@ export function InquirySection({
       title="Inquiry"
       aside={
         <Link
-          href={`/app/projects/${encodeURIComponent(projectId)}/inquiries`}
+          href={pageHref("/app/projects/[id]/inquiries", { id: projectId })}
           className="text-primary text-sm font-medium underline-offset-4 hover:underline"
         >
           Inquiries

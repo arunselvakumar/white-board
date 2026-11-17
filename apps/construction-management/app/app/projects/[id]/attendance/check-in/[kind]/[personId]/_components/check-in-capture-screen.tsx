@@ -60,6 +60,7 @@ import {
   useDeviceLocation,
 } from "./capture-parts";
 import { useCheckInCamera, type CapturedPhoto } from "./use-camera";
+import type { AppHref } from "@/lib/page-href";
 
 export const PRIVACY_LINE =
   "A photo and this device's location are saved with the entry.";
@@ -124,7 +125,7 @@ function useEscape(onEscape: () => void) {
   }, [onEscape]);
 }
 
-function BackLink({ href }: { href: string }) {
+function BackLink({ href }: { href: AppHref }) {
   return (
     <Link
       href={href}
@@ -181,7 +182,7 @@ function Capture({
   projectId: string;
   kind: CheckInKind;
   personId: string;
-  back: string;
+  back: AppHref;
   labelId: string;
 }) {
   const { data, dataUpdatedAt } = useSuspenseQuery(

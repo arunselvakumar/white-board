@@ -8,9 +8,10 @@ import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import { KUMARI } from "@/app/app/_components/projects/project-fixtures";
 import { storyHome } from "@/app/app/_components/projects/project-home-fixtures";
 import { ProjectLanding } from "./project-landing";
+import { pageHref } from "@/lib/page-href";
 
 const BASE = "/api/construction/projects/projects";
-const PATH = `/app/projects/${KUMARI.id}`;
+const PATH = pageHref("/app/projects/[id]", { id: KUMARI.id });
 
 function serve(home: ProjectHome = storyHome()) {
   return () =>

@@ -24,7 +24,6 @@ import {
   DocumentFiles,
 } from "@/app/app/_components/procurement/documents/document-activity";
 import { quantityText } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/purchase-request-format";
-import { purchaseRequestsPath } from "@/app/app/projects/[id]/materials/_components/purchase-request-actions";
 import { ScrollTable } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/scroll-table";
 import { formatMobile } from "@repo/auth/construction/react";
 import {
@@ -36,13 +35,13 @@ import { gstStateName } from "@/src/shared-kernel/gst-states";
 
 import { PurchaseOrderActions } from "@/app/app/projects/[id]/materials/purchase-orders/_components/purchase-order-actions";
 import {
-  purchaseOrdersPath,
   RECEIPT_LABELS,
   ReceiptBadge,
   StageBadge,
   STAGE_LABELS,
 } from "@/app/app/projects/[id]/materials/purchase-orders/_components/purchase-order-format";
 import { FactValueSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
+import { pageHref } from "@/lib/page-href";
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -97,7 +96,9 @@ export function PurchaseOrderDetailPage({
     <div className="w-full max-w-5xl space-y-6">
       <div className="space-y-3">
         <Link
-          href={purchaseOrdersPath(projectId)}
+          href={pageHref("/app/projects/[id]/materials/purchase-orders", {
+            id: projectId,
+          })}
           className="text-muted-foreground inline-flex items-center gap-1 text-sm hover:underline"
         >
           <ArrowLeft aria-hidden="true" className="size-4" />
@@ -117,7 +118,11 @@ export function PurchaseOrderDetailPage({
             variant="buttons"
             onError={setError}
             onDeleted={() => {
-              router.push(purchaseOrdersPath(projectId));
+              router.push(
+                pageHref("/app/projects/[id]/materials/purchase-orders", {
+                  id: projectId,
+                }),
+              );
             }}
           />
         </div>
@@ -134,9 +139,9 @@ export function PurchaseOrderDetailPage({
             "—"
           ) : (
             <Link
-              href={purchaseRequestsPath(
-                projectId,
-                `/${po.purchaseRequest.id}`,
+              href={pageHref(
+                "/app/projects/[id]/materials/purchase-requests/[prId]",
+                { id: projectId, prId: po.purchaseRequest.id },
               )}
               className="text-primary hover:underline"
             >
@@ -387,7 +392,10 @@ export function PurchaseOrderDetailPage({
                 className="flex justify-between gap-2 px-3 py-2 text-sm"
               >
                 <Link
-                  href={`/app/projects/${encodeURIComponent(projectId)}/materials/goods-received/${grn.id}`}
+                  href={pageHref(
+                    "/app/projects/[id]/materials/goods-received/[grnId]",
+                    { id: projectId, grnId: grn.id },
+                  )}
                   className="font-medium hover:underline"
                 >
                   {grn.number}

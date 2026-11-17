@@ -42,6 +42,7 @@ import {
   localToday,
 } from "./inventory-format";
 import { StockRegisterTableSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
+import type { AppHref } from "@/lib/page-href";
 
 function monthStart(today: string): string {
   return `${today.slice(0, 8)}01`;
@@ -141,7 +142,7 @@ export function StockRegisterPage({
 }: {
   location: StockLocation;
   /** Current Inventory; a Project's by default. */
-  backHref?: string;
+  backHref?: AppHref;
   today?: string;
 }) {
   const can = useInventoryCan(location);
@@ -155,7 +156,7 @@ export function StockRegisterPage({
     <div className="w-full space-y-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-1">
-          {back !== "" && (
+          {back != null && (
             <Link
               href={back}
               className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm"

@@ -23,7 +23,6 @@ import { localToday } from "@/app/app/_components/payments/payment-format";
 import { fieldForCode } from "@/lib/server-errors";
 import { canInFinance, financeAccessQuery } from "@/src/queries/finance-access";
 import {
-  otherExpensesPath,
   useOtherExpenseCommand,
   type OtherExpense,
 } from "@/src/queries/finance-other-expenses";
@@ -38,6 +37,7 @@ import {
   type OtherExpenseFormValues,
 } from "./other-expense-form-schema";
 import { MODE_LABELS } from "./other-expense-parts";
+import { pageHref } from "@/lib/page-href";
 
 function referenceLabel(mode: ExpenseMode): string {
   if (mode === "cheque") return "Cheque number";
@@ -107,7 +107,12 @@ export function OtherExpenseForm({
             return;
           }
         }
-        router.push(otherExpensesPath(projectId, `/${result.id}`));
+        router.push(
+          pageHref("/app/projects/[id]/payments/other-expenses/[expenseId]", {
+            id: projectId,
+            expenseId: result.id,
+          }),
+        );
       } catch (error) {
         const { field, message } = fieldForCode(error, EXPENSE_FIELD_BY_CODE);
         form.setError(field ?? "root", { message });
@@ -304,10 +309,16 @@ export function OtherExpenseForm({
               </Button>
             )}
             <Link
-              href={otherExpensesPath(
-                projectId,
-                expense == null ? "" : `/${expense.id}`,
-              )}
+              href={
+                expense == null
+                  ? pageHref("/app/projects/[id]/payments/other-expenses", {
+                      id: projectId,
+                    })
+                  : pageHref(
+                      "/app/projects/[id]/payments/other-expenses/[expenseId]",
+                      { id: projectId, expenseId: expense.id },
+                    )
+              }
               className={buttonVariants({ variant: "outline" })}
             >
               Cancel
@@ -315,7 +326,10 @@ export function OtherExpenseForm({
           </>
         ) : (
           <Link
-            href={otherExpensesPath(projectId, `/${saved.id}`)}
+            href={pageHref(
+              "/app/projects/[id]/payments/other-expenses/[expenseId]",
+              { id: projectId, expenseId: saved.id },
+            )}
             className={buttonVariants()}
           >
             Open {saved.number}

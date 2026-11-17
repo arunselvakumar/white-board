@@ -39,6 +39,7 @@ import {
 } from "@/app/app/projects/_components/project-flash";
 import { HideModulesDialog } from "@/app/app/projects/_components/project-home-dialogs";
 import { projectPath } from "@/app/app/projects/_components/projects-home";
+import { pageHref } from "@/lib/page-href";
 import {
   ProjectStatusBadge,
   projectDates,
@@ -232,7 +233,7 @@ function ProjectShellHeader({ id }: { id: string }) {
         </div>
         <div className="flex items-center gap-2">
           <Link
-            href={`${projectPath(id)}/edit`}
+            href={pageHref("/app/projects/[id]/edit", { id })}
             className={buttonVariants({ variant: "outline" })}
           >
             <Pencil aria-hidden="true" />

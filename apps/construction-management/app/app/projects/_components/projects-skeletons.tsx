@@ -12,6 +12,7 @@ import {
 } from "@repo/ui/components/skeleton-kit";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
+import { pageHref } from "@/lib/page-href";
 
 import { KINDS } from "./project-amenities";
 
@@ -52,7 +53,7 @@ export function ProjectsHomeSkeleton() {
           title="Projects"
           meta="Every site your Company builds: labour, attendance and payments are kept per Project."
           actions={
-            <Link href={`${PROJECTS_PATH}/new`} className={buttonVariants()}>
+            <Link href="/app/projects/new" className={buttonVariants()}>
               <Plus aria-hidden="true" />
               New Project
             </Link>
@@ -135,7 +136,7 @@ export function ProjectShellHeaderSkeleton({ id }: { id: string }) {
         </div>
         <div className="flex items-center gap-2">
           <Link
-            href={`${PROJECTS_PATH}/${encodeURIComponent(id)}/edit`}
+            href={pageHref("/app/projects/[id]/edit", { id })}
             className={buttonVariants({ variant: "outline" })}
           >
             <Pencil aria-hidden="true" />

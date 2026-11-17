@@ -213,7 +213,7 @@ export function StoreDetailPage({ storeId }: { storeId: string }) {
                 hrefFor={(transferId) =>
                   centralStoreHref.transfer(store.id, transferId)
                 }
-                newHref={`${centralStoreHref.transfer(store.id)}/new`}
+                newHref={centralStoreHref.newTransfer(store.id)}
               />
             </Suspense>
           </TabsContent>

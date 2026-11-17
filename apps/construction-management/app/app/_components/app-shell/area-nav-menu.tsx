@@ -20,11 +20,12 @@ import { isAppNavActive, type AppNavHref } from "@/lib/app-nav";
 
 import { APP_NAV_ICONS } from "./app-nav-icons";
 import { SUBMENU_BUTTON_CLASS, SUBMENU_CLASS, SubmenuRow } from "./submenu-row";
+import type { AppHref } from "@/lib/page-href";
 
 export type AreaNavGroup = {
   /** Shown above the group; an area with one group can leave it out. */
   label?: string;
-  sections: readonly { href: string; label: string; icon: LucideIcon }[];
+  sections: readonly { href: AppHref; label: string; icon: LucideIcon }[];
 };
 
 /**
@@ -48,7 +49,7 @@ export function AreaNavMenu({
 }: {
   href: AppNavHref;
   /** Where the area link goes when not `href` (Human Resources without Staff). */
-  linkHref?: string;
+  linkHref?: AppHref;
   label: string;
   groups: readonly AreaNavGroup[];
   /** The submenu entry the page belongs to, if any. */

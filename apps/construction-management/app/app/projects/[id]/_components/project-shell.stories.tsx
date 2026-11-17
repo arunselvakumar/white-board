@@ -17,9 +17,10 @@ import {
 } from "@/app/app/projects/_components/project-flash";
 import { storyHome } from "@/app/app/_components/projects/project-home-fixtures";
 import { ProjectShell } from "./project-shell";
+import { pageHref } from "@/lib/page-href";
 
 const BASE = "/api/construction/projects/projects";
-const PATH = `/app/projects/${KUMARI.id}`;
+const PATH = pageHref("/app/projects/[id]", { id: KUMARI.id });
 
 let api: ReturnType<typeof mockApi>;
 

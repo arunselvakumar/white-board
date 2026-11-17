@@ -28,14 +28,12 @@ import {
   type AccountStatement,
 } from "@/src/queries/finance-petty-cash";
 
-import {
-  Amount,
-  pettyCashPath,
-} from "@/app/app/projects/[id]/payments/petty-cash/_components/petty-cash-parts";
+import { Amount } from "@/app/app/projects/[id]/payments/petty-cash/_components/petty-cash-parts";
 import {
   STATEMENT_COLUMNS,
   StatementLinesSkeleton,
 } from "@/app/app/projects/[id]/payments/petty-cash/_components/petty-cash-skeletons";
+import { pageHref } from "@/lib/page-href";
 
 type Entry = AccountStatement["entries"][number];
 
@@ -216,8 +214,9 @@ export function AccountStatementView({
       <SiteRecordHeader
         back={{
           label: "Petty Cash",
-          href: pettyCashPath(
-            projectId,
+          href: pageHref(
+            "/app/projects/[id]/payments/petty-cash",
+            { id: projectId },
             `?account=${encodeURIComponent(accountId)}`,
           ),
         }}

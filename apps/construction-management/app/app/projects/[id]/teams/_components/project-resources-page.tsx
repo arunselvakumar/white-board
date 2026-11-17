@@ -36,6 +36,7 @@ import {
 } from "./resource-sections";
 import { SiteEngineersSection } from "./site-engineers-section";
 import { TeamRow } from "./team-row";
+import type { AppHref } from "@/lib/page-href";
 
 type Line = ProjectResources["teamMembers"][number];
 
@@ -74,7 +75,7 @@ function ResourceLine({
   href,
 }: {
   line: Line | ProjectResources["contractors"][number];
-  href: string | null;
+  href: AppHref | null;
 }) {
   const owner = "isOwner" in line && line.isOwner;
   return (

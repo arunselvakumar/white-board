@@ -46,7 +46,6 @@ import { accountOptionsQuery } from "@/src/queries/finance-accounts";
 import { paymentCategoryOptionsQuery } from "@/src/queries/finance-lookups";
 import {
   NO_EXPENSE_FILTERS,
-  otherExpensesPath,
   otherExpensesQuery,
   useBulkDecideOtherExpenses,
   type OtherExpense,
@@ -63,6 +62,7 @@ import {
   OTHER_EXPENSE_COLUMNS,
   OtherExpenseRowsSkeleton,
 } from "./other-expenses-skeletons";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 const ALL = "all";
 
@@ -130,7 +130,11 @@ export function OtherExpensesList({ projectId }: { projectId: string }) {
       setCursor(null);
     });
   };
-  const newHref = can("create") ? otherExpensesPath(projectId, "/new") : null;
+  const newHref = can("create")
+    ? pageHref("/app/projects/[id]/payments/other-expenses/new", {
+        id: projectId,
+      })
+    : null;
 
   return (
     <div className="w-full min-w-0 space-y-4">
@@ -264,7 +268,7 @@ function ExpenseRows({
   bulk: boolean;
   canApprove: boolean;
   canReject: boolean;
-  newHref: string | null;
+  newHref: AppHref | null;
   onPage: (cursor: OtherExpenseCursor) => void;
 }) {
   const { data } = useSuspenseQuery(
@@ -432,7 +436,10 @@ function ExpenseRows({
                 {bulk && <TableCell>{check(expense)}</TableCell>}
                 <TableCell>
                   <Link
-                    href={otherExpensesPath(projectId, `/${expense.id}`)}
+                    href={pageHref(
+                      "/app/projects/[id]/payments/other-expenses/[expenseId]",
+                      { id: projectId, expenseId: expense.id },
+                    )}
                     className="font-medium hover:underline"
                   >
                     {expense.number}
@@ -473,7 +480,10 @@ function ExpenseRows({
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <Link
-                    href={otherExpensesPath(projectId, `/${expense.id}`)}
+                    href={pageHref(
+                      "/app/projects/[id]/payments/other-expenses/[expenseId]",
+                      { id: projectId, expenseId: expense.id },
+                    )}
                     className="block truncate font-medium hover:underline"
                   >
                     {expense.number}

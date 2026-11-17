@@ -29,6 +29,7 @@ import {
   STOCK_REGISTER_COLUMNS,
   STOCK_REGISTER_LABELS,
 } from "@/src/procurement/domain/stock-register";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 /*
  * Procurement and inventory while they load (ADR-0047). List pages keep
@@ -163,7 +164,7 @@ export function DocumentDetailSkeleton({
   className = "w-full max-w-4xl space-y-6",
   children,
 }: {
-  back: { label: string; href: string };
+  back: { label: string; href: AppHref };
   header?: "link" | "page";
   label: string;
   facts: string[];
@@ -333,7 +334,9 @@ export function PurchaseRequestDetailSkeleton({
     <DocumentDetailSkeleton
       back={{
         label: "Purchase Requests",
-        href: `/app/projects/${encodeURIComponent(projectId)}/materials/purchase-requests`,
+        href: pageHref("/app/projects/[id]/materials/purchase-requests", {
+          id: projectId,
+        }),
       }}
       label="Loading Purchase Request"
       facts={[
@@ -487,7 +490,9 @@ export function PurchaseOrderDetailSkeleton({
       className="w-full max-w-5xl space-y-6"
       back={{
         label: "Purchase Orders",
-        href: `/app/projects/${encodeURIComponent(projectId)}/materials/purchase-orders`,
+        href: pageHref("/app/projects/[id]/materials/purchase-orders", {
+          id: projectId,
+        }),
       }}
       label="Loading Purchase Order"
       facts={[
@@ -561,7 +566,7 @@ export function GoodsReceiptRowsSkeleton() {
 }
 
 const goodsReceivedHref = (projectId: string) =>
-  `/app/projects/${encodeURIComponent(projectId)}/materials/goods-received`;
+  pageHref("/app/projects/[id]/materials/goods-received", { id: projectId });
 
 /** A Goods Receipt's page: facts, then the materials received. */
 export function GoodsReceiptDetailSkeleton({
@@ -616,7 +621,13 @@ export function GoodsReceiptFormSkeleton({
       ? { label: "Goods Received", href: goodsReceivedHref(projectId) }
       : {
           label: "Goods Receipt",
-          href: `${goodsReceivedHref(projectId)}/${encodeURIComponent(receiptId)}`,
+          href: pageHref(
+            "/app/projects/[id]/materials/goods-received/[grnId]",
+            {
+              id: projectId,
+              grnId: receiptId,
+            },
+          ),
         };
   return (
     <div className="w-full max-w-4xl space-y-6">
@@ -669,7 +680,7 @@ export function TransferRowsSkeleton() {
 }
 
 /** A Material Transfer's page: number and status, facts, its materials. */
-export function TransferDetailSkeleton({ backHref }: { backHref: string }) {
+export function TransferDetailSkeleton({ backHref }: { backHref: AppHref }) {
   return (
     <div className="w-full max-w-4xl space-y-6">
       <div className="space-y-2">
@@ -955,7 +966,7 @@ export function StoreDetailSkeleton() {
 export function MaterialRequestDetailSkeleton({
   back,
 }: {
-  back: { label: string; href: string };
+  back: { label: string; href: AppHref };
 }) {
   return (
     <DocumentDetailSkeleton
@@ -1041,7 +1052,7 @@ export function StockRegisterTableSkeleton() {
 }
 
 /** The Stock Register page while the viewer's rights load. */
-export function StockRegisterSkeleton({ backHref }: { backHref: string }) {
+export function StockRegisterSkeleton({ backHref }: { backHref: AppHref }) {
   return (
     <div className="w-full space-y-4">
       <div className="space-y-1">
@@ -1214,7 +1225,9 @@ export function MaterialRequestFormSkeleton({
       <ProcurementFormSkeleton
         back={{
           label: "Material Requests",
-          href: `/app/projects/${encodeURIComponent(projectId)}/materials/material-requests`,
+          href: pageHref("/app/projects/[id]/materials/material-requests", {
+            id: projectId,
+          }),
         }}
         title={title}
         label="Loading Material Request"

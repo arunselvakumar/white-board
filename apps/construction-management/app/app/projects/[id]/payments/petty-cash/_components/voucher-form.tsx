@@ -48,7 +48,8 @@ import {
 } from "@/src/queries/finance-petty-cash";
 import { QueryHttpError } from "@/src/queries/http";
 
-import { VOUCHER_TYPE_LABELS, pettyCashPath } from "./petty-cash-parts";
+import { VOUCHER_TYPE_LABELS } from "./petty-cash-parts";
+import { pageHref } from "@/lib/page-href";
 
 const THIS_PROJECT = "__this__";
 const NO_PROJECT = "__none__";
@@ -278,7 +279,12 @@ export function VoucherForm({
             });
       // A file that does not go up can be added again on the voucher.
       if (voucher == null) await uploads.uploadAll(saved.id, input.files);
-      router.push(pettyCashPath(projectId, `/${saved.id}`));
+      router.push(
+        pageHref("/app/projects/[id]/payments/petty-cash/[voucherId]", {
+          id: projectId,
+          voucherId: saved.id,
+        }),
+      );
     } catch (caught) {
       if (caught instanceof QueryHttpError) {
         const field = FIELD_OF_CODE[caught.code];
@@ -596,8 +602,13 @@ export function VoucherForm({
           onClick={() => {
             router.push(
               voucher == null
-                ? pettyCashPath(projectId)
-                : pettyCashPath(projectId, `/${voucher.id}`),
+                ? pageHref("/app/projects/[id]/payments/petty-cash", {
+                    id: projectId,
+                  })
+                : pageHref(
+                    "/app/projects/[id]/payments/petty-cash/[voucherId]",
+                    { id: projectId, voucherId: voucher.id },
+                  ),
             );
           }}
         >

@@ -1,3 +1,5 @@
+import { type AppHref, pageHref } from "@/lib/page-href";
+
 /**
  * Screen paths of the tracking records (M8, ADR CM-0019) under a Project:
  * `/app/projects/<id>/tasks/<taskId>`, `…/issues/<issueId>`,
@@ -22,8 +24,21 @@ export function trackingRecordPath(
   projectId: string,
   type: TrackingRecordType,
   id: string,
-): string {
-  return `/app/projects/${encodeURIComponent(projectId)}/${SEGMENTS[type]}/${encodeURIComponent(id)}`;
+): AppHref {
+  if (type === "task")
+    return pageHref("/app/projects/[id]/tasks/[taskId]", {
+      id: projectId,
+      taskId: id,
+    });
+  if (type === "issue")
+    return pageHref("/app/projects/[id]/issues/[issueId]", {
+      id: projectId,
+      issueId: id,
+    });
+  return pageHref("/app/projects/[id]/inspections/[inspectionId]", {
+    id: projectId,
+    inspectionId: id,
+  });
 }
 
 /** "Open Task" / "Open Issue" / "Open Inspection Request". */

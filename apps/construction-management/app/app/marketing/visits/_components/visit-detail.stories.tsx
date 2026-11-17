@@ -23,6 +23,7 @@ import {
   visit,
   type VisitApiOptions,
 } from "./visit-fixtures";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockVisitApi>;
 
@@ -71,7 +72,10 @@ export const CompletedWithNotesAndHistory: Story = {
     ).toBeVisible();
     await expect(
       canvas.getByRole("link", { name: "Sri Balaji Infra Projects" }),
-    ).toHaveAttribute("href", `/app/marketing/companies/${BALAJI_ID}`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/marketing/companies/[id]", { id: BALAJI_ID }),
+    );
     await expect(canvas.getByText("10 Nov 2026, 1:30 pm")).toBeVisible();
 
     const details = within(canvas.getByRole("region", { name: "Details" }));

@@ -46,11 +46,7 @@ import {
 } from "@/src/queries/project-testing-reports";
 
 import { TestingItemDialog } from "./testing-item-dialog";
-
-/** `/app/projects/<id>/testing-reports/<itemId>`. */
-export function testingItemHref(projectId: string, itemId: string): string {
-  return `/app/projects/${encodeURIComponent(projectId)}/testing-reports/${encodeURIComponent(itemId)}`;
-}
+import { pageHref } from "@/lib/page-href";
 
 export function reportCountLabel(count: number): string {
   return count === 1 ? "1 report" : `${String(count)} reports`;
@@ -74,7 +70,10 @@ function ItemRow({
   return (
     <li className="flex items-center gap-1 pr-2">
       <Link
-        href={testingItemHref(projectId, item.id)}
+        href={pageHref("/app/projects/[id]/testing-reports/[itemId]", {
+          id: projectId,
+          itemId: item.id,
+        })}
         className="hover:bg-muted/50 focus-visible:ring-ring flex min-w-0 flex-1 items-center gap-3 rounded-lg px-3 py-3 outline-none focus-visible:ring-2 sm:px-4"
       >
         <span className="bg-muted text-muted-foreground flex size-9 shrink-0 items-center justify-center rounded-lg">

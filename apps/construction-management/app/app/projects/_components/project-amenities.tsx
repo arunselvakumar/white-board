@@ -23,6 +23,7 @@ import {
   useSaveProjectDevelopments,
   type ProjectDevelopments,
 } from "@/src/queries/developments";
+import type { AppHref } from "@/lib/page-href";
 
 type Kind = "amenities" | "commonDevelopments";
 
@@ -30,7 +31,7 @@ export const KINDS: readonly {
   kind: Kind;
   title: string;
   singular: string;
-  href: string;
+  href: AppHref;
   icon: LucideIcon;
   hint: string;
 }[] = [

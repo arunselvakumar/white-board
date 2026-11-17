@@ -29,14 +29,14 @@ import { RadioCard } from "@/app/app/_components/site-work/equipment/radio-card"
 import { QueryHttpError } from "@/src/queries/http";
 import {
   bookingFormOptionsQuery,
-  bookingsPath,
   useCreateBooking,
   useUpdateBooking,
   type BookingDetail,
   type BookingFormOptions,
 } from "@/src/queries/sales-bookings";
 import { SALES_LIMITS } from "@/src/sales/domain/sales-terms";
-import { withUploadFailed } from "@/app/app/projects/[id]/_components/sales/documents/upload-failed";
+import { uploadFailedQuery } from "@/app/app/projects/[id]/_components/sales/documents/upload-failed";
+import { pageHref } from "@/lib/page-href";
 
 const limit = (max: number) =>
   z
@@ -261,7 +261,13 @@ export function BookingForm({
             { role: "booking_form", files: input.bookingForm },
             { role: "photo", files: input.photos },
           ]);
-      router.push(withUploadFailed(bookingsPath(projectId, saved.id), failed));
+      router.push(
+        pageHref(
+          "/app/projects/[id]/bookings/list/[bookingId]",
+          { id: projectId, bookingId: saved.id },
+          uploadFailedQuery(failed),
+        ),
+      );
     } catch (caught) {
       setLeaving(false);
       if (caught instanceof QueryHttpError) {

@@ -20,6 +20,7 @@ import {
   NewGoodsReceiptScreen,
 } from "./goods-receipt-form";
 import { pickMaterial } from "@/app/app/_components/procurement/material-options-fixtures";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockApi>;
 
@@ -84,7 +85,10 @@ export const AgainstPurchaseOrder: Story = {
     );
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
-        `/app/projects/${PROJECT_ID}/materials/goods-received/${GRN_ID}`,
+        pageHref("/app/projects/[id]/materials/goods-received/[grnId]", {
+          id: PROJECT_ID,
+          grnId: GRN_ID,
+        }),
       ),
     );
     await expect(sent(GOODS_RECEIPTS_API)).toMatchObject({

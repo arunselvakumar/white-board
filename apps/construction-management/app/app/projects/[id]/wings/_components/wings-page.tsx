@@ -32,12 +32,12 @@ import {
   StructureEmpty,
   saveProblem,
   wingPath,
-  wingsPath,
 } from "@/app/app/projects/[id]/_components/structure/structure-parts";
 import {
   structureTotals,
   wingRowTotals,
 } from "@/app/app/projects/[id]/_components/structure/wing-editor-state";
+import { pageHref } from "@/lib/page-href";
 
 /** What a Team Member may do here; reading is a given on this screen. */
 export type WingsAccess = {
@@ -96,7 +96,12 @@ function WingRow({
           {access.update ? (
             <DropdownMenuItem
               onClick={() => {
-                router.push(`${href}/edit`);
+                router.push(
+                  pageHref("/app/projects/[id]/wings/[wingId]/edit", {
+                    id: projectId,
+                    wingId: wing.id,
+                  }),
+                );
               }}
             >
               Edit Wing
@@ -146,11 +151,14 @@ export function WingsPage({
     null,
   );
   const [deleteError, setDeleteError] = useState<string | undefined>();
-  const base = wingsPath(projectId);
 
   const addWing = (phaseId?: string) => (
     <Link
-      href={phaseId == null ? `${base}/new` : `${base}/new?phase=${phaseId}`}
+      href={pageHref(
+        "/app/projects/[id]/wings/new",
+        { id: projectId },
+        phaseId == null ? "" : `?phase=${phaseId}`,
+      )}
       className={buttonVariants({
         variant: phaseId == null ? "default" : "outline",
         size: phaseId == null ? "default" : "sm",

@@ -26,11 +26,6 @@ export const OTHER_EXPENSES_API = `${FINANCE_API}/other-expenses`;
 /** Every Other Expense query key starts here (CM-704). */
 export const OTHER_EXPENSES_KEY = [...FINANCE_KEY, "other-expenses"] as const;
 
-/** The screens' paths under the Project's Payments module. */
-export function otherExpensesPath(projectId: string, rest = ""): string {
-  return `/app/projects/${encodeURIComponent(projectId)}/payments/other-expenses${rest}`;
-}
-
 export type OtherExpenseFilters = {
   from: string;
   to: string;

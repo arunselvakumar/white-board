@@ -15,6 +15,7 @@ import type { LocationRef } from "@/src/shared-kernel/location-ref";
 
 import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import { LocationLabel, LocationPicker, UNITS_SHOWN } from "./location-picker";
+import { pageHref } from "@/lib/page-href";
 
 const PROJECT = "0199c0de-0000-7000-8000-00000000a001";
 const PATH = `/api/construction/projects/projects/${PROJECT}/location-options`;
@@ -430,7 +431,10 @@ export const EmptyWingsProject: Story = {
     ).toBeVisible();
     await expect(
       canvas.getByRole("link", { name: "Open Wings" }),
-    ).toHaveAttribute("href", `/app/projects/${PROJECT}/wings`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/projects/[id]/wings", { id: PROJECT }),
+    );
     await expect(canvas.queryByLabelText("Location Type")).toBeNull();
   },
 };
@@ -440,7 +444,10 @@ export const EmptyLocationsProject: Story = {
   play: async ({ canvas }) => {
     await expect(
       await canvas.findByRole("link", { name: "Open Locations" }),
-    ).toHaveAttribute("href", `/app/projects/${PROJECT}/locations`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/projects/[id]/locations", { id: PROJECT }),
+    );
   },
 };
 

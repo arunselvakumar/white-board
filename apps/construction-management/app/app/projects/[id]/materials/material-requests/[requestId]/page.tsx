@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { MaterialRequestDetail } from "@/app/app/_components/procurement/material-requests/material-request-detail";
 import { MaterialRequestDetailSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
 import { QuerySuspense } from "@/components/query-suspense";
+import { pageHref } from "@/lib/page-href";
 
 export const metadata: Metadata = { title: "Material Request" };
 
@@ -19,7 +20,9 @@ export default async function MaterialRequestRoute({
         <MaterialRequestDetailSkeleton
           back={{
             label: "Material Requests",
-            href: `/app/projects/${encodeURIComponent(id)}/materials/material-requests`,
+            href: pageHref("/app/projects/[id]/materials/material-requests", {
+              id,
+            }),
           }}
         />
       }

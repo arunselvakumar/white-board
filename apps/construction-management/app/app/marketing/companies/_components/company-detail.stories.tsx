@@ -23,6 +23,7 @@ import {
   wonCompany,
   type CompanyApiOptions,
 } from "./company-fixtures";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockCompanyApi>;
 
@@ -111,11 +112,17 @@ export const WonWithProjects: Story = {
     if (plant == null || shed == null) throw new Error("two Projects");
     await expect(
       within(plant).getByRole("link", { name: "Kappalur PEB Plant" }),
-    ).toHaveAttribute("href", `/app/projects/${STEEL_PLANT_PROJECT_ID}`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/projects/[id]", { id: STEEL_PLANT_PROJECT_ID }),
+    );
     await expect(within(plant).getByText("Ongoing")).toBeVisible();
     await expect(
       within(shed).getByRole("link", { name: "Thirumangalam Warehouse Shed" }),
-    ).toHaveAttribute("href", `/app/projects/${STEEL_SHED_PROJECT_ID}`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/projects/[id]", { id: STEEL_SHED_PROJECT_ID }),
+    );
     await expect(within(shed).getByText("Completed")).toBeVisible();
     await expect(
       card.getByRole("link", { name: "Create Project" }),
@@ -239,7 +246,10 @@ export const HistoryWithVisits: Story = {
     for (const item of [note, photo, visit])
       await expect(
         within(item).getByRole("link", { name: "MV-0003" }),
-      ).toHaveAttribute("href", `/app/marketing/visits/${BALAJI_VISIT_ID}`);
+      ).toHaveAttribute(
+        "href",
+        pageHref("/app/marketing/visits/[id]", { id: BALAJI_VISIT_ID }),
+      );
   },
 };
 
@@ -542,7 +552,10 @@ export const HistoryWithFollowUps: Story = {
     await expect(done).toHaveTextContent("Check the drawings reached them");
     await expect(
       within(done).getByRole("link", { name: "MV-0003" }),
-    ).toHaveAttribute("href", `/app/marketing/visits/${BALAJI_VISIT_ID}`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/marketing/visits/[id]", { id: BALAJI_VISIT_ID }),
+    );
     await expect(cancelled).toHaveTextContent(
       "Email due 4 Nov · Priya Raman — Cancelled",
     );

@@ -2,22 +2,24 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 
+import { type AppHref, pageHref } from "@/lib/page-href";
 import { worksheetQuery } from "@/src/queries/worksheets";
 
 import { WorksheetForm } from "./worksheet-form";
-import { worksheetsPath } from "@/app/app/projects/[id]/_components/site-work/worksheets/worksheet-format";
 
 /** The saved sheet's page; photos that did not upload ride along to warn about. */
 function savedPath(
   projectId: string,
   id: string,
   failed: readonly string[] = [],
-): string {
-  const query =
+): AppHref {
+  return pageHref(
+    "/app/projects/[id]/worksheets/[worksheetId]",
+    { id: projectId, worksheetId: id },
     failed.length === 0
       ? ""
-      : `?uploadFailed=${encodeURIComponent(failed.slice(0, 20).join("\n"))}`;
-  return worksheetsPath(projectId, `/${id}${query}`);
+      : `?uploadFailed=${encodeURIComponent(failed.slice(0, 20).join("\n"))}`,
+  );
 }
 
 /** Add Worksheet, or Duplicate the `fromId` sheet (ADR CM-0016 §9). */

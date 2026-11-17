@@ -52,6 +52,7 @@ import {
 
 import { TransferStatusBadge, useTransferSideCan } from "./transfer-parts";
 import { TransferRowsSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
+import type { AppHref } from "@/lib/page-href";
 
 const DIRECTIONS = [
   { value: "all", label: "All", icon: LayoutGrid },
@@ -75,7 +76,7 @@ function TransferItem({
 }: {
   location: StockLocation;
   transfer: MaterialTransfer;
-  href: string;
+  href: AppHref;
 }) {
   const outgoing = sameStockLocation(transfer.from, location);
   const other = outgoing ? transfer.to : transfer.from;
@@ -123,8 +124,8 @@ function Transfers({
 }: {
   location: StockLocation;
   filters: TransferFilters;
-  hrefFor: (id: string) => string;
-  newHref: string;
+  hrefFor: (id: string) => AppHref;
+  newHref: AppHref;
   onPage: (cursor: TransferFilters["cursor"]) => void;
   className?: string;
 }) {
@@ -209,7 +210,7 @@ function NewTransferLink({
   href,
 }: {
   location: StockLocation;
-  href: string;
+  href: AppHref;
 }) {
   const can = useTransferSideCan(location);
   if (!can("create")) return null;
@@ -233,9 +234,9 @@ export function TransfersList({
 }: {
   location: StockLocation;
   /** A transfer's detail page. */
-  hrefFor: (id: string) => string;
+  hrefFor: (id: string) => AppHref;
   /** The new transfer page, from this location. */
-  newHref: string;
+  newHref: AppHref;
 }) {
   const [filters, setFilters] = useState<TransferFilters>({});
   // Filter and page changes keep the old rows on screen, dimmed (ADR-0047).

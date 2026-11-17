@@ -22,9 +22,9 @@ import {
 } from "@repo/ui/components/dropdown-menu";
 
 import { ReasonDialog } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/reason-dialog";
+import { pageHref } from "@/lib/page-href";
 import { fieldForCode } from "@/lib/server-errors";
 import {
-  equipmentSheetsPath,
   useEquipmentSheetCommand,
   type EquipmentSheet,
 } from "@/src/queries/equipment-sheets";
@@ -50,7 +50,6 @@ export function EquipmentSheetActions({
   const [rejecting, setRejecting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const { actions } = sheet;
-  const path = (rest: string) => equipmentSheetsPath(sheet.projectId, rest);
 
   const items: {
     key: string;
@@ -64,7 +63,12 @@ export function EquipmentSheetActions({
       key: "view",
       label: "View",
       run: () => {
-        router.push(path(`/${sheet.id}`));
+        router.push(
+          pageHref("/app/projects/[id]/equipment/usage-sheets/[sheetId]", {
+            id: sheet.projectId,
+            sheetId: sheet.id,
+          }),
+        );
       },
     });
   if (actions.approve)
@@ -97,7 +101,12 @@ export function EquipmentSheetActions({
       key: "edit",
       label: "Edit",
       run: () => {
-        router.push(path(`/${sheet.id}/edit`));
+        router.push(
+          pageHref("/app/projects/[id]/equipment/usage-sheets/[sheetId]/edit", {
+            id: sheet.projectId,
+            sheetId: sheet.id,
+          }),
+        );
       },
     });
   if (actions.duplicate)
@@ -105,7 +114,13 @@ export function EquipmentSheetActions({
       key: "duplicate",
       label: "Duplicate",
       run: () => {
-        router.push(path(`/new?from=${encodeURIComponent(sheet.id)}`));
+        router.push(
+          pageHref(
+            "/app/projects/[id]/equipment/usage-sheets/new",
+            { id: sheet.projectId },
+            `?from=${encodeURIComponent(sheet.id)}`,
+          ),
+        );
       },
     });
   if (actions.delete)

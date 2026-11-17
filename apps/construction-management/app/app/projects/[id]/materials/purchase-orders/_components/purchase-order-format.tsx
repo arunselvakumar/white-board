@@ -41,7 +41,3 @@ export function ReceiptBadge({ po }: { po: PurchaseOrder }) {
   if (po.orderedAt == null) return null;
   return <Badge variant="outline">{RECEIPT_LABELS[po.receiptStatus]}</Badge>;
 }
-
-export function purchaseOrdersPath(projectId: string, rest = ""): string {
-  return `/app/projects/${encodeURIComponent(projectId)}/materials/purchase-orders${rest}`;
-}

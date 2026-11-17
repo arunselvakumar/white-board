@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { inquiryModulePath } from "@/app/app/_components/sales/inquiries/inquiry-tabs";
+import { pageHref } from "@/lib/page-href";
 
 /** The Inquiries module opens on its list. */
 export default async function InquiriesPage({
@@ -9,5 +9,5 @@ export default async function InquiriesPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  redirect(inquiryModulePath(id, "list"));
+  redirect(pageHref("/app/projects/[id]/inquiries/list", { id }));
 }

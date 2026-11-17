@@ -27,6 +27,7 @@ import { SiteRecordHeader } from "@/app/app/projects/[id]/_components/site-work/
 import { formatDateTime } from "@/app/app/projects/[id]/_components/tracking/issues/issue-parts";
 import { QueryHttpError } from "@/src/queries/http";
 import { canInSales, salesAccessQuery } from "@/src/queries/sales-access";
+import { pageHref } from "@/lib/page-href";
 import { bookingsPath } from "@/src/queries/sales-bookings";
 import {
   inquiriesPath,
@@ -145,7 +146,10 @@ export function InquiryDetail({
             )}
             {inquiry.actions.edit && (
               <Link
-                href={`${inquiriesPath(projectId, inquiry.id)}/edit`}
+                href={pageHref(
+                  "/app/projects/[id]/inquiries/list/[inquiryId]/edit",
+                  { id: projectId, inquiryId: inquiry.id },
+                )}
                 className={buttonVariants({ size: "sm", variant: "outline" })}
               >
                 <Pencil aria-hidden="true" />

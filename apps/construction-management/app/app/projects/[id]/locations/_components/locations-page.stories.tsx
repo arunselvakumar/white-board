@@ -11,6 +11,7 @@ import {
   TOLL_PLAZA,
   mockStructureApi,
 } from "@/app/app/projects/[id]/_components/structure/structure-fixtures";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockStructureApi>;
 
@@ -43,7 +44,9 @@ const meta = {
   parameters: {
     nextjs: {
       navigation: {
-        pathname: `/app/projects/${KUMARI_HEIGHTS.id}/locations`,
+        pathname: pageHref("/app/projects/[id]/locations", {
+          id: KUMARI_HEIGHTS.id,
+        }),
       },
     },
   },

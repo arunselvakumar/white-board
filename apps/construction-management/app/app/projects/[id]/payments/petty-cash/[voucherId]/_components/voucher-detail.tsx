@@ -35,9 +35,9 @@ import {
   Amount,
   VOUCHER_TYPE_LABELS,
   VoucherStatusBadge,
-  pettyCashPath,
   voucherSign,
 } from "@/app/app/projects/[id]/payments/petty-cash/_components/petty-cash-parts";
+import { pageHref } from "@/lib/page-href";
 
 function Fact({
   label,
@@ -86,7 +86,12 @@ export function VoucherDetail({
   return (
     <div className="flex w-full min-w-0 flex-col gap-6">
       <SiteRecordHeader
-        back={{ label: "Petty Cash", href: pettyCashPath(projectId) }}
+        back={{
+          label: "Petty Cash",
+          href: pageHref("/app/projects/[id]/payments/petty-cash", {
+            id: projectId,
+          }),
+        }}
         title={voucher.number}
         size="detail"
         meta={`${VOUCHER_TYPE_LABELS[voucher.voucherType]} · ${formatDate(voucher.voucherDate)} · ${voucher.accountName}`}
@@ -94,7 +99,10 @@ export function VoucherDetail({
           <>
             {actions.edit ? (
               <Link
-                href={pettyCashPath(projectId, `/${voucher.id}/edit`)}
+                href={pageHref(
+                  "/app/projects/[id]/payments/petty-cash/[voucherId]/edit",
+                  { id: projectId, voucherId: voucher.id },
+                )}
                 className={buttonVariants({ variant: "outline", size: "sm" })}
               >
                 <Pencil aria-hidden="true" />
@@ -268,7 +276,11 @@ export function VoucherDetail({
                 remove.mutate(voucher.id, {
                   onSuccess: () => {
                     setDeleting(false);
-                    router.push(pettyCashPath(projectId));
+                    router.push(
+                      pageHref("/app/projects/[id]/payments/petty-cash", {
+                        id: projectId,
+                      }),
+                    );
                   },
                 });
               }}

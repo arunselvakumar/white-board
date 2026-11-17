@@ -1,6 +1,5 @@
 import { formatMobile } from "@repo/auth/construction/mobile";
 
-import { projectBasePath } from "@/lib/project-nav";
 import { formatTime } from "@/app/app/_components/check-in/check-in-entry-parts";
 import type {
   CheckInAction,
@@ -8,6 +7,7 @@ import type {
   CheckInKind,
   CheckInPerson,
 } from "@/src/queries/check-ins";
+import { type AppHref, type HrefSuffix, pageHref } from "@/lib/page-href";
 
 export { formatTime };
 
@@ -40,27 +40,39 @@ export const ACTION_LABELS: Record<CheckInAction, string> = {
   check_out: "Check Out",
 };
 
-export function checkInBasePath(projectId: string): string {
-  return `${projectBasePath(projectId)}/attendance/check-in`;
+export function checkInBasePath(projectId: string): AppHref {
+  return pageHref("/app/projects/[id]/attendance/check-in", { id: projectId });
 }
 
 /** The find screen, with the typed search when there is one. */
-export function checkInFindPath(projectId: string, q = ""): string {
-  const query = q.trim() === "" ? "" : `?${new URLSearchParams({ q })}`;
-  return `${checkInBasePath(projectId)}${query}`;
+export function checkInFindPath(projectId: string, q = ""): AppHref {
+  const query: HrefSuffix =
+    q.trim() === "" ? "" : `?${new URLSearchParams({ q })}`;
+  return pageHref(
+    "/app/projects/[id]/attendance/check-in",
+    { id: projectId },
+    query,
+  );
 }
 
 export function checkInCapturePath(
   projectId: string,
   person: { kind: CheckInKind; id: string },
   q = "",
-): string {
-  const query = q.trim() === "" ? "" : `?${new URLSearchParams({ q })}`;
-  return `${checkInBasePath(projectId)}/${KIND_SEGMENTS[person.kind]}/${encodeURIComponent(person.id)}${query}`;
+): AppHref {
+  const query: HrefSuffix =
+    q.trim() === "" ? "" : `?${new URLSearchParams({ q })}`;
+  return pageHref(
+    "/app/projects/[id]/attendance/check-in/[kind]/[personId]",
+    { id: projectId, kind: KIND_SEGMENTS[person.kind], personId: person.id },
+    query,
+  );
 }
 
-export function checkInLogPath(projectId: string): string {
-  return `${checkInBasePath(projectId)}/log`;
+export function checkInLogPath(projectId: string): AppHref {
+  return pageHref("/app/projects/[id]/attendance/check-in/log", {
+    id: projectId,
+  });
 }
 
 const formats = new Map<string, Intl.DateTimeFormat>();

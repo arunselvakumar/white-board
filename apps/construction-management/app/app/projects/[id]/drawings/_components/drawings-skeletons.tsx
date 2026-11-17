@@ -3,6 +3,7 @@ import Link from "next/link";
 import { buttonVariants } from "@repo/ui/components/button";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import { SkeletonGroup, SkeletonText } from "@repo/ui/components/skeleton-kit";
+import { pageHref } from "@/lib/page-href";
 
 /* Drawings while they load (ADR-0047). */
 
@@ -43,7 +44,7 @@ export function DrawingAlbumSkeleton({ projectId }: { projectId: string }) {
     <div className="w-full max-w-5xl space-y-5 p-6">
       <div className="space-y-2">
         <Link
-          href={`/app/projects/${encodeURIComponent(projectId)}/drawings`}
+          href={pageHref("/app/projects/[id]/drawings", { id: projectId })}
           className={buttonVariants({
             variant: "ghost",
             size: "sm",

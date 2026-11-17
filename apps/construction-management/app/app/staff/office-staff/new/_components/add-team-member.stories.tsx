@@ -13,6 +13,7 @@ import { mockFetch, type MockRoute } from "@/.storybook/mock-fetch";
 import { signInAs } from "@/.storybook/mocks/auth";
 import { AddTeamMember } from "./add-team-member";
 import { teamMember } from "@/app/app/staff/office-staff/_components/team-member-fixtures";
+import { pageHref } from "@/lib/page-href";
 
 const MEMBERS_URL = "/api/construction/organization/team-members";
 const SRI_HEIGHTS = "0199a000-0000-7000-8000-000000000001";
@@ -193,7 +194,10 @@ export const InviteByEmail: Story = {
     ).not.toBeInTheDocument();
     await expect(
       canvas.getByRole("link", { name: "Open in Role Management" }),
-    ).toHaveAttribute("href", `/app/staff/roles/${SITE_ENGINEER_ROLE.id}`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/staff/roles/[id]", { id: SITE_ENGINEER_ROLE.id }),
+    );
     await userEvent.click(
       canvas.getByRole("button", { name: "Add and invite" }),
     );

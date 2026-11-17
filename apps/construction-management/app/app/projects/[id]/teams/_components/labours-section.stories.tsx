@@ -18,6 +18,7 @@ import {
   labourPage,
   manyLabours,
 } from "./staffing-fixtures";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockFetch>;
 
@@ -126,7 +127,10 @@ export const AFew: Story = {
     const rows = within(section.getByRole("list", { name: "Labours" }));
     await expect(
       rows.getByRole("link", { name: ARUMUGAM.name }),
-    ).toHaveAttribute("href", `/app/staff/labours/${ARUMUGAM.id}`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/staff/labours/[id]", { id: ARUMUGAM.id }),
+    );
     await expect(
       rows.getByText("L-001 · Mason · Since 2 Mar 2026"),
     ).toBeVisible();

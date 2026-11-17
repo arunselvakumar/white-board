@@ -10,6 +10,7 @@ import {
   type EquipmentApiOptions,
 } from "./equipment-fixtures";
 import { EquipmentRegister, ProjectEquipmentList } from "./equipment-list";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockEquipmentApi>;
 
@@ -65,7 +66,7 @@ export const Register: Story = {
     await expect(items[2]).toHaveTextContent("In maintenance");
     await expect(list.getByRole("link", { name: /JCB 3DX/ })).toHaveAttribute(
       "href",
-      `/app/masters/equipments/${JCB_ID}`,
+      pageHref("/app/masters/equipments/[id]", { id: JCB_ID }),
     );
     await expect(
       canvas.getAllByRole("link", { name: "Add Equipment" })[0],
@@ -133,7 +134,9 @@ export const ProjectTab: Story = {
   parameters: {
     nextjs: {
       navigation: {
-        pathname: `/app/projects/${TOWER.id}/equipment/register`,
+        pathname: pageHref("/app/projects/[id]/equipment/register", {
+          id: TOWER.id,
+        }),
       },
     },
   },
@@ -150,13 +153,16 @@ export const ProjectTab: Story = {
     await expect(listCalls()[0]?.path).toContain(`projectId=${TOWER.id}`);
     await expect(list.getByRole("link", { name: /JCB 3DX/ })).toHaveAttribute(
       "href",
-      `/app/projects/${TOWER.id}/equipment/register/${JCB_ID}`,
+      pageHref("/app/projects/[id]/equipment/register/[equipmentId]", {
+        id: TOWER.id,
+        equipmentId: JCB_ID,
+      }),
     );
     await expect(
       canvas.getByRole("link", { name: "Add equipment" }),
     ).toHaveAttribute(
       "href",
-      `/app/projects/${TOWER.id}/equipment/register/new`,
+      pageHref("/app/projects/[id]/equipment/register/new", { id: TOWER.id }),
     );
   },
 };

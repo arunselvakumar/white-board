@@ -9,6 +9,7 @@ import {
 } from "@/app/app/_components/procurement/stores/central-store-fixtures";
 
 import { MaterialRequestDetail } from "./material-request-detail";
+import { pageHref } from "@/lib/page-href";
 
 const meta = {
   title: "Procurement/Central Store/Material Request",
@@ -47,7 +48,10 @@ export const StoreSideClose: Story = {
       await canvas.findByRole("link", { name: "Create Delivery Note" }),
     ).toHaveAttribute(
       "href",
-      `/app/workspace/central-store/material-requests/${IDS.request}/delivery-notes/new`,
+      pageHref(
+        "/app/workspace/central-store/material-requests/[id]/delivery-notes/new",
+        { id: IDS.request },
+      ),
     );
     // Edit and Delete belong to the Project side.
     await expect(canvas.queryByRole("link", { name: "Edit" })).toBeNull();

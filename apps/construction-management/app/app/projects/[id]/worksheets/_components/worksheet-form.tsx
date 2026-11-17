@@ -62,6 +62,7 @@ import {
   type Worksheet,
   type WorksheetFormOptions,
 } from "@/src/queries/worksheets";
+import type { AppHref } from "@/lib/page-href";
 import { addDays } from "@/src/shared-kernel/calendar-date";
 import type { LocationRef } from "@/src/shared-kernel/location-ref";
 import { WORK_SHIFT_LABELS, WORK_SHIFTS } from "@/src/site-work/domain/shift";
@@ -389,7 +390,7 @@ export function WorksheetForm({
    * Where to go after saving; `failed` names photos that did not upload,
    * for the detail page to warn about.
    */
-  hrefFor: (id: string, failed?: readonly string[]) => string;
+  hrefFor: (id: string, failed?: readonly string[]) => AppHref;
 }) {
   const router = useRouter();
   const { data: options } = useSuspenseQuery(

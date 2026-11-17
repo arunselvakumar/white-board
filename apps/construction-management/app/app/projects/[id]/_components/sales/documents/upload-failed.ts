@@ -6,14 +6,16 @@
 const PARAM = "uploadFailed";
 const MAX_NAMES = 20;
 
-/** `path` with the names of the files that did not upload, if any. */
-export function withUploadFailed(
-  path: string,
+/**
+ * The query that names the files that did not upload, or "" when every file
+ * did; the third argument of `pageHref` for the saved record's page.
+ */
+export function uploadFailedQuery(
   failed: readonly string[],
-): string {
-  if (failed.length === 0) return path;
+): "" | `?${typeof PARAM}=${string}` {
+  if (failed.length === 0) return "";
   const names = encodeURIComponent(failed.slice(0, MAX_NAMES).join("\n"));
-  return `${path}?${PARAM}=${names}`;
+  return `?${PARAM}=${names}`;
 }
 
 /** The names a page's `uploadFailed` search parameter carries. */

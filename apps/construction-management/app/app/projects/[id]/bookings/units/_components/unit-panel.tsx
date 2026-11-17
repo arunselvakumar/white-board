@@ -20,6 +20,7 @@ import {
   UnitStatusBadge,
 } from "@/app/app/projects/[id]/_components/sales/units/sales-status";
 import { UnitDetailsDialog, UnitUnavailableDialog } from "./unit-dialogs";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -35,9 +36,13 @@ export function newBookingHref(
   projectId: string,
   unitId: string,
   status: "on_hold" | "booked",
-): string {
+): AppHref {
   const params = new URLSearchParams({ unitId, status });
-  return `${bookingsPath(projectId)}/new?${params}`;
+  return pageHref(
+    "/app/projects/[id]/bookings/list/new",
+    { id: projectId },
+    `?${params}`,
+  );
 }
 
 /**

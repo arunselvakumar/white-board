@@ -10,6 +10,7 @@ import type {
 
 import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import { CompanyDashboard } from "./company-dashboard";
+import { pageHref } from "@/lib/page-href";
 
 const PATH = "/api/construction/reporting/company-dashboard";
 
@@ -168,7 +169,10 @@ export const Desktop: Story = {
         name: "Kumari Heights, Tower A",
         hidden: true,
       }),
-    ).toHaveAttribute("href", `/app/projects/${TOWER}/dashboard`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/projects/[id]/dashboard", { id: TOWER }),
+    );
     const rows = table.getAllByRole("row", { hidden: true });
     const tower = rows[1];
     if (tower == null) throw new Error("No row for Tower A");
@@ -300,7 +304,7 @@ export const Phone: Story = {
     await expect(tower).toBeVisible();
     await expect(tower).toHaveAttribute(
       "href",
-      `/app/projects/${TOWER}/dashboard`,
+      pageHref("/app/projects/[id]/dashboard", { id: TOWER }),
     );
     await expect(tower).toHaveTextContent("₹12,45,000");
     await expect(cards.getAllByRole("link")).toHaveLength(3);

@@ -37,6 +37,7 @@ import {
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
+import type { AppHref } from "@/lib/page-href";
 
 export const byName = new Intl.Collator("en", {
   sensitivity: "base",
@@ -111,7 +112,7 @@ export function MasterRow({
 }: {
   name: string;
   /** The row's own page, linked from its name. */
-  href?: string;
+  href?: AppHref;
   details?: ReactNode;
   isSeed?: boolean;
   disabled: boolean;

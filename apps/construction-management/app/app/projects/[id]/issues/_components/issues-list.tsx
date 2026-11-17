@@ -78,6 +78,7 @@ import {
   IssueFiltersSkeleton,
   IssueRowsSkeleton,
 } from "@/app/app/projects/[id]/_components/tracking/tracking-skeletons";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 type Filters = {
   statuses: IssueStatus[];
@@ -163,7 +164,9 @@ export function IssuesList({
       setCursor(null);
     });
   };
-  const newHref = `${issuesPath(projectId)}/new`;
+  const newHref = pageHref("/app/projects/[id]/issues/new", {
+    id: projectId,
+  });
   return (
     <div className="flex w-full max-w-6xl min-w-0 flex-col gap-4 p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -374,7 +377,7 @@ function IssueRows({
   cursor: IssueFilters["cursor"];
   canSolve: boolean;
   canVerify: boolean;
-  newHref: string | null;
+  newHref: AppHref | null;
   onPage: (cursor: IssueFilters["cursor"]) => void;
   className?: string;
 }) {

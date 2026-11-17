@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { materialsPath } from "@/app/app/_components/procurement/materials-hub/materials-tabs";
+import { pageHref } from "@/lib/page-href";
 
 /** The Materials module opens on Current Inventory. */
 export default async function MaterialsPage({
@@ -9,5 +9,5 @@ export default async function MaterialsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  redirect(materialsPath(id, "inventory"));
+  redirect(pageHref("/app/projects/[id]/materials/inventory", { id }));
 }

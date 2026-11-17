@@ -50,12 +50,9 @@ import {
   StackedBar,
   type BarItem,
 } from "./tracking-charts";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
-function projectPath(projectId: string, segment: string): string {
-  return `/app/projects/${encodeURIComponent(projectId)}/${segment}`;
-}
-
-function SectionLink({ href, children }: { href: string; children: string }) {
+function SectionLink({ href, children }: { href: AppHref; children: string }) {
   return (
     <Link
       href={href}
@@ -493,7 +490,9 @@ export function IssueSection({
       id="dashboard-issue_snag"
       title="Issue & Snag"
       aside={
-        <SectionLink href={projectPath(projectId, "issues")}>
+        <SectionLink
+          href={pageHref("/app/projects/[id]/issues", { id: projectId })}
+        >
           Issues & Snags
         </SectionLink>
       }
@@ -583,7 +582,9 @@ export function InspectionSection({
       id="dashboard-inspection_request"
       title="Inspection Request"
       aside={
-        <SectionLink href={projectPath(projectId, "inspections")}>
+        <SectionLink
+          href={pageHref("/app/projects/[id]/inspections", { id: projectId })}
+        >
           Inspection Requests
         </SectionLink>
       }
@@ -623,7 +624,7 @@ function TrackingTile({
   duration,
   label,
   icon,
-  segment,
+  href,
   pick,
   caption,
   needs,
@@ -632,7 +633,8 @@ function TrackingTile({
   duration: Duration;
   label: string;
   icon: typeof SearchCheck;
-  segment: string;
+  /** The list the tile opens. */
+  href: AppHref;
   pick: (kpis: {
     pendingIssues: number | null;
     pendingInspections: number | null;
@@ -667,11 +669,7 @@ function TrackingTile({
             caption
           )
         }
-        render={
-          count == null ? undefined : (
-            <Link href={projectPath(projectId, segment)} />
-          )
-        }
+        render={count == null ? undefined : <Link href={href} />}
       />
     </li>
   );
@@ -691,7 +689,7 @@ export function PendingIssuesTile({
       duration={duration}
       label="Pending Issues & Snags"
       icon={TriangleAlert}
-      segment="issues"
+      href={pageHref("/app/projects/[id]/issues", { id: projectId })}
       pick={(kpis) => kpis.pendingIssues}
       caption="Open, delayed included"
       needs="Needs Issues & Snags read"
@@ -713,7 +711,7 @@ export function PendingInspectionsTile({
       duration={duration}
       label="Pending Inspections"
       icon={SearchCheck}
-      segment="inspections"
+      href={pageHref("/app/projects/[id]/inspections", { id: projectId })}
       pick={(kpis) => kpis.pendingInspections}
       caption="Pending for approval"
       needs="Needs Inspection Request read"

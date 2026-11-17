@@ -29,7 +29,6 @@ import {
   SheetTitle,
 } from "@repo/ui/components/sheet";
 
-import { wingsPath } from "@/app/app/projects/[id]/_components/structure/structure-parts";
 import { isWingType } from "@/src/projects/domain/wing-generator";
 import { unitChartQuery, type UnitChart } from "@/src/queries/sales-units";
 import {
@@ -42,6 +41,7 @@ import { SalesUnitsChart } from "./sales-units-chart";
 import { UNIT_STATUS_DOTS } from "@/app/app/projects/[id]/_components/sales/units/sales-status";
 import { UnitPanel } from "./unit-panel";
 import { UnitPanelSkeleton } from "./units-skeletons";
+import { pageHref } from "@/lib/page-href";
 
 function Counts({
   label,
@@ -118,7 +118,7 @@ export function UnitsTab({ projectId }: { projectId: string }) {
           </EmptyHeader>
           <EmptyContent>
             <Link
-              href={wingsPath(projectId)}
+              href={pageHref("/app/projects/[id]/wings", { id: projectId })}
               className={buttonVariants({ size: "sm" })}
             >
               Open Wings

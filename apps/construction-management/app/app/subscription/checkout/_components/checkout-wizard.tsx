@@ -41,7 +41,10 @@ import {
 } from "@repo/ui/components/table";
 import { Textarea } from "@repo/ui/components/textarea";
 
-import { PageHeader } from "@/app/app/_components/app-shell/page-header";
+import {
+  PageHeader,
+  type PageHeaderBack,
+} from "@/app/app/_components/app-shell/page-header";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { loadRazorpayCheckout } from "@/lib/razorpay-checkout";
@@ -91,7 +94,10 @@ const TITLES: Record<CheckoutKind, string> = {
   add_ons: "Buy add-ons",
 };
 
-const BACK = { label: "Your Subscription", href: "/app/subscription" };
+const BACK: PageHeaderBack = {
+  label: "Your Subscription",
+  href: "/app/subscription",
+};
 
 const STATE_ITEMS = GST_STATES.map((state) => ({
   value: state.code,

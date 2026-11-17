@@ -18,6 +18,7 @@ import {
   type FollowUpApiOptions,
 } from "./follow-up-fixtures";
 import { FollowUpsList } from "./follow-ups-list";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockFollowUpApi>;
 
@@ -80,7 +81,10 @@ export const Mine: Story = {
     await expect(within(overdue).getByText("Visit")).toBeVisible();
     await expect(
       within(overdue).getByRole("link", { name: "Kaveri Cement Works" }),
-    ).toHaveAttribute("href", `/app/marketing/companies/${KAVERI_ID}`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/marketing/companies/[id]", { id: KAVERI_ID }),
+    );
     await expect(overdue).toHaveTextContent(
       "Due 9 Nov 2026 · Arun Selva Kumar · from MV-0002",
     );

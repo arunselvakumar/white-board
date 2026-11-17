@@ -18,6 +18,7 @@ import type { StockLocation } from "@/src/procurement/domain/stock-location";
 
 import { apiJson } from "./http";
 import { PROCUREMENT_API, PROCUREMENT_KEY } from "./procurement-access";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 export type MaterialTransfer =
   ConstructionProcurementMaterialTransferResponseModel;
@@ -166,7 +167,9 @@ export function useDeleteTransfer(id: string) {
 }
 
 /** Pages of a Project's transfers. */
-export function projectTransfersPath(projectId: string, id?: string): string {
-  const base = `/app/projects/${encodeURIComponent(projectId)}/materials/transfers`;
+export function projectTransfersPath(projectId: string, id?: string): AppHref {
+  const base = pageHref("/app/projects/[id]/materials/transfers", {
+    id: projectId,
+  });
   return id == null ? base : `${base}/${encodeURIComponent(id)}`;
 }

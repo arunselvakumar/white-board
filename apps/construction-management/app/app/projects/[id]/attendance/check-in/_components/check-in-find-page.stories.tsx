@@ -18,6 +18,7 @@ import {
   RAVI,
   peopleResponse,
 } from "./check-in-fixtures";
+import { pageHref } from "@/lib/page-href";
 
 const PEOPLE = `${CHECK_INS_PATH}/people?projectId=${PROJECT_ID}`;
 const HOME = `/api/construction/projects/projects/${PROJECT_ID}/home`;
@@ -124,7 +125,9 @@ export const Loaded: Story = {
     );
     await expect(canvas.getByRole("link", { name: "Log" })).toHaveAttribute(
       "href",
-      `/app/projects/${PROJECT_ID}/attendance/check-in/log`,
+      pageHref("/app/projects/[id]/attendance/check-in/log", {
+        id: PROJECT_ID,
+      }),
     );
   },
 };
@@ -263,7 +266,10 @@ export const GroupWithNobody: Story = {
     await expect(vendors.getByText(/No Vendors on this Project/)).toBeVisible();
     await expect(
       await vendors.findByRole("link", { name: "Add them on Teams" }),
-    ).toHaveAttribute("href", `/app/projects/${PROJECT_ID}/teams`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/projects/[id]/teams", { id: PROJECT_ID }),
+    );
   },
 };
 

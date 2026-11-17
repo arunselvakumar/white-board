@@ -11,6 +11,7 @@ import {
   PROJECT_ID,
 } from "@/app/app/_components/finance/parties/party-fixtures";
 import { PartyPaymentDetail } from "./party-payment-detail";
+import { pageHref } from "@/lib/page-href";
 
 const PAYMENT = `/api/construction/finance/party-payments/${CONTRACTOR_PAYMENT.id}`;
 
@@ -106,7 +107,10 @@ export const CancelPayment: Story = {
     );
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
-        `/app/projects/${PROJECT_ID}/payments/contractors/${CONTRACTOR_ID}`,
+        pageHref("/app/projects/[id]/payments/contractors/[partyId]", {
+          id: PROJECT_ID,
+          partyId: CONTRACTOR_ID,
+        }),
       ),
     );
     await expect(posted(`${PAYMENT}/cancel`)).toEqual([

@@ -46,6 +46,7 @@ import {
   TRACKING_DASHBOARD_PATH,
   trackingDashboard,
 } from "./tracking-dashboard-fixtures";
+import { pageHref } from "@/lib/page-href";
 
 const PROJECT_PATH = `/api/construction/projects/projects/${KUMARI.id}`;
 const SUMMARY_PATH = `${PROJECT_PATH}/dashboard/summary`;
@@ -413,7 +414,10 @@ export const PaymentsSection: Story = {
     await expect(modules.getByText("₹14,00,000.00")).toBeVisible();
     await expect(
       payments.getByRole("link", { name: "Payments" }),
-    ).toHaveAttribute("href", `/app/projects/${KUMARI.id}/payments`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/projects/[id]/payments", { id: KUMARI.id }),
+    );
     // The month table for screen readers sits in a hidden wrapper.
     const table = payments.getByRole("table", {
       name: "Payment in and out per month",
@@ -520,7 +524,10 @@ export const TrackingSections: Story = {
       delayed.getByRole("link", { name: /Footings and plinth beams/ }),
     ).toHaveAttribute(
       "href",
-      `/app/projects/${KUMARI.id}/tasks/${FOOTINGS_TASK_ID}`,
+      pageHref("/app/projects/[id]/tasks/[taskId]", {
+        id: KUMARI.id,
+        taskId: FOOTINGS_TASK_ID,
+      }),
     );
 
     const issues = within(canvas.getByRole("region", { name: "Issue & Snag" }));
@@ -681,7 +688,10 @@ export const SiteWorkSections: Story = {
     await expect(contractors.getByText("A removed Contractor")).toBeVisible();
     await expect(
       daily.getByRole("link", { name: "Worksheets" }),
-    ).toHaveAttribute("href", `/app/projects/${KUMARI.id}/worksheets`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/projects/[id]/worksheets", { id: KUMARI.id }),
+    );
 
     const equipment = within(
       canvas.getByRole("region", { name: "Equipment Usage" }),

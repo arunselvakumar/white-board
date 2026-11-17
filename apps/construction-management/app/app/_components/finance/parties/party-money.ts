@@ -1,5 +1,5 @@
 import { formatPaise, paiseToRupees } from "@/components/money/money-input";
-import { paymentsPath } from "@/app/app/_components/finance/payments-hub/payments-tabs";
+import { type AppHref, type HrefSuffix, pageHref } from "@/lib/page-href";
 import type { Invoice, PartyType } from "@/src/queries/finance-parties";
 
 /**
@@ -11,7 +11,6 @@ export type PartyScreen = {
   type: PartyType;
   label: string;
   plural: string;
-  segment: "contractors" | "suppliers" | "other-parties";
   /** Contractors deduct TDS. */
   tds: boolean;
 };
@@ -21,41 +20,111 @@ export const PARTY_SCREENS: Record<PartyType, PartyScreen> = {
     type: "contractor",
     label: "Contractor",
     plural: "Contractors",
-    segment: "contractors",
     tds: true,
   },
   supplier: {
     type: "supplier",
     label: "Supplier",
     plural: "Suppliers",
-    segment: "suppliers",
     tds: false,
   },
   other_party: {
     type: "other_party",
     label: "Other Party",
     plural: "Other Parties",
-    segment: "other-parties",
     tds: false,
   },
 };
 
 /** Where a party type's screens live under the Project's Payments. */
-export function partyPaths(projectId: string, partyType: PartyType) {
-  const base = paymentsPath(projectId, PARTY_SCREENS[partyType].segment);
-  return {
-    tab: base,
-    party: (partyId: string) => `${base}/${encodeURIComponent(partyId)}`,
-    pay: (partyId?: string | null, direction?: "in" | "out") => {
-      const query = new URLSearchParams();
-      if (partyId != null) query.set("partyId", partyId);
-      if (direction === "in") query.set("direction", "in");
-      const text = query.toString();
-      return `${base}/pay${text === "" ? "" : `?${text}`}`;
-    },
-    payment: (paymentId: string) =>
-      `${base}/payments/${encodeURIComponent(paymentId)}`,
-  };
+export type PartyPaths = {
+  tab: AppHref;
+  party: (partyId: string) => AppHref;
+  pay: (partyId?: string | null, direction?: "in" | "out") => AppHref;
+  payment: (paymentId: string) => AppHref;
+};
+
+/** The Pay screen's query: the party picked, and Receive instead of Pay. */
+function payQuery(
+  partyId: string | null | undefined,
+  direction: "in" | "out" | undefined,
+): HrefSuffix {
+  const query = new URLSearchParams();
+  if (partyId != null) query.set("partyId", partyId);
+  if (direction === "in") query.set("direction", "in");
+  const text = query.toString();
+  return text === "" ? "" : `?${text}`;
+}
+
+/**
+ * Each party type's pages, named by their folders (ADR CM-0045): the three
+ * types have the same pages under their own Payments tab.
+ */
+const PARTY_PATHS: Record<PartyType, (id: string) => PartyPaths> = {
+  contractor: (id) => ({
+    tab: pageHref("/app/projects/[id]/payments/contractors", { id }),
+    party: (partyId) =>
+      pageHref("/app/projects/[id]/payments/contractors/[partyId]", {
+        id,
+        partyId,
+      }),
+    pay: (partyId, direction) =>
+      pageHref(
+        "/app/projects/[id]/payments/contractors/pay",
+        { id },
+        payQuery(partyId, direction),
+      ),
+    payment: (paymentId) =>
+      pageHref("/app/projects/[id]/payments/contractors/payments/[paymentId]", {
+        id,
+        paymentId,
+      }),
+  }),
+  supplier: (id) => ({
+    tab: pageHref("/app/projects/[id]/payments/suppliers", { id }),
+    party: (partyId) =>
+      pageHref("/app/projects/[id]/payments/suppliers/[partyId]", {
+        id,
+        partyId,
+      }),
+    pay: (partyId, direction) =>
+      pageHref(
+        "/app/projects/[id]/payments/suppliers/pay",
+        { id },
+        payQuery(partyId, direction),
+      ),
+    payment: (paymentId) =>
+      pageHref("/app/projects/[id]/payments/suppliers/payments/[paymentId]", {
+        id,
+        paymentId,
+      }),
+  }),
+  other_party: (id) => ({
+    tab: pageHref("/app/projects/[id]/payments/other-parties", { id }),
+    party: (partyId) =>
+      pageHref("/app/projects/[id]/payments/other-parties/[partyId]", {
+        id,
+        partyId,
+      }),
+    pay: (partyId, direction) =>
+      pageHref(
+        "/app/projects/[id]/payments/other-parties/pay",
+        { id },
+        payQuery(partyId, direction),
+      ),
+    payment: (paymentId) =>
+      pageHref(
+        "/app/projects/[id]/payments/other-parties/payments/[paymentId]",
+        { id, paymentId },
+      ),
+  }),
+};
+
+export function partyPaths(
+  projectId: string,
+  partyType: PartyType,
+): PartyPaths {
+  return PARTY_PATHS[partyType](projectId);
 }
 
 export function money(paise: number | null | undefined): string {

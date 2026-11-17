@@ -13,6 +13,7 @@ import {
   type HindranceApiOptions,
 } from "@/app/app/projects/[id]/hindrances/_components/hindrance-fixtures";
 import { HindranceDetail } from "./hindrance-detail";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockHindranceApi>;
 
@@ -40,7 +41,10 @@ const meta = {
   parameters: {
     nextjs: {
       navigation: {
-        pathname: `/app/projects/${HINDRANCE_PROJECT_ID}/hindrances/${OPEN_ID}`,
+        pathname: pageHref("/app/projects/[id]/hindrances/[hindranceId]", {
+          id: HINDRANCE_PROJECT_ID,
+          hindranceId: OPEN_ID,
+        }),
       },
     },
   },

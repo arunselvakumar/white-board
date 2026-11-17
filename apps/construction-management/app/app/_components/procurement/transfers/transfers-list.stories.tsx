@@ -9,6 +9,7 @@ import {
   type TransferApiOptions,
 } from "./transfer-fixtures";
 import { TransfersList } from "./transfers-list";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockTransferApi>;
 
@@ -28,15 +29,23 @@ function transferApi(options: TransferApiOptions = {}) {
   };
 }
 
-const BASE = `/app/projects/${TOWER.id}/materials/transfers`;
+const BASE = pageHref("/app/projects/[id]/materials/transfers", {
+  id: TOWER.id,
+});
 
 const meta = {
   title: "Procurement/Material Transfers/List",
   component: TransfersList,
   args: {
     location: { kind: "project", id: TOWER.id },
-    hrefFor: (id: string) => `${BASE}/${id}`,
-    newHref: `${BASE}/new`,
+    hrefFor: (id: string) =>
+      pageHref("/app/projects/[id]/materials/transfers/[transferId]", {
+        id: TOWER.id,
+        transferId: id,
+      }),
+    newHref: pageHref("/app/projects/[id]/materials/transfers/new", {
+      id: TOWER.id,
+    }),
   },
   beforeEach: transferApi(),
   parameters: { nextjs: { navigation: { pathname: BASE } } },

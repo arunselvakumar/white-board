@@ -23,6 +23,7 @@ import {
 import { clearProjectFlash, peekProjectFlash } from "./project-flash";
 import { NewProjectScreen } from "./project-form";
 import { ProjectEditScreen } from "../[id]/edit/_components/project-edit-screen";
+import { pageHref } from "@/lib/page-href";
 
 const BASE = "/api/construction/projects/projects";
 const LABELS = `${BASE}/custom-field-labels`;
@@ -205,7 +206,11 @@ export const NewValidatesAndSaves: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Add Project" }));
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
-        `/app/projects/${ANUGRAHA.id}/teams?step=teams`,
+        pageHref(
+          "/app/projects/[id]/teams",
+          { id: ANUGRAHA.id },
+          "?step=teams",
+        ),
       ),
     );
     await expect(posts()[0]?.body).toEqual({
@@ -575,7 +580,11 @@ export const NewUploadsHeldFilesAfterCreate: Story = {
     releaseUploads();
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
-        `/app/projects/${ANUGRAHA.id}/teams?step=teams`,
+        pageHref(
+          "/app/projects/[id]/teams",
+          { id: ANUGRAHA.id },
+          "?step=teams",
+        ),
       ),
     );
     await expect(peekProjectFlash(ANUGRAHA.id)).toBe(
@@ -683,7 +692,7 @@ export const EditSaves: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
-        `/app/projects/${KUMARI.id}`,
+        pageHref("/app/projects/[id]", { id: KUMARI.id }),
       ),
     );
     await expect(posts()[0]?.body).toEqual({
@@ -1125,7 +1134,11 @@ export const NewUploadsPickedLogoAfterCreate: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Add Project" }));
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
-        `/app/projects/${ANUGRAHA.id}/teams?step=teams`,
+        pageHref(
+          "/app/projects/[id]/teams",
+          { id: ANUGRAHA.id },
+          "?step=teams",
+        ),
       ),
     );
     await expect(posts().map((call) => call.path)).toEqual([BASE, LOGO_PATH]);

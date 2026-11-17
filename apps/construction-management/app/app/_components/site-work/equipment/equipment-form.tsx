@@ -77,6 +77,7 @@ import {
 } from "@/src/site-work/domain/equipment";
 
 import { RadioCard } from "./radio-card";
+import type { AppHref, HrefSuffix } from "@/lib/page-href";
 
 const WAREHOUSE = "warehouse";
 const NONE = "none";
@@ -989,8 +990,9 @@ export function EquipmentFormScreen({
 }: {
   equipment?: EquipmentDetail;
   fixedProjectId?: string;
-  backHref: string;
-  hrefFor: (id: string) => string;
+  backHref: AppHref;
+  /** The saved machine's page, with `suffix` (a failed photo upload) on it. */
+  hrefFor: (id: string, suffix: HrefSuffix) => AppHref;
 }) {
   const router = useRouter();
   return (
@@ -998,9 +1000,7 @@ export function EquipmentFormScreen({
       equipment={equipment}
       fixedProjectId={fixedProjectId ?? null}
       onSaved={(saved, { photoFailed }) => {
-        router.push(
-          `${hrefFor(saved.id)}${photoFailed ? "?photoFailed=1" : ""}`,
-        );
+        router.push(hrefFor(saved.id, photoFailed ? "?photoFailed=1" : ""));
       }}
       onCancel={() => {
         router.push(backHref);

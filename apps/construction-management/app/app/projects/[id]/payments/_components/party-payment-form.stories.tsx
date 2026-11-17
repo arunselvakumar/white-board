@@ -19,6 +19,7 @@ import {
   TODAY,
 } from "@/app/app/_components/finance/parties/party-fixtures";
 import { PartyPaymentScreen } from "./party-payment-form";
+import { pageHref } from "@/lib/page-href";
 
 const PAYMENTS = "/api/construction/finance/party-payments";
 const BANK = ACCOUNT_OPTIONS[1];
@@ -97,7 +98,10 @@ export const SupplierPaymentFillsOldestFirst: Story = {
     );
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
-        `/app/projects/${PROJECT_ID}/payments/suppliers/payments/${CONTRACTOR_PAYMENT.id}`,
+        pageHref("/app/projects/[id]/payments/suppliers/payments/[paymentId]", {
+          id: PROJECT_ID,
+          paymentId: CONTRACTOR_PAYMENT.id,
+        }),
       ),
     );
     await expect(recorded()[0]).toMatchObject({

@@ -26,6 +26,7 @@ import {
   MetricFigureSkeleton,
   SectionSkeleton,
 } from "./dashboard-skeletons";
+import { pageHref } from "@/lib/page-href";
 
 const MONTH = new Intl.DateTimeFormat("en-IN", {
   month: "short",
@@ -367,7 +368,7 @@ export function PaymentsSection({
       title="Payments"
       aside={
         <Link
-          href={`/app/projects/${encodeURIComponent(projectId)}/payments`}
+          href={pageHref("/app/projects/[id]/payments", { id: projectId })}
           className="text-primary text-sm font-medium underline-offset-4 hover:underline"
         >
           Payments
@@ -448,7 +449,7 @@ export function PaymentApprovalsTile({
           counted(approvals.settlements, "settlement", "settlements"),
         ].filter((part) => part != null);
   const any = parts.length > 0;
-  const base = `/app/projects/${encodeURIComponent(projectId)}/payments`;
+  const base = pageHref("/app/projects/[id]/payments", { id: projectId });
   return (
     <li className="flex min-w-0">
       <MetricCard
@@ -480,7 +481,9 @@ export function PaymentApprovalsTile({
             <Link
               href={
                 (approvals.transactions ?? 0) > 0
-                  ? `${base}/transactions`
+                  ? pageHref("/app/projects/[id]/payments/transactions", {
+                      id: projectId,
+                    })
                   : base
               }
             />

@@ -22,6 +22,7 @@ import {
   materialRequestsQuery,
   type MaterialRequest,
 } from "@/src/queries/material-requests";
+import type { AppHref } from "@/lib/page-href";
 
 type Cursor = { after?: string; before?: string };
 
@@ -31,7 +32,7 @@ function RequestRow({
   showProject,
 }: {
   request: MaterialRequest;
-  href: string;
+  href: AppHref;
   showProject: boolean;
 }) {
   const items = request.items.length;
@@ -73,9 +74,9 @@ export function MaterialRequestsList({
 }: {
   projectId?: string;
   storeId?: string;
-  hrefFor: (request: MaterialRequest) => string;
+  hrefFor: (request: MaterialRequest) => AppHref;
   /** Shown as "Raise request" when the viewer may raise one. */
-  createHref?: string | null;
+  createHref?: AppHref | null;
 }) {
   const [cursor, setCursor] = useState<Cursor>({});
   const { data } = useSuspenseQuery(

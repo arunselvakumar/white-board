@@ -29,14 +29,7 @@ import {
 } from "@/src/queries/purchase-requests";
 
 import { ReasonDialog } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/reason-dialog";
-
-export function purchaseRequestsPath(projectId: string, rest = ""): string {
-  return `/app/projects/${encodeURIComponent(projectId)}/materials/purchase-requests${rest}`;
-}
-
-export function generatePurchaseOrderPath(projectId: string, prId: string) {
-  return `/app/projects/${encodeURIComponent(projectId)}/materials/purchase-orders/new?purchaseRequestId=${encodeURIComponent(prId)}`;
-}
+import { pageHref } from "@/lib/page-href";
 
 /**
  * What can be done with one Purchase Request, from its `actions`: View,
@@ -81,7 +74,12 @@ export function PurchaseRequestActions({
       key: "view",
       label: "View",
       run: () => {
-        router.push(purchaseRequestsPath(pr.projectId, `/${pr.id}`));
+        router.push(
+          pageHref("/app/projects/[id]/materials/purchase-requests/[prId]", {
+            id: pr.projectId,
+            prId: pr.id,
+          }),
+        );
       },
     });
   if (actions.approve)
@@ -107,7 +105,13 @@ export function PurchaseRequestActions({
       label: "Generate PO",
       primary: !actions.approve,
       run: () => {
-        router.push(generatePurchaseOrderPath(pr.projectId, pr.id));
+        router.push(
+          pageHref(
+            "/app/projects/[id]/materials/purchase-orders/new",
+            { id: pr.projectId },
+            `?purchaseRequestId=${pr.id}`,
+          ),
+        );
       },
     });
   if (actions.markOrdered)
@@ -127,7 +131,12 @@ export function PurchaseRequestActions({
       key: "edit",
       label: "Edit",
       run: () => {
-        router.push(purchaseRequestsPath(pr.projectId, `/${pr.id}/edit`));
+        router.push(
+          pageHref(
+            "/app/projects/[id]/materials/purchase-requests/[prId]/edit",
+            { id: pr.projectId, prId: pr.id },
+          ),
+        );
       },
     });
   if (actions.print)

@@ -4,9 +4,10 @@ import type { ReactNode } from "react";
 
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { PageWatermark } from "@repo/ui/components/page-watermark";
+import type { AppHref } from "@/lib/page-href";
 
 export type PageHeaderBack =
-  { label: string; href: string } | { label: string; onClick: () => void };
+  { label: string; href: AppHref } | { label: string; onClick: () => void };
 
 const backClassName =
   "text-muted-foreground h-auto justify-start gap-1.5 p-0 text-left text-sm font-normal whitespace-normal hover:text-foreground";

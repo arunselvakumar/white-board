@@ -30,10 +30,11 @@ import {
   MasterListPageSkeleton,
 } from "@/app/app/_components/masters/masters-skeletons";
 import { SignInBadge } from "./sign-in-badge";
+import type { AppHref } from "@/lib/page-href";
 
 const NEW_PATH = `${SITE_ENGINEERS_PATH}/new`;
 
-function editPath(id: string): string {
+function editPath(id: string): AppHref {
   return `${SITE_ENGINEERS_PATH}/${encodeURIComponent(id)}`;
 }
 

@@ -22,6 +22,7 @@ import type { TrackingPriority } from "@/src/tracking/domain/tracking-documents"
 
 import { apiJson } from "./http";
 import { TRACKING_API, TRACKING_KEY } from "./tracking-access";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 export type Issue = ConstructionTrackingIssueResponse;
 export type IssueDetail = ConstructionTrackingIssueDetailResponse;
@@ -222,7 +223,7 @@ export function useDeleteIssueProgress(id: string) {
 }
 
 /** Pages of a Project's Issues & Snags. */
-export function issuesPath(projectId: string, id?: string): string {
-  const base = `/app/projects/${encodeURIComponent(projectId)}/issues`;
+export function issuesPath(projectId: string, id?: string): AppHref {
+  const base = pageHref("/app/projects/[id]/issues", { id: projectId });
   return id == null ? base : `${base}/${encodeURIComponent(id)}`;
 }

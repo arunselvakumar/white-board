@@ -6,6 +6,7 @@ import { StoryQueryClient } from "@/app/app/_components/masters/masters-story-su
 import { mockFetch } from "@/.storybook/mock-fetch";
 import { PROJECT_OPTIONS, VENDOR_SUMMARIES } from "./vendor-fixtures";
 import { VendorsPage } from "./vendors-page";
+import { pageHref } from "@/lib/page-href";
 
 const VENDORS = "/api/construction/labour/vendors";
 const PROJECTS = "/api/construction/projects/projects/options";
@@ -65,7 +66,9 @@ export const WithVendors: Story = {
       rows.getByRole("link", { name: "Muthu Gang" }),
     ).toHaveAttribute(
       "href",
-      `/app/staff/vendors/${VENDOR_SUMMARIES[0]?.id ?? ""}`,
+      pageHref("/app/staff/vendors/[id]", {
+        id: VENDOR_SUMMARIES[0]?.id ?? "",
+      }),
     );
     await expect(rows.getByText("No rate card")).toBeVisible();
     await expect(rows.getByText("Tower A +1")).toBeVisible();

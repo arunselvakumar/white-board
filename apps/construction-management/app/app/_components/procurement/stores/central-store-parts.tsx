@@ -15,7 +15,6 @@ import {
   useComboboxAnchor,
 } from "@repo/ui/components/combobox";
 
-import { materialsPath } from "@/app/app/_components/procurement/materials-hub/materials-tabs";
 import {
   STOCK_STATE_LABELS,
   type StockState,
@@ -28,41 +27,69 @@ import {
   MATERIAL_REQUEST_STATUS_LABELS,
   type MaterialRequestStatus,
 } from "@/src/queries/material-requests";
+import { pageHref } from "@/lib/page-href";
 
 export { formatQuantity } from "@/src/queries/central-inventory";
 
 export const CENTRAL_STORE_PATH = "/app/workspace/central-store";
 export const CENTRAL_INVENTORY_PATH = "/app/workspace/central-inventory";
 
+// `as const` keeps the two static pages literal, so they stay checked links.
 export const centralStoreHref = {
   stores: CENTRAL_STORE_PATH,
-  newStore: `${CENTRAL_STORE_PATH}/new`,
-  store: (id: string) => `${CENTRAL_STORE_PATH}/${encodeURIComponent(id)}`,
+  newStore: "/app/workspace/central-store/new",
+  store: (id: string) => pageHref("/app/workspace/central-store/[id]", { id }),
   editStore: (id: string) =>
-    `${CENTRAL_STORE_PATH}/${encodeURIComponent(id)}/edit`,
+    pageHref("/app/workspace/central-store/[id]/edit", { id }),
   request: (id: string) =>
-    `${CENTRAL_STORE_PATH}/material-requests/${encodeURIComponent(id)}`,
+    pageHref("/app/workspace/central-store/material-requests/[id]", { id }),
   newNote: (requestId: string) =>
-    `${CENTRAL_STORE_PATH}/material-requests/${encodeURIComponent(requestId)}/delivery-notes/new`,
+    pageHref(
+      "/app/workspace/central-store/material-requests/[id]/delivery-notes/new",
+      { id: requestId },
+    ),
   note: (id: string) =>
-    `${CENTRAL_STORE_PATH}/delivery-notes/${encodeURIComponent(id)}`,
+    pageHref("/app/workspace/central-store/delivery-notes/[id]", { id }),
   editNote: (id: string) =>
-    `${CENTRAL_STORE_PATH}/delivery-notes/${encodeURIComponent(id)}/edit`,
+    pageHref("/app/workspace/central-store/delivery-notes/[id]/edit", { id }),
   register: (storeId: string) =>
-    `${CENTRAL_STORE_PATH}/${encodeURIComponent(storeId)}/register`,
-  transfer: (storeId: string, transferId?: string) =>
-    `${CENTRAL_STORE_PATH}/${encodeURIComponent(storeId)}/transfers${transferId == null ? "" : `/${encodeURIComponent(transferId)}`}`,
-};
+    pageHref("/app/workspace/central-store/[id]/register", { id: storeId }),
+  transfer: (storeId: string, transferId: string) =>
+    pageHref("/app/workspace/central-store/[id]/transfers/[transferId]", {
+      id: storeId,
+      transferId,
+    }),
+  editTransfer: (storeId: string, transferId: string) =>
+    pageHref("/app/workspace/central-store/[id]/transfers/[transferId]/edit", {
+      id: storeId,
+      transferId,
+    }),
+  newTransfer: (storeId: string) =>
+    pageHref("/app/workspace/central-store/[id]/transfers/new", {
+      id: storeId,
+    }),
+} as const;
 
 /** A Project's Material Request pages. */
 export const projectRequestHref = {
-  list: (projectId: string) => materialsPath(projectId, "material-requests"),
+  list: (projectId: string) =>
+    pageHref("/app/projects/[id]/materials/material-requests", {
+      id: projectId,
+    }),
   create: (projectId: string) =>
-    `${materialsPath(projectId, "material-requests")}/new`,
+    pageHref("/app/projects/[id]/materials/material-requests/new", {
+      id: projectId,
+    }),
   detail: (projectId: string, id: string) =>
-    `${materialsPath(projectId, "material-requests")}/${encodeURIComponent(id)}`,
+    pageHref("/app/projects/[id]/materials/material-requests/[requestId]", {
+      id: projectId,
+      requestId: id,
+    }),
   edit: (projectId: string, id: string) =>
-    `${materialsPath(projectId, "material-requests")}/${encodeURIComponent(id)}/edit`,
+    pageHref(
+      "/app/projects/[id]/materials/material-requests/[requestId]/edit",
+      { id: projectId, requestId: id },
+    ),
 };
 
 const REQUEST_VARIANTS: Record<

@@ -1,12 +1,16 @@
 import { describe, expect, it } from "vitest";
 
-import { PROJECT_MODULE_KEYS } from "@/src/projects/domain/project-modules";
+import {
+  PROJECT_MODULE_KEYS,
+  PROJECT_MODULES,
+} from "@/src/projects/domain/project-modules";
 import { PROJECT_NAV_GROUPS } from "@/src/projects/domain/project-nav-groups";
 
 import {
   activeProjectSegment,
   firstProjectModulePath,
   projectIdFromPath,
+  projectModuleHref,
   projectNavGroups,
 } from "./project-nav";
 
@@ -71,6 +75,15 @@ describe("projectNavGroups", () => {
       ["Materials & money", ["Payments"]],
       ["Files", ["Documents"]],
     ]);
+  });
+});
+
+describe("projectModuleHref", () => {
+  it("is the module's segment under the Project, for every module", () => {
+    for (const item of PROJECT_MODULES)
+      expect(projectModuleHref(ID, item.key)).toBe(
+        `/app/projects/${ID}/${item.segment}`,
+      );
   });
 });
 

@@ -7,13 +7,14 @@ import {
   subscriptionQuery,
   type SubscriptionView,
 } from "@/src/queries/subscription";
+import type { AppHref } from "@/lib/page-href";
 
 /** Days left on a paid plan from which the banner reminds the Owner. */
 const ENDING_SOON_DAYS = 7;
 
 type Banner = {
   message: string;
-  action: { label: string; href: string };
+  action: { label: string; href: AppHref };
   tone: string;
 };
 

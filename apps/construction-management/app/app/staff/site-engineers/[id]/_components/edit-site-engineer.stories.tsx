@@ -17,6 +17,7 @@ import {
   siteEngineer,
 } from "@/app/app/staff/site-engineers/_components/site-engineer-fixtures";
 import { EditSiteEngineer } from "./edit-site-engineer";
+import { pageHref } from "@/lib/page-href";
 
 const KARTHIK = siteEngineer();
 const SAVED_AT = "2026-10-08T07:00:00.000Z";
@@ -262,7 +263,9 @@ export const OfficeStaff: Story = {
       }),
     ).toHaveAttribute(
       "href",
-      `/app/staff/office-staff/${OFFICE_STAFF_SIGN_IN.memberId}`,
+      pageHref("/app/staff/office-staff/[id]", {
+        id: OFFICE_STAFF_SIGN_IN.memberId,
+      }),
     );
     await expect(cardTitles(canvas)).toEqual([
       "Details",

@@ -69,6 +69,7 @@ import {
 import { ContactDialog } from "./contact-dialog";
 import { MoveStageDialog } from "./move-stage-dialog";
 import { ReassignDialog } from "./reassign-dialog";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 function Fact({
   label,
@@ -425,7 +426,7 @@ function Contacts({
 }
 
 /** New Project with the client name filled in from the company's name. */
-function newProjectPath(clientName: string): string {
+function newProjectPath(clientName: string): AppHref {
   return `/app/projects/new?clientName=${encodeURIComponent(clientName)}`;
 }
 
@@ -469,7 +470,7 @@ function Projects({
               className="flex min-w-0 items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
             >
               <Link
-                href={`/app/projects/${project.id}`}
+                href={pageHref("/app/projects/[id]", { id: project.id })}
                 className="min-w-0 font-medium break-words underline-offset-4 hover:underline"
               >
                 {project.name}
@@ -717,7 +718,12 @@ export function CompanyDetail({
                       {canUpdate && (
                         <DropdownMenuItem
                           render={
-                            <Link href={`${companyPath(company.id)}/edit`} />
+                            <Link
+                              href={pageHref(
+                                "/app/marketing/companies/[id]/edit",
+                                { id: company.id },
+                              )}
+                            />
                           }
                         >
                           <Pencil aria-hidden="true" />

@@ -58,10 +58,7 @@ import {
   type DateFilterValue,
 } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/date-filter";
 import { FilterSelect } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/filter-select";
-import {
-  purchaseRequestsPath,
-  PurchaseRequestActions,
-} from "@/app/app/projects/[id]/materials/_components/purchase-request-actions";
+import { PurchaseRequestActions } from "@/app/app/projects/[id]/materials/_components/purchase-request-actions";
 import {
   ApprovalBadge,
   chipFilter,
@@ -72,6 +69,7 @@ import {
 } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/purchase-request-format";
 import { ReasonDialog } from "@/app/app/projects/[id]/_components/procurement/purchase-requests/reason-dialog";
 import { PurchaseRequestRowsSkeleton } from "@/app/app/_components/procurement/procurement-skeletons";
+import { pageHref } from "@/lib/page-href";
 
 const STATUS_ICONS: Record<StatusChip, LucideIcon> = {
   all: LayoutGrid,
@@ -180,7 +178,10 @@ export function PurchaseRequestsPage({
           )}
           {may("create") && (
             <Link
-              href={purchaseRequestsPath(projectId, "/new")}
+              href={pageHref(
+                "/app/projects/[id]/materials/purchase-requests/new",
+                { id: projectId },
+              )}
               className={buttonVariants({ size: "sm" })}
             >
               <Plus aria-hidden="true" />
@@ -369,7 +370,10 @@ function PurchaseRequestRows({
           {!filtered && canCreate && (
             <EmptyContent>
               <Link
-                href={purchaseRequestsPath(projectId, "/new")}
+                href={pageHref(
+                  "/app/projects/[id]/materials/purchase-requests/new",
+                  { id: projectId },
+                )}
                 className={buttonVariants({ size: "sm" })}
               >
                 Add Purchase Request
@@ -472,7 +476,10 @@ function PurchaseRequestRows({
                 {bulk && <TableCell>{check(pr)}</TableCell>}
                 <TableCell className="font-medium whitespace-nowrap">
                   <Link
-                    href={purchaseRequestsPath(projectId, `/${pr.id}`)}
+                    href={pageHref(
+                      "/app/projects/[id]/materials/purchase-requests/[prId]",
+                      { id: projectId, prId: pr.id },
+                    )}
                     className="hover:underline"
                   >
                     {pr.number}
@@ -515,7 +522,10 @@ function PurchaseRequestRows({
               {check(pr)}
               <div className="min-w-0 flex-1">
                 <Link
-                  href={purchaseRequestsPath(projectId, `/${pr.id}`)}
+                  href={pageHref(
+                    "/app/projects/[id]/materials/purchase-requests/[prId]",
+                    { id: projectId, prId: pr.id },
+                  )}
                   className="font-medium hover:underline"
                 >
                   {pr.number}

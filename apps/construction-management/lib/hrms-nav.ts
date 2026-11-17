@@ -18,12 +18,13 @@ import {
   WalletCards,
   type LucideIcon,
 } from "lucide-react";
+import type { AppHref } from "@/lib/page-href";
 
 /** Where HRMS lives: Human Resources → HRMS (ADR CM-0034; Workspace → HRMS before it). */
 export const HRMS_PATH = "/app/hrms";
 
 export type HrmsPage = {
-  href: string;
+  href: AppHref;
   /** Tab label; short. */
   label: string;
   /** Page title. */
@@ -41,7 +42,7 @@ export type HrmsSection = {
   key: HrmsSectionKey;
   label: string;
   /** The section's own path; a section with several pages redirects to the first. */
-  href: string;
+  href: AppHref;
   icon: LucideIcon;
   description: string;
   pages: readonly HrmsPage[];

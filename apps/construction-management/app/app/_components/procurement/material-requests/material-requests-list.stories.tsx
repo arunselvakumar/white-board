@@ -8,6 +8,7 @@ import {
 } from "@/app/app/_components/procurement/stores/central-store-fixtures";
 
 import { ProjectMaterialRequestsPage } from "@/app/app/projects/[id]/materials/material-requests/_components/project-material-requests-page";
+import { pageHref } from "@/lib/page-href";
 
 const meta = {
   title: "Procurement/Central Store/Project Material Requests",
@@ -30,7 +31,10 @@ export const Requests: Story = {
     const link = await canvas.findByRole("link", { name: /MR\/26-27\/00007/ });
     await expect(link).toHaveAttribute(
       "href",
-      `/app/projects/${IDS.tower}/materials/material-requests/${IDS.request}`,
+      pageHref("/app/projects/[id]/materials/material-requests/[requestId]", {
+        id: IDS.tower,
+        requestId: IDS.request,
+      }),
     );
     await expect(link).toHaveTextContent(
       "To Ambattur Central Store · 2 materials",
@@ -50,7 +54,9 @@ export const Empty: Story = {
       canvas.getByRole("link", { name: "Raise request" }),
     ).toHaveAttribute(
       "href",
-      `/app/projects/${IDS.tower}/materials/material-requests/new`,
+      pageHref("/app/projects/[id]/materials/material-requests/new", {
+        id: IDS.tower,
+      }),
     );
   },
 };

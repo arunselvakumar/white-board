@@ -29,7 +29,6 @@ import {
 import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
-import { projectBasePath } from "@/lib/project-nav";
 import {
   checkInPeopleQuery,
   type CheckInKind,
@@ -49,6 +48,7 @@ import {
 } from "./check-in-format";
 import { matchesPerson } from "./check-in-search";
 import { CheckInPeopleSkeleton } from "./check-in-skeletons";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 export const SEARCH_PLACEHOLDER = "Search by name, role, ID or phone";
 
@@ -170,7 +170,7 @@ function PersonCard({
   person: CheckInPerson;
   timeZone: string;
   /** Null when the viewer may not check people in. */
-  href: string | null;
+  href: AppHref | null;
 }) {
   const line = personLine(person);
   const content = (
@@ -263,7 +263,7 @@ function Group({
             No {label} on this Project.{" "}
             {canOpenTeams ? (
               <Link
-                href={`${projectBasePath(projectId)}/teams`}
+                href={pageHref("/app/projects/[id]/teams", { id: projectId })}
                 className="text-primary font-medium underline-offset-4 hover:underline"
               >
                 Add them on Teams

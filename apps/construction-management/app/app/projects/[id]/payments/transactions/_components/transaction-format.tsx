@@ -1,6 +1,7 @@
 import { Badge } from "@repo/ui/components/badge";
 
 import type { RegisterItem } from "@/src/queries/finance-transactions";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 export const MODE_LABELS = {
   cash: "Cash",
@@ -46,15 +47,17 @@ export function ApprovalChip({ status }: { status: ApprovalStatusValue }) {
   );
 }
 
-export function transactionsPath(projectId: string, rest = ""): string {
-  return `/app/projects/${encodeURIComponent(projectId)}/payments/transactions${rest}`;
-}
-
 /** The detail page of a register row. */
-export function itemPath(projectId: string, item: RegisterItem): string {
+export function itemPath(projectId: string, item: RegisterItem): AppHref {
   return item.type === "transaction"
-    ? transactionsPath(projectId, `/${item.id}`)
-    : transactionsPath(projectId, `/transfers/${item.id}`);
+    ? pageHref("/app/projects/[id]/payments/transactions/[transactionId]", {
+        id: projectId,
+        transactionId: item.id,
+      })
+    : pageHref(
+        "/app/projects/[id]/payments/transactions/transfers/[transferId]",
+        { id: projectId, transferId: item.id },
+      );
 }
 
 /** The date a register row is dated. */

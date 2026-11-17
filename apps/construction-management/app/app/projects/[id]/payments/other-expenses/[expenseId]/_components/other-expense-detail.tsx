@@ -27,7 +27,6 @@ import { fieldForCode } from "@/lib/server-errors";
 import { canInFinance, financeAccessQuery } from "@/src/queries/finance-access";
 import {
   otherExpenseQuery,
-  otherExpensesPath,
   useOtherExpenseCommand,
 } from "@/src/queries/finance-other-expenses";
 
@@ -35,6 +34,7 @@ import {
   ExpenseStatusBadge,
   modeText,
 } from "@/app/app/projects/[id]/payments/other-expenses/_components/other-expense-parts";
+import { pageHref } from "@/lib/page-href";
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -111,7 +111,10 @@ export function OtherExpenseDetail({
       )}
       {actions.edit && (
         <Link
-          href={otherExpensesPath(projectId, `/${expense.id}/edit`)}
+          href={pageHref(
+            "/app/projects/[id]/payments/other-expenses/[expenseId]/edit",
+            { id: projectId, expenseId: expense.id },
+          )}
           className={buttonVariants({ size: "sm", variant: "outline" })}
         >
           Edit
@@ -137,7 +140,12 @@ export function OtherExpenseDetail({
   return (
     <div className="w-full min-w-0 space-y-6">
       <PageHeader
-        back={{ label: "Other Expenses", href: otherExpensesPath(projectId) }}
+        back={{
+          label: "Other Expenses",
+          href: pageHref("/app/projects/[id]/payments/other-expenses", {
+            id: projectId,
+          }),
+        }}
         title={expense.number}
         watermark="Other Expenses"
         meta={
@@ -231,7 +239,11 @@ export function OtherExpenseDetail({
                   {
                     onSuccess: () => {
                       setDeleting(false);
-                      router.push(otherExpensesPath(projectId));
+                      router.push(
+                        pageHref("/app/projects/[id]/payments/other-expenses", {
+                          id: projectId,
+                        }),
+                      );
                     },
                     onError: (failure) => {
                       setDeleting(false);

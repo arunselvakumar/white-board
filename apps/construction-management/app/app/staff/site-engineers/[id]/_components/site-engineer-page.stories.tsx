@@ -21,6 +21,7 @@ import {
 import type { PersonActivityPage } from "@/src/queries/activity";
 
 import { EditSiteEngineer } from "./edit-site-engineer";
+import { pageHref } from "@/lib/page-href";
 
 const KARTHIK = siteEngineer();
 const ONE = `${SITE_ENGINEERS_URL}/${KARTHIK.id}`;
@@ -133,7 +134,10 @@ export const ActivityEntries: Story = {
     );
     await expect(
       today.getByRole("link", { name: "Green Valley" }),
-    ).toHaveAttribute("href", `/app/projects/${GREEN_VALLEY}`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/projects/[id]", { id: GREEN_VALLEY }),
+    );
 
     // The night shift's Check Out sits on the day the shift began.
     const yesterday = within(canvas.getByRole("region", { name: "Yesterday" }));

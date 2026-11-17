@@ -8,10 +8,10 @@ import { SiteRecordHeader } from "@/app/app/projects/[id]/_components/site-work/
 import {
   inspectionQuery,
   inspectionReinspectionQuery,
-  inspectionsPath,
 } from "@/src/queries/tracking-inspections";
 
 import { InspectionForm } from "./inspection-form";
+import { pageHref } from "@/lib/page-href";
 
 export function InspectionNew({ projectId }: { projectId: string }) {
   return (
@@ -20,7 +20,7 @@ export function InspectionNew({ projectId }: { projectId: string }) {
         <SiteRecordHeader
           back={{
             label: "Inspection Requests",
-            href: inspectionsPath(projectId),
+            href: pageHref("/app/projects/[id]/inspections", { id: projectId }),
           }}
           title="Add Inspection Request"
         />
@@ -52,7 +52,10 @@ export function InspectionReinspect({
         <SiteRecordHeader
           back={{
             label: original.number,
-            href: inspectionsPath(projectId, `/${originalId}`),
+            href: pageHref("/app/projects/[id]/inspections/[inspectionId]", {
+              id: projectId,
+              inspectionId: originalId,
+            }),
           }}
           title="Raise re-inspection"
         />
@@ -75,7 +78,10 @@ export function InspectionEdit({
   inspectionId: string;
 }) {
   const { data } = useSuspenseQuery(inspectionQuery(inspectionId));
-  const back = inspectionsPath(projectId, `/${inspectionId}`);
+  const back = pageHref("/app/projects/[id]/inspections/[inspectionId]", {
+    id: projectId,
+    inspectionId,
+  });
   return (
     <div className="w-full p-6">
       <div className="flex w-full max-w-4xl flex-col gap-4">

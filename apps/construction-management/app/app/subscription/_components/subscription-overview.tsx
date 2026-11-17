@@ -34,6 +34,8 @@ import {
 } from "@repo/ui/components/table";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
+import type { CheckoutKind } from "@/app/app/subscription/checkout/_components/checkout-wizard";
+import type { AppHref } from "@/lib/page-href";
 import {
   invoicesQuery,
   subscriptionQuery,
@@ -49,7 +51,7 @@ import {
   STATUS_LABELS,
 } from "./subscription-text";
 
-const checkoutHref = (kind: string) =>
+const checkoutHref = (kind: CheckoutKind): AppHref =>
   `/app/subscription/checkout?kind=${kind}`;
 
 function OwnerActions({ view }: { view: SubscriptionView }) {

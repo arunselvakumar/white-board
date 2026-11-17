@@ -4,6 +4,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
+import type { AppHref } from "@/lib/page-href";
 import { visitPath, visitQuery } from "@/src/queries/marketing-visits";
 
 import { VisitForm } from "./visit-form";
@@ -14,7 +15,7 @@ function Frame({
   watermark,
   children,
 }: {
-  back: { label: string; href: string };
+  back: { label: string; href: AppHref };
   title: string;
   watermark?: string;
   children: ReactNode;

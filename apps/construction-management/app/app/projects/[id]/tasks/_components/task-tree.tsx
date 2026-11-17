@@ -32,6 +32,7 @@ import {
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
+import { pageHref } from "@/lib/page-href";
 import { QueryHttpError } from "@/src/queries/http";
 import {
   tasksFiltered,
@@ -257,7 +258,9 @@ export function TaskTree({
         {!filtered && canCreate && (
           <EmptyContent>
             <Link
-              href={`${tasksPath(projectId)}/new`}
+              href={pageHref("/app/projects/[id]/tasks/new", {
+                id: projectId,
+              })}
               className={buttonVariants()}
             >
               <Plus aria-hidden="true" />

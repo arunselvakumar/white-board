@@ -30,7 +30,6 @@ import {
   useCreateInquiry,
   type InquiryDetail,
   type InquiryDuplicateMatch,
-  inquiriesPath,
 } from "@/src/queries/sales-inquiries";
 import {
   INTEREST_TYPE_LABELS,
@@ -41,7 +40,8 @@ import {
 
 import { InquiryDuplicatePrompt } from "./inquiry-duplicate-prompt";
 import { InquirySelect } from "./inquiry-select";
-import { withUploadFailed } from "@/app/app/projects/[id]/_components/sales/documents/upload-failed";
+import { uploadFailedQuery } from "@/app/app/projects/[id]/_components/sales/documents/upload-failed";
+import { pageHref } from "@/lib/page-href";
 
 const schema = z.object({
   name: z
@@ -153,7 +153,11 @@ export function InquiryQuickAddDialog({
         // The card can be added again on the inquiry's page, which names it.
         if (failed.length > 0)
           router.push(
-            withUploadFailed(inquiriesPath(projectId, saved.id), failed),
+            pageHref(
+              "/app/projects/[id]/inquiries/list/[inquiryId]",
+              { id: projectId, inquiryId: saved.id },
+              uploadFailedQuery(failed),
+            ),
           );
       } catch (caught) {
         const duplicates = duplicateMatches(caught);

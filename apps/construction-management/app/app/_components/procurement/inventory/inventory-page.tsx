@@ -88,6 +88,7 @@ import {
   StockSettingsDialog,
   type SettingsMode,
 } from "./stock-settings-dialog";
+import { type AppHref, type HrefSuffix, pageHref } from "@/lib/page-href";
 
 const STATE_BADGE: Record<
   StockState,
@@ -119,13 +120,33 @@ const ALL = "all";
  */
 function materialsLink(
   projectId: string,
-  segment: string,
+  segment: "purchase-requests" | "purchase-orders" | "transfers",
   materialIds: readonly string[],
-): string {
-  const base = `/app/projects/${encodeURIComponent(projectId)}/materials/${segment}/new`;
-  return materialIds.length === 0
-    ? base
-    : `${base}?materials=${materialIds.map(encodeURIComponent).join(",")}`;
+): AppHref {
+  const query: HrefSuffix =
+    materialIds.length === 0
+      ? ""
+      : `?materials=${materialIds.map(encodeURIComponent).join(",")}`;
+  switch (segment) {
+    case "purchase-requests":
+      return pageHref(
+        "/app/projects/[id]/materials/purchase-requests/new",
+        { id: projectId },
+        query,
+      );
+    case "purchase-orders":
+      return pageHref(
+        "/app/projects/[id]/materials/purchase-orders/new",
+        { id: projectId },
+        query,
+      );
+    case "transfers":
+      return pageHref(
+        "/app/projects/[id]/materials/transfers/new",
+        { id: projectId },
+        query,
+      );
+  }
 }
 
 type Dialogs =
@@ -149,7 +170,7 @@ export function InventoryPage({
 }: {
   location: StockLocation;
   /** The Stock Register page; a Project's by default. */
-  registerHref?: string;
+  registerHref?: AppHref;
 }) {
   const { data } = useSuspenseQuery(inventoryQuery(location));
   const can = useInventoryCan(location);
@@ -404,7 +425,7 @@ export function InventoryPage({
               Export Data
             </DropdownMenuItem>
           )}
-          {canReport && register !== "" && (
+          {canReport && register != null && (
             <DropdownMenuItem render={<Link href={register} />}>
               <ClipboardList aria-hidden="true" />
               Stock Register
@@ -414,7 +435,10 @@ export function InventoryPage({
             <DropdownMenuItem
               render={
                 <Link
-                  href={`/app/projects/${encodeURIComponent(projectId)}/materials/goods-received/new`}
+                  href={pageHref(
+                    "/app/projects/[id]/materials/goods-received/new",
+                    { id: projectId },
+                  )}
                 />
               }
             >

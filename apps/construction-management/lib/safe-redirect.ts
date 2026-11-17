@@ -1,3 +1,5 @@
+import type { HrefSuffix } from "./page-href";
+
 /** Where a signed-in User lands when nothing else was asked for. */
 export const APP_HOME = "/app/projects";
 
@@ -29,8 +31,14 @@ export function safeAppPath(value: string | null | undefined): string {
   return value;
 }
 
-/** `/continue` with the redirect target carried along. */
-export function continuePath(redirectUrl: string | null | undefined): string {
+/**
+ * `/continue` with the redirect target carried along. The target sits in the
+ * query string, so the result is always `/continue`, a route handler rather
+ * than a page, which Next's typed routes still check.
+ */
+export function continuePath(
+  redirectUrl: string | null | undefined,
+): `/continue${HrefSuffix}` {
   const target = safeAppPath(redirectUrl);
   return target === APP_HOME
     ? "/continue"

@@ -21,6 +21,7 @@ import {
   formatDate,
   localToday,
 } from "@/app/app/_components/procurement/inventory/inventory-format";
+import { pageHref } from "@/lib/page-href";
 import { addDays, isCalendarDate } from "@/src/shared-kernel/calendar-date";
 import {
   siteDiaryDaysQuery,
@@ -75,7 +76,11 @@ function DiaryForDate({
         {canCreate && (
           <EmptyContent>
             <Link
-              href={`${siteDiaryPath(projectId)}/new?date=${date}`}
+              href={pageHref(
+                "/app/projects/[id]/site-diary/new",
+                { id: projectId },
+                `?date=${date}`,
+              )}
               className={buttonVariants()}
             >
               <PenLine aria-hidden="true" />
@@ -89,7 +94,10 @@ function DiaryForDate({
     <div className={cn("min-w-0", className)}>
       <SiteDiaryView
         diary={data.diary}
-        editHref={`${siteDiaryPath(projectId)}/${data.diary.id}/edit`}
+        editHref={pageHref("/app/projects/[id]/site-diary/[diaryId]/edit", {
+          id: projectId,
+          diaryId: data.diary.id,
+        })}
         canAttach={canAttach}
       />
     </div>

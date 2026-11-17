@@ -14,6 +14,7 @@ import {
   RECEIPT_NO_FINANCIAL,
 } from "@/app/app/projects/[id]/materials/goods-received/_components/goods-receipt-fixtures";
 import { GoodsReceiptDetail } from "./goods-receipt-detail";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockApi>;
 
@@ -56,7 +57,10 @@ export const AgainstPurchaseOrder: Story = {
     ).toHaveAttribute("href", goodsReceiptPdfUrl(GRN_ID));
     await expect(canvas.getByRole("link", { name: "Edit" })).toHaveAttribute(
       "href",
-      `/app/projects/${PROJECT_ID}/materials/goods-received/${GRN_ID}/edit`,
+      pageHref("/app/projects/[id]/materials/goods-received/[grnId]/edit", {
+        id: PROJECT_ID,
+        grnId: GRN_ID,
+      }),
     );
     await expect(
       await canvas.findByRole("heading", { name: "Remarks" }),
@@ -163,7 +167,9 @@ export const Delete: Story = {
     await userEvent.click(dialog.getByRole("button", { name: "Delete" }));
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith(
-        `/app/projects/${PROJECT_ID}/materials/goods-received`,
+        pageHref("/app/projects/[id]/materials/goods-received", {
+          id: PROJECT_ID,
+        }),
       ),
     );
   },

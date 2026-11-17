@@ -13,6 +13,7 @@ import type {
   StockEntry,
   StockRegister,
 } from "@/src/queries/inventory";
+import { pageHref } from "@/lib/page-href";
 
 /** Story fixtures for Current Inventory. */
 
@@ -138,7 +139,10 @@ export const CEMENT_HISTORY: StockEntry[] = [
       type: "material_transfer",
       id: "0199c4a0-0000-7000-8000-0000000a0001",
       number: "MT/26-27/00004",
-      href: `/app/projects/${SITE.id}/materials/transfers/0199c4a0-0000-7000-8000-0000000a0001`,
+      href: pageHref("/app/projects/[id]/materials/transfers/[transferId]", {
+        id: SITE.id,
+        transferId: "0199c4a0-0000-7000-8000-0000000a0001",
+      }),
     },
     counterpartyLabel: "To Villa Phase 2",
     siteLocation: null,
@@ -160,7 +164,10 @@ export const CEMENT_HISTORY: StockEntry[] = [
       type: "goods_receipt",
       id: "0199c4a0-0000-7000-8000-0000000b0001",
       number: "GRN/26-27/00012",
-      href: `/app/projects/${SITE.id}/materials/goods-received/0199c4a0-0000-7000-8000-0000000b0001`,
+      href: pageHref("/app/projects/[id]/materials/goods-received/[grnId]", {
+        id: SITE.id,
+        grnId: "0199c4a0-0000-7000-8000-0000000b0001",
+      }),
     },
     counterpartyLabel: "From Sri Murugan Traders",
     siteLocation: null,

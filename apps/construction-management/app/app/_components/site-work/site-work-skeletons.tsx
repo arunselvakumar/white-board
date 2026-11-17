@@ -18,6 +18,7 @@ import {
   DocumentDetailSkeleton,
   ResponsiveListSkeleton,
 } from "@/app/app/_components/procurement/procurement-skeletons";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 /*
  * Site work while it loads (ADR-0047): worksheets, equipment, hindrances,
@@ -191,16 +192,13 @@ export function MaterialChecklistSkeleton() {
   );
 }
 
-const projectPath = (projectId: string, rest: string) =>
-  `/app/projects/${encodeURIComponent(projectId)}/${rest}`;
-
 /** A Daily Worksheet's page: facts, then the materials used. */
 export function WorksheetDetailSkeleton({ projectId }: { projectId: string }) {
   return (
     <DocumentDetailSkeleton
       back={{
         label: "Daily Worksheet",
-        href: projectPath(projectId, "worksheets"),
+        href: pageHref("/app/projects/[id]/worksheets", { id: projectId }),
       }}
       label="Loading worksheet"
       facts={[
@@ -237,7 +235,9 @@ export function EquipmentSheetDetailSkeleton({
     <DocumentDetailSkeleton
       back={{
         label: "Usage sheets",
-        href: projectPath(projectId, "equipment/usage-sheets"),
+        href: pageHref("/app/projects/[id]/equipment/usage-sheets", {
+          id: projectId,
+        }),
       }}
       label="Loading usage sheet"
       facts={[
@@ -362,7 +362,7 @@ const EQUIPMENT_FACTS = [
 export function EquipmentDetailSkeleton({
   back,
 }: {
-  back: { label: string; href: string };
+  back: { label: string; href: AppHref };
 }) {
   return (
     <div className="w-full p-6">
@@ -518,7 +518,7 @@ export function SiteRecordHeaderSkeleton({
   title,
   size = "form",
 }: {
-  back: { label: string; href: string };
+  back: { label: string; href: AppHref };
   title?: string;
   size?: "form" | "detail";
 }) {
@@ -551,7 +551,7 @@ export function SiteRecordHeaderSkeleton({
 }
 
 const hindrancesHref = (projectId: string) =>
-  projectPath(projectId, "hindrances");
+  pageHref("/app/projects/[id]/hindrances", { id: projectId });
 
 /** A hindrance's page: number and cause, then its facts. */
 export function HindranceDetailSkeleton({ projectId }: { projectId: string }) {
@@ -808,7 +808,7 @@ export function SiteDiaryFormSkeleton({ projectId }: { projectId: string }) {
       <SiteRecordHeaderSkeleton
         back={{
           label: "Site Diary",
-          href: projectPath(projectId, "site-diary"),
+          href: pageHref("/app/projects/[id]/site-diary", { id: projectId }),
         }}
         title="Edit Site Diary"
       />

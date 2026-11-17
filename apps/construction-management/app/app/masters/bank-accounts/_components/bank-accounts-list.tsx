@@ -33,10 +33,10 @@ import {
 import { AccountDialog } from "./account-dialog";
 import {
   ACCOUNT_KIND_LABELS,
-  bankAccountsPath,
   maskAccountNumber,
   SignedAmount,
 } from "./account-format";
+import { pageHref } from "@/lib/page-href";
 
 const MENU = "masters.bank_accounts";
 
@@ -119,7 +119,10 @@ export function BankAccountsList() {
                   <div className="min-w-0 flex-1 space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <Link
-                        href={bankAccountsPath(`/${account.id}`)}
+                        href={pageHref(
+                          "/app/masters/bank-accounts/[accountId]",
+                          { accountId: account.id },
+                        )}
                         className="truncate font-medium hover:underline"
                       >
                         {account.name}
@@ -166,7 +169,11 @@ export function BankAccountsList() {
                     <DropdownMenuContent align="end" className="w-44">
                       <DropdownMenuItem
                         onClick={() => {
-                          router.push(bankAccountsPath(`/${account.id}`));
+                          router.push(
+                            pageHref("/app/masters/bank-accounts/[accountId]", {
+                              accountId: account.id,
+                            }),
+                          );
                         }}
                       >
                         View Ledger

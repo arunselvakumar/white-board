@@ -39,6 +39,7 @@ import { cn } from "@repo/ui/lib/utils";
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
+import { pageHref } from "@/lib/page-href";
 import {
   VISIT_LIMITS,
   VISIT_PURPOSE_LABELS,
@@ -376,7 +377,9 @@ export function VisitDetail({
               <div className="flex flex-wrap gap-2">
                 {actions.canComplete && (
                   <Link
-                    href={`${visitPath(visit.id)}/complete`}
+                    href={pageHref("/app/marketing/visits/[id]/complete", {
+                      id: visit.id,
+                    })}
                     className={buttonVariants()}
                   >
                     <CalendarCheck aria-hidden="true" />
@@ -394,7 +397,16 @@ export function VisitDetail({
                     <DropdownMenuContent align="end" className="w-44">
                       {actions.canUpdate && (
                         <DropdownMenuItem
-                          render={<Link href={`${visitPath(visit.id)}/edit`} />}
+                          render={
+                            <Link
+                              href={pageHref(
+                                "/app/marketing/visits/[id]/edit",
+                                {
+                                  id: visit.id,
+                                },
+                              )}
+                            />
+                          }
                         >
                           <Pencil aria-hidden="true" />
                           Edit

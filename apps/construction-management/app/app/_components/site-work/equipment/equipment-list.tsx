@@ -45,11 +45,11 @@ import {
 import { EquipmentReportsButton } from "./equipment-reports-dialog";
 import {
   EQUIPMENTS_PATH,
-  equipmentModulePath,
   equipmentPath,
   projectEquipmentPath,
 } from "./equipment-tabs";
 import { EquipmentRowsSkeleton } from "@/app/app/_components/site-work/site-work-skeletons";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 const ALL = "all";
 
@@ -115,7 +115,7 @@ function Rows({
 }: {
   filters: EquipmentFilters;
   filtered: boolean;
-  hrefFor: (id: string) => string;
+  hrefFor: (id: string) => AppHref;
   empty: { description: string; action: React.ReactNode };
   onPage: (after: string | null) => void;
   className?: string;
@@ -351,7 +351,9 @@ export function ProjectEquipmentList({ projectId }: { projectId: string }) {
       canInSiteWork(access, "site_work.equipment_usage", "create"));
   const addButton = canAdd ? (
     <Link
-      href={`${equipmentModulePath(projectId, "register")}/new`}
+      href={pageHref("/app/projects/[id]/equipment/register/new", {
+        id: projectId,
+      })}
       className={buttonVariants()}
     >
       <Plus aria-hidden="true" />

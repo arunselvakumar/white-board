@@ -17,14 +17,13 @@ import { DomainError } from "@/src/shared-kernel/domain-error";
 import { QueryHttpError } from "@/src/queries/http";
 
 import type { EditorProblem } from "./wing-editor";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
-/** `/app/projects/{id}/wings` and the screens under it. */
-export function wingsPath(projectId: string): string {
-  return `/app/projects/${encodeURIComponent(projectId)}/wings`;
-}
-
-export function wingPath(projectId: string, wingId: string): string {
-  return `${wingsPath(projectId)}/${encodeURIComponent(wingId)}`;
+export function wingPath(projectId: string, wingId: string): AppHref {
+  return pageHref("/app/projects/[id]/wings/[wingId]", {
+    id: projectId,
+    wingId,
+  });
 }
 
 /** A section's header inside the project shell: back link, title, actions. */
@@ -34,7 +33,7 @@ export function SectionHeader({
   meta,
   actions,
 }: {
-  back?: { label: string; href: string };
+  back?: { label: string; href: AppHref };
   title: string;
   meta?: ReactNode;
   actions?: ReactNode;

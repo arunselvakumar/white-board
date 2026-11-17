@@ -24,6 +24,7 @@ import {
   TermsConditionDialog,
 } from "./material-master-dialogs";
 import { PagedMasterListScreen } from "./paged-master-list";
+import { pageHref } from "@/lib/page-href";
 
 export const ITEM_TYPE_LABELS: Record<MaterialItem["itemType"], string> = {
   consumable: "Consumable",
@@ -225,7 +226,7 @@ export function MaterialsList() {
         editLabel: "Edit",
         pages: {
           newHref: "/app/masters/materials/new",
-          editHref: (id) => `/app/masters/materials/${id}`,
+          editHref: (id) => pageHref("/app/masters/materials/[id]", { id }),
         },
       }}
     />

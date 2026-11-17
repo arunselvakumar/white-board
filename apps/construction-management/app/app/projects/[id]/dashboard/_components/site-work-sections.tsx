@@ -13,8 +13,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-import { equipmentModulePath } from "@/app/app/_components/site-work/equipment/equipment-tabs";
-import { worksheetsPath } from "@/app/app/projects/[id]/_components/site-work/worksheets/worksheet-format";
 import type { Duration } from "@/lib/dashboard-duration";
 import {
   dailyWorkDashboardQuery,
@@ -30,10 +28,11 @@ import {
   TopEquipmentChart,
 } from "./equipment-usage-charts";
 import { LabourAvailabilityChart } from "./labour-availability-chart";
+import { type AppHref, pageHref } from "@/lib/page-href";
 
 const NUMBER = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 });
 
-function SectionLink({ href, children }: { href: string; children: string }) {
+function SectionLink({ href, children }: { href: AppHref; children: string }) {
   return (
     <Link
       href={href}
@@ -132,7 +131,11 @@ export function DailyWorkSection({
       id="dashboard-daily_work"
       title="Daily Work"
       aside={
-        <SectionLink href={worksheetsPath(projectId)}>Worksheets</SectionLink>
+        <SectionLink
+          href={pageHref("/app/projects/[id]/worksheets", { id: projectId })}
+        >
+          Worksheets
+        </SectionLink>
       }
     >
       {isPending ? (
@@ -193,7 +196,11 @@ export function EquipmentUsageSection({
       id="dashboard-equipment_usage"
       title="Equipment Usage"
       aside={
-        <SectionLink href={equipmentModulePath(projectId, "usage-sheets")}>
+        <SectionLink
+          href={pageHref("/app/projects/[id]/equipment/usage-sheets", {
+            id: projectId,
+          })}
+        >
           Usage sheets
         </SectionLink>
       }

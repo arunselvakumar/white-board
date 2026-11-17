@@ -14,6 +14,7 @@ import {
   OWN_SIGN_IN_PENDING,
 } from "./site-engineer-fixtures";
 import { SupervisorsList } from "./supervisors-list";
+import { pageHref } from "@/lib/page-href";
 
 const KARTHIK = siteEngineer();
 const PRABHU = officeStaffEngineer();
@@ -125,7 +126,10 @@ export const WithSiteEngineers: Story = {
       );
     await expect(
       within(karthik).getByRole("link", { name: "Karthik Raja" }),
-    ).toHaveAttribute("href", `/app/staff/site-engineers/${KARTHIK.id}`);
+    ).toHaveAttribute(
+      "href",
+      pageHref("/app/staff/site-engineers/[id]", { id: KARTHIK.id }),
+    );
 
     const search = canvas.getByLabelText("Search Site Engineers");
     await userEvent.type(search, "se-014");
@@ -155,7 +159,7 @@ export const WithSiteEngineers: Story = {
 
     await chooseFromMenu(canvasElement, userEvent, "Karthik Raja", "Edit");
     await expect(getRouter().push).toHaveBeenCalledWith(
-      `/app/staff/site-engineers/${KARTHIK.id}`,
+      pageHref("/app/staff/site-engineers/[id]", { id: KARTHIK.id }),
     );
   },
 };

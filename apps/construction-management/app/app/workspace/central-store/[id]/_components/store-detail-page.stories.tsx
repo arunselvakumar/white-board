@@ -10,6 +10,7 @@ import {
   type CentralStoreApiOptions,
 } from "@/app/app/_components/procurement/stores/central-store-fixtures";
 import { StoreDetailPage } from "./store-detail-page";
+import { pageHref } from "@/lib/page-href";
 
 /** The store's own reads, then Current Inventory and transfers for its tabs. */
 function serve(
@@ -66,7 +67,9 @@ export const Stock: Story = {
       await canvas.findByRole("link", { name: /MR\/26-27\/00007/ }),
     ).toHaveAttribute(
       "href",
-      `/app/workspace/central-store/material-requests/${IDS.request}`,
+      pageHref("/app/workspace/central-store/material-requests/[id]", {
+        id: IDS.request,
+      }),
     );
     await userEvent.click(canvas.getByRole("tab", { name: "Delivery Notes" }));
     await expect(await canvas.findByText("DN/26-27/00003")).toBeVisible();

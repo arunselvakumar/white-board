@@ -9,6 +9,7 @@ import {
   mockDrawingsApi,
 } from "./drawing-fixtures";
 import { DrawingsPage } from "./drawings-page";
+import { pageHref } from "@/lib/page-href";
 
 let api: ReturnType<typeof mockDrawingsApi>;
 
@@ -25,7 +26,7 @@ function drawingsApi(options: Parameters<typeof mockDrawingsApi>[0] = {}) {
   };
 }
 
-const PATH = `/app/projects/${ANUGRAHA.id}/drawings`;
+const PATH = pageHref("/app/projects/[id]/drawings", { id: ANUGRAHA.id });
 
 type Play = NonNullable<Story["play"]>;
 type PlayContext = Parameters<Play>[0];
