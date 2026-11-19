@@ -1,6 +1,5 @@
 import type { Icon } from "@phosphor-icons/react";
 import {
-  CalendarBlankIcon,
   FileTextIcon,
   FolderSimpleIcon,
   ImageSquareIcon,
@@ -146,7 +145,6 @@ const SATELLITES: readonly Satellite[] = [
   { ring: 112, angle: 166, icon: FileTextIcon },
   { ring: 112, angle: -14, icon: ImageSquareIcon },
   { ring: 112, angle: 24, icon: PlayCircleIcon },
-  { ring: 148, angle: -170, icon: CalendarBlankIcon },
 ];
 
 function polar(ring: number, angle: number) {
@@ -163,7 +161,7 @@ function EmptyStateOrbit() {
       aria-hidden="true"
       focusable="false"
       viewBox="0 0 320 200"
-      className="absolute inset-0 size-full overflow-visible [mask-image:radial-gradient(circle_at_50%_50%,#000_42%,transparent_88%)] print:hidden"
+      className="absolute inset-0 size-full overflow-visible [mask-image:radial-gradient(ellipse_closest-side_at_50%_50%,#000_55%,transparent_100%)] print:hidden"
     >
       {RINGS.map((r) => (
         <circle

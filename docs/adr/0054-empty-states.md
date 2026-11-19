@@ -15,7 +15,7 @@ The owner wanted the centre icon in colour. Lucide icons are a single stroke and
 **How it is drawn.**
 
 - The centre icon is bare: no tile, border or filled circle behind it. 48px for a page (`lg`), 40px in a card (`md`), 32px in a table, sheet or dialog (`sm`).
-- At `md` and `lg` the icon sits in an SVG orbit: four rings and eight small tiles in a 320 × 200 box. Each tile is placed by its ring and angle (`x = cx + r·cos θ`), so it is always centred on the ring's line. The whole orbit scales with its width and a radial mask fades the outer rings. `sm` has no orbit.
+- At `md` and `lg` the icon sits in an SVG orbit: four rings and seven small tiles in a 320 × 200 box. Each tile is placed by its ring and angle (`x = cx + r·cos θ`), so it is always centred on the ring's line. The whole orbit scales with its width, and an elliptical mask fades it to nothing at the box edges, so no ring is cut off. `sm` has no orbit.
 - The title overlaps the faded lower part of the orbit, as in the reference.
 - The orbit and the icon are `aria-hidden`. The orbit is hidden in print. Nothing moves.
 

@@ -78,7 +78,7 @@ export const Page: Story = {
     await expect(orbit).toHaveAttribute("aria-hidden", "true");
     await expect(
       canvasElement.querySelectorAll('[data-slot="empty-state-satellite"]'),
-    ).toHaveLength(8);
+    ).toHaveLength(7);
     await expect(
       canvasElement.querySelector('[data-slot="empty-state-icon"]'),
     ).toHaveAttribute("aria-hidden", "true");
