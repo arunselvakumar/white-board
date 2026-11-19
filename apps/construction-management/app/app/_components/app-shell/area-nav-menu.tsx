@@ -30,16 +30,15 @@ export type AreaNavGroup = {
 
 /**
  * A top-level area in the sidebar with a submenu of its screens, grouped
- * (Masters, Workspace, Human Resources). The submenu opens by itself on any
+ * (Masters, Workspace, Departments). The submenu opens by itself on any
  * page of the area and can be folded away elsewhere. A page of the area is
- * one under its link or one a submenu entry owns (`currentHref`): Human
- * Resources links to Staff, and Role Management, HRMS and the Labour lists
- * sit beside it. While the menu search has a query, `groups` are the
+ * one under its link or one a submenu entry owns (`currentHref`): every
+ * Staff, HRMS and Marketing screen belongs to its department's row under
+ * Departments (ADR CM-0046). While the menu search has a query, `groups` are the
  * matching ones and `forceOpen` holds the submenu open (`menu-filter.ts`).
  */
 export function AreaNavMenu({
   href,
-  linkHref,
   label,
   groups,
   currentHref,
@@ -48,8 +47,6 @@ export function AreaNavMenu({
   forceOpen = false,
 }: {
   href: AppNavHref;
-  /** Where the area link goes when not `href` (Human Resources without Staff). */
-  linkHref?: AppHref;
   label: string;
   groups: readonly AreaNavGroup[];
   /** The submenu entry the page belongs to, if any. */
@@ -83,7 +80,7 @@ export function AreaNavMenu({
               tooltip={label}
               aria-current={onIndex ? "page" : undefined}
               className={buttonClassName}
-              render={<Link href={linkHref ?? href} />}
+              render={<Link href={href} />}
             >
               <Icon />
               <span className="min-w-0 flex-1 truncate">{label}</span>

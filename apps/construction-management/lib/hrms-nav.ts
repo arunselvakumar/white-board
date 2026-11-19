@@ -54,9 +54,9 @@ const SALARY = `${HRMS_PATH}/salary`;
 const CONFIGURATION = `${HRMS_PATH}/configuration`;
 
 /**
- * The HRMS area: its sections (the tabs under HRMS and the sidebar's
- * Human Resources submenu) and each section's pages (the sub-tabs). This is the
- * one place HRMS navigation is defined. To build a screen, replace the
+ * The HRMS area: its sections (the tabs under HRMS and the HRMS cards on
+ * the Human Resources page, ADR CM-0046) and each section's pages (the
+ * sub-tabs). This is the one place HRMS navigation is defined. To build a screen, replace the
  * `HrmsComingSoon` in its `page.tsx`; to add a screen, add a page here and
  * its `page.tsx` under `app/app/hrms/`.
  */

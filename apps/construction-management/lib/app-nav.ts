@@ -1,12 +1,11 @@
 /**
- * The main menu (ADR CM-0034): the Company Dashboard (CM-902), Projects,
- * Marketing (ADR CM-0040; Company-level, shown only to members who may open
- * one of its entries), Human Resources (Staff and HRMS; the area opens on Labour), the
- * two cross-project areas Workspace and Masters (`docs/00-overview.md`,
- * "The shape of the product"), then Settings: the Company profile and the
- * Advanced Settings. Each area grows its own screens in later milestones.
- * The Dashboard shows only with the Dashboard menu's Read flag
- * (`AppShell`'s `canOpenDashboard`).
+ * The main menu (ADR CM-0034, ADR CM-0046): the Company Dashboard (CM-902),
+ * Projects, Departments (Human Resources and Marketing, each a page of
+ * cards), the two cross-project areas Workspace and Masters
+ * (`docs/00-overview.md`, "The shape of the product"), then Settings: the
+ * Company profile and the Advanced Settings. Each area grows its own
+ * screens in later milestones. The Dashboard shows only with the Dashboard
+ * menu's Read flag (`AppShell`'s `canOpenDashboard`).
  */
 export const APP_NAV = [
   {
@@ -24,21 +23,14 @@ export const APP_NAV = [
       "Your Company's Projects will show here: daily work, materials, labour and payments per site.",
   },
   {
-    href: "/app/marketing",
-    label: "Marketing",
-    title: "Marketing",
+    // Human Resources and Marketing (ADR CM-0046). Their screens keep their
+    // own addresses (/app/staff, /app/hrms, /app/marketing); each
+    // department's page of cards is under /app/departments.
+    href: "/app/departments",
+    label: "Departments",
+    title: "Departments",
     description:
-      "Visits to Prospect Companies, the Follow-ups owed after them, your Marketing Team and their targets.",
-  },
-  {
-    // Every Staff page (Labour, Site Engineer, Vendor, Office Staff, Role
-    // Management) lives under /app/staff; the area opens on Labour, and
-    // HRMS sits beside Staff in the submenu.
-    href: "/app/staff",
-    label: "Human Resources",
-    title: "Human Resources",
-    description:
-      "Your own Labours, their Site Engineers and the Vendors you hire gangs from, your Office Staff and their Roles, and HRMS for attendance, leave and salary.",
+      "Human Resources for your Labours, Staff and HRMS, and Marketing for Visits, Follow-ups and Prospect Companies.",
   },
   {
     href: "/app/workspace",
