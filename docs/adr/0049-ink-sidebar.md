@@ -22,7 +22,8 @@ We were shown a reference (a mail client) whose sidebar is a near-black rounded 
 | `SidebarMenuCount`    | a figure (`muted`) or a red pill (`alert`) at the right end of a row      |
 | `SidebarMeter`        | a ring meter with the figure in the middle                                |
 | `SidebarMeterCard`    | the card near the bottom: a meter or icon, a title, a caption, and a link |
-| `SidebarFootnote`     | the version line                                                          |
+
+**No version line.** The sidebar first ended with the app's version (`SidebarFootnote`). It was removed on 2026-11-19 at the owner's request: neither app shows a version to its users in any form.
 
 **Real numbers only.** A count on a row comes from a query the app already has (Whiteboard's Owner Dashboard; Construction Management's subscription), never from a placeholder, and the row shows no count while that query loads or fails. The search filters the menu rows by label; it is not a global search.
 

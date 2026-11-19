@@ -6,7 +6,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import {
-  SidebarFootnote,
   SidebarPhoneBar,
   SidebarReopenTrigger,
   SidebarSearch,
@@ -57,9 +56,6 @@ import { SidebarAccountRow } from "./sidebar-account-row";
 import { SidebarPlanCard } from "./sidebar-plan-card";
 import { SwitchCompany } from "./switch-company";
 import { WorkspaceNavMenu } from "./workspace-nav-menu";
-
-/** From package.json at build time (next.config.ts), so the browser never gets the dependency list. */
-const VERSION = `v${process.env["NEXT_PUBLIC_APP_VERSION"] ?? "0.0.0"}`;
 
 /** The page's `<main>`, the same in the sidebar and the full-page menu layout. */
 const MAIN_CLASS = `${PAGE_WATERMARK_HOST_CLASS} flex min-w-0 flex-1 flex-col outline-none`;
@@ -184,7 +180,6 @@ export function AppShell({
         <SidebarFooter className="gap-2 px-3 pt-2 pb-3">
           <SidebarPlanCard />
           <FooterMenu pathname={pathname} />
-          <SidebarFootnote>{VERSION}</SidebarFootnote>
         </SidebarFooter>
       </Sidebar>
       {/* min-w-0: a wide child (a table, a chart) scrolls inside
