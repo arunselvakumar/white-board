@@ -1,4 +1,10 @@
-import { Megaphone, UsersRound, type LucideIcon } from "lucide-react";
+import {
+  BriefcaseBusiness,
+  Megaphone,
+  Users,
+  UsersRound,
+  type LucideIcon,
+} from "lucide-react";
 
 import { HRMS_PATH, HRMS_SECTIONS } from "@/lib/hrms-nav";
 import {
@@ -25,9 +31,14 @@ export type DepartmentCard = {
   icon: LucideIcon;
 };
 
-/** A labelled run of cards; a page with one group can leave the label out. */
+/**
+ * A labelled run of cards; a page with one group can leave the label out.
+ * In the sidebar (ADR CM-0047) a labelled group is a row that folds out
+ * into its cards, with `icon`; an unlabelled one is a plain list of rows.
+ */
 export type DepartmentCardGroup = {
   label?: string;
+  icon?: LucideIcon;
   sections: readonly DepartmentCard[];
 };
 
@@ -77,8 +88,16 @@ export function humanResourcesGroups(
   canOpenStaffRoles: boolean,
 ): readonly DepartmentCardGroup[] {
   return [
-    { label: "Staff", sections: staffSections(canOpenStaffRoles).map(card) },
-    { label: "HRMS", sections: HRMS_SECTIONS.map(card) },
+    {
+      label: "Staff",
+      icon: Users,
+      sections: staffSections(canOpenStaffRoles).map(card),
+    },
+    {
+      label: "HRMS",
+      icon: BriefcaseBusiness,
+      sections: HRMS_SECTIONS.map(card),
+    },
   ];
 }
 
@@ -136,4 +155,42 @@ export function activeDepartment(pathname: string): Department | undefined {
       isUnder(pathname, department.href) ||
       department.areas.some((area) => isUnder(pathname, area)),
   );
+}
+
+/**
+ * The department whose own menu the sidebar shows on this path (ADR
+ * CM-0047): its page or any of its screens, when the viewer may open the
+ * department. Elsewhere, or for a department the Role does not open (its
+ * screens say so), the sidebar keeps the main menu.
+ */
+export function departmentMenuAt(
+  pathname: string,
+  access: DepartmentsAccess,
+): VisibleDepartment | undefined {
+  const department = activeDepartment(pathname);
+  if (department == null) return undefined;
+  return visibleDepartments(access).find(
+    (shown) => shown.department.key === department.key,
+  );
+}
+
+/**
+ * The card a path belongs to: the one whose address is the longest that
+ * the path is on or under. `/app/hrms/attendance/team` is Attendance, not
+ * the HRMS Dashboard at `/app/hrms`; `/app/marketing` alone is Marketing's
+ * Dashboard.
+ */
+export function departmentCardAt(
+  groups: readonly DepartmentCardGroup[],
+  pathname: string,
+): DepartmentCard | undefined {
+  let best: DepartmentCard | undefined;
+  for (const group of groups)
+    for (const section of group.sections)
+      if (
+        isUnder(pathname, section.href) &&
+        (best == null || section.href.length > best.href.length)
+      )
+        best = section;
+  return best;
 }

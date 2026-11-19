@@ -198,7 +198,9 @@ function shellOn(
 /**
  * Departments (ADR CM-0046) sits after Projects and folds out into Human
  * Resources and Marketing, each a link to its page of cards. Their screens
- * (Labour, HRMS, Visits) are not rows in the sidebar.
+ * (Labour, HRMS, Visits) are not rows in the main menu: on a department's
+ * page and screens the sidebar is the department's own menu
+ * (`department-menu.stories.tsx`, ADR CM-0047).
  */
 export const Departments: Story = {
   ...shellOn("/app/departments"),
@@ -227,62 +229,6 @@ export const Departments: Story = {
       ).toHaveAttribute("href", department.href);
     for (const name of ["Labour", "Office Staff", "Attendance", "Visits"])
       await expect(nav.queryByRole("link", { name })).toBeNull();
-  },
-};
-
-/**
- * Every screen of a department lights its row and keeps Departments open:
- * the department's own page, Staff and HRMS screens for Human Resources,
- * Marketing's pages for Marketing.
- */
-export const DepartmentRowLitOnItsScreens: Story = {
-  ...shellOn("/app/staff/roles/r1"),
-  play: async (context) => {
-    const nav = await mainMenu(context);
-    const submenu = within(
-      await nav.findByRole("list", { name: "Departments" }),
-    );
-    await expect(
-      submenu.getByRole("link", { name: "Human Resources" }),
-    ).toHaveAttribute("aria-current", "page");
-    await expect(
-      submenu.getByRole("link", { name: "Marketing" }),
-    ).not.toHaveAttribute("aria-current");
-    await expect(
-      nav.getByRole("link", { name: "Departments" }),
-    ).not.toHaveAttribute("aria-current");
-  },
-};
-
-export const HrmsScreenLightsHumanResources: Story = {
-  ...shellOn("/app/hrms/attendance/team"),
-  play: async (context) => {
-    const nav = await mainMenu(context);
-    const submenu = within(
-      await nav.findByRole("list", { name: "Departments" }),
-    );
-    await expect(
-      submenu.getByRole("link", { name: "Human Resources" }),
-    ).toHaveAttribute("aria-current", "page");
-    await expect(
-      nav.getByRole("link", { name: "Workspace" }),
-    ).not.toHaveAttribute("aria-current");
-  },
-};
-
-export const MarketingScreenLightsMarketing: Story = {
-  ...shellOn("/app/marketing/visits/v1"),
-  play: async (context) => {
-    const nav = await mainMenu(context);
-    const submenu = within(
-      await nav.findByRole("list", { name: "Departments" }),
-    );
-    await expect(
-      submenu.getByRole("link", { name: "Marketing" }),
-    ).toHaveAttribute("aria-current", "page");
-    await expect(
-      submenu.getByRole("link", { name: "Human Resources" }),
-    ).not.toHaveAttribute("aria-current");
   },
 };
 

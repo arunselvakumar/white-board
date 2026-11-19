@@ -19,15 +19,21 @@ marketingPageTest.describe("Marketing", () => {
         marketing.heading("Marketing Dashboard", { level: 1 }),
       ).toBeVisible();
       await marketing.openSidebar();
-      // Marketing is under Departments, lit on its pages (ADR CM-0046).
-      const marketingRow = marketing.departmentsSubmenu.getByRole("link", {
-        name: "Marketing",
-      });
-      await expect(marketingRow).toHaveAttribute(
+      // On Marketing's pages the sidebar is Marketing's own menu, with the
+      // entries the Role opens (ADR CM-0047).
+      await expect(marketing.backToMainMenu).toHaveAttribute(
         "href",
-        marketing.departmentUrl,
+        "/app/departments",
       );
-      await expect(marketingRow).toHaveAttribute("aria-current", "page");
+      await expect(marketing.departmentMenu.getByRole("link")).toHaveText([
+        "Dashboard",
+        "Visits",
+        "Follow-ups",
+        "Companies",
+      ]);
+      await expect(
+        marketing.departmentMenu.getByRole("link", { name: "Dashboard" }),
+      ).toHaveAttribute("aria-current", "page");
 
       await marketing.currentPage.goto(marketing.departmentUrl);
       await expect(marketing.cards).toHaveCount(4);
@@ -77,13 +83,18 @@ marketingPageTest.describe("Marketing", () => {
   marketingPageTest(
     "should show every Marketing entry as a card, when the Owner opens Marketing from Departments",
     async ({ marketingPage }) => {
-      await marketingPage.goto();
+      await marketingPage.currentPage.goto("/app/departments");
       await marketingPage.openSidebar();
       await marketingPage.departmentsSubmenu
         .getByRole("link", { name: "Marketing" })
         .click();
       await expect(marketingPage.currentPage).toHaveURL(
         marketingPage.departmentUrl,
+      );
+      // The sidebar swaps to Marketing's own menu (ADR CM-0047).
+      await expect(marketingPage.backToMainMenu).toBeVisible();
+      await expect(marketingPage.departmentMenu.getByRole("link")).toHaveCount(
+        6,
       );
       await expect(marketingPage.cards).toHaveCount(6);
       for (const name of [
