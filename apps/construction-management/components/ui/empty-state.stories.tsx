@@ -27,7 +27,22 @@ const meta = {
     icon: { control: false },
     tone: {
       control: "inline-radio",
-      options: ["neutral", "brand", "success", "warning", "danger"],
+      options: [
+        "neutral",
+        "brand",
+        "success",
+        "warning",
+        "danger",
+        "red",
+        "orange",
+        "amber",
+        "green",
+        "teal",
+        "sky",
+        "blue",
+        "violet",
+        "pink",
+      ],
     },
     size: { control: "inline-radio", options: ["sm", "md", "lg"] },
   },
@@ -173,20 +188,35 @@ export const LoadError: Story = {
 
 export const Tones: Story = {
   render: () => (
-    <div className="grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-3">
-      {(["neutral", "brand", "success", "warning", "danger"] as const).map(
-        (tone) => (
-          <div key={tone} className="bg-card rounded-xl border">
-            <EmptyState
-              icon={HardHatIcon}
-              tone={tone}
-              size="md"
-              title={`Tone: ${tone}`}
-              description="Site Engineers you add appear here."
-            />
-          </div>
-        ),
-      )}
+    <div className="grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-4">
+      {(
+        [
+          "neutral",
+          "brand",
+          "success",
+          "warning",
+          "danger",
+          "red",
+          "orange",
+          "amber",
+          "green",
+          "teal",
+          "sky",
+          "blue",
+          "violet",
+          "pink",
+        ] as const
+      ).map((tone) => (
+        <div key={tone} className="bg-card rounded-xl border">
+          <EmptyState
+            icon={HardHatIcon}
+            tone={tone}
+            size="md"
+            title={`Tone: ${tone}`}
+            description="Site Engineers you add appear here."
+          />
+        </div>
+      ))}
     </div>
   ),
 };

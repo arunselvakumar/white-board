@@ -52,7 +52,7 @@ Every empty list, tab, page, load error and no-access screen uses `EmptyState` f
 | Couldn't load / error boundary          | `WarningCircleIcon`, `tone="danger"`, `orbit={false}` |
 | No access, not found                    | `tone="neutral"`, `orbit={false}`                     |
 
-Pick the icon for the thing that is missing (a folder for Projects, people for Labour). Lucide stays the icon set for everything else.
+Pick the icon for the thing that is missing (a folder for Projects, people for Labour). The icon is drawn bare, in its `tone`: a meaning (`brand` by default, `success`, `warning`, `danger`, `neutral`) or a hue (`red`, `orange`, `amber`, `green`, `teal`, `sky`, `blue`, `violet`, `pink`). Lucide stays the icon set for everything else.
 
 ## Select
 

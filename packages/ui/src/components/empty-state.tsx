@@ -33,7 +33,22 @@ import {
  *   <EmptyState icon={UsersThreeIcon} title="No Labour yet" … />
  */
 export type EmptyStateTone =
-  "neutral" | "brand" | "success" | "warning" | "danger";
+  /* Meaning */
+  | "neutral"
+  | "brand"
+  | "success"
+  | "warning"
+  | "danger"
+  /* Colour, for when the icon just needs its own hue */
+  | "red"
+  | "orange"
+  | "amber"
+  | "green"
+  | "teal"
+  | "sky"
+  | "blue"
+  | "violet"
+  | "pink";
 
 export type EmptyStateSize = "sm" | "md" | "lg";
 
@@ -46,7 +61,7 @@ export type EmptyStateProps = {
   actions?: ReactNode;
   /** Anything else that belongs under the description (a list, a hint). */
   children?: ReactNode;
-  /** Colour of the centre icon, from the theme's tokens. */
+  /** Colour of the centre icon: a meaning (`danger`) or a hue (`orange`). */
   tone?: EmptyStateTone;
   /** `lg` for a whole page, `md` inside a card, `sm` in a table, sheet or list. */
   size?: EmptyStateSize;
@@ -55,44 +70,46 @@ export type EmptyStateProps = {
   className?: string;
 } & Omit<React.ComponentProps<"div">, "title" | "children">;
 
-/** Each tone sets `--empty-tone`; the tile, halo and glyph read from it. */
+/** The centre icon's colour; the duotone's back layer is the same hue, lighter. */
 const toneVariants = cva("", {
   variants: {
     tone: {
-      neutral: "[--empty-tone:var(--foreground)]",
-      brand: "[--empty-tone:var(--primary)]",
-      success: "[--empty-tone:var(--chart-3)]",
-      warning: "[--empty-tone:var(--chart-4)]",
-      danger: "[--empty-tone:var(--destructive)]",
+      neutral: "text-muted-foreground",
+      brand: "text-primary",
+      success: "text-green-600 dark:text-green-400",
+      warning: "text-amber-500 dark:text-amber-400",
+      danger: "text-destructive",
+      red: "text-red-500 dark:text-red-400",
+      orange: "text-orange-500 dark:text-orange-400",
+      amber: "text-amber-500 dark:text-amber-400",
+      green: "text-green-600 dark:text-green-400",
+      teal: "text-teal-600 dark:text-teal-400",
+      sky: "text-sky-500 dark:text-sky-400",
+      blue: "text-blue-600 dark:text-blue-400",
+      violet: "text-violet-600 dark:text-violet-400",
+      pink: "text-pink-500 dark:text-pink-400",
     },
   },
   defaultVariants: { tone: "brand" },
 });
 
-const tileVariants = cva(
-  [
-    "relative flex shrink-0 items-center justify-center border border-[color-mix(in_oklab,var(--empty-tone)_18%,var(--border))]",
-    "bg-linear-to-b from-card to-[color-mix(in_oklab,var(--empty-tone)_9%,var(--card))]",
-    "text-(--empty-tone) shadow-[0_1px_2px_rgb(0_0_0/0.04),0_10px_24px_-10px_color-mix(in_oklab,var(--empty-tone)_45%,transparent)]",
-  ],
-  {
-    variants: {
-      size: {
-        sm: "size-10 rounded-xl [&_svg]:size-5",
-        md: "size-12 rounded-[0.9rem] [&_svg]:size-6",
-        lg: "size-14 rounded-2xl [&_svg]:size-7",
-      },
+const iconVariants = cva("flex shrink-0 items-center justify-center", {
+  variants: {
+    size: {
+      sm: "[&_svg]:size-8",
+      md: "[&_svg]:size-10",
+      lg: "[&_svg]:size-12",
     },
-    defaultVariants: { size: "lg" },
   },
-);
+  defaultVariants: { size: "lg" },
+});
 
 const orbitVariants = cva("relative mx-auto aspect-8/5 w-full", {
   variants: {
     size: {
       sm: "",
       // The title sits over the faded lower rings, as the tiles fan out above it.
-      md: "-mb-8 max-w-60",
+      md: "-mb-6 max-w-60",
       lg: "-mb-10 max-w-80",
     },
   },
@@ -148,12 +165,6 @@ function EmptyStateOrbit() {
       viewBox="0 0 320 200"
       className="absolute inset-0 size-full overflow-visible [mask-image:radial-gradient(circle_at_50%_50%,#000_42%,transparent_88%)] print:hidden"
     >
-      <circle
-        cx={CX}
-        cy={CY}
-        r={RINGS[0]}
-        className="fill-[color-mix(in_oklab,var(--empty-tone)_6%,transparent)]"
-      />
       {RINGS.map((r) => (
         <circle
           key={r}
@@ -211,7 +222,7 @@ function EmptyState({
     <div
       aria-hidden="true"
       data-slot="empty-state-icon"
-      className={tileVariants({ size })}
+      className={cn(iconVariants({ size }), toneVariants({ tone }))}
     >
       <CentreIcon weight="duotone" />
     </div>
@@ -221,11 +232,7 @@ function EmptyState({
     <Empty
       data-size={size}
       data-tone={tone}
-      className={cn(
-        toneVariants({ tone }),
-        size === "sm" ? "gap-3 p-4" : "gap-5",
-        className,
-      )}
+      className={cn(size === "sm" ? "gap-3 p-4" : "gap-5", className)}
       {...props}
     >
       <EmptyHeader
