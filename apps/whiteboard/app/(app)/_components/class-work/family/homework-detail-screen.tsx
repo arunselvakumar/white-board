@@ -1,5 +1,7 @@
 "use client";
 
+import { ClipboardTextIcon } from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { useAuth } from "@repo/auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -20,12 +22,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/card";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-} from "@repo/ui/components/empty";
 import { Label } from "@repo/ui/components/label";
 import { Textarea } from "@repo/ui/components/textarea";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
@@ -424,19 +420,22 @@ function NotAvailable({ role }: { role: FamilyHomeRole }) {
   return (
     <div className="w-full p-6">
       <div className="max-w-3xl">
-        <Empty className="border">
-          <EmptyHeader>
-            <EmptyDescription>This Homework isn’t available.</EmptyDescription>
-          </EmptyHeader>
-          <EmptyContent>
+        <EmptyState
+          className="border"
+          icon={ClipboardTextIcon}
+          tone="neutral"
+          size="md"
+          orbit={false}
+          title="This Homework isn’t available."
+          actions={
             <Link
               href={homeworkPagePath(role)}
               className={buttonVariants({ variant: "outline" })}
             >
               Back to Homework
             </Link>
-          </EmptyContent>
-        </Empty>
+          }
+        />
       </div>
     </div>
   );

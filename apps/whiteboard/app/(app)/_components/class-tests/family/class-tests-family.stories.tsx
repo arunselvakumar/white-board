@@ -260,9 +260,10 @@ export const ParentStudentWithoutResults: Story = {
   ),
   play: async ({ canvas }) => {
     const ravi = within(canvas.getByRole("region", { name: "Ravi Kumar" }));
+    await expect(ravi.getByText("No published results yet.")).toBeVisible();
     await expect(
       ravi.getByText(
-        "No published results yet. Ravi Kumar’s marks show here once the centre publishes a Test.",
+        "Ravi Kumar’s marks show here once the centre publishes a Test.",
       ),
     ).toBeVisible();
     await expect(ravi.queryByRole("list")).toBeNull();
@@ -283,9 +284,10 @@ export const StudentWithoutResults: Story = {
     </AppShell>
   ),
   play: async ({ canvas }) => {
+    await expect(canvas.getByText("No published results yet.")).toBeVisible();
     await expect(
       canvas.getByText(
-        "No published results yet. Your marks show here once the centre publishes a Test.",
+        "Your marks show here once the centre publishes a Test.",
       ),
     ).toBeVisible();
     await expect(

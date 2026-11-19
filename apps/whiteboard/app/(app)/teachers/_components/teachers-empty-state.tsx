@@ -1,17 +1,18 @@
+import { ChalkboardTeacherIcon } from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import Link from "next/link";
 import { Button } from "@repo/ui/components/button";
 
 export function TeachersEmptyState() {
   return (
-    <div className="rounded-xl border border-dashed p-8 text-center">
-      <h2 className="text-lg font-semibold">No Teachers yet</h2>
-      <p className="text-muted-foreground mt-1 text-sm">
-        Add a Centre Teacher or Visiting Tutor to invite them and assign
-        Batches.
-      </p>
-      <Button className="mt-5" render={<Link href="/teachers/new" />}>
-        Add Teacher
-      </Button>
-    </div>
+    <EmptyState
+      className="border"
+      icon={ChalkboardTeacherIcon}
+      title={<h2>No Teachers yet</h2>}
+      description="Add a Centre Teacher or Visiting Tutor to invite them and assign Batches."
+      actions={
+        <Button render={<Link href="/teachers/new" />}>Add Teacher</Button>
+      }
+    />
   );
 }

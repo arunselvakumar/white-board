@@ -1,18 +1,13 @@
 "use client";
 
+import { CalendarCheckIcon } from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { useAuth } from "@repo/auth/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { CalendarCheck, Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 import { useId } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Card, CardContent, CardHeader } from "@repo/ui/components/card";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
 
 import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import { StudentAvatar } from "@/app/(app)/_components/students/student-avatar";
@@ -78,15 +73,12 @@ export function AbsenceNoticesContent({
       <div className="max-w-4xl space-y-6">
         <PageHeader title="Absence Notices" meta={copy.meta} />
         {days.length === 0 ? (
-          <Empty className="rounded-2xl border">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <CalendarCheck aria-hidden="true" />
-              </EmptyMedia>
-              <EmptyTitle>No absence notices for upcoming Classes</EmptyTitle>
-              <EmptyDescription>{copy.emptyDescription}</EmptyDescription>
-            </EmptyHeader>
-          </Empty>
+          <EmptyState
+            className="rounded-2xl border"
+            icon={CalendarCheckIcon}
+            title="No absence notices for upcoming Classes"
+            description={copy.emptyDescription}
+          />
         ) : (
           days.map((day) => <DaySection key={day.date} day={day} />)
         )}

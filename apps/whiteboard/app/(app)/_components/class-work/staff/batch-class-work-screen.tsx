@@ -1,5 +1,7 @@
 "use client";
 
+import { BooksIcon, ClipboardTextIcon } from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   useMutation,
   useQueryClient,
@@ -28,14 +30,6 @@ import {
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
 import { Card, CardContent, CardHeader } from "@repo/ui/components/card";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
 import {
   Tabs,
   TabsContent,
@@ -603,27 +597,25 @@ function HomeworkEmpty({
   onSet: () => void;
 }) {
   return (
-    <Empty className="rounded-2xl border">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <ClipboardList aria-hidden="true" />
-        </EmptyMedia>
-        <EmptyTitle>No Homework yet</EmptyTitle>
-        <EmptyDescription>
-          {canEdit
-            ? "After a Class, set Homework with a due date. Students and Parents see it and mark it done."
-            : "No Homework was set for this Batch."}
-        </EmptyDescription>
-      </EmptyHeader>
-      {canEdit ? (
-        <EmptyContent>
+    <EmptyState
+      className="rounded-2xl border"
+      icon={ClipboardTextIcon}
+      size="md"
+      title="No Homework yet"
+      description={
+        canEdit
+          ? "After a Class, set Homework with a due date. Students and Parents see it and mark it done."
+          : "No Homework was set for this Batch."
+      }
+      actions={
+        canEdit ? (
           <Button type="button" onClick={onSet}>
             <Plus aria-hidden="true" />
             Set homework
           </Button>
-        </EmptyContent>
-      ) : null}
-    </Empty>
+        ) : null
+      }
+    />
   );
 }
 
@@ -635,26 +627,24 @@ function MaterialsEmpty({
   onShare: () => void;
 }) {
   return (
-    <Empty className="rounded-2xl border">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <BookOpen aria-hidden="true" />
-        </EmptyMedia>
-        <EmptyTitle>No Study Material yet</EmptyTitle>
-        <EmptyDescription>
-          {canEdit
-            ? "Share notes, a link, or a PDF or photo with the Batch."
-            : "No Study Material was shared with this Batch."}
-        </EmptyDescription>
-      </EmptyHeader>
-      {canEdit ? (
-        <EmptyContent>
+    <EmptyState
+      className="rounded-2xl border"
+      icon={BooksIcon}
+      size="md"
+      title="No Study Material yet"
+      description={
+        canEdit
+          ? "Share notes, a link, or a PDF or photo with the Batch."
+          : "No Study Material was shared with this Batch."
+      }
+      actions={
+        canEdit ? (
           <Button type="button" onClick={onShare}>
             <Plus aria-hidden="true" />
             Share material
           </Button>
-        </EmptyContent>
-      ) : null}
-    </Empty>
+        ) : null
+      }
+    />
   );
 }

@@ -1,8 +1,5 @@
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-} from "@repo/ui/components/empty";
+import { HourglassIcon } from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { PageWatermark } from "@repo/ui/components/page-watermark";
 
 export function PagePlaceholder({
@@ -20,11 +17,13 @@ export function PagePlaceholder({
           <h1 className="text-2xl tracking-tight">{title}</h1>
         </div>
       </div>
-      <Empty className="border">
-        <EmptyHeader>
-          <EmptyDescription>{description}</EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState
+        className="border"
+        icon={HourglassIcon}
+        tone="neutral"
+        title="Nothing here yet"
+        description={description}
+      />
     </div>
   );
 }

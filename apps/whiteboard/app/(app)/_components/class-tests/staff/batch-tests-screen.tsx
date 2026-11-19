@@ -1,5 +1,7 @@
 "use client";
 
+import { ExamIcon } from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ClipboardCheck, Lock, PenLine, Plus } from "lucide-react";
 import Link from "next/link";
@@ -7,14 +9,6 @@ import { useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
 import { Card, CardContent, CardHeader } from "@repo/ui/components/card";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
 
 import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import {
@@ -183,26 +177,24 @@ function TestsEmpty({
   onCreate: () => void;
 }) {
   return (
-    <Empty className="rounded-2xl border">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <ClipboardCheck aria-hidden="true" />
-        </EmptyMedia>
-        <EmptyTitle>No Tests yet</EmptyTitle>
-        <EmptyDescription>
-          {canCreate
-            ? "Create a Test, enter each Student’s marks, and publish when they’re ready. Students and Parents see only their own results."
-            : "No Tests were recorded for this Batch."}
-        </EmptyDescription>
-      </EmptyHeader>
-      {canCreate ? (
-        <EmptyContent>
+    <EmptyState
+      className="rounded-2xl border"
+      icon={ExamIcon}
+      size="md"
+      title="No Tests yet"
+      description={
+        canCreate
+          ? "Create a Test, enter each Student’s marks, and publish when they’re ready. Students and Parents see only their own results."
+          : "No Tests were recorded for this Batch."
+      }
+      actions={
+        canCreate ? (
           <Button type="button" onClick={onCreate}>
             <Plus aria-hidden="true" />
             Create test
           </Button>
-        </EmptyContent>
-      ) : null}
-    </Empty>
+        ) : null
+      }
+    />
   );
 }

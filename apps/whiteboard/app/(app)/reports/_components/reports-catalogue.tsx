@@ -1,16 +1,12 @@
 "use client";
 
+import { ChartBarIcon } from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ChevronRight, Settings } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@repo/ui/components/badge";
 import { buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
 
 import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import {
@@ -68,14 +64,12 @@ export function ReportsCatalogue({
         }
       />
       {groups.length === 0 ? (
-        <Empty className="border">
-          <EmptyHeader>
-            <EmptyTitle>No reports for you yet.</EmptyTitle>
-            <EmptyDescription>
-              Reports you can open will show here.
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+        <EmptyState
+          className="border"
+          icon={ChartBarIcon}
+          title="No reports for you yet."
+          description="Reports you can open will show here."
+        />
       ) : (
         groups.map((entry) => (
           <section

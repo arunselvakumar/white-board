@@ -1,5 +1,7 @@
 "use client";
 
+import { LinkBreakIcon } from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Badge } from "@repo/ui/components/badge";
 import { buttonVariants } from "@repo/ui/components/button";
 import {
@@ -8,11 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/card";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-} from "@repo/ui/components/empty";
 import { PageWatermark } from "@repo/ui/components/page-watermark";
 import { Download } from "lucide-react";
 import Link from "next/link";
@@ -343,15 +340,19 @@ export function FamilyHome({
           <h1 className="text-2xl tracking-tight">{title}</h1>
         </div>
         {home.students.length === 0 ? (
-          <Empty className="border">
-            <EmptyHeader>
-              <EmptyDescription>
-                {role === "parent"
-                  ? "No Students are linked to you yet. Ask the centre to add your email address to your child’s Student profile."
-                  : "Your Student record isn’t linked yet. Ask the centre to check the email address on your Student profile."}
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
+          <EmptyState
+            className="border"
+            icon={LinkBreakIcon}
+            size="md"
+            title={
+              role === "parent" ? "No Students linked yet" : "Not linked yet"
+            }
+            description={
+              role === "parent"
+                ? "No Students are linked to you yet. Ask the centre to add your email address to your child’s Student profile."
+                : "Your Student record isn’t linked yet. Ask the centre to check the email address on your Student profile."
+            }
+          />
         ) : role === "parent" ? (
           home.students.map((student) => (
             <section

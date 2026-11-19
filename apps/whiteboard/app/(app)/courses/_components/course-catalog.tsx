@@ -1,5 +1,7 @@
 "use client";
 
+import { BookOpenIcon } from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { useState } from "react";
 import { BookOpen, BookOpenCheck, FolderClosed, Plus } from "lucide-react";
 import {
@@ -13,12 +15,6 @@ import {
 } from "@repo/ui/components/alert-dialog";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-} from "@repo/ui/components/empty";
 import { PageWatermark } from "@repo/ui/components/page-watermark";
 import {
   Table,
@@ -123,18 +119,18 @@ export function CourseCatalog({
         ) : loading ? (
           <CatalogStatus noun="Courses" />
         ) : courses.length === 0 ? (
-          <Empty className="border-0">
-            <EmptyHeader>
-              <EmptyDescription>
-                Add the first Course this centre teaches.
-              </EmptyDescription>
-            </EmptyHeader>
-            <EmptyContent>
+          <EmptyState
+            className="border-0"
+            icon={BookOpenIcon}
+            size="md"
+            title="No Courses yet"
+            description="Add the first Course this centre teaches."
+            actions={
               <Button type="button" onClick={onAdd}>
                 Add Course
               </Button>
-            </EmptyContent>
-          </Empty>
+            }
+          />
         ) : (
           <Table>
             <TableHeader className="bg-muted/40">

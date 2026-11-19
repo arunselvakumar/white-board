@@ -146,7 +146,7 @@ function EmptyStateOrbit() {
       aria-hidden="true"
       focusable="false"
       viewBox="0 0 320 200"
-      className="absolute inset-0 size-full overflow-visible [mask-image:radial-gradient(circle_at_50%_50%,#000_42%,transparent_88%)]"
+      className="absolute inset-0 size-full overflow-visible [mask-image:radial-gradient(circle_at_50%_50%,#000_42%,transparent_88%)] print:hidden"
     >
       <circle
         cx={CX}

@@ -1,6 +1,12 @@
 "use client";
 
 import {
+  LockSimpleIcon,
+  SlidersHorizontalIcon,
+  WarningCircleIcon,
+} from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
+import {
   keepPreviousData,
   useQuery,
   useQueryClient,
@@ -16,13 +22,6 @@ import {
   type ReactNode,
 } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import { Spinner } from "@repo/ui/components/spinner";
 import Link from "next/link";
@@ -85,19 +84,19 @@ export function ReportScreen({ reportKey }: { reportKey: string }) {
 function ReportNotAvailable() {
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-6 p-4 sm:p-6">
-      <Empty className="border">
-        <EmptyHeader>
-          <EmptyTitle>This report isn&apos;t available to you.</EmptyTitle>
-          <EmptyDescription>
-            Open Reports to see the reports you can use.
-          </EmptyDescription>
-        </EmptyHeader>
-        <EmptyContent>
+      <EmptyState
+        className="border"
+        icon={LockSimpleIcon}
+        tone="neutral"
+        orbit={false}
+        title="This report isn't available to you."
+        description="Open Reports to see the reports you can use."
+        actions={
           <Link href="/reports" className={buttonVariants()}>
             Open Reports
           </Link>
-        </EmptyContent>
-      </Empty>
+        }
+      />
     </div>
   );
 }
@@ -243,12 +242,14 @@ function ChoosePrompt({
   description: string;
 }) {
   return (
-    <Empty className="border print:hidden">
-      <EmptyHeader>
-        <EmptyTitle>{title}</EmptyTitle>
-        <EmptyDescription>{description}</EmptyDescription>
-      </EmptyHeader>
-    </Empty>
+    <EmptyState
+      className="border print:hidden"
+      icon={SlidersHorizontalIcon}
+      tone="neutral"
+      size="md"
+      title={title}
+      description={description}
+    />
   );
 }
 
@@ -329,34 +330,38 @@ function ReportErrorState({
 }) {
   const queryClient = useQueryClient();
   return (
-    <Empty className="border" role="alert">
-      <EmptyHeader>
-        <EmptyTitle>{message}</EmptyTitle>
-        <EmptyDescription>
-          Change the filters above, or try again.
-        </EmptyDescription>
-      </EmptyHeader>
-      <EmptyContent className="flex-row justify-center">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => {
-            void queryClient
-              .resetQueries({
-                queryKey: [...reportQueries.key.documents(), reportKey],
-              })
-              .then(onRetry);
-          }}
-        >
-          Try again
-        </Button>
-        <Link
-          href={reportHref(reportKey)}
-          className={buttonVariants({ variant: "ghost" })}
-        >
-          Clear filters
-        </Link>
-      </EmptyContent>
-    </Empty>
+    <EmptyState
+      className="border"
+      role="alert"
+      icon={WarningCircleIcon}
+      tone="danger"
+      size="md"
+      orbit={false}
+      title={message}
+      description="Change the filters above, or try again."
+      actions={
+        <>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              void queryClient
+                .resetQueries({
+                  queryKey: [...reportQueries.key.documents(), reportKey],
+                })
+                .then(onRetry);
+            }}
+          >
+            Try again
+          </Button>
+          <Link
+            href={reportHref(reportKey)}
+            className={buttonVariants({ variant: "ghost" })}
+          >
+            Clear filters
+          </Link>
+        </>
+      }
+    />
   );
 }

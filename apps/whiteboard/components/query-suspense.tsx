@@ -1,5 +1,7 @@
 "use client";
 
+import { WarningCircleIcon } from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import {
@@ -9,13 +11,6 @@ import {
   useSyncExternalStore,
 } from "react";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
 import { Skeleton } from "@repo/ui/components/skeleton";
 
 import { isServerRendered } from "@/lib/server-rendered-routes";
@@ -106,12 +101,15 @@ class QueryErrorBoundary extends Component<
   override render() {
     if (this.state.error != null) {
       return (
-        <Empty className="border">
-          <EmptyHeader>
-            <EmptyTitle>Couldn&apos;t load this page</EmptyTitle>
-            <EmptyDescription>Please try again.</EmptyDescription>
-          </EmptyHeader>
-          <EmptyContent>
+        <EmptyState
+          className="border"
+          icon={WarningCircleIcon}
+          tone="danger"
+          size="md"
+          orbit={false}
+          title="Couldn't load this page"
+          description="Please try again."
+          actions={
             <Button
               type="button"
               onClick={() => {
@@ -121,8 +119,8 @@ class QueryErrorBoundary extends Component<
             >
               Try again
             </Button>
-          </EmptyContent>
-        </Empty>
+          }
+        />
       );
     }
 
