@@ -43,7 +43,7 @@ Company (tenant)
     Chat, Notifications, Support                              → modules/13
 ```
 
-In our build (ADR CM-0034, ADR CM-0046) the main menu is Dashboard, Projects, **Departments** (Human Resources: Staff and HRMS; Marketing), Workspace (Central Store, Central Inventory, Central Payment, Party Balance, Central Reports), Masters and Settings. Each department is a page of cards, one per screen. The tree above is the legacy shape the modules were specified from.
+In our build (ADR CM-0034, ADR CM-0046, ADR CM-0047) the main menu is Dashboard, Projects, **Departments** (Human Resources: Staff and HRMS; Marketing), Workspace (Central Store, Central Inventory, Central Payment, Party Balance, Central Reports), Masters and Settings. Each department is a page of cards, one per screen; in the sidebar layout, a department's page and screens swap the main menu for the department's own menu, as a Project does. The tree above is the legacy shape the modules were specified from.
 
 Three things define the product's character:
 

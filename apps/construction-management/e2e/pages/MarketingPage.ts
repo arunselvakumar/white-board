@@ -6,9 +6,22 @@ export class MarketingPage extends AppShellPage {
     return "/app/marketing";
   }
 
-  /** The Departments submenu in the sidebar, open on any Marketing page (ADR CM-0046). */
+  /** The Departments submenu in the main menu, open on `/app/departments` (ADR CM-0046). */
   public get departmentsSubmenu() {
     return this.mainMenu.getByRole("list", { name: "Departments" });
+  }
+
+  /** Marketing's own sidebar menu, in place of the main menu on its pages (ADR CM-0047). */
+  public get departmentMenu() {
+    return this.page.getByRole("navigation", {
+      name: "Marketing",
+      exact: true,
+    });
+  }
+
+  /** The first row of a department's sidebar menu (ADR CM-0047). */
+  public get backToMainMenu() {
+    return this.page.getByRole("link", { name: "Back to Main Menu" });
   }
 
   /** Marketing's page of cards, one per entry the Role opens (ADR CM-0046). */

@@ -33,6 +33,7 @@ import {
 import { NotificationBell } from "@/app/app/_components/notifications/notification-bell";
 import { ReadyDownloadToast } from "@/app/app/_components/notifications/ready-download-toast";
 import { isAppNavActive } from "@/lib/app-nav";
+import { departmentMenuAt } from "@/lib/departments-nav";
 import {
   NO_MARKETING_ACCESS,
   type MarketingMenuAccess,
@@ -44,6 +45,7 @@ import { BrandMark } from "@/components/app-shell/brand-mark";
 import { MastersNavMenu } from "./masters-nav-menu";
 import { NAV_BUTTON_CLASS } from "./nav-button-class";
 import { CompanyDeletionBanner } from "./company-deletion-banner";
+import { DepartmentMenu } from "./department-menu";
 import { DepartmentsNavMenu } from "./departments-nav-menu";
 import { HOME_PATH, filterMainMenu, mainMenuAreas } from "./main-menu-areas";
 import { setMenuLayout, useMenuLayout } from "./menu-layout";
@@ -66,9 +68,11 @@ const MAIN_CLASS = `${PAGE_WATERMARK_HOST_CLASS} flex min-w-0 flex-1 flex-col ou
  * Departments, Workspace, Masters and Settings, then the plan card, My
  * Profile, Switch Company (ADR-0051) and Sign out. On a phone a slim bar
  * opens the sidebar sheet and keeps the bell in reach. Inside a Project the
- * areas give way to the Project's own menu (ADR CM-0020). A User who
- * picked the full-page menu (ADR CM-0039) gets a top bar in the sidebar's
- * ink and no sidebar, outside a Project: the main menu is then a page.
+ * areas give way to the Project's own menu (ADR CM-0020), and on a
+ * department's page and screens to the department's own menu, with Back
+ * to Main Menu first (ADR CM-0047). A User who picked the full-page menu
+ * (ADR CM-0039) gets a top bar in the sidebar's ink and no sidebar,
+ * outside a Project: the main menu is then a page.
  * `canOpenDashboard` is the Dashboard menu's Read flag: without it the
  * Dashboard is not in the menu. `canOpenStaffRoles` is Team Members or Role
  * Management Read (ADR CM-0030): without either, Office Staff and Role
@@ -89,6 +93,10 @@ export function AppShell({
 }) {
   const pathname = usePathname() || "/app";
   const projectId = projectIdFromPath(pathname);
+  const department =
+    projectId == null
+      ? departmentMenuAt(pathname, { canOpenStaffRoles, marketing })
+      : undefined;
   const [query, setQuery] = useState("");
   // Picking a row clears the search, so a query typed on the Main menu
   // does not hide every module of the Project opened next, and the phone
@@ -158,20 +166,27 @@ export function AppShell({
         </SidebarHeader>
         <SidebarContent>
           <SidebarGlide>
-            {projectId == null ? (
+            {projectId != null ? (
+              <ProjectNavMenu
+                projectId={projectId}
+                pathname={pathname}
+                query={query}
+                buttonClassName={NAV_BUTTON_CLASS}
+              />
+            ) : department != null ? (
+              <DepartmentMenu
+                shown={department}
+                pathname={pathname}
+                query={query}
+                buttonClassName={NAV_BUTTON_CLASS}
+              />
+            ) : (
               <MainMenu
                 pathname={pathname}
                 query={query}
                 canOpenDashboard={canOpenDashboard}
                 canOpenStaffRoles={canOpenStaffRoles}
                 marketing={marketing}
-              />
-            ) : (
-              <ProjectNavMenu
-                projectId={projectId}
-                pathname={pathname}
-                query={query}
-                buttonClassName={NAV_BUTTON_CLASS}
               />
             )}
           </SidebarGlide>

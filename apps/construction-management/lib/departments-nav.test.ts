@@ -4,6 +4,8 @@ import {
   HUMAN_RESOURCES,
   MARKETING_DEPARTMENT,
   activeDepartment,
+  departmentCardAt,
+  departmentMenuAt,
   humanResourcesGroups,
   marketingGroups,
   visibleDepartments,
@@ -83,5 +85,52 @@ describe("Departments (ADR CM-0046)", () => {
       "/app/projects",
     ])
       expect(activeDepartment(path)).toBeUndefined();
+  });
+});
+
+describe("a department's own sidebar menu (ADR CM-0047)", () => {
+  const ALL = { canOpenStaffRoles: true, marketing: FULL_MARKETING_ACCESS };
+
+  it("shows on the department's page and every one of its screens", () => {
+    for (const path of [
+      HUMAN_RESOURCES.href,
+      "/app/staff/labours",
+      "/app/hrms/leave/my",
+    ])
+      expect(departmentMenuAt(path, ALL)?.department).toBe(HUMAN_RESOURCES);
+    for (const path of [MARKETING_DEPARTMENT.href, "/app/marketing/team"])
+      expect(departmentMenuAt(path, ALL)?.department).toBe(
+        MARKETING_DEPARTMENT,
+      );
+    for (const path of ["/app/departments", "/app/projects", "/app/masters"])
+      expect(departmentMenuAt(path, ALL)).toBeUndefined();
+  });
+
+  it("keeps the main menu on Marketing's screens for a Role without Marketing", () => {
+    const access = { canOpenStaffRoles: false, marketing: NO_MARKETING_ACCESS };
+    expect(departmentMenuAt("/app/marketing/visits", access)).toBeUndefined();
+    expect(departmentMenuAt("/app/staff/labours", access)?.department).toBe(
+      HUMAN_RESOURCES,
+    );
+  });
+
+  it("lights the screen with the longest address the path is on", () => {
+    const groups = humanResourcesGroups(true);
+    const at = (path: string) => departmentCardAt(groups, path)?.label;
+    expect(at("/app/hrms")).toBe("Dashboard");
+    expect(at("/app/hrms/attendance/team")).toBe("Attendance");
+    expect(at("/app/staff/roles/r1")).toBe("Role Management");
+    expect(at("/app/staff/labours-old")).toBeUndefined();
+    expect(at(HUMAN_RESOURCES.href)).toBeUndefined();
+    expect(
+      departmentCardAt(marketingGroups(FULL_MARKETING_ACCESS), "/app/marketing")
+        ?.label,
+    ).toBe("Dashboard");
+    expect(
+      departmentCardAt(
+        marketingGroups(FULL_MARKETING_ACCESS),
+        "/app/marketing/follow-ups/f1",
+      )?.label,
+    ).toBe("Follow-ups");
   });
 });
