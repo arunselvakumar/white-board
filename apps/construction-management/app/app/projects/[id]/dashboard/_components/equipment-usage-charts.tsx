@@ -1,6 +1,8 @@
 import { useId } from "react";
+import { BulldozerIcon } from "@phosphor-icons/react/ssr";
 
 import type { EquipmentUsageDashboard } from "@/src/queries/site-work-dashboard";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 const HOURS = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 });
 
@@ -27,9 +29,12 @@ export function TopEquipmentChart({
         Top equipment by work hours
       </figcaption>
       {machines.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          No hourly equipment worked in this period.
-        </p>
+        <EmptyState
+          icon={BulldozerIcon}
+          tone="orange"
+          size="sm"
+          title="No hourly equipment worked in this period."
+        />
       ) : (
         <ol className="space-y-2.5" aria-labelledby={titleId}>
           {machines.map((machine) => (
@@ -83,9 +88,12 @@ export function OwnershipSplit({
         Owned vs rented hours
       </figcaption>
       {total === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          No hourly equipment worked in this period.
-        </p>
+        <EmptyState
+          icon={BulldozerIcon}
+          tone="orange"
+          size="sm"
+          title="No hourly equipment worked in this period."
+        />
       ) : (
         <>
           <div

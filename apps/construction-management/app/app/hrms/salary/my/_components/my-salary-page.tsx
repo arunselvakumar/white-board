@@ -1,7 +1,8 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Download, Receipt } from "lucide-react";
+import { ReceiptIcon } from "@phosphor-icons/react/ssr";
+import { Download } from "lucide-react";
 import { useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 
@@ -33,7 +34,8 @@ export function MySalaryPage() {
     >
       {data.items.length === 0 ? (
         <HrmsEmpty
-          icon={Receipt}
+          icon={ReceiptIcon}
+          tone="green"
           title="No salary slips yet"
           description="Your payslip appears here once your salary for a month is approved."
         />

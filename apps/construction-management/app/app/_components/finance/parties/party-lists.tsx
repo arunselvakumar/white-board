@@ -1,17 +1,11 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { FileText, Wallet } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { ReceiptIcon, WalletIcon } from "@phosphor-icons/react/ssr";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   Table,
   TableBody,
@@ -96,17 +90,13 @@ export function PartyInvoices({
   );
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <FileText />
-          </EmptyMedia>
-          <EmptyTitle>No invoices yet</EmptyTitle>
-          <EmptyDescription>
-            Record the party&apos;s bills here; payments settle them.
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState
+        icon={ReceiptIcon}
+        tone="green"
+        title="No invoices yet"
+        description="Record the party's bills here; payments settle them."
+        className="bg-card border"
+      />
     );
   return (
     <div className="space-y-3">
@@ -173,18 +163,13 @@ export function PartyPayments({
   const paths = partyPaths(projectId, partyType);
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <Wallet />
-          </EmptyMedia>
-          <EmptyTitle>No payments yet</EmptyTitle>
-          <EmptyDescription>
-            Payments to (or from) the party on this Project show here, each with
-            its receipt.
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState
+        icon={WalletIcon}
+        tone="green"
+        title="No payments yet"
+        description="Payments to (or from) the party on this Project show here, each with its receipt."
+        className="bg-card border"
+      />
     );
   return (
     <div className="space-y-3">
@@ -247,9 +232,12 @@ export function PartyStatementTable({
   );
   if (data.lines.length === 0)
     return (
-      <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
-        Nothing on the statement yet.
-      </p>
+      <EmptyState
+        icon={ReceiptIcon}
+        tone="green"
+        title="Nothing on the statement yet."
+        className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm"
+      />
     );
   return (
     <div className="space-y-2">

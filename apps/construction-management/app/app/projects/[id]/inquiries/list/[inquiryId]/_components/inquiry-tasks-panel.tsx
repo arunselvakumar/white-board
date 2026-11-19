@@ -2,6 +2,7 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ListTodo, MoreHorizontal, Plus } from "lucide-react";
+import { ListChecksIcon } from "@phosphor-icons/react/ssr";
 import { Suspense, useState } from "react";
 import { Button } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
@@ -12,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
@@ -180,9 +182,13 @@ function TaskList({
         )}
       </div>
       {data.items.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          No tasks. Add to-dos like sending the brochure or a site visit.
-        </p>
+        <EmptyState
+          icon={ListChecksIcon}
+          tone="sky"
+          size="sm"
+          title="No tasks."
+          description="Add to-dos like sending the brochure or a site visit."
+        />
       ) : (
         <ul aria-label="Tasks" className="divide-y">
           {data.items.map((task) => (

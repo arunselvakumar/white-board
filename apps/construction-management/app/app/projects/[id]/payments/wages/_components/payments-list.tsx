@@ -8,8 +8,8 @@ import {
   Handshake,
   LayoutGrid,
   Shovel,
-  Wallet,
 } from "lucide-react";
+import { MagnifyingGlassIcon, WalletIcon } from "@phosphor-icons/react/ssr";
 import { Suspense, useState, useTransition } from "react";
 import {
   AlertDialog,
@@ -22,13 +22,7 @@ import {
 } from "@repo/ui/components/alert-dialog";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { FilterTabs, type FilterTab } from "@repo/ui/components/filter-tabs";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
@@ -192,21 +186,17 @@ function PaymentRows({
     filter.to !== "";
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <Wallet />
-          </EmptyMedia>
-          <EmptyTitle>
-            {filtered ? "No payments match" : "No payments yet"}
-          </EmptyTitle>
-          <EmptyDescription>
-            {filtered
-              ? "Try another type, kind or date range."
-              : "Pay a Labour or a Vendor from the Labour or Vendor tab; their payments list here."}
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState
+        className="bg-card border"
+        icon={filtered ? MagnifyingGlassIcon : WalletIcon}
+        tone={filtered ? "neutral" : "green"}
+        title={filtered ? "No payments match" : "No payments yet"}
+        description={
+          filtered
+            ? "Try another type, kind or date range."
+            : "Pay a Labour or a Vendor from the Labour or Vendor tab; their payments list here."
+        }
+      />
     );
 
   const ask = (payment: WagePayment) => {

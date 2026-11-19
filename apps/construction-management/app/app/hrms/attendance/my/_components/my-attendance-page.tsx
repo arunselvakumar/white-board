@@ -5,6 +5,7 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
+import { CalendarCheckIcon } from "@phosphor-icons/react/ssr";
 import {
   CalendarPlus,
   Clock,
@@ -18,6 +19,7 @@ import { useEffect, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@repo/ui/components/alert";
 import { Button } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import {
   HRMS_ATTENDANCE_KEY,
@@ -374,9 +376,13 @@ function MyAttendance() {
           </p>
         </div>
         {data.entries.length === 0 ? (
-          <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
-            No check-ins today yet.
-          </p>
+          <EmptyState
+            icon={CalendarCheckIcon}
+            tone="teal"
+            size="md"
+            title="No check-ins today yet."
+            className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm"
+          />
         ) : (
           <ul
             aria-label="Today's entries"

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
+import { FolderSimpleIcon, WrenchIcon } from "@phosphor-icons/react/ssr";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
 import { Input } from "@repo/ui/components/input";
@@ -19,6 +20,7 @@ import {
 } from "@repo/ui/components/select";
 import { Switch } from "@repo/ui/components/switch";
 import { Textarea } from "@repo/ui/components/textarea";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { ChecklistSkeleton } from "@/app/app/_components/masters/masters-skeletons";
@@ -106,10 +108,14 @@ function ProjectsChecklist({
   const { data } = useSuspenseQuery(projectOptionsQuery);
   if (data.items.length === 0)
     return (
-      <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
-        No Projects yet. Add a Project first, then assign the {screen.label} to
-        it.
-      </p>
+      <EmptyState
+        icon={FolderSimpleIcon}
+        tone="blue"
+        size="sm"
+        title="No Projects yet."
+        description={`Add a Project first, then assign the ${screen.label} to it.`}
+        className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm"
+      />
     );
   return (
     <Checklist
@@ -144,9 +150,14 @@ function DepartmentsChecklist({
     }));
   if (choices.length === 0)
     return (
-      <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
-        No Departments yet. Add them under Masters → Departments.
-      </p>
+      <EmptyState
+        icon={WrenchIcon}
+        tone="orange"
+        size="sm"
+        title="No Departments yet."
+        description="Add them under Masters → Departments."
+        className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm"
+      />
     );
   return (
     <Checklist

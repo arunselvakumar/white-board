@@ -1,10 +1,12 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { FileTextIcon } from "@phosphor-icons/react/ssr";
 import { FileText, Trash2, Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { ImageUploader } from "@/app/app/_components/profile/image-uploader";
@@ -126,10 +128,14 @@ export function LabourFiles({ labour }: { labour: LabourResponse }) {
         {documents.isPending ? (
           <LabourFilesSkeleton />
         ) : (documents.data?.items.length ?? 0) === 0 ? (
-          <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
-            No documents yet. Add an ID card, bank passbook or licence (PDF,
-            PNG, JPEG or WebP, up to 10 MB).
-          </p>
+          <EmptyState
+            icon={FileTextIcon}
+            tone="blue"
+            size="md"
+            title="No documents yet."
+            description="Add an ID card, bank passbook or licence (PDF, PNG, JPEG or WebP, up to 10 MB)."
+            className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm"
+          />
         ) : (
           <ul
             aria-label="Documents"

@@ -1,15 +1,9 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { FileSpreadsheet } from "lucide-react";
 import { Suspense } from "react";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { LockSimpleIcon } from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { RecentReports } from "@/app/app/_components/reports/recent-reports";
@@ -41,18 +35,14 @@ function MarketingReportCards({ today }: { today: string }) {
   const pickers = useReportPickerOptions(null, offered);
   if (offered.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <FileSpreadsheet />
-          </EmptyMedia>
-          <EmptyTitle>No Marketing Reports you can generate</EmptyTitle>
-          <EmptyDescription>
-            Marketing Reports need the Report flag on Visits. Ask the Owner to
-            change your Permission Matrix.
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState
+        icon={LockSimpleIcon}
+        tone="neutral"
+        orbit={false}
+        title="No Marketing Reports you can generate"
+        description="Marketing Reports need the Report flag on Visits. Ask the Owner to change your Permission Matrix."
+        className="bg-card border"
+      />
     );
   const copy = REPORT_GROUP_COPY.marketing;
   return (

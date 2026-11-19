@@ -1,7 +1,9 @@
 "use client";
 
 import { useId, type CSSProperties } from "react";
+import { ChartBarIcon } from "@phosphor-icons/react/ssr";
 import { cn } from "@repo/ui/lib/utils";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 /**
  * Small charts of the Project Dashboard's tracking sections, in the style
@@ -114,7 +116,7 @@ export function CountBars({
         {title}
       </figcaption>
       {total === 0 ? (
-        <p className="text-muted-foreground text-sm">{empty}</p>
+        <EmptyState icon={ChartBarIcon} tone="sky" size="sm" title={empty} />
       ) : (
         <ol className="space-y-2.5" aria-labelledby={titleId}>
           {items.map((item) => (

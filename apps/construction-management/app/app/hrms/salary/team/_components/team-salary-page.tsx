@@ -1,12 +1,12 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { CurrencyInrIcon, LockSimpleIcon } from "@phosphor-icons/react/ssr";
 import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   Download,
-  IndianRupee,
   Wallet,
 } from "lucide-react";
 import { Suspense, useState, useTransition } from "react";
@@ -152,7 +152,9 @@ function Month({ month, today }: { month: string; today: string }) {
   if (data == null)
     return (
       <HrmsEmpty
-        icon={IndianRupee}
+        icon={LockSimpleIcon}
+        tone="neutral"
+        orbit={false}
         title="Team salary is not shared with you"
         description="Seeing everyone's salary needs View All on Salary Management. Your own payslips are in My Salary."
       />
@@ -283,7 +285,8 @@ function MonthSalaries({
 
       {regular.length === 0 ? (
         <HrmsEmpty
-          icon={IndianRupee}
+          icon={CurrencyInrIcon}
+          tone="green"
           title={`No salaries for ${monthLabel(month)}`}
           description={
             can.calculate

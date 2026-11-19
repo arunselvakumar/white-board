@@ -1,7 +1,11 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { MoreHorizontal, Plus, Search, ShieldCheck } from "lucide-react";
+import {
+  MagnifyingGlassIcon,
+  ShieldCheckIcon,
+} from "@phosphor-icons/react/ssr";
+import { MoreHorizontal, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, useMemo, useState } from "react";
@@ -23,14 +27,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   InputGroup,
   InputGroupAddon,
@@ -227,19 +224,14 @@ function RolesListContent({ actions }: { actions: RoleActions }) {
           actions={addLink}
         />
         {data.length === 0 ? (
-          <Empty className="bg-card border">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <ShieldCheck />
-              </EmptyMedia>
-              <EmptyTitle>No Roles yet</EmptyTitle>
-              <EmptyDescription>
-                Make a Role for each kind of work, like Site Engineer or
-                Accountant, and tick what it may do.
-              </EmptyDescription>
-            </EmptyHeader>
-            {addLink != null ? <EmptyContent>{addLink}</EmptyContent> : null}
-          </Empty>
+          <EmptyState
+            icon={ShieldCheckIcon}
+            tone="violet"
+            title="No Roles yet"
+            description="Make a Role for each kind of work, like Site Engineer or Accountant, and tick what it may do."
+            className="bg-card border"
+            actions={addLink}
+          />
         ) : (
           <div className="space-y-3">
             <InputGroup className="sm:max-w-xs">
@@ -258,9 +250,12 @@ function RolesListContent({ actions }: { actions: RoleActions }) {
             </InputGroup>
             <FormAlert message={listError} />
             {items.length === 0 ? (
-              <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
-                No Role matches “{query.trim()}”.
-              </p>
+              <EmptyState
+                icon={MagnifyingGlassIcon}
+                tone="neutral"
+                title={`No Role matches “${query.trim()}”.`}
+                className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm"
+              />
             ) : (
               <ul
                 aria-label="Roles"

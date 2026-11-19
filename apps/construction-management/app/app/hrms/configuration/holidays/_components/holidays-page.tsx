@@ -5,13 +5,8 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import {
-  CalendarHeart,
-  ChevronLeft,
-  ChevronRight,
-  FileSpreadsheet,
-  Plus,
-} from "lucide-react";
+import { CalendarStarIcon } from "@phosphor-icons/react/ssr";
+import { ChevronLeft, ChevronRight, FileSpreadsheet, Plus } from "lucide-react";
 import { Suspense, useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
@@ -157,7 +152,8 @@ function HolidayYear({
   if (data.items.length === 0)
     return (
       <HrmsEmpty
-        icon={CalendarHeart}
+        icon={CalendarStarIcon}
+        tone="teal"
         title={`No holidays in ${String(year)}`}
         description="Add the national, festival and Company holidays your Team Members get, or import the year's list from Excel."
         action={

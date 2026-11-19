@@ -1,18 +1,12 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ClipboardList, Plus } from "lucide-react";
+import { ClipboardTextIcon } from "@phosphor-icons/react/ssr";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import {
   formatDate,
@@ -91,20 +85,18 @@ export function MaterialRequestsList({
     );
   if (data.total === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <ClipboardList />
-          </EmptyMedia>
-          <EmptyTitle>No Material Requests</EmptyTitle>
-          <EmptyDescription>
-            {storeId != null
-              ? "Requests the Projects raise to this store show here."
-              : "Ask a Central Store for materials; its Delivery Notes bring them to site."}
-          </EmptyDescription>
-        </EmptyHeader>
-        {add == null ? null : <EmptyContent>{add}</EmptyContent>}
-      </Empty>
+      <EmptyState
+        icon={ClipboardTextIcon}
+        tone="sky"
+        title="No Material Requests"
+        description={
+          storeId != null
+            ? "Requests the Projects raise to this store show here."
+            : "Ask a Central Store for materials; its Delivery Notes bring them to site."
+        }
+        className="bg-card border"
+        actions={add}
+      />
     );
   return (
     <div className="space-y-3">

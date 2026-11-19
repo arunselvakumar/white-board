@@ -1,7 +1,11 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Handshake, Plus, Search } from "lucide-react";
+import {
+  AddressBookIcon,
+  MagnifyingGlassIcon,
+} from "@phosphor-icons/react/ssr";
+import { Plus, Search } from "lucide-react";
 import Link from "next/link";
 import {
   Suspense,
@@ -21,14 +25,7 @@ import {
   AlertDialogTitle,
 } from "@repo/ui/components/alert-dialog";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   InputGroup,
   InputGroupAddon,
@@ -149,22 +146,18 @@ function OtherPartyRows({
   const filtered = filter.search.trim().length > 0;
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <Handshake />
-          </EmptyMedia>
-          <EmptyTitle>
-            {filtered ? "No Other Parties match" : "No Other Parties yet"}
-          </EmptyTitle>
-          <EmptyDescription>
-            {filtered
-              ? "Try another name, GSTIN or mobile."
-              : "Add the landlords, consultants and buyers you bill or pay, with the Projects they work on."}
-          </EmptyDescription>
-        </EmptyHeader>
-        {!filtered && <EmptyContent>{addLink}</EmptyContent>}
-      </Empty>
+      <EmptyState
+        icon={filtered ? MagnifyingGlassIcon : AddressBookIcon}
+        tone={filtered ? "neutral" : "violet"}
+        title={filtered ? "No Other Parties match" : "No Other Parties yet"}
+        description={
+          filtered
+            ? "Try another name, GSTIN or mobile."
+            : "Add the landlords, consultants and buyers you bill or pay, with the Projects they work on."
+        }
+        className="bg-card border"
+        actions={filtered ? undefined : addLink}
+      />
     );
 
   const ask = (party: OtherParty) => {

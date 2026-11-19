@@ -2,19 +2,13 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { FileDown, Plus, ScrollText, Wallet } from "lucide-react";
+import { CoinsIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { cn } from "@repo/ui/lib/utils";
 
 import { formatDate } from "@/app/app/_components/payments/payment-format";
@@ -223,26 +217,22 @@ export function PettyCashScreen({ projectId }: { projectId: string }) {
         {openButton}
       </div>
       {data.items.length === 0 ? (
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <Wallet />
-            </EmptyMedia>
-            <EmptyTitle>
-              {data.viewAll
-                ? "No petty-cash accounts yet"
-                : "You hold no petty-cash account"}
-            </EmptyTitle>
-            <EmptyDescription>
-              {data.viewAll
-                ? "Open one for each Team Member who spends cash on site."
-                : "Ask your accountant to open one for you."}
-            </EmptyDescription>
-          </EmptyHeader>
-          {openButton == null ? null : (
-            <EmptyContent>{openButton}</EmptyContent>
-          )}
-        </Empty>
+        <EmptyState
+          className="bg-card border"
+          icon={CoinsIcon}
+          tone="green"
+          title={
+            data.viewAll
+              ? "No petty-cash accounts yet"
+              : "You hold no petty-cash account"
+          }
+          description={
+            data.viewAll
+              ? "Open one for each Team Member who spends cash on site."
+              : "Ask your accountant to open one for you."
+          }
+          actions={openButton}
+        />
       ) : (
         <>
           <ul

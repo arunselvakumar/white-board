@@ -1,14 +1,8 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Lock } from "lucide-react";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { LockSimpleIcon } from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { AdvancedSettings } from "@/app/app/settings/_components/advanced-settings";
@@ -28,17 +22,14 @@ export function CompanyProfileScreen() {
           meta="How your Company appears on documents and to your team."
         />
         {profile == null ? (
-          <Empty className="bg-card border">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <Lock />
-              </EmptyMedia>
-              <EmptyTitle>You cannot see the Company profile</EmptyTitle>
-              <EmptyDescription>
-                Ask the Owner to allow Settings in your Permission Matrix.
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
+          <EmptyState
+            icon={LockSimpleIcon}
+            tone="neutral"
+            orbit={false}
+            title="You cannot see the Company profile"
+            description="Ask the Owner to allow Settings in your Permission Matrix."
+            className="bg-card border"
+          />
         ) : (
           <CompanyProfileForm profile={profile} />
         )}

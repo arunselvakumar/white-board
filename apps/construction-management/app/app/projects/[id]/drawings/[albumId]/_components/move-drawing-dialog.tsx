@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense, useState } from "react";
+import { FoldersIcon } from "@phosphor-icons/react/ssr";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
@@ -22,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -92,9 +94,12 @@ function MoveDrawingForm({
         </DialogDescription>
       </DialogHeader>
       {items.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          This Project has no other album. Add one on the Drawings page first.
-        </p>
+        <EmptyState
+          icon={FoldersIcon}
+          tone="blue"
+          size="sm"
+          title="This Project has no other album. Add one on the Drawings page first."
+        />
       ) : (
         <div className="space-y-1.5">
           <Label htmlFor="move-drawing-album" required>

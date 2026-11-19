@@ -1,10 +1,10 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { MagnifyingGlassIcon, StorefrontIcon } from "@phosphor-icons/react/ssr";
 import {
   CircleDot,
   CircleOff,
-  HardHat,
   LayoutGrid,
   MoreHorizontal,
   Plus,
@@ -30,14 +30,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { FilterTabs, type FilterTab } from "@repo/ui/components/filter-tabs";
 import {
   InputGroup,
@@ -266,22 +259,18 @@ function VendorRows({
     filter.projectId != null;
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <HardHat />
-          </EmptyMedia>
-          <EmptyTitle>
-            {filtered ? "No Vendors match" : "No Vendors yet"}
-          </EmptyTitle>
-          <EmptyDescription>
-            {filtered
-              ? "Try another name, status or Project."
-              : "Add the labour gangs you hire, with a rate per day for each Labour Category on each shift."}
-          </EmptyDescription>
-        </EmptyHeader>
-        {!filtered && <EmptyContent>{addLink}</EmptyContent>}
-      </Empty>
+      <EmptyState
+        icon={filtered ? MagnifyingGlassIcon : StorefrontIcon}
+        tone={filtered ? "neutral" : "orange"}
+        title={filtered ? "No Vendors match" : "No Vendors yet"}
+        description={
+          filtered
+            ? "Try another name, status or Project."
+            : "Add the labour gangs you hire, with a rate per day for each Labour Category on each shift."
+        }
+        className="bg-card border"
+        actions={filtered ? undefined : addLink}
+      />
     );
 
   const showBalance = data.items.some((item) => item.balance != null);

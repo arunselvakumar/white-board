@@ -4,19 +4,13 @@ import {
   useSuspenseInfiniteQuery,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { CalendarDays, Download, List, MapPinned } from "lucide-react";
+import { MagnifyingGlassIcon, MapTrifoldIcon } from "@phosphor-icons/react/ssr";
+import { CalendarDays, Download, List } from "lucide-react";
 import Link from "next/link";
 import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
 import { Suspense, useEffect, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import {
@@ -526,26 +520,18 @@ function VisitRows({
 
   if (items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <MapPinned />
-          </EmptyMedia>
-          <EmptyTitle>
-            {filtered ? "No Visits match" : "No Visits yet"}
-          </EmptyTitle>
-          <EmptyDescription>
-            {filtered
-              ? "Try other dates, people, companies or statuses."
-              : "Plan the Visits your marketing team will make to Prospect Companies, or log one already made, with the people met and what was discussed."}
-          </EmptyDescription>
-        </EmptyHeader>
-        {!filtered && canCreate && (
-          <EmptyContent>
-            <VisitButtons />
-          </EmptyContent>
-        )}
-      </Empty>
+      <EmptyState
+        icon={filtered ? MagnifyingGlassIcon : MapTrifoldIcon}
+        tone={filtered ? "neutral" : "teal"}
+        title={filtered ? "No Visits match" : "No Visits yet"}
+        description={
+          filtered
+            ? "Try other dates, people, companies or statuses."
+            : "Plan the Visits your marketing team will make to Prospect Companies, or log one already made, with the people met and what was discussed."
+        }
+        className="bg-card border"
+        actions={!filtered && canCreate ? <VisitButtons /> : undefined}
+      />
     );
 
   return (

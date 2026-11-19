@@ -1,6 +1,7 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { MagnifyingGlassIcon, UsersThreeIcon } from "@phosphor-icons/react/ssr";
 import {
   AlarmClock,
   CalendarOff,
@@ -9,11 +10,11 @@ import {
   LogIn,
   LogOut,
   Plane,
-  Users,
 } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { FilterTabs, type FilterTab } from "@repo/ui/components/filter-tabs";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import type { LiveState } from "@/src/hrms/domain/attendance";
 import {
@@ -88,7 +89,8 @@ function TeamToday() {
   if (data.items.length === 0)
     return (
       <HrmsEmpty
-        icon={Users}
+        icon={UsersThreeIcon}
+        tone="violet"
         title="No Team Members yet"
         description="Add Team Members in Masters → Team Members. Once they join the Company they appear here with today's check-in."
       />
@@ -116,9 +118,12 @@ function TeamToday() {
         onValueChange={setFilter}
       />
       {items.length === 0 ? (
-        <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
-          Nobody matches this filter.
-        </p>
+        <EmptyState
+          icon={MagnifyingGlassIcon}
+          tone="neutral"
+          title="Nobody matches this filter."
+          className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm"
+        />
       ) : (
         <ul
           aria-label="Team Members today"

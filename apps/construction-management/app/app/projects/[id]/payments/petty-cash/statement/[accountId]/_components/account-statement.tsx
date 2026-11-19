@@ -2,6 +2,7 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense, useId, useState, useTransition } from "react";
+import { CoinsIcon } from "@phosphor-icons/react/ssr";
 import { Badge } from "@repo/ui/components/badge";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
@@ -14,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { cn } from "@repo/ui/lib/utils";
 
 import { formatPaise } from "@/components/money/money-input";
@@ -85,10 +87,12 @@ function Lines({
         ))}
       </dl>
       {data.entries.length === 0 ? (
-        <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
-          No entries between {formatDate(from)} and {formatDate(to)}. Pending
-          vouchers show once approved.
-        </p>
+        <EmptyState
+          className="bg-card border"
+          icon={CoinsIcon}
+          tone="green"
+          title={`No entries between ${formatDate(from)} and ${formatDate(to)}. Pending vouchers show once approved.`}
+        />
       ) : (
         <>
           <div className="bg-card hidden overflow-x-auto rounded-lg border md:block">

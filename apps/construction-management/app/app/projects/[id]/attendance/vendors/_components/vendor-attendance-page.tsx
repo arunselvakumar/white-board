@@ -6,20 +6,13 @@ import {
   CalendarRange,
   ChevronLeft,
   ChevronRight,
-  HardHat,
   Timer,
 } from "lucide-react";
+import { StorefrontIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { Suspense, useDeferredValue, useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import {
@@ -52,24 +45,18 @@ export function shiftDate(date: string, days: number): string {
 
 function NoVendors() {
   return (
-    <Empty className="bg-card border">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <HardHat />
-        </EmptyMedia>
-        <EmptyTitle>No vendors on this Project</EmptyTitle>
-        <EmptyDescription>
-          Assign a vendor to this Project in Human Resources → Vendors, with a
-          rate card of shifts and Labour Category rates, to record its
-          headcount.
-        </EmptyDescription>
-      </EmptyHeader>
-      <EmptyContent>
+    <EmptyState
+      className="bg-card border"
+      icon={StorefrontIcon}
+      tone="orange"
+      title="No vendors on this Project"
+      description="Assign a vendor to this Project in Human Resources → Vendors, with a rate card of shifts and Labour Category rates, to record its headcount."
+      actions={
         <Link href={VENDORS_PATH} className={buttonVariants()}>
           Go to Vendors
         </Link>
-      </EmptyContent>
-    </Empty>
+      }
+    />
   );
 }
 

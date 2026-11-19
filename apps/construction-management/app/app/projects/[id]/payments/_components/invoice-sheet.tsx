@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+import { WalletIcon } from "@phosphor-icons/react/ssr";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -22,6 +23,7 @@ import {
   SheetTitle,
 } from "@repo/ui/components/sheet";
 import { Textarea } from "@repo/ui/components/textarea";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -190,7 +192,12 @@ export function InvoiceDetail({
           Payments
         </h3>
         {invoice.payments.length === 0 ? (
-          <p className="text-muted-foreground text-sm">Nothing paid yet.</p>
+          <EmptyState
+            icon={WalletIcon}
+            tone="green"
+            size="sm"
+            title="Nothing paid yet."
+          />
         ) : (
           <ul className="space-y-0.5 text-sm">
             {invoice.payments.map((payment) => (

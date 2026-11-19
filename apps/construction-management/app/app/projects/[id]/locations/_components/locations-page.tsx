@@ -2,7 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowDown, ArrowUp, MapPin, MoreHorizontal, Plus } from "lucide-react";
+import { MapPinIcon } from "@phosphor-icons/react/ssr";
+import { ArrowDown, ArrowUp, MoreHorizontal, Plus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -252,7 +253,8 @@ export function LocationsPage({
       />
       {items.length === 0 ? (
         <StructureEmpty
-          icon={MapPin}
+          icon={MapPinIcon}
+          tone="teal"
           title={
             access.create
               ? "Name the places on this Project"

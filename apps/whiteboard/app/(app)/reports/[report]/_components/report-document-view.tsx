@@ -1,11 +1,7 @@
+import { MagnifyingGlassIcon } from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import Link from "next/link";
 import { Badge } from "@repo/ui/components/badge";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
 import {
   Table,
   TableBody,
@@ -63,16 +59,18 @@ export function ReportDocumentView({
     >
       <ReportDocumentHeader document={document} />
       {document.emptyText != null || document.pages.length === 0 ? (
-        <Empty className="border print:border-0">
-          <EmptyHeader>
-            <EmptyTitle>
-              {document.emptyText ?? "Nothing to show for these filters."}
-            </EmptyTitle>
-            <EmptyDescription className="print:hidden">
+        <EmptyState
+          className="border print:border-0"
+          icon={MagnifyingGlassIcon}
+          tone="neutral"
+          size="md"
+          title={document.emptyText ?? "Nothing to show for these filters."}
+          description={
+            <span className="print:hidden">
               Try another period or fewer filters.
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+            </span>
+          }
+        />
       ) : (
         document.pages.map((page, index) => (
           <section

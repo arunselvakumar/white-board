@@ -5,7 +5,6 @@ import {
   AlarmClock,
   Ban,
   BadgeCheck,
-  Building2,
   CircleCheck,
   CircleX,
   Inbox,
@@ -13,9 +12,16 @@ import {
   Percent,
   UserRoundSearch,
 } from "lucide-react";
+import {
+  BuildingsIcon,
+  HouseLineIcon,
+  UserListIcon,
+  UsersThreeIcon,
+} from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useState } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { formatDate } from "@/app/app/_components/payments/payment-format";
 import {
@@ -68,10 +74,12 @@ export function BookingSectionBody({
 }) {
   if (booking.counts.total === 0)
     return (
-      <p className="text-muted-foreground flex items-center gap-2 text-sm">
-        <Building2 aria-hidden="true" className="size-4" />
-        No units yet: add Wings with their floors and units.
-      </p>
+      <EmptyState
+        icon={BuildingsIcon}
+        tone="blue"
+        size="sm"
+        title="No units yet: add Wings with their floors and units."
+      />
     );
   const max = Math.max(1, ...booking.wings.map((wing) => wing.counts.total));
   return (
@@ -133,7 +141,12 @@ export function BookingSectionBody({
         <div className="min-w-0 space-y-3">
           <h3 className="text-sm font-medium">Latest bookings</h3>
           {booking.latest.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No bookings yet.</p>
+            <EmptyState
+              icon={HouseLineIcon}
+              tone="blue"
+              size="sm"
+              title="No bookings yet."
+            />
           ) : (
             <ul
               aria-label="Latest bookings"
@@ -316,9 +329,12 @@ export function InquirySectionBody({
         <div className="min-w-0 space-y-2">
           <h3 className="text-sm font-semibold">Lead source performance</h3>
           {inquiry.leadSources.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              No inquiries in this duration.
-            </p>
+            <EmptyState
+              icon={UserListIcon}
+              tone="violet"
+              size="sm"
+              title="No inquiries in this duration."
+            />
           ) : (
             <ul
               aria-label="Lead source performance"
@@ -344,9 +360,12 @@ export function InquirySectionBody({
         <div className="min-w-0 space-y-2">
           <h3 className="text-sm font-semibold">Sales team performance</h3>
           {inquiry.team.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              No inquiries or follow-ups in this duration.
-            </p>
+            <EmptyState
+              icon={UsersThreeIcon}
+              tone="violet"
+              size="sm"
+              title="No inquiries or follow-ups in this duration."
+            />
           ) : (
             <ul
               aria-label="Sales team performance"

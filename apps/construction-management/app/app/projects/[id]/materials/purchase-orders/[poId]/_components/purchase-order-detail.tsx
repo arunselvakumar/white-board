@@ -2,6 +2,7 @@
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
+import { PackageIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, useState, type ReactNode } from "react";
@@ -12,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { LocationLabel } from "@/app/app/_components/locations/location-picker";
@@ -381,9 +383,12 @@ export function PurchaseOrderDetailPage({
           Goods Receipts
         </h3>
         {po.goodsReceipts.length === 0 ? (
-          <p className="text-muted-foreground text-sm">
-            Nothing received against it yet.
-          </p>
+          <EmptyState
+            icon={PackageIcon}
+            tone="orange"
+            size="sm"
+            title="Nothing received against it yet."
+          />
         ) : (
           <ul className="bg-card divide-y rounded-lg border">
             {po.goodsReceipts.map((grn) => (

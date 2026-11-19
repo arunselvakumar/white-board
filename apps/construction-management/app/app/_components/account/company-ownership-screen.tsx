@@ -1,5 +1,6 @@
 "use client";
 
+import { LockSimpleIcon } from "@phosphor-icons/react/ssr";
 import {
   useActiveCompany,
   useCompanyAuth,
@@ -9,16 +10,10 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { Lock, Trash2, UserRoundCog } from "lucide-react";
+import { Trash2, UserRoundCog } from "lucide-react";
 import { Suspense, useState } from "react";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   Item,
   ItemActions,
@@ -180,18 +175,19 @@ export function CompanyOwnershipScreen() {
             <OwnerActions companyName={companyName} />
           </Suspense>
         ) : (
-          <Empty className="bg-card border">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <Lock />
-              </EmptyMedia>
-              <EmptyTitle>Only the Owner can do this</EmptyTitle>
-              <EmptyDescription>
+          <EmptyState
+            icon={LockSimpleIcon}
+            tone="neutral"
+            orbit={false}
+            title="Only the Owner can do this"
+            description={
+              <>
                 Transferring ownership and deleting {companyName} are the
                 Owner&apos;s alone.
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
+              </>
+            }
+            className="bg-card border"
+          />
         )}
       </div>
     </div>

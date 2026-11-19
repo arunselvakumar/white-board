@@ -1,7 +1,8 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { ChevronDown, History, Search, SearchX, X } from "lucide-react";
+import { ChevronDown, History, Search, X } from "lucide-react";
+import { MagnifyingGlassIcon, UsersThreeIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { parseAsString, useQueryState } from "nuqs";
 import { Suspense, useDeferredValue, useEffect, useRef } from "react";
@@ -12,14 +13,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@repo/ui/components/collapsible";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   InputGroup,
   InputGroupAddon,
@@ -259,19 +253,29 @@ function Group({
       </h2>
       <CollapsibleContent>
         {people.length === 0 ? (
-          <p className="text-muted-foreground text-sm">
-            No {label} on this Project.{" "}
-            {canOpenTeams ? (
-              <Link
-                href={pageHref("/app/projects/[id]/teams", { id: projectId })}
-                className="text-primary font-medium underline-offset-4 hover:underline"
-              >
-                Add them on Teams
-              </Link>
-            ) : null}
-          </p>
+          <EmptyState
+            icon={UsersThreeIcon}
+            tone="violet"
+            size="sm"
+            title={`No ${label} on this Project.`}
+            actions={
+              canOpenTeams ? (
+                <Link
+                  href={pageHref("/app/projects/[id]/teams", { id: projectId })}
+                  className="text-primary font-medium underline-offset-4 hover:underline"
+                >
+                  Add them on Teams
+                </Link>
+              ) : null
+            }
+          />
         ) : searching && shown.length === 0 ? (
-          <p className="text-muted-foreground text-sm">No match</p>
+          <EmptyState
+            icon={MagnifyingGlassIcon}
+            size="sm"
+            tone="neutral"
+            title="No match"
+          />
         ) : (
           <ul
             aria-label={label}
@@ -296,22 +300,18 @@ function Group({
 
 function NoMatch({ q, onClear }: { q: string; onClear: () => void }) {
   return (
-    <Empty className="bg-card border">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <SearchX />
-        </EmptyMedia>
-        <EmptyTitle>Nobody matches “{q.trim()}”</EmptyTitle>
-        <EmptyDescription>
-          Check the spelling, or search by part of the phone number.
-        </EmptyDescription>
-      </EmptyHeader>
-      <EmptyContent>
+    <EmptyState
+      className="bg-card border"
+      icon={MagnifyingGlassIcon}
+      tone="neutral"
+      title={`Nobody matches “${q.trim()}”`}
+      description="Check the spelling, or search by part of the phone number."
+      actions={
         <Button type="button" variant="outline" onClick={onClear}>
           Clear search
         </Button>
-      </EmptyContent>
-    </Empty>
+      }
+    />
   );
 }
 

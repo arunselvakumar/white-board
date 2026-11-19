@@ -1,17 +1,15 @@
 "use client";
 
-import { ArrowLeft, Lock, type LucideIcon } from "lucide-react";
+import type { Icon } from "@phosphor-icons/react";
+import { LockSimpleIcon } from "@phosphor-icons/react/ssr";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { buttonVariants } from "@repo/ui/components/button";
 import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+  EmptyState,
+  type EmptyStateTone,
+} from "@repo/ui/components/empty-state";
 
 import { DomainError } from "@/src/shared-kernel/domain-error";
 import { QueryHttpError } from "@/src/queries/http";
@@ -71,27 +69,30 @@ export function SectionHeader({
 }
 
 export function StructureEmpty({
-  icon: Icon,
+  icon,
   title,
   description,
   action,
+  tone,
+  orbit,
 }: {
-  icon: LucideIcon;
+  icon: Icon;
   title: string;
   description: string;
   action?: ReactNode;
+  tone?: EmptyStateTone;
+  orbit?: boolean;
 }) {
   return (
-    <Empty className="bg-card border">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <Icon />
-        </EmptyMedia>
-        <EmptyTitle>{title}</EmptyTitle>
-        <EmptyDescription>{description}</EmptyDescription>
-      </EmptyHeader>
-      {action == null ? null : <EmptyContent>{action}</EmptyContent>}
-    </Empty>
+    <EmptyState
+      className="bg-card border"
+      icon={icon}
+      tone={tone}
+      orbit={orbit}
+      title={title}
+      description={description}
+      actions={action}
+    />
   );
 }
 
@@ -100,7 +101,9 @@ export function StructureNoAccess({ what }: { what: string }) {
   return (
     <div className="w-full max-w-5xl p-6">
       <StructureEmpty
-        icon={Lock}
+        icon={LockSimpleIcon}
+        tone="neutral"
+        orbit={false}
         title={`You don't have access to ${what}`}
         description="Your Permission Matrix does not include it. Ask the Owner if you need it."
       />

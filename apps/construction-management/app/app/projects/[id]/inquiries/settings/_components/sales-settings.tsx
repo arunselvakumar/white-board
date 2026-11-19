@@ -1,5 +1,6 @@
 "use client";
 
+import { ProhibitIcon, SignpostIcon } from "@phosphor-icons/react/ssr";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
   ArrowDown,
@@ -240,7 +241,8 @@ function PickList({
   if (items.length === 0)
     return (
       <MasterEmpty
-        icon={list === "lead_source" ? Signpost : Ban}
+        icon={list === "lead_source" ? SignpostIcon : ProhibitIcon}
+        tone={list === "lead_source" ? "pink" : "red"}
         title={`No ${label}s`}
         description={
           list === "lead_source"

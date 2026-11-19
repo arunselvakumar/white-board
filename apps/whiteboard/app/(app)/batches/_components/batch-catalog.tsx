@@ -1,5 +1,7 @@
 "use client";
 
+import { BookOpenIcon, UsersFourIcon } from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import Link from "next/link";
 import { useState } from "react";
 import { CalendarDays, DoorOpen, Plus, UsersRound } from "lucide-react";
@@ -14,12 +16,6 @@ import {
 } from "@repo/ui/components/alert-dialog";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-} from "@repo/ui/components/empty";
 import { PageWatermark } from "@repo/ui/components/page-watermark";
 import {
   Select,
@@ -170,16 +166,19 @@ export function BatchCatalog({
         ) : loading ? (
           <CatalogStatus noun="Batches" />
         ) : batches.length === 0 ? (
-          <Empty className="border-0">
-            <EmptyHeader>
-              <EmptyDescription>
-                {noCourses
-                  ? "Add a Course before opening a Batch."
-                  : "Open the first Batch this centre runs."}
-              </EmptyDescription>
-            </EmptyHeader>
-            <EmptyContent>
-              {noCourses && onAddCourse != null ? (
+          <EmptyState
+            className="border-0"
+            icon={noCourses ? BookOpenIcon : UsersFourIcon}
+            tone={noCourses ? "sky" : "violet"}
+            size="md"
+            title={noCourses ? "No Courses yet" : "No Batches yet"}
+            description={
+              noCourses
+                ? "Add a Course before opening a Batch."
+                : "Open the first Batch this centre runs."
+            }
+            actions={
+              noCourses && onAddCourse != null ? (
                 <Button type="button" onClick={onAddCourse}>
                   Add Course
                 </Button>
@@ -187,9 +186,9 @@ export function BatchCatalog({
                 <Button type="button" onClick={onAdd} disabled={noCourses}>
                   Add Batch
                 </Button>
-              )}
-            </EmptyContent>
-          </Empty>
+              )
+            }
+          />
         ) : (
           <Table>
             <TableHeader className="bg-muted/40">

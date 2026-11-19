@@ -5,10 +5,12 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { Building2, HardHat, MapPin, Plus } from "lucide-react";
+import { MapPinIcon } from "@phosphor-icons/react/ssr";
+import { Building2, HardHat, Plus } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { fieldForCode } from "@/lib/server-errors";
 import type { BranchKind } from "@/src/hrms/domain/branch";
@@ -151,7 +153,8 @@ export function BranchesPage({ showMap = true }: { showMap?: boolean }) {
     >
       {data.items.length === 0 ? (
         <HrmsEmpty
-          icon={MapPin}
+          icon={MapPinIcon}
+          tone="teal"
           title="No branches or site fences yet"
           description="Add your office with its location and a radius. Add a site fence for each Project where Team Members check in."
           action={
@@ -175,10 +178,14 @@ export function BranchesPage({ showMap = true }: { showMap?: boolean }) {
               <Badge variant="secondary">{offices.length}</Badge>
             </div>
             {offices.length === 0 ? (
-              <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
-                No office branch yet. Members not on a Project need one to check
-                in when GPS is required.
-              </p>
+              <EmptyState
+                icon={MapPinIcon}
+                tone="teal"
+                size="md"
+                title="No office branch yet."
+                description="Members not on a Project need one to check in when GPS is required."
+                className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm"
+              />
             ) : (
               <ul
                 aria-label="Office branches"
@@ -216,10 +223,14 @@ export function BranchesPage({ showMap = true }: { showMap?: boolean }) {
               <Badge variant="secondary">{sites.length}</Badge>
             </div>
             {sites.length === 0 ? (
-              <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
-                No site fence yet. Team Members on a Project can check in at its
-                site once it has one.
-              </p>
+              <EmptyState
+                icon={MapPinIcon}
+                tone="teal"
+                size="md"
+                title="No site fence yet."
+                description="Team Members on a Project can check in at its site once it has one."
+                className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm"
+              />
             ) : (
               <ul
                 aria-label="Project sites"

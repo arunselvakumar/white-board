@@ -5,7 +5,8 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { Hash, Plus } from "lucide-react";
+import { HashIcon } from "@phosphor-icons/react/ssr";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -19,14 +20,7 @@ import {
 } from "@repo/ui/components/alert-dialog";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Label } from "@repo/ui/components/label";
 import {
   Select,
@@ -160,15 +154,12 @@ export function SequenceIdsManager({
         <FormAlert message={error} />
 
         {rules.length === 0 ? (
-          <Empty className="bg-card border">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <Hash />
-              </EmptyMedia>
-              <EmptyTitle>
-                No rule for {sequenceModule(module).label}
-              </EmptyTitle>
-              <EmptyDescription>
+          <EmptyState
+            icon={HashIcon}
+            tone="amber"
+            title={`No rule for ${sequenceModule(module).label}`}
+            description={
+              <>
                 Numbers use the standard format{" "}
                 <span className="font-mono">
                   {formatSequenceNumber(
@@ -178,10 +169,11 @@ export function SequenceIdsManager({
                   )}
                 </span>{" "}
                 until you add a rule.
-              </EmptyDescription>
-            </EmptyHeader>
-            <EmptyContent>{addButton}</EmptyContent>
-          </Empty>
+              </>
+            }
+            className="bg-card border"
+            actions={addButton}
+          />
         ) : (
           <ul
             aria-label={`${sequenceModule(module).label} rules`}

@@ -6,11 +6,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, useMemo, type ReactNode } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { FolderSimpleIcon } from "@phosphor-icons/react/ssr";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import { Textarea } from "@repo/ui/components/textarea";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { ChecklistSkeleton } from "@/app/app/_components/masters/masters-skeletons";
@@ -82,9 +84,14 @@ function ProjectsChecklist({
   const { data } = useSuspenseQuery(projectOptionsQuery);
   if (data.items.length === 0)
     return (
-      <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
-        No Projects yet. Add a Project first, then assign the Vendor to it.
-      </p>
+      <EmptyState
+        icon={FolderSimpleIcon}
+        tone="blue"
+        size="sm"
+        title="No Projects yet."
+        description="Add a Project first, then assign the Vendor to it."
+        className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm"
+      />
     );
   return (
     <ul className="grid gap-2 sm:grid-cols-2">

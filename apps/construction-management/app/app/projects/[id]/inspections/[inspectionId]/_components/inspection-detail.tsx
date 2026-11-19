@@ -10,6 +10,7 @@ import {
   Trash2,
   TriangleAlert,
 } from "lucide-react";
+import { BlueprintIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, useState, type ReactNode } from "react";
@@ -23,6 +24,7 @@ import {
   AlertDialogTitle,
 } from "@repo/ui/components/alert-dialog";
 import { Button, buttonVariants } from "@repo/ui/components/button";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
@@ -233,7 +235,12 @@ function Drawings({
         Linked drawings
       </h3>
       {inspection.drawings.length === 0 ? (
-        <p className="text-muted-foreground text-sm">No drawings linked.</p>
+        <EmptyState
+          icon={BlueprintIcon}
+          tone="blue"
+          size="sm"
+          title="No drawings linked."
+        />
       ) : (
         <ul className="grid gap-2 sm:grid-cols-2">
           {inspection.drawings.map((drawing) => (

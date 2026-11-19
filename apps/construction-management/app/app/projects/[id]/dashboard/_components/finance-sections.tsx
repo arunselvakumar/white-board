@@ -8,9 +8,11 @@ import {
   Scale,
   Wallet,
 } from "lucide-react";
+import { ReceiptIcon, WalletIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useId, useState } from "react";
 import { MetricCard } from "@repo/ui/components/metric-card";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { cn } from "@repo/ui/lib/utils";
 
 import { formatPaise } from "@/components/money/money-input";
@@ -199,9 +201,12 @@ export function DuePaymentsTable({
         Due payments
       </h3>
       {dues.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          Nothing is due to any party on this Project.
-        </p>
+        <EmptyState
+          icon={ReceiptIcon}
+          tone="green"
+          size="sm"
+          title="Nothing is due to any party on this Project."
+        />
       ) : (
         <table
           aria-labelledby={headingId}
@@ -304,9 +309,12 @@ export function ModuleWisePayment({
         Module wise payment
       </figcaption>
       {total === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          Nothing was paid out on this Project in this period.
-        </p>
+        <EmptyState
+          icon={WalletIcon}
+          tone="green"
+          size="sm"
+          title="Nothing was paid out on this Project in this period."
+        />
       ) : (
         <ol className="space-y-2.5" aria-labelledby={titleId}>
           {MODULES.map((module) => {

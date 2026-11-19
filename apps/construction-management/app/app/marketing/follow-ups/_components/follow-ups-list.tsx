@@ -4,17 +4,11 @@ import {
   useSuspenseInfiniteQuery,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { CalendarClock, Plus } from "lucide-react";
+import { PhoneCallIcon } from "@phosphor-icons/react/ssr";
+import { Plus } from "lucide-react";
 import { Suspense, useState, useTransition } from "react";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import {
   ItemListSkeleton,
@@ -248,7 +242,7 @@ function Group({
         </span>
       </h2>
       {items.length === 0 ? (
-        <p className="text-muted-foreground text-sm">{empty}</p>
+        <EmptyState icon={PhoneCallIcon} tone="pink" size="sm" title={empty} />
       ) : (
         <FollowUpItems
           items={items}
@@ -284,33 +278,31 @@ function FollowUpRows({
   if (items.length === 0) {
     const word = FOLLOW_UP_STATUS_LABELS[status].toLowerCase();
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <CalendarClock />
-          </EmptyMedia>
-          <EmptyTitle>
-            {status === "open"
-              ? mine
-                ? "Nothing owed by you"
-                : "No open Follow-ups"
-              : `No ${word} Follow-ups`}
-          </EmptyTitle>
-          <EmptyDescription>
-            {status === "open"
-              ? "Calls, return Visits, emails and quotations owed after a Visit show here by due date, overdue first."
-              : `Follow-ups marked ${word} show here.`}
-          </EmptyDescription>
-        </EmptyHeader>
-        {status === "open" && canCreate && (
-          <EmptyContent>
+      <EmptyState
+        icon={PhoneCallIcon}
+        tone="pink"
+        title={
+          status === "open"
+            ? mine
+              ? "Nothing owed by you"
+              : "No open Follow-ups"
+            : `No ${word} Follow-ups`
+        }
+        description={
+          status === "open"
+            ? "Calls, return Visits, emails and quotations owed after a Visit show here by due date, overdue first."
+            : `Follow-ups marked ${word} show here.`
+        }
+        className="bg-card border"
+        actions={
+          status === "open" && canCreate ? (
             <Button type="button" onClick={onAdd}>
               <Plus aria-hidden="true" />
               Add Follow-up
             </Button>
-          </EmptyContent>
-        )}
-      </Empty>
+          ) : undefined
+        }
+      />
     );
   }
 

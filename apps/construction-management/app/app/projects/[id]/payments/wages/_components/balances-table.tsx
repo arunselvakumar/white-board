@@ -1,16 +1,10 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { HardHat, Users } from "lucide-react";
+import { StorefrontIcon, UsersThreeIcon } from "@phosphor-icons/react/ssr";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   Table,
   TableBody,
@@ -61,19 +55,17 @@ export function BalancesTable({
 
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            {partyType === "labour" ? <Users /> : <HardHat />}
-          </EmptyMedia>
-          <EmptyTitle>No {nouns.many} to pay</EmptyTitle>
-          <EmptyDescription>
-            {partyType === "labour"
-              ? "Labours on this Project, and anyone who worked here in this period, show here. Add them in Human Resources → Labours."
-              : "Vendors assigned to this Project, and any who worked here in this period, show here. Assign them in Human Resources → Vendors."}
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState
+        className="bg-card border"
+        icon={partyType === "labour" ? UsersThreeIcon : StorefrontIcon}
+        tone={partyType === "labour" ? "violet" : "orange"}
+        title={`No ${nouns.many} to pay`}
+        description={
+          partyType === "labour"
+            ? "Labours on this Project, and anyone who worked here in this period, show here. Add them in Human Resources → Labours."
+            : "Vendors assigned to this Project, and any who worked here in this period, show here. Assign them in Human Resources → Vendors."
+        }
+      />
     );
 
   return (

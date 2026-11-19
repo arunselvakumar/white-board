@@ -1,7 +1,8 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { MoreHorizontal, Plus, Search, UsersRound } from "lucide-react";
+import { MoreHorizontal, Plus, Search } from "lucide-react";
+import { MagnifyingGlassIcon, UsersThreeIcon } from "@phosphor-icons/react/ssr";
 import { useDeferredValue, useState, useTransition } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
@@ -11,13 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   InputGroup,
   InputGroupAddon,
@@ -210,25 +205,24 @@ export function LaboursSection({
         </InputGroup>
       )}
       {data.items.length === 0 ? (
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <UsersRound />
-            </EmptyMedia>
-            <EmptyTitle>
-              {searching
-                ? `No Labours match “${deferredSearch.trim()}”`
-                : "No Labours on this Project"}
-            </EmptyTitle>
-            <EmptyDescription>
-              {searching
-                ? "Search by name, Labour Id or phone."
-                : canEdit && canPickLabours
-                  ? "Add the Labours who work here, from the day they start."
-                  : "Nobody has put Labours on this Project yet."}
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+        <EmptyState
+          className="bg-card border"
+          icon={searching ? MagnifyingGlassIcon : UsersThreeIcon}
+          size="md"
+          tone={searching ? "neutral" : "violet"}
+          title={
+            searching
+              ? `No Labours match “${deferredSearch.trim()}”`
+              : "No Labours on this Project"
+          }
+          description={
+            searching
+              ? "Search by name, Labour Id or phone."
+              : canEdit && canPickLabours
+                ? "Add the Labours who work here, from the day they start."
+                : "Nobody has put Labours on this Project yet."
+          }
+        />
       ) : (
         <ul
           aria-label="Labours"

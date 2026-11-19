@@ -1,6 +1,11 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import {
+  AddressBookIcon,
+  BankIcon,
+  CoinsIcon,
+} from "@phosphor-icons/react/ssr";
 import { BookOpen, Landmark, Wallet } from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState } from "react";
@@ -14,6 +19,7 @@ import {
   TabsTrigger,
 } from "@repo/ui/components/tabs";
 import { cn } from "@repo/ui/lib/utils";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { formatPaise } from "@/components/money/money-input";
@@ -100,9 +106,13 @@ function PartyDuesTable({
 }) {
   if (rows.length === 0)
     return (
-      <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
-        No {noun} has invoices, payments or a balance on these Projects.
-      </p>
+      <EmptyState
+        icon={AddressBookIcon}
+        tone="violet"
+        size="md"
+        title={`No ${noun} has invoices, payments or a balance on these Projects.`}
+        className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm"
+      />
     );
   const wide = "hidden py-2 pl-2 text-right sm:table-cell";
   // On a phone the table sizes Due and Balance to their amounts and the
@@ -297,9 +307,13 @@ function Accounts({
         </Link>
       </div>
       {accounts.length === 0 ? (
-        <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
-          There are no company accounts yet.
-        </p>
+        <EmptyState
+          icon={BankIcon}
+          tone="green"
+          size="md"
+          title="There are no company accounts yet."
+          className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm"
+        />
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2" aria-label="Company accounts">
           {accounts.map((account) => (
@@ -375,9 +389,13 @@ function PettyCash({
         Petty cash
       </h2>
       {accounts.length === 0 ? (
-        <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
-          There is no petty-cash account you can see.
-        </p>
+        <EmptyState
+          icon={CoinsIcon}
+          tone="green"
+          size="md"
+          title="There is no petty-cash account you can see."
+          className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm"
+        />
       ) : (
         <ul
           className="bg-card divide-y rounded-xl border"

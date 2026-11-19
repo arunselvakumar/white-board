@@ -2,6 +2,13 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
+  CalendarStarIcon,
+  CalendarXIcon,
+  ListChecksIcon,
+  LockSimpleIcon,
+  UsersThreeIcon,
+} from "@phosphor-icons/react/ssr";
+import {
   CalendarHeart,
   CalendarOff,
   ChevronRight,
@@ -20,6 +27,7 @@ import { Badge } from "@repo/ui/components/badge";
 import { buttonVariants } from "@repo/ui/components/button";
 import { MetricCard } from "@repo/ui/components/metric-card";
 import { cn } from "@repo/ui/lib/utils";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { HRMS_PATH } from "@/lib/hrms-nav";
 import {
@@ -522,9 +530,12 @@ function Approvals({
       }
     >
       {approvals.items.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          Nothing is waiting for your decision.
-        </p>
+        <EmptyState
+          icon={ListChecksIcon}
+          tone="sky"
+          size="sm"
+          title="Nothing is waiting for your decision."
+        />
       ) : (
         <RequestList
           label="Waiting for your decision"
@@ -556,9 +567,12 @@ function TeamLeaves({
       action={<SeeAll href={TEAM_LEAVES} label="Team Leaves" />}
     >
       {leaves.items.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          Nobody is on leave in the next 14 days.
-        </p>
+        <EmptyState
+          icon={CalendarXIcon}
+          tone="teal"
+          size="sm"
+          title="Nobody is on leave in the next 14 days."
+        />
       ) : (
         <ul aria-label="Upcoming leave" className="divide-y">
           {leaves.items.map((leave) => (
@@ -601,16 +615,23 @@ function Holidays({
   return (
     <Section id="hrms-holidays" title="Upcoming holidays">
       {holidays.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          No holidays coming up.{" "}
-          <Link
-            href={HOLIDAYS}
-            className="text-primary underline underline-offset-4"
-          >
-            Add the year&apos;s holidays
-          </Link>
-          .
-        </p>
+        <EmptyState
+          icon={CalendarStarIcon}
+          tone="teal"
+          size="sm"
+          title="No holidays coming up."
+          description={
+            <>
+              <Link
+                href={HOLIDAYS}
+                className="text-primary underline underline-offset-4"
+              >
+                Add the year&apos;s holidays
+              </Link>
+              .
+            </>
+          }
+        />
       ) : (
         <ul aria-label="Upcoming holidays" className="divide-y">
           {holidays.map((holiday) => (
@@ -689,9 +710,12 @@ function MyDay({
       action={<SeeAll href={MY_ATTENDANCE} label="My Attendance" />}
     >
       {today == null ? (
-        <p className="text-muted-foreground text-sm">
-          Your attendance is not shared with you.
-        </p>
+        <EmptyState
+          icon={LockSimpleIcon}
+          tone="neutral"
+          size="sm"
+          title="Your attendance is not shared with you."
+        />
       ) : (
         <div className="flex flex-wrap items-center gap-3">
           <span
@@ -723,9 +747,12 @@ function MyDay({
             <SeeAll href={MY_LEAVES} label="My Leaves" />
           </div>
           {balances.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              No leave balances yet.
-            </p>
+            <EmptyState
+              icon={CalendarXIcon}
+              tone="teal"
+              size="sm"
+              title="No leave balances yet."
+            />
           ) : (
             <ul
               aria-label="Leave balance"
@@ -758,9 +785,12 @@ function MyDay({
         <div className="space-y-2">
           <h4 className="text-sm font-medium">Your pending requests</h4>
           {pending.items.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              Nothing of yours is waiting for a decision.
-            </p>
+            <EmptyState
+              icon={ListChecksIcon}
+              tone="sky"
+              size="sm"
+              title="Nothing of yours is waiting for a decision."
+            />
           ) : (
             <RequestList
               label="Your pending requests"
@@ -777,7 +807,8 @@ function MyDay({
 function NoTeamYet() {
   return (
     <HrmsEmpty
-      icon={Users}
+      icon={UsersThreeIcon}
+      tone="violet"
       title="No Team Members yet"
       description="Invite your staff from Team Members. Then set working hours, holidays, shifts and leave in Configuration, and their attendance shows here."
       action={
@@ -840,7 +871,9 @@ function Dashboard() {
       </div>
       {team == null && me == null && lists.length === 0 ? (
         <HrmsEmpty
-          icon={Users}
+          icon={LockSimpleIcon}
+          tone="neutral"
+          orbit={false}
           title="Nothing to show yet"
           description="Your Permission Matrix does not include attendance or leave. Ask the Owner if you need them."
         />

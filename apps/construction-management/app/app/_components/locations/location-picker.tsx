@@ -1,9 +1,9 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { MapPin } from "lucide-react";
 import Link from "next/link";
 import { useId, useMemo, useState, type Ref } from "react";
+import { MapPinIcon } from "@phosphor-icons/react/ssr";
 import { buttonVariants } from "@repo/ui/components/button";
 import {
   Combobox,
@@ -17,14 +17,7 @@ import {
   ComboboxValue,
   useComboboxAnchor,
 } from "@repo/ui/components/combobox";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import {
   Select,
@@ -272,19 +265,19 @@ function EmptyLocations({
 }) {
   const wings = structure === "wings";
   return (
-    <Empty className="bg-card border p-6" aria-label={label}>
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <MapPin />
-        </EmptyMedia>
-        <EmptyTitle>Nothing to locate this at yet</EmptyTitle>
-        <EmptyDescription>
-          {wings
-            ? "This Project has no Wings, Amenities or Common Developments yet. Add a Wing first."
-            : "This Project has no Locations, Amenities or Common Developments yet. Add a Location first."}
-        </EmptyDescription>
-      </EmptyHeader>
-      <EmptyContent>
+    <EmptyState
+      icon={MapPinIcon}
+      tone="teal"
+      size="sm"
+      className="bg-card border p-6"
+      aria-label={label}
+      title="Nothing to locate this at yet"
+      description={
+        wings
+          ? "This Project has no Wings, Amenities or Common Developments yet. Add a Wing first."
+          : "This Project has no Locations, Amenities or Common Developments yet. Add a Location first."
+      }
+      actions={
         <Link
           href={
             wings
@@ -295,8 +288,8 @@ function EmptyLocations({
         >
           {wings ? "Open Wings" : "Open Locations"}
         </Link>
-      </EmptyContent>
-    </Empty>
+      }
+    />
   );
 }
 

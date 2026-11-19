@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  ChatsCircleIcon,
+  MagnifyingGlassIcon,
+} from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { useAuth } from "@repo/auth/react";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import {
@@ -21,13 +26,6 @@ import {
   useTransition,
 } from "react";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
 import { Input } from "@repo/ui/components/input";
 import { Spinner } from "@repo/ui/components/spinner";
 import {
@@ -310,25 +308,27 @@ function EmptyResults({
 }) {
   if (q != null) {
     return (
-      <Empty className="border-0">
-        <EmptyHeader>
-          <EmptyTitle>No Enquiries match “{q}”.</EmptyTitle>
-          <EmptyDescription>
-            Search by the prospect’s name or phone number.
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState
+        className="border-0"
+        icon={MagnifyingGlassIcon}
+        tone="neutral"
+        size="md"
+        title={<>No Enquiries match “{q}”.</>}
+        description="Search by the prospect’s name or phone number."
+      />
     );
   }
   const copy = EMPTY_COPY[view];
   return (
-    <Empty className="border-0">
-      <EmptyHeader>
-        <EmptyTitle>{copy.title}</EmptyTitle>
-        <EmptyDescription>{copy.description}</EmptyDescription>
-      </EmptyHeader>
-      <EmptyContent>
-        {view === "due" ? (
+    <EmptyState
+      className="border-0"
+      icon={ChatsCircleIcon}
+      tone="pink"
+      size="md"
+      title={copy.title}
+      description={copy.description}
+      actions={
+        view === "due" ? (
           <Button type="button" variant="outline" onClick={onShowOpen}>
             See open Enquiries
           </Button>
@@ -337,9 +337,9 @@ function EmptyResults({
             <Plus aria-hidden="true" />
             Add enquiry
           </Button>
-        )}
-      </EmptyContent>
-    </Empty>
+        )
+      }
+    />
   );
 }
 

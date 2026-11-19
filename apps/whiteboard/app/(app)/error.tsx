@@ -1,16 +1,11 @@
 "use client";
 
+import { WarningCircleIcon } from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { useQueryErrorResetBoundary } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
 
 /**
  * A page that failed to load, on the server (its prefetch) or in the browser
@@ -24,12 +19,15 @@ export default function AppError({ reset }: { reset: () => void }) {
 
   return (
     <div className="p-4 sm:p-6">
-      <Empty className="border">
-        <EmptyHeader>
-          <EmptyTitle>Couldn&apos;t load this page</EmptyTitle>
-          <EmptyDescription>Please try again.</EmptyDescription>
-        </EmptyHeader>
-        <EmptyContent>
+      <EmptyState
+        className="border"
+        icon={WarningCircleIcon}
+        tone="danger"
+        size="md"
+        orbit={false}
+        title="Couldn't load this page"
+        description="Please try again."
+        actions={
           <Button
             type="button"
             disabled={pending}
@@ -43,8 +41,8 @@ export default function AppError({ reset }: { reset: () => void }) {
           >
             Try again
           </Button>
-        </EmptyContent>
-      </Empty>
+        }
+      />
     </div>
   );
 }

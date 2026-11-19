@@ -13,6 +13,7 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
+import { PackageIcon } from "@phosphor-icons/react/ssr";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import {
@@ -34,6 +35,7 @@ import {
   SelectValue,
 } from "@repo/ui/components/select";
 import { Textarea } from "@repo/ui/components/textarea";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FieldError } from "@/components/auth/field-error";
 import { LocationPicker } from "@/app/app/_components/locations/location-picker";
@@ -847,9 +849,13 @@ export function WorksheetForm({
           </Button>
         </div>
         {lines.fields.length === 0 ? (
-          <p className="text-muted-foreground text-sm">
-            No material consumed. Add the materials the crew used, if any.
-          </p>
+          <EmptyState
+            icon={PackageIcon}
+            tone="orange"
+            size="sm"
+            title="No material consumed."
+            description="Add the materials the crew used, if any."
+          />
         ) : (
           <ol className="space-y-3">
             {lines.fields.map((field, index) => {

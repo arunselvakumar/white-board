@@ -1,23 +1,17 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { CalendarXIcon, LockSimpleIcon } from "@phosphor-icons/react/ssr";
 import {
   Ban,
   CircleCheck,
   CircleX,
   Clock,
-  ListChecks,
   type LucideIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   Tabs,
   TabsContent,
@@ -71,23 +65,25 @@ const TABS: {
   },
 ];
 
+/** An empty tab, or (`noAccess`) a part of leave the viewer may not see. */
 function Nothing({
   title,
   description,
+  noAccess = false,
 }: {
   title: string;
   description: string;
+  noAccess?: boolean;
 }) {
   return (
-    <Empty className="bg-card border">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <ListChecks />
-        </EmptyMedia>
-        <EmptyTitle>{title}</EmptyTitle>
-        <EmptyDescription>{description}</EmptyDescription>
-      </EmptyHeader>
-    </Empty>
+    <EmptyState
+      icon={noAccess ? LockSimpleIcon : CalendarXIcon}
+      tone={noAccess ? "neutral" : "teal"}
+      orbit={!noAccess}
+      title={title}
+      description={description}
+      className="bg-card border"
+    />
   );
 }
 
@@ -117,6 +113,7 @@ export function LeaveApprovalsPage({
           <ApprovalTabs initialTab={initialTab} />
         ) : (
           <Nothing
+            noAccess
             title="Approvals are not shared with you"
             description="Deciding leave needs Approve or Reject on Leave Management in your Permission Matrix."
           />

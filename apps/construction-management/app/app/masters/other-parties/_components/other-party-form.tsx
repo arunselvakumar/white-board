@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
+import { FolderSimpleIcon } from "@phosphor-icons/react/ssr";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
@@ -17,6 +18,7 @@ import {
   SelectValue,
 } from "@repo/ui/components/select";
 import { Textarea } from "@repo/ui/components/textarea";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FieldError } from "@/components/auth/field-error";
@@ -59,9 +61,14 @@ function ProjectsChecklist({
   const { data } = useSuspenseQuery(projectOptionsQuery);
   if (data.items.length === 0)
     return (
-      <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
-        No Projects yet. Add a Project first, then choose it here.
-      </p>
+      <EmptyState
+        icon={FolderSimpleIcon}
+        tone="blue"
+        size="sm"
+        title="No Projects yet."
+        description="Add a Project first, then choose it here."
+        className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm"
+      />
     );
   return (
     <CheckList

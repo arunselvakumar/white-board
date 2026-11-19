@@ -2,6 +2,7 @@
 
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { ImagePlus, Paperclip, RotateCw, X } from "lucide-react";
+import { FileTextIcon } from "@phosphor-icons/react/ssr";
 import { useId, useRef, useState } from "react";
 import {
   AlertDialog,
@@ -16,6 +17,7 @@ import {
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Progress } from "@repo/ui/components/progress";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { DocumentSection } from "@/app/app/_components/procurement/documents/document-section";
@@ -180,9 +182,13 @@ function RoleGroup({
         {label}
       </h3>
       {files.length === 0 && pending.length === 0 ? (
-        <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-center text-sm">
-          {`No ${label.toLowerCase()} yet.`}
-        </p>
+        <EmptyState
+          className="bg-card border"
+          icon={FileTextIcon}
+          tone="blue"
+          size="sm"
+          title={`No ${label.toLowerCase()} yet.`}
+        />
       ) : (
         <ul
           aria-label={label}

@@ -1,20 +1,14 @@
 "use client";
 
+import { UsersThreeIcon } from "@phosphor-icons/react/ssr";
 import { formatMobile } from "@repo/auth/construction/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Contact, Target, UserPlus } from "lucide-react";
+import { Target, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Progress } from "@repo/ui/components/progress";
 import {
   Table,
@@ -186,19 +180,14 @@ export function TeamPage({ timeZone }: { timeZone: string }) {
           actions={add}
         />
         {team.people.length === 0 ? (
-          <Empty className="bg-card border">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <Contact />
-              </EmptyMedia>
-              <EmptyTitle>No Marketing People yet</EmptyTitle>
-              <EmptyDescription>
-                Office Staff on a Role that adds Visits show here, with their
-                Visits this month and Follow-ups overdue.
-              </EmptyDescription>
-            </EmptyHeader>
-            {add != null && <EmptyContent>{add}</EmptyContent>}
-          </Empty>
+          <EmptyState
+            icon={UsersThreeIcon}
+            tone="violet"
+            title="No Marketing People yet"
+            description="Office Staff on a Role that adds Visits show here, with their Visits this month and Follow-ups overdue."
+            className="bg-card border"
+            actions={add}
+          />
         ) : (
           <div className="min-w-0 space-y-3">
             <p className="text-muted-foreground text-sm">

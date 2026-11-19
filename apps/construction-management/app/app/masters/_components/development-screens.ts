@@ -1,4 +1,6 @@
-import { Fence, Waves, type LucideIcon } from "lucide-react";
+import type { EmptyStateTone } from "@repo/ui/components/empty-state";
+import type { Icon } from "@phosphor-icons/react";
+import { BarricadeIcon, WavesIcon } from "@phosphor-icons/react/ssr";
 
 import type { DevelopmentList } from "@/src/queries/developments";
 
@@ -14,7 +16,8 @@ export type DevelopmentScreenConfig = {
   placeholder: string;
   emptyDescription: string;
   deleteDescription: string;
-  icon: LucideIcon;
+  icon: Icon;
+  tone: EmptyStateTone;
 };
 
 export const AMENITIES_SCREEN: DevelopmentScreenConfig = {
@@ -31,7 +34,8 @@ export const AMENITIES_SCREEN: DevelopmentScreenConfig = {
     "Add the facilities your Projects offer, like a Swimming Pool or a Club House.",
   deleteDescription:
     "It will no longer be offered anywhere. An Amenity a Project has cannot be deleted; remove it from those Projects or disable it instead.",
-  icon: Waves,
+  icon: WavesIcon,
+  tone: "amber",
 };
 
 export const COMMON_DEVELOPMENTS_SCREEN: DevelopmentScreenConfig = {
@@ -48,5 +52,6 @@ export const COMMON_DEVELOPMENTS_SCREEN: DevelopmentScreenConfig = {
     "Add the shared works your sites need, like a Compound Wall or Internal Roads.",
   deleteDescription:
     "It will no longer be offered anywhere. A Common Development a Project has cannot be deleted; remove it from those Projects or disable it instead.",
-  icon: Fence,
+  icon: BarricadeIcon,
+  tone: "amber",
 };

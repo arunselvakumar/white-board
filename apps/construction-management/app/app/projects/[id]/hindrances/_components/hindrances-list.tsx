@@ -1,18 +1,15 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { OctagonPause, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
+import {
+  MagnifyingGlassIcon,
+  PauseCircleIcon,
+} from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { Suspense, useDeferredValue, useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
@@ -114,29 +111,25 @@ function Hindrances({
     (filters.search ?? "").trim() !== "";
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <OctagonPause />
-          </EmptyMedia>
-          <EmptyTitle>
-            {filtered ? "No hindrances match" : "No hindrances recorded"}
-          </EmptyTitle>
-          <EmptyDescription>
-            {filtered
-              ? "Try another status, cause, party or date range."
-              : "Record each stoppage on site: its cause, the activity it held up and who was responsible."}
-          </EmptyDescription>
-        </EmptyHeader>
-        {!filtered && newHref != null && (
-          <EmptyContent>
+      <EmptyState
+        className="bg-card border"
+        icon={filtered ? MagnifyingGlassIcon : PauseCircleIcon}
+        tone={filtered ? "neutral" : "amber"}
+        title={filtered ? "No hindrances match" : "No hindrances recorded"}
+        description={
+          filtered
+            ? "Try another status, cause, party or date range."
+            : "Record each stoppage on site: its cause, the activity it held up and who was responsible."
+        }
+        actions={
+          !filtered && newHref != null ? (
             <Link href={newHref} className={buttonVariants()}>
               <Plus aria-hidden="true" />
               Record hindrance
             </Link>
-          </EmptyContent>
-        )}
-      </Empty>
+          ) : null
+        }
+      />
     );
   return (
     <div className={cn("space-y-3", className)}>

@@ -1,14 +1,7 @@
-import { SearchX } from "lucide-react";
 import Link from "next/link";
+import { MagnifyingGlassIcon } from "@phosphor-icons/react/ssr";
 import { buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { MARKETING_COMPANIES_PATH } from "@/lib/marketing-nav";
 
@@ -32,25 +25,22 @@ export function isCompanyNotFound(error: unknown): boolean {
 export function CompanyNotFound() {
   return (
     <div className="w-full max-w-4xl p-6">
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <SearchX />
-          </EmptyMedia>
-          <EmptyTitle>This Prospect Company was not found</EmptyTitle>
-          <EmptyDescription>
-            It may have been deleted, or it is not one of yours.
-          </EmptyDescription>
-        </EmptyHeader>
-        <EmptyContent>
+      <EmptyState
+        icon={MagnifyingGlassIcon}
+        tone="neutral"
+        orbit={false}
+        title="This Prospect Company was not found"
+        description="It may have been deleted, or it is not one of yours."
+        className="bg-card border"
+        actions={
           <Link
             href={MARKETING_COMPANIES_PATH}
             className={buttonVariants({ variant: "outline" })}
           >
             Back to Prospect Companies
           </Link>
-        </EmptyContent>
-      </Empty>
+        }
+      />
     </div>
   );
 }

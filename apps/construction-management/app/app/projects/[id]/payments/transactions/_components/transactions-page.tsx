@@ -1,19 +1,16 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowLeftRight, FileUp, Plus, Receipt } from "lucide-react";
+import { ArrowLeftRight, FileUp, Plus } from "lucide-react";
+import {
+  CurrencyInrIcon,
+  MagnifyingGlassIcon,
+} from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
 import { Button } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   Table,
   TableBody,
@@ -423,22 +420,18 @@ function TransactionRows({
     return (
       <div className="space-y-4">
         {(filtered || data.total > 0) && filterBar}
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <Receipt />
-            </EmptyMedia>
-            <EmptyTitle>
-              {filtered ? "No Transactions match" : "No Transactions yet"}
-            </EmptyTitle>
-            <EmptyDescription>
-              {filtered
-                ? "Try another date, account or status."
-                : "Record money in or out of an account that is not a party payment: bank charges, interest, the owner's capital, a token amount."}
-            </EmptyDescription>
-          </EmptyHeader>
-          {!filtered && canCreate && (
-            <EmptyContent>
+        <EmptyState
+          className="bg-card border"
+          icon={filtered ? MagnifyingGlassIcon : CurrencyInrIcon}
+          tone={filtered ? "neutral" : "green"}
+          title={filtered ? "No Transactions match" : "No Transactions yet"}
+          description={
+            filtered
+              ? "Try another date, account or status."
+              : "Record money in or out of an account that is not a party payment: bank charges, interest, the owner's capital, a token amount."
+          }
+          actions={
+            !filtered && canCreate ? (
               <Button
                 type="button"
                 size="sm"
@@ -448,9 +441,9 @@ function TransactionRows({
               >
                 New transaction
               </Button>
-            </EmptyContent>
-          )}
-        </Empty>
+            ) : null
+          }
+        />
       </div>
     );
 

@@ -10,6 +10,7 @@ import {
   Trash2,
   UserCheck,
 } from "lucide-react";
+import { MagnifyingGlassIcon } from "@phosphor-icons/react/ssr";
 import { useMemo, useState } from "react";
 import {
   useFieldArray,
@@ -41,6 +42,7 @@ import {
 } from "@repo/ui/components/select";
 import { Switch } from "@repo/ui/components/switch";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
@@ -991,9 +993,12 @@ export function LabourMarkingSheet({
       </div>
 
       {visible.length === 0 ? (
-        <p className="bg-card text-muted-foreground rounded-lg border p-6 text-center text-sm">
-          No Labour matches the filter.
-        </p>
+        <EmptyState
+          className="bg-card border"
+          icon={MagnifyingGlassIcon}
+          tone="neutral"
+          title="No Labour matches the filter."
+        />
       ) : (
         <ul className="space-y-2">
           {visible.map(({ row, index }) =>

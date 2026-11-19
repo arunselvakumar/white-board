@@ -1,24 +1,13 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import {
-  FileMinus,
-  LayoutGrid,
-  PackageCheck,
-  Plus,
-  ShoppingCart,
-} from "lucide-react";
+import { FileMinus, LayoutGrid, Plus, ShoppingCart } from "lucide-react";
+import { MagnifyingGlassIcon, PackageIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { Suspense, useDeferredValue, useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
@@ -209,21 +198,17 @@ function ReceiptRows({
     return (
       <div className={cn("space-y-3", className)}>
         {supplierFilter}
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <PackageCheck />
-            </EmptyMedia>
-            <EmptyTitle>
-              {filtered ? "No Goods Receipts match" : "No goods received yet"}
-            </EmptyTitle>
-            <EmptyDescription>
-              {filtered
-                ? "Try another date range, supplier or search."
-                : "Record a Goods Receipt when material arrives at the site, against a Purchase Order or without one."}
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+        <EmptyState
+          className="bg-card border"
+          icon={filtered ? MagnifyingGlassIcon : PackageIcon}
+          tone={filtered ? "neutral" : "orange"}
+          title={filtered ? "No Goods Receipts match" : "No goods received yet"}
+          description={
+            filtered
+              ? "Try another date range, supplier or search."
+              : "Record a Goods Receipt when material arrives at the site, against a Purchase Order or without one."
+          }
+        />
       </div>
     );
 

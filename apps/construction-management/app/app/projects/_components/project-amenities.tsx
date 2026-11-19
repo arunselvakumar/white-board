@@ -1,19 +1,16 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Fence, Waves, type LucideIcon } from "lucide-react";
+import type { Icon } from "@phosphor-icons/react";
+import { RoadHorizonIcon, SwimmingPoolIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+  EmptyState,
+  type EmptyStateTone,
+} from "@repo/ui/components/empty-state";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { CheckList } from "@/app/app/_components/masters/check-list";
@@ -32,7 +29,8 @@ export const KINDS: readonly {
   title: string;
   singular: string;
   href: AppHref;
-  icon: LucideIcon;
+  icon: Icon;
+  tone: EmptyStateTone;
   hint: string;
 }[] = [
   {
@@ -40,7 +38,8 @@ export const KINDS: readonly {
     title: "Amenities",
     singular: "Amenity",
     href: "/app/masters/amenities",
-    icon: Waves,
+    icon: SwimmingPoolIcon,
+    tone: "amber",
     hint: "Facilities this Project offers.",
   },
   {
@@ -48,7 +47,8 @@ export const KINDS: readonly {
     title: "Common Developments",
     singular: "Common Development",
     href: "/app/masters/common-developments",
-    icon: Fence,
+    icon: RoadHorizonIcon,
+    tone: "amber",
     hint: "Shared works on this site.",
   },
 ];
@@ -96,25 +96,22 @@ function KindSection({
         <p className="text-muted-foreground text-sm">{kind.hint}</p>
       </div>
       {rows.length === 0 ? (
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <kind.icon />
-            </EmptyMedia>
-            <EmptyTitle>No {kind.title} in Masters</EmptyTitle>
-            <EmptyDescription>
-              Add them under Masters, then tick the ones this Project has.
-            </EmptyDescription>
-          </EmptyHeader>
-          <EmptyContent>
+        <EmptyState
+          className="bg-card border"
+          icon={kind.icon}
+          tone={kind.tone}
+          size="md"
+          title={`No ${kind.title} in Masters`}
+          description="Add them under Masters, then tick the ones this Project has."
+          actions={
             <Link
               href={kind.href}
               className={buttonVariants({ variant: "outline" })}
             >
               Open {kind.title}
             </Link>
-          </EmptyContent>
-        </Empty>
+          }
+        />
       ) : canEdit ? (
         <CheckList
           legend={kind.title}
@@ -131,9 +128,12 @@ function KindSection({
           onChange={onChange}
         />
       ) : assigned.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          This Project has no {kind.title} yet.
-        </p>
+        <EmptyState
+          icon={kind.icon}
+          tone={kind.tone}
+          size="sm"
+          title={`This Project has no ${kind.title} yet.`}
+        />
       ) : (
         <ul aria-label={kind.title} className="flex flex-wrap gap-2">
           {assigned.map((row) => (

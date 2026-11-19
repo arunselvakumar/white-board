@@ -9,6 +9,7 @@ import {
   ShieldCheck,
   Trash2,
 } from "lucide-react";
+import { ClockCounterClockwiseIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, useState, type ReactNode } from "react";
@@ -26,6 +27,7 @@ import {
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Label } from "@repo/ui/components/label";
 import { Textarea } from "@repo/ui/components/textarea";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { cn } from "@repo/ui/lib/utils";
 
 import { FieldError } from "@/components/auth/field-error";
@@ -284,7 +286,12 @@ function ProgressThread({ issue }: { issue: Issue }) {
         Progress
       </h3>
       {data.items.length === 0 ? (
-        <p className="text-muted-foreground text-sm">No updates yet.</p>
+        <EmptyState
+          icon={ClockCounterClockwiseIcon}
+          tone="teal"
+          size="sm"
+          title="No updates yet."
+        />
       ) : (
         <ul aria-label="Updates" className="space-y-2">
           {data.items.map((update) => (

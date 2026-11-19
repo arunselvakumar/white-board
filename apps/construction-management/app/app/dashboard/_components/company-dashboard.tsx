@@ -1,6 +1,7 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { FolderSimpleIcon } from "@phosphor-icons/react/ssr";
 import {
   Building2,
   ClipboardCheck,
@@ -13,14 +14,7 @@ import {
 import Link from "next/link";
 import { Suspense, useState, useTransition, type ReactNode } from "react";
 import { buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { MetricCard } from "@repo/ui/components/metric-card";
 import { cn } from "@repo/ui/lib/utils";
 
@@ -301,26 +295,21 @@ function ProjectCards({ data }: { data: Dashboard }) {
 
 function NoProjects() {
   return (
-    <Empty className="bg-card border">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <Building2 />
-        </EmptyMedia>
-        <EmptyTitle>No Projects to show</EmptyTitle>
-        <EmptyDescription>
-          The Projects you are on show here with their approvals, issues, labour
-          on site and amounts due.
-        </EmptyDescription>
-      </EmptyHeader>
-      <EmptyContent>
+    <EmptyState
+      icon={FolderSimpleIcon}
+      tone="blue"
+      title="No Projects to show"
+      description="The Projects you are on show here with their approvals, issues, labour on site and amounts due."
+      className="bg-card border"
+      actions={
         <Link
           href="/app/projects"
           className={buttonVariants({ variant: "outline" })}
         >
           Go to Projects
         </Link>
-      </EmptyContent>
-    </Empty>
+      }
+    />
   );
 }
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { AddressBookIcon, FolderSimpleIcon } from "@phosphor-icons/react/ssr";
 import { formatMobile } from "@repo/auth/construction/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
@@ -36,6 +37,7 @@ import {
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
 import { cn } from "@repo/ui/lib/utils";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { activityRecordedLabel } from "@/app/app/_components/activity/activity-feed";
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
@@ -262,10 +264,13 @@ function Contacts({
       }
     >
       {company.contacts.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          No Contacts yet.
-          {canUpdate ? " Add the people you meet there." : ""}
-        </p>
+        <EmptyState
+          icon={AddressBookIcon}
+          tone="violet"
+          size="sm"
+          title="No Contacts yet."
+          description={canUpdate ? "Add the people you meet there." : undefined}
+        />
       ) : (
         <ul aria-label="Contacts" className="divide-y">
           {company.contacts.map((contact) => (
@@ -459,9 +464,12 @@ function Projects({
       }
     >
       {projects.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          No Projects for this client yet.
-        </p>
+        <EmptyState
+          icon={FolderSimpleIcon}
+          tone="blue"
+          size="sm"
+          title="No Projects for this client yet."
+        />
       ) : (
         <ul aria-label="Projects" className="divide-y">
           {projects.map((project) => (

@@ -1,12 +1,14 @@
 "use client";
 
+import { HardHatIcon, MagnifyingGlassIcon } from "@phosphor-icons/react/ssr";
 import { formatMobile } from "@repo/auth/construction/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Plus, UserCheck } from "lucide-react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, useMemo, useState } from "react";
 import { buttonVariants } from "@repo/ui/components/button";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -120,7 +122,8 @@ function SupervisorsListContent() {
         />
         {data.items.length === 0 ? (
           <MasterEmpty
-            icon={UserCheck}
+            icon={HardHatIcon}
+            tone="violet"
             title="No Site Engineers yet"
             description="Add the Site Engineers your Labours report to. Each signs in with the Site Engineer Role, and attendance can be filtered by Site Engineer."
             action={addButton}
@@ -134,9 +137,12 @@ function SupervisorsListContent() {
             />
             <FormAlert message={listError} />
             {items.length === 0 ? (
-              <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
-                No Site Engineer matches “{query.trim()}”.
-              </p>
+              <EmptyState
+                icon={MagnifyingGlassIcon}
+                tone="neutral"
+                title={`No Site Engineer matches “${query.trim()}”.`}
+                className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm"
+              />
             ) : (
               <ul
                 aria-label="Site Engineers"

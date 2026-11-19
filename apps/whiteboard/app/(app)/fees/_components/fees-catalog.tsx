@@ -1,6 +1,12 @@
 "use client";
 
 import {
+  CalendarCheckIcon,
+  CheckCircleIcon,
+  ReceiptIcon,
+} from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
+import {
   AlarmClock,
   CalendarClock,
   ClipboardList,
@@ -11,13 +17,6 @@ import {
 import Link from "next/link";
 import { Badge } from "@repo/ui/components/badge";
 import { buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
 import { Label } from "@repo/ui/components/label";
 import {
   Select,
@@ -247,29 +246,31 @@ export function FeesCatalog({
 function EmptyDues({ filter }: { filter: FeeDuesFilter }) {
   if (filter === "all") {
     return (
-      <Empty className="border-0">
-        <EmptyHeader>
-          <EmptyTitle>No remaining dues.</EmptyTitle>
-          <EmptyDescription>
-            Remaining dues will show here after an Enrollment has a Fee Plan.
-          </EmptyDescription>
-        </EmptyHeader>
-        <EmptyContent>
+      <EmptyState
+        className="border-0"
+        icon={ReceiptIcon}
+        tone="green"
+        size="md"
+        title="No remaining dues."
+        description="Remaining dues will show here after an Enrollment has a Fee Plan."
+        actions={
           <Link href="/students" className={buttonVariants()}>
             Open Students
           </Link>
-        </EmptyContent>
-      </Empty>
+        }
+      />
     );
   }
   const copy = EMPTY_COPY[filter];
   return (
-    <Empty className="border-0">
-      <EmptyHeader>
-        <EmptyTitle>{copy.title}</EmptyTitle>
-        <EmptyDescription>{copy.description}</EmptyDescription>
-      </EmptyHeader>
-    </Empty>
+    <EmptyState
+      className="border-0"
+      icon={filter === "overdue" ? CheckCircleIcon : CalendarCheckIcon}
+      tone="success"
+      size="md"
+      title={copy.title}
+      description={copy.description}
+    />
   );
 }
 

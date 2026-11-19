@@ -5,6 +5,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
+import { CalendarXIcon } from "@phosphor-icons/react/ssr";
 import { Button } from "@repo/ui/components/button";
 import {
   Dialog,
@@ -32,6 +33,7 @@ import {
   SheetTitle,
 } from "@repo/ui/components/sheet";
 import { Textarea } from "@repo/ui/components/textarea";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -583,10 +585,14 @@ function CreditList({
   );
   if (data.items.length === 0)
     return (
-      <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
-        No credits in {data.leaveYear} yet. Balances are opened by initialising
-        them.
-      </p>
+      <EmptyState
+        icon={CalendarXIcon}
+        tone="teal"
+        size="sm"
+        title={`No credits in ${data.leaveYear} yet.`}
+        description="Balances are opened by initialising them."
+        className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm"
+      />
     );
   return (
     <ul aria-label="Credits" className="bg-card divide-y rounded-xl border">

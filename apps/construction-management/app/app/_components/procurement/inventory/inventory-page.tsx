@@ -1,6 +1,7 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { MagnifyingGlassIcon, PackageIcon } from "@phosphor-icons/react/ssr";
 import {
   ArrowLeftRight,
   BellRing,
@@ -11,8 +12,6 @@ import {
   History,
   MoreHorizontal,
   PackageMinus,
-  PackageOpen,
-  PackageSearch,
   PackageX,
   Ruler,
   Scale,
@@ -32,14 +31,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Input } from "@repo/ui/components/input";
 import {
   Select,
@@ -470,20 +462,14 @@ export function InventoryPage({
       </div>
 
       {data.items.length === 0 ? (
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <PackageOpen />
-            </EmptyMedia>
-            <EmptyTitle>No stock here yet</EmptyTitle>
-            <EmptyDescription>
-              Stock comes in with goods receipts, transfers and deliveries from
-              a store. To start from today&apos;s count, import the opening
-              stock from the sample sheet.
-            </EmptyDescription>
-          </EmptyHeader>
-          {canCreate && (
-            <EmptyContent>
+        <EmptyState
+          icon={PackageIcon}
+          tone="orange"
+          title="No stock here yet"
+          description="Stock comes in with goods receipts, transfers and deliveries from a store. To start from today's count, import the opening stock from the sample sheet."
+          className="bg-card border"
+          actions={
+            canCreate ? (
               <Button
                 type="button"
                 onClick={() => {
@@ -493,9 +479,9 @@ export function InventoryPage({
                 <Upload aria-hidden="true" />
                 Import Inventory Stock
               </Button>
-            </EmptyContent>
-          )}
-        </Empty>
+            ) : undefined
+          }
+        />
       ) : (
         <>
           <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
@@ -611,17 +597,13 @@ export function InventoryPage({
           )}
 
           {rows.length === 0 ? (
-            <Empty className="bg-card border">
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <PackageSearch />
-                </EmptyMedia>
-                <EmptyTitle>No materials match</EmptyTitle>
-                <EmptyDescription>
-                  Try another name, category or state.
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
+            <EmptyState
+              icon={MagnifyingGlassIcon}
+              tone="neutral"
+              title="No materials match"
+              description="Try another name, category or state."
+              className="bg-card border"
+            />
           ) : (
             <>
               <div

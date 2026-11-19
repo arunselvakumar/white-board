@@ -1,11 +1,13 @@
 "use client";
 
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { FolderOpenIcon } from "@phosphor-icons/react/ssr";
 import { Paperclip, RotateCw, X } from "lucide-react";
 import { useId, useRef, useState } from "react";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Progress } from "@repo/ui/components/progress";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { useDirectUpload } from "@/app/app/_components/uploads/use-direct-upload";
 import { DocumentFileIcon } from "@/app/app/_components/projects/documents/document-file-icon";
@@ -80,11 +82,17 @@ function FilesBody({ documentType, documentId, canEdit, heading }: Props) {
   return (
     <div className="space-y-3">
       {files.length === 0 && pending.length === 0 ? (
-        <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
-          {mayUpload
-            ? "No attachments yet. Attach a quotation, an invoice, a challan or photos."
-            : "No attachments."}
-        </p>
+        <EmptyState
+          icon={FolderOpenIcon}
+          tone="blue"
+          size="md"
+          title={
+            mayUpload
+              ? "No attachments yet. Attach a quotation, an invoice, a challan or photos."
+              : "No attachments."
+          }
+          className="bg-card text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm"
+        />
       ) : (
         <ul
           aria-label={`${heading} files`}

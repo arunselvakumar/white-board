@@ -1,24 +1,18 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { CalendarXIcon, LockSimpleIcon } from "@phosphor-icons/react/ssr";
 import {
   CalendarDays,
   ChartColumn,
   ChevronLeft,
   ChevronRight,
   List,
-  Users,
 } from "lucide-react";
 import { Suspense, useState, useTransition } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   Tabs,
   TabsContent,
@@ -70,23 +64,25 @@ function monthLabel(month: string): string {
   }).format(new Date(`${month}-01T00:00:00Z`));
 }
 
+/** An empty tab, or (`noAccess`) a part of leave the viewer may not see. */
 function Nothing({
   title,
   description,
+  noAccess = false,
 }: {
   title: string;
   description: string;
+  noAccess?: boolean;
 }) {
   return (
-    <Empty className="bg-card border">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <Users />
-        </EmptyMedia>
-        <EmptyTitle>{title}</EmptyTitle>
-        <EmptyDescription>{description}</EmptyDescription>
-      </EmptyHeader>
-    </Empty>
+    <EmptyState
+      icon={noAccess ? LockSimpleIcon : CalendarXIcon}
+      tone={noAccess ? "neutral" : "teal"}
+      orbit={!noAccess}
+      title={title}
+      description={description}
+      className="bg-card border"
+    />
   );
 }
 
@@ -183,6 +179,7 @@ export function TeamLeavesPage({ today }: { today?: string }) {
           </Tabs>
         ) : (
           <Nothing
+            noAccess
             title="Team leave is not shared with you"
             description="Seeing everyone's leave needs View All on Leave Management."
           />

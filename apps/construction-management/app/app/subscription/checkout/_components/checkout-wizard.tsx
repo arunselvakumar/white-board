@@ -1,5 +1,6 @@
 "use client";
 
+import { CreditCardIcon, LockSimpleIcon } from "@phosphor-icons/react/ssr";
 import { useCompanyUser } from "@repo/auth/construction/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -7,19 +8,13 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { CheckCircle2, CreditCard } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Controller, useForm, type UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Input } from "@repo/ui/components/input";
 import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/radio-group";
@@ -190,14 +185,14 @@ export function CheckoutWizard({ kind: requested }: { kind?: string | null }) {
     return (
       <Centered>
         <PageHeader back={BACK} title="Choose a plan" />
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyTitle>Only the Owner can buy or change the plan</EmptyTitle>
-            <EmptyDescription>
-              Ask the Owner of this Company to renew or upgrade.
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+        <EmptyState
+          icon={LockSimpleIcon}
+          tone="neutral"
+          orbit={false}
+          title="Only the Owner can buy or change the plan"
+          description="Ask the Owner of this Company to renew or upgrade."
+          className="bg-card border"
+        />
       </Centered>
     );
 
@@ -205,18 +200,14 @@ export function CheckoutWizard({ kind: requested }: { kind?: string | null }) {
     return (
       <Centered>
         <PageHeader back={BACK} title="Choose a plan" />
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <CreditCard aria-hidden="true" />
-            </EmptyMedia>
-            <EmptyTitle>Payments are not configured</EmptyTitle>
-            <EmptyDescription>
-              Online payment is not set up on this server yet, so plans cannot
-              be bought here. Your data is not affected.
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+        <EmptyState
+          icon={CreditCardIcon}
+          tone="neutral"
+          orbit={false}
+          title="Payments are not configured"
+          description="Online payment is not set up on this server yet, so plans cannot be bought here. Your data is not affected."
+          className="bg-card border"
+        />
       </Centered>
     );
 

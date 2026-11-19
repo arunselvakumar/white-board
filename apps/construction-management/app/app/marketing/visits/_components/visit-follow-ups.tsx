@@ -1,6 +1,7 @@
 "use client";
 
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
+import { PhoneCallIcon } from "@phosphor-icons/react/ssr";
 import { Plus } from "lucide-react";
 import { Suspense, useState } from "react";
 import { Button } from "@repo/ui/components/button";
@@ -8,6 +9,7 @@ import {
   ItemListSkeleton,
   SkeletonGroup,
 } from "@repo/ui/components/skeleton-kit";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { followUpsQuery } from "@/src/queries/marketing-follow-ups";
 import type { Visit } from "@/src/queries/marketing-visits";
@@ -102,7 +104,14 @@ function Rows({
   const items = query.data.pages.flatMap((page) => page.items);
   const today = query.data.pages[0]?.today ?? "";
   if (items.length === 0)
-    return <p className="text-muted-foreground text-sm">No Follow-ups yet.</p>;
+    return (
+      <EmptyState
+        icon={PhoneCallIcon}
+        tone="pink"
+        size="sm"
+        title="No Follow-ups yet."
+      />
+    );
   return (
     <FollowUpItems
       items={items}

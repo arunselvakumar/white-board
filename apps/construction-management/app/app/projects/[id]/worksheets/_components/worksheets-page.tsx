@@ -1,19 +1,13 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { ClipboardList, Plus, Settings } from "lucide-react";
+import { Plus, Settings } from "lucide-react";
+import { MagnifyingGlassIcon, NotePencilIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   Table,
   TableBody,
@@ -346,22 +340,18 @@ function WorksheetRows({
     return (
       <div className={cn("space-y-4", className)}>
         {(filtered || data.total > 0) && filterBar}
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <ClipboardList />
-            </EmptyMedia>
-            <EmptyTitle>
-              {filtered ? "No worksheets match" : "No worksheets yet"}
-            </EmptyTitle>
-            <EmptyDescription>
-              {filtered
-                ? "Try another date, contractor or department."
-                : "Record each crew's day: where they worked, how many came, and the material they used."}
-            </EmptyDescription>
-          </EmptyHeader>
-          {!filtered && canCreate && (
-            <EmptyContent>
+        <EmptyState
+          className="bg-card border"
+          icon={filtered ? MagnifyingGlassIcon : NotePencilIcon}
+          tone={filtered ? "neutral" : "sky"}
+          title={filtered ? "No worksheets match" : "No worksheets yet"}
+          description={
+            filtered
+              ? "Try another date, contractor or department."
+              : "Record each crew's day: where they worked, how many came, and the material they used."
+          }
+          actions={
+            !filtered && canCreate ? (
               <Link
                 href={pageHref("/app/projects/[id]/worksheets/new", {
                   id: projectId,
@@ -370,9 +360,9 @@ function WorksheetRows({
               >
                 Add Worksheet
               </Link>
-            </EmptyContent>
-          )}
-        </Empty>
+            ) : null
+          }
+        />
       </div>
     );
 

@@ -2,10 +2,12 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
+import { ChatTextIcon, NoteIcon } from "@phosphor-icons/react/ssr";
 import { useId, useState } from "react";
 import { Button } from "@repo/ui/components/button";
 import { Label } from "@repo/ui/components/label";
 import { Textarea } from "@repo/ui/components/textarea";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -80,7 +82,12 @@ function ObservationsBody({
   return (
     <div className="space-y-4">
       {data.items.length === 0 ? (
-        <p className="text-muted-foreground text-sm">No observations yet.</p>
+        <EmptyState
+          icon={NoteIcon}
+          tone="pink"
+          size="sm"
+          title="No observations yet."
+        />
       ) : (
         <ol aria-label="Observations" className="space-y-3">
           {data.items.map((item) => (
@@ -237,7 +244,12 @@ function RemarksBody({
   return (
     <div className="space-y-4">
       {data.items.length === 0 ? (
-        <p className="text-muted-foreground text-sm">No remarks yet.</p>
+        <EmptyState
+          icon={ChatTextIcon}
+          tone="pink"
+          size="sm"
+          title="No remarks yet."
+        />
       ) : (
         <ol aria-label="Remarks" className="space-y-3">
           {data.items.map((item) => (

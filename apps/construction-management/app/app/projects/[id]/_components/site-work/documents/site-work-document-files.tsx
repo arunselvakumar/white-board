@@ -2,10 +2,12 @@
 
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { ImagePlus, Paperclip, RotateCw, X } from "lucide-react";
+import { FileTextIcon, ImagesIcon } from "@phosphor-icons/react/ssr";
 import { useId, useRef, useState } from "react";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Progress } from "@repo/ui/components/progress";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { DocumentSection } from "@/app/app/_components/procurement/documents/document-section";
 import { DocumentFileIcon } from "@/app/app/_components/projects/documents/document-file-icon";
@@ -106,13 +108,19 @@ function FilesBody({
   return (
     <div className="space-y-3">
       {files.length === 0 && pending.length === 0 ? (
-        <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
-          {mayUpload
-            ? photos
-              ? "No photos yet. Add photos of the work."
-              : "No files yet. Add a PDF or photos."
-            : `No ${noun}s.`}
-        </p>
+        <EmptyState
+          className="bg-card border"
+          icon={photos ? ImagesIcon : FileTextIcon}
+          tone="blue"
+          size="sm"
+          title={
+            mayUpload
+              ? photos
+                ? "No photos yet. Add photos of the work."
+                : "No files yet. Add a PDF or photos."
+              : `No ${noun}s.`
+          }
+        />
       ) : (
         <ul
           aria-label={heading}

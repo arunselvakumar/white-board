@@ -5,19 +5,12 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { Building2 } from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState } from "react";
+import { FolderSimpleIcon } from "@phosphor-icons/react/ssr";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { ProjectStatusBadge } from "@/app/app/_components/projects/project-status";
@@ -44,26 +37,22 @@ function ProjectChecklist({ value, onChange }: Selection) {
 
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <Building2 />
-          </EmptyMedia>
-          <EmptyTitle>No Projects yet</EmptyTitle>
-          <EmptyDescription>
-            Once you add Projects, choose here which ones this staff member
-            works on. You can assign them later from Edit.
-          </EmptyDescription>
-        </EmptyHeader>
-        <EmptyContent>
+      <EmptyState
+        icon={FolderSimpleIcon}
+        tone="blue"
+        size="sm"
+        title="No Projects yet"
+        description="Once you add Projects, choose here which ones this staff member works on. You can assign them later from Edit."
+        className="bg-card border"
+        actions={
           <Link
             href="/app/projects/new"
             className={buttonVariants({ variant: "outline" })}
           >
             Add a Project
           </Link>
-        </EmptyContent>
-      </Empty>
+        }
+      />
     );
 
   const toggle = (id: string, on: boolean) => {

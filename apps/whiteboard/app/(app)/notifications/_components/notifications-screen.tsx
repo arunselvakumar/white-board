@@ -1,17 +1,12 @@
 "use client";
 
+import { BellIcon } from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { useAuth } from "@repo/auth/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Bell, CheckCheck } from "lucide-react";
+import { CheckCheck } from "lucide-react";
 import { useState, useTransition } from "react";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
 
 import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -95,18 +90,13 @@ export function NotificationsContent({
           }
         />
         {view.items.length === 0 ? (
-          <Empty className="rounded-2xl border">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <Bell aria-hidden="true" />
-              </EmptyMedia>
-              <EmptyTitle>No Notifications yet</EmptyTitle>
-              <EmptyDescription>
-                When a Student or Parent gives or withdraws an Absence Notice
-                for one of your Batches, you’ll see it here and get an email.
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
+          <EmptyState
+            className="rounded-2xl border"
+            icon={BellIcon}
+            tone="pink"
+            title="No Notifications yet"
+            description="When a Student or Parent gives or withdraws an Absence Notice for one of your Batches, you’ll see it here and get an email."
+          />
         ) : (
           <ul
             aria-label="Notifications"

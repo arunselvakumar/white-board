@@ -15,14 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@repo/ui/components/dialog";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   InputGroup,
   InputGroupAddon,
@@ -90,22 +83,19 @@ function PickerBody({
   if (choices.length === 0)
     return (
       <>
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <section.icon />
-            </EmptyMedia>
-            <EmptyTitle>No {section.title} yet</EmptyTitle>
-            <EmptyDescription>
-              Add {section.title} in {section.area}, then choose them here.
-            </EmptyDescription>
-          </EmptyHeader>
-          <EmptyContent>
+        <EmptyState
+          className="bg-card border"
+          icon={section.icon}
+          tone={section.tone}
+          size="sm"
+          title={`No ${section.title} yet`}
+          description={`Add ${section.title} in ${section.area}, then choose them here.`}
+          actions={
             <Link href={section.addPath} className={buttonVariants()}>
               Add a {section.singular}
             </Link>
-          </EmptyContent>
-        </Empty>
+          }
+        />
         <DialogFooter>
           <Button type="button" variant="outline" onClick={onDone}>
             Close

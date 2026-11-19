@@ -1,4 +1,6 @@
-import { HardHat, Wrench, type LucideIcon } from "lucide-react";
+import type { EmptyStateTone } from "@repo/ui/components/empty-state";
+import type { Icon } from "@phosphor-icons/react";
+import { HardHatIcon, WrenchIcon } from "@phosphor-icons/react/ssr";
 
 import type { PageHeaderBack } from "@/app/app/_components/app-shell/page-header";
 import type { LookupList } from "@/src/queries/masters";
@@ -15,7 +17,8 @@ export type LookupScreenConfig = {
   placeholder: string;
   emptyDescription: string;
   deleteDescription: string;
-  icon: LucideIcon;
+  icon: Icon;
+  tone: EmptyStateTone;
   /** Back to Masters, or null on a main-menu page. */
   back: PageHeaderBack | null;
   /**
@@ -45,7 +48,8 @@ export const LABOUR_CATEGORIES_SCREEN: LookupScreenConfig = {
     "Add the trades your Labours work in, like Mason, Helper or Carpenter.",
   deleteDescription:
     "It will no longer be offered anywhere. A Labour Category that Labours, Vendor rate cards or attendance use cannot be deleted; disable it instead.",
-  icon: HardHat,
+  icon: HardHatIcon,
+  tone: "violet",
   back: { label: "Masters", href: "/app/masters" },
   withSkill: true,
 };
@@ -62,6 +66,7 @@ export const DEPARTMENTS_SCREEN: LookupScreenConfig = {
   emptyDescription:
     "Add the trades and work categories you book work under, like RCC or Plumbing.",
   deleteDescription: "It will no longer be offered anywhere.",
-  icon: Wrench,
+  icon: WrenchIcon,
+  tone: "orange",
   back: { label: "Masters", href: "/app/masters" },
 };

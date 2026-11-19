@@ -2,7 +2,8 @@
 
 import { formatMobile } from "@repo/auth/construction/mobile";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { HardHat, Plus, Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
+import { HardHatIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { Suspense, useMemo, useState } from "react";
 import {
@@ -26,14 +27,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@repo/ui/components/dialog";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   InputGroup,
   InputGroupAddon,
@@ -99,25 +93,21 @@ function PickerBody({
   if (data.items.length === 0)
     return (
       <>
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <HardHat />
-            </EmptyMedia>
-            <EmptyTitle>No Site Engineers to add</EmptyTitle>
-            <EmptyDescription>
-              Every enabled Site Engineer is on this Project already, or none
-              has been added yet.
-            </EmptyDescription>
-          </EmptyHeader>
-          {canOpenPages && (
-            <EmptyContent>
+        <EmptyState
+          className="bg-card border"
+          icon={HardHatIcon}
+          tone="violet"
+          size="sm"
+          title="No Site Engineers to add"
+          description="Every enabled Site Engineer is on this Project already, or none has been added yet."
+          actions={
+            canOpenPages ? (
               <Link href={ADD_SITE_ENGINEER_PATH} className={buttonVariants()}>
                 Add a Site Engineer
               </Link>
-            </EmptyContent>
-          )}
-        </Empty>
+            ) : null
+          }
+        />
         <DialogFooter>
           <Button type="button" variant="outline" onClick={onDone}>
             Close
@@ -333,19 +323,18 @@ export function SiteEngineersSection({
       </div>
       <FormAlert message={error} />
       {engineers.length === 0 ? (
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <HardHat />
-            </EmptyMedia>
-            <EmptyTitle>No Site Engineers on this Project</EmptyTitle>
-            <EmptyDescription>
-              {canEdit
-                ? "Add the Site Engineers who run this site."
-                : "Nobody has put Site Engineers on this Project yet."}
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+        <EmptyState
+          className="bg-card border"
+          icon={HardHatIcon}
+          tone="violet"
+          size="md"
+          title="No Site Engineers on this Project"
+          description={
+            canEdit
+              ? "Add the Site Engineers who run this site."
+              : "Nobody has put Site Engineers on this Project yet."
+          }
+        />
       ) : (
         <ul
           aria-label="Site Engineers"

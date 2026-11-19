@@ -1,18 +1,12 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Building2, FileSpreadsheet } from "lucide-react";
+import { FileSpreadsheet } from "lucide-react";
+import { BuildingsIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Label } from "@repo/ui/components/label";
 import {
   Select,
@@ -105,26 +99,21 @@ export function UnitsTab({ projectId }: { projectId: string }) {
       </div>
 
       {wing == null ? (
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <Building2 />
-            </EmptyMedia>
-            <EmptyTitle>No Wings yet</EmptyTitle>
-            <EmptyDescription>
-              Units for sale come from the Project&apos;s Wings. Add a Wing with
-              its floors and units first.
-            </EmptyDescription>
-          </EmptyHeader>
-          <EmptyContent>
+        <EmptyState
+          className="bg-card border"
+          icon={BuildingsIcon}
+          tone="blue"
+          title="No Wings yet"
+          description="Units for sale come from the Project's Wings. Add a Wing with its floors and units first."
+          actions={
             <Link
               href={pageHref("/app/projects/[id]/wings", { id: projectId })}
               className={buttonVariants({ size: "sm" })}
             >
               Open Wings
             </Link>
-          </EmptyContent>
-        </Empty>
+          }
+        />
       ) : (
         <>
           <section

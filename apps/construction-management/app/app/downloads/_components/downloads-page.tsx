@@ -1,7 +1,8 @@
 "use client";
 
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
-import { CircleAlert, Download } from "lucide-react";
+import { DownloadSimpleIcon } from "@phosphor-icons/react/ssr";
+import { CircleAlert } from "lucide-react";
 import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@repo/ui/components/alert";
 import {
@@ -14,13 +15,7 @@ import {
   AlertDialogTitle,
 } from "@repo/ui/components/alert-dialog";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Spinner } from "@repo/ui/components/spinner";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
@@ -72,18 +67,13 @@ export function DownloadsPage() {
           </Alert>
         )}
         {items.length === 0 ? (
-          <Empty className="bg-card border">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <Download />
-              </EmptyMedia>
-              <EmptyTitle>Nothing to download yet</EmptyTitle>
-              <EmptyDescription>
-                Reports you generate on any Project, or centrally, appear here
-                with their Excel and PDF.
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
+          <EmptyState
+            icon={DownloadSimpleIcon}
+            tone="sky"
+            title="Nothing to download yet"
+            description="Reports you generate on any Project, or centrally, appear here with their Excel and PDF."
+            className="bg-card border"
+          />
         ) : (
           <ul
             aria-label="Downloads"

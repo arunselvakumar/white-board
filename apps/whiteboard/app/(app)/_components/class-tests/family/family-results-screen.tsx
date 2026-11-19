@@ -1,5 +1,11 @@
 "use client";
 
+import { ExamIcon, LinkBreakIcon } from "@phosphor-icons/react/ssr";
+import type { Icon } from "@phosphor-icons/react";
+import {
+  EmptyState,
+  type EmptyStateTone,
+} from "@repo/ui/components/empty-state";
 import { useAuth } from "@repo/auth/react";
 import {
   Card,
@@ -8,11 +14,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/card";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-} from "@repo/ui/components/empty";
 import { PageWatermark } from "@repo/ui/components/page-watermark";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
@@ -30,13 +31,28 @@ import {
   type FamilyResultsStudent,
 } from "./family-results-format";
 
-function EmptyText({ children }: { children: string }) {
+function EmptyText({
+  icon,
+  tone,
+  title,
+  children,
+  size = "sm",
+}: {
+  icon: Icon;
+  tone?: EmptyStateTone;
+  title: string;
+  children?: string;
+  size?: "sm" | "md";
+}) {
   return (
-    <Empty className="border">
-      <EmptyHeader>
-        <EmptyDescription>{children}</EmptyDescription>
-      </EmptyHeader>
-    </Empty>
+    <EmptyState
+      className="border"
+      icon={icon}
+      tone={tone}
+      size={size}
+      title={title}
+      description={children}
+    />
   );
 }
 
@@ -84,12 +100,10 @@ function StudentResults({
 }) {
   if (student.results.length === 0) {
     return (
-      <EmptyText>
-        {`${NO_RESULTS_TEXT} ${
-          role === "parent"
-            ? `${student.name}’s marks show here once the centre publishes a Test.`
-            : "Your marks show here once the centre publishes a Test."
-        }`}
+      <EmptyText icon={ExamIcon} tone="sky" title={NO_RESULTS_TEXT}>
+        {role === "parent"
+          ? `${student.name}’s marks show here once the centre publishes a Test.`
+          : "Your marks show here once the centre publishes a Test."}
       </EmptyText>
     );
   }
@@ -134,7 +148,14 @@ export function FamilyResults({
           <h1 className="text-2xl tracking-tight">Results</h1>
         </div>
         {results.students.length === 0 ? (
-          <EmptyText>
+          <EmptyText
+            icon={LinkBreakIcon}
+            tone="pink"
+            size="md"
+            title={
+              role === "parent" ? "No Students linked yet" : "Not linked yet"
+            }
+          >
             {role === "parent"
               ? "No Students are linked to you yet. Ask the centre to add your email address to your child’s Student profile."
               : "Your Student record isn’t linked yet. Ask the centre to check the email address on your Student profile."}

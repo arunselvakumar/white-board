@@ -12,14 +12,7 @@ import {
 } from "@repo/ui/components/alert";
 import { Badge } from "@repo/ui/components/badge";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { projectPath } from "@/app/app/projects/_components/projects-home";
 import {
@@ -111,7 +104,6 @@ function ResourceCard({
   const [editing, setEditing] = useState(false);
   const assigned = lines.filter((line) => !("isOwner" in line && line.isOwner));
   const headingId = `resources-${section.key}`;
-  const Icon = section.icon;
   return (
     <section
       aria-labelledby={headingId}
@@ -145,29 +137,28 @@ function ResourceCard({
         )}
       </div>
       {lines.length === 0 ? (
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <Icon />
-            </EmptyMedia>
-            <EmptyTitle>No {section.title} on this Project</EmptyTitle>
-            <EmptyDescription>
-              {canEdit
-                ? `Choose them with Edit, or add a new ${section.singular} in ${section.area}.`
-                : `Nobody has put ${section.title} on this Project yet.`}
-            </EmptyDescription>
-          </EmptyHeader>
-          {canEdit && (
-            <EmptyContent>
+        <EmptyState
+          className="bg-card border"
+          icon={section.icon}
+          tone={section.tone}
+          size="md"
+          title={`No ${section.title} on this Project`}
+          description={
+            canEdit
+              ? `Choose them with Edit, or add a new ${section.singular} in ${section.area}.`
+              : `Nobody has put ${section.title} on this Project yet.`
+          }
+          actions={
+            canEdit ? (
               <Link
                 href={section.addPath}
                 className={buttonVariants({ variant: "outline" })}
               >
                 Add a {section.singular}
               </Link>
-            </EmptyContent>
-          )}
-        </Empty>
+            ) : null
+          }
+        />
       ) : (
         <ul
           aria-label={section.title}

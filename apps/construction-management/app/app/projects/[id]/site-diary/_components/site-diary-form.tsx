@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Trash2 } from "lucide-react";
+import { ClipboardTextIcon, UsersThreeIcon } from "@phosphor-icons/react/ssr";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
@@ -22,6 +23,7 @@ import {
   SelectValue,
 } from "@repo/ui/components/select";
 import { Textarea } from "@repo/ui/components/textarea";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -378,7 +380,12 @@ export function SiteDiaryForm({
           Visitors
         </h3>
         {visitors.fields.length === 0 && (
-          <p className="text-muted-foreground text-sm">No visitors added.</p>
+          <EmptyState
+            icon={UsersThreeIcon}
+            tone="violet"
+            size="sm"
+            title="No visitors added."
+          />
         )}
         <ol className="space-y-3">
           {visitors.fields.map((row, index) => {
@@ -482,9 +489,12 @@ export function SiteDiaryForm({
           Instructions
         </h3>
         {instructions.fields.length === 0 && (
-          <p className="text-muted-foreground text-sm">
-            No instructions added.
-          </p>
+          <EmptyState
+            icon={ClipboardTextIcon}
+            tone="sky"
+            size="sm"
+            title="No instructions added."
+          />
         )}
         <ol className="space-y-3">
           {instructions.fields.map((row, index) => {

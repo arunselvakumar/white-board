@@ -1,19 +1,13 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { BookOpen, ChevronLeft, ChevronRight, PenLine } from "lucide-react";
+import { ChevronLeft, ChevronRight, PenLine } from "lucide-react";
+import { NotebookIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, useDeferredValue, useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Input } from "@repo/ui/components/input";
 import { cn } from "@repo/ui/lib/utils";
 
@@ -63,18 +57,14 @@ function DiaryForDate({
   const { data } = useSuspenseQuery(siteDiaryOnDateQuery(projectId, date));
   if (data.diary == null)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <BookOpen />
-          </EmptyMedia>
-          <EmptyTitle>No diary for {formatDate(date)}</EmptyTitle>
-          <EmptyDescription>
-            Record the weather, visitors and instructions on site for the day.
-          </EmptyDescription>
-        </EmptyHeader>
-        {canCreate && (
-          <EmptyContent>
+      <EmptyState
+        className="bg-card border"
+        icon={NotebookIcon}
+        tone="sky"
+        title={`No diary for ${formatDate(date)}`}
+        description="Record the weather, visitors and instructions on site for the day."
+        actions={
+          canCreate ? (
             <Link
               href={pageHref(
                 "/app/projects/[id]/site-diary/new",
@@ -86,9 +76,9 @@ function DiaryForDate({
               <PenLine aria-hidden="true" />
               Write the diary
             </Link>
-          </EmptyContent>
-        )}
-      </Empty>
+          ) : null
+        }
+      />
     );
   return (
     <div className={cn("min-w-0", className)}>
@@ -121,9 +111,12 @@ function MonthDays({
   const { data } = useSuspenseQuery(siteDiaryDaysQuery(projectId, from, to));
   if (data.items.length === 0)
     return (
-      <p className="text-muted-foreground px-1 text-sm">
-        No diaries this month.
-      </p>
+      <EmptyState
+        icon={NotebookIcon}
+        tone="sky"
+        size="sm"
+        title="No diaries this month."
+      />
     );
   return (
     <ul

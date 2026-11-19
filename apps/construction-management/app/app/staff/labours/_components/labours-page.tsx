@@ -1,12 +1,12 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { MagnifyingGlassIcon, UsersThreeIcon } from "@phosphor-icons/react/ssr";
 import {
   ArrowRightLeft,
   CircleDot,
   CircleOff,
   Download,
-  HardHat,
   LayoutGrid,
   MoreHorizontal,
   Plus,
@@ -40,14 +40,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { FilterTabs, type FilterTab } from "@repo/ui/components/filter-tabs";
 import {
   InputGroup,
@@ -346,32 +339,28 @@ function LabourRows({
     filter.categoryId != null;
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <HardHat />
-          </EmptyMedia>
-          <EmptyTitle>
-            {filtered ? "No Labours match" : "No Labours yet"}
-          </EmptyTitle>
-          <EmptyDescription>
-            {filtered
-              ? "Try another name, status, Project, category or Site Engineer."
-              : "Add the Labours on your own roll with their wage and Projects, or import them from Excel."}
-          </EmptyDescription>
-        </EmptyHeader>
-        {!filtered && (
-          <EmptyContent>
-            <div className="flex flex-wrap justify-center gap-2">
+      <EmptyState
+        icon={filtered ? MagnifyingGlassIcon : UsersThreeIcon}
+        tone={filtered ? "neutral" : "violet"}
+        title={filtered ? "No Labours match" : "No Labours yet"}
+        description={
+          filtered
+            ? "Try another name, status, Project, category or Site Engineer."
+            : "Add the Labours on your own roll with their wage and Projects, or import them from Excel."
+        }
+        className="bg-card border"
+        actions={
+          filtered ? undefined : (
+            <>
               {addLink}
               <Button type="button" variant="outline" onClick={onImport}>
                 <Upload aria-hidden="true" />
                 Import from Excel
               </Button>
-            </div>
-          </EmptyContent>
-        )}
-      </Empty>
+            </>
+          )
+        }
+      />
     );
 
   const showBalance = data.items.some((item) => item.balance != null);

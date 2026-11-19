@@ -8,20 +8,13 @@ import {
   LayoutGrid,
   PauseCircle,
   Plus,
-  Receipt,
   TimerOff,
 } from "lucide-react";
+import { HouseLineIcon, MagnifyingGlassIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { FilterTabs, type FilterTab } from "@repo/ui/components/filter-tabs";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
@@ -209,28 +202,24 @@ function BookingRows({
 
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <Receipt />
-          </EmptyMedia>
-          <EmptyTitle>
-            {filtered ? "No bookings match" : "No bookings yet"}
-          </EmptyTitle>
-          <EmptyDescription>
-            {filtered
-              ? "Try another status, Wing or search."
-              : "Hold a unit for a customer or book it. Each unit has one booking at a time; a cancelled one stays in its history."}
-          </EmptyDescription>
-        </EmptyHeader>
-        {!filtered && newHref != null && (
-          <EmptyContent>
+      <EmptyState
+        className="bg-card border"
+        icon={filtered ? MagnifyingGlassIcon : HouseLineIcon}
+        tone={filtered ? "neutral" : "blue"}
+        title={filtered ? "No bookings match" : "No bookings yet"}
+        description={
+          filtered
+            ? "Try another status, Wing or search."
+            : "Hold a unit for a customer or book it. Each unit has one booking at a time; a cancelled one stays in its history."
+        }
+        actions={
+          !filtered && newHref != null ? (
             <Link href={newHref} className={buttonVariants({ size: "sm" })}>
               New booking
             </Link>
-          </EmptyContent>
-        )}
-      </Empty>
+          ) : null
+        }
+      />
     );
 
   return (

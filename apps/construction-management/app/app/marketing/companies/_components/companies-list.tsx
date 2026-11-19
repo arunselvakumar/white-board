@@ -1,30 +1,17 @@
 "use client";
 
+import { BuildingsIcon, MagnifyingGlassIcon } from "@phosphor-icons/react/ssr";
 import { formatMobile } from "@repo/auth/construction/react";
 import {
   useQuery,
   useSuspenseInfiniteQuery,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import {
-  ArrowRight,
-  Building,
-  Download,
-  Plus,
-  Upload,
-  UserRoundX,
-} from "lucide-react";
+import { ArrowRight, Download, Plus, Upload, UserRoundX } from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import {
@@ -417,28 +404,20 @@ function CompanyRows({
 
   if (items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <Building />
-          </EmptyMedia>
-          <EmptyTitle>
-            {filtered
-              ? "No Prospect Companies match"
-              : "No Prospect Companies yet"}
-          </EmptyTitle>
-          <EmptyDescription>
-            {filtered
-              ? "Try another search, Stage, person or industry."
-              : "Add the companies your marketing team visits, with their Contacts, and move each one through its Stages until it is won or lost."}
-          </EmptyDescription>
-        </EmptyHeader>
-        {!filtered && canCreate && (
-          <EmptyContent>
-            <AddButton />
-          </EmptyContent>
-        )}
-      </Empty>
+      <EmptyState
+        icon={filtered ? MagnifyingGlassIcon : BuildingsIcon}
+        tone={filtered ? "neutral" : "blue"}
+        title={
+          filtered ? "No Prospect Companies match" : "No Prospect Companies yet"
+        }
+        description={
+          filtered
+            ? "Try another search, Stage, person or industry."
+            : "Add the companies your marketing team visits, with their Contacts, and move each one through its Stages until it is won or lost."
+        }
+        className="bg-card border"
+        actions={!filtered && canCreate ? <AddButton /> : undefined}
+      />
     );
 
   return (

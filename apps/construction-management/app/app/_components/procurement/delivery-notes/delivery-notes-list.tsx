@@ -1,17 +1,11 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Truck } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { TruckIcon } from "@phosphor-icons/react/ssr";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import {
   centralStoreHref,
@@ -38,17 +32,13 @@ export function DeliveryNotesList({
   );
   if (data.total === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <Truck />
-          </EmptyMedia>
-          <EmptyTitle>No Delivery Notes</EmptyTitle>
-          <EmptyDescription>
-            The store creates Delivery Notes from Material Requests.
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState
+        icon={TruckIcon}
+        tone="orange"
+        title="No Delivery Notes"
+        description="The store creates Delivery Notes from Material Requests."
+        className="bg-card border"
+      />
     );
   return (
     <div className="space-y-3">

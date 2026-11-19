@@ -1,13 +1,19 @@
 "use client";
 
+import {
+  BooksIcon,
+  ClipboardTextIcon,
+  LinkBreakIcon,
+  UsersThreeIcon,
+} from "@phosphor-icons/react/ssr";
+import type { Icon } from "@phosphor-icons/react";
+import {
+  EmptyState,
+  type EmptyStateTone,
+} from "@repo/ui/components/empty-state";
 import { useAuth } from "@repo/auth/react";
 import { Card, CardContent } from "@repo/ui/components/card";
 import { BookOpen, ClipboardList } from "lucide-react";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-} from "@repo/ui/components/empty";
 import { PageWatermark } from "@repo/ui/components/page-watermark";
 import {
   Tabs,
@@ -81,13 +87,28 @@ function HomeworkGroup({
   );
 }
 
-function EmptyText({ children }: { children: string }) {
+function EmptyText({
+  icon,
+  tone,
+  title,
+  children,
+  size = "sm",
+}: {
+  icon: Icon;
+  tone?: EmptyStateTone;
+  title: string;
+  children?: string;
+  size?: "sm" | "md";
+}) {
   return (
-    <Empty className="border">
-      <EmptyHeader>
-        <EmptyDescription>{children}</EmptyDescription>
-      </EmptyHeader>
-    </Empty>
+    <EmptyState
+      className="border"
+      icon={icon}
+      tone={tone}
+      size={size}
+      title={title}
+      description={children}
+    />
   );
 }
 
@@ -102,7 +123,7 @@ function StudentClassWork({
 }) {
   if (student.batches.length === 0) {
     return (
-      <EmptyText>
+      <EmptyText icon={UsersThreeIcon} tone="violet" title="Not in a Batch yet">
         {role === "parent"
           ? `${student.name} isn’t in a Batch yet. Homework and Study Material show here once they join one.`
           : "You aren’t in a Batch yet. Homework and Study Material show here once you join one."}
@@ -153,7 +174,11 @@ function StudentClassWork({
         </TabsList>
         <TabsContent value="homework" className="space-y-5">
           {student.homework.length === 0 ? (
-            <EmptyText>No Homework yet.</EmptyText>
+            <EmptyText
+              icon={ClipboardTextIcon}
+              tone="sky"
+              title="No Homework yet."
+            />
           ) : (
             GROUPS.map(({ key, label }) =>
               groups[key].length === 0 ? null : (
@@ -172,7 +197,11 @@ function StudentClassWork({
         </TabsContent>
         <TabsContent value="materials">
           {materials.length === 0 ? (
-            <EmptyText>No Study Material yet.</EmptyText>
+            <EmptyText
+              icon={BooksIcon}
+              tone="sky"
+              title="No Study Material yet."
+            />
           ) : (
             <Card size="sm">
               <CardContent>
@@ -211,7 +240,14 @@ export function FamilyHomework({
           <h1 className="text-2xl tracking-tight">Homework</h1>
         </div>
         {classWork.students.length === 0 ? (
-          <EmptyText>
+          <EmptyText
+            icon={LinkBreakIcon}
+            tone="pink"
+            size="md"
+            title={
+              role === "parent" ? "No Students linked yet" : "Not linked yet"
+            }
+          >
             {role === "parent"
               ? "No Students are linked to you yet. Ask the centre to add your email address to your child’s Student profile."
               : "Your Student record isn’t linked yet. Ask the centre to check the email address on your Student profile."}

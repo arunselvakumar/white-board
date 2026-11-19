@@ -1,15 +1,9 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { FileSpreadsheet } from "lucide-react";
 import { Suspense } from "react";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { LockSimpleIcon } from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { equipmentListQuery } from "@/src/queries/equipment";
 import { counterpartyOptionsQuery } from "@/src/queries/finance-lookups";
@@ -207,18 +201,14 @@ export function ReportsPage({
   return (
     <div className="space-y-8">
       {offered.length === 0 ? (
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <FileSpreadsheet />
-            </EmptyMedia>
-            <EmptyTitle>No reports you can generate here</EmptyTitle>
-            <EmptyDescription>
-              Reports need the Report flag on their menu for this Project. Ask
-              the Owner to change your Permission Matrix.
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+        <EmptyState
+          icon={LockSimpleIcon}
+          tone="neutral"
+          orbit={false}
+          title="No reports you can generate here"
+          description="Reports need the Report flag on their menu for this Project. Ask the Owner to change your Permission Matrix."
+          className="bg-card border"
+        />
       ) : null}
       {PAGE_GROUPS.map((group) => {
         const definitions = inGroup(group);

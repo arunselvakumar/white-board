@@ -1,12 +1,8 @@
 "use client";
 
+import { PencilSimpleSlashIcon } from "@phosphor-icons/react/ssr";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { purchaseOrderQuery } from "@/src/queries/purchase-orders";
 
@@ -25,15 +21,14 @@ export function EditPurchaseOrder({
   const { data } = useSuspenseQuery(purchaseOrderQuery(id));
   if (!data.actions.edit)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyTitle>{data.number} cannot be edited</EmptyTitle>
-          <EmptyDescription>
-            An ordered or closed Purchase Order is not edited: close it and
-            raise a new one.
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState
+        className="bg-card border"
+        icon={PencilSimpleSlashIcon}
+        tone="neutral"
+        orbit={false}
+        title={`${data.number} cannot be edited`}
+        description="An ordered or closed Purchase Order is not edited: close it and raise a new one."
+      />
     );
   return (
     <div className="w-full space-y-4">

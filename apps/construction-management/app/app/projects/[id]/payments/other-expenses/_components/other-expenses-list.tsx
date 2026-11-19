@@ -1,19 +1,13 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { Plus, ReceiptText } from "lucide-react";
+import { Plus } from "lucide-react";
+import { MagnifyingGlassIcon, ReceiptIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import {
@@ -314,29 +308,25 @@ function ExpenseRows({
 
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <ReceiptText />
-          </EmptyMedia>
-          <EmptyTitle>
-            {filtered ? "No expenses match" : "No Other Expenses yet"}
-          </EmptyTitle>
-          <EmptyDescription>
-            {filtered
-              ? "Try another date range, category, account or status."
-              : "Record what the site spends without a party bill: tea, transport, small tools, site office bills."}
-          </EmptyDescription>
-        </EmptyHeader>
-        {!filtered && newHref != null && (
-          <EmptyContent>
+      <EmptyState
+        className="bg-card border"
+        icon={filtered ? MagnifyingGlassIcon : ReceiptIcon}
+        tone={filtered ? "neutral" : "green"}
+        title={filtered ? "No expenses match" : "No Other Expenses yet"}
+        description={
+          filtered
+            ? "Try another date range, category, account or status."
+            : "Record what the site spends without a party bill: tea, transport, small tools, site office bills."
+        }
+        actions={
+          !filtered && newHref != null ? (
             <Link href={newHref} className={buttonVariants({ size: "sm" })}>
               <Plus aria-hidden="true" />
               Add Other Expense
             </Link>
-          </EmptyContent>
-        )}
-      </Empty>
+          ) : null
+        }
+      />
     );
 
   const check = (expense: OtherExpense) =>

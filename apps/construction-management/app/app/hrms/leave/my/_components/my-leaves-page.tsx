@@ -1,17 +1,11 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { CalendarOff, History, Plus } from "lucide-react";
+import { CalendarXIcon, LockSimpleIcon } from "@phosphor-icons/react/ssr";
+import { History, Plus } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import {
   leaveBalancesQuery,
@@ -40,15 +34,14 @@ function NotShared({
   description: string;
 }) {
   return (
-    <Empty className="bg-card border">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <CalendarOff />
-        </EmptyMedia>
-        <EmptyTitle>{title}</EmptyTitle>
-        <EmptyDescription>{description}</EmptyDescription>
-      </EmptyHeader>
-    </Empty>
+    <EmptyState
+      icon={LockSimpleIcon}
+      tone="neutral"
+      orbit={false}
+      title={title}
+      description={description}
+      className="bg-card border"
+    />
   );
 }
 
@@ -177,10 +170,14 @@ function MyLeaves({
             ))}
           </ul>
         ) : (
-          <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
-            Your leave balances for {balances.leaveYear} are not open yet. Your
-            manager opens them from Leave Balances.
-          </p>
+          <EmptyState
+            icon={CalendarXIcon}
+            tone="teal"
+            size="md"
+            title={`Your leave balances for ${balances.leaveYear} are not open yet.`}
+            description="Your manager opens them from Leave Balances."
+            className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm"
+          />
         )}
       </section>
 
@@ -189,20 +186,15 @@ function MyLeaves({
           Requests
         </h3>
         {requests.items.length === 0 ? (
-          <Empty className="bg-card border">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <CalendarOff />
-              </EmptyMedia>
-              <EmptyTitle>No leave requests yet</EmptyTitle>
-              <EmptyDescription>
-                Leave you apply for shows here with its status.
-              </EmptyDescription>
-            </EmptyHeader>
-            {applyButton != null ? (
-              <EmptyContent>{applyButton}</EmptyContent>
-            ) : null}
-          </Empty>
+          <EmptyState
+            icon={CalendarXIcon}
+            tone="teal"
+            size="md"
+            title="No leave requests yet"
+            description="Leave you apply for shows here with its status."
+            className="bg-card border"
+            actions={applyButton ?? undefined}
+          />
         ) : (
           <ul
             aria-label="My leave requests"

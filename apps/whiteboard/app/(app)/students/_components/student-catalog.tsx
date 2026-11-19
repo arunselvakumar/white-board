@@ -1,5 +1,7 @@
 "use client";
 
+import { MagnifyingGlassIcon, StudentIcon } from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { useState } from "react";
 import {
   ChevronLeft,
@@ -21,12 +23,6 @@ import {
 } from "@repo/ui/components/alert-dialog";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-} from "@repo/ui/components/empty";
 import { Input } from "@repo/ui/components/input";
 import { PageWatermark } from "@repo/ui/components/page-watermark";
 import { Skeleton } from "@repo/ui/components/skeleton";
@@ -279,22 +275,25 @@ export function StudentCatalog({
             )}
           </div>
         ) : students.length === 0 ? (
-          <Empty className="border-0">
-            <EmptyHeader>
-              <EmptyDescription>
-                {emptyBecauseSearch
-                  ? "No Students match that search."
-                  : "Add the first Student this centre admits."}
-              </EmptyDescription>
-            </EmptyHeader>
-            {emptyBecauseSearch ? null : (
-              <EmptyContent>
+          <EmptyState
+            className="border-0"
+            size="md"
+            icon={emptyBecauseSearch ? MagnifyingGlassIcon : StudentIcon}
+            tone={emptyBecauseSearch ? "neutral" : "violet"}
+            title={emptyBecauseSearch ? "No Students found" : "No Students yet"}
+            description={
+              emptyBecauseSearch
+                ? "No Students match that search."
+                : "Add the first Student this centre admits."
+            }
+            actions={
+              emptyBecauseSearch ? null : (
                 <Button type="button" onClick={onAdd}>
                   Add Student
                 </Button>
-              </EmptyContent>
-            )}
-          </Empty>
+              )
+            }
+          />
         ) : (
           <Table>
             <TableHeader className="bg-muted/40">

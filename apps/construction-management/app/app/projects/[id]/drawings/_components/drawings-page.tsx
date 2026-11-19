@@ -8,6 +8,7 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
+import { FoldersIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@repo/ui/components/button";
@@ -17,14 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import {
   drawingAlbumsQuery,
@@ -181,20 +175,18 @@ export function DrawingsPage({
       </div>
 
       {albums.length === 0 ? (
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <Folder />
-            </EmptyMedia>
-            <EmptyTitle>No albums on this Project</EmptyTitle>
-            <EmptyDescription>
-              {canCreate
-                ? "Add an album for each kind of drawing — Architect, Electrical, Plumbing — then upload the sheets into it."
-                : "Albums of drawings kept on this Project show here."}
-            </EmptyDescription>
-          </EmptyHeader>
-          {canCreate ? <EmptyContent>{addButton}</EmptyContent> : null}
-        </Empty>
+        <EmptyState
+          className="bg-card border"
+          icon={FoldersIcon}
+          tone="blue"
+          title="No albums on this Project"
+          description={
+            canCreate
+              ? "Add an album for each kind of drawing — Architect, Electrical, Plumbing — then upload the sheets into it."
+              : "Albums of drawings kept on this Project show here."
+          }
+          actions={canCreate ? addButton : null}
+        />
       ) : (
         <ul
           aria-label="Albums"

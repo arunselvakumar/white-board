@@ -1,6 +1,7 @@
 "use client";
 
 import { Pencil, Trash2 } from "lucide-react";
+import { ClipboardTextIcon, UsersThreeIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { Suspense, useState, type ReactNode } from "react";
 import {
@@ -20,6 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { cn } from "@repo/ui/lib/utils";
 
@@ -134,7 +136,12 @@ export function SiteDiaryView({
       <div className="space-y-2">
         <h3 className="text-sm font-semibold">Visitors</h3>
         {diary.visitors.length === 0 ? (
-          <p className="text-muted-foreground text-sm">No visitors recorded.</p>
+          <EmptyState
+            icon={UsersThreeIcon}
+            tone="violet"
+            size="sm"
+            title="No visitors recorded."
+          />
         ) : (
           <ScrollTable label="Visitors">
             <TableHeader>
@@ -170,9 +177,12 @@ export function SiteDiaryView({
       <div className="space-y-2">
         <h3 className="text-sm font-semibold">Instructions</h3>
         {diary.instructions.length === 0 ? (
-          <p className="text-muted-foreground text-sm">
-            No instructions recorded.
-          </p>
+          <EmptyState
+            icon={ClipboardTextIcon}
+            tone="sky"
+            size="sm"
+            title="No instructions recorded."
+          />
         ) : (
           <ScrollTable label="Instructions">
             <TableHeader>
