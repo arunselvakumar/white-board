@@ -238,6 +238,7 @@ export function TaskGanttChart({
       <EmptyState
         className="bg-card border"
         icon={ChartBarHorizontalIcon}
+        tone="sky"
         title="Nothing to chart yet"
         description="Give tasks a Start Date and a Due Date to see them on the Gantt."
       />

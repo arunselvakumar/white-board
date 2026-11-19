@@ -82,7 +82,12 @@ function ObservationsBody({
   return (
     <div className="space-y-4">
       {data.items.length === 0 ? (
-        <EmptyState icon={NoteIcon} size="sm" title="No observations yet." />
+        <EmptyState
+          icon={NoteIcon}
+          tone="pink"
+          size="sm"
+          title="No observations yet."
+        />
       ) : (
         <ol aria-label="Observations" className="space-y-3">
           {data.items.map((item) => (
@@ -239,7 +244,12 @@ function RemarksBody({
   return (
     <div className="space-y-4">
       {data.items.length === 0 ? (
-        <EmptyState icon={ChatTextIcon} size="sm" title="No remarks yet." />
+        <EmptyState
+          icon={ChatTextIcon}
+          tone="pink"
+          size="sm"
+          title="No remarks yet."
+        />
       ) : (
         <ol aria-label="Remarks" className="space-y-3">
           {data.items.map((item) => (

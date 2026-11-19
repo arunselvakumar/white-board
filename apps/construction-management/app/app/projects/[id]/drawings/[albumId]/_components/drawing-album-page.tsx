@@ -308,6 +308,7 @@ export function DrawingAlbumPage({
         <EmptyState
           className="bg-card border"
           icon={BlueprintIcon}
+          tone="blue"
           title={
             canCreate
               ? `Upload the ${album.name} drawings`

@@ -108,6 +108,7 @@ function PartyDuesTable({
     return (
       <EmptyState
         icon={AddressBookIcon}
+        tone="violet"
         size="md"
         title={`No ${noun} has invoices, payments or a balance on these Projects.`}
         className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm"
@@ -308,6 +309,7 @@ function Accounts({
       {accounts.length === 0 ? (
         <EmptyState
           icon={BankIcon}
+          tone="green"
           size="md"
           title="There are no company accounts yet."
           className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm"
@@ -389,6 +391,7 @@ function PettyCash({
       {accounts.length === 0 ? (
         <EmptyState
           icon={CoinsIcon}
+          tone="green"
           size="md"
           title="There is no petty-cash account you can see."
           className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm"

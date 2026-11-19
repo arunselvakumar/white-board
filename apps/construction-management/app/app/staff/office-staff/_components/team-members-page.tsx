@@ -202,7 +202,7 @@ function TeamMemberRows({
     return (
       <EmptyState
         icon={filtered ? MagnifyingGlassIcon : UsersThreeIcon}
-        tone={filtered ? "neutral" : "brand"}
+        tone={filtered ? "neutral" : "violet"}
         title={filtered ? "No Staff match" : "No Staff yet"}
         description={
           filtered

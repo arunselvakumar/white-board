@@ -464,6 +464,7 @@ export function InventoryPage({
       {data.items.length === 0 ? (
         <EmptyState
           icon={PackageIcon}
+          tone="orange"
           title="No stock here yet"
           description="Stock comes in with goods receipts, transfers and deliveries from a store. To start from today's count, import the opening stock from the sample sheet."
           className="bg-card border"

@@ -382,6 +382,7 @@ export function SiteDiaryForm({
         {visitors.fields.length === 0 && (
           <EmptyState
             icon={UsersThreeIcon}
+            tone="violet"
             size="sm"
             title="No visitors added."
           />
@@ -490,6 +491,7 @@ export function SiteDiaryForm({
         {instructions.fields.length === 0 && (
           <EmptyState
             icon={ClipboardTextIcon}
+            tone="sky"
             size="sm"
             title="No instructions added."
           />

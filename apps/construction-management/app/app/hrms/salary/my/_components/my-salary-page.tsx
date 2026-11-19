@@ -35,6 +35,7 @@ export function MySalaryPage() {
       {data.items.length === 0 ? (
         <HrmsEmpty
           icon={ReceiptIcon}
+          tone="green"
           title="No salary slips yet"
           description="Your payslip appears here once your salary for a month is approved."
         />

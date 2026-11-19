@@ -231,6 +231,7 @@ function LedgerBody({
       {data.entries.length === 0 ? (
         <EmptyState
           icon={ReceiptIcon}
+          tone="green"
           title={
             <>
               Nothing moved through this account between {formatDate(data.from)}{" "}

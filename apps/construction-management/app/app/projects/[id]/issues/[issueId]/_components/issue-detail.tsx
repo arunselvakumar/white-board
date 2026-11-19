@@ -288,6 +288,7 @@ function ProgressThread({ issue }: { issue: Issue }) {
       {data.items.length === 0 ? (
         <EmptyState
           icon={ClockCounterClockwiseIcon}
+          tone="teal"
           size="sm"
           title="No updates yet."
         />

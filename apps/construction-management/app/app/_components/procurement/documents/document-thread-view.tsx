@@ -85,6 +85,7 @@ function ThreadBody({ documentType, documentId, heading }: Props) {
       {data.items.length === 0 ? (
         <EmptyState
           icon={ChatTextIcon}
+          tone="pink"
           size="md"
           title={
             <>

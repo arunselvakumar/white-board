@@ -76,6 +76,7 @@ export function BookingSectionBody({
     return (
       <EmptyState
         icon={BuildingsIcon}
+        tone="blue"
         size="sm"
         title="No units yet: add Wings with their floors and units."
       />
@@ -142,6 +143,7 @@ export function BookingSectionBody({
           {booking.latest.length === 0 ? (
             <EmptyState
               icon={HouseLineIcon}
+              tone="blue"
               size="sm"
               title="No bookings yet."
             />
@@ -329,6 +331,7 @@ export function InquirySectionBody({
           {inquiry.leadSources.length === 0 ? (
             <EmptyState
               icon={UserListIcon}
+              tone="violet"
               size="sm"
               title="No inquiries in this duration."
             />
@@ -359,6 +362,7 @@ export function InquirySectionBody({
           {inquiry.team.length === 0 ? (
             <EmptyState
               icon={UsersThreeIcon}
+              tone="violet"
               size="sm"
               title="No inquiries or follow-ups in this duration."
             />

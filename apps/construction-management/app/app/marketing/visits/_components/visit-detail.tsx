@@ -265,7 +265,12 @@ function Notes({ visit }: { visit: Visit }) {
         </div>
       )}
       {visit.notes.length === 0 ? (
-        <EmptyState icon={NoteIcon} size="sm" title="No notes yet." />
+        <EmptyState
+          icon={NoteIcon}
+          tone="pink"
+          size="sm"
+          title="No notes yet."
+        />
       ) : (
         <ol aria-label="Notes" className="divide-y">
           {visit.notes.map((item) => (
@@ -295,6 +300,7 @@ function History({ visit }: { visit: Visit }) {
       {visit.history.length === 0 ? (
         <EmptyState
           icon={ClockCounterClockwiseIcon}
+          tone="teal"
           size="sm"
           title="Nothing yet."
         />

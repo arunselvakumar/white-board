@@ -219,6 +219,7 @@ export function ActivityFeed({
     return (
       <EmptyState
         icon={ClockCounterClockwiseIcon}
+        tone="teal"
         title="No activity"
         description={emptyMessage}
         className="border"

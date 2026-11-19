@@ -169,6 +169,7 @@ export function BatchCatalog({
           <EmptyState
             className="border-0"
             icon={noCourses ? BookOpenIcon : UsersFourIcon}
+            tone={noCourses ? "sky" : "violet"}
             size="md"
             title={noCourses ? "No Courses yet" : "No Batches yet"}
             description={

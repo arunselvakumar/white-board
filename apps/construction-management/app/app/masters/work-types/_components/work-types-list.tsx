@@ -113,6 +113,7 @@ function WorkTypesListContent() {
         {data.items.length === 0 ? (
           <MasterEmpty
             icon={HammerIcon}
+            tone="orange"
             title="No Work Types yet"
             description="Add the kinds of work your crews do, like Column casting under RCC."
             action={addButton}

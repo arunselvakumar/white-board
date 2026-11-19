@@ -78,7 +78,7 @@ function Nothing({
   return (
     <EmptyState
       icon={noAccess ? LockSimpleIcon : CalendarXIcon}
-      tone={noAccess ? "neutral" : "brand"}
+      tone={noAccess ? "neutral" : "teal"}
       orbit={!noAccess}
       title={title}
       description={description}

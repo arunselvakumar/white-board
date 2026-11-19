@@ -55,6 +55,7 @@ function Register({
     return (
       <EmptyState
         icon={PackageIcon}
+        tone="orange"
         title="Nothing in stock or moved"
         description={
           <>

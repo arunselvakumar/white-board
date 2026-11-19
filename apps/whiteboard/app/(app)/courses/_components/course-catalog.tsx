@@ -122,6 +122,7 @@ export function CourseCatalog({
           <EmptyState
             className="border-0"
             icon={BookOpenIcon}
+            tone="sky"
             size="md"
             title="No Courses yet"
             description="Add the first Course this centre teaches."

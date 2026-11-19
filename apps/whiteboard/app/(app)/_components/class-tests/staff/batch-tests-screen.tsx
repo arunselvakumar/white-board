@@ -180,6 +180,7 @@ function TestsEmpty({
     <EmptyState
       className="rounded-2xl border"
       icon={ExamIcon}
+      tone="sky"
       size="md"
       title="No Tests yet"
       description={

@@ -86,6 +86,7 @@ function PickerBody({
         <EmptyState
           className="bg-card border"
           icon={section.icon}
+          tone={section.tone}
           size="sm"
           title={`No ${section.title} yet`}
           description={`Add ${section.title} in ${section.area}, then choose them here.`}

@@ -423,7 +423,7 @@ function TransactionRows({
         <EmptyState
           className="bg-card border"
           icon={filtered ? MagnifyingGlassIcon : CurrencyInrIcon}
-          tone={filtered ? "neutral" : "brand"}
+          tone={filtered ? "neutral" : "green"}
           title={filtered ? "No Transactions match" : "No Transactions yet"}
           description={
             filtered

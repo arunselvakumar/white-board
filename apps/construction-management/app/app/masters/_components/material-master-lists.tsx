@@ -46,6 +46,7 @@ export function MeasurementUnitsList() {
         plural: "Measurement Units",
         description: "Units Materials are counted in: Bag, kg, cum, sqft…",
         icon: RulerIcon,
+        tone: "orange",
         emptyDescription:
           "Add the units you count material in, like Bag or cum.",
         deleteDescription:
@@ -70,6 +71,7 @@ export function MaterialCategoriesList() {
         description:
           "Groups of Materials, one level deep: Civil Work Materials › Cement.",
         icon: TreeStructureIcon,
+        tone: "orange",
         emptyDescription:
           "Add the groups you buy material in, like Civil Work Materials or Plumbing Material.",
         deleteDescription:
@@ -104,6 +106,7 @@ export function TermsConditionsList() {
         plural: "Terms & Conditions",
         description: "Reusable terms you pick on Purchase Orders.",
         icon: FileTextIcon,
+        tone: "blue",
         emptyDescription:
           "Add the terms you print on Purchase Orders, like delivery, payment or warranty.",
         deleteDescription:
@@ -216,6 +219,7 @@ export function MaterialsList() {
         description:
           "What you buy and stock: unit, category, rate, GST, HSN and minimum stock.",
         icon: PackageIcon,
+        tone: "orange",
         emptyDescription:
           "Add the materials you buy, like Cement OPC 53 or TMT 12 mm.",
         deleteDescription:

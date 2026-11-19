@@ -148,7 +148,7 @@ function OtherPartyRows({
     return (
       <EmptyState
         icon={filtered ? MagnifyingGlassIcon : AddressBookIcon}
-        tone={filtered ? "neutral" : "brand"}
+        tone={filtered ? "neutral" : "violet"}
         title={filtered ? "No Other Parties match" : "No Other Parties yet"}
         description={
           filtered

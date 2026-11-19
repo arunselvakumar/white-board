@@ -214,6 +214,7 @@ export function TodayEntries({
       {entries.length === 0 ? (
         <EmptyState
           icon={CalendarCheckIcon}
+          tone="teal"
           size="sm"
           title="No entries yet today."
         />

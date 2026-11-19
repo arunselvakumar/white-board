@@ -184,6 +184,7 @@ function TaskList({
       {data.items.length === 0 ? (
         <EmptyState
           icon={ListChecksIcon}
+          tone="sky"
           size="sm"
           title="No tasks."
           description="Add to-dos like sending the brochure or a site visit."

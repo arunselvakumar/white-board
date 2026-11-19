@@ -261,7 +261,7 @@ function VendorRows({
     return (
       <EmptyState
         icon={filtered ? MagnifyingGlassIcon : StorefrontIcon}
-        tone={filtered ? "neutral" : "brand"}
+        tone={filtered ? "neutral" : "orange"}
         title={filtered ? "No Vendors match" : "No Vendors yet"}
         description={
           filtered

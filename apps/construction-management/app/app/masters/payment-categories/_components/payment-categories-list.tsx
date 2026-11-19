@@ -85,6 +85,7 @@ export function PaymentCategoriesList() {
         {data.items.length === 0 ? (
           <MasterEmpty
             icon={TagIcon}
+            tone="amber"
             title="No Payment Categories yet"
             description="Add the heads your money goes to, like Fuel or Site Expenses."
             action={addButton}

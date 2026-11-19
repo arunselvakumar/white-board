@@ -73,6 +73,7 @@ export function NotificationsScreen() {
         {items.length === 0 ? (
           <EmptyState
             icon={BellIcon}
+            tone="pink"
             title="No notifications yet"
             description="Approvals, Tasks, Issues and the reports you ask for show up here."
             className="bg-card rounded-2xl border"

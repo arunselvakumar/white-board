@@ -34,6 +34,7 @@ export function DeliveryNotesList({
     return (
       <EmptyState
         icon={TruckIcon}
+        tone="orange"
         title="No Delivery Notes"
         description="The store creates Delivery Notes from Material Requests."
         className="bg-card border"

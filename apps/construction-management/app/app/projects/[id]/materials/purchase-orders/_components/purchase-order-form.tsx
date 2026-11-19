@@ -512,6 +512,7 @@ function PurchaseOrderFields({
           ) : (
             <EmptyState
               icon={PackageIcon}
+              tone="orange"
               size="sm"
               title="No materials yet."
             />

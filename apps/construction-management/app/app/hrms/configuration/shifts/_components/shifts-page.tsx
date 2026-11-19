@@ -189,6 +189,7 @@ export function ShiftsPage({
           {shifts.items.length === 0 ? (
             <HrmsEmpty
               icon={ClockIcon}
+              tone="teal"
               title="No shifts yet"
               description="Until a member has a shift, their day follows the HRMS Settings: working hours, half day, grace and working days. Add a shift for a different start time or a night shift."
               action={addShift}
@@ -246,6 +247,7 @@ export function ShiftsPage({
           {rotations.items.length === 0 ? (
             <HrmsEmpty
               icon={ArrowsClockwiseIcon}
+              tone="teal"
               title="No rotations yet"
               description={
                 anyActiveShift

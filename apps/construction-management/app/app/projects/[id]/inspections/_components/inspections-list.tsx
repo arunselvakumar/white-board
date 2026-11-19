@@ -426,7 +426,7 @@ function Rows({
         <EmptyState
           className="bg-card border"
           icon={filtered ? MagnifyingGlassIcon : SealCheckIcon}
-          tone={filtered ? "neutral" : "brand"}
+          tone={filtered ? "neutral" : "sky"}
           title={
             filtered
               ? "No Inspection Requests match"

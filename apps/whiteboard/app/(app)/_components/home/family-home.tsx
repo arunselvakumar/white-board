@@ -343,6 +343,7 @@ export function FamilyHome({
           <EmptyState
             className="border"
             icon={LinkBreakIcon}
+            tone="pink"
             size="md"
             title={
               role === "parent" ? "No Students linked yet" : "Not linked yet"

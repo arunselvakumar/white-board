@@ -532,6 +532,7 @@ function Approvals({
       {approvals.items.length === 0 ? (
         <EmptyState
           icon={ListChecksIcon}
+          tone="sky"
           size="sm"
           title="Nothing is waiting for your decision."
         />
@@ -568,6 +569,7 @@ function TeamLeaves({
       {leaves.items.length === 0 ? (
         <EmptyState
           icon={CalendarXIcon}
+          tone="teal"
           size="sm"
           title="Nobody is on leave in the next 14 days."
         />
@@ -615,6 +617,7 @@ function Holidays({
       {holidays.length === 0 ? (
         <EmptyState
           icon={CalendarStarIcon}
+          tone="teal"
           size="sm"
           title="No holidays coming up."
           description={
@@ -746,6 +749,7 @@ function MyDay({
           {balances.length === 0 ? (
             <EmptyState
               icon={CalendarXIcon}
+              tone="teal"
               size="sm"
               title="No leave balances yet."
             />
@@ -783,6 +787,7 @@ function MyDay({
           {pending.items.length === 0 ? (
             <EmptyState
               icon={ListChecksIcon}
+              tone="sky"
               size="sm"
               title="Nothing of yours is waiting for a decision."
             />
@@ -803,6 +808,7 @@ function NoTeamYet() {
   return (
     <HrmsEmpty
       icon={UsersThreeIcon}
+      tone="violet"
       title="No Team Members yet"
       description="Invite your staff from Team Members. Then set working hours, holidays, shifts and leave in Configuration, and their attendance shows here."
       action={

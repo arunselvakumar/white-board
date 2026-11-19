@@ -150,6 +150,7 @@ function Settlements({
       <EmptyState
         className="bg-card border"
         icon={HandCoinsIcon}
+        tone="green"
         title={
           status === "pending"
             ? "Nothing waiting for approval"

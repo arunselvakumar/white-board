@@ -84,6 +84,7 @@ function FilesBody({ documentType, documentId, canEdit, heading }: Props) {
       {files.length === 0 && pending.length === 0 ? (
         <EmptyState
           icon={FolderOpenIcon}
+          tone="blue"
           size="md"
           title={
             mayUpload

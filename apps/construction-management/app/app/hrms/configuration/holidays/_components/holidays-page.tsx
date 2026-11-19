@@ -153,6 +153,7 @@ function HolidayYear({
     return (
       <HrmsEmpty
         icon={CalendarStarIcon}
+        tone="teal"
         title={`No holidays in ${String(year)}`}
         description="Add the national, festival and Company holidays your Team Members get, or import the year's list from Excel."
         action={

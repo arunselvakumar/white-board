@@ -47,6 +47,7 @@ function NoLabourers() {
     <EmptyState
       className="bg-card border"
       icon={UsersThreeIcon}
+      tone="violet"
       title="No Labours on this Project"
       description="Add Labours to this Project in Human Resources → Labours, or transfer them here, to mark their attendance."
       actions={

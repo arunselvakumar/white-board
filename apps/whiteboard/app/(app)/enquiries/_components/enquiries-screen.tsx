@@ -323,6 +323,7 @@ function EmptyResults({
     <EmptyState
       className="border-0"
       icon={ChatsCircleIcon}
+      tone="pink"
       size="md"
       title={copy.title}
       description={copy.description}

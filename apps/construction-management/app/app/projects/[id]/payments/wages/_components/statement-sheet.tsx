@@ -146,6 +146,7 @@ function StatementLines({
       {data.lines.length === 0 ? (
         <EmptyState
           icon={ReceiptIcon}
+          tone="green"
           size="sm"
           title="No entries in this period."
         />

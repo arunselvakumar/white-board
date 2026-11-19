@@ -366,7 +366,7 @@ function SheetRows({
         <EmptyState
           className="bg-card border"
           icon={filtered ? MagnifyingGlassIcon : BulldozerIcon}
-          tone={filtered ? "neutral" : "brand"}
+          tone={filtered ? "neutral" : "orange"}
           title={filtered ? "No usage sheets match" : "No usage sheets yet"}
           description={
             filtered

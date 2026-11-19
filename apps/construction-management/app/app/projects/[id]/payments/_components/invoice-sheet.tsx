@@ -192,7 +192,12 @@ export function InvoiceDetail({
           Payments
         </h3>
         {invoice.payments.length === 0 ? (
-          <EmptyState icon={WalletIcon} size="sm" title="Nothing paid yet." />
+          <EmptyState
+            icon={WalletIcon}
+            tone="green"
+            size="sm"
+            title="Nothing paid yet."
+          />
         ) : (
           <ul className="space-y-0.5 text-sm">
             {invoice.payments.map((payment) => (

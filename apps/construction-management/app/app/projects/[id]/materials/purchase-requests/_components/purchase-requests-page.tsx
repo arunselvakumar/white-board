@@ -350,7 +350,7 @@ function PurchaseRequestRows({
         <EmptyState
           className="bg-card border"
           icon={filtered ? MagnifyingGlassIcon : ClipboardTextIcon}
-          tone={filtered ? "neutral" : "brand"}
+          tone={filtered ? "neutral" : "sky"}
           title={
             filtered ? "No Purchase Requests match" : "No Purchase Requests yet"
           }

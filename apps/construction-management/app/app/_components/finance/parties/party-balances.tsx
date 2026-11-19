@@ -87,6 +87,7 @@ export function PartyBalances({
     return (
       <EmptyState
         icon={AddressBookIcon}
+        tone="violet"
         title={`No ${screen.plural} on this Project`}
         description={
           <>

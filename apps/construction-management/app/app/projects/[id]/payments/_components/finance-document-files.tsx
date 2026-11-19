@@ -108,6 +108,7 @@ function FilesBody({
         <EmptyState
           className="bg-card border"
           icon={FileTextIcon}
+          tone="blue"
           size="sm"
           title={
             mayUpload

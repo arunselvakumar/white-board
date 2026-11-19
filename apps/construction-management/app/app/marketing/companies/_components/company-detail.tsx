@@ -266,6 +266,7 @@ function Contacts({
       {company.contacts.length === 0 ? (
         <EmptyState
           icon={AddressBookIcon}
+          tone="violet"
           size="sm"
           title="No Contacts yet."
           description={canUpdate ? "Add the people you meet there." : undefined}
@@ -465,6 +466,7 @@ function Projects({
       {projects.length === 0 ? (
         <EmptyState
           icon={FolderSimpleIcon}
+          tone="blue"
           size="sm"
           title="No Projects for this client yet."
         />

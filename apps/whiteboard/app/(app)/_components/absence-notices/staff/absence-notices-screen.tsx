@@ -76,6 +76,7 @@ export function AbsenceNoticesContent({
           <EmptyState
             className="rounded-2xl border"
             icon={CalendarCheckIcon}
+            tone="teal"
             title="No absence notices for upcoming Classes"
             description={copy.emptyDescription}
           />

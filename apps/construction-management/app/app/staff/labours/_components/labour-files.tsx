@@ -130,6 +130,7 @@ export function LabourFiles({ labour }: { labour: LabourResponse }) {
         ) : (documents.data?.items.length ?? 0) === 0 ? (
           <EmptyState
             icon={FileTextIcon}
+            tone="blue"
             size="md"
             title="No documents yet."
             description="Add an ID card, bank passbook or licence (PDF, PNG, JPEG or WebP, up to 10 MB)."

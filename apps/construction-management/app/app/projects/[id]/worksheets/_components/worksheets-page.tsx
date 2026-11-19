@@ -343,7 +343,7 @@ function WorksheetRows({
         <EmptyState
           className="bg-card border"
           icon={filtered ? MagnifyingGlassIcon : NotePencilIcon}
-          tone={filtered ? "neutral" : "brand"}
+          tone={filtered ? "neutral" : "sky"}
           title={filtered ? "No worksheets match" : "No worksheets yet"}
           description={
             filtered

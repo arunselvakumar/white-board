@@ -185,6 +185,7 @@ function RoleGroup({
         <EmptyState
           className="bg-card border"
           icon={FileTextIcon}
+          tone="blue"
           size="sm"
           title={`No ${label.toLowerCase()} yet.`}
         />

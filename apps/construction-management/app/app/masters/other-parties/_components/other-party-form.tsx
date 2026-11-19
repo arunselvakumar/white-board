@@ -63,6 +63,7 @@ function ProjectsChecklist({
     return (
       <EmptyState
         icon={FolderSimpleIcon}
+        tone="blue"
         size="sm"
         title="No Projects yet."
         description="Add a Project first, then choose it here."

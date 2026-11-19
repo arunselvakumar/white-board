@@ -198,6 +198,7 @@ function ReportList({
       <EmptyState
         className="bg-card border"
         icon={ChartBarIcon}
+        tone="sky"
         title="No Progress Reports yet"
         description="Generate a Daily Progress Report for a day (its weather, labour, worksheets, equipment, materials, visitors and hindrances) or a Task Progress Report for a period, each as one PDF."
         actions={

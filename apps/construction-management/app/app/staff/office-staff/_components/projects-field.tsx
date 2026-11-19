@@ -39,6 +39,7 @@ function ProjectChecklist({ value, onChange }: Selection) {
     return (
       <EmptyState
         icon={FolderSimpleIcon}
+        tone="blue"
         size="sm"
         title="No Projects yet"
         description="Once you add Projects, choose here which ones this staff member works on. You can assign them later from Edit."

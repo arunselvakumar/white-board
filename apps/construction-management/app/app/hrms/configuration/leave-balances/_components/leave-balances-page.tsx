@@ -186,6 +186,7 @@ function TeamBalances({ canManage }: { canManage: boolean }) {
         {data.members.length === 0 ? (
           <MasterEmpty
             icon={UsersThreeIcon}
+            tone="violet"
             title="No Team Members yet"
             description="Balances appear here once Team Members have joined."
             action={null}

@@ -92,6 +92,7 @@ function ThreadBody({ documentType, documentId, heading }: Props) {
       {data.items.length === 0 ? (
         <EmptyState
           icon={ChatTextIcon}
+          tone="pink"
           size="sm"
           title={`No ${word}s yet.${data.canComment ? ` Write the first ${word} below.` : ""}`}
         />

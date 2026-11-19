@@ -402,6 +402,7 @@ export function GalleryPage({ projectId }: { projectId: string }) {
         <EmptyState
           className="bg-card border"
           icon={ImagesIcon}
+          tone="blue"
           title="No files on this Project yet"
           description="Photos and PDFs from Documents, Drawings and Testing Reports show here. Add them where they belong."
         />

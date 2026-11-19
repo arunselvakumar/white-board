@@ -1,3 +1,4 @@
+import type { EmptyStateTone } from "@repo/ui/components/empty-state";
 import type { Icon } from "@phosphor-icons/react";
 import { BarricadeIcon, WavesIcon } from "@phosphor-icons/react/ssr";
 
@@ -16,6 +17,7 @@ export type DevelopmentScreenConfig = {
   emptyDescription: string;
   deleteDescription: string;
   icon: Icon;
+  tone: EmptyStateTone;
 };
 
 export const AMENITIES_SCREEN: DevelopmentScreenConfig = {
@@ -33,6 +35,7 @@ export const AMENITIES_SCREEN: DevelopmentScreenConfig = {
   deleteDescription:
     "It will no longer be offered anywhere. An Amenity a Project has cannot be deleted; remove it from those Projects or disable it instead.",
   icon: WavesIcon,
+  tone: "amber",
 };
 
 export const COMMON_DEVELOPMENTS_SCREEN: DevelopmentScreenConfig = {
@@ -50,4 +53,5 @@ export const COMMON_DEVELOPMENTS_SCREEN: DevelopmentScreenConfig = {
   deleteDescription:
     "It will no longer be offered anywhere. A Common Development a Project has cannot be deleted; remove it from those Projects or disable it instead.",
   icon: BarricadeIcon,
+  tone: "amber",
 };

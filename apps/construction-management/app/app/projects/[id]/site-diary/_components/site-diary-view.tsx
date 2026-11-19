@@ -138,6 +138,7 @@ export function SiteDiaryView({
         {diary.visitors.length === 0 ? (
           <EmptyState
             icon={UsersThreeIcon}
+            tone="violet"
             size="sm"
             title="No visitors recorded."
           />
@@ -178,6 +179,7 @@ export function SiteDiaryView({
         {diary.instructions.length === 0 ? (
           <EmptyState
             icon={ClipboardTextIcon}
+            tone="sky"
             size="sm"
             title="No instructions recorded."
           />

@@ -201,7 +201,7 @@ function ReceiptRows({
         <EmptyState
           className="bg-card border"
           icon={filtered ? MagnifyingGlassIcon : PackageIcon}
-          tone={filtered ? "neutral" : "brand"}
+          tone={filtered ? "neutral" : "orange"}
           title={filtered ? "No Goods Receipts match" : "No goods received yet"}
           description={
             filtered

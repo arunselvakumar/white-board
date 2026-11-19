@@ -8,6 +8,7 @@ export function TeachersEmptyState() {
     <EmptyState
       className="border"
       icon={ChalkboardTeacherIcon}
+      tone="violet"
       title={<h2>No Teachers yet</h2>}
       description="Add a Centre Teacher or Visiting Tutor to invite them and assign Batches."
       actions={

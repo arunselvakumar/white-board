@@ -343,7 +343,7 @@ function LogBody({
           <EmptyState
             className="bg-card border"
             icon={filtered ? MagnifyingGlassIcon : CalendarCheckIcon}
-            tone={filtered ? "neutral" : "brand"}
+            tone={filtered ? "neutral" : "teal"}
             title="No entries"
             description={
               filtered

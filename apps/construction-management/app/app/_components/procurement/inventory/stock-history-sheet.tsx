@@ -213,6 +213,7 @@ function Entries({
     return (
       <EmptyState
         icon={ClockCounterClockwiseIcon}
+        tone="teal"
         size="sm"
         title="No stock movements yet"
         description="Receipts, transfers, consumption and adjustments of this material here show in this list."

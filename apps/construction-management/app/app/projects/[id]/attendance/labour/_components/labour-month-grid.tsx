@@ -83,6 +83,7 @@ function Grid({ projectId, month }: { projectId: string; month: string }) {
       <EmptyState
         className="bg-card border"
         icon={UsersThreeIcon}
+        tone="violet"
         title="No Labours on this Project in this month."
       />
     );

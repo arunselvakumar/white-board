@@ -406,7 +406,7 @@ function CompanyRows({
     return (
       <EmptyState
         icon={filtered ? MagnifyingGlassIcon : BuildingsIcon}
-        tone={filtered ? "neutral" : "brand"}
+        tone={filtered ? "neutral" : "blue"}
         title={
           filtered ? "No Prospect Companies match" : "No Prospect Companies yet"
         }

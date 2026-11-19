@@ -600,6 +600,7 @@ function HomeworkEmpty({
     <EmptyState
       className="rounded-2xl border"
       icon={ClipboardTextIcon}
+      tone="sky"
       size="md"
       title="No Homework yet"
       description={
@@ -630,6 +631,7 @@ function MaterialsEmpty({
     <EmptyState
       className="rounded-2xl border"
       icon={BooksIcon}
+      tone="sky"
       size="md"
       title="No Study Material yet"
       description={

@@ -17,7 +17,10 @@ import {
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { FilterTabs, type FilterTab } from "@repo/ui/components/filter-tabs";
 import { cn } from "@repo/ui/lib/utils";
-import { EmptyState } from "@repo/ui/components/empty-state";
+import {
+  EmptyState,
+  type EmptyStateTone,
+} from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -54,6 +57,7 @@ export type PagedMasterScreen<L extends MaterialMasterList> = {
   plural: string;
   description: string;
   icon: Icon;
+  tone: EmptyStateTone;
   emptyDescription: string;
   deleteDescription: string;
   searchLabel: string;
@@ -239,6 +243,7 @@ function PagedRows<L extends MaterialMasterList>({
     ) : (
       <MasterEmpty
         icon={screen.icon}
+        tone={screen.tone}
         title={`No ${screen.plural} yet`}
         description={screen.emptyDescription}
         action={addButton}

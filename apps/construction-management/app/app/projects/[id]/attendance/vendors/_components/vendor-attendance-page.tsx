@@ -48,6 +48,7 @@ function NoVendors() {
     <EmptyState
       className="bg-card border"
       icon={StorefrontIcon}
+      tone="orange"
       title="No vendors on this Project"
       description="Assign a vendor to this Project in Human Resources → Vendors, with a rate card of shifts and Labour Category rates, to record its headcount."
       actions={

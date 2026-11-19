@@ -191,6 +191,7 @@ function Ledger({
         <EmptyState
           className="bg-card border"
           icon={ReceiptIcon}
+          tone="green"
           title="No payments this year"
           description={`Payments to the Contractor in FY ${financialYearLabel(year)} show here with their TDS.`}
         />

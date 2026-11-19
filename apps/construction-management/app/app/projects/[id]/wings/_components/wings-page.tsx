@@ -206,6 +206,7 @@ export function WingsPage({
       {data.phases.length === 0 ? (
         <StructureEmpty
           icon={BuildingsIcon}
+          tone="blue"
           title={
             access.create
               ? "Set up this Project's Wings"
@@ -287,6 +288,7 @@ export function WingsPage({
               <EmptyState
                 className="bg-card border"
                 icon={BuildingsIcon}
+                tone="blue"
                 size="sm"
                 title={`No Wings in ${phase.name} yet.`}
               />

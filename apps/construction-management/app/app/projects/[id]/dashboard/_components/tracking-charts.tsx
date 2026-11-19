@@ -116,7 +116,7 @@ export function CountBars({
         {title}
       </figcaption>
       {total === 0 ? (
-        <EmptyState icon={ChartBarIcon} size="sm" title={empty} />
+        <EmptyState icon={ChartBarIcon} tone="sky" size="sm" title={empty} />
       ) : (
         <ol className="space-y-2.5" aria-labelledby={titleId}>
           {items.map((item) => (

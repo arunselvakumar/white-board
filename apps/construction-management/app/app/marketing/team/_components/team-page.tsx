@@ -182,6 +182,7 @@ export function TeamPage({ timeZone }: { timeZone: string }) {
         {team.people.length === 0 ? (
           <EmptyState
             icon={UsersThreeIcon}
+            tone="violet"
             title="No Marketing People yet"
             description="Office Staff on a Role that adds Visits show here, with their Visits this month and Follow-ups overdue."
             className="bg-card border"

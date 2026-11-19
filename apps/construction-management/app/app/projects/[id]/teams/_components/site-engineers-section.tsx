@@ -96,6 +96,7 @@ function PickerBody({
         <EmptyState
           className="bg-card border"
           icon={HardHatIcon}
+          tone="violet"
           size="sm"
           title="No Site Engineers to add"
           description="Every enabled Site Engineer is on this Project already, or none has been added yet."
@@ -325,6 +326,7 @@ export function SiteEngineersSection({
         <EmptyState
           className="bg-card border"
           icon={HardHatIcon}
+          tone="violet"
           size="md"
           title="No Site Engineers on this Project"
           description={

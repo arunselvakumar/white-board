@@ -255,6 +255,7 @@ function Group({
         {people.length === 0 ? (
           <EmptyState
             icon={UsersThreeIcon}
+            tone="violet"
             size="sm"
             title={`No ${label} on this Project.`}
             actions={

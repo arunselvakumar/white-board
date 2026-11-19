@@ -851,6 +851,7 @@ export function WorksheetForm({
         {lines.fields.length === 0 ? (
           <EmptyState
             icon={PackageIcon}
+            tone="orange"
             size="sm"
             title="No material consumed."
             description="Add the materials the crew used, if any."

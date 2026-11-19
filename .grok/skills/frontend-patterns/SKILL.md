@@ -52,7 +52,20 @@ Every empty list, tab, page, load error and no-access screen uses `EmptyState` f
 | Couldn't load / error boundary          | `WarningCircleIcon`, `tone="danger"`, `orbit={false}` |
 | No access, not found                    | `tone="neutral"`, `orbit={false}`                     |
 
-Pick the icon for the thing that is missing (a folder for Projects, people for Labour). The icon is drawn bare, in its `tone`: a meaning (`brand` by default, `success`, `warning`, `danger`, `neutral`) or a hue (`red`, `orange`, `amber`, `green`, `teal`, `sky`, `blue`, `violet`, `pink`). Lucide stays the icon set for everything else.
+Pick the icon for the thing that is missing (a folder for Projects, people for Labour) and the `tone` for its subject, so the same subject has the same colour on every screen:
+
+| Subject                                                          | `tone`   |
+| ---------------------------------------------------------------- | -------- |
+| Projects, structure, documents, drawings, photos                 | `blue`   |
+| People: Labour, team members, Site Engineers, Students, Teachers | `violet` |
+| Money: payments, receipts, fees, wallets, salary                 | `green`  |
+| Materials, procurement, equipment, Suppliers, Vendors            | `orange` |
+| Time: attendance, leave, shifts, history, visits, locations      | `teal`   |
+| Work, learning and reports: tasks, homework, tests, charts       | `sky`    |
+| Conversations: notifications, follow-ups, enquiries, remarks     | `pink`   |
+| Masters lists and problems: issues, hindrances, tags             | `amber`  |
+
+Search misses, no access and placeholders stay `neutral`; load errors stay `danger`. Lucide stays the icon set for everything else.
 
 ## Select
 

@@ -90,6 +90,7 @@ export function BillingAddressesManager() {
         {data.items.length === 0 ? (
           <EmptyState
             icon={MapPinIcon}
+            tone="teal"
             title="No billing addresses yet"
             description="Add the address and GSTIN you bill from. The first one you add becomes the default on Purchase Orders."
             className="bg-card border"

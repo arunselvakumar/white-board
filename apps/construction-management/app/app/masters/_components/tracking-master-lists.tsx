@@ -12,7 +12,10 @@ import { Suspense, useMemo, useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
-import { EmptyState } from "@repo/ui/components/empty-state";
+import {
+  EmptyState,
+  type EmptyStateTone,
+} from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -48,6 +51,7 @@ type Screen = {
   plural: string;
   description: string;
   icon: Icon;
+  tone: EmptyStateTone;
   emptyTitle: string;
   emptyDescription: string;
   inUseLine: string;
@@ -64,6 +68,7 @@ const SCREENS: Record<TrackingMasterList, Screen> = {
     description:
       "What an issue or snag is about. Disabled ones leave the issue form; old issues keep them.",
     icon: WarningIcon,
+    tone: "amber",
     emptyTitle: "No Issue Categories",
     emptyDescription:
       "Add what your issues and snags are about, like Quality or Safety.",
@@ -79,6 +84,7 @@ const SCREENS: Record<TrackingMasterList, Screen> = {
     description:
       "Labels on Tasks, to find and filter them. The Task form can add one as you type.",
     icon: TagIcon,
+    tone: "amber",
     emptyTitle: "No Tags yet",
     emptyDescription:
       "Add labels for your Tasks, like Critical path or Monsoon work.",
@@ -150,6 +156,7 @@ function TrackingMasterListContent({ screen }: { screen: Screen }) {
         {rows.length === 0 ? (
           <MasterEmpty
             icon={screen.icon}
+            tone={screen.tone}
             title={screen.emptyTitle}
             description={screen.emptyDescription}
             action={addButton}

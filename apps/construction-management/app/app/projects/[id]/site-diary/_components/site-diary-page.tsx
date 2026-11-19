@@ -60,6 +60,7 @@ function DiaryForDate({
       <EmptyState
         className="bg-card border"
         icon={NotebookIcon}
+        tone="sky"
         title={`No diary for ${formatDate(date)}`}
         description="Record the weather, visitors and instructions on site for the day."
         actions={
@@ -112,6 +113,7 @@ function MonthDays({
     return (
       <EmptyState
         icon={NotebookIcon}
+        tone="sky"
         size="sm"
         title="No diaries this month."
       />

@@ -31,6 +31,7 @@ export function TopEquipmentChart({
       {machines.length === 0 ? (
         <EmptyState
           icon={BulldozerIcon}
+          tone="orange"
           size="sm"
           title="No hourly equipment worked in this period."
         />
@@ -89,6 +90,7 @@ export function OwnershipSplit({
       {total === 0 ? (
         <EmptyState
           icon={BulldozerIcon}
+          tone="orange"
           size="sm"
           title="No hourly equipment worked in this period."
         />

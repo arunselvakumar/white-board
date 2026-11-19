@@ -140,6 +140,7 @@ function ResourceCard({
         <EmptyState
           className="bg-card border"
           icon={section.icon}
+          tone={section.tone}
           size="md"
           title={`No ${section.title} on this Project`}
           description={

@@ -100,6 +100,7 @@ export function BankAccountsList() {
         {data.items.length === 0 ? (
           <MasterEmpty
             icon={BankIcon}
+            tone="green"
             title="No accounts yet"
             description="Add the Company's cash box and bank accounts, with what they held when you started."
             action={addButton}

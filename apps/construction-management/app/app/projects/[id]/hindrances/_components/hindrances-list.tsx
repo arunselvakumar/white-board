@@ -114,7 +114,7 @@ function Hindrances({
       <EmptyState
         className="bg-card border"
         icon={filtered ? MagnifyingGlassIcon : PauseCircleIcon}
-        tone={filtered ? "neutral" : "brand"}
+        tone={filtered ? "neutral" : "amber"}
         title={filtered ? "No hindrances match" : "No hindrances recorded"}
         description={
           filtered

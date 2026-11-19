@@ -368,6 +368,7 @@ export function TestingItemPage({
         <EmptyState
           className="bg-card border"
           icon={FlaskIcon}
+          tone="sky"
           title={`No reports for ${item.name} yet`}
           description={
             canCreate

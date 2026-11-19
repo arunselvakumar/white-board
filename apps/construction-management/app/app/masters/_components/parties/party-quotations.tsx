@@ -191,6 +191,7 @@ function QuotationList({
     return (
       <EmptyState
         icon={FileTextIcon}
+        tone="blue"
         size="md"
         title="No quotations yet"
         description={

@@ -92,6 +92,7 @@ export function PartyInvoices({
     return (
       <EmptyState
         icon={ReceiptIcon}
+        tone="green"
         title="No invoices yet"
         description="Record the party's bills here; payments settle them."
         className="bg-card border"
@@ -164,6 +165,7 @@ export function PartyPayments({
     return (
       <EmptyState
         icon={WalletIcon}
+        tone="green"
         title="No payments yet"
         description="Payments to (or from) the party on this Project show here, each with its receipt."
         className="bg-card border"
@@ -232,6 +234,7 @@ export function PartyStatementTable({
     return (
       <EmptyState
         icon={ReceiptIcon}
+        tone="green"
         title="Nothing on the statement yet."
         className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm"
       />

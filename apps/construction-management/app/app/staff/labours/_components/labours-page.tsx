@@ -341,7 +341,7 @@ function LabourRows({
     return (
       <EmptyState
         icon={filtered ? MagnifyingGlassIcon : UsersThreeIcon}
-        tone={filtered ? "neutral" : "brand"}
+        tone={filtered ? "neutral" : "violet"}
         title={filtered ? "No Labours match" : "No Labours yet"}
         description={
           filtered

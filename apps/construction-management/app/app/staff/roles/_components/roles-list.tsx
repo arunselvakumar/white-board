@@ -226,6 +226,7 @@ function RolesListContent({ actions }: { actions: RoleActions }) {
         {data.length === 0 ? (
           <EmptyState
             icon={ShieldCheckIcon}
+            tone="violet"
             title="No Roles yet"
             description="Make a Role for each kind of work, like Site Engineer or Accountant, and tick what it may do."
             className="bg-card border"

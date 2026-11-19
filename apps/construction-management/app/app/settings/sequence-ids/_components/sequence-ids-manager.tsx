@@ -156,6 +156,7 @@ export function SequenceIdsManager({
         {rules.length === 0 ? (
           <EmptyState
             icon={HashIcon}
+            tone="amber"
             title={`No rule for ${sequenceModule(module).label}`}
             description={
               <>

@@ -357,6 +357,7 @@ export function EmployeeSalaryGrid() {
         {data.structures.length === 0 ? (
           <EmptyState
             icon={ReceiptIcon}
+            tone="green"
             title="Add a salary structure first"
             description="Members are paid by a salary structure. Add one, then come back to give each member theirs."
             className="bg-card border"

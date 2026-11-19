@@ -198,7 +198,7 @@ function VoucherRows({
       <EmptyState
         className="bg-card border"
         icon={filtered ? MagnifyingGlassIcon : ReceiptIcon}
-        tone={filtered ? "neutral" : "brand"}
+        tone={filtered ? "neutral" : "green"}
         title={
           filtered
             ? "No vouchers match"

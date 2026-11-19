@@ -209,7 +209,7 @@ export function LaboursSection({
           className="bg-card border"
           icon={searching ? MagnifyingGlassIcon : UsersThreeIcon}
           size="md"
-          tone={searching ? "neutral" : "brand"}
+          tone={searching ? "neutral" : "violet"}
           title={
             searching
               ? `No Labours match “${deferredSearch.trim()}”`

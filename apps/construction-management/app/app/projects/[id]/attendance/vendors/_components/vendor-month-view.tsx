@@ -85,6 +85,7 @@ function MonthTable({
       <EmptyState
         className="bg-card border"
         icon={CalendarCheckIcon}
+        tone="teal"
         title="No vendor attendance recorded in this month."
       />
     );

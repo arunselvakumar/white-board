@@ -90,6 +90,7 @@ function Lines({
         <EmptyState
           className="bg-card border"
           icon={CoinsIcon}
+          tone="green"
           title={`No entries between ${formatDate(from)} and ${formatDate(to)}. Pending vouchers show once approved.`}
         />
       ) : (

@@ -260,6 +260,7 @@ export function WorkTypeDialog({
               {materials.fields.length === 0 ? (
                 <EmptyState
                   icon={PackageIcon}
+                  tone="orange"
                   size="sm"
                   title="No Materials assigned."
                   className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-center text-sm"

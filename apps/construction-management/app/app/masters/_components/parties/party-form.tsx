@@ -110,6 +110,7 @@ function ProjectsChecklist({
     return (
       <EmptyState
         icon={FolderSimpleIcon}
+        tone="blue"
         size="sm"
         title="No Projects yet."
         description={`Add a Project first, then assign the ${screen.label} to it.`}
@@ -151,6 +152,7 @@ function DepartmentsChecklist({
     return (
       <EmptyState
         icon={WrenchIcon}
+        tone="orange"
         size="sm"
         title="No Departments yet."
         description="Add them under Masters → Departments."

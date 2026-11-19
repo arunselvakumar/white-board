@@ -378,6 +378,7 @@ function MyAttendance() {
         {data.entries.length === 0 ? (
           <EmptyState
             icon={CalendarCheckIcon}
+            tone="teal"
             size="md"
             title="No check-ins today yet."
             className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm"

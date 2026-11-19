@@ -52,6 +52,7 @@ function OvertimeTable({
       <EmptyState
         className="bg-card border"
         icon={ClockIcon}
+        tone="teal"
         title="No vendor overtime between these dates."
       />
     );

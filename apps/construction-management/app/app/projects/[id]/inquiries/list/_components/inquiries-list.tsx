@@ -363,7 +363,7 @@ function InquiryRows({
       <EmptyState
         className="bg-card border"
         icon={filtered ? MagnifyingGlassIcon : UserListIcon}
-        tone={filtered ? "neutral" : "brand"}
+        tone={filtered ? "neutral" : "violet"}
         title={filtered ? "No inquiries match" : "No inquiries yet"}
         description={
           filtered

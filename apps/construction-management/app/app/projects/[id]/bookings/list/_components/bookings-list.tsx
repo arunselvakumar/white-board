@@ -205,7 +205,7 @@ function BookingRows({
       <EmptyState
         className="bg-card border"
         icon={filtered ? MagnifyingGlassIcon : HouseLineIcon}
-        tone={filtered ? "neutral" : "brand"}
+        tone={filtered ? "neutral" : "blue"}
         title={filtered ? "No bookings match" : "No bookings yet"}
         description={
           filtered

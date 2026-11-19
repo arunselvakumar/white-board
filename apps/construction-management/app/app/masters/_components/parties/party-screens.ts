@@ -1,3 +1,4 @@
+import type { EmptyStateTone } from "@repo/ui/components/empty-state";
 import type { Icon } from "@phosphor-icons/react";
 import { HammerIcon, TruckIcon } from "@phosphor-icons/react/ssr";
 
@@ -16,6 +17,7 @@ export type PartyScreen = {
   /** The empty list's message. */
   empty: string;
   icon: Icon;
+  tone: EmptyStateTone;
   /** Contractors work in Departments; Suppliers have none. */
   departments: boolean;
 };
@@ -32,6 +34,7 @@ export const PARTY_SCREENS: Record<PartyList, PartyScreen> = {
     empty:
       "Add the Contractors you give work to, with the Departments they work in and their Projects.",
     icon: HammerIcon,
+    tone: "orange",
     departments: true,
   },
   suppliers: {
@@ -44,6 +47,7 @@ export const PARTY_SCREENS: Record<PartyList, PartyScreen> = {
     empty:
       "Add the Suppliers you buy cement, steel, bricks and other material from, and their Projects.",
     icon: TruckIcon,
+    tone: "orange",
     departments: false,
   },
 };

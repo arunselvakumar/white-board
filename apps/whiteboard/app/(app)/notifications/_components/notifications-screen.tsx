@@ -93,6 +93,7 @@ export function NotificationsContent({
           <EmptyState
             className="rounded-2xl border"
             icon={BellIcon}
+            tone="pink"
             title="No Notifications yet"
             description="When a Student or Parent gives or withdraws an Absence Notice for one of your Batches, you’ll see it here and get an email."
           />

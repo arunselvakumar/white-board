@@ -130,6 +130,7 @@ function BellPanel({
         ) : items.length === 0 ? (
           <EmptyState
             icon={BellIcon}
+            tone="pink"
             size="sm"
             title="No notifications yet"
             className="p-3"

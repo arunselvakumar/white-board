@@ -242,6 +242,7 @@ function PickList({
     return (
       <MasterEmpty
         icon={list === "lead_source" ? SignpostIcon : ProhibitIcon}
+        tone={list === "lead_source" ? "pink" : "red"}
         title={`No ${label}s`}
         description={
           list === "lead_source"

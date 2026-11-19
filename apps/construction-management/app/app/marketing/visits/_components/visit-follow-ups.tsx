@@ -105,7 +105,12 @@ function Rows({
   const today = query.data.pages[0]?.today ?? "";
   if (items.length === 0)
     return (
-      <EmptyState icon={PhoneCallIcon} size="sm" title="No Follow-ups yet." />
+      <EmptyState
+        icon={PhoneCallIcon}
+        tone="pink"
+        size="sm"
+        title="No Follow-ups yet."
+      />
     );
   return (
     <FollowUpItems

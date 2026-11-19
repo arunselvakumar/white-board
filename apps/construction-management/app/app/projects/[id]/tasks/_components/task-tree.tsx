@@ -232,7 +232,7 @@ export function TaskTree({
       <EmptyState
         className="bg-card border"
         icon={filtered ? MagnifyingGlassIcon : ListChecksIcon}
-        tone={filtered ? "neutral" : "brand"}
+        tone={filtered ? "neutral" : "sky"}
         title={filtered ? "No tasks match" : "No tasks yet"}
         description={
           filtered

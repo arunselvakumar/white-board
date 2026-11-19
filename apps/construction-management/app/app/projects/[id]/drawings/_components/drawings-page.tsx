@@ -178,6 +178,7 @@ export function DrawingsPage({
         <EmptyState
           className="bg-card border"
           icon={FoldersIcon}
+          tone="blue"
           title="No albums on this Project"
           description={
             canCreate

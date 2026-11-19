@@ -161,6 +161,7 @@ function ApprovalList() {
     return (
       <HrmsEmpty
         icon={CalendarCheckIcon}
+        tone="teal"
         title="Nothing to approve"
         description="Back-dated days, missed checkouts and check-ins outside the fence appear here for a decision."
       />

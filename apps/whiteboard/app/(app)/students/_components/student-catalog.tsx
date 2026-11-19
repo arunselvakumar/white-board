@@ -279,7 +279,7 @@ export function StudentCatalog({
             className="border-0"
             size="md"
             icon={emptyBecauseSearch ? MagnifyingGlassIcon : StudentIcon}
-            tone={emptyBecauseSearch ? "neutral" : "brand"}
+            tone={emptyBecauseSearch ? "neutral" : "violet"}
             title={emptyBecauseSearch ? "No Students found" : "No Students yet"}
             description={
               emptyBecauseSearch

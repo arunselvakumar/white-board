@@ -176,6 +176,7 @@ function MaintenanceLog({
       {equipment.maintenance.length === 0 ? (
         <EmptyState
           icon={WrenchIcon}
+          tone="orange"
           size="md"
           title="No maintenance logged yet."
           className="bg-card text-muted-foreground rounded-lg border p-4 text-sm"

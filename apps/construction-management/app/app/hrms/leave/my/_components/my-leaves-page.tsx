@@ -172,6 +172,7 @@ function MyLeaves({
         ) : (
           <EmptyState
             icon={CalendarXIcon}
+            tone="teal"
             size="md"
             title={`Your leave balances for ${balances.leaveYear} are not open yet.`}
             description="Your manager opens them from Leave Balances."
@@ -187,6 +188,7 @@ function MyLeaves({
         {requests.items.length === 0 ? (
           <EmptyState
             icon={CalendarXIcon}
+            tone="teal"
             size="md"
             title="No leave requests yet"
             description="Leave you apply for shows here with its status."

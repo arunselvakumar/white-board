@@ -129,6 +129,7 @@ export function TodaySection({
             {today.visits.length === 0 ? (
               <EmptyState
                 icon={MapTrifoldIcon}
+                tone="teal"
                 size="sm"
                 title="No Visits for you today."
               />
@@ -168,6 +169,7 @@ export function TodaySection({
             {today.followUps.length === 0 ? (
               <EmptyState
                 icon={PhoneCallIcon}
+                tone="pink"
                 size="sm"
                 title="Nothing due today."
               />
@@ -364,6 +366,7 @@ export function PerPersonSection({ people }: { people: Person[] }) {
       {people.length === 0 ? (
         <EmptyState
           icon={UsersThreeIcon}
+          tone="violet"
           size="sm"
           title="No Marketing People yet."
         />
@@ -418,6 +421,7 @@ export function RecentSection({
       {recent.length === 0 ? (
         <EmptyState
           icon={ClockCounterClockwiseIcon}
+          tone="teal"
           size="sm"
           title="Nothing yet."
           description="Completed Visits, notes and Stage changes show here."
@@ -480,6 +484,7 @@ export function HotSection({
       {companies.length === 0 ? (
         <EmptyState
           icon={PhoneCallIcon}
+          tone="pink"
           size="sm"
           title="Every Hot company has a Follow-up."
         />

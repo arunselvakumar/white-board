@@ -267,6 +267,7 @@ function EmptyLocations({
   return (
     <EmptyState
       icon={MapPinIcon}
+      tone="teal"
       size="sm"
       className="bg-card border p-6"
       aria-label={label}

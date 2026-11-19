@@ -27,7 +27,10 @@ import {
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components/tabs";
-import { EmptyState } from "@repo/ui/components/empty-state";
+import {
+  EmptyState,
+  type EmptyStateTone,
+} from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { DeliveryNotesList } from "@/app/app/_components/procurement/delivery-notes/delivery-notes-list";
@@ -53,17 +56,19 @@ function Assigned({
   items,
   empty,
   icon,
+  tone,
 }: {
   title: string;
   items: Store["projects"];
   empty: string;
   icon: Icon;
+  tone: EmptyStateTone;
 }) {
   return (
     <section className="space-y-2">
       <h3 className="text-sm font-medium">{title}</h3>
       {items.length === 0 ? (
-        <EmptyState icon={icon} size="sm" title={empty} />
+        <EmptyState icon={icon} tone={tone} size="sm" title={empty} />
       ) : (
         <ul aria-label={title} className="flex flex-wrap gap-2">
           {items.map((item) => (
@@ -165,18 +170,21 @@ export function StoreDetailPage({ storeId }: { storeId: string }) {
             <Assigned
               title="Projects"
               icon={FolderSimpleIcon}
+              tone="blue"
               items={store.projects}
               empty="No Projects."
             />
             <Assigned
               title="Store keepers"
               icon={UsersThreeIcon}
+              tone="violet"
               items={store.keepers}
               empty="No store keepers yet."
             />
             <Assigned
               title="Suppliers"
               icon={TruckIcon}
+              tone="orange"
               items={store.suppliers}
               empty="No Suppliers yet."
             />

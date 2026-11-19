@@ -284,7 +284,7 @@ function PurchaseOrderRows({
         <EmptyState
           className="bg-card border"
           icon={filtered ? MagnifyingGlassIcon : ShoppingCartIcon}
-          tone={filtered ? "neutral" : "brand"}
+          tone={filtered ? "neutral" : "orange"}
           title={
             filtered ? "No Purchase Orders match" : "No Purchase Orders yet"
           }

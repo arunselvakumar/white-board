@@ -220,6 +220,7 @@ export function PettyCashScreen({ projectId }: { projectId: string }) {
         <EmptyState
           className="bg-card border"
           icon={CoinsIcon}
+          tone="green"
           title={
             data.viewAll
               ? "No petty-cash accounts yet"

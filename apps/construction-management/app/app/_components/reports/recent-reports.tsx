@@ -64,6 +64,7 @@ export function RecentReports({
     return (
       <EmptyState
         icon={ChartBarIcon}
+        tone="sky"
         size="md"
         title="No reports yet"
         description="Generate a report above; its Excel and PDF stay here to download again."

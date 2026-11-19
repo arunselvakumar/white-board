@@ -237,6 +237,7 @@ export function ProjectDocumentsPage({
         <EmptyState
           className="bg-card border"
           icon={FolderOpenIcon}
+          tone="blue"
           title={
             canEdit
               ? "Keep this Project's papers here"

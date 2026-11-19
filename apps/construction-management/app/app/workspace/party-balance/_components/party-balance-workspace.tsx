@@ -76,6 +76,7 @@ function Balances({ partyType }: { partyType: PartyType }) {
     return (
       <EmptyState
         icon={AddressBookIcon}
+        tone="violet"
         title="No Other Parties yet"
         description="Add Other Parties under Masters → Other Party and put them on Projects; their invoices and payments show here."
         className="bg-card border"

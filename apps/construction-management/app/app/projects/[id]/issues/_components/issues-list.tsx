@@ -434,7 +434,7 @@ function IssueRows({
       <EmptyState
         className="bg-card border"
         icon={filtered ? MagnifyingGlassIcon : FlagIcon}
-        tone={filtered ? "neutral" : "brand"}
+        tone={filtered ? "neutral" : "amber"}
         title={filtered ? "No issues match" : "No issues or snags yet"}
         description={
           filtered

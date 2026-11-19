@@ -72,6 +72,7 @@ function HistoryDialog({
         {item.history.length === 0 ? (
           <EmptyState
             icon={ClockCounterClockwiseIcon}
+            tone="teal"
             size="sm"
             title="No shift assigned yet; the HRMS Settings day applies."
           />
@@ -138,6 +139,7 @@ export function ShiftManagementPage() {
       >
         <HrmsEmpty
           icon={ClockIcon}
+          tone="teal"
           title="No active shifts or rotations"
           description="Everyone works the standard day from HRMS Settings. Add a shift or a rotation first, then assign it here."
           action={

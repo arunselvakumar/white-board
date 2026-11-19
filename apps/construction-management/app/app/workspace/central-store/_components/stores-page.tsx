@@ -97,6 +97,7 @@ export function StoresPage() {
         {data.items.length === 0 ? (
           <EmptyState
             icon={WarehouseIcon}
+            tone="orange"
             title="No stores yet"
             description={
               canCreate

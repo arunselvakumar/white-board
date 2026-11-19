@@ -242,7 +242,7 @@ function Group({
         </span>
       </h2>
       {items.length === 0 ? (
-        <EmptyState icon={PhoneCallIcon} size="sm" title={empty} />
+        <EmptyState icon={PhoneCallIcon} tone="pink" size="sm" title={empty} />
       ) : (
         <FollowUpItems
           items={items}
@@ -280,6 +280,7 @@ function FollowUpRows({
     return (
       <EmptyState
         icon={PhoneCallIcon}
+        tone="pink"
         title={
           status === "open"
             ? mine

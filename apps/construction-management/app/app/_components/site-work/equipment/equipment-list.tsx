@@ -134,6 +134,7 @@ function Rows({
     ) : (
       <MasterEmpty
         icon={BulldozerIcon}
+        tone="orange"
         title="No equipment yet"
         description={empty.description}
         action={empty.action}

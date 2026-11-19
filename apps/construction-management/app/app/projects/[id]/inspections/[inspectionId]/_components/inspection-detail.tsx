@@ -237,6 +237,7 @@ function Drawings({
       {inspection.drawings.length === 0 ? (
         <EmptyState
           icon={BlueprintIcon}
+          tone="blue"
           size="sm"
           title="No drawings linked."
         />

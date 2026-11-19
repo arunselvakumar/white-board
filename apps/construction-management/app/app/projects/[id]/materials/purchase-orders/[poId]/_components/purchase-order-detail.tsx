@@ -385,6 +385,7 @@ export function PurchaseOrderDetailPage({
         {po.goodsReceipts.length === 0 ? (
           <EmptyState
             icon={PackageIcon}
+            tone="orange"
             size="sm"
             title="Nothing received against it yet."
           />

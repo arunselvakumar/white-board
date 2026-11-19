@@ -7,7 +7,10 @@ import Link from "next/link";
 import { useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import { EmptyState } from "@repo/ui/components/empty-state";
+import {
+  EmptyState,
+  type EmptyStateTone,
+} from "@repo/ui/components/empty-state";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { CheckList } from "@/app/app/_components/masters/check-list";
@@ -27,6 +30,7 @@ export const KINDS: readonly {
   singular: string;
   href: AppHref;
   icon: Icon;
+  tone: EmptyStateTone;
   hint: string;
 }[] = [
   {
@@ -35,6 +39,7 @@ export const KINDS: readonly {
     singular: "Amenity",
     href: "/app/masters/amenities",
     icon: SwimmingPoolIcon,
+    tone: "amber",
     hint: "Facilities this Project offers.",
   },
   {
@@ -43,6 +48,7 @@ export const KINDS: readonly {
     singular: "Common Development",
     href: "/app/masters/common-developments",
     icon: RoadHorizonIcon,
+    tone: "amber",
     hint: "Shared works on this site.",
   },
 ];
@@ -93,6 +99,7 @@ function KindSection({
         <EmptyState
           className="bg-card border"
           icon={kind.icon}
+          tone={kind.tone}
           size="md"
           title={`No ${kind.title} in Masters`}
           description="Add them under Masters, then tick the ones this Project has."
@@ -123,6 +130,7 @@ function KindSection({
       ) : assigned.length === 0 ? (
         <EmptyState
           icon={kind.icon}
+          tone={kind.tone}
           size="sm"
           title={`This Project has no ${kind.title} yet.`}
         />

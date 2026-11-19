@@ -162,6 +162,7 @@ export function SalaryStructuresList() {
         {data.items.length === 0 ? (
           <EmptyState
             icon={ReceiptIcon}
+            tone="green"
             title="No salary structures yet"
             description="Add one for each way you pay Team Members, like Site staff with Basic, HRA and a Special Allowance."
             className="bg-card border"

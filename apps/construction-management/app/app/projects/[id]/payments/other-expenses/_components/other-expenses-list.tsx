@@ -311,7 +311,7 @@ function ExpenseRows({
       <EmptyState
         className="bg-card border"
         icon={filtered ? MagnifyingGlassIcon : ReceiptIcon}
-        tone={filtered ? "neutral" : "brand"}
+        tone={filtered ? "neutral" : "green"}
         title={filtered ? "No expenses match" : "No Other Expenses yet"}
         description={
           filtered

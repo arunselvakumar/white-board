@@ -249,6 +249,7 @@ function EmptyDues({ filter }: { filter: FeeDuesFilter }) {
       <EmptyState
         className="border-0"
         icon={ReceiptIcon}
+        tone="green"
         size="md"
         title="No remaining dues."
         description="Remaining dues will show here after an Enrollment has a Fee Plan."

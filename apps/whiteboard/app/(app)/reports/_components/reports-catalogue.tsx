@@ -67,6 +67,7 @@ export function ReportsCatalogue({
         <EmptyState
           className="border"
           icon={ChartBarIcon}
+          tone="sky"
           title="No reports for you yet."
           description="Reports you can open will show here."
         />

@@ -254,6 +254,7 @@ export function LocationsPage({
       {items.length === 0 ? (
         <StructureEmpty
           icon={MapPinIcon}
+          tone="teal"
           title={
             access.create
               ? "Name the places on this Project"

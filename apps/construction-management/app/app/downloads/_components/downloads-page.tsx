@@ -69,6 +69,7 @@ export function DownloadsPage() {
         {items.length === 0 ? (
           <EmptyState
             icon={DownloadSimpleIcon}
+            tone="sky"
             title="Nothing to download yet"
             description="Reports you generate on any Project, or centrally, appear here with their Excel and PDF."
             className="bg-card border"

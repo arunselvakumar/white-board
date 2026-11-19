@@ -286,6 +286,7 @@ function MonthSalaries({
       {regular.length === 0 ? (
         <HrmsEmpty
           icon={CurrencyInrIcon}
+          tone="green"
           title={`No salaries for ${monthLabel(month)}`}
           description={
             can.calculate

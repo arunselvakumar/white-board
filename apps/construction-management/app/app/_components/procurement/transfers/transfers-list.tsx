@@ -131,7 +131,7 @@ function Transfers({
     return (
       <EmptyState
         icon={filtered ? MagnifyingGlassIcon : ArrowsLeftRightIcon}
-        tone={filtered ? "neutral" : "brand"}
+        tone={filtered ? "neutral" : "orange"}
         title={filtered ? "No transfers match" : "No material transfers yet"}
         description={
           filtered

@@ -203,6 +203,7 @@ export function DuePaymentsTable({
       {dues.length === 0 ? (
         <EmptyState
           icon={ReceiptIcon}
+          tone="green"
           size="sm"
           title="Nothing is due to any party on this Project."
         />
@@ -310,6 +311,7 @@ export function ModuleWisePayment({
       {total === 0 ? (
         <EmptyState
           icon={WalletIcon}
+          tone="green"
           size="sm"
           title="Nothing was paid out on this Project in this period."
         />

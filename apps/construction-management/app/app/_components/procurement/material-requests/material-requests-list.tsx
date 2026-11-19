@@ -87,6 +87,7 @@ export function MaterialRequestsList({
     return (
       <EmptyState
         icon={ClipboardTextIcon}
+        tone="sky"
         title="No Material Requests"
         description={
           storeId != null

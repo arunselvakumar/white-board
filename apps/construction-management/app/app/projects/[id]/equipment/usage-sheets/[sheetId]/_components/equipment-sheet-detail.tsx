@@ -342,6 +342,7 @@ export function EquipmentSheetDetailPage({
         {sheet.materials.length === 0 ? (
           <EmptyState
             icon={PackageIcon}
+            tone="orange"
             size="sm"
             title="No material consumed."
           />

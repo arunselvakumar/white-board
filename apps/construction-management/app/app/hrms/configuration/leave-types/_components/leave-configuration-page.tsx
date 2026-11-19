@@ -160,6 +160,7 @@ function LeaveTypesTab() {
       {data.items.length === 0 ? (
         <MasterEmpty
           icon={CalendarXIcon}
+          tone="teal"
           title="No leave types yet"
           description="Add the kinds of leave your Company gives, like Casual Leave or Sick."
           action={addButton}
@@ -345,6 +346,7 @@ function StructuresTab({ today }: { today: string }) {
       {structures.items.length === 0 ? (
         <MasterEmpty
           icon={StackIcon}
+          tone="blue"
           title="No leave structures yet"
           description="A structure bundles leave types with the days Team Members get, like “Office staff” or “Site staff”. Without one, everyone gets every active type at its yearly limit."
           action={addButton}

@@ -365,6 +365,7 @@ export function ProjectsHome() {
             <EmptyState
               className="bg-card mx-5 mb-5 w-auto border"
               icon={FolderSimpleIcon}
+              tone="blue"
               size="md"
               title="No Projects yet"
               description="Add your first Project to start recording labour, attendance and payments on site."

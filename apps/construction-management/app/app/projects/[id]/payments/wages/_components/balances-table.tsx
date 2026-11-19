@@ -58,6 +58,7 @@ export function BalancesTable({
       <EmptyState
         className="bg-card border"
         icon={partyType === "labour" ? UsersThreeIcon : StorefrontIcon}
+        tone={partyType === "labour" ? "violet" : "orange"}
         title={`No ${nouns.many} to pay`}
         description={
           partyType === "labour"

@@ -133,7 +133,14 @@ function Timeline({
 }) {
   const { data } = useSuspenseQuery(inquiryActivityQuery(inquiry.id));
   if (data.items.length === 0)
-    return <EmptyState icon={PhoneCallIcon} size="sm" title="Nothing yet." />;
+    return (
+      <EmptyState
+        icon={PhoneCallIcon}
+        tone="pink"
+        size="sm"
+        title="Nothing yet."
+      />
+    );
   return (
     <ol aria-label="Follow-ups and history" className="space-y-2">
       {data.items.map((item) =>

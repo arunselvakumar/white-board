@@ -96,6 +96,7 @@ function MoveDrawingForm({
       {items.length === 0 ? (
         <EmptyState
           icon={FoldersIcon}
+          tone="blue"
           size="sm"
           title="This Project has no other album. Add one on the Drawings page first."
         />

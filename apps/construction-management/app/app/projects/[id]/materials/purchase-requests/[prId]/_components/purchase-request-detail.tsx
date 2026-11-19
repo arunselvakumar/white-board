@@ -229,6 +229,7 @@ export function PurchaseRequestDetailPage({
         {pr.purchaseOrders.length === 0 ? (
           <EmptyState
             icon={ShoppingCartIcon}
+            tone="orange"
             size="sm"
             title="No Purchase Order raised against it yet."
           />

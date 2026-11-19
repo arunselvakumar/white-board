@@ -207,6 +207,7 @@ function Ledger({ filter }: { filter: StockLedgerFilter }) {
     return (
       <EmptyState
         icon={ClockCounterClockwiseIcon}
+        tone="teal"
         size="md"
         title="No stock movements in this period."
       />

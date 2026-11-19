@@ -155,7 +155,7 @@ function QuotationRows({
     return (
       <EmptyState
         icon={filtered ? MagnifyingGlassIcon : FileTextIcon}
-        tone={filtered ? "neutral" : "brand"}
+        tone={filtered ? "neutral" : "blue"}
         title={filtered ? "No quotations match" : "No quotations yet"}
         description={
           filtered

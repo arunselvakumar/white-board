@@ -154,6 +154,7 @@ export function BranchesPage({ showMap = true }: { showMap?: boolean }) {
       {data.items.length === 0 ? (
         <HrmsEmpty
           icon={MapPinIcon}
+          tone="teal"
           title="No branches or site fences yet"
           description="Add your office with its location and a radius. Add a site fence for each Project where Team Members check in."
           action={
@@ -179,6 +180,7 @@ export function BranchesPage({ showMap = true }: { showMap?: boolean }) {
             {offices.length === 0 ? (
               <EmptyState
                 icon={MapPinIcon}
+                tone="teal"
                 size="md"
                 title="No office branch yet."
                 description="Members not on a Project need one to check in when GPS is required."
@@ -223,6 +225,7 @@ export function BranchesPage({ showMap = true }: { showMap?: boolean }) {
             {sites.length === 0 ? (
               <EmptyState
                 icon={MapPinIcon}
+                tone="teal"
                 size="md"
                 title="No site fence yet."
                 description="Team Members on a Project can check in at its site once it has one."

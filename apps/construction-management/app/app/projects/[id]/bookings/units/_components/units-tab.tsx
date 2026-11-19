@@ -102,6 +102,7 @@ export function UnitsTab({ projectId }: { projectId: string }) {
         <EmptyState
           className="bg-card border"
           icon={BuildingsIcon}
+          tone="blue"
           title="No Wings yet"
           description="Units for sale come from the Project's Wings. Add a Wing with its floors and units first."
           actions={

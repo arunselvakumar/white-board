@@ -62,6 +62,7 @@ function ContractorLabourTable({
       {rows.length === 0 ? (
         <EmptyState
           icon={NotePencilIcon}
+          tone="sky"
           size="sm"
           title="No worksheets in this period."
         />

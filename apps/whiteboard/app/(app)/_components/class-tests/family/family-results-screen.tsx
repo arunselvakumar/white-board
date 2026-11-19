@@ -2,7 +2,10 @@
 
 import { ExamIcon, LinkBreakIcon } from "@phosphor-icons/react/ssr";
 import type { Icon } from "@phosphor-icons/react";
-import { EmptyState } from "@repo/ui/components/empty-state";
+import {
+  EmptyState,
+  type EmptyStateTone,
+} from "@repo/ui/components/empty-state";
 import { useAuth } from "@repo/auth/react";
 import {
   Card,
@@ -30,11 +33,13 @@ import {
 
 function EmptyText({
   icon,
+  tone,
   title,
   children,
   size = "sm",
 }: {
   icon: Icon;
+  tone?: EmptyStateTone;
   title: string;
   children?: string;
   size?: "sm" | "md";
@@ -43,6 +48,7 @@ function EmptyText({
     <EmptyState
       className="border"
       icon={icon}
+      tone={tone}
       size={size}
       title={title}
       description={children}
@@ -94,7 +100,7 @@ function StudentResults({
 }) {
   if (student.results.length === 0) {
     return (
-      <EmptyText icon={ExamIcon} title={NO_RESULTS_TEXT}>
+      <EmptyText icon={ExamIcon} tone="sky" title={NO_RESULTS_TEXT}>
         {role === "parent"
           ? `${student.name}’s marks show here once the centre publishes a Test.`
           : "Your marks show here once the centre publishes a Test."}
@@ -144,6 +150,7 @@ export function FamilyResults({
         {results.students.length === 0 ? (
           <EmptyText
             icon={LinkBreakIcon}
+            tone="pink"
             size="md"
             title={
               role === "parent" ? "No Students linked yet" : "Not linked yet"

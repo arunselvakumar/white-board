@@ -61,6 +61,7 @@ function ProjectsField({
     return (
       <EmptyState
         icon={FolderSimpleIcon}
+        tone="blue"
         size="sm"
         title={`Add a Project first; then assign this ${config.singular} to it here or from the Project.`}
       />

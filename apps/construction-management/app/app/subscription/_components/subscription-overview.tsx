@@ -148,6 +148,7 @@ function Invoices() {
       {data.items.length === 0 ? (
         <EmptyState
           icon={ReceiptIcon}
+          tone="green"
           size="md"
           title="No invoices yet"
           description="A tax invoice appears here after each payment."

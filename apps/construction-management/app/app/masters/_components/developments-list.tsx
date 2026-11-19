@@ -129,6 +129,7 @@ function DevelopmentListContent({
         {data.items.length === 0 ? (
           <MasterEmpty
             icon={config.icon}
+            tone={config.tone}
             title={`No ${config.plural} yet`}
             description={config.emptyDescription}
             action={addButton}

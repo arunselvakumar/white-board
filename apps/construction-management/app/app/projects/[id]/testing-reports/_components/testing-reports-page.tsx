@@ -254,6 +254,7 @@ export function TestingReportsPage({
         <EmptyState
           className="bg-card border"
           icon={FlaskIcon}
+          tone="sky"
           title="No testing materials yet"
           description={
             canCreate

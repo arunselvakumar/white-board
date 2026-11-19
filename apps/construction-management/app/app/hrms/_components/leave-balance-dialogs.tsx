@@ -587,6 +587,7 @@ function CreditList({
     return (
       <EmptyState
         icon={CalendarXIcon}
+        tone="teal"
         size="sm"
         title={`No credits in ${data.leaveYear} yet.`}
         description="Balances are opened by initialising them."

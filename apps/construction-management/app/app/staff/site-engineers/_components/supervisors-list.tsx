@@ -123,6 +123,7 @@ function SupervisorsListContent() {
         {data.items.length === 0 ? (
           <MasterEmpty
             icon={HardHatIcon}
+            tone="violet"
             title="No Site Engineers yet"
             description="Add the Site Engineers your Labours report to. Each signs in with the Site Engineer Role, and attendance can be filtered by Site Engineer."
             action={addButton}

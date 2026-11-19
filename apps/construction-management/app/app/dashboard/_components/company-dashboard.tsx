@@ -297,6 +297,7 @@ function NoProjects() {
   return (
     <EmptyState
       icon={FolderSimpleIcon}
+      tone="blue"
       title="No Projects to show"
       description="The Projects you are on show here with their approvals, issues, labour on site and amounts due."
       className="bg-card border"

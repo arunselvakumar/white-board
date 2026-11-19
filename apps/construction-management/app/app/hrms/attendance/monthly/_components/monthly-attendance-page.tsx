@@ -49,6 +49,7 @@ function Grid({ month }: { month: string }) {
     return (
       <HrmsEmpty
         icon={UsersThreeIcon}
+        tone="violet"
         title="No Team Members yet"
         description="Add Team Members in Masters → Team Members. Once they join the Company they appear here with their month."
       />

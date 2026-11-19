@@ -108,6 +108,7 @@ export function ValueEarnedChart({
       {value.tasks.length === 0 ? (
         <EmptyState
           icon={CurrencyInrIcon}
+          tone="green"
           size="sm"
           title="No priced task was added in this period."
         />
@@ -192,6 +193,7 @@ export function MostDelayedTasks({
       {tasks.length === 0 ? (
         <EmptyState
           icon={ListChecksIcon}
+          tone="sky"
           size="sm"
           title="No task is past its Due Date."
         />
@@ -362,6 +364,7 @@ export function AssigneeIssues({
       {rows.length === 0 ? (
         <EmptyState
           icon={FlagIcon}
+          tone="amber"
           size="sm"
           title="No issue was raised in this period."
         />

@@ -182,6 +182,7 @@ export function NeedsReassigningPage({
         {none ? (
           <EmptyState
             icon={UserSwitchIcon}
+            tone="violet"
             title="Nothing needs reassigning"
             description="When a Marketing Person leaves, their Prospect Companies and open Follow-ups show here for someone else to take over."
             className="bg-card border"

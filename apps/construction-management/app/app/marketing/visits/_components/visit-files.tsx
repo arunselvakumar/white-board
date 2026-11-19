@@ -160,6 +160,7 @@ export function VisitFiles({ visit }: { visit: Visit }) {
       {files.length === 0 && pending.length === 0 ? (
         <EmptyState
           icon={ImagesIcon}
+          tone="blue"
           size="sm"
           title="No photos or files yet."
         />

@@ -1,3 +1,4 @@
+import type { EmptyStateTone } from "@repo/ui/components/empty-state";
 import type { Icon } from "@phosphor-icons/react";
 import {
   HammerIcon,
@@ -23,6 +24,7 @@ export type ResourceSectionInfo = {
   pagePath: (id: string) => AppHref;
   /** Phosphor, for the empty states. */
   icon: Icon;
+  tone: EmptyStateTone;
 };
 
 /** The four sections of a Project's Resources, in screen order. */
@@ -37,6 +39,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
     pagePath: (id) => pageHref("/app/staff/office-staff/[id]", { id }),
     area: "Human Resources",
     icon: UsersThreeIcon,
+    tone: "violet",
   },
   {
     key: "contractors",
@@ -47,6 +50,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
     pagePath: (id) => pageHref("/app/masters/contractors/[id]", { id }),
     area: "Masters",
     icon: HammerIcon,
+    tone: "orange",
   },
   {
     key: "suppliers",
@@ -57,6 +61,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
     pagePath: (id) => pageHref("/app/masters/suppliers/[id]", { id }),
     area: "Masters",
     icon: TruckIcon,
+    tone: "orange",
   },
   {
     key: "vendors",
@@ -68,5 +73,6 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
     pagePath: (id) => pageHref("/app/staff/vendors/[id]", { id }),
     area: "Human Resources",
     icon: StorefrontIcon,
+    tone: "orange",
   },
 ];

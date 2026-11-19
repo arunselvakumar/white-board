@@ -230,7 +230,7 @@ function PartyRows({
     return (
       <EmptyState
         icon={filtered ? MagnifyingGlassIcon : screen.icon}
-        tone={filtered ? "neutral" : "brand"}
+        tone={filtered ? "neutral" : screen.tone}
         title={
           filtered ? `No ${screen.plural} match` : `No ${screen.plural} yet`
         }

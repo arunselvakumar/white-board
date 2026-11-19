@@ -199,6 +199,7 @@ function ProgressList({
     return (
       <EmptyState
         icon={ListChecksIcon}
+        tone="sky"
         size="sm"
         title="No progress recorded yet."
       />
@@ -344,6 +345,7 @@ function ActivityFeed({ task }: { task: Detail }) {
     return (
       <EmptyState
         icon={ClockCounterClockwiseIcon}
+        tone="teal"
         size="sm"
         title="No activity yet."
       />

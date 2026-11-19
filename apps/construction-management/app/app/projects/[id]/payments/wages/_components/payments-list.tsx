@@ -189,7 +189,7 @@ function PaymentRows({
       <EmptyState
         className="bg-card border"
         icon={filtered ? MagnifyingGlassIcon : WalletIcon}
-        tone={filtered ? "neutral" : "brand"}
+        tone={filtered ? "neutral" : "green"}
         title={filtered ? "No payments match" : "No payments yet"}
         description={
           filtered

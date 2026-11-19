@@ -75,6 +75,7 @@ export function AllocationTable({
       <EmptyState
         className="bg-card border"
         icon={ReceiptIcon}
+        tone="green"
         size="sm"
         title="No open invoices. The whole payment is an advance; apply it to a later invoice from the payment."
       />

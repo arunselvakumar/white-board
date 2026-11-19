@@ -522,7 +522,7 @@ function VisitRows({
     return (
       <EmptyState
         icon={filtered ? MagnifyingGlassIcon : MapTrifoldIcon}
-        tone={filtered ? "neutral" : "brand"}
+        tone={filtered ? "neutral" : "teal"}
         title={filtered ? "No Visits match" : "No Visits yet"}
         description={
           filtered
