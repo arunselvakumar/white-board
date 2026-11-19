@@ -431,23 +431,8 @@ function SidebarMeterCard({
   );
 }
 
-/** The last line of the sidebar: the version, in the smallest muted type. */
-function SidebarFootnote({ className, ...props }: React.ComponentProps<"p">) {
-  return (
-    <p
-      data-slot="sidebar-footnote"
-      className={cn(
-        "text-sidebar-foreground/35 px-3 pt-1 text-[11px] tabular-nums",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
 export {
   SidebarAccount,
-  SidebarFootnote,
   SidebarMenuCount,
   SidebarMeter,
   SidebarMeterCard,

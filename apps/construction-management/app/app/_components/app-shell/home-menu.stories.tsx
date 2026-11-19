@@ -8,16 +8,14 @@ import {
   MENU_LAYOUT_KEY,
   setMenuLayout,
 } from "@/app/app/_components/app-shell/menu-layout";
-import { HRMS_PATH, HRMS_SECTIONS } from "@/lib/hrms-nav";
+import { HUMAN_RESOURCES, MARKETING_DEPARTMENT } from "@/lib/departments-nav";
 import {
   FULL_MARKETING_ACCESS,
-  MARKETING_PATH,
-  MARKETING_SECTIONS,
   NO_MARKETING_ACCESS,
   type MarketingMenuAccess,
 } from "@/lib/marketing-nav";
 import { MASTERS_SECTIONS } from "@/lib/masters-nav";
-import { LABOURS_PAGE_PATH, staffSections } from "@/lib/staff-nav";
+import { LABOURS_PAGE_PATH } from "@/lib/staff-nav";
 
 import { signInAs } from "@/.storybook/mocks/auth";
 
@@ -106,8 +104,7 @@ export const Home: Story = {
       [/^Dashboard/, "/app/dashboard"],
       [/^Projects/, "/app/projects"],
       [/^Settings/, "/app/settings"],
-      ["Marketing", MARKETING_PATH],
-      ["Human Resources", LABOURS_PAGE_PATH],
+      ["Departments", "/app/departments"],
       ["Workspace", "/app/workspace"],
       ["Masters", "/app/masters"],
     ] as const)
@@ -116,21 +113,20 @@ export const Home: Story = {
         href,
       );
 
-    const marketing = within(nav.getByRole("region", { name: "Marketing" }));
-    for (const section of MARKETING_SECTIONS)
+    // Departments mirrors the sidebar (ADR CM-0046): a tile per
+    // department, opening its page of cards; the screens are not here.
+    const departments = within(
+      nav.getByRole("region", { name: "Departments" }),
+    );
+    await expect(
+      departments.getAllByRole("link").map((link) => link.textContent),
+    ).toEqual(["Departments", "Human Resources", "Marketing"]);
+    for (const department of [HUMAN_RESOURCES, MARKETING_DEPARTMENT])
       await expect(
-        marketing.getByRole("link", { name: section.label }),
-      ).toHaveAttribute("href", section.href);
-    const staff = within(nav.getByRole("list", { name: "Staff" }));
-    for (const section of staffSections(true))
-      await expect(
-        staff.getByRole("link", { name: section.label }),
-      ).toHaveAttribute("href", section.href);
-    const hrms = within(nav.getByRole("list", { name: "HRMS" }));
-    for (const section of HRMS_SECTIONS)
-      await expect(
-        hrms.getByRole("link", { name: section.label }),
-      ).toHaveAttribute("href", section.href);
+        departments.getByRole("link", { name: department.label }),
+      ).toHaveAttribute("href", department.href);
+    await expect(nav.queryByRole("link", { name: "Labour" })).toBeNull();
+    await expect(nav.queryByRole("link", { name: "Visits" })).toBeNull();
     const masters = within(nav.getByRole("region", { name: "Masters" }));
     for (const section of MASTERS_SECTIONS)
       await expect(
@@ -155,34 +151,16 @@ export const WithoutDashboard: Story = {
 };
 
 /**
- * Without Team Members or Role Management Read, Office Staff and Role
- * Management are left out and Human Resources opens on HRMS (ADR CM-0030,
- * ADR CM-0034).
+ * A Role with no Marketing menu has no Marketing tile under Departments
+ * (ADR CM-0040 §1, ADR CM-0046).
  */
-export const WithoutStaffRoles: Story = {
-  ...homeWith(true, false),
-  play: async ({ canvas }) => {
-    const nav = within(canvas.getByRole("navigation", { name: "Main" }));
-    await expect(
-      nav.getByRole("link", { name: "Human Resources" }),
-    ).toHaveAttribute("href", HRMS_PATH);
-    const staff = within(nav.getByRole("list", { name: "Staff" }));
-    await expect(staff.getByRole("link", { name: "Labour" })).toBeVisible();
-    await expect(
-      staff.queryByRole("link", { name: "Office Staff" }),
-    ).toBeNull();
-    await expect(
-      staff.queryByRole("link", { name: "Role Management" }),
-    ).toBeNull();
-  },
-};
-
-/** A Role with no Marketing menu has no Marketing block (ADR CM-0040 §1). */
 export const WithoutMarketing: Story = {
   ...homeWith(true, true, NO_MARKETING_ACCESS),
   play: async ({ canvas }) => {
     const nav = within(canvas.getByRole("navigation", { name: "Main" }));
-    await expect(nav.queryByRole("region", { name: "Marketing" })).toBeNull();
+    await expect(
+      nav.getByRole("link", { name: "Human Resources" }),
+    ).toBeVisible();
     await expect(nav.queryByRole("link", { name: "Marketing" })).toBeNull();
   },
 };
@@ -210,6 +188,18 @@ export const Search: Story = {
     await userEvent.clear(search);
     await userEvent.type(search, "Masters");
     await expect(nav.getByRole("link", { name: "Contractors" })).toBeVisible();
+
+    // A department's screens are found under Departments (ADR CM-0046).
+    await userEvent.clear(search);
+    await userEvent.type(search, "labour");
+    const departments = within(
+      nav.getByRole("region", { name: "Departments" }),
+    );
+    await expect(
+      within(
+        departments.getByRole("list", { name: "Human Resources" }),
+      ).getByRole("link", { name: "Labour" }),
+    ).toHaveAttribute("href", LABOURS_PAGE_PATH);
 
     await userEvent.clear(search);
     await userEvent.type(search, "zzz");

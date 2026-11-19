@@ -19,19 +19,20 @@ marketingPageTest.describe("Marketing", () => {
         marketing.heading("Marketing Dashboard", { level: 1 }),
       ).toBeVisible();
       await marketing.openSidebar();
-      await expect(marketing.menuLink(/^Marketing$/)).toHaveAttribute(
+      // Marketing is under Departments, lit on its pages (ADR CM-0046).
+      const marketingRow = marketing.departmentsSubmenu.getByRole("link", {
+        name: "Marketing",
+      });
+      await expect(marketingRow).toHaveAttribute(
         "href",
-        "/app/marketing",
+        marketing.departmentUrl,
       );
-      await expect(marketing.submenuLinks).toHaveText([
-        "Dashboard",
-        "Visits",
-        "Follow-ups",
-        "Companies",
-      ]);
-      await expect(
-        marketing.submenu.getByRole("link", { name: "Dashboard" }),
-      ).toHaveAttribute("aria-current", "page");
+      await expect(marketingRow).toHaveAttribute("aria-current", "page");
+
+      await marketing.currentPage.goto(marketing.departmentUrl);
+      await expect(marketing.cards).toHaveCount(4);
+      for (const name of ["Dashboard", "Visits", "Follow-ups", "Companies"])
+        await expect(marketing.card(name)).toBeVisible();
 
       await marketing.currentPage.goto("/app/marketing/team");
       await expect(
@@ -56,8 +57,16 @@ marketingPageTest.describe("Marketing", () => {
       await projects.goto();
       await projects.openSidebar();
       await expect(projects.menuLink("Projects")).toBeVisible();
+      await projects.mainMenu
+        .getByRole("button", { name: "Show Departments list" })
+        .click();
+      await expect(projects.menuLink("Human Resources")).toBeVisible();
       await expect(projects.menuLink(/^Marketing$/)).toHaveCount(0);
 
+      await page.goto("/app/departments/marketing");
+      await expect(
+        page.getByText("You don't have access to Marketing"),
+      ).toBeVisible();
       await page.goto("/app/marketing");
       await expect(
         page.getByText("You don't have access to Marketing"),
@@ -66,19 +75,27 @@ marketingPageTest.describe("Marketing", () => {
   );
 
   marketingPageTest(
-    "should show every Marketing entry, when the Owner opens Marketing",
+    "should show every Marketing entry as a card, when the Owner opens Marketing from Departments",
     async ({ marketingPage }) => {
       await marketingPage.goto();
       await marketingPage.openSidebar();
-      await expect(marketingPage.submenuLinks).toHaveText([
+      await marketingPage.departmentsSubmenu
+        .getByRole("link", { name: "Marketing" })
+        .click();
+      await expect(marketingPage.currentPage).toHaveURL(
+        marketingPage.departmentUrl,
+      );
+      await expect(marketingPage.cards).toHaveCount(6);
+      for (const name of [
         "Dashboard",
         "Visits",
         "Follow-ups",
         "Companies",
         "Team",
         "Reports",
-      ]);
-      await marketingPage.submenu.getByRole("link", { name: "Visits" }).click();
+      ])
+        await expect(marketingPage.card(name)).toBeVisible();
+      await marketingPage.card("Visits").click();
       await expect(marketingPage.currentPage).toHaveURL(
         "/app/marketing/visits",
       );

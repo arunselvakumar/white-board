@@ -28,17 +28,28 @@ rolesPageTest.describe("Role Management", () => {
       await expect(projectsPage.addProjectLink).toHaveCount(0);
       await expect(projectsPage.menuLink("Projects")).toBeVisible();
       await expect(projectsPage.menuLink("Dashboard")).toHaveCount(0);
-      // Human Resources shows for everyone; Office Staff and Role
-      // Management need Team Members or Role Management Read (ADR CM-0036).
-      await expect(projectsPage.menuLink("Human Resources")).toBeVisible();
+      // Human Resources, under Departments, shows for everyone; Office
+      // Staff and Role Management need Team Members or Role Management
+      // Read (ADR CM-0036, ADR CM-0046).
       await projectsPage.mainMenu
-        .getByRole("button", { name: "Show Human Resources list" })
+        .getByRole("button", { name: "Show Departments list" })
         .click();
-      await expect(projectsPage.menuLink(/^Labour$/)).toBeVisible();
-      await expect(projectsPage.menuLink(/^Site Engineer$/)).toBeVisible();
-      await expect(projectsPage.menuLink(/^Vendor$/)).toBeVisible();
-      await expect(projectsPage.menuLink(/^Office Staff$/)).toHaveCount(0);
-      await expect(projectsPage.menuLink("Role Management")).toHaveCount(0);
+      await projectsPage.menuLink("Human Resources").click();
+      await expect(page).toHaveURL("/app/departments/human-resources");
+      const staff = page.getByRole("main").getByRole("region", {
+        name: "Staff",
+      });
+      await expect(staff.getByRole("link", { name: /^Labour/ })).toBeVisible();
+      await expect(
+        staff.getByRole("link", { name: /^Site Engineer/ }),
+      ).toBeVisible();
+      await expect(staff.getByRole("link", { name: /^Vendor/ })).toBeVisible();
+      await expect(
+        staff.getByRole("link", { name: /^Office Staff/ }),
+      ).toHaveCount(0);
+      await expect(
+        staff.getByRole("link", { name: /^Role Management/ }),
+      ).toHaveCount(0);
 
       await page.goto("/app/staff/roles/new");
       await expect(
@@ -58,12 +69,14 @@ rolesPageTest.describe("Role Management", () => {
         projectIds: [project.id],
       });
       const memberPage = await member.page();
-      const memberProjects = new ProjectsPage(memberPage);
-      await memberProjects.goto();
-      await memberProjects.mainMenu
-        .getByRole("button", { name: "Show Human Resources list" })
-        .click();
-      await expect(memberProjects.menuLink("Role Management")).toHaveCount(0);
+      const roleCard = memberPage
+        .getByRole("main")
+        .getByRole("link", { name: /^Role Management/ });
+      await memberPage.goto("/app/departments/human-resources");
+      await expect(
+        memberPage.getByRole("main").getByRole("link", { name: /^Labour/ }),
+      ).toBeVisible();
+      await expect(roleCard).toHaveCount(0);
 
       const roleForm = new RoleFormPage(ownerPage, member.roleId);
       await roleForm.goto();
@@ -72,10 +85,7 @@ rolesPageTest.describe("Role Management", () => {
       await expect(ownerPage).toHaveURL("/app/staff/roles");
 
       await memberPage.reload();
-      await memberProjects.mainMenu
-        .getByRole("button", { name: "Show Human Resources list" })
-        .click();
-      await expect(memberProjects.menuLink("Role Management")).toBeVisible();
+      await expect(roleCard).toBeVisible();
     },
   );
 

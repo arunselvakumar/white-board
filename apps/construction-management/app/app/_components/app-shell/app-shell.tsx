@@ -6,7 +6,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import {
-  SidebarFootnote,
   SidebarPhoneBar,
   SidebarReopenTrigger,
   SidebarSearch,
@@ -42,12 +41,11 @@ import { projectIdFromPath } from "@/lib/project-nav";
 
 import { APP_NAV_ICONS } from "./app-nav-icons";
 import { BrandMark } from "@/components/app-shell/brand-mark";
-import { HumanResourcesNavMenu } from "./human-resources-nav-menu";
 import { MastersNavMenu } from "./masters-nav-menu";
 import { NAV_BUTTON_CLASS } from "./nav-button-class";
 import { CompanyDeletionBanner } from "./company-deletion-banner";
+import { DepartmentsNavMenu } from "./departments-nav-menu";
 import { HOME_PATH, filterMainMenu, mainMenuAreas } from "./main-menu-areas";
-import { MarketingNavMenu } from "./marketing-nav-menu";
 import { setMenuLayout, useMenuLayout } from "./menu-layout";
 import { MenuTopBar } from "./menu-top-bar";
 import { menuQuery, noMatchMessage } from "./menu-filter";
@@ -58,9 +56,6 @@ import { SidebarPlanCard } from "./sidebar-plan-card";
 import { SwitchCompany } from "./switch-company";
 import { WorkspaceNavMenu } from "./workspace-nav-menu";
 
-/** From package.json at build time (next.config.ts), so the browser never gets the dependency list. */
-const VERSION = `v${process.env["NEXT_PUBLIC_APP_VERSION"] ?? "0.0.0"}`;
-
 /** The page's `<main>`, the same in the sidebar and the full-page menu layout. */
 const MAIN_CLASS = `${PAGE_WATERMARK_HOST_CLASS} flex min-w-0 flex-1 flex-col outline-none`;
 
@@ -68,7 +63,7 @@ const MAIN_CLASS = `${PAGE_WATERMARK_HOST_CLASS} flex min-w-0 flex-1 flex-col ou
  * Authenticated chrome (ADR-0049, ADR-0050): the ink sidebar carries it
  * all, with no top bar from `md` up: the User's account row with the
  * notification bell, the menu search, the Company Dashboard, Projects,
- * Marketing, Human Resources, Workspace, Masters and Settings, then the plan card, My
+ * Departments, Workspace, Masters and Settings, then the plan card, My
  * Profile, Switch Company (ADR-0051) and Sign out. On a phone a slim bar
  * opens the sidebar sheet and keeps the bell in reach. Inside a Project the
  * areas give way to the Project's own menu (ADR CM-0020). A User who
@@ -77,9 +72,9 @@ const MAIN_CLASS = `${PAGE_WATERMARK_HOST_CLASS} flex min-w-0 flex-1 flex-col ou
  * `canOpenDashboard` is the Dashboard menu's Read flag: without it the
  * Dashboard is not in the menu. `canOpenStaffRoles` is Team Members or Role
  * Management Read (ADR CM-0030): without either, Office Staff and Role
- * Management are not in the Staff group of Human Resources (ADR CM-0034).
+ * Management are not on the Human Resources page (ADR CM-0034, CM-0046).
  * `marketing` is the Marketing entries the Role opens: with none, Marketing
- * is not in the menu (ADR CM-0040).
+ * is not under Departments (ADR CM-0040, CM-0046).
  */
 export function AppShell({
   children,
@@ -184,7 +179,6 @@ export function AppShell({
         <SidebarFooter className="gap-2 px-3 pt-2 pb-3">
           <SidebarPlanCard />
           <FooterMenu pathname={pathname} />
-          <SidebarFootnote>{VERSION}</SidebarFootnote>
         </SidebarFooter>
       </Sidebar>
       {/* min-w-0: a wide child (a table, a chart) scrolls inside
@@ -262,9 +256,10 @@ function FooterMenu({ pathname }: { pathname: string }) {
 
 /**
  * The Company Dashboard (with Dashboard Read), Projects, then the areas
- * with a submenu each: Marketing (with an entry the Role opens, ADR
- * CM-0040), Human Resources, Workspace and Masters, then Settings (ADR
- * CM-0034). The menu search narrows it (`menu-filter.ts`).
+ * with a submenu each: Departments (Human Resources, and Marketing with an
+ * entry the Role opens; ADR CM-0046), Workspace and Masters, then Settings
+ * (ADR CM-0034). The menu search narrows it (`menu-filter.ts`,
+ * `departments-menu.ts`).
  */
 function MainMenu({
   pathname,
@@ -306,22 +301,8 @@ function MainMenu({
                   };
                   if (item.href === "/app/masters")
                     return <MastersNavMenu key={item.href} {...area} />;
-                  if (item.href === "/app/marketing")
-                    return (
-                      <MarketingNavMenu
-                        key={item.href}
-                        {...area}
-                        access={marketing}
-                      />
-                    );
-                  if (item.href === "/app/staff")
-                    return (
-                      <HumanResourcesNavMenu
-                        key={item.href}
-                        {...area}
-                        canOpenStaffRoles={canOpenStaffRoles}
-                      />
-                    );
+                  if (item.href === "/app/departments")
+                    return <DepartmentsNavMenu key={item.href} {...area} />;
                   return <WorkspaceNavMenu key={item.href} {...area} />;
                 }
                 const Icon = APP_NAV_ICONS[item.href];

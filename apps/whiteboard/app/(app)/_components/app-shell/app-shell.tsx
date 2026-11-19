@@ -21,7 +21,6 @@ import {
   SidebarProvider,
 } from "@repo/ui/components/sidebar";
 import {
-  SidebarFootnote,
   SidebarPhoneBar,
   SidebarReopenTrigger,
   SidebarSearch,
@@ -31,9 +30,6 @@ import { SidebarGlide } from "@repo/ui/components/sidebar-glide";
 
 import { NotificationBell } from "@/app/(app)/_components/notifications/notification-bell";
 import { navForRole } from "@/lib/app-nav";
-
-/** From package.json at build time (next.config.ts), so the browser never gets the dependency list. */
-const VERSION = `v${process.env["NEXT_PUBLIC_APP_VERSION"] ?? "0.0.0"}`;
 
 import { AppBreadcrumbs } from "./app-breadcrumbs";
 import { SIDEBAR_ROW_CLASS, SidebarMainNav } from "./sidebar-nav";
@@ -131,7 +127,6 @@ export function AppShell({ children }: { children: ReactNode }) {
               <SidebarSignOut />
             </SidebarMenu>
           </SidebarGlide>
-          <SidebarFootnote>{VERSION}</SidebarFootnote>
         </SidebarFooter>
       </Sidebar>
       {/* Room for SidebarReopenTrigger while the sidebar is collapsed (ADR-0050). */}

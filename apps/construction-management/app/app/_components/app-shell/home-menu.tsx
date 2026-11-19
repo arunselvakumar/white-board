@@ -1,7 +1,7 @@
 "use client";
 
 import { useActiveCompany } from "@repo/auth/construction/react";
-import { ArrowRight, SearchIcon, type LucideIcon } from "lucide-react";
+import { ArrowRight, SearchIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -18,6 +18,7 @@ import {
   type MainMenuAccess,
   type MainMenuArea,
 } from "./main-menu-areas";
+import { MENU_FOCUS_RING, MenuIconChip } from "./menu-card";
 import { menuQuery, noMatchMessage } from "./menu-filter";
 import { readMenuLayout, useMenuLayout } from "./menu-layout";
 
@@ -43,9 +44,9 @@ export function HomeMenu(access: MainMenuAccess) {
 }
 
 /**
- * The one-page areas (Dashboard, Projects, Settings) are cards; Human
- * Resources, Workspace and Masters are blocks with their groups and one
- * tile per entry. It renders the sidebar's list (`mainMenuAreas`) under the
+ * The one-page areas (Dashboard, Projects, Settings) are cards;
+ * Departments, Workspace and Masters are blocks with their groups and one
+ * tile per entry (Departments: one per department, ADR CM-0046). It renders the sidebar's list (`mainMenuAreas`) under the
  * sidebar's search rule, so the two never differ. Every tile is a link to
  * its page.
  */
@@ -117,39 +118,14 @@ function MainMenuPage(access: MainMenuAccess) {
   );
 }
 
-/** The icon on its tinted square; it fills with the primary on hover or focus of the link around it. */
-function IconChip({
-  icon: Icon,
-  size,
-}: {
-  icon: LucideIcon;
-  size: "md" | "lg";
-}) {
-  return (
-    <span
-      aria-hidden="true"
-      className={`bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground group-focus-visible:bg-primary group-focus-visible:text-primary-foreground flex shrink-0 items-center justify-center transition-colors ${
-        size === "lg"
-          ? "size-12 rounded-2xl [&>svg]:size-6"
-          : "size-14 rounded-2xl [&>svg]:size-6"
-      }`}
-    >
-      <Icon />
-    </span>
-  );
-}
-
-const FOCUS_RING =
-  "focus-visible:ring-ring/50 focus-visible:border-ring outline-none focus-visible:ring-3";
-
 /** An area that is one page: its icon, name and what it holds. */
 function PageCard({ area }: { area: MainMenuArea }) {
   return (
     <Link
       href={area.href}
-      className={`group bg-card hover:border-primary/50 flex w-full items-start gap-4 rounded-2xl border p-5 transition-colors ${FOCUS_RING}`}
+      className={`group bg-card hover:border-primary/50 flex w-full items-start gap-4 rounded-2xl border p-5 transition-colors ${MENU_FOCUS_RING}`}
     >
-      <IconChip icon={APP_NAV_ICONS[area.item.href]} size="lg" />
+      <MenuIconChip icon={APP_NAV_ICONS[area.item.href]} size="lg" />
       <span className="min-w-0 flex-1 space-y-1">
         <span className="block text-base font-semibold">{area.item.label}</span>
         <span className="text-muted-foreground line-clamp-2 text-sm">
@@ -188,7 +164,7 @@ function AreaBlock({
         <h2 id={headingId} className="min-w-0 text-lg font-semibold">
           <Link
             href={area.href}
-            className={`group hover:text-primary inline-flex items-center gap-1.5 rounded-md ${FOCUS_RING}`}
+            className={`group hover:text-primary inline-flex items-center gap-1.5 rounded-md ${MENU_FOCUS_RING}`}
           >
             {area.item.label}
             <ArrowRight
@@ -219,9 +195,9 @@ function AreaBlock({
                   <li key={section.href} className="sm:w-24">
                     <Link
                       href={section.href}
-                      className={`group flex flex-col items-center gap-2 rounded-xl px-1 py-1.5 text-center ${FOCUS_RING}`}
+                      className={`group flex flex-col items-center gap-2 rounded-xl px-1 py-1.5 text-center ${MENU_FOCUS_RING}`}
                     >
-                      <IconChip icon={section.icon} size="md" />
+                      <MenuIconChip icon={section.icon} size="md" />
                       <span className="text-foreground/85 group-hover:text-foreground line-clamp-2 text-[13px] leading-tight font-medium">
                         {section.label}
                       </span>

@@ -3,22 +3,21 @@ import { describe, expect, it } from "vitest";
 import { APP_NAV, isAppNavActive } from "./app-nav";
 
 describe("APP_NAV", () => {
-  it("has the Company Dashboard, Projects, Marketing, Human Resources, Workspace, Masters, then Settings (ADR CM-0034, CM-0040)", () => {
+  it("has the Company Dashboard, Projects, Departments, Workspace, Masters, then Settings (ADR CM-0034, CM-0046)", () => {
     expect(APP_NAV.map((item) => item.label)).toEqual([
       "Dashboard",
       "Projects",
-      "Marketing",
-      "Human Resources",
+      "Departments",
       "Workspace",
       "Masters",
       "Settings",
     ]);
   });
 
-  it("keys Human Resources on the Staff area, written out and never shortened", () => {
-    const area = APP_NAV.find((item) => item.label === "Human Resources");
-    expect(area?.href).toBe("/app/staff");
+  it("keeps Human Resources and Marketing under Departments, not at the top", () => {
     const labels: readonly string[] = APP_NAV.map((item) => item.label);
+    expect(labels).not.toContain("Human Resources");
+    expect(labels).not.toContain("Marketing");
     expect(labels).not.toContain("HR");
   });
 

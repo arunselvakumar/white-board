@@ -1,16 +1,11 @@
 import { APP_NAV, type AppNavItem } from "@/lib/app-nav";
-import { HRMS_PATH } from "@/lib/hrms-nav";
-import {
-  marketingSections,
-  type MarketingMenuAccess,
-} from "@/lib/marketing-nav";
+import { visibleDepartments } from "@/lib/departments-nav";
+import type { MarketingMenuAccess } from "@/lib/marketing-nav";
 import { MASTERS_GROUPS } from "@/lib/masters-nav";
 import { APP_HOME } from "@/lib/safe-redirect";
-import { LABOURS_PAGE_PATH } from "@/lib/staff-nav";
 
 import type { AreaNavGroup } from "./area-nav-menu";
-import { humanResourcesGroups } from "./human-resources-nav-menu";
-import { marketingGroups } from "./marketing-nav-menu";
+import { departmentsMenuGroups, filterDepartments } from "./departments-menu";
 import { filterMenuArea, labelMatches, type AreaMatch } from "./menu-filter";
 import { WORKSPACE_GROUPS } from "./workspace-nav-menu";
 import type { AppHref } from "@/lib/page-href";
@@ -33,19 +28,25 @@ export type MainMenuAccess = {
   canOpenDashboard: boolean;
   /** Team Members or Role Management Read (ADR CM-0030, ADR CM-0034). */
   canOpenStaffRoles: boolean;
-  /** The Marketing entries the Role opens; none leaves Marketing out (ADR CM-0040). */
+  /**
+   * The Marketing entries the Role opens; none leaves Marketing out of
+   * Departments (ADR CM-0040, ADR CM-0046).
+   */
   marketing: MarketingMenuAccess;
 };
 
 export type MainMenuArea = {
   item: AppNavItem;
-  /**
-   * Where the area's own link goes (Human Resources opens on Labour or
-   * HRMS, Marketing on the first entry the viewer may open).
-   */
+  /** Where the area's own link goes. */
   href: AppHref;
   /** The submenu; undefined for an area that is one page. */
   groups?: readonly AreaNavGroup[];
+  /**
+   * The area's own search rule, when the shared one (`menu-filter.ts`)
+   * does not fit: Departments also finds the screens on its departments'
+   * pages, which its submenu does not list.
+   */
+  filter?: (query: string) => AreaMatch<AreaNavGroup> | null;
 };
 
 /**
@@ -61,20 +62,20 @@ export function mainMenuAreas({
     switch (item.href) {
       case "/app/dashboard":
         return canOpenDashboard ? [{ item, href: item.href }] : [];
-      case "/app/marketing": {
-        const first = marketingSections(marketing)[0];
-        return first == null
-          ? []
-          : [{ item, href: first.href, groups: marketingGroups(marketing) }];
-      }
-      case "/app/staff":
+      case "/app/departments": {
+        const departments = visibleDepartments({
+          canOpenStaffRoles,
+          marketing,
+        });
         return [
           {
             item,
-            href: canOpenStaffRoles ? LABOURS_PAGE_PATH : HRMS_PATH,
-            groups: humanResourcesGroups(canOpenStaffRoles),
+            href: item.href,
+            groups: departmentsMenuGroups(departments),
+            filter: (query) => filterDepartments(departments, query),
           },
         ];
+      }
       case "/app/workspace":
         return [{ item, href: item.href, groups: WORKSPACE_GROUPS }];
       case "/app/masters":
@@ -97,6 +98,10 @@ export function filterMainMenu(
   query: string,
 ): MainMenuRow[] {
   return areas.flatMap((area): MainMenuRow[] => {
+    if (area.filter != null) {
+      const match = area.filter(query);
+      return match == null ? [] : [{ area, match }];
+    }
     if (area.groups == null)
       return labelMatches(area.item.label, query)
         ? [{ area, match: null }]
