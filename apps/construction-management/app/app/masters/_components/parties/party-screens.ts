@@ -1,4 +1,5 @@
-import { Hammer, Truck, type LucideIcon } from "lucide-react";
+import type { Icon } from "@phosphor-icons/react";
+import { HammerIcon, TruckIcon } from "@phosphor-icons/react/ssr";
 
 import type { PartyList } from "@/src/queries/parties";
 import { type AppHref, pageHref } from "@/lib/page-href";
@@ -14,7 +15,7 @@ export type PartyScreen = {
   meta: string;
   /** The empty list's message. */
   empty: string;
-  icon: LucideIcon;
+  icon: Icon;
   /** Contractors work in Departments; Suppliers have none. */
   departments: boolean;
 };
@@ -30,7 +31,7 @@ export const PARTY_SCREENS: Record<PartyList, PartyScreen> = {
     meta: "Parties that execute work on your Projects, by Department.",
     empty:
       "Add the Contractors you give work to, with the Departments they work in and their Projects.",
-    icon: Hammer,
+    icon: HammerIcon,
     departments: true,
   },
   suppliers: {
@@ -42,7 +43,7 @@ export const PARTY_SCREENS: Record<PartyList, PartyScreen> = {
     meta: "Parties you buy material from.",
     empty:
       "Add the Suppliers you buy cement, steel, bricks and other material from, and their Projects.",
-    icon: Truck,
+    icon: TruckIcon,
     departments: false,
   },
 };

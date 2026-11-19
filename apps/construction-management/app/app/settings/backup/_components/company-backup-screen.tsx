@@ -2,11 +2,12 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
+import { LockSimpleIcon } from "@phosphor-icons/react/ssr";
 import {
   useActiveCompany,
   useCompanyAuth,
 } from "@repo/auth/construction/react";
-import { DatabaseBackup, Lock, UsersRound } from "lucide-react";
+import { DatabaseBackup, UsersRound } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -21,13 +22,7 @@ import {
   CardTitle,
 } from "@repo/ui/components/card";
 import { Checkbox } from "@repo/ui/components/checkbox";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { ActionCodeStep } from "@/app/app/_components/account/action-code-step";
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
@@ -312,19 +307,20 @@ export function CompanyBackupScreen() {
             <HrmsBackupForm />
           </>
         ) : (
-          <Empty className="bg-card border">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <Lock />
-              </EmptyMedia>
-              <EmptyTitle>Only the Owner can do this</EmptyTitle>
-              <EmptyDescription>
+          <EmptyState
+            icon={LockSimpleIcon}
+            tone="neutral"
+            orbit={false}
+            title="Only the Owner can do this"
+            description={
+              <>
                 A full backup of {companyName} is the Owner&apos;s alone. You
                 can back up a Project from its options menu, or master records
                 from Masters.
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
+              </>
+            }
+            className="bg-card border"
+          />
         )}
       </div>
     </div>

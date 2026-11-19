@@ -7,7 +7,6 @@ import {
   Eye,
   FileIcon,
   FileSignature,
-  FolderOpen,
   Gavel,
   Handshake,
   LayoutGrid,
@@ -16,6 +15,7 @@ import {
   Trash2,
   Upload,
 } from "lucide-react";
+import { FolderOpenIcon } from "@phosphor-icons/react/ssr";
 import { useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import {
@@ -24,14 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { FilterTabs, type FilterTab } from "@repo/ui/components/filter-tabs";
 
 import {
@@ -241,26 +234,21 @@ export function ProjectDocumentsPage({
       </div>
 
       {data.items.length === 0 ? (
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <FolderOpen />
-            </EmptyMedia>
-            <EmptyTitle>
-              {canEdit
-                ? "Keep this Project's papers here"
-                : "No files on this Project yet"}
-            </EmptyTitle>
-            <EmptyDescription>
-              {canEdit
-                ? "Upload the quotation, PO / WO, agreement or any other file. Up to 25 MB each."
-                : "Quotations, PO / WOs, agreements and other files kept on this Project show here."}
-            </EmptyDescription>
-          </EmptyHeader>
-          {canEdit ? (
-            <EmptyContent>{uploadButton("Upload")}</EmptyContent>
-          ) : null}
-        </Empty>
+        <EmptyState
+          className="bg-card border"
+          icon={FolderOpenIcon}
+          title={
+            canEdit
+              ? "Keep this Project's papers here"
+              : "No files on this Project yet"
+          }
+          description={
+            canEdit
+              ? "Upload the quotation, PO / WO, agreement or any other file. Up to 25 MB each."
+              : "Quotations, PO / WOs, agreements and other files kept on this Project show here."
+          }
+          actions={canEdit ? uploadButton("Upload") : null}
+        />
       ) : (
         <>
           <FilterTabs

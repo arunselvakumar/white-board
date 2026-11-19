@@ -1,8 +1,13 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { FileText, FolderTree, Package, Ruler } from "lucide-react";
 import { useState } from "react";
+import {
+  FileTextIcon,
+  PackageIcon,
+  RulerIcon,
+  TreeStructureIcon,
+} from "@phosphor-icons/react/ssr";
 import {
   Select,
   SelectContent,
@@ -40,7 +45,7 @@ export function MeasurementUnitsList() {
         singular: "Measurement Unit",
         plural: "Measurement Units",
         description: "Units Materials are counted in: Bag, kg, cum, sqft…",
-        icon: Ruler,
+        icon: RulerIcon,
         emptyDescription:
           "Add the units you count material in, like Bag or cum.",
         deleteDescription:
@@ -64,7 +69,7 @@ export function MaterialCategoriesList() {
         plural: "Material Categories",
         description:
           "Groups of Materials, one level deep: Civil Work Materials › Cement.",
-        icon: FolderTree,
+        icon: TreeStructureIcon,
         emptyDescription:
           "Add the groups you buy material in, like Civil Work Materials or Plumbing Material.",
         deleteDescription:
@@ -98,7 +103,7 @@ export function TermsConditionsList() {
         singular: "Terms & Conditions",
         plural: "Terms & Conditions",
         description: "Reusable terms you pick on Purchase Orders.",
-        icon: FileText,
+        icon: FileTextIcon,
         emptyDescription:
           "Add the terms you print on Purchase Orders, like delivery, payment or warranty.",
         deleteDescription:
@@ -210,7 +215,7 @@ export function MaterialsList() {
         plural: "Materials",
         description:
           "What you buy and stock: unit, category, rate, GST, HSN and minimum stock.",
-        icon: Package,
+        icon: PackageIcon,
         emptyDescription:
           "Add the materials you buy, like Cement OPC 53 or TMT 12 mm.",
         deleteDescription:

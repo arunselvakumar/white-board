@@ -1,6 +1,8 @@
 "use client";
 
-import { Lock, MoreHorizontal, type LucideIcon } from "lucide-react";
+import type { Icon } from "@phosphor-icons/react";
+import { LockSimpleIcon } from "@phosphor-icons/react/ssr";
+import { MoreHorizontal } from "lucide-react";
 import { Component, type ReactNode } from "react";
 import {
   AlertDialog,
@@ -20,13 +22,10 @@ import {
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
 import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+  EmptyState,
+  type EmptyStateSize,
+  type EmptyStateTone,
+} from "@repo/ui/components/empty-state";
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
@@ -71,27 +70,33 @@ export function HrmsPage({
 }
 
 export function HrmsEmpty({
-  icon: Icon,
+  icon,
   title,
   description,
   action,
+  tone,
+  size,
+  orbit,
 }: {
-  icon: LucideIcon;
+  icon: Icon;
   title: string;
   description: string;
   action?: ReactNode;
+  tone?: EmptyStateTone;
+  size?: EmptyStateSize;
+  orbit?: boolean;
 }) {
   return (
-    <Empty className="bg-card border">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <Icon />
-        </EmptyMedia>
-        <EmptyTitle>{title}</EmptyTitle>
-        <EmptyDescription>{description}</EmptyDescription>
-      </EmptyHeader>
-      {action == null ? null : <EmptyContent>{action}</EmptyContent>}
-    </Empty>
+    <EmptyState
+      icon={icon}
+      tone={tone}
+      size={size}
+      orbit={orbit}
+      title={title}
+      description={description}
+      actions={action}
+      className="bg-card border"
+    />
   );
 }
 
@@ -99,7 +104,9 @@ export function HrmsEmpty({
 export function HrmsNoAccess({ what }: { what: string }) {
   return (
     <HrmsEmpty
-      icon={Lock}
+      icon={LockSimpleIcon}
+      tone="neutral"
+      orbit={false}
       title={`You don't have access to ${what}`}
       description="Your Permission Matrix does not include it. Ask the Owner if you need it."
     />

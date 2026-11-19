@@ -1,16 +1,10 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Scale } from "lucide-react";
 import { Suspense, useState } from "react";
+import { AddressBookIcon } from "@phosphor-icons/react/ssr";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   Sheet,
   SheetContent,
@@ -80,18 +74,12 @@ function Balances({ partyType }: { partyType: PartyType }) {
 
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <Scale />
-          </EmptyMedia>
-          <EmptyTitle>No Other Parties yet</EmptyTitle>
-          <EmptyDescription>
-            Add Other Parties under Masters → Other Party and put them on
-            Projects; their invoices and payments show here.
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState
+        icon={AddressBookIcon}
+        title="No Other Parties yet"
+        description="Add Other Parties under Masters → Other Party and put them on Projects; their invoices and payments show here."
+        className="bg-card border"
+      />
     );
 
   return (

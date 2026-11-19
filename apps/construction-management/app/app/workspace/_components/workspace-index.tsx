@@ -1,4 +1,6 @@
+import { LockSimpleIcon } from "@phosphor-icons/react/ssr";
 import { ItemGroup } from "@repo/ui/components/item";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { CentralPaymentWorkspaceTile } from "@/app/app/workspace/_components/central-payment-workspace-tile";
@@ -40,11 +42,14 @@ export function WorkspaceIndex({
       <div className="w-full max-w-4xl space-y-6">
         <PageHeader title="Workspace" meta="Work across all your Projects." />
         {nothing ? (
-          <p className="text-muted-foreground text-sm">
-            Nothing here for you yet. Central Store, Central Inventory, Central
-            Payment, Party Balance and Central Reports show once your Role may
-            read them.
-          </p>
+          <EmptyState
+            icon={LockSimpleIcon}
+            tone="neutral"
+            orbit={false}
+            title="Nothing here for you yet."
+            description="Central Store, Central Inventory, Central Payment, Party Balance and Central Reports show once your Role may read them."
+            className="bg-card border"
+          />
         ) : (
           <ItemGroup className="grid gap-3 sm:grid-cols-2">
             {centralStore ? (

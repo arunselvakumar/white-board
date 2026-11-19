@@ -1,14 +1,10 @@
 "use client";
 
+import { LockSimpleIcon, WarningCircleIcon } from "@phosphor-icons/react/ssr";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Button } from "@repo/ui/components/button";
 
 import { canInFinance, financeAccessQuery } from "@/src/queries/finance-access";
@@ -39,33 +35,32 @@ export function PaymentsIndex({ projectId }: { projectId: string }) {
   // A failed read is not "no access": say so and offer to try again.
   if (query.isError)
     return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyTitle>Couldn&apos;t load Payments</EmptyTitle>
-          <EmptyDescription>
-            Check your connection and try again.
-          </EmptyDescription>
-        </EmptyHeader>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => {
-            void query.refetch();
-          }}
-        >
-          Try again
-        </Button>
-      </Empty>
+      <EmptyState
+        icon={WarningCircleIcon}
+        tone="danger"
+        orbit={false}
+        title="Couldn't load Payments"
+        description="Check your connection and try again."
+        actions={
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              void query.refetch();
+            }}
+          >
+            Try again
+          </Button>
+        }
+      />
     );
   return (
-    <Empty>
-      <EmptyHeader>
-        <EmptyTitle>No payments you can see</EmptyTitle>
-        <EmptyDescription>
-          Ask the Owner for access to Parties, Transactions, Petty Cash or Other
-          Expenses on this Project.
-        </EmptyDescription>
-      </EmptyHeader>
-    </Empty>
+    <EmptyState
+      icon={LockSimpleIcon}
+      tone="neutral"
+      orbit={false}
+      title="No payments you can see"
+      description="Ask the Owner for access to Parties, Transactions, Petty Cash or Other Expenses on this Project."
+    />
   );
 }

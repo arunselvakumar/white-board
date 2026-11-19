@@ -7,6 +7,7 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2 } from "lucide-react";
+import { PackageIcon } from "@phosphor-icons/react/ssr";
 import { useRouter } from "next/navigation";
 import { type ReactNode, Suspense, useEffect, useRef, useState } from "react";
 import {
@@ -28,6 +29,7 @@ import {
   SelectValue,
 } from "@repo/ui/components/select";
 import { Textarea } from "@repo/ui/components/textarea";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -503,11 +505,17 @@ function PurchaseOrderFields({
 
       <Section title="Materials" required>
         {fields.length === 0 ? (
-          <p className="text-muted-foreground text-sm">
-            {loadingPr
-              ? "Loading the request's pending items…"
-              : "No materials yet."}
-          </p>
+          loadingPr ? (
+            <p className="text-muted-foreground text-sm">
+              Loading the request&apos;s pending items…
+            </p>
+          ) : (
+            <EmptyState
+              icon={PackageIcon}
+              size="sm"
+              title="No materials yet."
+            />
+          )
         ) : (
           <ul
             aria-label="Order lines"

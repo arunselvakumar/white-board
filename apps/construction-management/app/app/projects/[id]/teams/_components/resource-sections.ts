@@ -1,4 +1,10 @@
-import { Hammer, Handshake, Truck, Users, type LucideIcon } from "lucide-react";
+import type { Icon } from "@phosphor-icons/react";
+import {
+  HammerIcon,
+  StorefrontIcon,
+  TruckIcon,
+  UsersThreeIcon,
+} from "@phosphor-icons/react/ssr";
 
 import type { ResourceSection } from "@/src/queries/project-resources";
 import { type AppHref, pageHref } from "@/lib/page-href";
@@ -15,7 +21,8 @@ export type ResourceSectionInfo = {
   area: string;
   /** The page of one of them, which a row opens (ADR CM-0044 §1). */
   pagePath: (id: string) => AppHref;
-  icon: LucideIcon;
+  /** Phosphor, for the empty states. */
+  icon: Icon;
 };
 
 /** The four sections of a Project's Resources, in screen order. */
@@ -29,7 +36,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
     addPath: "/app/staff/office-staff/new",
     pagePath: (id) => pageHref("/app/staff/office-staff/[id]", { id }),
     area: "Human Resources",
-    icon: Users,
+    icon: UsersThreeIcon,
   },
   {
     key: "contractors",
@@ -39,7 +46,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
     addPath: "/app/masters/contractors/new",
     pagePath: (id) => pageHref("/app/masters/contractors/[id]", { id }),
     area: "Masters",
-    icon: Hammer,
+    icon: HammerIcon,
   },
   {
     key: "suppliers",
@@ -49,7 +56,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
     addPath: "/app/masters/suppliers/new",
     pagePath: (id) => pageHref("/app/masters/suppliers/[id]", { id }),
     area: "Masters",
-    icon: Truck,
+    icon: TruckIcon,
   },
   {
     key: "vendors",
@@ -60,6 +67,6 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionInfo[] = [
     addPath: "/app/staff/vendors/new",
     pagePath: (id) => pageHref("/app/staff/vendors/[id]", { id }),
     area: "Human Resources",
-    icon: Handshake,
+    icon: StorefrontIcon,
   },
 ];

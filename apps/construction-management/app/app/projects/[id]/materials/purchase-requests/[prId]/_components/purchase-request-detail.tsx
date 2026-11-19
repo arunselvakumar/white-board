@@ -2,6 +2,7 @@
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
+import { ShoppingCartIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, useState, type ReactNode } from "react";
@@ -12,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { LocationLabel } from "@/app/app/_components/locations/location-picker";
@@ -225,9 +227,11 @@ export function PurchaseRequestDetailPage({
           Purchase Orders
         </h3>
         {pr.purchaseOrders.length === 0 ? (
-          <p className="text-muted-foreground text-sm">
-            No Purchase Order raised against it yet.
-          </p>
+          <EmptyState
+            icon={ShoppingCartIcon}
+            size="sm"
+            title="No Purchase Order raised against it yet."
+          />
         ) : (
           <ul className="bg-card divide-y rounded-lg border">
             {pr.purchaseOrders.map((po) => (

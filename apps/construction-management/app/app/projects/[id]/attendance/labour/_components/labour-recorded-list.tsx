@@ -2,6 +2,7 @@
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense, useDeferredValue, useState, useTransition } from "react";
+import { MagnifyingGlassIcon } from "@phosphor-icons/react/ssr";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
@@ -21,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
@@ -185,9 +187,12 @@ function Results({
   const { data } = useSuspenseQuery(labourAttendanceListQuery(filter));
   if (data.items.length === 0)
     return (
-      <p className="bg-card text-muted-foreground rounded-lg border p-6 text-center text-sm">
-        No attendance matches these filters.
-      </p>
+      <EmptyState
+        className="bg-card border"
+        icon={MagnifyingGlassIcon}
+        tone="neutral"
+        title="No attendance matches these filters."
+      />
     );
   return (
     <div className="space-y-3">

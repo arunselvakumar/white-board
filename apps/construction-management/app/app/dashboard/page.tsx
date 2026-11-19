@@ -1,12 +1,6 @@
-import { LayoutDashboard } from "lucide-react";
 import type { Metadata } from "next";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { LockSimpleIcon } from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { CompanyDashboard } from "@/app/app/dashboard/_components/company-dashboard";
@@ -21,18 +15,14 @@ export default async function CompanyDashboardPage() {
   if (!(await viewerCan("reporting.project_dashboard", "read")))
     return (
       <div className="w-full p-6">
-        <Empty className="bg-card max-w-4xl border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <LayoutDashboard />
-            </EmptyMedia>
-            <EmptyTitle>No access to the Dashboard</EmptyTitle>
-            <EmptyDescription>
-              Ask the Owner to give you the Dashboard permission in your
-              Permission Matrix.
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+        <EmptyState
+          icon={LockSimpleIcon}
+          tone="neutral"
+          orbit={false}
+          title="No access to the Dashboard"
+          description="Ask the Owner to give you the Dashboard permission in your Permission Matrix."
+          className="bg-card max-w-4xl border"
+        />
       </div>
     );
   return <CompanyDashboard />;

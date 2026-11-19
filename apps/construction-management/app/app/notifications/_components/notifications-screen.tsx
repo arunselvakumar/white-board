@@ -1,15 +1,10 @@
 "use client";
 
 import { useQuery, useSuspenseInfiniteQuery } from "@tanstack/react-query";
-import { Bell, CheckCheck } from "lucide-react";
+import { BellIcon } from "@phosphor-icons/react/ssr";
+import { CheckCheck } from "lucide-react";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 
@@ -76,18 +71,12 @@ export function NotificationsScreen() {
           </p>
         ) : null}
         {items.length === 0 ? (
-          <Empty className="bg-card rounded-2xl border">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <Bell aria-hidden="true" />
-              </EmptyMedia>
-              <EmptyTitle>No notifications yet</EmptyTitle>
-              <EmptyDescription>
-                Approvals, Tasks, Issues and the reports you ask for show up
-                here.
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
+          <EmptyState
+            icon={BellIcon}
+            title="No notifications yet"
+            description="Approvals, Tasks, Issues and the reports you ask for show up here."
+            className="bg-card rounded-2xl border"
+          />
         ) : (
           <ul aria-label="Notifications" className="space-y-2">
             {items.map((notification) => (

@@ -1,7 +1,8 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { MoreHorizontal, Plus, Receipt } from "lucide-react";
+import { ReceiptIcon } from "@phosphor-icons/react/ssr";
+import { MoreHorizontal, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -23,14 +24,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { formatPaise } from "@/components/money/money-input";
@@ -166,19 +160,13 @@ export function SalaryStructuresList() {
           {data.items.length === 0 ? null : addLink}
         </div>
         {data.items.length === 0 ? (
-          <Empty className="bg-card border">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <Receipt />
-              </EmptyMedia>
-              <EmptyTitle>No salary structures yet</EmptyTitle>
-              <EmptyDescription>
-                Add one for each way you pay Team Members, like Site staff with
-                Basic, HRA and a Special Allowance.
-              </EmptyDescription>
-            </EmptyHeader>
-            <EmptyContent>{addLink}</EmptyContent>
-          </Empty>
+          <EmptyState
+            icon={ReceiptIcon}
+            title="No salary structures yet"
+            description="Add one for each way you pay Team Members, like Site staff with Basic, HRA and a Special Allowance."
+            className="bg-card border"
+            actions={addLink}
+          />
         ) : (
           <ul
             aria-label="Salary structures"

@@ -7,21 +7,14 @@ import {
   CircleCheck,
   Clock,
   LayoutGrid,
-  ListChecks,
   Plus,
 } from "lucide-react";
+import { FlagIcon, MagnifyingGlassIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { FilterTabs, type FilterTab } from "@repo/ui/components/filter-tabs";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
@@ -438,28 +431,24 @@ function IssueRows({
 
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <ListChecks />
-          </EmptyMedia>
-          <EmptyTitle>
-            {filtered ? "No issues match" : "No issues or snags yet"}
-          </EmptyTitle>
-          <EmptyDescription>
-            {filtered
-              ? "Try another status, priority or date."
-              : "Record each problem on site with who must fix it and by when. Past its Due Date an open issue shows Delayed."}
-          </EmptyDescription>
-        </EmptyHeader>
-        {!filtered && newHref != null && (
-          <EmptyContent>
+      <EmptyState
+        className="bg-card border"
+        icon={filtered ? MagnifyingGlassIcon : FlagIcon}
+        tone={filtered ? "neutral" : "brand"}
+        title={filtered ? "No issues match" : "No issues or snags yet"}
+        description={
+          filtered
+            ? "Try another status, priority or date."
+            : "Record each problem on site with who must fix it and by when. Past its Due Date an open issue shows Delayed."
+        }
+        actions={
+          !filtered && newHref != null ? (
             <Link href={newHref} className={buttonVariants({ size: "sm" })}>
               Add Issue
             </Link>
-          </EmptyContent>
-        )}
-      </Empty>
+          ) : null
+        }
+      />
     );
 
   const check = (issue: Issue) =>

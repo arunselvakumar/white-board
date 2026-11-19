@@ -5,7 +5,8 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { MapPinned, MoreHorizontal, Plus } from "lucide-react";
+import { MapPinIcon } from "@phosphor-icons/react/ssr";
+import { MoreHorizontal, Plus } from "lucide-react";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -26,14 +27,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
@@ -94,19 +88,13 @@ export function BillingAddressesManager() {
         <FormAlert message={error} />
 
         {data.items.length === 0 ? (
-          <Empty className="bg-card border">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <MapPinned />
-              </EmptyMedia>
-              <EmptyTitle>No billing addresses yet</EmptyTitle>
-              <EmptyDescription>
-                Add the address and GSTIN you bill from. The first one you add
-                becomes the default on Purchase Orders.
-              </EmptyDescription>
-            </EmptyHeader>
-            <EmptyContent>{addButton}</EmptyContent>
-          </Empty>
+          <EmptyState
+            icon={MapPinIcon}
+            title="No billing addresses yet"
+            description="Add the address and GSTIN you bill from. The first one you add becomes the default on Purchase Orders."
+            className="bg-card border"
+            actions={addButton}
+          />
         ) : (
           <ul
             aria-label="Billing addresses"

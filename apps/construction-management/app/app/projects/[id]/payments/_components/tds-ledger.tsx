@@ -1,16 +1,10 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { Receipt } from "lucide-react";
+import { ReceiptIcon } from "@phosphor-icons/react/ssr";
 import { Suspense, useState, useTransition } from "react";
 import { Badge } from "@repo/ui/components/badge";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Label } from "@repo/ui/components/label";
 import {
   Select,
@@ -194,18 +188,12 @@ function Ledger({
         </p>
       </section>
       {data.rows.length === 0 ? (
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <Receipt />
-            </EmptyMedia>
-            <EmptyTitle>No payments this year</EmptyTitle>
-            <EmptyDescription>
-              Payments to the Contractor in FY {financialYearLabel(year)} show
-              here with their TDS.
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+        <EmptyState
+          className="bg-card border"
+          icon={ReceiptIcon}
+          title="No payments this year"
+          description={`Payments to the Contractor in FY ${financialYearLabel(year)} show here with their TDS.`}
+        />
       ) : (
         <>
           <div className="bg-card hidden overflow-x-auto rounded-lg border md:block">

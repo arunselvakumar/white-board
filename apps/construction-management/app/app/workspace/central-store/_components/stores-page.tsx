@@ -1,17 +1,11 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { WarehouseIcon } from "@phosphor-icons/react/ssr";
 import { ChevronRight, Plus, Warehouse } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import {
@@ -101,20 +95,17 @@ export function StoresPage() {
           }
         />
         {data.items.length === 0 ? (
-          <Empty className="bg-card border">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <Warehouse />
-              </EmptyMedia>
-              <EmptyTitle>No stores yet</EmptyTitle>
-              <EmptyDescription>
-                {canCreate
-                  ? "Add a store, choose the Projects it serves and its store keepers. Sites then raise Material Requests to it."
-                  : "The Company's Central Stores show here."}
-              </EmptyDescription>
-            </EmptyHeader>
-            {canCreate ? <EmptyContent>{add}</EmptyContent> : null}
-          </Empty>
+          <EmptyState
+            icon={WarehouseIcon}
+            title="No stores yet"
+            description={
+              canCreate
+                ? "Add a store, choose the Projects it serves and its store keepers. Sites then raise Material Requests to it."
+                : "The Company's Central Stores show here."
+            }
+            className="bg-card border"
+            actions={canCreate ? add : undefined}
+          />
         ) : (
           <ul aria-label="Stores" className="grid gap-3 sm:grid-cols-2">
             {data.items.map((store) => (

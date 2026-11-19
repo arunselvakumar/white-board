@@ -1,15 +1,9 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { FileSpreadsheet } from "lucide-react";
 import { Suspense } from "react";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { LockSimpleIcon } from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { reportCatalogueQuery } from "@/src/queries/report-catalogue";
@@ -70,18 +64,14 @@ function CentralReportCards({ today }: { today: string }) {
   const pickers = useReportPickerOptions(null, offered);
   if (offered.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <FileSpreadsheet />
-          </EmptyMedia>
-          <EmptyTitle>No central reports you can generate</EmptyTitle>
-          <EmptyDescription>
-            A central report needs the Report flag on its menu. Ask the Owner to
-            change your Permission Matrix.
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState
+        icon={LockSimpleIcon}
+        tone="neutral"
+        orbit={false}
+        title="No central reports you can generate"
+        description="A central report needs the Report flag on its menu. Ask the Owner to change your Permission Matrix."
+        className="bg-card border"
+      />
     );
   return (
     <div className="space-y-8">

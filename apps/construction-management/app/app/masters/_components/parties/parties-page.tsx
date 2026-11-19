@@ -1,6 +1,7 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { MagnifyingGlassIcon } from "@phosphor-icons/react/ssr";
 import {
   CircleDot,
   CircleOff,
@@ -37,14 +38,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import {
   InputGroup,
@@ -230,25 +224,20 @@ function PartyRows({
   } | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [error, setError] = useState<string | undefined>();
-  const Icon = screen.icon;
 
   const filtered = filter.search.trim().length > 0 || filter.status !== "all";
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <Icon />
-          </EmptyMedia>
-          <EmptyTitle>
-            {filtered ? `No ${screen.plural} match` : `No ${screen.plural} yet`}
-          </EmptyTitle>
-          <EmptyDescription>
-            {filtered ? "Try another name or status." : screen.empty}
-          </EmptyDescription>
-        </EmptyHeader>
-        {!filtered && <EmptyContent>{addLink}</EmptyContent>}
-      </Empty>
+      <EmptyState
+        icon={filtered ? MagnifyingGlassIcon : screen.icon}
+        tone={filtered ? "neutral" : "brand"}
+        title={
+          filtered ? `No ${screen.plural} match` : `No ${screen.plural} yet`
+        }
+        description={filtered ? "Try another name or status." : screen.empty}
+        className="bg-card border"
+        actions={filtered ? undefined : addLink}
+      />
     );
 
   const confirm =

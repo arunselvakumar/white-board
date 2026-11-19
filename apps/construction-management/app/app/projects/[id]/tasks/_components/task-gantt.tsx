@@ -1,7 +1,8 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ChartGantt, ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChartBarHorizontalIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -13,13 +14,7 @@ import {
   type ReactNode,
 } from "react";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 import { cn } from "@repo/ui/lib/utils";
 
@@ -240,17 +235,12 @@ export function TaskGanttChart({
   }, [start, today, scale]);
   if (range == null)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <ChartGantt />
-          </EmptyMedia>
-          <EmptyTitle>Nothing to chart yet</EmptyTitle>
-          <EmptyDescription>
-            Give tasks a Start Date and a Due Date to see them on the Gantt.
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState
+        className="bg-card border"
+        icon={ChartBarHorizontalIcon}
+        title="Nothing to chart yet"
+        description="Give tasks a Start Date and a Due Date to see them on the Gantt."
+      />
     );
 
   const unit = DAY_WIDTH[scale];

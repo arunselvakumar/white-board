@@ -1,15 +1,9 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { FileSpreadsheet } from "lucide-react";
+import { ChartBarIcon } from "@phosphor-icons/react/ssr";
 import { Badge } from "@repo/ui/components/badge";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Spinner } from "@repo/ui/components/spinner";
 
 import {
@@ -68,18 +62,13 @@ export function RecentReports({
       : data.items.filter((job) => kinds.includes(job.kind));
   if (items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <FileSpreadsheet />
-          </EmptyMedia>
-          <EmptyTitle>No reports yet</EmptyTitle>
-          <EmptyDescription>
-            Generate a report above; its Excel and PDF stay here to download
-            again.
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState
+        icon={ChartBarIcon}
+        size="md"
+        title="No reports yet"
+        description="Generate a report above; its Excel and PDF stay here to download again."
+        className="bg-card border"
+      />
     );
   return (
     <ul

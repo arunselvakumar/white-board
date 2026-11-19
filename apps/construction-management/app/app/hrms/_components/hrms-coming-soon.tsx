@@ -1,10 +1,6 @@
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { HourglassIcon } from "@phosphor-icons/react/ssr";
+
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { hrmsPage } from "@/lib/hrms-nav";
 
@@ -15,20 +11,17 @@ import { hrmsPage } from "@/lib/hrms-nav";
  */
 export function HrmsComingSoon({ href }: { href: string }) {
   const page = hrmsPage(href);
-  const Icon = page.icon;
   return (
     <div className="w-full p-6">
       <div className="w-full max-w-4xl space-y-4">
         <h2 className="text-xl font-semibold tracking-tight">{page.title}</h2>
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <Icon />
-            </EmptyMedia>
-            <EmptyTitle>Coming in this milestone</EmptyTitle>
-            <EmptyDescription>{page.description}</EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+        <EmptyState
+          icon={HourglassIcon}
+          tone="neutral"
+          title="Coming in this milestone"
+          description={page.description}
+          className="bg-card border"
+        />
       </div>
     </div>
   );

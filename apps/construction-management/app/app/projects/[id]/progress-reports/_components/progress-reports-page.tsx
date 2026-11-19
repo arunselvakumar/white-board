@@ -1,7 +1,8 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { FileText, NotebookText, Plus, RotateCw, Trash2 } from "lucide-react";
+import { FileText, Plus, RotateCw, Trash2 } from "lucide-react";
+import { ChartBarIcon } from "@phosphor-icons/react/ssr";
 import { Suspense, useState } from "react";
 import {
   AlertDialog,
@@ -14,14 +15,7 @@ import {
 } from "@repo/ui/components/alert-dialog";
 import { Badge } from "@repo/ui/components/badge";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Spinner } from "@repo/ui/components/spinner";
 
 import { FormAlert } from "@/components/auth/form-alert";
@@ -201,27 +195,20 @@ function ReportList({
 
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <NotebookText />
-          </EmptyMedia>
-          <EmptyTitle>No Progress Reports yet</EmptyTitle>
-          <EmptyDescription>
-            Generate a Daily Progress Report for a day (its weather, labour,
-            worksheets, equipment, materials, visitors and hindrances) or a Task
-            Progress Report for a period, each as one PDF.
-          </EmptyDescription>
-        </EmptyHeader>
-        {onCreate != null && (
-          <EmptyContent>
+      <EmptyState
+        className="bg-card border"
+        icon={ChartBarIcon}
+        title="No Progress Reports yet"
+        description="Generate a Daily Progress Report for a day (its weather, labour, worksheets, equipment, materials, visitors and hindrances) or a Task Progress Report for a period, each as one PDF."
+        actions={
+          onCreate != null ? (
             <Button type="button" onClick={onCreate}>
               <Plus aria-hidden="true" />
               Create new
             </Button>
-          </EmptyContent>
-        )}
-      </Empty>
+          ) : null
+        }
+      />
     );
 
   return (

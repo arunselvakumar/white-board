@@ -5,6 +5,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
+import { FolderSimpleIcon } from "@phosphor-icons/react/ssr";
 import { Button } from "@repo/ui/components/button";
 import {
   Dialog,
@@ -16,6 +17,7 @@ import {
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -57,10 +59,11 @@ function ProjectsField({
   const options = useProjectOptions();
   if (options.length === 0)
     return (
-      <p className="text-muted-foreground text-sm">
-        Add a Project first; then assign this {config.singular} to it here or
-        from the Project.
-      </p>
+      <EmptyState
+        icon={FolderSimpleIcon}
+        size="sm"
+        title={`Add a Project first; then assign this ${config.singular} to it here or from the Project.`}
+      />
     );
   return (
     <div className="max-h-[50vh] overflow-y-auto">

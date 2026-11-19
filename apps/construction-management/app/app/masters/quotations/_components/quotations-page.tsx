@@ -1,9 +1,9 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { FileTextIcon, MagnifyingGlassIcon } from "@phosphor-icons/react/ssr";
 import {
   ExternalLink,
-  FileText,
   Hammer,
   LayoutGrid,
   type LucideIcon,
@@ -13,13 +13,7 @@ import {
 import Link from "next/link";
 import { Suspense, useDeferredValue, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import {
   InputGroup,
@@ -159,21 +153,17 @@ function QuotationRows({
 
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <FileText />
-          </EmptyMedia>
-          <EmptyTitle>
-            {filtered ? "No quotations match" : "No quotations yet"}
-          </EmptyTitle>
-          <EmptyDescription>
-            {filtered
-              ? "Try another party or file name."
-              : "Upload a quotation on a Contractor's or Supplier's page, under Masters, and it shows here."}
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState
+        icon={filtered ? MagnifyingGlassIcon : FileTextIcon}
+        tone={filtered ? "neutral" : "brand"}
+        title={filtered ? "No quotations match" : "No quotations yet"}
+        description={
+          filtered
+            ? "Try another party or file name."
+            : "Upload a quotation on a Contractor's or Supplier's page, under Masters, and it shows here."
+        }
+        className="bg-card border"
+      />
     );
 
   return (

@@ -1,12 +1,6 @@
-import { LayoutDashboard } from "lucide-react";
+import { LockSimpleIcon } from "@phosphor-icons/react/ssr";
 import type { Metadata } from "next";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectDashboard } from "@/app/app/projects/[id]/dashboard/_components/project-dashboard";
@@ -26,18 +20,14 @@ export default async function ProjectDashboardRoute({
   if (!canRead)
     return (
       <div className="w-full p-6">
-        <Empty className="bg-card max-w-4xl border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <LayoutDashboard />
-            </EmptyMedia>
-            <EmptyTitle>No access to the Dashboard</EmptyTitle>
-            <EmptyDescription>
-              Ask the Owner to give you the Dashboard permission in your
-              Permission Matrix.
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+        <EmptyState
+          className="bg-card max-w-4xl border"
+          icon={LockSimpleIcon}
+          tone="neutral"
+          orbit={false}
+          title="No access to the Dashboard"
+          description="Ask the Owner to give you the Dashboard permission in your Permission Matrix."
+        />
       </div>
     );
   return <ProjectDashboard projectId={id} />;

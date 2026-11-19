@@ -13,9 +13,11 @@ import {
   Trash2,
   type LucideIcon,
 } from "lucide-react";
+import { PhoneCallIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { Suspense, useState } from "react";
 import { Button } from "@repo/ui/components/button";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { formatDate } from "@/app/app/_components/payments/payment-format";
@@ -131,7 +133,7 @@ function Timeline({
 }) {
   const { data } = useSuspenseQuery(inquiryActivityQuery(inquiry.id));
   if (data.items.length === 0)
-    return <p className="text-muted-foreground text-sm">Nothing yet.</p>;
+    return <EmptyState icon={PhoneCallIcon} size="sm" title="Nothing yet." />;
   return (
     <ol aria-label="Follow-ups and history" className="space-y-2">
       {data.items.map((item) =>

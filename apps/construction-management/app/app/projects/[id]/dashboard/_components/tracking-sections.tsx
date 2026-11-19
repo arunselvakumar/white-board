@@ -10,9 +10,15 @@ import {
   SearchCheck,
   TriangleAlert,
 } from "lucide-react";
+import {
+  CurrencyInrIcon,
+  FlagIcon,
+  ListChecksIcon,
+} from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useId } from "react";
 import { MetricCard } from "@repo/ui/components/metric-card";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { formatPaise } from "@/components/money/money-input";
 import { formatCalendarDate } from "@/app/app/_components/projects/project-status";
@@ -100,9 +106,11 @@ export function ValueEarnedChart({
         Value earned by task
       </figcaption>
       {value.tasks.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          No priced task was added in this period.
-        </p>
+        <EmptyState
+          icon={CurrencyInrIcon}
+          size="sm"
+          title="No priced task was added in this period."
+        />
       ) : (
         <>
           <Legend
@@ -182,9 +190,11 @@ export function MostDelayedTasks({
         Most delayed tasks
       </h3>
       {tasks.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          No task is past its Due Date.
-        </p>
+        <EmptyState
+          icon={ListChecksIcon}
+          size="sm"
+          title="No task is past its Due Date."
+        />
       ) : (
         <ol aria-labelledby={titleId} className="divide-y">
           {tasks.map((task) => (
@@ -350,9 +360,11 @@ export function AssigneeIssues({
         Issues by assignee
       </figcaption>
       {rows.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          No issue was raised in this period.
-        </p>
+        <EmptyState
+          icon={FlagIcon}
+          size="sm"
+          title="No issue was raised in this period."
+        />
       ) : (
         <>
           <Legend

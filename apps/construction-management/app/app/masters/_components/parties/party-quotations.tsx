@@ -1,7 +1,8 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Download, ExternalLink, FileText, Trash2, Upload } from "lucide-react";
+import { FileTextIcon } from "@phosphor-icons/react/ssr";
+import { Download, ExternalLink, Trash2, Upload } from "lucide-react";
 import { Suspense, useRef, useState } from "react";
 import {
   AlertDialog,
@@ -14,13 +15,7 @@ import {
   AlertDialogTitle,
 } from "@repo/ui/components/alert-dialog";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Input } from "@repo/ui/components/input";
 import { Progress } from "@repo/ui/components/progress";
 
@@ -194,18 +189,18 @@ function QuotationList({
   const { data } = useSuspenseQuery(partyQuotationsQuery(screen.list, partyId));
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <FileText />
-          </EmptyMedia>
-          <EmptyTitle>No quotations yet</EmptyTitle>
-          <EmptyDescription>
+      <EmptyState
+        icon={FileTextIcon}
+        size="md"
+        title="No quotations yet"
+        description={
+          <>
             Upload the rates this {screen.label} quoted, so you can compare them
             before you give the order.
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+          </>
+        }
+        className="bg-card border"
+      />
     );
   return (
     <ul

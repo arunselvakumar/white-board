@@ -2,23 +2,14 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
-  ArrowDownLeft,
-  ArrowLeftRight,
-  ArrowUpRight,
-  LayoutGrid,
-  Plus,
-} from "lucide-react";
+  ArrowsLeftRightIcon,
+  MagnifyingGlassIcon,
+} from "@phosphor-icons/react/ssr";
+import { ArrowDownLeft, ArrowUpRight, LayoutGrid, Plus } from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
@@ -138,29 +129,25 @@ function Transfers({
     (filters.to ?? "") !== "";
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <ArrowLeftRight />
-          </EmptyMedia>
-          <EmptyTitle>
-            {filtered ? "No transfers match" : "No material transfers yet"}
-          </EmptyTitle>
-          <EmptyDescription>
-            {filtered
-              ? "Try another direction, status or date range."
-              : "Material sent to or received from another site or store shows here."}
-          </EmptyDescription>
-        </EmptyHeader>
-        {!filtered && canCreate && (
-          <EmptyContent>
+      <EmptyState
+        icon={filtered ? MagnifyingGlassIcon : ArrowsLeftRightIcon}
+        tone={filtered ? "neutral" : "brand"}
+        title={filtered ? "No transfers match" : "No material transfers yet"}
+        description={
+          filtered
+            ? "Try another direction, status or date range."
+            : "Material sent to or received from another site or store shows here."
+        }
+        className="bg-card border"
+        actions={
+          !filtered && canCreate ? (
             <Link href={newHref} className={buttonVariants()}>
               <Plus aria-hidden="true" />
               New transfer
             </Link>
-          </EmptyContent>
-        )}
-      </Empty>
+          ) : undefined
+        }
+      />
     );
   return (
     <div className={cn("space-y-3", className)}>

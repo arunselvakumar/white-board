@@ -4,23 +4,15 @@ import { useSuspenseQueries } from "@tanstack/react-query";
 import {
   ChevronLeft,
   ChevronRight,
-  Images,
   Search,
-  SearchX,
   SlidersHorizontal,
 } from "lucide-react";
+import { ImagesIcon, MagnifyingGlassIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useEffect, useId, useState, useTransition } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import { Input } from "@repo/ui/components/input";
 import {
@@ -407,18 +399,12 @@ export function GalleryPage({ projectId }: { projectId: string }) {
     return (
       <div className="w-full max-w-5xl space-y-5 p-6">
         <h2 className="font-semibold">Gallery</h2>
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <Images />
-            </EmptyMedia>
-            <EmptyTitle>No files on this Project yet</EmptyTitle>
-            <EmptyDescription>
-              Photos and PDFs from Documents, Drawings and Testing Reports show
-              here. Add them where they belong.
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+        <EmptyState
+          className="bg-card border"
+          icon={ImagesIcon}
+          title="No files on this Project yet"
+          description="Photos and PDFs from Documents, Drawings and Testing Reports show here. Add them where they belong."
+        />
       </div>
     );
 
@@ -492,22 +478,18 @@ export function GalleryPage({ projectId }: { projectId: string }) {
       </div>
 
       {items.length === 0 ? (
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <SearchX />
-            </EmptyMedia>
-            <EmptyTitle>No files match these filters</EmptyTitle>
-            <EmptyDescription>
-              Try another name, source or date.
-            </EmptyDescription>
-          </EmptyHeader>
-          <EmptyContent>
+        <EmptyState
+          className="bg-card border"
+          icon={MagnifyingGlassIcon}
+          tone="neutral"
+          title="No files match these filters"
+          description="Try another name, source or date."
+          actions={
             <Button type="button" variant="outline" onClick={clear}>
               Clear filters
             </Button>
-          </EmptyContent>
-        </Empty>
+          }
+        />
       ) : (
         <ul
           aria-label="Files"

@@ -2,6 +2,7 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense, useDeferredValue, useState } from "react";
+import { ClockIcon } from "@phosphor-icons/react/ssr";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import {
@@ -13,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { cn } from "@repo/ui/lib/utils";
 
 import { formatPaise } from "@/components/money/money-input";
@@ -47,9 +49,11 @@ function OvertimeTable({
   );
   if (data.items.length === 0)
     return (
-      <p className="bg-card text-muted-foreground rounded-lg border p-6 text-center text-sm">
-        No vendor overtime between these dates.
-      </p>
+      <EmptyState
+        className="bg-card border"
+        icon={ClockIcon}
+        title="No vendor overtime between these dates."
+      />
     );
   return (
     <div

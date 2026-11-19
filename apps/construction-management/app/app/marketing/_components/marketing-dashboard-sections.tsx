@@ -1,6 +1,12 @@
 "use client";
 
 import {
+  ClockCounterClockwiseIcon,
+  MapTrifoldIcon,
+  PhoneCallIcon,
+  UsersThreeIcon,
+} from "@phosphor-icons/react/ssr";
+import {
   CircleCheck,
   Flame,
   MapPinCheck,
@@ -29,6 +35,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { MARKETING_FOLLOW_UPS_PATH } from "@/lib/marketing-nav";
 import { STAGE_LABELS } from "@/src/marketing/domain/marketing-terms";
@@ -120,7 +127,11 @@ export function TodaySection({
           <div className="min-w-0 space-y-2">
             <h3 className="text-muted-foreground text-sm">My Visits</h3>
             {today.visits.length === 0 ? (
-              <Quiet>No Visits for you today.</Quiet>
+              <EmptyState
+                icon={MapTrifoldIcon}
+                size="sm"
+                title="No Visits for you today."
+              />
             ) : (
               <ul aria-label="My Visits today" className="divide-y">
                 {today.visits.map((visit) => (
@@ -155,7 +166,11 @@ export function TodaySection({
           <div className="min-w-0 space-y-2">
             <h3 className="text-muted-foreground text-sm">My Follow-ups due</h3>
             {today.followUps.length === 0 ? (
-              <Quiet>Nothing due today.</Quiet>
+              <EmptyState
+                icon={PhoneCallIcon}
+                size="sm"
+                title="Nothing due today."
+              />
             ) : (
               <ul aria-label="My Follow-ups due today" className="divide-y">
                 {today.followUps.map((followUp) => (
@@ -347,7 +362,11 @@ export function PerPersonSection({ people }: { people: Person[] }) {
   return (
     <Section id="per-person" title="Visits per Marketing Person">
       {people.length === 0 ? (
-        <Quiet>No Marketing People yet.</Quiet>
+        <EmptyState
+          icon={UsersThreeIcon}
+          size="sm"
+          title="No Marketing People yet."
+        />
       ) : (
         <Table aria-label="Visits per Marketing Person">
           <TableHeader>
@@ -397,9 +416,12 @@ export function RecentSection({
   return (
     <Section id="recent" title="Recent activity">
       {recent.length === 0 ? (
-        <Quiet>
-          Nothing yet. Completed Visits, notes and Stage changes show here.
-        </Quiet>
+        <EmptyState
+          icon={ClockCounterClockwiseIcon}
+          size="sm"
+          title="Nothing yet."
+          description="Completed Visits, notes and Stage changes show here."
+        />
       ) : (
         <ul aria-label="Recent activity" className="space-y-3">
           {recent.map((row, index) => {
@@ -456,7 +478,11 @@ export function HotSection({
   return (
     <Section id="hot" title="Hot companies with no Follow-up">
       {companies.length === 0 ? (
-        <Quiet>Every Hot company has a Follow-up.</Quiet>
+        <EmptyState
+          icon={PhoneCallIcon}
+          size="sm"
+          title="Every Hot company has a Follow-up."
+        />
       ) : (
         <ul aria-label="Hot companies with no Follow-up" className="divide-y">
           {companies.map((company) => (

@@ -1,5 +1,6 @@
 "use client";
 
+import { BellIcon } from "@phosphor-icons/react/ssr";
 import { useCompanyAuth } from "@repo/auth/construction/react";
 import { useQuery } from "@tanstack/react-query";
 import { Bell, CheckCheck } from "lucide-react";
@@ -13,6 +14,7 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@repo/ui/components/popover";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { bellLabel, unreadBadge } from "@/lib/notification-format";
 
@@ -126,9 +128,12 @@ function BellPanel({
             Couldn’t load notifications. Please try again.
           </p>
         ) : items.length === 0 ? (
-          <p className="text-muted-foreground p-3 text-sm">
-            No notifications yet
-          </p>
+          <EmptyState
+            icon={BellIcon}
+            size="sm"
+            title="No notifications yet"
+            className="p-3"
+          />
         ) : (
           <ul aria-label="Latest notifications" className="space-y-1">
             {items.map((notification) => (

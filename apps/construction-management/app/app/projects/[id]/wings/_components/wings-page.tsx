@@ -1,7 +1,8 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Building2, MoreHorizontal, Plus } from "lucide-react";
+import { BuildingsIcon } from "@phosphor-icons/react/ssr";
+import { MoreHorizontal, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -13,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { ConfirmDeleteDialog } from "@/app/app/_components/masters/master-list-parts";
@@ -203,7 +205,7 @@ export function WingsPage({
 
       {data.phases.length === 0 ? (
         <StructureEmpty
-          icon={Building2}
+          icon={BuildingsIcon}
           title={
             access.create
               ? "Set up this Project's Wings"
@@ -282,9 +284,12 @@ export function WingsPage({
               ) : null}
             </div>
             {phase.items.length === 0 ? (
-              <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-4 text-center text-sm">
-                No Wings in {phase.name} yet.
-              </p>
+              <EmptyState
+                className="bg-card border"
+                icon={BuildingsIcon}
+                size="sm"
+                title={`No Wings in ${phase.name} yet.`}
+              />
             ) : (
               <ul
                 aria-label={`Wings in ${phase.name}`}

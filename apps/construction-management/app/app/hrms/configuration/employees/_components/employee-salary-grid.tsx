@@ -1,7 +1,8 @@
 "use client";
 
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { IdCard, Search, SlidersHorizontal } from "lucide-react";
+import { MagnifyingGlassIcon, ReceiptIcon } from "@phosphor-icons/react/ssr";
+import { Search, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
@@ -22,14 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@repo/ui/components/dialog";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Input } from "@repo/ui/components/input";
 import {
   InputGroup,
@@ -361,26 +355,20 @@ export function EmployeeSalaryGrid() {
         </div>
 
         {data.structures.length === 0 ? (
-          <Empty className="bg-card border">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <IdCard />
-              </EmptyMedia>
-              <EmptyTitle>Add a salary structure first</EmptyTitle>
-              <EmptyDescription>
-                Members are paid by a salary structure. Add one, then come back
-                to give each member theirs.
-              </EmptyDescription>
-            </EmptyHeader>
-            <EmptyContent>
+          <EmptyState
+            icon={ReceiptIcon}
+            title="Add a salary structure first"
+            description="Members are paid by a salary structure. Add one, then come back to give each member theirs."
+            className="bg-card border"
+            actions={
               <Link
                 href={`${SALARY_STRUCTURES_PATH}/new`}
                 className={buttonVariants()}
               >
                 Add salary structure
               </Link>
-            </EmptyContent>
-          </Empty>
+            }
+          />
         ) : (
           <form
             noValidate
@@ -443,9 +431,12 @@ export function EmployeeSalaryGrid() {
               </div>
             )}
             {visible.length === 0 ? (
-              <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
-                No member matches “{query.trim()}”.
-              </p>
+              <EmptyState
+                icon={MagnifyingGlassIcon}
+                tone="neutral"
+                title={`No member matches “${query.trim()}”.`}
+                className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm"
+              />
             ) : (
               <ul aria-label="Members" className="space-y-3">
                 {visible.map(({ item, index }) => (

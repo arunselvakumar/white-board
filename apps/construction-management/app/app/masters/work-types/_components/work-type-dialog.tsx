@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { PackageIcon } from "@phosphor-icons/react/ssr";
 import { X } from "lucide-react";
 import { useId } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
@@ -25,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/select";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -256,9 +258,12 @@ export function WorkTypeDialog({
                 }}
               />
               {materials.fields.length === 0 ? (
-                <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-center text-sm">
-                  No Materials assigned.
-                </p>
+                <EmptyState
+                  icon={PackageIcon}
+                  size="sm"
+                  title="No Materials assigned."
+                  className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-center text-sm"
+                />
               ) : (
                 <ul
                   aria-label="Assigned Materials"

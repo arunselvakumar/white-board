@@ -6,6 +6,7 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
+import { PackageIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -29,6 +30,7 @@ import {
   SelectValue,
 } from "@repo/ui/components/select";
 import { Textarea } from "@repo/ui/components/textarea";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FieldError } from "@/components/auth/field-error";
 import { LocationPicker } from "@/app/app/_components/locations/location-picker";
@@ -1460,9 +1462,12 @@ export function EquipmentSheetForm({
     machine == null || !settings.showMaterials ? null : (
       <Section id={id("materials-heading")} title="Material Consumption">
         {lines.fields.length === 0 ? (
-          <p className="text-muted-foreground text-sm">
-            No material consumed. Add grease, oil or spares used, if any.
-          </p>
+          <EmptyState
+            icon={PackageIcon}
+            size="sm"
+            title="No material consumed."
+            description="Add grease, oil or spares used, if any."
+          />
         ) : (
           <ol className="space-y-3">
             {lines.fields.map((field, index) => {

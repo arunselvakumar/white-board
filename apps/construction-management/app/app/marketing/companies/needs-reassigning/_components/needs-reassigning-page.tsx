@@ -1,17 +1,11 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { UserRoundCheck } from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState, type ReactNode } from "react";
+import { UserSwitchIcon } from "@phosphor-icons/react/ssr";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { companyPath } from "@/src/queries/marketing-companies";
@@ -186,18 +180,12 @@ export function NeedsReassigningPage({
           meta="Companies and open Follow-ups of people who are no longer active Marketing People."
         />
         {none ? (
-          <Empty className="bg-card border">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <UserRoundCheck />
-              </EmptyMedia>
-              <EmptyTitle>Nothing needs reassigning</EmptyTitle>
-              <EmptyDescription>
-                When a Marketing Person leaves, their Prospect Companies and
-                open Follow-ups show here for someone else to take over.
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
+          <EmptyState
+            icon={UserSwitchIcon}
+            title="Nothing needs reassigning"
+            description="When a Marketing Person leaves, their Prospect Companies and open Follow-ups show here for someone else to take over."
+            className="bg-card border"
+          />
         ) : (
           <>
             <Section

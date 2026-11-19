@@ -9,6 +9,7 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
+import { FlaskIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -28,14 +29,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { uploadErrorMessage } from "@/src/queries/direct-upload";
@@ -257,20 +251,17 @@ export function TestingReportsPage({
       </div>
 
       {data.items.length === 0 ? (
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <FlaskConical />
-            </EmptyMedia>
-            <EmptyTitle>No testing materials yet</EmptyTitle>
-            <EmptyDescription>
-              {canCreate
-                ? "Add a material you send to the lab, then keep its reports under it."
-                : "Materials tested on this Project and their lab reports show here."}
-            </EmptyDescription>
-          </EmptyHeader>
-          {canCreate ? <EmptyContent>{addButton}</EmptyContent> : null}
-        </Empty>
+        <EmptyState
+          className="bg-card border"
+          icon={FlaskIcon}
+          title="No testing materials yet"
+          description={
+            canCreate
+              ? "Add a material you send to the lab, then keep its reports under it."
+              : "Materials tested on this Project and their lab reports show here."
+          }
+          actions={canCreate ? addButton : null}
+        />
       ) : (
         <ul
           aria-label="Testing materials"

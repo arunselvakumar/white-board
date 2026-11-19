@@ -2,6 +2,7 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense, useState, useTransition } from "react";
+import { ReceiptIcon } from "@phosphor-icons/react/ssr";
 import { Badge } from "@repo/ui/components/badge";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
@@ -14,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import {
   PageHeader,
@@ -227,10 +229,16 @@ function LedgerBody({
         </dl>
       </section>
       {data.entries.length === 0 ? (
-        <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
-          Nothing moved through this account between {formatDate(data.from)} and{" "}
-          {formatDate(data.to)}.
-        </p>
+        <EmptyState
+          icon={ReceiptIcon}
+          title={
+            <>
+              Nothing moved through this account between {formatDate(data.from)}{" "}
+              and {formatDate(data.to)}.
+            </>
+          }
+          className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm"
+        />
       ) : (
         <>
           <div className="bg-card hidden overflow-x-auto rounded-lg border md:block">

@@ -1,9 +1,11 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { MagnifyingGlassIcon } from "@phosphor-icons/react/ssr";
 import { Plus } from "lucide-react";
 import { Suspense, useMemo, useState } from "react";
 import { Button } from "@repo/ui/components/button";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -114,9 +116,12 @@ function LookupListContent({ config }: { config: LookupScreenConfig }) {
             />
             <FormAlert message={listError} />
             {items.length === 0 ? (
-              <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
-                No {config.singular} matches “{query.trim()}”.
-              </p>
+              <EmptyState
+                icon={MagnifyingGlassIcon}
+                tone="neutral"
+                title={`No ${config.singular} matches “${query.trim()}”.`}
+                className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm"
+              />
             ) : (
               <ul
                 aria-label={config.plural}

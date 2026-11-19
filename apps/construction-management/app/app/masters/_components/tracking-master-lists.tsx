@@ -1,11 +1,18 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { CircleAlert, Plus, Tag, type LucideIcon } from "lucide-react";
+import type { Icon } from "@phosphor-icons/react";
+import {
+  MagnifyingGlassIcon,
+  TagIcon,
+  WarningIcon,
+} from "@phosphor-icons/react/ssr";
+import { Plus } from "lucide-react";
 import { Suspense, useMemo, useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -40,7 +47,7 @@ type Screen = {
   singular: string;
   plural: string;
   description: string;
-  icon: LucideIcon;
+  icon: Icon;
   emptyTitle: string;
   emptyDescription: string;
   inUseLine: string;
@@ -56,7 +63,7 @@ const SCREENS: Record<TrackingMasterList, Screen> = {
     plural: "Issue Categories",
     description:
       "What an issue or snag is about. Disabled ones leave the issue form; old issues keep them.",
-    icon: CircleAlert,
+    icon: WarningIcon,
     emptyTitle: "No Issue Categories",
     emptyDescription:
       "Add what your issues and snags are about, like Quality or Safety.",
@@ -71,7 +78,7 @@ const SCREENS: Record<TrackingMasterList, Screen> = {
     plural: "Tags",
     description:
       "Labels on Tasks, to find and filter them. The Task form can add one as you type.",
-    icon: Tag,
+    icon: TagIcon,
     emptyTitle: "No Tags yet",
     emptyDescription:
       "Add labels for your Tasks, like Critical path or Monsoon work.",
@@ -156,9 +163,12 @@ function TrackingMasterListContent({ screen }: { screen: Screen }) {
             />
             <FormAlert message={listError} />
             {items.length === 0 ? (
-              <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
-                No {screen.singular} matches “{query.trim()}”.
-              </p>
+              <EmptyState
+                icon={MagnifyingGlassIcon}
+                tone="neutral"
+                title={`No ${screen.singular} matches “${query.trim()}”.`}
+                className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm"
+              />
             ) : (
               <ul
                 aria-label={screen.plural}

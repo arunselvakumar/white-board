@@ -1,16 +1,11 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { CalendarPlus, RefreshCw, Scale } from "lucide-react";
+import { LockSimpleIcon, UsersThreeIcon } from "@phosphor-icons/react/ssr";
+import { CalendarPlus, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Label } from "@repo/ui/components/label";
 import {
   Select,
@@ -55,18 +50,14 @@ export function LeaveBalancesPage() {
           <h2 className="text-xl font-semibold tracking-tight">
             Leave Balances
           </h2>
-          <Empty className="bg-card border">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <Scale />
-              </EmptyMedia>
-              <EmptyTitle>Team balances are not shared with you</EmptyTitle>
-              <EmptyDescription>
-                Seeing everyone&apos;s balances needs View All on Leave
-                Management. Your own balances are on My Leaves.
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
+          <EmptyState
+            icon={LockSimpleIcon}
+            tone="neutral"
+            orbit={false}
+            title="Team balances are not shared with you"
+            description="Seeing everyone's balances needs View All on Leave Management. Your own balances are on My Leaves."
+            className="bg-card border"
+          />
         </div>
       </div>
     );
@@ -194,7 +185,7 @@ function TeamBalances({ canManage }: { canManage: boolean }) {
 
         {data.members.length === 0 ? (
           <MasterEmpty
-            icon={Scale}
+            icon={UsersThreeIcon}
             title="No Team Members yet"
             description="Balances appear here once Team Members have joined."
             action={null}

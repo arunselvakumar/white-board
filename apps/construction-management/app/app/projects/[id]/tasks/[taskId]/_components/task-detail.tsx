@@ -10,6 +10,10 @@ import {
   Trash2,
   TrendingUp,
 } from "lucide-react";
+import {
+  ClockCounterClockwiseIcon,
+  ListChecksIcon,
+} from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, useState, type ReactNode } from "react";
@@ -23,6 +27,7 @@ import {
   AlertDialogTitle,
 } from "@repo/ui/components/alert-dialog";
 import { Button, buttonVariants } from "@repo/ui/components/button";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { LocationLabel } from "@/app/app/_components/locations/location-picker";
@@ -192,7 +197,11 @@ function ProgressList({
   const [error, setError] = useState<string | undefined>();
   if (data.items.length === 0)
     return (
-      <p className="text-muted-foreground text-sm">No progress recorded yet.</p>
+      <EmptyState
+        icon={ListChecksIcon}
+        size="sm"
+        title="No progress recorded yet."
+      />
     );
   return (
     <>
@@ -332,7 +341,13 @@ function ProgressList({
 function ActivityFeed({ task }: { task: Detail }) {
   const { data } = useSuspenseQuery(taskActivityQuery(task.id));
   if (data.items.length === 0)
-    return <p className="text-muted-foreground text-sm">No activity yet.</p>;
+    return (
+      <EmptyState
+        icon={ClockCounterClockwiseIcon}
+        size="sm"
+        title="No activity yet."
+      />
+    );
   return (
     <ol aria-label="Activity" className="space-y-2 border-l pl-4">
       {data.items.map((row) => (

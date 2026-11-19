@@ -1,5 +1,6 @@
 "use client";
 
+import { MagnifyingGlassIcon } from "@phosphor-icons/react/ssr";
 import { ChevronRight, Search } from "lucide-react";
 import {
   memo,
@@ -32,6 +33,7 @@ import {
   TableRow,
 } from "@repo/ui/components/table";
 import { cn } from "@repo/ui/lib/utils";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import {
   byCategory,
@@ -310,9 +312,12 @@ export function PermissionMatrix({
         )}
       </div>
       {categories.length === 0 ? (
-        <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
-          No menu matches “{query.trim()}”.
-        </p>
+        <EmptyState
+          icon={MagnifyingGlassIcon}
+          tone="neutral"
+          title={`No menu matches “${query.trim()}”.`}
+          className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm"
+        />
       ) : (
         categories.map((category) => (
           <CategorySection

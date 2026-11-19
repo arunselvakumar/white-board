@@ -1,13 +1,8 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import {
-  ChevronDown,
-  ChevronRight,
-  ListTree,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { ChevronDown, ChevronRight, Plus, Trash2 } from "lucide-react";
+import { ListChecksIcon, MagnifyingGlassIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
@@ -21,14 +16,7 @@ import {
 } from "@repo/ui/components/alert-dialog";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
@@ -241,22 +229,18 @@ export function TaskTree({
   const filtered = tasksFiltered(filters);
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <ListTree />
-          </EmptyMedia>
-          <EmptyTitle>
-            {filtered ? "No tasks match" : "No tasks yet"}
-          </EmptyTitle>
-          <EmptyDescription>
-            {filtered
-              ? "Try another status, assignee or date range."
-              : "Plan the Project as tasks and sub-tasks with dates, work and price, then record progress as work gets done."}
-          </EmptyDescription>
-        </EmptyHeader>
-        {!filtered && canCreate && (
-          <EmptyContent>
+      <EmptyState
+        className="bg-card border"
+        icon={filtered ? MagnifyingGlassIcon : ListChecksIcon}
+        tone={filtered ? "neutral" : "brand"}
+        title={filtered ? "No tasks match" : "No tasks yet"}
+        description={
+          filtered
+            ? "Try another status, assignee or date range."
+            : "Plan the Project as tasks and sub-tasks with dates, work and price, then record progress as work gets done."
+        }
+        actions={
+          !filtered && canCreate ? (
             <Link
               href={pageHref("/app/projects/[id]/tasks/new", {
                 id: projectId,
@@ -266,9 +250,9 @@ export function TaskTree({
               <Plus aria-hidden="true" />
               Add Task
             </Link>
-          </EmptyContent>
-        )}
-      </Empty>
+          ) : null
+        }
+      />
     );
 
   const count = deleteCount(data.items, selected);

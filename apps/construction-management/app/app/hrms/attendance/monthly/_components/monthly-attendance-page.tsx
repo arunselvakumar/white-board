@@ -1,7 +1,8 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { CalendarDays, Download } from "lucide-react";
+import { UsersThreeIcon } from "@phosphor-icons/react/ssr";
+import { Download } from "lucide-react";
 import { useDeferredValue, useState } from "react";
 import { buttonVariants } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
@@ -47,7 +48,7 @@ function Grid({ month }: { month: string }) {
   if (data.rows.length === 0)
     return (
       <HrmsEmpty
-        icon={CalendarDays}
+        icon={UsersThreeIcon}
         title="No Team Members yet"
         description="Add Team Members in Masters → Team Members. Once they join the Company they appear here with their month."
       />

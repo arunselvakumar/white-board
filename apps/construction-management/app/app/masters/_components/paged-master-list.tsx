@@ -1,13 +1,9 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import {
-  CircleCheck,
-  CircleOff,
-  LayoutGrid,
-  Plus,
-  type LucideIcon,
-} from "lucide-react";
+import type { Icon } from "@phosphor-icons/react";
+import { MagnifyingGlassIcon } from "@phosphor-icons/react/ssr";
+import { CircleCheck, CircleOff, LayoutGrid, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -21,6 +17,7 @@ import {
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { FilterTabs, type FilterTab } from "@repo/ui/components/filter-tabs";
 import { cn } from "@repo/ui/lib/utils";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -56,7 +53,7 @@ export type PagedMasterScreen<L extends MaterialMasterList> = {
   singular: string;
   plural: string;
   description: string;
-  icon: LucideIcon;
+  icon: Icon;
   emptyDescription: string;
   deleteDescription: string;
   searchLabel: string;
@@ -233,9 +230,12 @@ function PagedRows<L extends MaterialMasterList>({
     Object.values(filter.extra ?? {}).some((value) => value != null);
   if (items.length === 0)
     return filtered ? (
-      <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
-        No {screen.singular} matches these filters.
-      </p>
+      <EmptyState
+        icon={MagnifyingGlassIcon}
+        tone="neutral"
+        title={`No ${screen.singular} matches these filters.`}
+        className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm"
+      />
     ) : (
       <MasterEmpty
         icon={screen.icon}

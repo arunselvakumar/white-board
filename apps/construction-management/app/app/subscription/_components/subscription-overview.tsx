@@ -1,6 +1,7 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { ReceiptIcon } from "@phosphor-icons/react/ssr";
 import { CalendarClock, FileText } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@repo/ui/components/alert";
@@ -13,12 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/card";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   Progress,
   ProgressLabel,
@@ -150,14 +146,13 @@ function Invoices() {
         Invoices
       </h2>
       {data.items.length === 0 ? (
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyTitle>No invoices yet</EmptyTitle>
-            <EmptyDescription>
-              A tax invoice appears here after each payment.
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+        <EmptyState
+          icon={ReceiptIcon}
+          size="md"
+          title="No invoices yet"
+          description="A tax invoice appears here after each payment."
+          className="bg-card border"
+        />
       ) : (
         <div className="bg-card rounded-lg border">
           <Table>

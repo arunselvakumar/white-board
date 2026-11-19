@@ -1,9 +1,11 @@
 "use client";
 
 import { MapPin, MapPinOff } from "lucide-react";
+import { CalendarCheckIcon } from "@phosphor-icons/react/ssr";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@repo/ui/components/button";
 import { Spinner } from "@repo/ui/components/spinner";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { cn } from "@repo/ui/lib/utils";
 
 import {
@@ -210,7 +212,11 @@ export function TodayEntries({
         Today
       </h2>
       {entries.length === 0 ? (
-        <p className="text-muted-foreground text-sm">No entries yet today.</p>
+        <EmptyState
+          icon={CalendarCheckIcon}
+          size="sm"
+          title="No entries yet today."
+        />
       ) : (
         <ol aria-label="Today's entries" className="space-y-2">
           {entries.map((entry) => {

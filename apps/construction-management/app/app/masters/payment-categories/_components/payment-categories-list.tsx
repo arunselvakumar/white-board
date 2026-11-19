@@ -1,11 +1,13 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Plus, Tags } from "lucide-react";
+import { MagnifyingGlassIcon, TagIcon } from "@phosphor-icons/react/ssr";
+import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -82,7 +84,7 @@ export function PaymentCategoriesList() {
         />
         {data.items.length === 0 ? (
           <MasterEmpty
-            icon={Tags}
+            icon={TagIcon}
             title="No Payment Categories yet"
             description="Add the heads your money goes to, like Fuel or Site Expenses."
             action={addButton}
@@ -96,9 +98,12 @@ export function PaymentCategoriesList() {
             />
             <FormAlert message={listError} />
             {items.length === 0 ? (
-              <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
-                No Payment Category matches “{query.trim()}”.
-              </p>
+              <EmptyState
+                icon={MagnifyingGlassIcon}
+                tone="neutral"
+                title={`No Payment Category matches “${query.trim()}”.`}
+                className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm"
+              />
             ) : (
               <ul
                 aria-label="Payment Categories"

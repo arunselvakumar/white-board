@@ -1,5 +1,6 @@
 "use client";
 
+import { ClockCounterClockwiseIcon, NoteIcon } from "@phosphor-icons/react/ssr";
 import { formatMobile } from "@repo/auth/construction/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
@@ -35,6 +36,7 @@ import {
 import { Label } from "@repo/ui/components/label";
 import { Textarea } from "@repo/ui/components/textarea";
 import { cn } from "@repo/ui/lib/utils";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FieldError } from "@/components/auth/field-error";
@@ -263,7 +265,7 @@ function Notes({ visit }: { visit: Visit }) {
         </div>
       )}
       {visit.notes.length === 0 ? (
-        <p className="text-muted-foreground text-sm">No notes yet.</p>
+        <EmptyState icon={NoteIcon} size="sm" title="No notes yet." />
       ) : (
         <ol aria-label="Notes" className="divide-y">
           {visit.notes.map((item) => (
@@ -291,7 +293,11 @@ function History({ visit }: { visit: Visit }) {
   return (
     <Card title="History">
       {visit.history.length === 0 ? (
-        <p className="text-muted-foreground text-sm">Nothing yet.</p>
+        <EmptyState
+          icon={ClockCounterClockwiseIcon}
+          size="sm"
+          title="Nothing yet."
+        />
       ) : (
         <ol aria-label="History" className="space-y-3">
           {visit.history.map((item) => (

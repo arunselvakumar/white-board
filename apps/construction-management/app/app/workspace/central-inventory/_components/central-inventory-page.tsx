@@ -1,16 +1,14 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { Download, Package } from "lucide-react";
+import {
+  ClockCounterClockwiseIcon,
+  MagnifyingGlassIcon,
+} from "@phosphor-icons/react/ssr";
+import { Download } from "lucide-react";
 import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import {
@@ -118,18 +116,13 @@ function FilterSelect({
 function Positions({ data }: { data: CentralInventory }) {
   if (data.materials.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <Package />
-          </EmptyMedia>
-          <EmptyTitle>No stock matches</EmptyTitle>
-          <EmptyDescription>
-            Stock shows here once Goods Receipts, transfers or opening stock are
-            recorded at a Project or Store.
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState
+        icon={MagnifyingGlassIcon}
+        tone="neutral"
+        title="No stock matches"
+        description="Stock shows here once Goods Receipts, transfers or opening stock are recorded at a Project or Store."
+        className="bg-card border"
+      />
     );
   return (
     <>
@@ -212,9 +205,11 @@ function Ledger({ filter }: { filter: StockLedgerFilter }) {
   const { data } = useSuspenseQuery(stockLedgerQuery(filter));
   if (data.rows.length === 0)
     return (
-      <p className="text-muted-foreground text-sm">
-        No stock movements in this period.
-      </p>
+      <EmptyState
+        icon={ClockCounterClockwiseIcon}
+        size="md"
+        title="No stock movements in this period."
+      />
     );
   return (
     <ScrollRegion label="Stock Ledger, scrolls sideways">

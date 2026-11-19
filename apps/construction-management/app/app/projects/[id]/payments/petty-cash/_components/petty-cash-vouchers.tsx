@@ -6,20 +6,13 @@ import {
   LayoutGrid,
   type LucideIcon,
   Paperclip,
-  ReceiptText,
 } from "lucide-react";
+import { MagnifyingGlassIcon, ReceiptIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import {
   Table,
@@ -202,28 +195,26 @@ function VoucherRows({
 
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <ReceiptText />
-          </EmptyMedia>
-          <EmptyTitle>
-            {filtered
-              ? "No vouchers match"
-              : filters.scope === "project"
-                ? "No vouchers on this Project"
-                : "No vouchers yet"}
-          </EmptyTitle>
-          <EmptyDescription>
-            {filtered
-              ? "Try another date, type, status or category."
-              : filters.scope === "project"
-                ? "No voucher of this account is on this Project. Show All Projects, or write one."
-                : "Write a Payment, Receipt or Transfer voucher for each cash movement."}
-          </EmptyDescription>
-        </EmptyHeader>
-        {!filtered && canCreate ? (
-          <EmptyContent>
+      <EmptyState
+        className="bg-card border"
+        icon={filtered ? MagnifyingGlassIcon : ReceiptIcon}
+        tone={filtered ? "neutral" : "brand"}
+        title={
+          filtered
+            ? "No vouchers match"
+            : filters.scope === "project"
+              ? "No vouchers on this Project"
+              : "No vouchers yet"
+        }
+        description={
+          filtered
+            ? "Try another date, type, status or category."
+            : filters.scope === "project"
+              ? "No voucher of this account is on this Project. Show All Projects, or write one."
+              : "Write a Payment, Receipt or Transfer voucher for each cash movement."
+        }
+        actions={
+          !filtered && canCreate ? (
             <Link
               href={pageHref(
                 "/app/projects/[id]/payments/petty-cash/new",
@@ -234,9 +225,9 @@ function VoucherRows({
             >
               New voucher
             </Link>
-          </EmptyContent>
-        ) : null}
-      </Empty>
+          ) : null
+        }
+      />
     );
 
   const check = (voucher: PettyCashVoucher) =>

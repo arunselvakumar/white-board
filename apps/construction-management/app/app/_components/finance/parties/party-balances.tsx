@@ -1,17 +1,11 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { HardHat } from "lucide-react";
 import Link from "next/link";
+import { AddressBookIcon } from "@phosphor-icons/react/ssr";
 import { Badge } from "@repo/ui/components/badge";
 import { buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   Table,
   TableBody,
@@ -91,19 +85,18 @@ export function PartyBalances({
 
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <HardHat />
-          </EmptyMedia>
-          <EmptyTitle>No {screen.plural} on this Project</EmptyTitle>
-          <EmptyDescription>
+      <EmptyState
+        icon={AddressBookIcon}
+        title={`No ${screen.plural} on this Project`}
+        description={
+          <>
             {screen.plural} assigned to the Project, and any with invoices or
             payments here, show with their balances. Assign them under the
             Project&apos;s Teams.
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+          </>
+        }
+        className="bg-card border"
+      />
     );
 
   return (

@@ -4,14 +4,17 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import {
   ArrowLeft,
   Eye,
-  FileSearch,
-  FlaskConical,
   MoreHorizontal,
   Pencil,
   Plus,
   Search,
   Trash2,
 } from "lucide-react";
+import {
+  FileXIcon,
+  FlaskIcon,
+  MagnifyingGlassIcon,
+} from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useDeferredValue, useEffect, useState } from "react";
 import {
@@ -31,14 +34,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   InputGroup,
   InputGroupAddon,
@@ -369,20 +365,17 @@ export function TestingItemPage({
       </div>
 
       {item.reportCount === 0 ? (
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <FlaskConical />
-            </EmptyMedia>
-            <EmptyTitle>No reports for {item.name} yet</EmptyTitle>
-            <EmptyDescription>
-              {canCreate
-                ? "Add each lab report as a PDF or a photo, with its date and result."
-                : "Lab reports for this material show here."}
-            </EmptyDescription>
-          </EmptyHeader>
-          {canCreate ? <EmptyContent>{addButton}</EmptyContent> : null}
-        </Empty>
+        <EmptyState
+          className="bg-card border"
+          icon={FlaskIcon}
+          title={`No reports for ${item.name} yet`}
+          description={
+            canCreate
+              ? "Add each lab report as a PDF or a photo, with its date and result."
+              : "Lab reports for this material show here."
+          }
+          actions={canCreate ? addButton : null}
+        />
       ) : (
         <>
           <InputGroup className="sm:max-w-xs">
@@ -402,23 +395,21 @@ export function TestingItemPage({
           </InputGroup>
 
           {data.items.length === 0 ? (
-            <Empty className="bg-card border">
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <FileSearch />
-                </EmptyMedia>
-                <EmptyTitle>
-                  {searching
-                    ? `No reports match “${shownQuery}”`
-                    : "No reports on this page"}
-                </EmptyTitle>
-                <EmptyDescription>
-                  {searching
-                    ? "Search looks at the report name."
-                    : "They were deleted while you looked."}
-                </EmptyDescription>
-              </EmptyHeader>
-              <EmptyContent>
+            <EmptyState
+              className="bg-card border"
+              icon={searching ? MagnifyingGlassIcon : FileXIcon}
+              tone="neutral"
+              title={
+                searching
+                  ? `No reports match “${shownQuery}”`
+                  : "No reports on this page"
+              }
+              description={
+                searching
+                  ? "Search looks at the report name."
+                  : "They were deleted while you looked."
+              }
+              actions={
                 <Button
                   type="button"
                   variant="outline"
@@ -430,8 +421,8 @@ export function TestingItemPage({
                 >
                   {searching ? "Clear search" : "Back to the first page"}
                 </Button>
-              </EmptyContent>
-            </Empty>
+              }
+            />
           ) : (
             <>
               <ul

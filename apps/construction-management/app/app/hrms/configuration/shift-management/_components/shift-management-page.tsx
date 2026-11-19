@@ -1,6 +1,11 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
+import {
+  ClockCounterClockwiseIcon,
+  ClockIcon,
+  MagnifyingGlassIcon,
+} from "@phosphor-icons/react/ssr";
 import { CalendarClock, History } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -15,6 +20,7 @@ import {
   DialogTitle,
 } from "@repo/ui/components/dialog";
 import { Label } from "@repo/ui/components/label";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { MasterSearch } from "@/app/app/_components/masters/master-list-parts";
 import { HRMS_PATH } from "@/lib/hrms-nav";
@@ -64,9 +70,11 @@ function HistoryDialog({
           </DialogDescription>
         </DialogHeader>
         {item.history.length === 0 ? (
-          <p className="text-muted-foreground text-sm">
-            No shift assigned yet; the HRMS Settings day applies.
-          </p>
+          <EmptyState
+            icon={ClockCounterClockwiseIcon}
+            size="sm"
+            title="No shift assigned yet; the HRMS Settings day applies."
+          />
         ) : (
           <ol
             aria-label="Shift history"
@@ -129,7 +137,7 @@ export function ShiftManagementPage() {
         description="Who works which shift or rotation, until changed."
       >
         <HrmsEmpty
-          icon={CalendarClock}
+          icon={ClockIcon}
           title="No active shifts or rotations"
           description="Everyone works the standard day from HRMS Settings. Add a shift or a rotation first, then assign it here."
           action={
@@ -192,9 +200,12 @@ export function ShiftManagementPage() {
         {notice}
       </p>
       {shown.length === 0 ? (
-        <p className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
-          No Team Member matches “{query.trim()}”.
-        </p>
+        <EmptyState
+          icon={MagnifyingGlassIcon}
+          tone="neutral"
+          title={`No Team Member matches “${query.trim()}”.`}
+          className="bg-card text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm"
+        />
       ) : (
         <ul
           aria-label="Team Members"

@@ -1,18 +1,16 @@
 "use client";
 
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, ListX, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import {
+  CalendarCheckIcon,
+  MagnifyingGlassIcon,
+} from "@phosphor-icons/react/ssr";
 import { parseAsString, parseAsStringLiteral, useQueryStates } from "nuqs";
 import { Suspense, useDeferredValue, useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import { Input } from "@repo/ui/components/input";
 import {
@@ -342,19 +340,17 @@ function LogBody({
           </p>
         )}
         {items.length === 0 ? (
-          <Empty className="bg-card border">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <ListX />
-              </EmptyMedia>
-              <EmptyTitle>No entries</EmptyTitle>
-              <EmptyDescription>
-                {filtered
-                  ? "Nobody matches these filters on this day."
-                  : "Nobody was checked in or out on this day."}
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
+          <EmptyState
+            className="bg-card border"
+            icon={filtered ? MagnifyingGlassIcon : CalendarCheckIcon}
+            tone={filtered ? "neutral" : "brand"}
+            title="No entries"
+            description={
+              filtered
+                ? "Nobody matches these filters on this day."
+                : "Nobody was checked in or out on this day."
+            }
+          />
         ) : (
           <ul aria-label="Check-In log" className="space-y-2">
             {items.map((entry) => (

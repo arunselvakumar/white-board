@@ -18,6 +18,10 @@ import {
   UserRound,
   type LucideIcon,
 } from "lucide-react";
+import {
+  FolderSimpleIcon,
+  MagnifyingGlassIcon,
+} from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
@@ -37,14 +41,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { cn } from "@repo/ui/lib/utils";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
@@ -365,26 +362,22 @@ export function ProjectsHome() {
             />
           </header>
           {data.counts.all === 0 ? (
-            <Empty className="bg-card mx-5 mb-5 w-auto border">
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <Building2 />
-                </EmptyMedia>
-                <EmptyTitle>No Projects yet</EmptyTitle>
-                <EmptyDescription>
-                  Add your first Project to start recording labour, attendance
-                  and payments on site.
-                </EmptyDescription>
-              </EmptyHeader>
-              <EmptyContent>
-                {newProjectLink("Add your first Project")}
-              </EmptyContent>
-            </Empty>
+            <EmptyState
+              className="bg-card mx-5 mb-5 w-auto border"
+              icon={FolderSimpleIcon}
+              size="md"
+              title="No Projects yet"
+              description="Add your first Project to start recording labour, attendance and payments on site."
+              actions={newProjectLink("Add your first Project")}
+            />
           ) : items.length === 0 ? (
-            <p className="bg-card text-muted-foreground mx-5 mb-5 rounded-xl border border-dashed p-6 text-center text-sm">
-              No Projects are{" "}
-              {PROJECT_STATUS_LABELS[filter as ProjectStatus].toLowerCase()}.
-            </p>
+            <EmptyState
+              className="bg-card mx-5 mb-5 w-auto border"
+              icon={MagnifyingGlassIcon}
+              size="md"
+              tone="neutral"
+              title={`No Projects are ${PROJECT_STATUS_LABELS[filter as ProjectStatus].toLowerCase()}.`}
+            />
           ) : (
             <div
               role="group"

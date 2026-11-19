@@ -1,6 +1,7 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { WrenchIcon } from "@phosphor-icons/react/ssr";
 import {
   ArrowRightLeft,
   CircleOff,
@@ -23,6 +24,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import {
   PageHeader,
@@ -172,9 +174,12 @@ function MaintenanceLog({
         Maintenance log
       </h2>
       {equipment.maintenance.length === 0 ? (
-        <p className="bg-card text-muted-foreground rounded-lg border p-4 text-sm">
-          No maintenance logged yet.
-        </p>
+        <EmptyState
+          icon={WrenchIcon}
+          size="md"
+          title="No maintenance logged yet."
+          className="bg-card text-muted-foreground rounded-lg border p-4 text-sm"
+        />
       ) : (
         <ul
           className="bg-card divide-y rounded-lg border"

@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Paperclip } from "lucide-react";
+import { ChatTextIcon } from "@phosphor-icons/react/ssr";
 import { useId, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
@@ -11,6 +12,7 @@ import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import { Textarea } from "@repo/ui/components/textarea";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { initials } from "@/app/app/_components/app-shell/user-menu";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -89,10 +91,11 @@ function ThreadBody({ documentType, documentId, heading }: Props) {
   return (
     <div className="space-y-4">
       {data.items.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          No {word}s yet.
-          {data.canComment ? ` Write the first ${word} below.` : null}
-        </p>
+        <EmptyState
+          icon={ChatTextIcon}
+          size="sm"
+          title={`No ${word}s yet.${data.canComment ? ` Write the first ${word} below.` : ""}`}
+        />
       ) : (
         <ol aria-label={heading} className="space-y-4">
           {data.items.map((remark) => (

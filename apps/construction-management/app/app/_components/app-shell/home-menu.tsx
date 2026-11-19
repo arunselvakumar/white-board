@@ -1,5 +1,6 @@
 "use client";
 
+import { MagnifyingGlassIcon } from "@phosphor-icons/react/ssr";
 import { useActiveCompany } from "@repo/auth/construction/react";
 import { ArrowRight, SearchIcon } from "lucide-react";
 import Link from "next/link";
@@ -7,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Input } from "@repo/ui/components/input";
 import { PageWatermark } from "@repo/ui/components/page-watermark";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { APP_NAV_ICONS } from "./app-nav-icons";
 import type { AreaNavGroup } from "./area-nav-menu";
@@ -92,9 +94,12 @@ function MainMenuPage(access: MainMenuAccess) {
 
         <nav aria-label="Main" className="space-y-8">
           {rows.length === 0 && (
-            <p className="text-muted-foreground text-sm">
-              {noMatchMessage(query)}
-            </p>
+            <EmptyState
+              icon={MagnifyingGlassIcon}
+              tone="neutral"
+              size="md"
+              title={noMatchMessage(query)}
+            />
           )}
           {pages.length > 0 && (
             <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

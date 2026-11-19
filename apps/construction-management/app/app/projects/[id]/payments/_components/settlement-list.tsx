@@ -1,13 +1,8 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import {
-  CircleCheck,
-  CircleX,
-  Clock,
-  HandCoins,
-  type LucideIcon,
-} from "lucide-react";
+import { CircleCheck, CircleX, Clock, type LucideIcon } from "lucide-react";
+import { HandCoinsIcon } from "@phosphor-icons/react/ssr";
 import { Suspense, useState, useTransition } from "react";
 import {
   AlertDialog,
@@ -21,13 +16,7 @@ import {
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import { Label } from "@repo/ui/components/label";
 import { Textarea } from "@repo/ui/components/textarea";
@@ -158,22 +147,16 @@ function Settlements({
 
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <HandCoins />
-          </EmptyMedia>
-          <EmptyTitle>
-            {status === "pending"
-              ? "Nothing waiting for approval"
-              : `No ${STATUS_LABELS[status].toLowerCase()} settlements`}
-          </EmptyTitle>
-          <EmptyDescription>
-            Settle invoice on a {screen.label}&apos;s invoice asks to write off
-            what is left; it waits here for someone with Approve on Parties.
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState
+        className="bg-card border"
+        icon={HandCoinsIcon}
+        title={
+          status === "pending"
+            ? "Nothing waiting for approval"
+            : `No ${STATUS_LABELS[status].toLowerCase()} settlements`
+        }
+        description={`Settle invoice on a ${screen.label}'s invoice asks to write off what is left; it waits here for someone with Approve on Parties.`}
+      />
     );
 
   const run = (

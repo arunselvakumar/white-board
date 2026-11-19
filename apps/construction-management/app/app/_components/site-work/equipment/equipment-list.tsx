@@ -1,7 +1,8 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { ChevronRight, Plus, Truck } from "lucide-react";
+import { BulldozerIcon, MagnifyingGlassIcon } from "@phosphor-icons/react/ssr";
+import { ChevronRight, Plus } from "lucide-react";
 import Link from "next/link";
 import { Suspense, useDeferredValue, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
@@ -13,6 +14,7 @@ import {
   SelectValue,
 } from "@repo/ui/components/select";
 import { cn } from "@repo/ui/lib/utils";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import {
@@ -123,12 +125,15 @@ function Rows({
   const { data } = useSuspenseQuery(equipmentListQuery(filters));
   if (data.items.length === 0)
     return filtered ? (
-      <p className="bg-card text-muted-foreground rounded-lg border p-6 text-center text-sm">
-        No equipment matches these filters.
-      </p>
+      <EmptyState
+        icon={MagnifyingGlassIcon}
+        tone="neutral"
+        title="No equipment matches these filters."
+        className="bg-card text-muted-foreground rounded-lg border p-6 text-center text-sm"
+      />
     ) : (
       <MasterEmpty
-        icon={Truck}
+        icon={BulldozerIcon}
         title="No equipment yet"
         description={empty.description}
         action={empty.action}

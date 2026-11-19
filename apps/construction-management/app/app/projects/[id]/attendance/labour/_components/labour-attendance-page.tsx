@@ -7,19 +7,12 @@ import {
   ChevronRight,
   ClipboardCheck,
   ListChecks,
-  Users,
 } from "lucide-react";
+import { UsersThreeIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { Suspense, useDeferredValue, useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import {
@@ -51,23 +44,17 @@ export function shiftDate(date: string, days: number): string {
 
 function NoLabourers() {
   return (
-    <Empty className="bg-card border">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <Users />
-        </EmptyMedia>
-        <EmptyTitle>No Labours on this Project</EmptyTitle>
-        <EmptyDescription>
-          Add Labours to this Project in Human Resources → Labours, or transfer
-          them here, to mark their attendance.
-        </EmptyDescription>
-      </EmptyHeader>
-      <EmptyContent>
+    <EmptyState
+      className="bg-card border"
+      icon={UsersThreeIcon}
+      title="No Labours on this Project"
+      description="Add Labours to this Project in Human Resources → Labours, or transfer them here, to mark their attendance."
+      actions={
         <Link href={LABOURS_PAGE_PATH} className={buttonVariants()}>
           Go to Labours
         </Link>
-      </EmptyContent>
-    </Empty>
+      }
+    />
   );
 }
 

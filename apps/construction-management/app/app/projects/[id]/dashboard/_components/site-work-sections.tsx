@@ -11,6 +11,7 @@ import {
   Truck,
   Hourglass,
 } from "lucide-react";
+import { NotePencilIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 
 import type { Duration } from "@/lib/dashboard-duration";
@@ -29,6 +30,7 @@ import {
 } from "./equipment-usage-charts";
 import { LabourAvailabilityChart } from "./labour-availability-chart";
 import { type AppHref, pageHref } from "@/lib/page-href";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 const NUMBER = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 });
 
@@ -58,9 +60,11 @@ function ContractorLabourTable({
         Contractor-wise labour
       </h3>
       {rows.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          No worksheets in this period.
-        </p>
+        <EmptyState
+          icon={NotePencilIcon}
+          size="sm"
+          title="No worksheets in this period."
+        />
       ) : (
         <table
           aria-labelledby="contractor-labour-heading"

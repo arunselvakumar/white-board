@@ -1,17 +1,12 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowLeft, ClipboardList, Download } from "lucide-react";
+import { PackageIcon } from "@phosphor-icons/react/ssr";
+import { ArrowLeft, Download } from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState } from "react";
 import { buttonVariants } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import {
@@ -58,18 +53,17 @@ function Register({
   const { data } = useSuspenseQuery(stockRegisterQuery(location, range));
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <ClipboardList />
-          </EmptyMedia>
-          <EmptyTitle>Nothing in stock or moved</EmptyTitle>
-          <EmptyDescription>
+      <EmptyState
+        icon={PackageIcon}
+        title="Nothing in stock or moved"
+        description={
+          <>
             No material was held or moved here from {formatDate(range.from)} to{" "}
             {formatDate(range.to)}.
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+          </>
+        }
+        className="bg-card border"
+      />
     );
   return (
     <div

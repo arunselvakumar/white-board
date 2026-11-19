@@ -2,6 +2,7 @@
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowLeft, TriangleAlert } from "lucide-react";
+import { PackageIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, useState, type ReactNode } from "react";
@@ -13,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { LocationLabel } from "@/app/app/_components/locations/location-picker";
@@ -338,7 +340,11 @@ export function EquipmentSheetDetailPage({
           Material Consumption
         </h3>
         {sheet.materials.length === 0 ? (
-          <p className="text-muted-foreground text-sm">No material consumed.</p>
+          <EmptyState
+            icon={PackageIcon}
+            size="sm"
+            title="No material consumed."
+          />
         ) : (
           <ScrollTable label={`Materials of ${sheet.number}`}>
             <TableHeader>

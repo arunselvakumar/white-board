@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ImagesIcon } from "@phosphor-icons/react/ssr";
 import {
   Camera,
   MoreHorizontal,
@@ -41,6 +42,7 @@ import {
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import { Progress } from "@repo/ui/components/progress";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { DocumentFileIcon } from "@/app/app/_components/projects/documents/document-file-icon";
 import { FileThumbnail } from "@/app/app/_components/projects/files/file-thumbnail";
@@ -156,7 +158,11 @@ export function VisitFiles({ visit }: { visit: Visit }) {
         Photos and files
       </h2>
       {files.length === 0 && pending.length === 0 ? (
-        <p className="text-muted-foreground text-sm">No photos or files yet.</p>
+        <EmptyState
+          icon={ImagesIcon}
+          size="sm"
+          title="No photos or files yet."
+        />
       ) : (
         <ul
           aria-label="Photos and files"

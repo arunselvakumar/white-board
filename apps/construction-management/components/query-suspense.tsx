@@ -8,14 +8,9 @@ import {
   Suspense,
   useSyncExternalStore,
 } from "react";
+import { WarningCircleIcon } from "@phosphor-icons/react/ssr";
 import { Button } from "@repo/ui/components/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   SkeletonGroup,
   SkeletonText,
@@ -141,12 +136,14 @@ class QueryErrorBoundary extends Component<
   override render() {
     if (this.state.error != null) {
       return (
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyTitle>Couldn&apos;t load this page</EmptyTitle>
-            <EmptyDescription>Please try again.</EmptyDescription>
-          </EmptyHeader>
-          <EmptyContent>
+        <EmptyState
+          icon={WarningCircleIcon}
+          tone="danger"
+          orbit={false}
+          title="Couldn't load this page"
+          description="Please try again."
+          className="bg-card border"
+          actions={
             <Button
               type="button"
               onClick={() => {
@@ -156,8 +153,8 @@ class QueryErrorBoundary extends Component<
             >
               Try again
             </Button>
-          </EmptyContent>
-        </Empty>
+          }
+        />
       );
     }
 

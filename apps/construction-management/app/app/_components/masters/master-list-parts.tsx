@@ -1,6 +1,7 @@
 "use client";
 
-import { MoreHorizontal, Search, type LucideIcon } from "lucide-react";
+import type { Icon } from "@phosphor-icons/react";
+import { MoreHorizontal, Search } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import {
@@ -22,13 +23,9 @@ import {
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
 import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+  EmptyState,
+  type EmptyStateTone,
+} from "@repo/ui/components/empty-state";
 import {
   InputGroup,
   InputGroupAddon,
@@ -72,27 +69,27 @@ export function MasterSearch({
 }
 
 export function MasterEmpty({
-  icon: Icon,
+  icon,
   title,
   description,
   action,
+  tone,
 }: {
-  icon: LucideIcon;
+  icon: Icon;
   title: string;
   description: string;
-  action: ReactNode;
+  action?: ReactNode;
+  tone?: EmptyStateTone;
 }) {
   return (
-    <Empty className="bg-card border">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <Icon />
-        </EmptyMedia>
-        <EmptyTitle>{title}</EmptyTitle>
-        <EmptyDescription>{description}</EmptyDescription>
-      </EmptyHeader>
-      <EmptyContent>{action}</EmptyContent>
-    </Empty>
+    <EmptyState
+      icon={icon}
+      tone={tone}
+      title={title}
+      description={description}
+      actions={action}
+      className="bg-card border"
+    />
   );
 }
 

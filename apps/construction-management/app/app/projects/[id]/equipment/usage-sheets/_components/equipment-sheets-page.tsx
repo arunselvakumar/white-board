@@ -1,19 +1,13 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { Plus, Settings, Truck } from "lucide-react";
+import { Plus, Settings } from "lucide-react";
+import { BulldozerIcon, MagnifyingGlassIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   Table,
   TableBody,
@@ -369,22 +363,18 @@ function SheetRows({
     return (
       <div className={cn("space-y-4", className)}>
         {(filtered || data.total > 0) && filterBar}
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <Truck />
-            </EmptyMedia>
-            <EmptyTitle>
-              {filtered ? "No usage sheets match" : "No usage sheets yet"}
-            </EmptyTitle>
-            <EmptyDescription>
-              {filtered
-                ? "Try another date, machine or ownership."
-                : "Record each machine's day: the hours or distance it worked, idle and breakdown time, fuel and hire."}
-            </EmptyDescription>
-          </EmptyHeader>
-          {!filtered && canCreate && (
-            <EmptyContent>
+        <EmptyState
+          className="bg-card border"
+          icon={filtered ? MagnifyingGlassIcon : BulldozerIcon}
+          tone={filtered ? "neutral" : "brand"}
+          title={filtered ? "No usage sheets match" : "No usage sheets yet"}
+          description={
+            filtered
+              ? "Try another date, machine or ownership."
+              : "Record each machine's day: the hours or distance it worked, idle and breakdown time, fuel and hire."
+          }
+          actions={
+            !filtered && canCreate ? (
               <Link
                 href={pageHref(
                   "/app/projects/[id]/equipment/usage-sheets/new",
@@ -394,9 +384,9 @@ function SheetRows({
               >
                 Add usage sheet
               </Link>
-            </EmptyContent>
-          )}
-        </Empty>
+            ) : null
+          }
+        />
       </div>
     );
 

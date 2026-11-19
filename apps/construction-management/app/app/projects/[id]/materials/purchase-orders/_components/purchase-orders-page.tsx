@@ -1,26 +1,16 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { CircleCheck, CircleX, Clock, LayoutGrid, Plus } from "lucide-react";
 import {
-  CircleCheck,
-  CircleX,
-  Clock,
-  LayoutGrid,
-  Plus,
-  ShoppingCart,
-} from "lucide-react";
+  MagnifyingGlassIcon,
+  ShoppingCartIcon,
+} from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import {
   Table,
@@ -291,22 +281,20 @@ function PurchaseOrderRows({
     return (
       <div className={cn("space-y-4", className)}>
         {filterBar}
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <ShoppingCart />
-            </EmptyMedia>
-            <EmptyTitle>
-              {filtered ? "No Purchase Orders match" : "No Purchase Orders yet"}
-            </EmptyTitle>
-            <EmptyDescription>
-              {filtered
-                ? "Try another status, date or Supplier."
-                : "Order materials from a Supplier on this Project, from scratch or from an approved Purchase Request."}
-            </EmptyDescription>
-          </EmptyHeader>
-          {!filtered && canCreate && (
-            <EmptyContent>
+        <EmptyState
+          className="bg-card border"
+          icon={filtered ? MagnifyingGlassIcon : ShoppingCartIcon}
+          tone={filtered ? "neutral" : "brand"}
+          title={
+            filtered ? "No Purchase Orders match" : "No Purchase Orders yet"
+          }
+          description={
+            filtered
+              ? "Try another status, date or Supplier."
+              : "Order materials from a Supplier on this Project, from scratch or from an approved Purchase Request."
+          }
+          actions={
+            !filtered && canCreate ? (
               <Link
                 href={pageHref(
                   "/app/projects/[id]/materials/purchase-orders/new",
@@ -316,9 +304,9 @@ function PurchaseOrderRows({
               >
                 Add Purchase Order
               </Link>
-            </EmptyContent>
-          )}
-        </Empty>
+            ) : null
+          }
+        />
       </div>
     );
 

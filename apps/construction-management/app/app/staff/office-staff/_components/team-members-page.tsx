@@ -1,5 +1,6 @@
 "use client";
 
+import { MagnifyingGlassIcon, UsersThreeIcon } from "@phosphor-icons/react/ssr";
 import { useActiveCompany } from "@repo/auth/construction/react";
 import {
   useMutation,
@@ -14,7 +15,6 @@ import {
   MoreHorizontal,
   Plus,
   Search,
-  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { Suspense, useDeferredValue, useState, useTransition } from "react";
@@ -36,14 +36,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { FilterTabs, type FilterTab } from "@repo/ui/components/filter-tabs";
 import {
   InputGroup,
@@ -207,29 +200,25 @@ function TeamMemberRows({
   const filtered = filter.search.trim().length > 0 || filter.status !== "all";
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <Users />
-          </EmptyMedia>
-          <EmptyTitle>
-            {filtered ? "No Staff match" : "No Staff yet"}
-          </EmptyTitle>
-          <EmptyDescription>
-            {filtered
-              ? "Try another name or status."
-              : "Add your site engineers, store keepers and accountants. Invite them by email, or set a password so they sign in with their mobile."}
-          </EmptyDescription>
-        </EmptyHeader>
-        {!filtered && (
-          <EmptyContent>
+      <EmptyState
+        icon={filtered ? MagnifyingGlassIcon : UsersThreeIcon}
+        tone={filtered ? "neutral" : "brand"}
+        title={filtered ? "No Staff match" : "No Staff yet"}
+        description={
+          filtered
+            ? "Try another name or status."
+            : "Add your site engineers, store keepers and accountants. Invite them by email, or set a password so they sign in with their mobile."
+        }
+        className="bg-card border"
+        actions={
+          filtered ? undefined : (
             <Link href={`${STAFF_PATH}/new`} className={buttonVariants()}>
               <Plus />
               Add Staff
             </Link>
-          </EmptyContent>
-        )}
-      </Empty>
+          )
+        }
+      />
     );
 
   return (

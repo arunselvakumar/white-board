@@ -6,25 +6,21 @@ import {
   CircleDashed,
   CirclePlus,
   CircleX,
-  ClipboardList,
   Clock,
   LayoutGrid,
   type LucideIcon,
   Plus,
   ShoppingCart,
 } from "lucide-react";
+import {
+  ClipboardTextIcon,
+  MagnifyingGlassIcon,
+} from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import {
   Table,
@@ -351,24 +347,20 @@ function PurchaseRequestRows({
     return (
       <div className={cn("space-y-4", className)}>
         {filterBar}
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <ClipboardList />
-            </EmptyMedia>
-            <EmptyTitle>
-              {filtered
-                ? "No Purchase Requests match"
-                : "No Purchase Requests yet"}
-            </EmptyTitle>
-            <EmptyDescription>
-              {filtered
-                ? "Try another status, date or material."
-                : "Ask for the materials the site needs. An approver approves the request, then a Purchase Order orders it."}
-            </EmptyDescription>
-          </EmptyHeader>
-          {!filtered && canCreate && (
-            <EmptyContent>
+        <EmptyState
+          className="bg-card border"
+          icon={filtered ? MagnifyingGlassIcon : ClipboardTextIcon}
+          tone={filtered ? "neutral" : "brand"}
+          title={
+            filtered ? "No Purchase Requests match" : "No Purchase Requests yet"
+          }
+          description={
+            filtered
+              ? "Try another status, date or material."
+              : "Ask for the materials the site needs. An approver approves the request, then a Purchase Order orders it."
+          }
+          actions={
+            !filtered && canCreate ? (
               <Link
                 href={pageHref(
                   "/app/projects/[id]/materials/purchase-requests/new",
@@ -378,9 +370,9 @@ function PurchaseRequestRows({
               >
                 Add Purchase Request
               </Link>
-            </EmptyContent>
-          )}
-        </Empty>
+            ) : null
+          }
+        />
       </div>
     );
 

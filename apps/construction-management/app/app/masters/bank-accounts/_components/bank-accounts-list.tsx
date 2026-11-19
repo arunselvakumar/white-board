@@ -1,7 +1,8 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { Landmark, MoreHorizontal, Plus } from "lucide-react";
+import { BankIcon } from "@phosphor-icons/react/ssr";
+import { MoreHorizontal, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -98,7 +99,7 @@ export function BankAccountsList() {
         <FormAlert message={listError} />
         {data.items.length === 0 ? (
           <MasterEmpty
-            icon={Landmark}
+            icon={BankIcon}
             title="No accounts yet"
             description="Add the Company's cash box and bank accounts, with what they held when you started."
             action={addButton}

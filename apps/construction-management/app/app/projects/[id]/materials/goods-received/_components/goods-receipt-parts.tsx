@@ -1,11 +1,7 @@
 "use client";
 
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { LockSimpleIcon } from "@phosphor-icons/react/ssr";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   Select,
   SelectContent,
@@ -138,13 +134,13 @@ export function ChoiceSelect({
 
 export function GoodsReceiptNoAccess({ what }: { what: string }) {
   return (
-    <Empty className="bg-card border">
-      <EmptyHeader>
-        <EmptyTitle>No access to {what}</EmptyTitle>
-        <EmptyDescription>
-          Ask the Owner to give you Material Received in your Permission Matrix.
-        </EmptyDescription>
-      </EmptyHeader>
-    </Empty>
+    <EmptyState
+      className="bg-card border"
+      icon={LockSimpleIcon}
+      tone="neutral"
+      orbit={false}
+      title={`No access to ${what}`}
+      description="Ask the Owner to give you Material Received in your Permission Matrix."
+    />
   );
 }

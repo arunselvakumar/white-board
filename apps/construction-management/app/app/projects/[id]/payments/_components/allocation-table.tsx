@@ -1,6 +1,8 @@
 "use client";
 
+import { ReceiptIcon } from "@phosphor-icons/react/ssr";
 import { Button } from "@repo/ui/components/button";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import {
   isRupees,
@@ -70,10 +72,12 @@ export function AllocationTable({
 }) {
   if (invoices.length === 0)
     return (
-      <p className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
-        No open invoices. The whole payment is an advance; apply it to a later
-        invoice from the payment.
-      </p>
+      <EmptyState
+        className="bg-card border"
+        icon={ReceiptIcon}
+        size="sm"
+        title="No open invoices. The whole payment is an advance; apply it to a later invoice from the payment."
+      />
     );
   return (
     <div className="space-y-2">

@@ -5,7 +5,11 @@ import {
   type InfiniteData,
   type UseSuspenseInfiniteQueryResult,
 } from "@tanstack/react-query";
-import { ChevronDown, History, type LucideIcon } from "lucide-react";
+import {
+  ClockCounterClockwiseIcon,
+  WarningCircleIcon,
+} from "@phosphor-icons/react/ssr";
+import { ChevronDown, type LucideIcon } from "lucide-react";
 import { Component, Suspense, type ReactNode } from "react";
 import { Button } from "@repo/ui/components/button";
 import {
@@ -13,14 +17,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@repo/ui/components/collapsible";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
@@ -220,15 +217,12 @@ export function ActivityFeed({
 }) {
   if (items.length === 0)
     return (
-      <Empty className="border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <History aria-hidden="true" />
-          </EmptyMedia>
-          <EmptyTitle>No activity</EmptyTitle>
-          <EmptyDescription>{emptyMessage}</EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState
+        icon={ClockCounterClockwiseIcon}
+        title="No activity"
+        description={emptyMessage}
+        className="border"
+      />
     );
   return (
     <div className="space-y-4">
@@ -291,12 +285,14 @@ class FeedErrorBoundary extends Component<BoundaryProps, { failed: boolean }> {
   override render() {
     if (!this.state.failed) return this.props.children;
     return (
-      <Empty className="border">
-        <EmptyHeader>
-          <EmptyTitle>Couldn&apos;t load the activity</EmptyTitle>
-          <EmptyDescription>Please try again.</EmptyDescription>
-        </EmptyHeader>
-        <EmptyContent>
+      <EmptyState
+        icon={WarningCircleIcon}
+        tone="danger"
+        orbit={false}
+        title="Couldn't load the activity"
+        description="Please try again."
+        className="border"
+        actions={
           <Button
             type="button"
             onClick={() => {
@@ -306,8 +302,8 @@ class FeedErrorBoundary extends Component<BoundaryProps, { failed: boolean }> {
           >
             Try again
           </Button>
-        </EmptyContent>
-      </Empty>
+        }
+      />
     );
   }
 }

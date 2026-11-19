@@ -5,7 +5,6 @@ import {
   ArrowLeft,
   Download,
   Eye,
-  FileStack,
   FileUp,
   FolderInput,
   History,
@@ -14,6 +13,7 @@ import {
   Trash2,
   Upload,
 } from "lucide-react";
+import { BlueprintIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
@@ -25,14 +25,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { documentMeta } from "@/lib/project-documents";
 import {
@@ -312,24 +305,21 @@ export function DrawingAlbumPage({
       </div>
 
       {drawings.length === 0 ? (
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <FileStack />
-            </EmptyMedia>
-            <EmptyTitle>
-              {canCreate
-                ? `Upload the ${album.name} drawings`
-                : "No drawings in this album yet"}
-            </EmptyTitle>
-            <EmptyDescription>
-              {canCreate
-                ? DRAWING_FILES_HINT
-                : "Drawings uploaded to this album show here."}
-            </EmptyDescription>
-          </EmptyHeader>
-          {canCreate ? <EmptyContent>{uploadButton}</EmptyContent> : null}
-        </Empty>
+        <EmptyState
+          className="bg-card border"
+          icon={BlueprintIcon}
+          title={
+            canCreate
+              ? `Upload the ${album.name} drawings`
+              : "No drawings in this album yet"
+          }
+          description={
+            canCreate
+              ? DRAWING_FILES_HINT
+              : "Drawings uploaded to this album show here."
+          }
+          actions={canCreate ? uploadButton : null}
+        />
       ) : (
         <>
           <ul

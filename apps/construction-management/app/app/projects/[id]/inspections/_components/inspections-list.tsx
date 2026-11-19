@@ -1,26 +1,13 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import {
-  CircleCheck,
-  CircleX,
-  ClipboardCheck,
-  Clock,
-  LayoutGrid,
-  Plus,
-} from "lucide-react";
+import { CircleCheck, CircleX, Clock, LayoutGrid, Plus } from "lucide-react";
+import { MagnifyingGlassIcon, SealCheckIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { Suspense, useState, useTransition } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import { Input } from "@repo/ui/components/input";
 import {
@@ -436,30 +423,28 @@ function Rows({
     return (
       <div className="space-y-4">
         {(filtered || allCount > 0) && tabs}
-        <Empty className="bg-card border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <ClipboardCheck />
-            </EmptyMedia>
-            <EmptyTitle>
-              {filtered
-                ? "No Inspection Requests match"
-                : "No Inspection Requests yet"}
-            </EmptyTitle>
-            <EmptyDescription>
-              {filtered
-                ? "Try another status, contractor, inspector or date."
-                : "Ask an inspector to check work at a location before it is covered up: slab reinforcement, shuttering, waterproofing."}
-            </EmptyDescription>
-          </EmptyHeader>
-          {!filtered && newHref != null && (
-            <EmptyContent>
+        <EmptyState
+          className="bg-card border"
+          icon={filtered ? MagnifyingGlassIcon : SealCheckIcon}
+          tone={filtered ? "neutral" : "brand"}
+          title={
+            filtered
+              ? "No Inspection Requests match"
+              : "No Inspection Requests yet"
+          }
+          description={
+            filtered
+              ? "Try another status, contractor, inspector or date."
+              : "Ask an inspector to check work at a location before it is covered up: slab reinforcement, shuttering, waterproofing."
+          }
+          actions={
+            !filtered && newHref != null ? (
               <Link href={newHref} className={buttonVariants({ size: "sm" })}>
                 Add Inspection Request
               </Link>
-            </EmptyContent>
-          )}
-        </Empty>
+            ) : null
+          }
+        />
       </div>
     );
 

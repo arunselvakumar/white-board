@@ -1,7 +1,8 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { History, MoreHorizontal, Pencil, Trash2, Undo2 } from "lucide-react";
+import { ClockCounterClockwiseIcon } from "@phosphor-icons/react/ssr";
+import { MoreHorizontal, Pencil, Trash2, Undo2 } from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState } from "react";
 import {
@@ -21,13 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   Sheet,
   SheetContent,
@@ -216,18 +211,13 @@ function Entries({
 
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <History />
-          </EmptyMedia>
-          <EmptyTitle>No stock movements yet</EmptyTitle>
-          <EmptyDescription>
-            Receipts, transfers, consumption and adjustments of this material
-            here show in this list.
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState
+        icon={ClockCounterClockwiseIcon}
+        size="sm"
+        title="No stock movements yet"
+        description="Receipts, transfers, consumption and adjustments of this material here show in this list."
+        className="bg-card border"
+      />
     );
 
   return (

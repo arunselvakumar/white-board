@@ -1,13 +1,8 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import {
-  FileSpreadsheet,
-  MoreHorizontal,
-  Plus,
-  UserPlus,
-  Users,
-} from "lucide-react";
+import { FileSpreadsheet, MoreHorizontal, Plus, UserPlus } from "lucide-react";
+import { MagnifyingGlassIcon, UserListIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState, useTransition } from "react";
@@ -18,14 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@repo/ui/components/empty";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { FilterTabs } from "@repo/ui/components/filter-tabs";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
@@ -372,28 +360,24 @@ function InquiryRows({
 
   if (data.items.length === 0)
     return (
-      <Empty className="bg-card border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <Users />
-          </EmptyMedia>
-          <EmptyTitle>
-            {filtered ? "No inquiries match" : "No inquiries yet"}
-          </EmptyTitle>
-          <EmptyDescription>
-            {filtered
-              ? "Try another status, stage or follow-up."
-              : "Add every walk-in, call and referral here, then follow each one up until it is booked or lost."}
-          </EmptyDescription>
-        </EmptyHeader>
-        {!filtered && canCreate && (
-          <EmptyContent>
+      <EmptyState
+        className="bg-card border"
+        icon={filtered ? MagnifyingGlassIcon : UserListIcon}
+        tone={filtered ? "neutral" : "brand"}
+        title={filtered ? "No inquiries match" : "No inquiries yet"}
+        description={
+          filtered
+            ? "Try another status, stage or follow-up."
+            : "Add every walk-in, call and referral here, then follow each one up until it is booked or lost."
+        }
+        actions={
+          !filtered && canCreate ? (
             <Link href={newHref} className={buttonVariants({ size: "sm" })}>
               Add Inquiry
             </Link>
-          </EmptyContent>
-        )}
-      </Empty>
+          ) : null
+        }
+      />
     );
 
   return (

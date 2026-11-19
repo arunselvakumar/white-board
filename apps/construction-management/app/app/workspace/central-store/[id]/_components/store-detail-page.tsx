@@ -1,6 +1,13 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import type { Icon } from "@phosphor-icons/react";
+import {
+  FolderSimpleIcon,
+  LockSimpleIcon,
+  TruckIcon,
+  UsersThreeIcon,
+} from "@phosphor-icons/react/ssr";
 import {
   ArrowLeftRight,
   ClipboardList,
@@ -20,6 +27,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components/tabs";
+import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { DeliveryNotesList } from "@/app/app/_components/procurement/delivery-notes/delivery-notes-list";
@@ -44,16 +52,18 @@ function Assigned({
   title,
   items,
   empty,
+  icon,
 }: {
   title: string;
   items: Store["projects"];
   empty: string;
+  icon: Icon;
 }) {
   return (
     <section className="space-y-2">
       <h3 className="text-sm font-medium">{title}</h3>
       {items.length === 0 ? (
-        <p className="text-muted-foreground text-sm">{empty}</p>
+        <EmptyState icon={icon} size="sm" title={empty} />
       ) : (
         <ul aria-label={title} className="flex flex-wrap gap-2">
           {items.map((item) => (
@@ -154,16 +164,19 @@ export function StoreDetailPage({ storeId }: { storeId: string }) {
           <TabsContent value="projects" className="space-y-5">
             <Assigned
               title="Projects"
+              icon={FolderSimpleIcon}
               items={store.projects}
               empty="No Projects."
             />
             <Assigned
               title="Store keepers"
+              icon={UsersThreeIcon}
               items={store.keepers}
               empty="No store keepers yet."
             />
             <Assigned
               title="Suppliers"
+              icon={TruckIcon}
               items={store.suppliers}
               empty="No Suppliers yet."
             />
@@ -181,10 +194,13 @@ export function StoreDetailPage({ storeId }: { storeId: string }) {
                 />
               </Suspense>
             ) : (
-              <p className="text-muted-foreground text-sm">
-                You cannot see Material Requests. Ask the Owner for Central
-                Store (MR) access.
-              </p>
+              <EmptyState
+                icon={LockSimpleIcon}
+                tone="neutral"
+                orbit={false}
+                title="You cannot see Material Requests."
+                description="Ask the Owner for Central Store (MR) access."
+              />
             )}
           </TabsContent>
           <TabsContent value="notes">
@@ -200,10 +216,13 @@ export function StoreDetailPage({ storeId }: { storeId: string }) {
                 <DeliveryNotesList storeId={store.id} />
               </Suspense>
             ) : (
-              <p className="text-muted-foreground text-sm">
-                You cannot see Delivery Notes. Ask the Owner for Delivery Note
-                access.
-              </p>
+              <EmptyState
+                icon={LockSimpleIcon}
+                tone="neutral"
+                orbit={false}
+                title="You cannot see Delivery Notes."
+                description="Ask the Owner for Delivery Note access."
+              />
             )}
           </TabsContent>
           <TabsContent value="transfers">

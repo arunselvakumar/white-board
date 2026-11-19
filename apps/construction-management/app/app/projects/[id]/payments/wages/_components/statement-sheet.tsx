@@ -2,6 +2,7 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { FileText } from "lucide-react";
+import { ReceiptIcon } from "@phosphor-icons/react/ssr";
 import { Suspense, useState } from "react";
 import {
   AlertDialog,
@@ -21,6 +22,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@repo/ui/components/sheet";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
@@ -142,9 +144,11 @@ function StatementLines({
       </dl>
       <FormAlert message={error} />
       {data.lines.length === 0 ? (
-        <p className="text-muted-foreground py-6 text-center text-sm">
-          No entries in this period.
-        </p>
+        <EmptyState
+          icon={ReceiptIcon}
+          size="sm"
+          title="No entries in this period."
+        />
       ) : (
         <ol aria-label="Entries" className="space-y-2">
           {data.lines.map((line) => {

@@ -6,7 +6,8 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { Check, ListChecks, X } from "lucide-react";
+import { CalendarCheckIcon } from "@phosphor-icons/react/ssr";
+import { Check, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -159,7 +160,7 @@ function ApprovalList() {
   if (data.items.length === 0)
     return (
       <HrmsEmpty
-        icon={ListChecks}
+        icon={CalendarCheckIcon}
         title="Nothing to approve"
         description="Back-dated days, missed checkouts and check-ins outside the fence appear here for a decision."
       />

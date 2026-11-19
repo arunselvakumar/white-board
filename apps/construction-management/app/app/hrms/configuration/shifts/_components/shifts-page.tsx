@@ -5,6 +5,7 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
+import { ArrowsClockwiseIcon, ClockIcon } from "@phosphor-icons/react/ssr";
 import { Clock, Plus, Repeat } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
@@ -187,7 +188,7 @@ export function ShiftsPage({
         <TabsContent value="shifts" className="pt-3">
           {shifts.items.length === 0 ? (
             <HrmsEmpty
-              icon={Clock}
+              icon={ClockIcon}
               title="No shifts yet"
               description="Until a member has a shift, their day follows the HRMS Settings: working hours, half day, grace and working days. Add a shift for a different start time or a night shift."
               action={addShift}
@@ -244,7 +245,7 @@ export function ShiftsPage({
         <TabsContent value="rotations" className="pt-3">
           {rotations.items.length === 0 ? (
             <HrmsEmpty
-              icon={Repeat}
+              icon={ArrowsClockwiseIcon}
               title="No rotations yet"
               description={
                 anyActiveShift

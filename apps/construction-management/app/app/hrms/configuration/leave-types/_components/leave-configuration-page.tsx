@@ -1,6 +1,7 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { CalendarXIcon, StackIcon } from "@phosphor-icons/react/ssr";
 import {
   CalendarOff,
   Layers,
@@ -158,7 +159,7 @@ function LeaveTypesTab() {
     <div className="space-y-3">
       {data.items.length === 0 ? (
         <MasterEmpty
-          icon={Layers}
+          icon={CalendarXIcon}
           title="No leave types yet"
           description="Add the kinds of leave your Company gives, like Casual Leave or Sick."
           action={addButton}
@@ -343,7 +344,7 @@ function StructuresTab({ today }: { today: string }) {
     <div className="space-y-6">
       {structures.items.length === 0 ? (
         <MasterEmpty
-          icon={Layers}
+          icon={StackIcon}
           title="No leave structures yet"
           description="A structure bundles leave types with the days Team Members get, like “Office staff” or “Site staff”. Without one, everyone gets every active type at its yearly limit."
           action={addButton}

@@ -2,6 +2,7 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense, useDeferredValue, useState } from "react";
+import { UsersThreeIcon } from "@phosphor-icons/react/ssr";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import {
@@ -13,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { EmptyState } from "@repo/ui/components/empty-state";
 import { cn } from "@repo/ui/lib/utils";
 
 import { formatPaise } from "@/components/money/money-input";
@@ -78,9 +80,11 @@ function Grid({ projectId, month }: { projectId: string; month: string }) {
   );
   if (data.labourers.length === 0)
     return (
-      <p className="bg-card text-muted-foreground rounded-lg border p-6 text-center text-sm">
-        No Labours on this Project in this month.
-      </p>
+      <EmptyState
+        className="bg-card border"
+        icon={UsersThreeIcon}
+        title="No Labours on this Project in this month."
+      />
     );
   const counts = new Map(data.dayCounts.map((row) => [row.date, row]));
   return (
