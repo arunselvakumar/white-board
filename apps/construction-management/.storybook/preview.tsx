@@ -9,6 +9,7 @@ import { TooltipProvider } from "@repo/ui/components/tooltip";
 import { sb } from "storybook/test";
 
 import "@repo/ui/globals.css";
+import { MENU_LAYOUT_KEY } from "../app/app/_components/app-shell/menu-layout";
 import { QueryProvider } from "../components/query-provider";
 import { getQueryClient } from "../src/queries/query-client";
 import { resetAuthMocks } from "./mocks/auth";
@@ -125,6 +126,11 @@ const preview: Preview = {
     resetAuthMocks();
     // One browser query client serves every story; start each one empty.
     getQueryClient().clear();
+    // Every story file shares one localStorage, and a file's last story is
+    // never cleaned up: the Home stories left the full-page menu layout
+    // behind, and the next file's shell had no sidebar. Each story starts
+    // on a device with no choice saved (the sidebar layout).
+    window.localStorage.removeItem(MENU_LAYOUT_KEY);
   },
 };
 

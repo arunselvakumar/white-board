@@ -164,6 +164,10 @@ jobs:
       - name: Build
         if: steps.affected.outputs.build == 'true'
         run: bunx vercel@63.1.2 build --token="$VERCEL_TOKEN"
+        # As in CI's Build job: Construction Management's build ran out of
+        # Node's default heap (about 4 GB) here once main reached #203.
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
 
       # Vercel refuses any uploaded file over 100 MB. Next's build trace
       # (diagnostics/trace, over 100 MB for this app) is only for Vercel's
