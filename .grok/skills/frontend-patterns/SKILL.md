@@ -37,7 +37,22 @@ Authenticated chrome is `AppShell`: `Sidebar` + `SidebarInset` from `@repo/ui`. 
 
 The shell stays mounted while a page loads. Put `QuerySuspense` around `{children}` in the in-app layout, not around the sidebar.
 
-Empty titled pages use `PagePlaceholder` (`Empty` from `@repo/ui`). Page reads use `useSuspenseQuery` — see the `tanstack-query` skill.
+Empty titled pages use `PagePlaceholder`. Page reads use `useSuspenseQuery` — see the `tanstack-query` skill.
+
+## Empty states
+
+Every empty list, tab, page, load error and no-access screen uses `EmptyState` from `@repo/ui/components/empty-state`, not the `Empty` primitives. Pass a Phosphor icon component imported from `@phosphor-icons/react/ssr` (it works in Server Components too), a `title`, an optional `description`, and buttons in `actions`. Stories: `components/ui/empty-state.stories.tsx` in each app.
+
+| Where                                   | Props                                                 |
+| --------------------------------------- | ----------------------------------------------------- |
+| Whole page or tab panel                 | `size="lg"` (default)                                 |
+| Inside a Card or page section           | `size="md"`                                           |
+| Table, sheet, dialog, list, side column | `size="sm"` (no orbit)                                |
+| Search or filter matched nothing        | `MagnifyingGlassIcon`, `tone="neutral"`               |
+| Couldn't load / error boundary          | `WarningCircleIcon`, `tone="danger"`, `orbit={false}` |
+| No access, not found                    | `tone="neutral"`, `orbit={false}`                     |
+
+Pick the icon for the thing that is missing (a folder for Projects, people for Labour). Lucide stays the icon set for everything else.
 
 ## Select
 
