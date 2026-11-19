@@ -31,6 +31,7 @@
     "@expo-google-fonts/noto-sans-telugu": "0.4.2",
     "@hookform/resolvers": "^5.9.1",
     "@pdf-lib/fontkit": "1.1.1",
+    "@phosphor-icons/react": "^2.1.10",
     "@repo/auth": "*",
     "@repo/construction-db": "*",
     "@repo/email-templates": "*",
