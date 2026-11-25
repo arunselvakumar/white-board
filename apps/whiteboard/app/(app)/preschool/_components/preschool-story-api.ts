@@ -7,7 +7,11 @@ import { preschoolKeys, type PreschoolMe } from "@/src/queries/preschool/me";
 // answer for /api/preschool/me, and handlers for the rest of /api/preschool.
 
 export type PreschoolApiReply = { status?: number; json?: unknown };
-export type PreschoolApiHandler = (body: unknown) => PreschoolApiReply;
+/** `url` carries the query string (`?centreId=…`). */
+export type PreschoolApiHandler = (
+  body: unknown,
+  url: URL,
+) => PreschoolApiReply;
 export type PreschoolApiCall = { route: string; body: unknown };
 
 export const CENTRE_IDS = {
@@ -115,7 +119,7 @@ export function mockPreschoolApi({
     const body: unknown =
       typeof init?.body === "string" ? JSON.parse(init.body) : undefined;
     calls.push({ route, body });
-    const reply = handler(body);
+    const reply = handler(body, url);
     return Promise.resolve(
       reply.status === 204
         ? new Response(null, { status: 204 })
