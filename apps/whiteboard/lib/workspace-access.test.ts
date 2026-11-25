@@ -293,6 +293,8 @@ describe("Preschool role access", () => {
       "/preschool/stock",
       "/preschool/staff",
       "/preschool/enquiries",
+      "/preschool/enquiries/new",
+      "/preschool/children/new",
       "/preschool/classrooms",
     ])
       expect(isAllowedPreschoolPath(path, "centre_head")).toBe(true);
@@ -309,11 +311,13 @@ describe("Preschool role access", () => {
       "/preschool/programmes",
       "/preschool/stock",
       "/preschool/enquiries/abc",
+      "/preschool/children/new",
     ])
       expect(isAllowedPreschoolPath(path, "teacher")).toBe(false);
     for (const path of [
       "/preschool/attendance",
       "/preschool/daily-reports",
+      "/preschool/children",
       "/preschool/children/abc",
       "/preschool/progress",
       "/preschool/announcements",
