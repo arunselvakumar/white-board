@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { mainMenuAccess } from "@/app/app/_lib/main-menu-access";
-import { visibleDepartments } from "@/lib/departments-nav";
+import { MANAGE_DEPARTMENTS, visibleDepartments } from "@/lib/departments-nav";
 
 import { DepartmentPage } from "./_components/department-page";
 
@@ -9,7 +9,8 @@ export const metadata: Metadata = { title: "Departments" };
 
 /**
  * Departments (ADR CM-0046): a card per department the viewer may open,
- * Human Resources, then Marketing when the Role opens one of its entries.
+ * Human Resources, then Marketing when the Role opens one of its entries,
+ * then Manage Departments with Departments Read (ADR CM-0049).
  */
 export default async function DepartmentsPage() {
   const access = await mainMenuAccess();
@@ -19,14 +20,17 @@ export default async function DepartmentsPage() {
       meta="Your Company's departments and their screens."
       groups={[
         {
-          sections: visibleDepartments(access).map(
-            ({ department: { href, label, description, icon } }) => ({
-              href,
-              label,
-              description,
-              icon,
-            }),
-          ),
+          sections: [
+            ...visibleDepartments(access).map(
+              ({ department: { href, label, description, icon } }) => ({
+                href,
+                label,
+                description,
+                icon,
+              }),
+            ),
+            ...(access.canManageDepartments ? [MANAGE_DEPARTMENTS] : []),
+          ],
         },
       ]}
     />

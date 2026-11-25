@@ -4,7 +4,11 @@ import { expect, fn, waitFor, within } from "storybook/test";
 import { AppAreaPage } from "@/app/app/_components/app-shell/app-area-page";
 import { AppShell } from "@/app/app/_components/app-shell/app-shell";
 import { APP_NAV, appPageByHref, type AppNavHref } from "@/lib/app-nav";
-import { HUMAN_RESOURCES, MARKETING_DEPARTMENT } from "@/lib/departments-nav";
+import {
+  HUMAN_RESOURCES,
+  MANAGE_DEPARTMENTS,
+  MARKETING_DEPARTMENT,
+} from "@/lib/departments-nav";
 import {
   FULL_MARKETING_ACCESS,
   NO_MARKETING_ACCESS,
@@ -184,11 +188,16 @@ function topLevelLinks(nav: Awaited<ReturnType<typeof mainMenu>>) {
 function shellOn(
   pathname: string,
   marketing: MarketingMenuAccess = FULL_MARKETING_ACCESS,
+  canManageDepartments = true,
 ) {
   return {
     parameters: { nextjs: { navigation: { pathname } } },
     render: () => (
-      <AppShell canOpenDashboard marketing={marketing}>
+      <AppShell
+        canOpenDashboard
+        marketing={marketing}
+        canManageDepartments={canManageDepartments}
+      >
         <p>A screen</p>
       </AppShell>
     ),
@@ -197,7 +206,8 @@ function shellOn(
 
 /**
  * Departments (ADR CM-0046) sits after Projects and folds out into Human
- * Resources and Marketing, each a link to its page of cards. Their screens
+ * Resources and Marketing, each a link to its page of cards, then Manage
+ * Departments (ADR CM-0049). Their screens
  * (Labour, HRMS, Visits) are not rows in the main menu: on a department's
  * page and screens the sidebar is the department's own menu
  * (`department-menu.stories.tsx`, ADR CM-0047).
@@ -222,8 +232,12 @@ export const Departments: Story = {
     );
     await expect(
       submenu.getAllByRole("link").map((link) => link.textContent),
-    ).toEqual(["Human Resources", "Marketing"]);
-    for (const department of [HUMAN_RESOURCES, MARKETING_DEPARTMENT])
+    ).toEqual(["Human Resources", "Marketing", "Manage Departments"]);
+    for (const department of [
+      HUMAN_RESOURCES,
+      MARKETING_DEPARTMENT,
+      MANAGE_DEPARTMENTS,
+    ])
       await expect(
         submenu.getByRole("link", { name: department.label }),
       ).toHaveAttribute("href", department.href);
@@ -233,11 +247,32 @@ export const Departments: Story = {
 };
 
 /**
+ * Manage Departments (ADR CM-0049) keeps the main menu, not a department's
+ * own menu, with its row lit under Departments.
+ */
+export const ManageDepartments: Story = {
+  ...shellOn(MANAGE_DEPARTMENTS.href),
+  play: async (context) => {
+    const nav = await mainMenu(context);
+    const submenu = within(
+      await nav.findByRole("list", { name: "Departments" }),
+    );
+    await expect(
+      submenu.getByRole("link", { name: "Manage Departments" }),
+    ).toHaveAttribute("aria-current", "page");
+    await expect(
+      nav.queryByRole("link", { name: "Back to Main Menu" }),
+    ).toBeNull();
+  },
+};
+
+/**
  * A Role with no Marketing menu has only Human Resources under
- * Departments (ADR CM-0040, CM-0046).
+ * Departments (ADR CM-0040, CM-0046); one without Departments Read has no
+ * Manage Departments (ADR CM-0049).
  */
 export const WithoutMarketing: Story = {
-  ...shellOn("/app/departments", NO_MARKETING_ACCESS),
+  ...shellOn("/app/departments", NO_MARKETING_ACCESS, false),
   play: async (context) => {
     const nav = await mainMenu(context);
     const submenu = within(

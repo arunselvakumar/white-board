@@ -28,6 +28,8 @@ export type MainMenuAccess = {
   canOpenDashboard: boolean;
   /** Team Members or Role Management Read (ADR CM-0030, ADR CM-0034). */
   canOpenStaffRoles: boolean;
+  /** Departments Read: Manage Departments under Departments (ADR CM-0049). */
+  canManageDepartments: boolean;
   /**
    * The Marketing entries the Role opens; none leaves Marketing out of
    * Departments (ADR CM-0040, ADR CM-0046).
@@ -56,6 +58,7 @@ export type MainMenuArea = {
 export function mainMenuAreas({
   canOpenDashboard,
   canOpenStaffRoles,
+  canManageDepartments,
   marketing,
 }: MainMenuAccess): MainMenuArea[] {
   return APP_NAV.flatMap((item): MainMenuArea[] => {
@@ -71,8 +74,9 @@ export function mainMenuAreas({
           {
             item,
             href: item.href,
-            groups: departmentsMenuGroups(departments),
-            filter: (query) => filterDepartments(departments, query),
+            groups: departmentsMenuGroups(departments, canManageDepartments),
+            filter: (query) =>
+              filterDepartments(departments, query, canManageDepartments),
           },
         ];
       }

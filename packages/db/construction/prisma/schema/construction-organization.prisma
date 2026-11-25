@@ -101,6 +101,28 @@ model ConstructionOrganizationRole {
   @@schema("construction_organization")
 }
 
+/// A department of the Company (Manage Departments, ADR CM-0049): a name
+/// only, linked to nothing else for now. Human Resources and Marketing are
+/// system departments in every Company: their name is fixed and they are
+/// never deleted. Names are unique among live rows, ignoring case (partial
+/// index in the migration).
+model ConstructionOrganizationDepartment {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  name        String
+  isSystem    Boolean   @default(false) @map("is_system")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
+
+  @@index([workspaceId])
+  @@map("departments")
+  @@schema("construction_organization")
+}
+
 /// One Permission Matrix row per Role per menu (ADR CM-0003, CM-0030).
 /// `flags` is a bitmask over the kernel's flag list; cells a menu does not
 /// support are never written.

@@ -13,7 +13,8 @@ import { loadMemberAccess } from "@/src/shared-kernel/access/prisma-access-reade
  * the Dashboard menu's Read; the Staff group of Human Resources needs Team
  * Members or Role Management Read (ADR CM-0030, ADR CM-0034); each
  * Marketing entry needs its own menu's Read, and Reports the Report flag on
- * Visits (ADR CM-0040 §1). Only a hint: every page and route checks again.
+ * Visits (ADR CM-0040 §1); Manage Departments needs Departments Read (ADR
+ * CM-0049). Only a hint: every page and route checks again.
  */
 export const mainMenuAccess = cache(async (): Promise<MainMenuAccess> => {
   const auth = await protectCompany();
@@ -21,6 +22,7 @@ export const mainMenuAccess = cache(async (): Promise<MainMenuAccess> => {
     return {
       canOpenDashboard: false,
       canOpenStaffRoles: false,
+      canManageDepartments: false,
       marketing: NO_MARKETING_ACCESS,
     };
   const access = await loadMemberAccess(prisma, {
@@ -33,6 +35,7 @@ export const mainMenuAccess = cache(async (): Promise<MainMenuAccess> => {
     canOpenStaffRoles:
       can(access, "organization.team_members", "read") ||
       can(access, "organization.roles", "read"),
+    canManageDepartments: can(access, "organization.departments", "read"),
     marketing: {
       dashboard: can(access, "marketing.dashboard", "read"),
       visits: can(access, "marketing.visits", "read"),

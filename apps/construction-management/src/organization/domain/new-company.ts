@@ -1,6 +1,7 @@
 import { newId } from "@/src/shared-kernel/ids";
 
 import type { CompanyDetails } from "./company-details";
+import { Department } from "./department";
 import type { CompanyCreated } from "./events";
 import type { Role } from "./role";
 import { TeamMember, teamMemberDetails } from "./team-member";
@@ -14,7 +15,8 @@ export type CompanyOwner = {
 
 /**
  * Everything written when a Company is created (CM-104): its profile, its
- * Owner, and its seed sets. No Subscription: a Company has none until its
+ * Owner, and its seed sets: Roles, and the system departments (ADR
+ * CM-0049). No Subscription: a Company has none until its
  * Owner buys a plan (CM-117). The Workspace itself already exists in
  * `@repo/auth`.
  */
@@ -25,6 +27,7 @@ export class NewCompany {
     readonly details: CompanyDetails,
     readonly owner: CompanyOwner,
     readonly roles: readonly Role[],
+    readonly departments: readonly Department[],
     readonly ownerMember: TeamMember,
     readonly createdAt: Date,
   ) {}
@@ -54,6 +57,11 @@ export class NewCompany {
       input.details,
       input.owner,
       input.roles,
+      Department.systemSet({
+        workspaceId: input.workspaceId,
+        by: input.owner.userId,
+        now: input.now,
+      }),
       ownerMember,
       input.now,
     );
