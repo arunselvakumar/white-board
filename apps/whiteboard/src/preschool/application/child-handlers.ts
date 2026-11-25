@@ -4,7 +4,7 @@ import {
   assertClassroomMove,
   assertEndsAfterAdmission,
   assertPromotionYear,
-  assertSeatAvailable,
+  assertLockedClassroomOpen,
   programmeAgeWarning,
 } from "../domain/admission";
 import {
@@ -40,6 +40,7 @@ import type {
   LockedChild,
   ParentInviter,
   PickupFields,
+  SiblingScope,
 } from "./child-ports";
 import type {
   AdmitChildView,
@@ -255,17 +256,16 @@ export class ChildHandlers {
     const emails = [profile.father.email, profile.mother.email].filter(
       (email) => email != null,
     );
-    const siblings = await this.deps.reader.siblings(actor.workspaceId, id, {
-      phones,
-      emails,
-    });
+    const siblings = await this.deps.reader.siblings(
+      actor.workspaceId,
+      id,
+      { phones, emails },
+      siblingScope(actor),
+    );
     return {
       ...profile,
       ageText: ageText(profile.dateOfBirth, this.today()),
-      siblings:
-        actor.role === "parent"
-          ? siblings.filter((sibling) => actor.childIds.includes(sibling.id))
-          : siblings,
+      siblings,
     };
   }
 
@@ -325,7 +325,7 @@ export class ChildHandlers {
             throw notFound("ENQUIRY_NOT_FOUND", "Enquiry not found.");
           assertCanAdmitEnquiry(enquiry, centreId);
         }
-        assertSeatAvailable(await store.lockSeats(classroom.id));
+        assertLockedClassroomOpen(await store.lockSeats(classroom.id));
         const { centreCode, sequence } = await store.takeAdmissionSequence(
           actor.workspaceId,
           centreId,
@@ -468,7 +468,7 @@ export class ChildHandlers {
       });
       const movedOn = input.movedOn ?? this.today();
       assertEndsAfterAdmission(current.admittedOn, movedOn);
-      assertSeatAvailable(await store.lockSeats(target.id));
+      assertLockedClassroomOpen(await store.lockSeats(target.id));
       await store.endAdmission(current.id, movedOn, "classroom_changed");
       const admissionId = this.id();
       await store.insertAdmission({
@@ -522,7 +522,7 @@ export class ChildHandlers {
         assertEndsAfterAdmission(current.admittedOn, today);
         const admittedOn =
           input.admittedOn ?? (year.startsOn > today ? year.startsOn : today);
-        assertSeatAvailable(await store.lockSeats(classroom.id));
+        assertLockedClassroomOpen(await store.lockSeats(classroom.id));
         await store.endAdmission(current.id, today, "promoted");
         await store.insertAdmission({
           id: admissionId,
@@ -710,6 +710,24 @@ export class ChildHandlers {
         console.error("Parent invitation failed", { childId }, error);
       }
     }
+  }
+}
+
+/**
+ * The siblings an actor may see: only Children they could open themselves,
+ * so a shared phone or email never reveals another Centre's or Classroom's
+ * Child.
+ */
+export function siblingScope(actor: PreschoolActor): SiblingScope {
+  switch (actor.role) {
+    case "owner":
+      return { kind: "all" };
+    case "centre_head":
+      return { kind: "centres", centreIds: actor.centreIds };
+    case "teacher":
+      return { kind: "classrooms", classroomIds: actor.classroomIds };
+    case "parent":
+      return { kind: "children", childIds: actor.childIds };
   }
 }
 

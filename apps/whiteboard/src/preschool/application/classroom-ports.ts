@@ -17,6 +17,15 @@ export type ClassroomRecord = {
 };
 
 export type ClassroomStore = {
+  /**
+   * Runs `work` in one transaction that first locks the Classroom's row, the
+   * lock admissions take before counting seats.
+   */
+  withLockedClassroom<T>(
+    workspaceId: string,
+    id: string,
+    work: (store: ClassroomStore) => Promise<T>,
+  ): Promise<T>;
   currentAcademicYear(workspaceId: string): Promise<AcademicYearRefView>;
   academicYear(
     workspaceId: string,

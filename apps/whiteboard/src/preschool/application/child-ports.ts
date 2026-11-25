@@ -133,8 +133,13 @@ export type ChildStore = {
   /** Runs `work` in one transaction; locks last until it ends. */
   transaction<T>(work: (store: ChildStore) => Promise<T>): Promise<T>;
   classroom(workspaceId: string, id: string): Promise<ClassroomRecord | null>;
-  /** Locks the Classroom row and counts its active Admissions. */
-  lockSeats(classroomId: string): Promise<{ capacity: number; filled: number }>;
+  /**
+   * Locks the Classroom row and counts its active Admissions; `archived` is
+   * read under the lock, so an archive that just committed is seen.
+   */
+  lockSeats(
+    classroomId: string,
+  ): Promise<{ capacity: number; filled: number; archived: boolean }>;
   programme(
     workspaceId: string,
     id: string,
@@ -202,6 +207,14 @@ export type ChildStore = {
   ): Promise<void>;
 };
 
+/** Which Children a reader may see as siblings. */
+export type SiblingScope =
+  | { kind: "all" }
+  | { kind: "centres"; centreIds: readonly string[] }
+  /** Children with an active Admission in one of these Classrooms. */
+  | { kind: "classrooms"; classroomIds: readonly string[] }
+  | { kind: "children"; childIds: readonly string[] };
+
 export type ChildListParams = {
   workspaceId: string;
   centreId: string;
@@ -224,11 +237,12 @@ export type ChildReader = {
     workspaceId: string,
     id: string,
   ): Promise<Omit<ChildProfileView, "ageText" | "siblings"> | null>;
-  /** Other Children sharing any of these phones or emails, by name. */
+  /** Other Children sharing any of these phones or emails, within `scope`, by name. */
   siblings(
     workspaceId: string,
     childId: string,
     match: { phones: string[]; emails: string[] },
+    scope: SiblingScope,
   ): Promise<SiblingView[]>;
   options(
     workspaceId: string,

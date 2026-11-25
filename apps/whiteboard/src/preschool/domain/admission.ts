@@ -93,6 +93,20 @@ export function assertSeatAvailable(seats: {
     });
 }
 
+/**
+ * The Classroom as read under its row lock: still open, with a seat. An
+ * archive that committed after the Classroom was first read is caught here.
+ */
+export function assertLockedClassroomOpen(seats: {
+  capacity: number;
+  filled: number;
+  archived: boolean;
+}): void {
+  if (seats.archived)
+    throw conflict("CLASSROOM_ARCHIVED", "The Classroom is archived.");
+  assertSeatAvailable(seats);
+}
+
 /** A move stays in the Programme and Academic Year, into another Classroom. */
 export function assertClassroomMove(
   current: { classroomId: string; programmeId: string; academicYearId: string },

@@ -5,6 +5,7 @@ import {
   assertClassroomFor,
   assertClassroomMove,
   assertEndsAfterAdmission,
+  assertLockedClassroomOpen,
   assertPromotionYear,
   assertSeatAvailable,
   programmeAgeWarning,
@@ -130,6 +131,21 @@ describe("assertSeatAvailable", () => {
     expect(full?.code).toBe("CLASSROOM_FULL");
     expect(full?.kind).toBe("conflict");
     expect(full?.details).toEqual({ capacity: 2, filled: 2, seatsLeft: 0 });
+  });
+});
+
+describe("assertLockedClassroomOpen", () => {
+  it("refuses a Classroom archived since it was first read, then a full one", () => {
+    expect(
+      errorOf(() => {
+        assertLockedClassroomOpen({ capacity: 5, filled: 0, archived: true });
+      })?.code,
+    ).toBe("CLASSROOM_ARCHIVED");
+    expect(
+      errorOf(() => {
+        assertLockedClassroomOpen({ capacity: 1, filled: 1, archived: false });
+      })?.code,
+    ).toBe("CLASSROOM_FULL");
   });
 });
 

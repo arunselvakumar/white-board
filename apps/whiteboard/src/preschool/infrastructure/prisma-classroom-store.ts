@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { prisma, type PrismaClient } from "@repo/whiteboard-db";
+import { prisma, type Prisma, type PrismaClient } from "@repo/whiteboard-db";
 
 import type {
   ClassroomRecord,
@@ -75,8 +75,31 @@ const ORDER = [
   { id: "asc" },
 ] as const;
 
+type Db = PrismaClient | Prisma.TransactionClient;
+
 export class PrismaClassroomStore implements ClassroomStore {
-  constructor(private readonly db: PrismaClient = prisma) {}
+  constructor(private readonly db: Db = prisma) {}
+
+  /**
+   * One transaction holding the Classroom's row lock, the lock an admission
+   * takes before counting seats (`SELECT … FOR UPDATE`), so a capacity
+   * change or an archive cannot interleave with one.
+   */
+  async withLockedClassroom<T>(
+    workspaceId: string,
+    id: string,
+    work: (store: ClassroomStore) => Promise<T>,
+  ): Promise<T> {
+    const run = async (tx: Db) => {
+      await tx.$queryRaw`
+        SELECT id FROM preschool.classrooms
+        WHERE id = ${id}::uuid AND workspace_id = ${workspaceId}
+        FOR UPDATE`;
+      return work(new PrismaClassroomStore(tx));
+    };
+    if (!("$transaction" in this.db)) return run(this.db);
+    return this.db.$transaction((tx) => run(tx));
+  }
 
   async currentAcademicYear(workspaceId: string): Promise<AcademicYearRefView> {
     return this.db.preschoolAcademicYear.findFirstOrThrow({
@@ -278,19 +301,21 @@ export class PrismaClassroomStore implements ClassroomStore {
     classroomId: string,
     staffIds: readonly string[],
   ): Promise<void> {
-    await this.db.$transaction([
-      this.db.preschoolClassroomTeacher.deleteMany({
+    const replace = async (db: Db) => {
+      await db.preschoolClassroomTeacher.deleteMany({
         where: { workspaceId, classroomId, staffId: { notIn: [...staffIds] } },
-      }),
-      this.db.preschoolClassroomTeacher.createMany({
+      });
+      await db.preschoolClassroomTeacher.createMany({
         data: staffIds.map((staffId) => ({
           workspaceId,
           classroomId,
           staffId,
         })),
         skipDuplicates: true,
-      }),
-    ]);
+      });
+    };
+    if ("$transaction" in this.db) await this.db.$transaction(replace);
+    else await replace(this.db);
   }
 
   async options(
