@@ -1,10 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
+import { FamilyAnnouncementsScreen } from "@/app/(app)/preschool/family/announcements/_components/family-announcements-screen";
 import { FamilyAttendanceScreen } from "@/app/(app)/preschool/family/attendance/_components/family-attendance-screen";
 import { FamilyChildScreen } from "@/app/(app)/preschool/family/child/_components/family-child-screen";
 import { FamilyReportsScreen } from "@/app/(app)/preschool/family/daily-reports/_components/family-reports-screen";
 import { FamilyFeesScreen } from "@/app/(app)/preschool/family/fees/_components/family-fees-screen";
+import { FamilyProgressScreen } from "@/app/(app)/preschool/family/progress/_components/family-progress-screen";
+import { ProgressReportScreen } from "@/app/(app)/preschool/progress/reports/[id]/_components/progress-report-screen";
 import { FamilyReceiptScreen } from "@/app/(app)/preschool/family/receipts/[id]/_components/family-receipt-screen";
 import { ActiveCentreProvider } from "@/app/(app)/preschool/_components/active-centre-provider";
 import {
@@ -18,6 +21,8 @@ import {
   type PreschoolApiHandler,
 } from "@/app/(app)/preschool/_components/preschool-story-api";
 import type { DailyReportView } from "@/src/preschool/application/daily-report-views";
+import type { PreschoolAnnouncement } from "@/src/queries/preschool/announcements";
+import type { PreschoolProgressReport } from "@/src/queries/preschool/progress-reports";
 import type { PreschoolChildAttendanceMonth } from "@/src/queries/preschool/attendance";
 import type { PreschoolChildProfile } from "@/src/queries/preschool/children";
 import type {
@@ -666,7 +671,27 @@ export const ChildDetails: Story = {
     nextjs: { navigation: { pathname: "/preschool/family/child" } },
   },
   beforeEach: () =>
-    api({ [`GET /children/${AARAV}`]: () => ({ json: PROFILE }) }, [AARAV]),
+    api(
+      {
+        [`GET /children/${AARAV}`]: () => ({ json: PROFILE }),
+        [`GET /stock/children/${AARAV}`]: () => ({
+          json: {
+            items: [
+              {
+                movementId: id(90),
+                itemId: id(91),
+                itemName: "Nursery kit",
+                unit: "set",
+                quantity: 1,
+                movedOn: "2026-06-02",
+                note: null,
+              },
+            ],
+          },
+        }),
+      },
+      [AARAV],
+    ),
   render: () => <FamilyChildScreen />,
   play: async ({ canvas, canvasElement }) => {
     const pickups = within(
@@ -678,6 +703,10 @@ export const ChildDetails: Story = {
     await expect(
       canvas.getByText("To change anything, tell the Centre."),
     ).toBeVisible();
+    const received = within(
+      canvas.getByRole("region", { name: "Books, kit and uniform received" }),
+    );
+    await expect(await received.findByText("Nursery kit")).toBeVisible();
     await expect(
       canvas.queryByRole("button", { name: /Edit|Save/ }),
     ).not.toBeInTheDocument();
@@ -711,6 +740,263 @@ export const NoChildLinked: Story = {
         "We couldn't find a Child linked to arun@example.com. Ask the Centre to check the email on your Child's record.",
       ),
     ).toBeVisible();
+    await expectFitsPhone(canvasElement);
+  },
+};
+
+function announcement(
+  n: number,
+  overrides: Partial<PreschoolAnnouncement> = {},
+): PreschoolAnnouncement {
+  return {
+    id: id(60 + n),
+    centreId: CENTRE_IDS.annaNagar,
+    classroomId: null,
+    audience: "Little Steps Anna Nagar",
+    kind: "notice",
+    title: `Notice ${String(n)}`,
+    body: `Line one of notice ${String(n)}.\nLine two.`,
+    startsOn: null,
+    endsOn: null,
+    publishedAt: "2026-11-20T05:00:00.000Z",
+    createdByUserId: "user_owner",
+    createdByName: "Arun",
+    updatedAt: "2026-11-20T05:00:00.000Z",
+    canEdit: false,
+    ...overrides,
+  };
+}
+
+const ANNUAL_DAY = announcement(9, {
+  kind: "event",
+  title: "Annual Day",
+  body: "Costumes by Thursday, please.",
+  startsOn: "2026-12-12",
+  endsOn: "2026-12-12",
+});
+
+const PUBLISHED_REPORTS = {
+  childId: AARAV,
+  name: "Aarav Kumar",
+  items: [
+    {
+      id: id(70),
+      academicYearId: id(7),
+      academicYearName: "2026–27",
+      term: {
+        term: "term_1" as const,
+        label: "Term 1",
+        startsOn: "2026-06-01",
+        endsOn: "2026-09-30",
+      },
+      status: "published" as const,
+      publishedAt: "2026-10-05T05:00:00.000Z",
+      updatedAt: "2026-10-05T05:00:00.000Z",
+    },
+  ],
+};
+
+const familyFeed =
+  (pages: { items: PreschoolAnnouncement[]; nextCursor: string | null }[]) =>
+  (_body: unknown, url: URL) => {
+    const page = url.searchParams.get("cursor") == null ? pages[0] : pages[1];
+    return {
+      json: {
+        items: page?.items ?? [],
+        nextCursor: page?.nextCursor ?? null,
+        total: pages.reduce((sum, each) => sum + each.items.length, 0),
+        upcoming: [ANNUAL_DAY],
+      },
+    };
+  };
+
+/** The Home with an Announcements card and, once published, a Progress card. */
+export const HomeWithAnnouncementsAndProgress: Story = {
+  beforeEach: () =>
+    api(
+      {
+        "GET /family/home": () => ({ json: home([AT_SCHOOL]) }),
+        "GET /announcements/family": familyFeed([
+          {
+            items: [announcement(1), announcement(2), announcement(3)],
+            nextCursor: null,
+          },
+        ]),
+        [`GET /progress-reports/children/${AARAV}`]: () => ({
+          json: PUBLISHED_REPORTS,
+        }),
+      },
+      [AARAV],
+    ),
+  render: () => <FamilyHomeScreen />,
+  play: async ({ canvas, canvasElement }) => {
+    await expect(
+      await canvas.findByRole("heading", { name: "Announcements" }),
+    ).toBeVisible();
+    await expect(canvas.getByText(/Annual Day/)).toBeVisible();
+    await expect(canvas.getByText(/Sat, 12 Dec/)).toBeVisible();
+    await expect(canvas.getByText("Notice 1")).toBeVisible();
+    await expect(canvas.getByText("Notice 2")).toBeVisible();
+    await expect(canvas.queryByText("Notice 3")).not.toBeInTheDocument();
+    await expect(
+      await canvas.findByText("Term 1 Progress Report · 2026–27"),
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("link", { name: /Read the report/ }),
+    ).toHaveAttribute("href", `/preschool/family/progress/${id(70)}`);
+    await expectFitsPhone(canvasElement);
+  },
+};
+
+export const Announcements: Story = {
+  parameters: {
+    nextjs: { navigation: { pathname: "/preschool/family/announcements" } },
+  },
+  beforeEach: () =>
+    api(
+      {
+        "GET /announcements/family": familyFeed([
+          { items: [ANNUAL_DAY, announcement(1)], nextCursor: "next" },
+          { items: [announcement(2)], nextCursor: null },
+        ]),
+      },
+      [AARAV],
+    ),
+  render: () => <FamilyAnnouncementsScreen />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const comingUp = within(
+      await canvas.findByRole("region", { name: "Coming up" }),
+    );
+    await expect(comingUp.getByText("Annual Day")).toBeVisible();
+    const annualDay = within(
+      canvas.getByRole("article", { name: "Annual Day" }),
+    );
+    await expect(annualDay.getByText("Event")).toBeVisible();
+    await expect(annualDay.getByText("Sat, 12 Dec")).toBeVisible();
+    await expect(
+      within(canvas.getByRole("article", { name: "Notice 1" })).getByText(
+        /Line one of notice 1\.\s+Line two\./,
+      ),
+    ).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: "Load more" }));
+    await expect(
+      await canvas.findByRole("article", { name: "Notice 2" }),
+    ).toBeVisible();
+    await expect(
+      canvas.queryByRole("button", { name: "Load more" }),
+    ).not.toBeInTheDocument();
+    await expectFitsPhone(canvasElement);
+  },
+};
+
+export const Progress: Story = {
+  parameters: {
+    nextjs: { navigation: { pathname: "/preschool/family/progress" } },
+  },
+  beforeEach: () =>
+    api(
+      {
+        [`GET /progress-reports/children/${AARAV}`]: () => ({
+          json: PUBLISHED_REPORTS,
+        }),
+      },
+      [AARAV],
+    ),
+  render: () => <FamilyProgressScreen />,
+  play: async ({ canvas, canvasElement }) => {
+    const reports = within(
+      await canvas.findByRole("list", { name: "Progress Reports" }),
+    );
+    await expect(
+      reports.getByRole("link", { name: /Term 1 · 2026–27/ }),
+    ).toHaveAttribute("href", `/preschool/family/progress/${id(70)}`);
+    await expect(reports.getByText("Published 5 Oct 2026")).toBeVisible();
+    await expectFitsPhone(canvasElement);
+  },
+};
+
+export const NoProgressYet: Story = {
+  parameters: {
+    nextjs: { navigation: { pathname: "/preschool/family/progress" } },
+  },
+  beforeEach: () =>
+    api(
+      {
+        [`GET /progress-reports/children/${AARAV}`]: () => ({
+          json: { ...PUBLISHED_REPORTS, items: [] },
+        }),
+      },
+      [AARAV],
+    ),
+  render: () => <FamilyProgressScreen />,
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByText(
+        "The first Progress Report comes at the end of the term.",
+      ),
+    ).toBeVisible();
+  },
+};
+
+const PARENT_REPORT: PreschoolProgressReport = {
+  id: id(70),
+  status: "published",
+  term: PUBLISHED_REPORTS.items[0]?.term ?? {
+    term: "term_1",
+    label: "Term 1",
+    startsOn: "2026-06-01",
+    endsOn: "2026-09-30",
+  },
+  academicYear: { id: id(7), name: "2026–27" },
+  centre: { id: CENTRE_IDS.annaNagar, name: "Little Steps Anna Nagar" },
+  child: {
+    id: AARAV,
+    name: "Aarav Kumar",
+    admissionNumber: "LSAN-0007",
+    dateOfBirth: "2023-03-10",
+    classroomName: "Nursery A",
+    programmeName: "Nursery (Pre-KG)",
+  },
+  attendance: { present: 62, marked: 68 },
+  ratings: [
+    {
+      domainId: id(80),
+      domainName: "Language and literacy",
+      description: null,
+      rating: "progressing",
+      remark: "Loves story time.",
+    },
+  ],
+  teacherRemarks: "A cheerful term.",
+  publishedAt: "2026-10-05T05:00:00.000Z",
+  updatedAt: "2026-10-05T05:00:00.000Z",
+  observations: null,
+};
+
+export const ProgressReport: Story = {
+  parameters: {
+    nextjs: {
+      navigation: { pathname: `/preschool/family/progress/${id(70)}` },
+    },
+  },
+  beforeEach: () =>
+    api(
+      { [`GET /progress-reports/${id(70)}`]: () => ({ json: PARENT_REPORT }) },
+      [AARAV],
+    ),
+  render: () => (
+    <ProgressReportScreen
+      reportId={id(70)}
+      back={{ href: "/preschool/family/progress", label: "Progress" }}
+    />
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    await expect(
+      await canvas.findByRole("link", { name: /Back to Progress/ }),
+    ).toHaveAttribute("href", "/preschool/family/progress");
+    await expect(canvas.getByText("Loves story time.")).toBeVisible();
+    await expect(canvas.getByText("A cheerful term.")).toBeVisible();
+    await expect(canvas.queryByText(/Observations/)).not.toBeInTheDocument();
     await expectFitsPhone(canvasElement);
   },
 };
