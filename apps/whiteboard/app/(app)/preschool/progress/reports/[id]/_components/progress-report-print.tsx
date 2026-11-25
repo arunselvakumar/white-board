@@ -64,7 +64,7 @@ function RatingBoxes({
     <div
       role="img"
       aria-label={`${domainName}: ${rating == null ? "not rated" : PRESCHOOL_RATING_LABELS[rating]}`}
-      className="flex gap-1.5"
+      className="flex flex-wrap gap-1.5"
     >
       {RATINGS.map((value) => (
         <span
@@ -135,39 +135,43 @@ export function ProgressReportPrint({
           }
         />
       </dl>
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-left">
-          <thead>
-            <tr className="border-b">
-              <th scope="col" className="py-2 pr-3 font-semibold">
-                Development Domain
+      {/* A table on paper and wide screens; on a phone each Domain stacks. */}
+      <table className="block w-full border-collapse text-left sm:table print:table">
+        <thead className="hidden sm:table-header-group print:table-header-group">
+          <tr className="border-b">
+            <th scope="col" className="py-2 pr-3 font-semibold">
+              Development Domain
+            </th>
+            <th scope="col" className="py-2 pr-3 font-semibold">
+              Rating
+            </th>
+            <th scope="col" className="py-2 font-semibold">
+              Remark
+            </th>
+          </tr>
+        </thead>
+        <tbody className="block sm:table-row-group print:table-row-group">
+          {report.ratings.map((row) => (
+            <tr
+              key={row.domainId}
+              className="block border-b py-2 align-top sm:table-row sm:py-0 print:table-row print:py-0"
+            >
+              <th
+                scope="row"
+                className="block pb-1.5 font-medium sm:table-cell sm:py-2 sm:pr-3 print:table-cell print:py-2 print:pr-3"
+              >
+                {row.domainName}
               </th>
-              <th scope="col" className="py-2 pr-3 font-semibold">
-                Rating
-              </th>
-              <th scope="col" className="py-2 font-semibold">
-                Remark
-              </th>
+              <td className="block sm:table-cell sm:py-2 sm:pr-3 print:table-cell print:py-2 print:pr-3">
+                <RatingBoxes rating={row.rating} domainName={row.domainName} />
+              </td>
+              <td className="block pt-1.5 max-sm:empty:hidden sm:table-cell sm:py-2 print:table-cell print:py-2">
+                {row.remark ?? ""}
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {report.ratings.map((row) => (
-              <tr key={row.domainId} className="border-b align-top">
-                <th scope="row" className="py-2 pr-3 font-medium">
-                  {row.domainName}
-                </th>
-                <td className="py-2 pr-3">
-                  <RatingBoxes
-                    rating={row.rating}
-                    domainName={row.domainName}
-                  />
-                </td>
-                <td className="py-2">{row.remark ?? ""}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
       <section className="space-y-1">
         <h3 className="font-semibold">Teacher&apos;s remarks</h3>
         <p className="min-h-12 whitespace-pre-line">

@@ -304,6 +304,7 @@ const SINGULAR: Partial<Record<PreschoolNavHref, string>> = {
   [FEE_STRUCTURES.href]: "Fee Structure",
   [STOCK_ITEMS.href]: "Stock Item",
   [FAMILY_ANNOUNCEMENTS.href]: "Announcement",
+  [FAMILY_PROGRESS.href]: "Progress Report",
   [ROYALTY.href]: "Centre statement",
 };
 
@@ -315,6 +316,7 @@ const NESTED_RECORD: Partial<
   Record<PreschoolNavHref, Readonly<Record<string, string>>>
 > = {
   [FEES.href]: { receipts: "Receipt", children: "Fee account" },
+  [PROGRESS.href]: { reports: "Progress Report" },
 };
 
 /**
