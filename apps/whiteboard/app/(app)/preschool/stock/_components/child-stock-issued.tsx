@@ -59,7 +59,7 @@ export function ChildStockIssued({ childId }: { childId: string }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Stock received</CardTitle>
+        <CardTitle>Books, kit and uniform received</CardTitle>
       </CardHeader>
       <CardContent>
         <Suspense fallback={<Skeleton className="h-16 w-full" />}>
