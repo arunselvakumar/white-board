@@ -124,6 +124,19 @@ describe("preschoolBreadcrumbs", () => {
       { label: "Centre" },
     ]);
   });
+
+  it("names a Receipt and a Child's fee account under Fees", () => {
+    expect(
+      preschoolBreadcrumbs("/preschool/fees/receipts/abc", "centre_head"),
+    ).toEqual([
+      { label: "Dashboard", href: "/preschool" },
+      { label: "Fees", href: "/preschool/fees" },
+      { label: "Receipt" },
+    ]);
+    expect(
+      preschoolBreadcrumbs("/preschool/fees/children/abc", "owner").at(-1),
+    ).toEqual({ label: "Fee account" });
+  });
 });
 
 describe("preschoolPageByHref", () => {

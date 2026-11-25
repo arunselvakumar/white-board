@@ -261,6 +261,16 @@ const SINGULAR: Partial<Record<PreschoolNavHref, string>> = {
 };
 
 /**
+ * Records that live one segment below a nav item, by that segment:
+ * `/preschool/fees/receipts/<id>` is a Receipt, not a Fee.
+ */
+const NESTED_RECORD: Partial<
+  Record<PreschoolNavHref, Readonly<Record<string, string>>>
+> = {
+  [FEES.href]: { receipts: "Receipt", children: "Fee account" },
+};
+
+/**
  * Breadcrumbs for a Preschool page: the role's Home, the nav item the page
  * belongs to, then "Add …" or the record.
  */
@@ -280,6 +290,11 @@ export function preschoolBreadcrumbs(
   ];
   if (pathname === href) return crumbs;
   const rest = pathname.slice(href.length + 1).split("/");
+  const nested = NESTED_RECORD[item.href]?.[rest[0] ?? ""];
+  if (nested != null) {
+    crumbs.push({ label: nested });
+    return crumbs;
+  }
   const singular = SINGULAR[item.href] ?? item.label;
   crumbs.push({ label: rest[0] === "new" ? `Add ${singular}` : singular });
   return crumbs;
