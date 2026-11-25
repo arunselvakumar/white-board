@@ -1,18 +1,20 @@
 # 02 — Master Records
 
-Master Records are the reference lists every other module picks from: the trades (Departments) and Work Types work is booked against; the parties the company pays or bills (Contractors, Suppliers, labour-supply Vendors, Labours, Other Parties); Equipment; the company's own Bank and Cash accounts; Materials with their category, unit, rate, GST and HSN; and small lookup lists (Measurement Units, Labour Categories, Payment Categories, Issue Categories, Amenities and Common Developments, Tags, Terms & Conditions, Lead Sources, Funnel statuses).
+Master Records are the reference lists every other module picks from: the Work Types work is booked against; the parties the company pays or bills (Contractors, Suppliers, labour-supply Vendors, Labours, Other Parties); Equipment; the company's own Bank and Cash accounts; Materials with their category, unit, rate, GST and HSN; and small lookup lists (Measurement Units, Labour Categories, Payment Categories, Issue Categories, Amenities and Common Developments, Tags, Terms & Conditions, Lead Sources, Funnel statuses).
 
 Many lists ship with **global seed records** (`companyId = null`) that every company sees; a company adds its own records beside them (`companyId = <company>`). Parties (Contractors, Suppliers, Vendors, Labours, Other Parties) are **assigned to projects** so that project screens only offer the relevant ones.
 
 Who uses it:
 
-- **Owner / Admin** set up departments, work types, accounts, categories and parties when onboarding.
+- **Owner / Admin** set up work types, accounts, categories and parties when onboarding.
 - **Purchase / store keeper** maintains Materials, Material Categories, Units, Suppliers.
 - **Site engineer / supervisor** adds Labours, Vendors, Contractors and Equipment for their project.
 - **Accountant** maintains Bank/Cash accounts, Payment Categories, Other Parties, party GST/PAN.
 - **Sales** maintains Lead Sources and Funnel statuses (per project / company).
 
 Team Members and Designations are listed under the Master tab but are specified in **01 Organization/Identity/Access**. Numbering, back-dated entry and currency (the **Setting** tile) are in **12 Settings**.
+
+> **No Departments ([ADR CM-0048](../adr/CM-0048-no-department-master.md)).** The trade list (RCC, Plumbing…) was removed, and nothing in our build is filed under one. Where the legacy sections below (behaviour, seed data, entities, workflows, rules, permissions, relationships) mention a Department, they describe BuildControl only.
 
 ---
 
@@ -188,7 +190,9 @@ A gang / piece-rate contractor who supplies workers counted by head per category
 
 ## Seed data (verbatim from notes)
 
-### Departments (~54; the list below has 53, and those 53 are the seed set)
+### Departments (~54; the list below has 53)
+
+BuildControl's list. Not seeded in our build (ADR CM-0048).
 
 Surveying, Departmental Work, Equipment, Tancha Work, Steel Reinforcement Work, Flooring Work, False Ceiling, Pollution Control, Landscaping, Planning, Marketing, Purchase, Account, HVAC, Solar Electric, Solar Water Heater, Corporation Water, Water, Drainage, Soil Backfilling, Excavation, Labour, Miscellaneous Labour, Elevation, Concrete Hacking, Glazing, Silicone, Stone Fixing, Soil Nail & Gunting, Anti Termite, Soil Filling, Diaphragm Wall, Piling Work, Safety, Shuttering, Glass Fixing, Aluminum Section, POP, Trimix Work, Exposed Work, Fire Safety, Fabrication, Carpentry, Cleaning, Acid Wash, Painting, Tiling Work, Plumbing, Electric, Chicken mesh, Water Proofing, Masonry & Plaster, RCC.
 
@@ -727,7 +731,7 @@ Minimal Contractor and Supplier masters ([ADR CM-0013 §6](../adr/CM-0013-projec
 
 - Menus `masters.contractors` and `masters.suppliers` (CRUD), under Masters → **Parties**. Routes `/api/construction/masters/{contractors|suppliers}`: list, add, `{id}`, `{id}/update`, `{id}/activate`, `{id}/deactivate` (Update flag), `{id}/delete`. Lists are newest first with cursor pages and a total, searched by name, contact person, GSTIN or mobile digits, filtered by active and Project.
 - Fields: name (required, at most 120, spaces collapsed, unique among the Company's live rows of that list ignoring case — 409 `CONTRACTOR_NAME_IN_USE` / `SUPPLIER_NAME_IN_USE`; a Contractor and a Supplier may share a name), contact person (at most 120), mobile (an Indian mobile, stored E.164, `MOBILE_INVALID`), email (`EMAIL_INVALID`), address (at most 500), GSTIN (`GSTIN_INVALID`) and PAN (`PAN_INVALID`) checked by `shared-kernel/tax-ids`, and a GSTIN must hold the PAN when both are given (`GSTIN_PAN_MISMATCH`). Edit replaces the whole form with the `updatedAt` it loaded (409 `<KIND>_CHANGED`).
-- A Contractor works in Departments: ids new to it must be live Departments of the Company and enabled (400 `DEPARTMENT_NOT_FOUND` / `DEPARTMENT_DISABLED`); one it already has stays when Masters disables it. A Department deleted in Masters simply drops off its Contractors. Suppliers have no Departments.
+- Contractors and Suppliers have no Departments (ADR CM-0048). In pickers and Project Resources a Contractor's second line is its contact person, else its mobile, as a Supplier's is.
 - Projects are chosen on the form too; ids new to the party must be live Projects of the Company (400 `PROJECT_NOT_FOUND`). The form is not limited to the Projects the editor is on (as for Vendors: the Masters menus are not project-level).
 - **Inactive** parties leave every picker, Resources' Edit dialog included, but stay on the Projects they are on; they are never added to another Project from Resources (400 `CONTRACTOR_INACTIVE` / `SUPPLIER_INACTIVE`).
 - **Delete** is a tombstone and is refused while the party is on a live Project (409 `CONTRACTOR_ON_PROJECTS` / `SUPPLIER_ON_PROJECTS`, naming them): take it off its Projects first, or deactivate it. CM-501 adds invoices, POs and GRNs to that check.
@@ -749,12 +753,20 @@ Minimal Contractor and Supplier masters ([ADR CM-0013 §6](../adr/CM-0013-projec
 ### CM-601 — Work Types and Labour Category skill
 
 - Menu `masters.work_types` (CRUD, Company-level), Masters → **Work Types**. Routes `/api/construction/masters/work-types`: list (`?status=`), add, `{id}`, `{id}/update`, `{id}/disable`, `{id}/enable`, `{id}/delete`. The list is by name and not paged.
-- A Work Type has a name (at most 120, spaces collapsed, unique among live Work Types ignoring case — 409 `WORK_TYPE_NAME_IN_USE`), a **Department** (a live one, 400 `DEPARTMENT_NOT_FOUND`; a disabled one only if already chosen, `DEPARTMENT_DISABLED`) and **assigned Materials** (at most 200; 400 `MATERIAL_NOT_FOUND` / `MATERIAL_DISABLED`, a disabled one already assigned stays). Update replaces the whole list. The assignment is a filter only: no quantity or coefficient (open question 14).
-- The seed **RCC** (under the RCC department) keeps its name and Department (409 `SEED_IS_READ_ONLY`) and is never deleted, but can be disabled and given Materials.
+- A Work Type has a name (at most 120, spaces collapsed, unique among live Work Types ignoring case — 409 `WORK_TYPE_NAME_IN_USE`), and **assigned Materials** (at most 200; 400 `MATERIAL_NOT_FOUND` / `MATERIAL_DISABLED`, a disabled one already assigned stays). Update replaces the whole list. The assignment is a filter only: no quantity or coefficient (open question 14).
+- A Work Type has no Department; the list is flat (ADR CM-0048).
+- The seed **RCC** keeps its name (409 `SEED_IS_READ_ONLY`) and is never deleted, but can be disabled and given Materials.
 - Delete is refused while a live Daily Worksheet names the Work Type (409 `WORK_TYPE_IN_USE`). Deleting a Material simply unassigns it.
-- The screen needs Departments Read for its Department picker, as the Contractor form does. The material picker (`materials/options`) is also open to Work Types Read.
+- The material picker (`materials/options`) is also open to Work Types Read.
 - **Labour Categories carry a skill** (Skilled / Unskilled; seed Helper, Labour and Unskilled are unskilled). Create defaults to skilled; update leaves it when left out. A seed category keeps its name, but its skill may change (Edit on the row), because the skill is how worksheets count heads, not what the row is.
-- In use, so not deletable (site work, CM-0016 §7): a Department on a Work Type or a live worksheet or usage sheet (`DEPARTMENT_IN_USE`); a Contractor on a live worksheet, usage sheet or hindrance, or the hire party of live equipment (`CONTRACTOR_IN_USE`); a Material on a line of a live worksheet or usage sheet (`MATERIAL_IN_USE`). Site work is read through `src/composition/site-work-usage.ts`.
+- In use, so not deletable (site work, CM-0016 §7): a Contractor on a live worksheet, usage sheet or hindrance, or the hire party of live equipment (`CONTRACTOR_IN_USE`); a Material on a line of a live worksheet or usage sheet (`MATERIAL_IN_USE`). Site work is read through `src/composition/site-work-usage.ts`.
+
+### No Department master (ADR CM-0048)
+
+- Masters → Work → Departments is gone: no screen, no `/api/construction/masters/departments` routes, no `masters.departments` menu in any Role's Permission Matrix.
+- A new Company is not seeded with Departments. Its seed Work Type is still RCC, with no Department.
+- The masters backup has no Departments sheet; a queued job that still names `masters.departments` skips it.
+- The main menu's **Departments** (Human Resources, Marketing; ADR CM-0046) is a different thing and stays.
 
 ## Open questions
 

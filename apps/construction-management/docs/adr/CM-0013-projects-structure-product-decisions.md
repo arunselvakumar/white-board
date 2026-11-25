@@ -1,6 +1,7 @@
 # CM-0013 — Projects & structure product decisions for M4
 
 - Status: accepted
+- Partly superseded by [CM-0048](CM-0048-no-department-master.md) (no Department master): Contractors have no Departments (§6).
 - Date: 2026-10-10
 - Tickets: CM-401 … CM-412 (M4)
 - Relates to: [CM-0003](CM-0003-permission-matrix.md) (Permission Matrix), [CM-0010](CM-0010-project-contract-details-and-documents.md) (Contract Details and Documents), [CM-0014](CM-0014-attachments-and-gallery-index.md) (attachments and the Gallery index)

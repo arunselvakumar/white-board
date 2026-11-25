@@ -60,15 +60,13 @@ _Avoid_: default password
 ### Masters and parties
 
 **Masters**:
-The Company's reference lists (Departments, Contractors, Suppliers, Materials, Units, Accounts…). A main-menu area. Staff, Labours and Vendors are not Masters: they are under Human Resources (ADR CM-0034). Labour Categories are: Masters → Labour → Categories (ADR CM-0035).
+The Company's reference lists (Work Types, Contractors, Suppliers, Materials, Units, Accounts…). A main-menu area. Staff, Labours and Vendors are not Masters: they are under Human Resources (ADR CM-0034). Labour Categories are: Masters → Labour → Categories (ADR CM-0035).
 _Avoid_: settings (for these lists), catalog
 
-**Department**:
-A trade or work category (RCC, Plumbing, Painting, Excavation…). Classifies Contractors, Work Types, Worksheets, Issues and Inspections.
-_Avoid_: trade, team
+There is no trade **Department** (RCC, Plumbing…) since ADR CM-0048. Nothing is filed under a trade; **Departments** in the main menu are Human Resources and Marketing (ADR CM-0046).
 
 **Contractor**:
-A party that executes work, labour-and-material or labour-only, in one or more Departments. Has invoices with TDS. Not a User. Inactive Contractors leave the pickers but stay on their Projects.
+A party that executes work, labour-and-material or labour-only. Has invoices with TDS. Not a User. Inactive Contractors leave the pickers but stay on their Projects.
 _Avoid_: subcontractor
 
 **Supplier**:
@@ -285,7 +283,7 @@ _Avoid_: salesman, executive, marketing staff
 ### Documents
 
 **Daily Worksheet**:
-The day's work record per Contractor/Department/location: labour counts, approximate work done, materials consumed, photos.
+The day's work record per Contractor and location, optionally with a Work Type: labour counts, approximate work done, materials consumed, photos.
 _Avoid_: DPR (that is the Daily Progress Report built from Worksheets), daily log
 
 **PR / PO / GRN / MT / MR / DN**:

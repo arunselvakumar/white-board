@@ -10,6 +10,8 @@ Who uses it:
 - **Quality / testing** staff upload lab reports per testing item.
 - **Every project member** sees the tiles they have permission for, pins projects, and uses project chat.
 
+> **No Departments ([ADR CM-0048](../adr/CM-0048-no-department-master.md)).** Where the legacy sections below mention a Department (the dashboard's contractor-wise labour), they describe BuildControl only. Our dashboard counts labour per Contractor.
+
 ---
 
 ## Legacy behaviour
@@ -572,7 +574,7 @@ M4 answered the open questions below with recommended defaults in [ADR CM-0013](
 
 ### CM-406
 
-- **Resources** is a Project section at `/app/projects/{id}/resources` (module `resources`, menu `projects.project`). It shows four sections — Team Members, Contractors, Suppliers, Vendors — each listing who is on the Project by name with a second line (Designation and "Joining Pending" for Team Members, Departments for Contractors, the contact person for Suppliers, otherwise the mobile) and an Inactive badge.
+- **Resources** is a Project section at `/app/projects/{id}/resources` (module `resources`, menu `projects.project`). It shows four sections — Team Members, Contractors, Suppliers, Vendors — each listing who is on the Project by name with a second line (Designation and "Joining Pending" for Team Members, the contact person for Contractors and Suppliers, otherwise the mobile; ADR CM-0048) and an Inactive badge.
 - Each party keeps its Projects in its own context (ADR CM-0013 §6): Team Members in organization (`team_member_projects`), Vendors in labour (`vendor_projects`), Contractors and Suppliers in masters. `src/composition/project-resources.ts` is where the contexts meet: it checks the Project is visible (projects context) and calls the owning context's application layer; no context imports another.
 - `GET …/projects/{id}/resources` needs `projects.project` Read; `GET …/resources/{team-members|contractors|suppliers|vendors}/options` and `POST …/resources/{kind}` need Update. A Project of another Company, or one a Member is not on, is 404 `PROJECT_NOT_FOUND`.
 - `POST …/resources/{kind}` takes `{ ids, expectedIds }`: every party of that kind that should be on the Project, and the ones the screen loaded. If the Project's set moved since, 409 `PROJECT_RESOURCES_CHANGED` and nothing changes. Each changed party's `updatedAt` moves (so a master form open on it gets its own 409) and gets one audit row (`<kind>.projects_changed`, before/after Projects), all in one transaction per kind. The response is the whole Resources.

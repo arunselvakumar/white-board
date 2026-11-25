@@ -142,7 +142,7 @@ The legacy product is a Flutter app first. We build a **PWA** with the App Route
 - `id uuid` (v7), `workspace_id text not null`, `created_at/updated_at timestamptz`, `created_by/updated_by text` (user ids), `deleted_at` soft delete as an invisible tombstone (root ADR-0019).
 - `project_id` on project-scoped rows; composite index `(workspace_id, project_id, <date>)`.
 - Enums are Postgres enums inside the context schema; statuses are enums, not ints (legacy uses `status: 1..4` ints — we map on import).
-- Seed data that the legacy ships as "global" rows (`companyId: null` departments, UoMs, designations, categories) becomes a **seed set copied into each workspace at creation** so a company can edit its own list; the seed sets are versioned JSON in the context's `infrastructure/seeds/`.
+- Seed data that the legacy ships as "global" rows (`companyId: null` UoMs, designations, categories) becomes a **seed set copied into each workspace at creation** so a company can edit its own list; the seed sets are versioned JSON in the context's `infrastructure/seeds/`.
 - Audit: an `audit_events` table in `construction_organization` appended by application services (who, what, before/after JSON) — the legacy has only `createdBy/approvedBy` columns.
 
 ## 4. Migration from legacy (if customers move)

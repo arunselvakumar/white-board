@@ -38,11 +38,11 @@ erDiagram
 
 ## 2. Master records
 
+BuildControl also had a **Department** master, a trade list (RCC, Plumbing…) that contractors, work types, worksheets, tasks, issues, inspections, MRs and contractor invoices were filed under. We dropped it (ADR CM-0048); none of the entities on this page has a Department.
+
 ```mermaid
 erDiagram
-    Department ||--o{ WorkType : has
     WorkType }o--o{ Material : "consumes"
-    Contractor }o--o{ Department : "works in"
     Contractor }o--o{ Project : "assigned to"
     Contractor ||--o{ ContractorQuotation : has
     Supplier }o--o{ Project : "assigned to"
@@ -69,9 +69,8 @@ erDiagram
 
 | Entity                                                                                                                       | Notes                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Department**                                                                                                               | Trade category; ~54 seeded (RCC, Plumbing, Painting, Excavation…).                                                                                                                                                                                                                                                                                                                                        |
-| **WorkType**                                                                                                                 | Activity under a department; `WorkerType/AssignItem` attaches materials.                                                                                                                                                                                                                                                                                                                                  |
-| **Contractor**                                                                                                               | Name, departments (multi), address, email, mobile, 2 contact persons, GST, PAN, quotation file, projects.                                                                                                                                                                                                                                                                                                 |
+| **WorkType**                                                                                                                 | An activity work is booked against; `WorkerType/AssignItem` attaches materials. One flat list (ADR CM-0048).                                                                                                                                                                                                                                                                                              |
+| **Contractor**                                                                                                               | Name, address, email, mobile, 2 contact persons, GST, PAN, quotation file, projects.                                                                                                                                                                                                                                                                                                                      |
 | **Supplier**                                                                                                                 | Name, contact person, email, mobile, address, GST, PAN, quotation file, projects.                                                                                                                                                                                                                                                                                                                         |
 | **Vendor**                                                                                                                   | Labour-supply party: joining date, contact, address, shifts (start/end time) each with category rates (rate/day, OT/hr), photo, documents, projects.                                                                                                                                                                                                                                                      |
 | **Labour**                                                                                                                   | Name, labour id, wage type (Daily \| Monthly), weekly holidays, wage, OT wage/hr, opening balance, joining date, UAN, ESIC, Aadhaar, category, Reports To (another Labour), contact, gender, photo, documents; Projects. No Site Engineer of their own: they answer to the Site Engineers on their Projects (ADR CM-0041).                                                                                |
@@ -118,7 +117,6 @@ erDiagram
 erDiagram
     Project ||--o{ Worksheet : "per day"
     Worksheet }o--|| Contractor : by
-    Worksheet }o--|| Department : for
     Worksheet }o--o| WorkType : for
     Worksheet ||--o{ WorksheetMaterial : consumed
     WorksheetMaterial }o--|| Material : of
@@ -133,12 +131,12 @@ erDiagram
     Project ||--o{ ProgressReport : generated
 ```
 
-| Entity                                    | Notes                                                                                                                                                                                                                                                                                       |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Worksheet** (WorkItem / DailyWorksheet) | Date, location ref, contractor, department, work type, skilled/unskilled counts, shift (1/2/3), approx work done (qty + unit), remark, photos; approval status Pending \| Partially Approved \| Approved (when approval setting on); `isCompleted`. Form sections configurable per project. |
-| **EquipmentSheet** (EquipmentUsage)       | Date, equipment, operator, supervisor, location, approx work done, time shifts or meter readings, usage hrs/km/trips, idle, breakdown hrs, fuel consumed + borne by, hire details (vendor, basis, rate, hours → hire cost), materials, remarks, files; approval.                            |
-| **EquipmentTransfer**                     | To project \| warehouse (off system); date, destination, location name, remark.                                                                                                                                                                                                             |
-| **ProgressReport**                        | Generated document (Daily Progress Report, Task Progress Report) for a date range; async job.                                                                                                                                                                                               |
+| Entity                                    | Notes                                                                                                                                                                                                                                                                           |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Worksheet** (WorkItem / DailyWorksheet) | Date, location ref, contractor, work type, skilled/unskilled counts, shift (1/2/3), approx work done (qty + unit), remark, photos; approval status Pending \| Partially Approved \| Approved (when approval setting on); `isCompleted`. Form sections configurable per project. |
+| **EquipmentSheet** (EquipmentUsage)       | Date, equipment, operator, supervisor, location, approx work done, time shifts or meter readings, usage hrs/km/trips, idle, breakdown hrs, fuel consumed + borne by, hire details (vendor, basis, rate, hours → hire cost), materials, remarks, files; approval.                |
+| **EquipmentTransfer**                     | To project \| warehouse (off system); date, destination, location name, remark.                                                                                                                                                                                                 |
+| **ProgressReport**                        | Generated document (Daily Progress Report, Task Progress Report) for a date range; async job.                                                                                                                                                                                   |
 
 ## 5. Tasks, issues, inspections
 
@@ -149,7 +147,6 @@ erDiagram
     Task }o--o{ TeamMember : "assigned to"
     Task }o--o{ Tag : tagged
     Task }o--o| Contractor : by
-    Task }o--o| Department : for
     Task ||--o{ TaskProgressUpdate : "progress"
     Project ||--o{ Issue : has
     Issue }o--|| IssueCategory : "of"
@@ -162,11 +159,11 @@ erDiagram
     InspectionRequest ||--o{ InspectionRemark : "approval remarks"
 ```
 
-| Entity                | Notes                                                                                                                                                                                                                                                                                                                                |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Task**              | Name, description, assignees, start/due, priority, location ref, department, contractor, tags, total quantity + UoM, total price, completed work/price (earned value), baseline start/end/duration/variance, actual start/end, progress %, status (Not Started \| In Progress \| Delayed \| Completed), task no, parent task. Gantt. |
-| **Issue** (IssueSnag) | Date, department, assignee, due date, details, priority (High \| Medium \| Low), category, location ref, images, attachment; status Pending \| Delayed \| Solved; solved on.                                                                                                                                                         |
-| **InspectionRequest** | Number (sequence), date, time, department, contractor, assignee, work description, location ref, drawings/photos; status Pending for approval \| Approved \| Rejected (+ reason); observations with images.                                                                                                                          |
+| Entity                | Notes                                                                                                                                                                                                                                                                                                                    |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Task**              | Name, description, assignees, start/due, priority, location ref, contractor, tags, total quantity + UoM, total price, completed work/price (earned value), baseline start/end/duration/variance, actual start/end, progress %, status (Not Started \| In Progress \| Delayed \| Completed), task no, parent task. Gantt. |
+| **Issue** (IssueSnag) | Date, assignee, due date, details, priority (High \| Medium \| Low), category, location ref, images, attachment; status Pending \| Delayed \| Solved; solved on.                                                                                                                                                         |
+| **InspectionRequest** | Number (sequence), date, time, contractor, assignee, work description, location ref, drawings/photos; status Pending for approval \| Approved \| Rejected (+ reason); observations with images.                                                                                                                          |
 
 ## 6. Procurement & inventory
 
@@ -240,7 +237,7 @@ erDiagram
 | **Party** (polymorphic)               | `paidToType`: Other Party (1), Contractor (2), Supplier (3), Labour (5), Vendor (6); plus Team Member for petty cash.                                                                                                                                                                  |
 | **Transaction**                       | Date, type Payment In \| Payment Out, account, category, payment mode (Cash \| Cheque \| Online \| UPI + reference/cheque no + mode date), payment module, party, project/store, amount, description, attachment; approval Pending \| Approved \| Rejected; transfer between accounts. |
 | **PettyCashVoucher**                  | Number, date, type Payment \| Receipt \| Transfer, project, party, amount, mode Cash \| Bank \| Company, reference, category, description, photo/document; approval.                                                                                                                   |
-| **ContractorInvoice / Payment**       | Invoice no/date/amount, department, TDS amount, paid, balance, opening balance; payment date, mode, reference, paid amount, category, paid by, remarks, documents.                                                                                                                     |
+| **ContractorInvoice / Payment**       | Invoice no/date/amount, TDS amount, paid, balance, opening balance; payment date, mode, reference, paid amount, category, paid by, remarks, documents.                                                                                                                                 |
 | **SupplierInvoice / Payment**         | Invoice no/date/amount, due date, GRN/DC link (total GRN value); payments as above.                                                                                                                                                                                                    |
 | **LabourPayment / VendorPayment**     | Period (monthly \| weekly \| custom), to pay, advance, previous balance, final amount; vendor from attendance totals.                                                                                                                                                                  |
 | **PartyInvoice** (OtherParty/Invoice) | Purchase (from party) \| Sales (to party, numbered); invoice date, due date, number, amount, remarks; "invoice settled" approval flow.                                                                                                                                                 |

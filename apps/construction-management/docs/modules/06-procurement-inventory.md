@@ -21,6 +21,8 @@ This module tracks material from need to use, both within a project and through 
 | Accountant                             | Uses GRN values and invoice details for supplier payments (module 07). Holds the F permission on Material Received.                                    |
 | Owner / Admin                          | Configures numbering sequences, billing addresses, T&C, GRN field visibility. Views Central Inventory.                                                 |
 
+> **No Departments ([ADR CM-0048](../adr/CM-0048-no-department-master.md)).** Our Material Requests have no Department (form, detail, PDF). Where the legacy sections below mention one on an MR, they describe BuildControl only.
+
 ---
 
 ## Legacy behaviour
@@ -881,6 +883,7 @@ Product rules are in [ADR CM-0015](../adr/CM-0015-procurement-inventory-product-
 - A DN line's pending counts every live, undelivered DN as taken (pending ones too), so two pending DNs cannot over-commit a line (409 `DELIVERY_NOTE_EXCEEDS_PENDING`). On create the store-stock check uses the lower of stock on the DN date and stock now; Approve runs the ledger's full check.
 - Close is refused while any DN is pending or in transit (409 `MATERIAL_REQUEST_HAS_OPEN_DELIVERY_NOTES`), so what is closed was never sent.
 - The MR PDF leaves out the site location.
+- An MR has no Department: not on the form, the detail or the PDF (ADR CM-0048).
 
 ### CM-509 — Central Inventory
 

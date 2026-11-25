@@ -1,6 +1,7 @@
 # CM-0019 — Tasks, Issues & Snags and Inspection Requests: product decisions for M8
 
 - Status: accepted
+- Partly superseded by [CM-0048](CM-0048-no-department-master.md) (no Department master): Tasks, Issues & Snags and Inspection Requests have no Department (§5, §7, §9–§11, §13, §14).
 - Date: 2026-10-14
 - Tickets: CM-801 … CM-806 (M8)
 - Relates to: [CM-0003](CM-0003-permission-matrix.md) (Permission Matrix), [CM-0013](CM-0013-projects-structure-product-decisions.md) (`LocationRef`, structure usage, drawings, dashboard shell), [CM-0014](CM-0014-attachments-and-gallery-index.md) (attachments, Gallery), [CM-0016](CM-0016-daily-site-work-product-decisions.md) (worksheets, numbering, back-dated entry)

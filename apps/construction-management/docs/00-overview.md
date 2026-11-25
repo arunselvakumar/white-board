@@ -58,8 +58,7 @@ Three things define the product's character:
 | **Company / Organization**       | The tenant. A user can belong to several and switch.                                                                                          |
 | **Team Member**                  | An employee user. "Normal" members work on projects with a permission matrix; "HRMS" members only use attendance/leave/salary.                |
 | **Designation**                  | Job title; some carry a default permission template.                                                                                          |
-| **Department**                   | A trade or work category (RCC, Plumbing, Painting, Excavation…). Used to classify contractors, work types, worksheets, issues, inspections.   |
-| **Work Type**                    | A finer activity under a Department; can have materials attached.                                                                             |
+| **Work Type**                    | An activity work is booked against, such as RCC; can have materials attached.                                                                 |
 | **Contractor**                   | A party that executes work (labour-and-material or labour-only). Has invoices with TDS.                                                       |
 | **Supplier**                     | A party that sells material. Linked to POs and GRNs.                                                                                          |
 | **Vendor**                       | A labour-supply party (a gang/mukadam). Attendance is counted per labour category per shift and priced from the vendor's rate card.           |
@@ -67,7 +66,7 @@ Three things define the product's character:
 | **Other Party**                  | Any other counter-party — a customer you raise a sales invoice to, a consultant, a lender.                                                    |
 | **Phase / Wing / Floor / Unit**  | Project structure. A Wing has a type (Commercial, Residential, Bungalow scheme, Plotting scheme, …) that drives floor generation.             |
 | **Amenity / Common Development** | Non-unit locations (Swimming Pool, Compound Wall).                                                                                            |
-| **Daily Worksheet**              | The day's work record per contractor/department/location: labour counts, approximate work done, materials consumed, photos.                   |
+| **Daily Worksheet**              | The day's work record per contractor/location: labour counts, approximate work done, materials consumed, photos.                              |
 | **Equipment Usage Sheet**        | The day's machine record: hours/km/trips, fuel, breakdown, hire cost.                                                                         |
 | **PR / PO / GRN / MT / MR / DN** | Purchase Request, Purchase Order, Goods Receipt Note (Material Received), Material Transfer, Material Request (central store), Delivery Note. |
 | **Petty Cash**                   | Per-user cash float; payment/receipt/transfer vouchers with approval.                                                                         |
@@ -75,6 +74,8 @@ Three things define the product's character:
 | **Inquiry / Booking**            | Pre-sales lead with funnel stage; and the unit-level sale record.                                                                             |
 | **Back-dated entry control**     | How many days in the past an entry may be created/edited; per module; overridable by designation; financial closing date.                     |
 | **Sequence ID**                  | The document number format per module (`PR/26-27/PX/00001`).                                                                                  |
+
+BuildControl also had a **Department**: a trade list (RCC, Plumbing, Painting…) that classified contractors, work types, worksheets, issues and inspections. We do not keep it (ADR CM-0048). In our build, **Departments** is the main-menu area above (Human Resources, Marketing).
 
 ## Legacy technical profile (for migration planning)
 

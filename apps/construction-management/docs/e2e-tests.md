@@ -66,7 +66,6 @@ bun run --cwd apps/construction-management test:e2e         # every test
 | --------------------------------------------------------------------------------------------------------- | ---- | ---------------------- |
 | should offer the new Labour Category on a Labour and list the new Site Engineer, when the Owner adds them |      | `masters.spec.ts`      |
 | should list the Supplier with its GSTIN and the Material with its unit, when the Owner adds them          |      | `masters.spec.ts`      |
-| should list the new entry, when the Owner adds one to Departments                                         |      | `master-lists.spec.ts` |
 | should list the new entry, when the Owner adds one to Material Categories                                 |      | `master-lists.spec.ts` |
 | should list the new entry, when the Owner adds one to Measurement Units                                   |      | `master-lists.spec.ts` |
 | should list the new entry, when the Owner adds one to Tags                                                |      | `master-lists.spec.ts` |
