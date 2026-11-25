@@ -4,8 +4,10 @@ import { describe, expect, it } from "vitest";
 import {
   destinationForRole,
   isAllowedAppPath,
+  isAllowedPreschoolPath,
   isOwnerRole,
   mustLeaveAppPath,
+  preschoolHomeFor,
 } from "./workspace-access";
 
 describe("Workspace role access", () => {
@@ -206,5 +208,123 @@ describe("Reports", () => {
     ["owner", "/reports/not-a-report", true],
   ] as const)("gates %s on %s", (role, path, leave) => {
     expect(mustLeaveAppPath(path, role)).toBe(leave);
+  });
+});
+
+describe("Screens by Institution Type (ADR-0055)", () => {
+  it("keeps a Preschool Workspace on the In-app Home and /preschool", () => {
+    for (const role of WORKSPACE_ROLES) {
+      expect(mustLeaveAppPath("/", role, "preschool")).toBe(false);
+      expect(mustLeaveAppPath("/preschool", role, "preschool")).toBe(false);
+      expect(
+        mustLeaveAppPath("/preschool/centres/abc", role, "preschool"),
+      ).toBe(false);
+      expect(mustLeaveAppPath("/students", role, "preschool")).toBe(true);
+      expect(mustLeaveAppPath("/calendar", role, "preschool")).toBe(true);
+      expect(mustLeaveAppPath("/notifications", role, "preschool")).toBe(true);
+      expect(mustLeaveAppPath("/teacher", role, "preschool")).toBe(true);
+    }
+    expect(mustLeaveAppPath("/preschoolers", "owner", "preschool")).toBe(true);
+  });
+
+  it("closes /preschool to a Training Institute, with or without a type", () => {
+    expect(mustLeaveAppPath("/preschool", "owner", "training_institute")).toBe(
+      true,
+    );
+    expect(mustLeaveAppPath("/preschool/family", "parent")).toBe(true);
+    expect(mustLeaveAppPath("/students", "owner", "training_institute")).toBe(
+      false,
+    );
+    expect(mustLeaveAppPath("/students", "parent", "training_institute")).toBe(
+      true,
+    );
+  });
+});
+
+describe("Preschool role access", () => {
+  it("sends each Preschool role to its own Home", () => {
+    expect(preschoolHomeFor("owner")).toBe("/preschool");
+    expect(preschoolHomeFor("centre_head")).toBe("/preschool");
+    expect(preschoolHomeFor("teacher")).toBe("/preschool/teacher");
+    expect(preschoolHomeFor("parent")).toBe("/preschool/family");
+  });
+
+  it("lets each role open its own Home only", () => {
+    for (const role of ["owner", "centre_head", "teacher", "parent"] as const)
+      expect(isAllowedPreschoolPath(preschoolHomeFor(role), role)).toBe(true);
+    expect(isAllowedPreschoolPath("/preschool/teacher", "owner")).toBe(false);
+    expect(isAllowedPreschoolPath("/preschool/family", "owner")).toBe(false);
+    expect(isAllowedPreschoolPath("/preschool/family", "teacher")).toBe(false);
+    expect(isAllowedPreschoolPath("/preschool", "teacher")).toBe(false);
+    expect(isAllowedPreschoolPath("/preschool", "parent")).toBe(false);
+  });
+
+  it("gives the Owner every Head Office screen", () => {
+    for (const path of [
+      "/preschool/head-office",
+      "/preschool/head-office/royalty",
+      "/preschool/centres",
+      "/preschool/centres/new",
+      "/preschool/programmes",
+      "/preschool/fees/structures",
+      "/preschool/stock/items",
+      "/preschool/fees",
+      "/preschool/children/abc",
+    ])
+      expect(isAllowedPreschoolPath(path, "owner")).toBe(true);
+  });
+
+  it("keeps a Centre Head inside the Centre", () => {
+    for (const path of [
+      "/preschool/head-office",
+      "/preschool/head-office/royalty",
+      "/preschool/centres",
+      "/preschool/centres/abc",
+      "/preschool/programmes",
+      "/preschool/fees/structures",
+      "/preschool/stock/items",
+    ])
+      expect(isAllowedPreschoolPath(path, "centre_head")).toBe(false);
+    for (const path of [
+      "/preschool/fees",
+      "/preschool/fees/dues",
+      "/preschool/stock",
+      "/preschool/staff",
+      "/preschool/enquiries",
+      "/preschool/classrooms",
+    ])
+      expect(isAllowedPreschoolPath(path, "centre_head")).toBe(true);
+  });
+
+  it("keeps a Teacher away from fees and masters", () => {
+    for (const path of [
+      "/preschool/fees",
+      "/preschool/centres",
+      "/preschool/staff",
+      "/preschool/head-office",
+      "/preschool/programmes",
+      "/preschool/stock",
+      "/preschool/enquiries/abc",
+    ])
+      expect(isAllowedPreschoolPath(path, "teacher")).toBe(false);
+    for (const path of [
+      "/preschool/attendance",
+      "/preschool/daily-reports",
+      "/preschool/children/abc",
+      "/preschool/progress",
+      "/preschool/announcements",
+    ])
+      expect(isAllowedPreschoolPath(path, "teacher")).toBe(true);
+  });
+
+  it("gives a Parent only the family area", () => {
+    expect(
+      isAllowedPreschoolPath("/preschool/family/announcements", "parent"),
+    ).toBe(true);
+    expect(isAllowedPreschoolPath("/preschool/announcements", "parent")).toBe(
+      false,
+    );
+    expect(isAllowedPreschoolPath("/preschool/children", "parent")).toBe(false);
+    expect(isAllowedPreschoolPath("/students", "parent")).toBe(false);
   });
 });
