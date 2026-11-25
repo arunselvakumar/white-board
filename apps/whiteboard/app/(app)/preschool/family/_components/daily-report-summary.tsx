@@ -12,13 +12,12 @@ import type {
   DailyReportContent,
   Mood,
 } from "@/src/preschool/domain/daily-report";
+import { formatClockTime } from "@/app/(app)/preschool/_components/preschool-format";
 import {
   PRESCHOOL_MEAL_LABELS,
   PRESCHOOL_MOOD_LABELS,
   PRESCHOOL_TOILET_LABELS,
 } from "@/src/queries/preschool/daily-reports";
-
-import { clock12 } from "./family-format";
 
 const MOOD_ICONS: Record<Mood, LucideIcon> = {
   happy: Laugh,
@@ -84,14 +83,15 @@ export function DailyReportSummary({
         <Row label="Nap">
           {report.napFrom == null || report.napTo == null
             ? "No nap"
-            : `${clock12(report.napFrom)} – ${clock12(report.napTo)}`}
+            : `${formatClockTime(report.napFrom)} – ${formatClockTime(report.napTo)}`}
         </Row>
         {report.toilet.length === 0 ? null : (
           <Row label="Toilet">
             <ul>
               {report.toilet.map((entry, index) => (
                 <li key={`${entry.time}-${String(index)}`}>
-                  {clock12(entry.time)} · {PRESCHOOL_TOILET_LABELS[entry.kind]}
+                  {formatClockTime(entry.time)} ·{" "}
+                  {PRESCHOOL_TOILET_LABELS[entry.kind]}
                 </li>
               ))}
             </ul>

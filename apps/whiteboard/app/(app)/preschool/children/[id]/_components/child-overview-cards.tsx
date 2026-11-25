@@ -19,7 +19,11 @@ import {
 } from "@repo/ui/components/card";
 import { Skeleton } from "@repo/ui/components/skeleton";
 
-import { formatDate } from "@/app/(app)/preschool/_components/preschool-format";
+import {
+  formatClockTime,
+  formatDate,
+} from "@/app/(app)/preschool/_components/preschool-format";
+import { ChildStockIssued } from "@/app/(app)/preschool/stock/_components/child-stock-issued";
 import { todayInIndia } from "@/src/preschool/domain/dates";
 import {
   PRESCHOOL_ATTENDANCE_STATUS_LABELS,
@@ -100,10 +104,12 @@ function AttendanceCard({ childId }: { childId: string }) {
             ) : (
               <>
                 {PRESCHOOL_ATTENDANCE_STATUS_LABELS[day.status]}
-                {day.checkInTime == null ? null : `, in ${day.checkInTime}`}
+                {day.checkInTime == null
+                  ? null
+                  : `, in ${formatClockTime(day.checkInTime)}`}
                 {day.checkOutTime == null
                   ? null
-                  : `, out ${day.checkOutTime}${day.collectedByName == null ? "" : ` with ${day.collectedByName}`}`}
+                  : `, out ${formatClockTime(day.checkOutTime)}${day.collectedByName == null ? "" : ` with ${day.collectedByName}`}`}
               </>
             )}
           </p>
@@ -249,5 +255,7 @@ export function overviewCards(
       { key: "progress", node: <ProgressCard childId={child.id} /> },
     );
   if (manager) cards.push({ key: "fees", node: <FeesCard child={child} /> });
+  if (staff)
+    cards.push({ key: "stock", node: <ChildStockIssued childId={child.id} /> });
   return cards;
 }

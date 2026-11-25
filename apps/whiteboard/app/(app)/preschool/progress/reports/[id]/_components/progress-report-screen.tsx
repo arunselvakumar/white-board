@@ -4,7 +4,10 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Printer } from "lucide-react";
 import { Button } from "@repo/ui/components/button";
 
-import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
+import {
+  PageHeader,
+  type PageHeaderBack,
+} from "@/app/(app)/_components/app-shell/page-header";
 import { preschoolProgressReportQueryOptions } from "@/src/queries/preschool/progress-reports";
 
 import {
@@ -12,8 +15,17 @@ import {
   ProgressReportPrint,
 } from "./progress-report-print";
 
-/** The printable Progress Report with Print and the way back. */
-export function ProgressReportScreen({ reportId }: { reportId: string }) {
+/**
+ * The printable Progress Report with Print and the way back. The family
+ * pages pass their own `back`; a Parent's report comes without Observations.
+ */
+export function ProgressReportScreen({
+  reportId,
+  back = { href: "/preschool/progress", label: "Progress" },
+}: {
+  reportId: string;
+  back?: PageHeaderBack;
+}) {
   const { data: report } = useSuspenseQuery(
     preschoolProgressReportQueryOptions(reportId),
   );
@@ -25,7 +37,7 @@ export function ProgressReportScreen({ reportId }: { reportId: string }) {
           title={`${report.child.name} — ${report.term.label}`}
           meta={report.academicYear.name}
           watermark="Progress"
-          back={{ href: "/preschool/progress", label: "Progress" }}
+          back={back}
           actions={
             <Button
               type="button"

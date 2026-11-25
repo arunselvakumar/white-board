@@ -7,10 +7,8 @@ import { Button } from "@repo/ui/components/button";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import { cn } from "@repo/ui/lib/utils";
 
-import {
-  clock12,
-  dayLabel,
-} from "@/app/(app)/preschool/family/_components/family-format";
+import { dayLabel } from "@/app/(app)/preschool/family/_components/family-format";
+import { formatClockTime } from "@/app/(app)/preschool/_components/preschool-format";
 import { FamilyPage } from "@/app/(app)/preschool/family/_components/family-page";
 import type { MeChildView } from "@/src/preschool/application/me";
 import { addMonths, todayInIndia } from "@/src/preschool/domain/dates";
@@ -64,11 +62,11 @@ function DayDetail({ day, firstName }: { day: Day; firstName: string }) {
         <>
           <p>{PRESCHOOL_ATTENDANCE_STATUS_LABELS[day.status]}</p>
           {day.checkInTime == null ? null : (
-            <p>Checked in {clock12(day.checkInTime)}</p>
+            <p>Checked in {formatClockTime(day.checkInTime)}</p>
           )}
           {day.checkOutTime == null ? null : (
             <p>
-              Collected {clock12(day.checkOutTime)}
+              Collected {formatClockTime(day.checkOutTime)}
               {day.collectedByName == null
                 ? ""
                 : ` by ${day.collectedByName}${

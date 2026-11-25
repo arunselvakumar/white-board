@@ -158,6 +158,82 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** The author or a manager corrects an Observation in place. */
+export const EditObservation: Story = {
+  beforeEach() {
+    calls.length = 0;
+    let observation = {
+      id: "ad0e8400-e29b-41d4-a716-446655440002",
+      childId: BALA,
+      childName: "Bala",
+      domainId: DOMAINS[2]?.id ?? "",
+      domainName: DOMAINS[2]?.name ?? "",
+      observedOn: "2026-11-24",
+      note: "Counted to ten.",
+      createdByUserId: "user_owner",
+      createdByName: "Arun",
+      createdAt: NOW,
+      canEdit: true,
+    };
+    return mockPreschoolApi({
+      calls,
+      centreId: CENTRE_IDS.annaNagar,
+      routes: {
+        ...commonRoutes,
+        "GET /observations": () => ({
+          json: { items: [observation], nextCursor: null, total: 1 },
+        }),
+        [`POST /observations/${observation.id}/details`]: (body) => {
+          const input = body as {
+            note: string;
+            domainId: string;
+            observedOn: string;
+          };
+          observation = {
+            ...observation,
+            ...input,
+            domainName:
+              DOMAINS.find((domain) => domain.id === input.domainId)?.name ??
+              "",
+          };
+          return { json: observation };
+        },
+      },
+    });
+  },
+  render: () => <ProgressScreen />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.click(
+      await canvas.findByRole("button", {
+        name: "Edit the Observation on Bala",
+      }),
+    );
+    const form = within(
+      canvas.getByRole("form", { name: "Edit the Observation on Bala" }),
+    );
+    await expect(form.getByLabelText("Note")).toHaveValue("Counted to ten.");
+    await userEvent.clear(form.getByLabelText("Note"));
+    await userEvent.type(form.getByLabelText("Note"), "Counted to twenty.");
+    await userEvent.click(form.getByLabelText("Development Domain"));
+    await userEvent.click(
+      await within(canvasElement.ownerDocument.body).findByRole("option", {
+        name: DOMAINS[0]?.name ?? "",
+      }),
+    );
+    await userEvent.click(form.getByRole("button", { name: "Save changes" }));
+    await expect(
+      await canvas.findByText("Counted to twenty.", { selector: "p" }),
+    ).toBeVisible();
+    await expect(
+      calls.find((call) => call.route.endsWith("/details"))?.body,
+    ).toEqual({
+      note: "Counted to twenty.",
+      domainId: DOMAINS[0]?.id,
+      observedOn: "2026-11-24",
+    });
+  },
+};
+
 export const QuickAddObservation: Story = {
   beforeEach() {
     calls.length = 0;

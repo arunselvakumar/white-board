@@ -309,7 +309,9 @@ export const TakeAttendance: Story = {
       panel.getByRole("button", { name: "Check out Aadhya" }),
     );
     await expect(
-      await canvas.findByText(/Collected \d\d:\d\d by Lakshmi \(Grandmother\)/),
+      await canvas.findByText(
+        /Collected \d{1,2}:\d\d [ap]m by Lakshmi \(Grandmother\)/,
+      ),
     ).toBeVisible();
     await expect(
       calls.find((call) => call.route === "POST /attendance/check-out")?.body,
@@ -350,7 +352,7 @@ export const TakeAttendance: Story = {
     );
     await expect(
       await canvas.findByText(
-        /Collected \d\d:\d\d by Ravi \(not on the list\)/,
+        /Collected \d{1,2}:\d\d [ap]m by Ravi \(not on the list\)/,
       ),
     ).toBeVisible();
     await waitFor(() =>

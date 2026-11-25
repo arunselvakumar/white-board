@@ -545,7 +545,7 @@ export const ChildPage: Story = {
       canvas.getByRole("complementary", { name: "At a glance" }),
     );
     await expect(
-      await glance.findByText("Today: Present, in 09:05"),
+      await glance.findByText("Today: Present, in 9:05 am"),
     ).toBeVisible();
     await expect(glance.getByText("Mood: Happy")).toBeVisible();
     await expect(glance.getByText("Published")).toBeVisible();

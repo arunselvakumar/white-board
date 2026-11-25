@@ -23,6 +23,7 @@ import { Textarea } from "@repo/ui/components/textarea";
 import { useIsMobile } from "@repo/ui/hooks/use-mobile";
 import { cn } from "@repo/ui/lib/utils";
 
+import { formatClockTime } from "@/app/(app)/preschool/_components/preschool-format";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { PersonAvatar } from "@/app/(app)/preschool/_components/person-avatar";
@@ -155,7 +156,8 @@ function CheckOutForm({
       next["collector"] = `Choose who is collecting ${firstName}.`;
     if (!isClockTime(time)) next["time"] = "Enter the time.";
     else if (checkInTime != null && time < checkInTime)
-      next["time"] = `${firstName} was checked in at ${checkInTime}.`;
+      next["time"] =
+        `${firstName} was checked in at ${formatClockTime(checkInTime)}.`;
     if (collector?.kind === "other") {
       if (otherName.trim() === "") next["otherName"] = "Enter their name.";
       if (note.trim() === "")

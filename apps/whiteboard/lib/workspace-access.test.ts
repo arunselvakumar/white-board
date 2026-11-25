@@ -343,6 +343,8 @@ describe("Preschool role access", () => {
       "/preschool/family/receipts/abc",
       "/preschool/family/child",
       "/preschool/family/progress",
+      "/preschool/family/progress/abc",
+      "/preschool/family/announcements",
     ]) {
       expect(isAllowedPreschoolPath(path, "parent")).toBe(true);
       for (const role of ["owner", "centre_head", "teacher"] as const)

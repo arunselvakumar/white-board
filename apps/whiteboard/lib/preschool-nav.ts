@@ -155,7 +155,7 @@ const FAMILY_PROGRESS = {
   description: "Progress Reports from your Child's Teachers.",
 } as const;
 
-/** The Owner's and a Centre Head's Main menu. */
+/** The Owner's and a Centre Head's menu for the Centre they are in: daily work. */
 export const PRESCHOOL_MANAGER_NAV = [
   DASHBOARD,
   ENQUIRIES,
@@ -166,19 +166,27 @@ export const PRESCHOOL_MANAGER_NAV = [
   ANNOUNCEMENTS,
   PROGRESS,
   STOCK,
-  CLASSROOMS,
-  STAFF,
 ] as const;
 
-/** The Owner's Head Office group. Head Office and Royalty need several Centres. */
-export const PRESCHOOL_HEAD_OFFICE_NAV = [
-  HEAD_OFFICE,
-  ROYALTY,
+/** The Owner's view across Centres; only with several Centres. */
+export const PRESCHOOL_HEAD_OFFICE_NAV = [HEAD_OFFICE, ROYALTY] as const;
+
+/** Masters, set up once and rarely visited: the Owner's whole list. */
+export const PRESCHOOL_SETUP_NAV = [
+  CLASSROOMS,
+  STAFF,
   CENTRES,
   PROGRAMMES,
   FEE_STRUCTURES,
   STOCK_ITEMS,
 ] as const;
+
+/** A Centre Head sets up their Centre's Classrooms, Staff and fee amounts. */
+const CENTRE_HEAD_SETUP_HREFS = new Set<string>([
+  CLASSROOMS.href,
+  STAFF.href,
+  FEE_STRUCTURES.href,
+]);
 
 export const PRESCHOOL_TEACHER_NAV = [
   TEACHER_HOME,
@@ -201,6 +209,7 @@ export const PRESCHOOL_PARENT_NAV = [
 export type PreschoolNavItem =
   | (typeof PRESCHOOL_MANAGER_NAV)[number]
   | (typeof PRESCHOOL_HEAD_OFFICE_NAV)[number]
+  | (typeof PRESCHOOL_SETUP_NAV)[number]
   | (typeof PRESCHOOL_TEACHER_NAV)[number]
   | (typeof PRESCHOOL_PARENT_NAV)[number];
 export type PreschoolNavHref = PreschoolNavItem["href"];
@@ -208,6 +217,7 @@ export type PreschoolNavHref = PreschoolNavItem["href"];
 const ALL_ITEMS: readonly PreschoolNavItem[] = [
   ...PRESCHOOL_MANAGER_NAV,
   ...PRESCHOOL_HEAD_OFFICE_NAV,
+  ...PRESCHOOL_SETUP_NAV,
   ...PRESCHOOL_TEACHER_NAV,
   ...PRESCHOOL_PARENT_NAV,
 ];
@@ -219,10 +229,16 @@ const HOME_HREFS = new Set<string>([
   FAMILY_HOME.href,
 ]);
 
+/**
+ * A Preschool sidebar in the order it is drawn: Head Office first, so the
+ * Owner never has to scroll for it; the Centre's daily work; Setup last.
+ */
 export type PreschoolNav = {
-  main: readonly PreschoolNavItem[];
-  /** Empty for everyone but the Owner. */
+  /** The Owner's, and only with several Centres. */
   headOffice: readonly PreschoolNavItem[];
+  main: readonly PreschoolNavItem[];
+  /** Empty for Teachers and Parents. */
+  setup: readonly PreschoolNavItem[];
 };
 
 /** The sidebar for a Preschool role. */
@@ -231,18 +247,21 @@ export function preschoolNavFor(me: {
   hasSeveralCentres: boolean;
 }): PreschoolNav {
   if (me.role === "parent")
-    return { main: PRESCHOOL_PARENT_NAV, headOffice: [] };
+    return { headOffice: [], main: PRESCHOOL_PARENT_NAV, setup: [] };
   if (me.role === "teacher")
-    return { main: PRESCHOOL_TEACHER_NAV, headOffice: [] };
+    return { headOffice: [], main: PRESCHOOL_TEACHER_NAV, setup: [] };
   if (me.role === "centre_head")
-    return { main: PRESCHOOL_MANAGER_NAV, headOffice: [] };
+    return {
+      headOffice: [],
+      main: PRESCHOOL_MANAGER_NAV,
+      setup: PRESCHOOL_SETUP_NAV.filter((item) =>
+        CENTRE_HEAD_SETUP_HREFS.has(item.href),
+      ),
+    };
   return {
+    headOffice: me.hasSeveralCentres ? PRESCHOOL_HEAD_OFFICE_NAV : [],
     main: PRESCHOOL_MANAGER_NAV,
-    headOffice: PRESCHOOL_HEAD_OFFICE_NAV.filter(
-      (item) =>
-        me.hasSeveralCentres ||
-        (item.href !== HEAD_OFFICE.href && item.href !== ROYALTY.href),
-    ),
+    setup: PRESCHOOL_SETUP_NAV,
   };
 }
 

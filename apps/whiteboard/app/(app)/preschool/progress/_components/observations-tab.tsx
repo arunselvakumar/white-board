@@ -2,7 +2,7 @@
 
 import { NotePencilIcon } from "@phosphor-icons/react/ssr";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { Suspense, useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
@@ -40,7 +40,9 @@ import {
   preschoolObservationKeys,
   preschoolObservationsQueryOptions,
   removePreschoolObservation,
+  updatePreschoolObservation,
   type PreschoolDevelopmentDomain,
+  type PreschoolObservation,
 } from "@/src/queries/preschool/observations";
 
 type RosterChild = { id: string; name: string; photoUrl: string | null };
@@ -226,6 +228,140 @@ export function QuickAdd({
   );
 }
 
+/**
+ * Edit one Observation in place: its note, Development Domain and date.
+ * For its author and the Centre's managers (the API's `canEdit`).
+ */
+function ObservationEditForm({
+  item,
+  domains,
+  onDone,
+}: {
+  item: PreschoolObservation;
+  domains: readonly PreschoolDevelopmentDomain[];
+  onDone: () => void;
+}) {
+  const queryClient = useQueryClient();
+  const today = todayInIndia(new Date());
+  const [note, setNote] = useState(item.note);
+  const [domainId, setDomainId] = useState(item.domainId);
+  const [observedOn, setObservedOn] = useState(item.observedOn);
+  const [error, setError] = useState<string>();
+  const [saving, setSaving] = useState(false);
+  const items = domains.map((domain) => ({
+    value: domain.id,
+    label: domain.name,
+  }));
+  if (!items.some((domain) => domain.value === item.domainId))
+    items.push({ value: item.domainId, label: item.domainName });
+  const noteId = `observation-note-${item.id}`;
+  const dateId = `observation-date-${item.id}`;
+  const domainFieldId = `observation-domain-${item.id}`;
+
+  return (
+    <form
+      noValidate
+      aria-label={`Edit the Observation on ${item.childName}`}
+      className="min-w-0 flex-1 space-y-3"
+      onSubmit={(event) => {
+        event.preventDefault();
+        if (note.trim() === "") {
+          setError("Write what you noticed.");
+          return;
+        }
+        if (observedOn === "" || observedOn > today) {
+          setError("Choose a day up to today.");
+          return;
+        }
+        setError(undefined);
+        setSaving(true);
+        updatePreschoolObservation(item.id, {
+          note: note.trim(),
+          domainId,
+          observedOn,
+        })
+          .then(async () => {
+            await queryClient.invalidateQueries({
+              queryKey: preschoolObservationKeys.all,
+            });
+            onDone();
+          })
+          .catch((caught: unknown) => {
+            setError(messageOf(caught, "Could not save it."));
+          })
+          .finally(() => {
+            setSaving(false);
+          });
+      }}
+    >
+      <p className="font-medium">{item.childName}</p>
+      <FormAlert message={error} />
+      <div className="space-y-1.5">
+        <Label htmlFor={noteId} required>
+          Note
+        </Label>
+        <Textarea
+          id={noteId}
+          rows={3}
+          aria-required
+          value={note}
+          onChange={(event) => {
+            setNote(event.target.value);
+          }}
+        />
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="space-y-1.5">
+          <Label htmlFor={domainFieldId}>Development Domain</Label>
+          <Select
+            items={items}
+            value={domainId}
+            onValueChange={(value) => {
+              if (value != null) setDomainId(value);
+            }}
+          >
+            <SelectTrigger
+              id={domainFieldId}
+              size="lg"
+              className="w-full min-w-0"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="start" alignItemWithTrigger={false}>
+              {items.map((domain) => (
+                <SelectItem key={domain.value} value={domain.value}>
+                  {domain.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor={dateId}>Date</Label>
+          <Input
+            id={dateId}
+            type="date"
+            className="h-10"
+            max={today}
+            value={observedOn}
+            onChange={(event) => {
+              setObservedOn(event.target.value);
+            }}
+          />
+        </div>
+      </div>
+      <div className="flex gap-2">
+        <Button type="submit" className="h-11" disabled={saving}>
+          {saving ? "Saving…" : "Save changes"}
+        </Button>
+        <Button type="button" variant="ghost" className="h-11" onClick={onDone}>
+          Cancel
+        </Button>
+      </div>
+    </form>
+  );
+}
+
 function Feed({
   classroomId,
   childId,
@@ -239,6 +375,8 @@ function Feed({
 }) {
   const queryClient = useQueryClient();
   const [error, setError] = useState<string>();
+  const [editing, setEditing] = useState<string | null>(null);
+  const { data: domains } = useSuspenseQuery(preschoolDomainsQueryOptions());
   const { data } = useSuspenseQuery(
     preschoolObservationsQueryOptions(
       childId === ANY
@@ -258,6 +396,7 @@ function Feed({
       />
     );
   const photo = new Map(roster.map((child) => [child.id, child.photoUrl]));
+  const editingItem = data.items.find((item) => item.id === editing);
   return (
     <div className="space-y-2">
       <FormAlert message={error} />
@@ -273,38 +412,66 @@ function Feed({
               photoUrl={photo.get(item.childId)}
               className="size-9 shrink-0"
             />
-            <div className="min-w-0 flex-1 space-y-1">
-              <p className="flex flex-wrap items-center gap-2">
-                <span className="font-medium">{item.childName}</span>
-                <Badge variant="secondary">{item.domainName}</Badge>
-              </p>
-              <p className="break-words whitespace-pre-line">{item.note}</p>
-              <p className="text-muted-foreground text-xs">
-                {formatDate(item.observedOn)} · {item.createdByName}
-              </p>
-            </div>
-            {item.canEdit ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                aria-label={`Remove the Observation on ${item.childName}`}
-                onClick={() => {
-                  setError(undefined);
-                  void removePreschoolObservation(item.id)
-                    .then(() =>
-                      queryClient.invalidateQueries({
-                        queryKey: preschoolObservationKeys.all,
-                      }),
-                    )
-                    .catch((caught: unknown) => {
-                      setError(messageOf(caught, "Could not remove it."));
-                    });
+            {editingItem?.id === item.id ? (
+              <ObservationEditForm
+                item={item}
+                domains={domains.items}
+                onDone={() => {
+                  setEditing(null);
                 }}
-              >
-                <Trash2 aria-hidden="true" />
-              </Button>
-            ) : null}
+              />
+            ) : (
+              <>
+                <div className="min-w-0 flex-1 space-y-1">
+                  <p className="flex flex-wrap items-center gap-2">
+                    <span className="font-medium">{item.childName}</span>
+                    <Badge variant="secondary">{item.domainName}</Badge>
+                  </p>
+                  <p className="break-words whitespace-pre-line">{item.note}</p>
+                  <p className="text-muted-foreground text-xs">
+                    {formatDate(item.observedOn)} · {item.createdByName}
+                  </p>
+                </div>
+                {item.canEdit ? (
+                  <div className="flex shrink-0 flex-col gap-1 sm:flex-row">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-11"
+                      aria-label={`Edit the Observation on ${item.childName}`}
+                      onClick={() => {
+                        setError(undefined);
+                        setEditing(item.id);
+                      }}
+                    >
+                      <Pencil aria-hidden="true" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-11"
+                      aria-label={`Remove the Observation on ${item.childName}`}
+                      onClick={() => {
+                        setError(undefined);
+                        void removePreschoolObservation(item.id)
+                          .then(() =>
+                            queryClient.invalidateQueries({
+                              queryKey: preschoolObservationKeys.all,
+                            }),
+                          )
+                          .catch((caught: unknown) => {
+                            setError(messageOf(caught, "Could not remove it."));
+                          });
+                      }}
+                    >
+                      <Trash2 aria-hidden="true" />
+                    </Button>
+                  </div>
+                ) : null}
+              </>
+            )}
           </li>
         ))}
       </ul>

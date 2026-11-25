@@ -74,7 +74,9 @@ export const OwnerOfSeveralCentres: Story = {
       await canvas.findByText("Working in Little Steps Anna Nagar as owner"),
     ).toBeVisible();
     const sidebar = within(await openSidebar(canvasElement, userEvent));
-    const main = within(sidebar.getByRole("navigation", { name: "Main" }));
+    const main = within(
+      sidebar.getByRole("navigation", { name: "This Centre" }),
+    );
     await expect(main.getByRole("link", { name: "Dashboard" })).toHaveAttribute(
       "aria-current",
       "page",
@@ -86,15 +88,18 @@ export const OwnerOfSeveralCentres: Story = {
     const headOffice = within(
       sidebar.getByRole("navigation", { name: "Head Office" }),
     );
+    for (const label of ["Head Office", "Royalty"])
+      await expect(headOffice.getByRole("link", { name: label })).toBeVisible();
+    const setup = within(sidebar.getByRole("navigation", { name: "Setup" }));
     for (const label of [
-      "Head Office",
-      "Royalty",
+      "Classrooms",
+      "Staff",
       "Centres",
       "Programmes",
       "Fee Structures",
       "Stock Items",
     ])
-      await expect(headOffice.getByRole("link", { name: label })).toBeVisible();
+      await expect(setup.getByRole("link", { name: label })).toBeVisible();
     await expect(
       sidebar.queryByRole("button", { name: /Notifications/ }),
     ).not.toBeInTheDocument();
@@ -151,7 +156,7 @@ export const RemembersTheCentre: Story = {
   },
 };
 
-/** A standalone preschool: no Head Office, no Royalty, no Switch Centre. */
+/** A standalone preschool: no Head Office group, no Switch Centre; Centres stays under Setup. */
 export const OwnerOfOneCentre: Story = {
   beforeEach() {
     const me = preschoolMe({ hasSeveralCentres: false });
@@ -160,14 +165,14 @@ export const OwnerOfOneCentre: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     await canvas.findByText("Working in Little Steps Anna Nagar as owner");
     const sidebar = within(await openSidebar(canvasElement, userEvent));
-    const headOffice = within(
-      sidebar.getByRole("navigation", { name: "Head Office" }),
-    );
     await expect(
-      headOffice.queryByRole("link", { name: "Royalty" }),
+      sidebar.queryByRole("navigation", { name: "Head Office" }),
     ).not.toBeInTheDocument();
     await expect(
-      headOffice.getByRole("link", { name: "Centres" }),
+      within(sidebar.getByRole("navigation", { name: "Setup" })).getByRole(
+        "link",
+        { name: "Centres" },
+      ),
     ).toBeVisible();
     await expect(
       sidebar.queryByRole("button", { name: /^Switch Centre/ }),
@@ -192,7 +197,7 @@ export const TeacherIsSentHome: Story = {
     );
     const sidebar = within(await openSidebar(canvasElement, userEvent));
     const main = within(
-      await sidebar.findByRole("navigation", { name: "Main" }),
+      await sidebar.findByRole("navigation", { name: "Main menu" }),
     );
     await expect(main.getByRole("link", { name: "Home" })).toHaveAttribute(
       "href",
@@ -203,6 +208,9 @@ export const TeacherIsSentHome: Story = {
     ).not.toBeInTheDocument();
     await expect(
       sidebar.queryByRole("navigation", { name: "Head Office" }),
+    ).not.toBeInTheDocument();
+    await expect(
+      sidebar.queryByRole("navigation", { name: "Setup" }),
     ).not.toBeInTheDocument();
   },
 };
