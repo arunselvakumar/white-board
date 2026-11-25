@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
-import { PreschoolEmptyPage } from "@/app/(app)/preschool/_components/preschool-empty-page";
+import { EnquiriesScreen } from "@/app/(app)/preschool/enquiries/_components/enquiries-screen";
 
 export const metadata: Metadata = { title: "Enquiries" };
 
 export default function Page() {
-  return <PreschoolEmptyPage href="/preschool/enquiries" />;
+  return <EnquiriesScreen />;
 }
