@@ -477,6 +477,7 @@ const ACCOUNT: PreschoolChildFeeAccount = {
       amountPaise: 3_000_00,
       method: "upi",
       reference: null,
+      cancelled: false,
     },
   ],
   totals: {
@@ -555,6 +556,7 @@ const RECEIPT: PreschoolReceipt = {
   note: null,
   receivedByName: "Arun",
   balanceDuePaise: 25_000_00,
+  cancellation: null,
 };
 
 export const Receipt: Story = {

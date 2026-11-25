@@ -3,6 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 import type {
+  ChildFeeAccountView,
   DuesListView,
   FeePaymentListView,
   FeeSummaryView,
@@ -20,12 +21,15 @@ import {
   signInWithEmail,
   type PreschoolFixture,
 } from "../_lib/testing";
+import { GET as account } from "./children/[childId]/route";
 import { GET as dues } from "./dues/route";
+import { POST as cancelPayment } from "./payments/[id]/cancel/route";
 import { GET as receipt } from "./payments/[id]/route";
 import { GET as listPayments, POST as pay } from "./payments/route";
 import { GET as summary } from "./summary/route";
 import {
   addInvoice,
+  childContext,
   codeOf,
   freezeToday,
   getRequest,
@@ -535,6 +539,210 @@ describe("Fee Payments, Receipts, Dues", () => {
         "Kit & books",
         "Uniform",
       ]);
+    });
+  });
+
+  describe("cancelling a Receipt", () => {
+    let child: Child;
+    let cancelledId: string;
+    let earlierId: string;
+
+    async function summaryNow(): Promise<FeeSummaryView> {
+      const response = await summary(
+        getRequest("/summary", { centreId: preschool.centreId }),
+      );
+      return (await response.json()) as FeeSummaryView;
+    }
+
+    function cancelRequest(reason: string): Request {
+      return jsonRequest({ reason });
+    }
+
+    beforeAll(async () => {
+      signInAsOwner(preschool);
+      child = await addChild(preschool, {
+        classroomId: lkg,
+        firstName: "Meghna",
+        motherEmail: "fp-cancel-parent@example.test",
+      });
+      for (const [label, dueOn] of [
+        ["Admission fee", "2026-06-01"],
+        ["Tuition — Term 2", "2026-08-01"],
+      ] as const)
+        await addInvoice(preschool, {
+          ...child,
+          label,
+          dueOn,
+          amountPaise: 500_000,
+        });
+      earlierId = (
+        await record({
+          childId: child.childId,
+          amountPaise: 500_000,
+          method: "cash",
+          receivedOn: "2026-11-20",
+        })
+      ).body.id;
+    });
+
+    it("takes the payment off its Invoices and every total, keeping the Receipt", async () => {
+      signInWithEmail(preschool, "teacher", HEAD);
+      const before = await summaryNow();
+      const listBefore = (await (
+        await listPayments(
+          getRequest("/payments", { centreId: preschool.centreId }),
+        )
+      ).json()) as FeePaymentListView;
+      const paid = await record({
+        childId: child.childId,
+        amountPaise: 300_000,
+        method: "cheque",
+        reference: "Cheque 004521",
+      });
+      cancelledId = paid.body.id;
+      expect((await summaryNow()).collectedTodayPaise).toBe(
+        before.collectedTodayPaise + 300_000,
+      );
+
+      const response = await cancelPayment(
+        cancelRequest("  Cheque bounced "),
+        idContext(cancelledId),
+      );
+      expect(response.status).toBe(StatusCodes.OK);
+      const view = (await response.json()) as ReceiptView;
+      expect(view).toMatchObject({
+        receiptNumber: paid.body.receiptNumber,
+        amountPaise: 300_000,
+        cancellation: {
+          cancelledByName: "fp-head",
+          reason: "Cheque bounced",
+          cancelledAt: expect.any(String) as unknown,
+        },
+      });
+      expect(view.lines).toHaveLength(1);
+
+      const invoices = await prisma.preschoolInvoice.findMany({
+        where: { childId: child.childId },
+        orderBy: { dueOn: "asc" },
+      });
+      expect(invoices.map((invoice) => invoice.paidPaise)).toEqual([
+        500_000, 0,
+      ]);
+      expect(
+        await prisma.preschoolFeePaymentAllocation.count({
+          where: { paymentId: cancelledId },
+        }),
+      ).toBe(1);
+
+      const after = await summaryNow();
+      expect(after.collectedTodayPaise).toBe(before.collectedTodayPaise);
+      expect(after.collectedThisMonthPaise).toBe(
+        before.collectedThisMonthPaise,
+      );
+      expect(after.duePaise).toBe(before.duePaise);
+
+      const list = (await (
+        await listPayments(
+          getRequest("/payments", { centreId: preschool.centreId }),
+        )
+      ).json()) as FeePaymentListView;
+      expect(list.total).toBe(listBefore.total + 1);
+      expect(list.totalPaise).toBe(listBefore.totalPaise);
+      expect(list.items.find((row) => row.id === cancelledId)?.cancelled).toBe(
+        true,
+      );
+      expect(list.items.find((row) => row.id === earlierId)?.cancelled).toBe(
+        false,
+      );
+
+      const dueRows = (await (
+        await dues(getRequest("/dues", { centreId: preschool.centreId }))
+      ).json()) as DuesListView;
+      expect(
+        dueRows.items.find((row) => row.childId === child.childId),
+      ).toMatchObject({ duePaise: 500_000, overduePaise: 500_000 });
+    });
+
+    it("shows the cancelled payment on the account, counted for nothing", async () => {
+      signInAsOwner(preschool);
+      const response = await account(
+        getRequest(""),
+        childContext(child.childId),
+      );
+      const body = (await response.json()) as ChildFeeAccountView;
+      expect(
+        body.payments.map((payment) => [
+          payment.amountPaise,
+          payment.cancelled,
+        ]),
+      ).toEqual([
+        [300_000, true],
+        [500_000, false],
+      ]);
+      expect(body.totals).toMatchObject({
+        paidPaise: 500_000,
+        duePaise: 500_000,
+      });
+      const earlier = (await (
+        await receipt(getRequest(""), idContext(earlierId))
+      ).json()) as ReceiptView;
+      expect(earlier.balanceDuePaise).toBe(500_000);
+      expect(earlier.cancellation).toBeNull();
+    });
+
+    it("shows the Parent the Receipt as cancelled", async () => {
+      signInWithEmail(preschool, "parent", "fp-cancel-parent@example.test");
+      const view = (await (
+        await receipt(getRequest(""), idContext(cancelledId))
+      ).json()) as ReceiptView;
+      expect(view.cancellation?.reason).toBe("Cheque bounced");
+    });
+
+    it("refuses a second cancel, a missing reason, a Teacher, another Centre and another Workspace", async () => {
+      signInAsOwner(preschool);
+      const twice = await cancelPayment(
+        cancelRequest("Duplicate entry"),
+        idContext(cancelledId),
+      );
+      expect(twice.status).toBe(StatusCodes.CONFLICT);
+      expect(await codeOf(twice)).toBe("FEE_PAYMENT_ALREADY_CANCELLED");
+      expect(
+        (await cancelPayment(cancelRequest(" "), idContext(earlierId))).status,
+      ).toBe(StatusCodes.BAD_REQUEST);
+      signInWithEmail(preschool, "teacher", TEACHER);
+      expect(
+        (
+          await cancelPayment(
+            cancelRequest("Wrong amount"),
+            idContext(earlierId),
+          )
+        ).status,
+      ).toBe(StatusCodes.FORBIDDEN);
+      signInWithEmail(preschool, "teacher", OTHER_HEAD);
+      expect(
+        await codeOf(
+          await cancelPayment(
+            cancelRequest("Wrong amount"),
+            idContext(earlierId),
+          ),
+        ),
+      ).toBe("CENTRE_FORBIDDEN");
+      signInAsOwner(other);
+      expect(
+        (
+          await cancelPayment(
+            cancelRequest("Wrong amount"),
+            idContext(earlierId),
+          )
+        ).status,
+      ).toBe(StatusCodes.NOT_FOUND);
+      expect(
+        (
+          await prisma.preschoolFeePayment.findUniqueOrThrow({
+            where: { id: earlierId },
+          })
+        ).cancelledAt,
+      ).toBeNull();
     });
   });
 });

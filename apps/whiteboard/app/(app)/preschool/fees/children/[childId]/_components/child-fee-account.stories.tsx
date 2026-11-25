@@ -94,6 +94,7 @@ function account(
               amountPaise: 500_000,
               method: "cash",
               reference: null,
+              cancelled: false,
             },
           ],
     totals: {

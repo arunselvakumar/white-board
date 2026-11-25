@@ -54,6 +54,7 @@ const RECEIPT: PreschoolReceipt = {
   note: null,
   receivedByName: "Arun",
   balanceDuePaise: 2_850_000,
+  cancellation: null,
 };
 
 let printed = 0;

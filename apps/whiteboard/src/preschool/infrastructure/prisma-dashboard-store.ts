@@ -136,13 +136,14 @@ export class PrismaDashboardStore implements DashboardStore {
         },
       }),
       db.preschoolFeePayment.aggregate({
-        where: { workspaceId, centreId, receivedOn: today },
+        where: { workspaceId, centreId, receivedOn: today, cancelledAt: null },
         _sum: { amountPaise: true },
       }),
       db.preschoolFeePayment.aggregate({
         where: {
           workspaceId,
           centreId,
+          cancelledAt: null,
           receivedOn: {
             gte: fromIsoDate(window.monthStartsOn),
             lte: fromIsoDate(window.monthEndsOn),

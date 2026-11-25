@@ -80,6 +80,8 @@ export type FeePaymentSummaryView = {
   amountPaise: number;
   method: FeePaymentMethod;
   reference: string | null;
+  /** Cancelled: kept for the record, counts for nothing. */
+  cancelled: boolean;
 };
 
 export type FeeChildView = {
@@ -132,7 +134,7 @@ export type FeePaymentListView = {
   nextCursor: string | null;
   /** Payments in the range. */
   total: number;
-  /** Their sum. */
+  /** The sum of those not cancelled. */
   totalPaise: number;
 };
 
@@ -168,6 +170,12 @@ export type ReceiptView = {
   receivedByName: string;
   /** What the Child still owed straight after this payment. */
   balanceDuePaise: number;
+  /** Set once the Receipt is cancelled; it then counts for nothing. */
+  cancellation: {
+    cancelledAt: string;
+    cancelledByName: string;
+    reason: string;
+  } | null;
 };
 
 export type DuesRowView = {

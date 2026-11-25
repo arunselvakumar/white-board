@@ -155,11 +155,13 @@ export class PrismaFeeAccountStore implements FeeAccountStore {
         amountPaise: true,
         method: true,
         reference: true,
+        cancelledAt: true,
       },
     });
-    return rows.map((row) => ({
+    return rows.map(({ cancelledAt, ...row }) => ({
       ...row,
       receivedOn: toIsoDate(row.receivedOn),
+      cancelled: cancelledAt != null,
     }));
   }
 

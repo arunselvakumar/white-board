@@ -96,6 +96,7 @@ const PAYMENTS: FeePaymentListView = {
       childName: "Aarav Kumar",
       admissionNumber: "LSAN-0007",
       recordedByName: "Arun",
+      cancelled: false,
     },
   ],
   nextCursor: null,

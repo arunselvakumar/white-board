@@ -1,6 +1,7 @@
 import { todayInIndia } from "../domain/dates";
-import { invalid, notFound } from "../domain/errors";
+import { conflict, invalid, notFound } from "../domain/errors";
 import { rupeesInWords } from "../domain/fee-amount-words";
+import { cancelReason } from "../domain/fee-payment";
 import { allocatePayment } from "../domain/fees";
 import { assertManagerOf, type PreschoolActor } from "./access";
 import { assertMayReadChildFees } from "./fee-account-handlers";
@@ -118,6 +119,34 @@ export class FeePaymentHandlers {
       id: owner.childId,
       centreId: owner.centreId,
     });
+    return this.read(actor.workspaceId, id);
+  }
+
+  /**
+   * Cancels a Receipt entered by mistake (Owner or the Centre's Head). It
+   * keeps its number and allocations but no longer counts as paid.
+   */
+  async cancel(
+    actor: PreschoolActor,
+    id: string,
+    input: { reason: string },
+  ): Promise<ReceiptView> {
+    const owner = await this.deps.payments.owner(actor.workspaceId, id);
+    if (owner == null)
+      throw notFound("FEE_PAYMENT_NOT_FOUND", "Fee Payment not found.");
+    assertManagerOf(actor, owner.centreId);
+    const reason = cancelReason(input.reason);
+    const result = await this.deps.payments.cancel(actor.workspaceId, id, {
+      at: this.deps.now(),
+      userId: actor.userId,
+      userName: actor.userName,
+      reason,
+    });
+    if (result === "already_cancelled")
+      throw conflict(
+        "FEE_PAYMENT_ALREADY_CANCELLED",
+        "This Receipt is already cancelled.",
+      );
     return this.read(actor.workspaceId, id);
   }
 

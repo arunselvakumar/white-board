@@ -156,6 +156,7 @@ export class PrismaFeePaymentStore implements FeePaymentStore {
           method: true,
           reference: true,
           recordedByName: true,
+          cancelledAt: true,
           child: {
             select: {
               id: true,
@@ -168,15 +169,16 @@ export class PrismaFeePaymentStore implements FeePaymentStore {
       }),
       this.db.preschoolFeePayment.count({ where }),
       this.db.preschoolFeePayment.aggregate({
-        where,
+        where: { ...where, cancelledAt: null },
         _sum: { amountPaise: true },
       }),
     ]);
     const page = rows.slice(0, query.limit);
     return {
-      items: page.map(({ child, receivedOn, ...row }) => ({
+      items: page.map(({ child, receivedOn, cancelledAt, ...row }) => ({
         ...row,
         receivedOn: toIsoDate(receivedOn),
+        cancelled: cancelledAt != null,
         childId: child.id,
         childName: [child.firstName, child.lastName]
           .filter((part) => part != null && part !== "")
@@ -214,6 +216,9 @@ export class PrismaFeePaymentStore implements FeePaymentStore {
         method: true,
         reference: true,
         note: true,
+        cancelledAt: true,
+        cancelledByName: true,
+        cancelReason: true,
         recordedByName: true,
         createdAt: true,
         allocations: {
@@ -268,7 +273,11 @@ export class PrismaFeePaymentStore implements FeePaymentStore {
       this.db.preschoolFeePaymentAllocation.aggregate({
         where: {
           workspaceId,
-          payment: { childId: child.id, createdAt: { gt: payment.createdAt } },
+          payment: {
+            childId: child.id,
+            createdAt: { gt: payment.createdAt },
+            cancelledAt: null,
+          },
         },
         _sum: { amountPaise: true },
       }),
@@ -302,6 +311,60 @@ export class PrismaFeePaymentStore implements FeePaymentStore {
       note: payment.note,
       receivedByName: payment.recordedByName,
       balanceDuePaise: dueNow + (later._sum.amountPaise ?? 0),
+      cancellation:
+        payment.cancelledAt == null
+          ? null
+          : {
+              cancelledAt: payment.cancelledAt.toISOString(),
+              cancelledByName: payment.cancelledByName ?? "",
+              reason: payment.cancelReason ?? "",
+            },
     };
+  }
+
+  async cancel(
+    workspaceId: string,
+    id: string,
+    input: { at: Date; userId: string; userName: string; reason: string },
+  ): Promise<"cancelled" | "already_cancelled"> {
+    return this.db.$transaction(async (tx) => {
+      const [payment] = await tx.$queryRaw<{ cancelled: boolean }[]>`
+        SELECT cancelled_at IS NOT NULL AS cancelled
+        FROM preschool.fee_payments
+        WHERE id = ${id}::uuid AND workspace_id = ${workspaceId}
+        FOR UPDATE`;
+      if (payment == null)
+        throw notFound("FEE_PAYMENT_NOT_FOUND", "Fee Payment not found.");
+      if (payment.cancelled) return "already_cancelled";
+      // The Invoices are locked as a payment locks them, oldest first, so a
+      // cancel and a payment for the same Child queue rather than deadlock.
+      await tx.$queryRaw`
+        SELECT 1 AS locked FROM preschool.invoices
+        WHERE id IN (
+          SELECT invoice_id FROM preschool.fee_payment_allocations
+          WHERE payment_id = ${id}::uuid
+        )
+        ORDER BY due_on, label, id
+        FOR UPDATE`;
+      const allocations = await tx.preschoolFeePaymentAllocation.findMany({
+        where: { paymentId: id, workspaceId },
+        select: { invoiceId: true, amountPaise: true },
+      });
+      for (const allocation of allocations)
+        await tx.preschoolInvoice.update({
+          where: { id: allocation.invoiceId },
+          data: { paidPaise: { decrement: allocation.amountPaise } },
+        });
+      await tx.preschoolFeePayment.update({
+        where: { id },
+        data: {
+          cancelledAt: input.at,
+          cancelledByUserId: input.userId,
+          cancelledByName: input.userName,
+          cancelReason: input.reason,
+        },
+      });
+      return "cancelled";
+    });
   }
 }

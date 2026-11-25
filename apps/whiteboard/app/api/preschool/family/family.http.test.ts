@@ -12,6 +12,7 @@ import { GET as childProfile } from "../children/[id]/route";
 import { GET as childReports } from "../daily-reports/children/[childId]/route";
 import { addPayment } from "../dashboard/testing";
 import { GET as feeAccount } from "../fees/children/[childId]/route";
+import { POST as cancelPayment } from "../fees/payments/[id]/cancel/route";
 import { GET as receipt } from "../fees/payments/[id]/route";
 import { addInvoice, freezeToday, unfreezeToday } from "../fees/testing";
 import {
@@ -20,6 +21,7 @@ import {
   addStaff,
   removePreschool,
   seedPreschool,
+  signInAsOwner,
   signInWithEmail,
   signOut,
   type PreschoolFixture,
@@ -36,6 +38,14 @@ const OTHER_PARENT = "other@family.example.test";
 const TEACHER = "teacher@family.example.test";
 
 type Child = { childId: string; admissionId: string };
+
+function cancelRequest(reason: string): Request {
+  return new Request("http://localhost", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ reason }),
+  });
+}
 
 describe("the Parent's view of a Preschool", () => {
   let preschool: PreschoolFixture;
@@ -317,6 +327,41 @@ describe("the Parent's view of a Preschool", () => {
       };
       for (const [name, response] of Object.entries(responses))
         expect(response.status, name).toBe(StatusCodes.FORBIDDEN);
+    });
+  });
+
+  describe("a cancelled Receipt", () => {
+    it("shows the Parent the Receipt as cancelled and the money as still due", async () => {
+      signInAsOwner(preschool);
+      const response = await cancelPayment(cancelRequest("Wrong amount"), {
+        params: Promise.resolve({ id: aaravPayment }),
+      });
+      expect(response.status).toBe(StatusCodes.OK);
+
+      signInWithEmail(preschool, "parent", PARENT);
+      const view = (await (await home()).json()) as FamilyHomeView;
+      expect(view.children[0]?.fees).toMatchObject({
+        duePaise: 800_000 + 120_000,
+        overduePaise: 500_000 + 120_000,
+      });
+      const get = new Request("http://localhost/");
+      const shown = (await (
+        await receipt(get, { params: Promise.resolve({ id: aaravPayment }) })
+      ).json()) as { cancellation: { reason: string } | null };
+      expect(shown.cancellation?.reason).toBe("Wrong amount");
+      const account = (await (
+        await feeAccount(get, {
+          params: Promise.resolve({ childId: aarav.childId }),
+        })
+      ).json()) as {
+        payments: { id: string; cancelled: boolean }[];
+        totals: { paidPaise: number };
+      };
+      expect(
+        account.payments.find((payment) => payment.id === aaravPayment)
+          ?.cancelled,
+      ).toBe(true);
+      expect(account.totals.paidPaise).toBe(0);
     });
   });
 });

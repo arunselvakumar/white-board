@@ -269,6 +269,14 @@ export function cancelInvoice(id: string): Promise<InvoiceView> {
   return post<InvoiceView>(`/invoices/${id}/cancel`);
 }
 
+/** Cancels a Receipt entered by mistake; it keeps its number but counts for nothing. */
+export function cancelFeePayment(
+  id: string,
+  reason: string,
+): Promise<ReceiptView> {
+  return post<ReceiptView>(`/payments/${id}/cancel`, { reason });
+}
+
 /** Records a Fee Payment and returns its Receipt. */
 export function recordFeePayment(
   body: RecordPreschoolFeePaymentInput,
