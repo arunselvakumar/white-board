@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect, within } from "storybook/test";
+import { expect, waitFor, within } from "storybook/test";
 
 import { ActiveCentreProvider } from "@/app/(app)/preschool/_components/active-centre-provider";
 import {
@@ -38,6 +38,26 @@ function api(items: PreschoolClassroom[]) {
       classroomIds: items.map((item) => item.id),
     }),
     routes: {
+      "GET /daily-reports": (_body, url) => ({
+        json: {
+          classroom: {
+            id: url.searchParams.get("classroomId"),
+            name: "Nursery A",
+            programmeName: "Nursery (Pre-KG)",
+            centreId: CENTRE_IDS.annaNagar,
+          },
+          date: "2026-11-25",
+          editable: true,
+          counts: { drafts: 1, published: 1, none: 1 },
+          children: ["present", "present", "absent"].map((attendance, n) => ({
+            childId: `ad0e8400-e29b-41d4-a716-44665544010${String(n)}`,
+            name: `Child ${String(n)}`,
+            photoUrl: null,
+            attendance,
+            report: null,
+          })),
+        },
+      }),
       "GET /classrooms": () => ({
         json: {
           academicYear: { id: CLASSROOM.academicYearId, name: "2026–27" },
@@ -87,6 +107,10 @@ export const MyClassrooms: Story = {
       canvas.getByText("Nursery (Pre-KG) · 17 Children"),
     ).toBeVisible();
     await expect(canvas.getByText("Daycare · 1 Child")).toBeVisible();
+    await waitFor(() =>
+      expect(canvas.getAllByText("2 of 3 present")).toHaveLength(2),
+    );
+    await expect(canvas.getAllByText("1 of 3 reports sent")).toHaveLength(2);
     const card = within(
       canvas.getByRole("heading", { name: "Nursery A" }).closest("li") ??
         canvas.getByRole("list"),
