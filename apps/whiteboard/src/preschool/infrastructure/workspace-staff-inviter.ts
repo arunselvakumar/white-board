@@ -17,6 +17,8 @@ export class WorkspaceStaffInviter implements StaffInviter {
       email: input.email,
       role: "teacher",
       replacePending: true,
+      // The Staff handler has checked the actor manages the Centre.
+      onBehalfOfOwner: true,
     });
     return result.status === "already_member" ? "already_member" : "sent";
   }

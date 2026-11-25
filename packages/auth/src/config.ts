@@ -59,6 +59,7 @@ export async function sendInvitationEmail(
     role: string;
     workspaceName: string;
     inviterName: string;
+    institutionType?: string | null;
   },
 ): Promise<void> {
   if (!isInvitableRole(input.role))
@@ -69,6 +70,9 @@ export async function sendInvitationEmail(
     role: input.role,
     acceptUrl: acceptInvitationUrl(input.invitationId),
     expiresInDays: INVITATION_EXPIRES_IN_SECONDS / (24 * 60 * 60),
+    ...(input.institutionType == null
+      ? {}
+      : { institutionType: input.institutionType }),
   });
   await email.send({ to: input.to, ...rendered });
 }

@@ -92,6 +92,7 @@ describe("/api/preschool/staff", () => {
       workspaceId: preschool.workspaceId,
       userId: preschool.ownerUserId,
       role: "owner",
+      institutionType: "preschool",
     });
     nurseryA = await addClassroom(preschool);
     nurseryB = await addClassroom(preschool, { name: "Nursery B" });
@@ -291,19 +292,8 @@ describe("/api/preschool/staff", () => {
       ).toBe(StatusCodes.CONFLICT);
     });
 
-    it("keeps the Staff member when the invitation fails", async () => {
-      const consoleError = vi
-        .spyOn(console, "error")
-        .mockImplementation(() => undefined);
-      // A Centre Head is a `teacher` member, and identity lets only the
-      // Workspace Owner invite.
-      const headUserId = signInWithEmail(preschool, "teacher", HEAD);
-      await seedWorkspaceMember({
-        workspaceId: preschool.workspaceId,
-        userId: headUserId,
-        email: HEAD,
-        role: "teacher",
-      });
+    it("sends a Centre Head's invitation for the Owner, in Preschool words", async () => {
+      signInWithEmail(preschool, "teacher", HEAD);
       const email = uniqueEmail("by-head");
       const { status, body } = await create({
         centreId: preschool.centreId,
@@ -313,16 +303,44 @@ describe("/api/preschool/staff", () => {
       });
       expect(status).toBe(StatusCodes.CREATED);
       expect(body).toMatchObject({
+        invitation: "sent",
+        staff: { name: "Added By Head" },
+      });
+      const sent = emailsTo(email);
+      expect(sent).toHaveLength(1);
+      expect(sent[0]?.text).toContain("a member of staff");
+      expect(sent[0]?.text).not.toContain("Batches");
+    });
+
+    it("keeps the Staff member when the invitation fails", async () => {
+      const consoleError = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => undefined);
+      // A Preschool whose identity Workspace was never seeded has no Owner
+      // row to send for.
+      const orphan = await seedPreschool();
+      signInAsOwner(orphan);
+      const email = uniqueEmail("orphan");
+      const { status, body } = await create({
+        centreId: orphan.centreId,
+        name: "No Workspace",
+        role: "teacher",
+        email,
+      });
+      expect(status).toBe(StatusCodes.CREATED);
+      expect(body).toMatchObject({
         invitation: "failed",
-        staff: { name: "Added By Head", invitedAt: null },
+        staff: { name: "No Workspace", invitedAt: null },
       });
       expect(emailsTo(email)).toEqual([]);
       expect(consoleError).toHaveBeenCalledWith(
         "Staff invitation failed",
         { staffId: (body as StaffInvitationView).staff.id },
-        expect.objectContaining({ code: "NOT_WORKSPACE_OWNER" }),
+        expect.objectContaining({ code: "WORKSPACE_NOT_FOUND" }),
       );
       consoleError.mockRestore();
+      await removePreschool(orphan);
+      signInAsOwner(preschool);
     });
 
     it("answers 403 to a Teacher, a Parent, and another Centre's Head", async () => {
