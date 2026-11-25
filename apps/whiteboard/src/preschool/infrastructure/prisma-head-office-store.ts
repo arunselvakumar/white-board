@@ -70,7 +70,12 @@ export class PrismaHeadOfficeStore implements HeadOfficeStore {
       }),
       db.preschoolFeePayment.groupBy({
         by: ["centreId"],
-        where: { workspaceId, centreId: inCentres, receivedOn: month },
+        where: {
+          workspaceId,
+          centreId: inCentres,
+          receivedOn: month,
+          cancelledAt: null,
+        },
         _sum: { amountPaise: true },
       }),
       db.preschoolInvoice.findMany({

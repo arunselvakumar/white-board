@@ -26,6 +26,7 @@ import {
   signOut,
   type PreschoolFixture,
 } from "../_lib/testing";
+import { POST as cancelPayment } from "../fees/payments/[id]/cancel/route";
 import { GET as headOffice } from "./head-office/route";
 import { GET as dashboard } from "./route";
 import { addPayment, monthRequest } from "./testing";
@@ -43,6 +44,14 @@ function centreRequest(centreId: string): Request {
   return new Request(
     `http://localhost/api/preschool/dashboard?centreId=${centreId}`,
   );
+}
+
+function cancelRequest(reason: string): Request {
+  return new Request("http://localhost", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ reason }),
+  });
 }
 
 async function read<T>(response: Response): Promise<T> {
@@ -533,6 +542,44 @@ describe("/api/preschool/dashboard", () => {
         (await headOffice(monthRequest("/dashboard/head-office", "2026-13")))
           .status,
       ).toBe(StatusCodes.BAD_REQUEST);
+    });
+  });
+
+  describe("a cancelled Fee Payment", () => {
+    it("is left out of the Centre Dashboard and the Head Office collections", async () => {
+      signInAsOwner(preschool);
+      const { paymentId } = await addPayment(preschool, {
+        ...child2,
+        receivedOn: "2026-11-25",
+        lines: [{ head: "Activity fee", amountPaise: 50_000 }],
+      });
+      const fees = async () =>
+        (
+          await read<CentreDashboardView>(
+            await dashboard(centreRequest(centreA)),
+          )
+        ).fees;
+      const collected = async () =>
+        (
+          await read<HeadOfficeView>(
+            await headOffice(monthRequest("/dashboard/head-office")),
+          )
+        ).centres.find((centre) => centre.id === centreA)?.collectedPaise;
+      expect(await fees()).toMatchObject({
+        collectedTodayPaise: 150_000,
+        collectedThisMonthPaise: 350_000,
+      });
+      expect(await collected()).toBe(350_000);
+
+      const response = await cancelPayment(cancelRequest("Duplicate entry"), {
+        params: Promise.resolve({ id: paymentId }),
+      });
+      expect(response.status).toBe(StatusCodes.OK);
+      expect(await fees()).toMatchObject({
+        collectedTodayPaise: 100_000,
+        collectedThisMonthPaise: 300_000,
+      });
+      expect(await collected()).toBe(300_000);
     });
   });
 });

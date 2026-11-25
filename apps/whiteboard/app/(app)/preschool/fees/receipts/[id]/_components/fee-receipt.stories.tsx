@@ -1,11 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect, spyOn, within } from "storybook/test";
+import { expect, spyOn, waitFor, within } from "storybook/test";
 
 import { ActiveCentreProvider } from "@/app/(app)/preschool/_components/active-centre-provider";
 import {
   CENTRE_IDS,
   mockPreschoolApi,
+  preschoolMe,
+  type PreschoolApiCall,
 } from "@/app/(app)/preschool/_components/preschool-story-api";
+import { FamilyReceiptScreen } from "@/app/(app)/preschool/family/receipts/[id]/_components/family-receipt-screen";
 import type { PreschoolReceipt } from "@/src/queries/preschool/fees";
 
 import { FeeReceiptScreen } from "./fee-receipt-screen";
@@ -54,6 +57,7 @@ const RECEIPT: PreschoolReceipt = {
   note: null,
   receivedByName: "Arun",
   balanceDuePaise: 2_850_000,
+  cancellation: null,
 };
 
 let printed = 0;
@@ -130,5 +134,123 @@ export const Receipt: Story = {
     ).toContain("LSAN/2026-27/00042");
     await userEvent.click(canvas.getByRole("button", { name: "Print" }));
     await expect(printed).toBe(1);
+  },
+};
+
+const CANCELLED: PreschoolReceipt = {
+  ...RECEIPT,
+  cancellation: {
+    cancelledAt: "2026-11-26T05:52:00.000Z",
+    cancelledByName: "Lakshmi Venkatesh",
+    reason: "Cheque bounced",
+  },
+};
+
+const calls: PreschoolApiCall[] = [];
+
+export const CancelReceipt: Story = {
+  beforeEach() {
+    calls.length = 0;
+    let current = RECEIPT;
+    return mockPreschoolApi({
+      calls,
+      routes: {
+        [`GET /fees/payments/${PAYMENT}`]: () => ({ json: current }),
+        [`POST /fees/payments/${PAYMENT}/cancel`]: () => {
+          current = CANCELLED;
+          return { json: CANCELLED };
+        },
+      },
+    });
+  },
+  render: () => <FeeReceiptScreen paymentId={PAYMENT} />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Cancel Receipt" }),
+    );
+    const dialog = within(await body.findByRole("dialog"));
+    await userEvent.click(
+      dialog.getByRole("button", { name: "Cancel Receipt" }),
+    );
+    await expect(
+      await dialog.findByText("Say why the Receipt is cancelled"),
+    ).toBeVisible();
+    await userEvent.click(
+      dialog.getByRole("button", { name: "Cheque bounced" }),
+    );
+    await userEvent.click(
+      dialog.getByRole("button", { name: "Cancel Receipt" }),
+    );
+    await waitFor(() =>
+      expect(
+        calls.find((call) => call.route.endsWith("/cancel"))?.body,
+      ).toEqual({ reason: "Cheque bounced" }),
+    );
+    await expect(await canvas.findByText("CANCELLED")).toBeVisible();
+    await expect(
+      canvas.queryByRole("button", { name: "Cancel Receipt" }),
+    ).toBeNull();
+    await expect(
+      canvas.queryByRole("link", { name: "Share on WhatsApp" }),
+    ).toBeNull();
+  },
+};
+
+export const Cancelled: Story = {
+  beforeEach() {
+    return mockPreschoolApi({
+      routes: {
+        [`GET /fees/payments/${PAYMENT}`]: () => ({ json: CANCELLED }),
+      },
+    });
+  },
+  render: () => <FeeReceiptScreen paymentId={PAYMENT} />,
+  play: async ({ canvas }) => {
+    await expect(await canvas.findByText("CANCELLED")).toBeVisible();
+    await expect(canvas.getByRole("note")).toHaveTextContent(
+      "Cancelled on 26 Nov 2026, 11:22 am by Lakshmi Venkatesh: Cheque bounced.",
+    );
+    await expect(
+      canvas.queryByRole("link", { name: "Share on WhatsApp" }),
+    ).toBeNull();
+    await expect(
+      canvas.queryByRole("button", { name: "Cancel Receipt" }),
+    ).toBeNull();
+  },
+};
+
+export const CancelledForTheParent: Story = {
+  parameters: {
+    nextjs: {
+      navigation: { pathname: `/preschool/family/receipts/${PAYMENT}` },
+    },
+  },
+  beforeEach() {
+    return mockPreschoolApi({
+      me: preschoolMe({
+        role: "parent",
+        children: [
+          {
+            id: AARAV,
+            centreId: CENTRE_IDS.annaNagar,
+            firstName: "Aarav",
+            lastName: "Kumar",
+            photoUrl: null,
+          },
+        ],
+      }),
+      routes: {
+        [`GET /fees/payments/${PAYMENT}`]: () => ({ json: CANCELLED }),
+      },
+    });
+  },
+  render: () => <FamilyReceiptScreen paymentId={PAYMENT} childQuery="" />,
+  play: async ({ canvas }) => {
+    await expect(await canvas.findByText("CANCELLED")).toBeVisible();
+    await expect(canvas.getByRole("note")).toHaveTextContent("Cheque bounced");
+    await expect(
+      canvas.queryByRole("button", { name: "Cancel Receipt" }),
+    ).toBeNull();
   },
 };

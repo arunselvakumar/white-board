@@ -48,7 +48,9 @@ export class PrismaRoyaltyStore implements RoyaltyStore {
     const rows = await this.db.preschoolFeePaymentAllocation.findMany({
       where: {
         workspaceId,
+        // A cancelled Receipt collected nothing.
         payment: {
+          cancelledAt: null,
           centreId: { in: [...centreIds] },
           receivedOn: {
             gte: fromIsoDate(span.startsOn),

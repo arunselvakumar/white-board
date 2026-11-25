@@ -133,11 +133,17 @@ function Account({
               <li key={payment.id}>
                 <Link
                   href={`/preschool/family/receipts/${payment.id}${childQuery}`}
-                  aria-label={`Receipt ${payment.receiptNumber}, ${formatPaiseAsRupees(payment.amountPaise)} on ${shortDate(payment.receivedOn)}`}
+                  aria-label={`Receipt ${payment.receiptNumber}, ${formatPaiseAsRupees(payment.amountPaise)} on ${shortDate(payment.receivedOn)}${payment.cancelled ? ", cancelled" : ""}`}
                   className="hover:bg-muted/60 focus-visible:ring-ring/50 flex min-h-14 items-center gap-3 px-3 py-2 outline-none focus-visible:ring-3"
                 >
                   <span className="min-w-0 flex-1">
-                    <span className="block font-medium tabular-nums">
+                    <span
+                      className={cn(
+                        "block font-medium tabular-nums",
+                        payment.cancelled &&
+                          "text-muted-foreground line-through",
+                      )}
+                    >
                       {formatPaiseAsRupees(payment.amountPaise)}
                     </span>
                     <span className="text-muted-foreground block text-xs">
@@ -146,6 +152,9 @@ function Account({
                       {payment.receiptNumber}
                     </span>
                   </span>
+                  {payment.cancelled ? (
+                    <Badge variant="destructive">Cancelled</Badge>
+                  ) : null}
                   <ChevronRight
                     aria-hidden="true"
                     className="text-muted-foreground size-5"

@@ -1,10 +1,14 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { MessageCircle, Printer } from "lucide-react";
+import { Ban, MessageCircle, Printer } from "lucide-react";
+import { useState } from "react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 
-import { RoleGate } from "@/app/(app)/preschool/_components/active-centre-provider";
+import {
+  RoleGate,
+  useActiveCentre,
+} from "@/app/(app)/preschool/_components/active-centre-provider";
 import {
   PageHeader,
   type PageHeaderBack,
@@ -19,6 +23,7 @@ import {
   type PreschoolReceipt,
 } from "@/src/queries/preschool/fees";
 
+import { CancelReceiptDialog } from "./cancel-receipt-dialog";
 import { FeeReceipt } from "./fee-receipt";
 
 /**
@@ -34,6 +39,11 @@ export function FeeReceiptView({
   back?: PageHeaderBack;
   share?: boolean;
 }) {
+  const { me } = useActiveCentre();
+  const [cancelling, setCancelling] = useState(false);
+  const cancelled = receipt.cancellation != null;
+  const canCancel =
+    !cancelled && (me.role === "owner" || me.role === "centre_head");
   const shareUrl = receiptShareUrl({
     centreName: receipt.centre.name,
     childName: childFullName(receipt.child),
@@ -58,7 +68,19 @@ export function FeeReceiptView({
           }
           actions={
             <>
-              {share ? (
+              {canCancel ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setCancelling(true);
+                  }}
+                >
+                  <Ban aria-hidden="true" />
+                  Cancel Receipt
+                </Button>
+              ) : null}
+              {share && !cancelled ? (
                 <a
                   href={shareUrl}
                   target="_blank"
@@ -83,6 +105,13 @@ export function FeeReceiptView({
         />
       </div>
       <FeeReceipt receipt={receipt} />
+      {canCancel ? (
+        <CancelReceiptDialog
+          receipt={receipt}
+          open={cancelling}
+          onOpenChange={setCancelling}
+        />
+      ) : null}
     </div>
   );
 }

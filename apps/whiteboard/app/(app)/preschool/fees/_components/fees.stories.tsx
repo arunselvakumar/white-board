@@ -96,10 +96,24 @@ const PAYMENTS: FeePaymentListView = {
       childName: "Aarav Kumar",
       admissionNumber: "LSAN-0007",
       recordedByName: "Arun",
+      cancelled: false,
+    },
+    {
+      id: "8a0e8400-e29b-41d4-a716-446655440002",
+      receiptNumber: "LSAN/2026-27/00041",
+      receivedOn: "2026-11-24",
+      amountPaise: 300_000,
+      method: "cheque",
+      reference: "Cheque 004521",
+      childId: AARAV,
+      childName: "Aarav Kumar",
+      admissionNumber: "LSAN-0007",
+      recordedByName: "Arun",
+      cancelled: true,
     },
   ],
   nextCursor: null,
-  total: 1,
+  total: 2,
   totalPaise: 1_250_000,
 };
 
@@ -227,7 +241,18 @@ export const Desk: Story = {
       "href",
       `/preschool/fees/receipts/${PAYMENT}`,
     );
-    await expect(canvas.getByText("1 payment in these dates")).toBeVisible();
+    await expect(
+      canvas.getByText(
+        "2 payments in these dates; cancelled ones are not counted",
+      ),
+    ).toBeVisible();
+    const cancelled = within(
+      canvas
+        .getByRole("link", { name: "LSAN/2026-27/00041" })
+        .closest("tr") as HTMLElement,
+    );
+    await expect(cancelled.getByText("Cancelled")).toBeVisible();
+    await expect(cancelled.getByText("₹3,000")).toHaveClass("line-through");
   },
 };
 

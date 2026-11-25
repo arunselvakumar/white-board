@@ -1772,6 +1772,20 @@ async function seedLittleSteps(today: IsoDate): Promise<LittleSteps> {
     await payFees(h, actor, child, { today, share, thisMonth, onToday });
   }
 
+  // A cheque that bounced: the Receipt stays on record, cancelled.
+  const bounced =
+    (await prisma.preschoolFeePayment.findFirst({
+      where: { centreId: annaNagar.id, method: "cheque" },
+      orderBy: { receiptNumber: "asc" },
+      select: { id: true },
+    })) ??
+    (await prisma.preschoolFeePayment.findFirstOrThrow({
+      where: { centreId: annaNagar.id },
+      orderBy: { receiptNumber: "asc" },
+      select: { id: true },
+    }));
+  await h.fees.payments.cancel(actor, bounced.id, { reason: "Cheque bounced" });
+
   // Two Children who left.
   for (const centre of [velachery, coimbatore]) {
     const leaver = children.find(
@@ -1833,6 +1847,22 @@ async function seedLittleSteps(today: IsoDate): Promise<LittleSteps> {
     const today_ = presentToday.get(name) ?? [];
     await writeReports(h, actor, room.id, today, today_, "half");
   }
+
+  // Reports go home mid-afternoon, whenever the script runs.
+  const published = await prisma.preschoolDailyReport.findMany({
+    where: { workspaceId: LITTLE_STEPS, status: "published" },
+    select: { id: true, date: true },
+  });
+  for (const report of published)
+    await prisma.preschoolDailyReport.update({
+      where: { id: report.id },
+      data: {
+        publishedAt: instantInIndia(
+          report.date.toISOString().slice(0, 10),
+          clock(15, 25 + (report.id.charCodeAt(0) % 10)),
+        ),
+      },
+    });
 
   // Enquiries.
   await seedEnquiries(h, actor, annaNagar, {
@@ -2465,7 +2495,11 @@ async function counts(today: IsoDate): Promise<void> {
         where: { centreId: centre.id, status: "active", deletedAt: null },
       }),
       prisma.preschoolFeePayment.aggregate({
-        where: { centreId: centre.id, receivedOn: { gte: monthStart } },
+        where: {
+          centreId: centre.id,
+          receivedOn: { gte: monthStart },
+          cancelledAt: null,
+        },
         _sum: { amountPaise: true },
       }),
       prisma.preschoolAttendance.count({

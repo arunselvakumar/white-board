@@ -1,3 +1,4 @@
+import { prisma } from "@repo/whiteboard-db";
 import { StatusCodes } from "http-status-codes";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
@@ -9,6 +10,7 @@ import type {
 
 import { GET as headOffice } from "../dashboard/head-office/route";
 import { addPayment, monthRequest } from "../dashboard/testing";
+import { POST as cancelPayment } from "../fees/payments/[id]/cancel/route";
 import { codeOf, freezeToday, unfreezeToday } from "../fees/testing";
 import {
   addChild,
@@ -37,6 +39,14 @@ function centreRequest(centreId: string, month?: string) {
     monthRequest(`/royalty/${centreId}`, month),
     { params: Promise.resolve({ centreId }) },
   ] as const;
+}
+
+function cancelRequest(reason: string): Request {
+  return new Request("http://localhost", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ reason }),
+  });
 }
 
 async function read<T>(response: Response): Promise<T> {
@@ -218,5 +228,42 @@ describe("/api/preschool/royalty", () => {
         StatusCodes.FORBIDDEN,
       );
     }
+  });
+
+  it("leaves a cancelled Fee Payment out of the statement and its Receipts", async () => {
+    signInAsOwner(preschool);
+    const child = await prisma.preschoolChild.findFirstOrThrow({
+      where: { workspaceId: preschool.workspaceId, firstName: "Aadhya" },
+      include: { admissions: { take: 1 } },
+    });
+    const { paymentId, receiptNumber } = await addPayment(preschool, {
+      childId: child.id,
+      admissionId: child.admissions[0]?.id ?? "",
+      centreId: franchised,
+      receivedOn: "2026-11-24",
+      lines: [{ head: "Tuition", amountPaise: 300_000 }],
+    });
+    const totals = async () =>
+      (
+        await read<RoyaltyStatementView>(
+          await statement(monthRequest("/royalty", "2026-11")),
+        )
+      ).totals;
+    expect((await totals()).royaltyBearingPaise).toBe(1_300_000);
+    const response = await cancelPayment(cancelRequest("Wrong Child"), {
+      params: Promise.resolve({ id: paymentId }),
+    });
+    expect(response.status).toBe(StatusCodes.OK);
+    expect(await totals()).toEqual({
+      royaltyBearingPaise: 1_000_000,
+      otherPaise: 200_000,
+      royaltyPaise: 100_000,
+    });
+    const view = await read<CentreRoyaltyStatementView>(
+      await centreStatement(...centreRequest(franchised, "2026-11")),
+    );
+    expect(view.payments.map((payment) => payment.receiptNumber)).not.toContain(
+      receiptNumber,
+    );
   });
 });

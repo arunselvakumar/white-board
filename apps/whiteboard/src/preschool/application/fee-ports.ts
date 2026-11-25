@@ -228,6 +228,16 @@ export type FeePaymentStore = {
     },
   ): Promise<FeePaymentListView>;
   receipt(workspaceId: string, id: string): Promise<ReceiptRecord | null>;
+  /**
+   * In one transaction: locks the payment and the Invoices it paid, takes
+   * each allocation off its Invoice's paid amount and marks the payment
+   * cancelled. `already_cancelled` when it was.
+   */
+  cancel(
+    workspaceId: string,
+    id: string,
+    input: { at: Date; userId: string; userName: string; reason: string },
+  ): Promise<"cancelled" | "already_cancelled">;
   /** The Centre and Child of a payment, for access checks. */
   owner(
     workspaceId: string,

@@ -321,7 +321,10 @@ export function ChildFeeAccount({
             </TableHeader>
             <TableBody>
               {payments.map((payment) => (
-                <TableRow key={payment.id}>
+                <TableRow
+                  key={payment.id}
+                  className={cn(payment.cancelled && "text-muted-foreground")}
+                >
                   <TableCell>
                     <Link
                       href={`/preschool/fees/receipts/${payment.id}`}
@@ -329,6 +332,11 @@ export function ChildFeeAccount({
                     >
                       {payment.receiptNumber}
                     </Link>
+                    {payment.cancelled ? (
+                      <Badge variant="destructive" className="ml-2">
+                        Cancelled
+                      </Badge>
+                    ) : null}
                   </TableCell>
                   <TableCell className="whitespace-nowrap">
                     {feeDateLabel(payment.receivedOn)}
@@ -339,7 +347,12 @@ export function ChildFeeAccount({
                       ? null
                       : ` · ${payment.reference}`}
                   </TableCell>
-                  <TableCell className="text-right tabular-nums">
+                  <TableCell
+                    className={cn(
+                      "text-right tabular-nums",
+                      payment.cancelled && "line-through",
+                    )}
+                  >
                     {formatPaiseAsRupees(payment.amountPaise)}
                   </TableCell>
                 </TableRow>

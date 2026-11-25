@@ -144,6 +144,8 @@ const FeePaymentSummaryModel = z.object({
   amountPaise: Paise,
   method: FeePaymentMethodModel,
   reference: z.string().nullable(),
+  /** Cancelled: kept for the record, counts for nothing. */
+  cancelled: z.boolean(),
 });
 
 export const PreschoolChildFeeAccountResponseModel = z.object({
@@ -262,6 +264,18 @@ export const PreschoolReceiptResponseModel = z.object({
   note: z.string().nullable(),
   receivedByName: z.string(),
   balanceDuePaise: Paise,
+  cancellation: z
+    .object({
+      cancelledAt: z.iso.datetime(),
+      cancelledByName: z.string(),
+      reason: z.string(),
+    })
+    .nullable(),
+});
+
+export const CancelPreschoolFeePaymentRequestModel = z.object({
+  /** Why: wrong amount, wrong Child, duplicate entry, cheque bounced. */
+  reason: z.string().trim().min(1).max(300),
 });
 
 // Dues and summary

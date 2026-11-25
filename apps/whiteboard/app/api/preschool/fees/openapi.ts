@@ -2,6 +2,7 @@ import { StatusCodes } from "http-status-codes";
 
 import type { PreschoolOpenApi } from "../_lib/openapi";
 import {
+  CancelPreschoolFeePaymentRequestModel,
   CreatePreschoolInvoiceRequestModel,
   ListPreschoolDuesRequestModel,
   ListPreschoolFeeHeadsRequestModel,
@@ -227,6 +228,19 @@ export const feesOpenApi: PreschoolOpenApi = {
       errors: BY_ID,
     },
     {
+      method: "post",
+      path: "/api/preschool/fees/payments/{id}/cancel",
+      summary: "Cancel a Receipt entered by mistake (Owner or Centre Head)",
+      tags,
+      params: PreschoolIdParamsModel,
+      body: CancelPreschoolFeePaymentRequestModel,
+      successStatus: StatusCodes.OK,
+      successDescription:
+        "The Receipt, cancelled; its Invoices are unpaid again by its amounts",
+      successSchema: PreschoolReceiptResponseModel,
+      errors: WRITE,
+    },
+    {
       method: "get",
       path: "/api/preschool/fees/dues",
       summary: "Children of a Centre who owe, most overdue first",
@@ -264,6 +278,7 @@ export const feesOpenApi: PreschoolOpenApi = {
     RecordPreschoolFeePaymentRequestModel,
     PreschoolFeePaymentListResponseModel,
     PreschoolReceiptResponseModel,
+    CancelPreschoolFeePaymentRequestModel,
     PreschoolDuesResponseModel,
     PreschoolFeeSummaryResponseModel,
   },

@@ -98,6 +98,7 @@ export class PrismaFeeReportStore implements FeeReportStore {
         where: {
           workspaceId,
           centreId: { in: centreIds },
+          cancelledAt: null,
           receivedOn: { gte: fromIsoDate(from), lte: fromIsoDate(query.today) },
         },
         _sum: { amountPaise: true },
