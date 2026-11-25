@@ -180,10 +180,12 @@ const TEACHER_CLOSED_AREAS = new Set([
 
 /**
  * Head Office screens and Workspace-wide masters: the Owner only. Fee
- * Structures stay open to a Centre Head, who sees their Centre's amounts.
+ * Structures stay open to a Centre Head, who sees their Centre's amounts,
+ * and so does one Stock Item's ledger (`/preschool/stock/items/<id>`); the
+ * Stock Items list itself is the Owner's.
  */
 const OWNER_ONLY_PATH =
-  /^\/preschool\/(?:head-office|centres|programmes|stock\/items)(?:\/|$)/;
+  /^\/preschool\/(?:(?:head-office|centres|programmes)(?:\/|$)|stock\/items\/?$)/;
 
 /**
  * Whether a Preschool role may open a path under `/preschool` (ADR-0055).
