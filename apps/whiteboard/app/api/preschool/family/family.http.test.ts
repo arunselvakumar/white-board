@@ -10,6 +10,8 @@ import { fromIsoDate } from "@/src/preschool/domain/dates";
 import { GET as attendanceMonth } from "../attendance/children/[childId]/route";
 import { GET as childProfile } from "../children/[id]/route";
 import { GET as childReports } from "../daily-reports/children/[childId]/route";
+import { GET as childProgressReports } from "../progress-reports/children/[childId]/route";
+import { GET as progressReport } from "../progress-reports/[id]/route";
 import { addPayment } from "../dashboard/testing";
 import { GET as feeAccount } from "../fees/children/[childId]/route";
 import { GET as receipt } from "../fees/payments/[id]/route";
@@ -44,6 +46,9 @@ describe("the Parent's view of a Preschool", () => {
   let other: Child;
   let aaravPayment: string;
   let otherPayment: string;
+  let aaravTerm1: string;
+  let aaravDraft: string;
+  let otherTerm1: string;
 
   beforeAll(async () => {
     freezeToday();
@@ -170,6 +175,34 @@ describe("the Parent's view of a Preschool", () => {
         lines: [{ head: "Tuition", amountPaise: 90_000 }],
       })
     ).paymentId;
+
+    const progress = (
+      child: Child,
+      term: "term_1" | "term_2",
+      status: "draft" | "published",
+    ) => {
+      const reportId = randomUUID();
+      return prisma.preschoolProgressReport
+        .create({
+          data: {
+            id: reportId,
+            workspaceId,
+            centreId: preschool.centreId,
+            childId: child.childId,
+            academicYearId: preschool.academicYearId,
+            term,
+            status,
+            teacherRemarks: "Settling in well.",
+            publishedAt:
+              status === "published" ? new Date("2026-10-01T05:00:00Z") : null,
+            createdByUserId: preschool.ownerUserId,
+          },
+        })
+        .then(() => reportId);
+    };
+    aaravTerm1 = await progress(aarav, "term_1", "published");
+    aaravDraft = await progress(aarav, "term_2", "draft");
+    otherTerm1 = await progress(other, "term_1", "published");
   });
 
   afterAll(async () => {
@@ -283,9 +316,24 @@ describe("the Parent's view of a Preschool", () => {
         fees: await feeAccount(get("/"), childContext(aarav.childId)),
         receipt: await receipt(get("/"), idContext(aaravPayment)),
         profile: await childProfile(get("/"), idContext(aarav.childId)),
+        progressList: await childProgressReports(
+          get("/"),
+          childContext(aarav.childId),
+        ),
+        progressReport: await progressReport(get("/"), idContext(aaravTerm1)),
       };
       for (const [name, response] of Object.entries(responses))
         expect(response.status, name).toBe(StatusCodes.OK);
+      const progress = (await responses.progressList.json()) as {
+        items: { id: string; status: string }[];
+      };
+      expect(progress.items.map((item) => [item.id, item.status])).toEqual([
+        [aaravTerm1, "published"],
+      ]);
+      const term1 = (await responses.progressReport.json()) as {
+        observations: unknown;
+      };
+      expect(term1.observations).toBeNull();
       const reports = (await responses.reports.json()) as {
         items: { status: string; note: string | null }[];
       };
@@ -314,9 +362,23 @@ describe("the Parent's view of a Preschool", () => {
         fees: await feeAccount(get("/"), childContext(other.childId)),
         receipt: await receipt(get("/"), idContext(otherPayment)),
         profile: await childProfile(get("/"), idContext(other.childId)),
+        progressList: await childProgressReports(
+          get("/"),
+          childContext(other.childId),
+        ),
       };
       for (const [name, response] of Object.entries(responses))
         expect(response.status, name).toBe(StatusCodes.FORBIDDEN);
+      expect([StatusCodes.FORBIDDEN, StatusCodes.NOT_FOUND]).toContain(
+        (await progressReport(get("/"), idContext(otherTerm1))).status,
+      );
+    });
+
+    it("never opens a draft Progress Report", async () => {
+      signInWithEmail(preschool, "parent", PARENT);
+      expect([StatusCodes.FORBIDDEN, StatusCodes.NOT_FOUND]).toContain(
+        (await progressReport(get("/"), idContext(aaravDraft))).status,
+      );
     });
   });
 });
