@@ -9,7 +9,7 @@
 /// - Money is paise in `BIGINT`, signed only on ledger entries. Balances are
 ///   `SUM(amount)::bigint` over append-only entries (ADR CM-0004); no
 ///   balance column exists.
-/// - Projects, Stores, Contractors, Suppliers, Departments, Labours, Vendors
+/// - Projects, Stores, Contractors, Suppliers, Labours, Vendors
 ///   and Team Members live in other schemas: their ids are kept without
 ///   foreign keys.
 /// - Document numbers come from the numbering rules (CM-114, CM-0017 §15).
@@ -525,8 +525,6 @@ model ConstructionFinanceInvoice {
   invoiceNumber String                              @map("invoice_number")
   invoiceDate   DateTime                            @map("invoice_date") @db.Date
   dueDate       DateTime?                           @map("due_date") @db.Date
-  /// Contractor invoices: one of the Contractor's Departments.
-  departmentId  String?                             @map("department_id") @db.Uuid
   /// Paise. Optional split for the TDS base and reports.
   taxableAmount BigInt?                             @map("taxable_amount")
   gstAmount     BigInt?                             @map("gst_amount")

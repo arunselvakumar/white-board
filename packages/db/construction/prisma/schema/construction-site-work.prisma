@@ -6,7 +6,7 @@
 /// Conventions:
 /// - Money is paise in `BIGINT`; quantities are `decimal(14,3)` in the
 ///   material's unit; hours are `decimal(6,2)`.
-/// - Projects, Contractors, Departments, Work Types, Materials and Team
+/// - Projects, Contractors, Work Types, Materials and Team
 ///   Members live in other schemas: their ids are kept without foreign keys.
 /// - A **site location** inside a Project is a `LocationRef` stored as JSON
 ///   with its type copied to `site_location_type` for filters (CM-403).
@@ -246,7 +246,6 @@ model ConstructionSiteWorkWorksheet {
   sheetDate        DateTime                           @map("sheet_date") @db.Date
   shift            ConstructionSiteWorkShift
   contractorId     String                             @map("contractor_id") @db.Uuid
-  departmentId     String                             @map("department_id") @db.Uuid
   workTypeId       String?                            @map("work_type_id") @db.Uuid
   skilledCount     Int?                               @map("skilled_count")
   unskilledCount   Int?                               @map("unskilled_count")
@@ -424,7 +423,6 @@ model ConstructionSiteWorkEquipmentUsageSheet {
   operatorName      String?                                @map("operator_name")
   supervisorUserId  String?                                @map("supervisor_user_id")
   contractorId      String?                                @map("contractor_id") @db.Uuid
-  departmentId      String?                                @map("department_id") @db.Uuid
   workItem          String?                                @map("work_item")
   siteLocationType  String?                                @map("site_location_type")
   siteLocation      Json?                                  @map("site_location")

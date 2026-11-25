@@ -6,7 +6,7 @@
 /// Conventions:
 /// - Money is paise in `BIGINT`; work quantities are `decimal(14,3)` in the
 ///   task's Measurement Unit; percentages are `decimal(5,2)`.
-/// - Projects, Contractors, Departments, Measurement Units, Issue
+/// - Projects, Contractors, Measurement Units, Issue
 ///   Categories, Tags, Drawings and Team Members live in other schemas:
 ///   their ids are kept without foreign keys. `*_member_id` columns are Team
 ///   Member ids; `created_by` / `updated_by` / `deleted_by` are user ids, as
@@ -101,7 +101,6 @@ model ConstructionTrackingTask {
   siteLocation     Json?                         @map("site_location")
   /// Further `LocationRef`s of the same Wing ("Locations", CM-0019 §5).
   extraLocations   Json?                         @map("extra_locations")
-  departmentId     String?                       @map("department_id") @db.Uuid
   contractorId     String?                       @map("contractor_id") @db.Uuid
   /// "Total work"; leaf tasks only. A unit is required with a quantity.
   totalWorkQty     Decimal?                      @map("total_work_qty") @db.Decimal(14, 3)
@@ -138,7 +137,6 @@ model ConstructionTrackingTask {
   @@index([workspaceId, projectId, parentId, sortOrder])
   @@index([workspaceId, projectId, dueDate])
   @@index([workspaceId, contractorId])
-  @@index([workspaceId, departmentId])
   @@map("tasks")
   @@schema("construction_tracking")
 }
@@ -252,7 +250,6 @@ model ConstructionTrackingIssue {
   details            String
   priority           ConstructionTrackingPriority?
   categoryId         String?                         @map("category_id") @db.Uuid
-  departmentId       String?                         @map("department_id") @db.Uuid
   contractorId       String?                         @map("contractor_id") @db.Uuid
   assigneeMemberId   String?                         @map("assignee_member_id") @db.Uuid
   dueDate            DateTime?                       @map("due_date") @db.Date
@@ -282,7 +279,6 @@ model ConstructionTrackingIssue {
   @@index([workspaceId, assigneeMemberId])
   @@index([workspaceId, categoryId])
   @@index([workspaceId, contractorId])
-  @@index([workspaceId, departmentId])
   @@map("issues")
   @@schema("construction_tracking")
 }
@@ -337,7 +333,6 @@ model ConstructionTrackingInspection {
   inspectionDate    DateTime                             @map("inspection_date") @db.Date
   /// "HH:MM", local time on site.
   inspectionTime    String?                              @map("inspection_time")
-  departmentId      String?                              @map("department_id") @db.Uuid
   contractorId      String?                              @map("contractor_id") @db.Uuid
   inspectorMemberId String?                              @map("inspector_member_id") @db.Uuid
   workDescription   String                               @map("work_description")
@@ -367,7 +362,6 @@ model ConstructionTrackingInspection {
   @@index([workspaceId, projectId, inspectionDate])
   @@index([workspaceId, projectId, status])
   @@index([workspaceId, contractorId])
-  @@index([workspaceId, departmentId])
   @@index([workspaceId, inspectorMemberId])
   @@map("inspections")
   @@schema("construction_tracking")
