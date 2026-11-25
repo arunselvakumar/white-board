@@ -65,6 +65,8 @@ _Avoid_: settings (for these lists), catalog
 
 There is no trade **Department** (RCC, Plumbing…) since ADR CM-0048. Nothing is filed under a trade; **Departments** in the main menu are Human Resources and Marketing (ADR CM-0046).
 
+A **Department** is an office unit of the Company (Accounts, Purchase), kept in **Manage Departments** under Departments (ADR CM-0049). Human Resources and Marketing are **system Departments**: every Company has them, and they keep their names and are never deleted. A Company adds its own; for now a Department is a name only, linked to no other record.
+
 **Contractor**:
 A party that executes work, labour-and-material or labour-only. Has invoices with TDS. Not a User. Inactive Contractors leave the pickers but stay on their Projects.
 _Avoid_: subcontractor

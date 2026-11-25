@@ -78,17 +78,20 @@ const MAIN_CLASS = `${PAGE_WATERMARK_HOST_CLASS} flex min-w-0 flex-1 flex-col ou
  * Management Read (ADR CM-0030): without either, Office Staff and Role
  * Management are not on the Human Resources page (ADR CM-0034, CM-0046).
  * `marketing` is the Marketing entries the Role opens: with none, Marketing
- * is not under Departments (ADR CM-0040, CM-0046).
+ * is not under Departments (ADR CM-0040, CM-0046). `canManageDepartments`
+ * is Departments Read: Manage Departments under Departments (ADR CM-0049).
  */
 export function AppShell({
   children,
   canOpenDashboard = false,
   canOpenStaffRoles = true,
+  canManageDepartments = true,
   marketing = NO_MARKETING_ACCESS,
 }: {
   children: ReactNode;
   canOpenDashboard?: boolean;
   canOpenStaffRoles?: boolean;
+  canManageDepartments?: boolean;
   marketing?: MarketingMenuAccess;
 }) {
   const pathname = usePathname() || "/app";
@@ -186,6 +189,7 @@ export function AppShell({
                 query={query}
                 canOpenDashboard={canOpenDashboard}
                 canOpenStaffRoles={canOpenStaffRoles}
+                canManageDepartments={canManageDepartments}
                 marketing={marketing}
               />
             )}
@@ -281,17 +285,24 @@ function MainMenu({
   query,
   canOpenDashboard,
   canOpenStaffRoles,
+  canManageDepartments,
   marketing,
 }: {
   pathname: string;
   query: string;
   canOpenDashboard: boolean;
   canOpenStaffRoles: boolean;
+  canManageDepartments: boolean;
   marketing: MarketingMenuAccess;
 }) {
   const q = menuQuery(query);
   const rows = filterMainMenu(
-    mainMenuAreas({ canOpenDashboard, canOpenStaffRoles, marketing }),
+    mainMenuAreas({
+      canOpenDashboard,
+      canOpenStaffRoles,
+      canManageDepartments,
+      marketing,
+    }),
     q,
   );
 

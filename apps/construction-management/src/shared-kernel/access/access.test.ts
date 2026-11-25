@@ -79,7 +79,8 @@ describe("the menu catalogue", () => {
       // Master records (ADR CM-0034, CM-0035).
       human_resources: 19,
       hrms: 57,
-      others: 1,
+      // Central Reports (1) + Departments CRUD (ADR CM-0049).
+      others: 5,
     });
   });
 

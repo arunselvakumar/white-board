@@ -57,6 +57,10 @@ import {
   roleOpenApiOperations,
 } from "@/app/api/construction/organization/roles/role-openapi";
 import {
+  departmentOpenApiComponents,
+  departmentOpenApiOperations,
+} from "@/app/api/construction/organization/departments/department-openapi";
+import {
   AcceptConstructionOrganizationJoinRequestResponseModel,
   JoinRequestIdParamsModel,
   ListConstructionOrganizationJoinRequestsResponseModel,
@@ -973,6 +977,9 @@ Object.assign(openApiComponents, billingAddressOpenApiComponents);
 openApiOperations.push(...billingAddressOpenApiOperations);
 Object.assign(openApiComponents, roleOpenApiComponents);
 openApiOperations.push(...roleOpenApiOperations);
+// Manage Departments (ADR CM-0049).
+Object.assign(openApiComponents, departmentOpenApiComponents);
+openApiOperations.push(...departmentOpenApiOperations);
 Object.assign(openApiComponents, grnFieldOpenApiComponents);
 openApiOperations.push(...grnFieldOpenApiOperations);
 

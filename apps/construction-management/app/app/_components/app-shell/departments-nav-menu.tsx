@@ -1,6 +1,6 @@
 "use client";
 
-import { activeDepartment } from "@/lib/departments-nav";
+import { MANAGE_DEPARTMENTS, activeDepartment } from "@/lib/departments-nav";
 
 import { AreaNavMenu, type AreaNavGroup } from "./area-nav-menu";
 import { DEPARTMENTS_LABEL } from "./departments-menu";
@@ -11,7 +11,8 @@ import { DEPARTMENTS_LABEL } from "./departments-menu";
  * opens the department's page of cards, where the sidebar swaps to the
  * department's own menu (`department-menu.tsx`, ADR CM-0047). `groups` and
  * `forceOpen` narrow it to what the menu search matches
- * (`departments-menu.ts`).
+ * (`departments-menu.ts`). Manage Departments (ADR CM-0049) is lit on its
+ * own page.
  */
 export function DepartmentsNavMenu({
   pathname,
@@ -29,7 +30,13 @@ export function DepartmentsNavMenu({
       href="/app/departments"
       label={DEPARTMENTS_LABEL}
       groups={groups}
-      currentHref={activeDepartment(pathname)?.href}
+      currentHref={
+        activeDepartment(pathname)?.href ??
+        (pathname === MANAGE_DEPARTMENTS.href ||
+        pathname.startsWith(`${MANAGE_DEPARTMENTS.href}/`)
+          ? MANAGE_DEPARTMENTS.href
+          : undefined)
+      }
       pathname={pathname}
       buttonClassName={buttonClassName}
       forceOpen={forceOpen}

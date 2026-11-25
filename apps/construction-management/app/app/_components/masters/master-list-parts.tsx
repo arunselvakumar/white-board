@@ -99,6 +99,7 @@ export function MasterRow({
   href,
   details,
   isSeed = false,
+  seedLabel = "Default",
   disabled,
   busy,
   onEdit,
@@ -112,6 +113,8 @@ export function MasterRow({
   href?: AppHref;
   details?: ReactNode;
   isSeed?: boolean;
+  /** The seed row's badge: "Default", or "System" for departments. */
+  seedLabel?: string;
   disabled: boolean;
   busy: boolean;
   /** Absent for seed rows, which cannot be renamed. */
@@ -147,49 +150,54 @@ export function MasterRow({
         {details}
         {isSeed || disabled ? (
           <div className="flex flex-wrap gap-1.5">
-            {isSeed ? <Badge variant="secondary">Default</Badge> : null}
+            {isSeed ? <Badge variant="secondary">{seedLabel}</Badge> : null}
             {disabled ? <Badge variant="outline">Disabled</Badge> : null}
           </div>
         ) : null}
       </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          render={
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              disabled={busy}
-              aria-label={`Actions for ${name}`}
-            />
-          }
-        >
-          <MoreHorizontal />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-44">
-          {onEdit != null ? (
-            <DropdownMenuItem onClick={onEdit}>{editLabel}</DropdownMenuItem>
-          ) : null}
-          {moreActions.map((action) => (
-            <DropdownMenuItem key={action.label} onClick={action.onSelect}>
-              {action.label}
-            </DropdownMenuItem>
-          ))}
-          {onToggle != null ? (
-            <DropdownMenuItem onClick={onToggle}>
-              {disabled ? "Enable" : "Disable"}
-            </DropdownMenuItem>
-          ) : null}
-          {onDelete != null ? (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem variant="destructive" onClick={onDelete}>
-                Delete
+      {onEdit == null &&
+      moreActions.length === 0 &&
+      onToggle == null &&
+      onDelete == null ? null : (
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                disabled={busy}
+                aria-label={`Actions for ${name}`}
+              />
+            }
+          >
+            <MoreHorizontal />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-44">
+            {onEdit != null ? (
+              <DropdownMenuItem onClick={onEdit}>{editLabel}</DropdownMenuItem>
+            ) : null}
+            {moreActions.map((action) => (
+              <DropdownMenuItem key={action.label} onClick={action.onSelect}>
+                {action.label}
               </DropdownMenuItem>
-            </>
-          ) : null}
-        </DropdownMenuContent>
-      </DropdownMenu>
+            ))}
+            {onToggle != null ? (
+              <DropdownMenuItem onClick={onToggle}>
+                {disabled ? "Enable" : "Disable"}
+              </DropdownMenuItem>
+            ) : null}
+            {onDelete != null ? (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem variant="destructive" onClick={onDelete}>
+                  Delete
+                </DropdownMenuItem>
+              </>
+            ) : null}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
     </li>
   );
 }

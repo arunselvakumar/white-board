@@ -35,6 +35,7 @@ function homeWith(
         <HomeMenu
           canOpenDashboard={canOpenDashboard}
           canOpenStaffRoles={canOpenStaffRoles}
+          canManageDepartments
           marketing={marketing}
         />
       </AppShell>
@@ -120,7 +121,12 @@ export const Home: Story = {
     );
     await expect(
       departments.getAllByRole("link").map((link) => link.textContent),
-    ).toEqual(["Departments", "Human Resources", "Marketing"]);
+    ).toEqual([
+      "Departments",
+      "Human Resources",
+      "Marketing",
+      "Manage Departments",
+    ]);
     for (const department of [HUMAN_RESOURCES, MARKETING_DEPARTMENT])
       await expect(
         departments.getByRole("link", { name: department.label }),
