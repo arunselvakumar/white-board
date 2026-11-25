@@ -178,6 +178,9 @@ const TEACHER_CLOSED_AREAS = new Set([
   "enquiries",
 ]);
 
+/** Screens inside an open area that still only managers use: admitting a Child. */
+const TEACHER_CLOSED_PATH = /^\/preschool\/children\/new(?:\/|$)/;
+
 /** Head Office screens and Workspace-wide masters: the Owner only. */
 const OWNER_ONLY_PATH =
   /^\/preschool\/(?:head-office|centres|programmes|fees\/structures|stock\/items)(?:\/|$)/;
@@ -197,7 +200,10 @@ export function isAllowedPreschoolPath(
   const area = pathname.split("/")[2] ?? "";
   if (role === "parent") return area === "family";
   if (area === "family") return false;
-  if (role === "teacher") return !TEACHER_CLOSED_AREAS.has(area);
+  if (role === "teacher")
+    return (
+      !TEACHER_CLOSED_AREAS.has(area) && !TEACHER_CLOSED_PATH.test(pathname)
+    );
   if (area === "teacher") return false;
   if (role === "centre_head") return !OWNER_ONLY_PATH.test(pathname);
   return true;
