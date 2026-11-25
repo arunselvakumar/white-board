@@ -25,3 +25,13 @@ export function formatDateTime(instant: string): string {
 export function plural(count: number, one: string, many: string): string {
   return `${String(count)} ${count === 1 ? one : many}`;
 }
+
+/**
+ * A clock time as people read it in India: "09:05" → "9:05 am", "23:22" →
+ * "11:22 pm". The API's "HH:mm" stays as it is everywhere else.
+ */
+export function formatClockTime(time: string): string {
+  const [hours = 0, minutes = 0] = time.split(":").map(Number);
+  const hour = hours % 12 === 0 ? 12 : hours % 12;
+  return `${String(hour)}:${String(minutes).padStart(2, "0")} ${hours < 12 ? "am" : "pm"}`;
+}

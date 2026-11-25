@@ -6,6 +6,7 @@ import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { cn } from "@repo/ui/lib/utils";
 
+import { formatClockTime } from "@/app/(app)/preschool/_components/preschool-format";
 import { ChildAvatar } from "@/app/(app)/preschool/_components/child-avatar";
 import { isClockTime } from "@/src/preschool/domain/attendance";
 import {
@@ -100,7 +101,7 @@ function CheckInTime({
   if (!editable)
     return (
       <p className="text-muted-foreground text-sm">
-        {time == null ? "No check-in time" : `In ${time}`}
+        {time == null ? "No check-in time" : `In ${formatClockTime(time)}`}
       </p>
     );
   return (
@@ -111,7 +112,7 @@ function CheckInTime({
       aria-label={
         time == null
           ? `Add check-in time for ${child.name}`
-          : `Check-in ${time} for ${child.name}. Change`
+          : `Check-in ${formatClockTime(time)} for ${child.name}. Change`
       }
       onClick={() => {
         setValue(time ?? "");
@@ -119,7 +120,7 @@ function CheckInTime({
       }}
     >
       <Clock aria-hidden="true" />
-      {time == null ? "Add check-in time" : `In ${time}`}
+      {time == null ? "Add check-in time" : `In ${formatClockTime(time)}`}
     </Button>
   );
 }
@@ -204,7 +205,8 @@ export function AttendanceRow({
           {collected ? (
             <div className="flex min-w-0 items-center gap-1">
               <p className="min-w-0 text-sm">
-                Collected {mark.checkOutTime} by {collectorLabel(child)}
+                Collected {formatClockTime(mark.checkOutTime ?? "")} by{" "}
+                {collectorLabel(child)}
               </p>
               {editable ? (
                 <Button

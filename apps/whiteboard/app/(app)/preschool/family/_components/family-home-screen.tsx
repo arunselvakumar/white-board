@@ -13,6 +13,7 @@ import {
 } from "@repo/ui/components/card";
 import { cn } from "@repo/ui/lib/utils";
 
+import { formatClockTime } from "@/app/(app)/preschool/_components/preschool-format";
 import { formatPaiseAsRupees } from "@/lib/money";
 import {
   preschoolFamilyHomeQueryOptions,
@@ -20,7 +21,7 @@ import {
 } from "@/src/queries/preschool/family";
 
 import { DailyReportSummary } from "./daily-report-summary";
-import { clock12, dayLabel, shortDate } from "./family-format";
+import { dayLabel, shortDate } from "./family-format";
 import { FamilyPage } from "./family-page";
 
 function HomeCard({
@@ -65,7 +66,7 @@ export function todayLine(entry: PreschoolFamilyChild): {
   const { status, checkInTime, checkOutTime, collectedBy } = entry.today;
   if (status === "present" && checkOutTime != null)
     return {
-      text: `Collected at ${clock12(checkOutTime)}${
+      text: `Collected at ${formatClockTime(checkOutTime)}${
         collectedBy == null
           ? ""
           : ` by ${collectedBy.name}${collectedBy.relationship == null ? "" : ` (${collectedBy.relationship})`}`
@@ -77,7 +78,7 @@ export function todayLine(entry: PreschoolFamilyChild): {
       text:
         checkInTime == null
           ? `${name} is at school`
-          : `${name} is at school — checked in ${clock12(checkInTime)}`,
+          : `${name} is at school — checked in ${formatClockTime(checkInTime)}`,
       tone: "good",
     };
   if (status === "absent") return { text: "Absent today", tone: "away" };

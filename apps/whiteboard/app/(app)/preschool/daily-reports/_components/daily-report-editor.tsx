@@ -20,6 +20,7 @@ import { Switch } from "@repo/ui/components/switch";
 import { Textarea } from "@repo/ui/components/textarea";
 import { cn } from "@repo/ui/lib/utils";
 
+import { formatClockTime } from "@/app/(app)/preschool/_components/preschool-format";
 import { FormAlert } from "@/components/auth/form-alert";
 import { isClockTime } from "@/src/preschool/domain/attendance";
 import {
@@ -347,15 +348,17 @@ export function DailyReportEditor({
                   className="flex items-center justify-between gap-2 px-3"
                 >
                   <span className="text-sm">
-                    <span className="tabular-nums">{entry.time}</span> ·{" "}
-                    {TOILET_BUTTONS[entry.kind]}
+                    <span className="tabular-nums">
+                      {formatClockTime(entry.time)}
+                    </span>{" "}
+                    · {TOILET_BUTTONS[entry.kind]}
                   </span>
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
                     className="size-11"
-                    aria-label={`Remove ${TOILET_BUTTONS[entry.kind]} at ${entry.time}`}
+                    aria-label={`Remove ${TOILET_BUTTONS[entry.kind]} at ${formatClockTime(entry.time)}`}
                     onClick={() => {
                       change({
                         toilet: content.toilet.filter((_, at) => at !== index),

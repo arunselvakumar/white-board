@@ -19,7 +19,10 @@ import {
 } from "@repo/ui/components/card";
 import { Skeleton } from "@repo/ui/components/skeleton";
 
-import { formatDate } from "@/app/(app)/preschool/_components/preschool-format";
+import {
+  formatClockTime,
+  formatDate,
+} from "@/app/(app)/preschool/_components/preschool-format";
 import { todayInIndia } from "@/src/preschool/domain/dates";
 import {
   PRESCHOOL_ATTENDANCE_STATUS_LABELS,
@@ -100,10 +103,12 @@ function AttendanceCard({ childId }: { childId: string }) {
             ) : (
               <>
                 {PRESCHOOL_ATTENDANCE_STATUS_LABELS[day.status]}
-                {day.checkInTime == null ? null : `, in ${day.checkInTime}`}
+                {day.checkInTime == null
+                  ? null
+                  : `, in ${formatClockTime(day.checkInTime)}`}
                 {day.checkOutTime == null
                   ? null
-                  : `, out ${day.checkOutTime}${day.collectedByName == null ? "" : ` with ${day.collectedByName}`}`}
+                  : `, out ${formatClockTime(day.checkOutTime)}${day.collectedByName == null ? "" : ` with ${day.collectedByName}`}`}
               </>
             )}
           </p>
