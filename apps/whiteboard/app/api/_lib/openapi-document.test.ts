@@ -334,7 +334,10 @@ describe("openApiDocument", () => {
     expect(names).toContain("CreateTrainingInstituteStudentRequest");
     expect(names).toContain("GetTrainingInstituteStudentResponse");
     const unqualified = names.filter(
-      (name) => name !== "ErrorResponse" && !name.includes("TrainingInstitute"),
+      (name) =>
+        name !== "ErrorResponse" &&
+        !name.includes("TrainingInstitute") &&
+        !name.includes("Preschool"),
     );
     expect(unqualified).toEqual([]);
   });
@@ -360,10 +363,11 @@ describe("openApiDocument", () => {
     });
   });
 
-  it("serves Training Institute resources under their context prefix", () => {
+  it("serves each context's resources under its own prefix", () => {
     const outside = Object.keys(openApiDocument.paths).filter(
       (path) =>
         !path.startsWith("/api/training-institute/") &&
+        !path.startsWith("/api/preschool/") &&
         !path.startsWith("/api/webhooks/"),
     );
     expect(outside).toEqual([]);

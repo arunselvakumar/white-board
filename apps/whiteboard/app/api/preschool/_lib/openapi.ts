@@ -52,7 +52,5 @@ export const preschoolOperations: OpenApiOperation[] = AREAS.flatMap(
   (area) => area.operations,
 );
 
-export const preschoolComponents: Record<string, z.ZodType> = Object.assign(
-  {},
-  ...AREAS.map((area) => area.components),
-);
+export const preschoolComponents: Record<string, z.ZodType> =
+  Object.fromEntries(AREAS.flatMap((area) => Object.entries(area.components)));
