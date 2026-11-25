@@ -19,6 +19,10 @@ import type {
 } from "@/src/queries/preschool/daily-reports";
 
 import { DailyReportsScreen } from "./daily-reports-screen";
+import {
+  expectFitsPhone,
+  withPhoneFrame,
+} from "@/app/(app)/preschool/_components/phone-frame";
 
 const id = (n: number) =>
   `cf0e8400-e29b-41d4-a716-4466554400${String(n).padStart(2, "0")}`;
@@ -326,15 +330,12 @@ export const ReadOnlyDay: Story = {
 /** At 375 px the page does not scroll sideways, with an editor open. */
 export const Phone: Story = {
   beforeEach: () => api(),
-  globals: { viewport: { value: "mobile1" } },
-  play: async ({ canvas, userEvent }) => {
-    await expect(window.innerWidth).toBeLessThanOrEqual(414);
+  decorators: [withPhoneFrame],
+  play: async ({ canvas, canvasElement, userEvent }) => {
     await userEvent.click(
       await canvas.findByRole("button", { name: /Aadhya Kumar/ }),
     );
     await canvas.findByRole("form", { name: "Daily Report for Aadhya Kumar" });
-    await expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(
-      document.documentElement.clientWidth,
-    );
+    await expectFitsPhone(canvasElement);
   },
 };

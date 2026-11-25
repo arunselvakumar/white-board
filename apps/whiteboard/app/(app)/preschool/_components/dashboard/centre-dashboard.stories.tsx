@@ -9,6 +9,7 @@ import {
 import type { PreschoolCentreDashboard } from "@/src/queries/preschool/dashboard";
 
 import { CentreDashboardScreen } from "./centre-dashboard-screen";
+import { expectFitsPhone, withPhoneFrame } from "../phone-frame";
 
 const id = (n: number) =>
   `da0e8400-e29b-41d4-a716-4466554400${String(n).padStart(2, "0")}`;
@@ -270,12 +271,9 @@ export const NothingNeedsAttention: Story = {
 /** At 375 px the dashboard does not scroll sideways. */
 export const Phone: Story = {
   beforeEach: () => api(BUSY),
-  globals: { viewport: { value: "mobile1" } },
-  play: async ({ canvas }) => {
-    await expect(window.innerWidth).toBeLessThanOrEqual(414);
+  decorators: [withPhoneFrame],
+  play: async ({ canvas, canvasElement }) => {
     await canvas.findByRole("region", { name: "Today's figures" });
-    await expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(
-      document.documentElement.clientWidth,
-    );
+    await expectFitsPhone(canvasElement);
   },
 };

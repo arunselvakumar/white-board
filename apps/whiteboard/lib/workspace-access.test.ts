@@ -263,6 +263,7 @@ describe("Preschool role access", () => {
     for (const path of [
       "/preschool/head-office",
       "/preschool/head-office/royalty",
+      "/preschool/head-office/royalty/abc",
       "/preschool/centres",
       "/preschool/centres/new",
       "/preschool/programmes",
@@ -278,6 +279,7 @@ describe("Preschool role access", () => {
     for (const path of [
       "/preschool/head-office",
       "/preschool/head-office/royalty",
+      "/preschool/head-office/royalty/abc",
       "/preschool/centres",
       "/preschool/centres/abc",
       "/preschool/programmes",

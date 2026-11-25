@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
-import { PreschoolEmptyPage } from "@/app/(app)/preschool/_components/preschool-empty-page";
+import { RoyaltyScreen } from "@/app/(app)/preschool/head-office/royalty/_components/royalty-screen";
 
-export const metadata: Metadata = { title: "Royalty Statements" };
+export const metadata: Metadata = { title: "Royalty Statement" };
 
-export default function Page() {
-  return <PreschoolEmptyPage href="/preschool/head-office/royalty" />;
+export default function RoyaltyPage() {
+  return <RoyaltyScreen />;
 }

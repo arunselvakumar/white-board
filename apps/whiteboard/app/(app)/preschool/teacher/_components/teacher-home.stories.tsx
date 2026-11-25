@@ -10,6 +10,10 @@ import {
 import type { PreschoolClassroom } from "@/src/queries/preschool/classrooms";
 
 import { TeacherHomeScreen } from "./teacher-home-screen";
+import {
+  expectFitsPhone,
+  withPhoneFrame,
+} from "@/app/(app)/preschool/_components/phone-frame";
 
 const NURSERY_A = "ad0e8400-e29b-41d4-a716-446655440001";
 
@@ -130,16 +134,14 @@ export const MyClassrooms: Story = {
 /** At 375 px the cards fit the column and the page does not scroll sideways. */
 export const Phone: Story = {
   beforeEach: () => api([CLASSROOM]),
-  globals: { viewport: { value: "mobile1" } },
-  play: async ({ canvas }) => {
+  decorators: [withPhoneFrame],
+  play: async ({ canvas, canvasElement }) => {
     await expect(
       await canvas.findByRole("link", {
         name: "Take attendance for Nursery A",
       }),
     ).toBeVisible();
-    await expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(
-      document.documentElement.clientWidth,
-    );
+    await expectFitsPhone(canvasElement);
   },
 };
 
