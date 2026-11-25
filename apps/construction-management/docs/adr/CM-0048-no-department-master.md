@@ -2,7 +2,7 @@
 
 - Status: accepted
 - Date: 2026-11-25
-- Supersedes: the Department master of `modules/02` (ticket CM-203), the Department on Work Types (CM-601), Daily Worksheets and Equipment Usage sheets ([CM-0016](CM-0016-daily-site-work-product-decisions.md)), Tasks, Issues & Snags and Inspection Requests ([CM-0019](CM-0019-tracking-product-decisions.md)), Material Requests ([CM-0015](CM-0015-procurement-inventory-product-decisions.md)) and Contractor invoices ([CM-0017](CM-0017-finance-product-decisions.md))
+- Supersedes: the Department master of `modules/02` (ticket CM-203), the Department on Work Types (CM-601), Daily Worksheets and Equipment Usage sheets ([CM-0016](CM-0016-daily-site-work-product-decisions.md)), Tasks, Issues & Snags and Inspection Requests ([CM-0019](CM-0019-tracking-product-decisions.md)), Material Requests (`modules/06`) and Contractor invoices ([CM-0017](CM-0017-finance-product-decisions.md))
 - Amends: [CM-0046](CM-0046-departments-menu.md) §5 (the name "Departments" is no longer shared with a Masters list)
 - Relates to: [CM-0033](CM-0033-one-page-staff-no-designations-labours-on-many-projects.md) (the last master removed the same way)
 
