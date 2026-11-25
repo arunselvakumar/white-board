@@ -185,7 +185,6 @@ export function EquipmentSheetDetailPage({
         <Fact label="Operator">{sheet.operatorName ?? "—"}</Fact>
         <Fact label="Site Engineer">{sheet.supervisor?.name ?? "—"}</Fact>
         <Fact label="Contractor">{sheet.contractor?.name ?? "—"}</Fact>
-        <Fact label="Department">{sheet.department?.name ?? "—"}</Fact>
         <Fact label="Work Item">{sheet.workItem ?? "—"}</Fact>
         <Fact label="Location">
           {sheet.siteLocation == null ? (

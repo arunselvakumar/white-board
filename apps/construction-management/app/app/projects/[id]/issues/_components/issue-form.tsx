@@ -58,7 +58,6 @@ const schema = z
       .min(1, "Describe the issue."),
     priority: z.string(),
     categoryId: z.string(),
-    departmentId: z.string(),
     contractorId: z.string(),
     assigneeMemberId: z.string(),
     dueDate: z.string(),
@@ -83,7 +82,6 @@ const SERVER_FIELDS: Record<string, FieldPath<Values>> = {
   details: "details",
   priority: "priority",
   categoryId: "categoryId",
-  departmentId: "departmentId",
   contractorId: "contractorId",
   assigneeMemberId: "assigneeMemberId",
   dueDate: "dueDate",
@@ -103,7 +101,6 @@ function defaults(issue: IssueDetail | undefined): Values {
     details: issue?.details ?? "",
     priority: issue?.priority ?? "",
     categoryId: issue?.category?.id ?? "",
-    departmentId: issue?.department?.id ?? "",
     contractorId: issue?.contractor?.id ?? "",
     assigneeMemberId: issue?.assignee?.id ?? "",
     dueDate: issue?.dueDate ?? "",
@@ -176,8 +173,8 @@ function withCurrent(
 
 /**
  * Raise or edit an Issue & Snag (ADR CM-0019 §7): Issue Date (back-dated
- * control), Details, Priority (colour and label), Category, Department,
- * Contractor, Assign To, Due Date (on or after the Issue Date) and
+ * control), Details, Priority (colour and label), Category, Contractor,
+ * Assign To, Due Date (on or after the Issue Date) and
  * Location; on a new issue its images and attachments, uploaded once it is
  * saved. **Save** raises it Pending; **Save & Mark As Solved** (Create and
  * Update) records one fixed on the spot. The form stays busy after a save
@@ -225,11 +222,6 @@ export function IssueForm({
     issue?.category,
     "disabled",
   );
-  const departments = withCurrent(
-    options.departments.map((item) => ({ value: item.id, label: item.name })),
-    issue?.department,
-    "disabled",
-  );
   const contractors = withCurrent(
     options.contractors.map((item) => ({ value: item.id, label: item.name })),
     issue?.contractor,
@@ -246,7 +238,6 @@ export function IssueForm({
         details: input.details.trim(),
         priority: orNull(input.priority) as TrackingPriority | null,
         categoryId: orNull(input.categoryId),
-        departmentId: orNull(input.departmentId),
         contractorId: orNull(input.contractorId),
         assigneeMemberId: orNull(input.assigneeMemberId),
         dueDate: orNull(input.dueDate),
@@ -385,25 +376,6 @@ export function IssueForm({
               )}
             />
             <FieldError message={errors.categoryId?.message} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="issue-department">Department</Label>
-            <Controller
-              control={form.control}
-              name="departmentId"
-              render={({ field }) => (
-                <OptionSelect
-                  id="issue-department"
-                  value={field.value}
-                  onChange={field.onChange}
-                  placeholder="No department"
-                  noneLabel="No department"
-                  invalid={errors.departmentId != null}
-                  items={departments}
-                />
-              )}
-            />
-            <FieldError message={errors.departmentId?.message} />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="issue-contractor">Contractor</Label>

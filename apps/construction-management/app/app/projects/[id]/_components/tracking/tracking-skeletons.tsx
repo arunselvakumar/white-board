@@ -39,7 +39,6 @@ export function IssueFiltersSkeleton() {
         "Priority",
         "Category",
         "Assigned to",
-        "Department",
         "Contractor",
         "Date",
         "Search",
@@ -71,11 +70,7 @@ export function IssueRowsSkeleton({ selecting }: { selecting: boolean }) {
 
 /** The Inspection Requests filter bar while its options load. */
 export function InspectionFiltersSkeleton() {
-  return (
-    <FilterBarSkeleton
-      labels={["Department", "Contractor", "Inspector", "Date"]}
-    />
-  );
+  return <FilterBarSkeleton labels={["Contractor", "Inspector", "Date"]} />;
 }
 
 /** Inspection Requests: status tabs with counts, the count, the rows. */
@@ -207,7 +202,6 @@ export function IssueDetailSkeleton({ projectId }: { projectId: string }) {
             "Due Date",
             "Priority",
             "Category",
-            "Department",
             "Contractor",
             "Assigned to",
             "Location",
@@ -240,7 +234,6 @@ export function InspectionDetailSkeleton({ projectId }: { projectId: string }) {
             "Inspection",
             "Inspector",
             "Contractor",
-            "Department",
             "Location",
             "Raised by",
           ]}
@@ -276,7 +269,6 @@ export function TaskDetailSkeleton({ projectId }: { projectId: string }) {
               "Variance",
               "Assigned to",
               "Priority",
-              "Department",
               "Contractor",
               "Tags",
             ]}
@@ -413,7 +405,6 @@ const ISSUE_FIELDS = [
   { label: "Due Date" },
   { label: "Details", control: "textarea", wide: true },
   { label: "Category", control: "select" },
-  { label: "Department", control: "select" },
   { label: "Contractor", control: "select" },
   { label: "Assign To", control: "select" },
 ] as const;
@@ -422,7 +413,6 @@ const INSPECTION_FIELDS = [
   { label: "Inspection Date" },
   { label: "Inspection Time" },
   { label: "Inspector", control: "select" },
-  { label: "Department", control: "select" },
   { label: "Contractor", control: "select" },
   { label: "Description of work", control: "textarea", wide: true },
 ] as const;
@@ -434,7 +424,6 @@ const TASK_FIELDS = [
   { label: "Priority", control: "select" },
   { label: "Start Date" },
   { label: "Due Date" },
-  { label: "Department", control: "select" },
   { label: "Contractor", control: "select" },
 ] as const;
 

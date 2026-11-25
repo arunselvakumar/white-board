@@ -46,8 +46,8 @@ function SectionLink({ href, children }: { href: AppHref; children: string }) {
 }
 
 /**
- * Contractor-wise Labour: Contractor with its Department underneath, so
- * four narrow columns fit a phone without scrolling sideways.
+ * Contractor-wise Labour: one row per Contractor, four narrow columns
+ * that fit a phone without scrolling sideways.
  */
 function ContractorLabourTable({
   rows,
@@ -89,13 +89,10 @@ function ContractorLabourTable({
           </thead>
           <tbody className="divide-y">
             {rows.map((row) => (
-              <tr key={`${row.contractorId}:${row.departmentId}`}>
+              <tr key={row.contractorId}>
                 <th scope="row" className="py-2 pr-2 text-left font-normal">
                   <span className="block truncate font-medium">
                     {row.contractor ?? "A removed Contractor"}
-                  </span>
-                  <span className="text-muted-foreground block truncate text-xs">
-                    {row.department ?? "A removed Department"}
                   </span>
                 </th>
                 <td className="py-2 pl-2 text-right tabular-nums">

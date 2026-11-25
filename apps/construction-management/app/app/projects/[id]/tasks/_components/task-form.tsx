@@ -73,7 +73,6 @@ const schema = z
     priority: z.string(),
     siteLocation: z.custom<LocationRef | null>(),
     extraLocations: z.array(z.object({ ref: z.custom<LocationRef | null>() })),
-    departmentId: z.string(),
     contractorId: z.string(),
     tagIds: z.array(z.string()),
     totalWorkQty: z.string().trim(),
@@ -140,7 +139,6 @@ const SERVER_FIELDS: Record<string, FieldPath<Values>> = {
   dueDate: "dueDate",
   priority: "priority",
   siteLocation: "siteLocation",
-  departmentId: "departmentId",
   contractorId: "contractorId",
   tagIds: "tagIds",
   totalWorkQty: "totalWorkQty",
@@ -159,7 +157,6 @@ function defaults(task: TaskDetail | undefined): Values {
       priority: "",
       siteLocation: null,
       extraLocations: [],
-      departmentId: "",
       contractorId: "",
       tagIds: [],
       totalWorkQty: "",
@@ -175,7 +172,6 @@ function defaults(task: TaskDetail | undefined): Values {
     priority: task.priority ?? "",
     siteLocation: task.siteLocation,
     extraLocations: task.extraLocations.map((ref) => ({ ref })),
-    departmentId: task.department?.id ?? "",
     contractorId: task.contractor?.id ?? "",
     tagIds: task.tags.map((t) => t.id),
     totalWorkQty: task.totalWorkQty ?? "",
@@ -245,7 +241,7 @@ function withCurrent(
 /**
  * Add or edit a task (ADR CM-0019 §5): name, description, assignees,
  * planned dates, priority, the location and other locations of its type,
- * Department, Contractor, Tags (created inline with Tags Create), Total
+ * Contractor, Tags (created inline with Tags Create), Total
  * work with its unit and Total Price (Financial only). A summary task's
  * dates, work and price roll up from its sub-tasks, so the form leaves
  * them out. With `parent` it adds a Sub-Task.
@@ -293,11 +289,6 @@ export function TaskForm({
   const canCreateTags = canInTracking(access, "masters.tags", "create");
   const summary = task?.isSummary === true;
 
-  const departments = withCurrent(
-    options.departments.map((d) => ({ value: d.id, label: d.name })),
-    task?.department,
-    "A removed Department",
-  );
   const contractors = withCurrent(
     options.contractors.map((c) => ({ value: c.id, label: c.name })),
     task?.contractor,
@@ -339,7 +330,6 @@ export function TaskForm({
       extraLocations: input.extraLocations.flatMap((item) =>
         item.ref == null ? [] : [item.ref],
       ) as CreateTaskInput["extraLocations"],
-      departmentId: orNull(input.departmentId),
       contractorId: orNull(input.contractorId),
       tagIds: input.tagIds,
       totalWorkQty: orNull(input.totalWorkQty),
@@ -498,24 +488,6 @@ export function TaskForm({
               </div>
             </>
           )}
-          <div className="space-y-1.5">
-            <Label htmlFor="task-department">Department</Label>
-            <Controller
-              control={form.control}
-              name="departmentId"
-              render={({ field }) => (
-                <OptionSelect
-                  id="task-department"
-                  value={field.value}
-                  onChange={field.onChange}
-                  placeholder="None"
-                  items={departments}
-                  invalid={errors.departmentId != null}
-                />
-              )}
-            />
-            <FieldError message={errors.departmentId?.message} />
-          </div>
           <div className="space-y-1.5">
             <Label htmlFor="task-contractor">Contractor</Label>
             <Controller

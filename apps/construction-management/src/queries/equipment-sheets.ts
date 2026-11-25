@@ -97,7 +97,7 @@ export function equipmentSheetQuery(id: string) {
   });
 }
 
-/** Settings, supervisors, Contractors with Departments and units for the form. */
+/** Settings, supervisors, Contractors and units for the form. */
 export function equipmentSheetFormOptionsQuery(projectId: string) {
   return queryOptions({
     queryKey: [...EQUIPMENT_SHEETS_KEY, "form-options", projectId] as const,

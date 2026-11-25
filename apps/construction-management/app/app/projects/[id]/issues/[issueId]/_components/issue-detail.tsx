@@ -96,7 +96,6 @@ const FIELD_WORDS: Record<string, string> = {
   details: "details",
   priority: "priority",
   categoryId: "category",
-  departmentId: "Department",
   contractorId: "Contractor",
   assigneeMemberId: "Assign To",
   dueDate: "Due Date",
@@ -113,8 +112,9 @@ export function historyLine(item: Issue["history"][number]): string {
         : "Raised from a rejected Inspection Request";
     case "edited": {
       const fields = Array.isArray(payload["fields"])
-        ? (payload["fields"] as string[]).map(
-            (field) => FIELD_WORDS[field] ?? field,
+        ? // Fields the form no longer has (ADR CM-0048) are left out.
+          (payload["fields"] as string[]).flatMap(
+            (field) => FIELD_WORDS[field] ?? [],
           )
         : [];
       return fields.length === 0 ? "Edited" : `Edited ${fields.join(", ")}`;
@@ -480,7 +480,6 @@ export function IssueDetail({
             )}
           </Fact>
           <Fact label="Category">{issue.category?.name ?? "—"}</Fact>
-          <Fact label="Department">{issue.department?.name ?? "—"}</Fact>
           <Fact label="Contractor">{issue.contractor?.name ?? "—"}</Fact>
           <Fact label="Assigned to">{person(issue.assignee)}</Fact>
           <Fact label="Location">

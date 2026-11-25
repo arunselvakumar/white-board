@@ -88,7 +88,6 @@ const FIELD_LABELS: Record<string, string> = {
   priority: "priority",
   siteLocation: "location",
   extraLocations: "other locations",
-  departmentId: "Department",
   contractorId: "Contractor",
   tagIds: "tags",
   totalWork: "total work",
@@ -119,8 +118,9 @@ export function activityText(row: TaskActivity, unit: string | null): string {
     case "created":
       return p["imported"] === true ? "Imported the task" : "Created the task";
     case "edited": {
-      const fields = ((p["fields"] as string[] | undefined) ?? []).map(
-        (field) => FIELD_LABELS[field] ?? field,
+      // Fields the form no longer has (ADR CM-0048) are left out.
+      const fields = ((p["fields"] as string[] | undefined) ?? []).flatMap(
+        (field) => FIELD_LABELS[field] ?? [],
       );
       return fields.length === 0
         ? "Edited the task"
@@ -570,7 +570,6 @@ export function TaskDetail({
           <Fact label="Priority">
             {task.priority == null ? "—" : PRIORITY_LABELS[task.priority]}
           </Fact>
-          <Fact label="Department">{task.department?.name ?? "—"}</Fact>
           <Fact label="Contractor">{task.contractor?.name ?? "—"}</Fact>
           <Fact label="Tags">
             {task.tags.length === 0

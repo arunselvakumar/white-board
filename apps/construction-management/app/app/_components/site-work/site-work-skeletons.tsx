@@ -56,7 +56,6 @@ export function WorksheetRowsSkeleton({
         "Date",
         "Filled By",
         "Contractor",
-        "Department",
         ...(approval ? ["Approval"] : []),
       ]}
       columns={[
@@ -204,7 +203,6 @@ export function WorksheetDetailSkeleton({ projectId }: { projectId: string }) {
       facts={[
         "Location",
         "Contractor",
-        "Department",
         "Work Type",
         "Labour",
         "Approx Work Done",
@@ -249,7 +247,6 @@ export function EquipmentSheetDetailSkeleton({
         "Operator",
         "Site Engineer",
         "Contractor",
-        "Department",
         "Work Item",
         "Location",
         "Approx Work Done",
@@ -286,7 +283,6 @@ export function WorksheetFormSkeleton() {
         fields={[
           { label: "Location", control: "select", wide: true },
           { label: "Contractor", control: "select" },
-          { label: "Department", control: "select" },
           { label: "Work Type", control: "select" },
           { label: "Work Shift", control: "select" },
           { label: "Skilled Labours" },

@@ -47,7 +47,6 @@ export type IssueFilters = {
   priorities?: readonly TrackingPriority[];
   categoryId?: string;
   assigneeMemberId?: string;
-  departmentId?: string;
   contractorId?: string;
   locationType?: LocationType;
   placeId?: string;
@@ -72,7 +71,6 @@ export function issueListParams(
     params.set("priority", filters.priorities.join(","));
   set("categoryId", filters.categoryId);
   set("assigneeMemberId", filters.assigneeMemberId);
-  set("departmentId", filters.departmentId);
   set("contractorId", filters.contractorId);
   set("locationType", filters.locationType);
   if (filters.locationType != null) set("placeId", filters.placeId);
@@ -112,7 +110,7 @@ export function issueProgressQuery(id: string) {
   });
 }
 
-/** Assign To, Departments, Contractors and Issue Categories on the Project. */
+/** Assign To, Contractors and Issue Categories on the Project. */
 export function issueFormOptionsQuery(projectId: string) {
   const params = new URLSearchParams({ projectId });
   return queryOptions({

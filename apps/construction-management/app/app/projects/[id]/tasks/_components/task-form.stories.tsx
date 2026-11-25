@@ -90,7 +90,7 @@ export const Validation: Story = {
   },
 };
 
-/** A full task: assignees, dates, priority, Department, Contractor, a new tag, work and price. */
+/** A full task: assignees, dates, priority, Contractor, a new tag, work and price. */
 export const Save: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const formElement = await canvas.findByRole("form", { name: "New task" });

@@ -6,7 +6,6 @@ import { StoryQueries, type ApiCall } from "@/.storybook/mocks/api";
 import {
   CONTRACTOR_ID,
   CULVERT_ID,
-  DEPARTMENT_ID,
   DRAWING_ID,
   INSPECTION_PROJECT_ID,
   INSPECTIONS_API,
@@ -109,7 +108,6 @@ export const Save: Story = {
       "Meena Iyer",
       userEvent,
     );
-    await choose(formElement, canvasElement, "Department", "Civil", userEvent);
     await choose(
       formElement,
       canvasElement,
@@ -144,7 +142,6 @@ export const Save: Story = {
       reinspectionOfId: null,
       inspectionDate: "2026-10-14",
       inspectionTime: "10:30",
-      departmentId: DEPARTMENT_ID,
       contractorId: CONTRACTOR_ID,
       inspectorMemberId: INSPECTOR_ID,
       workDescription: "Slab reinforcement before the pour",

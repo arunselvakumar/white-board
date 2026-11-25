@@ -85,7 +85,7 @@ function useLocationChoices(projectId: string) {
 
 /**
  * The task list's filters: search by Task No. or name and status always;
- * assignee, priority, tag, department, contractor, location and a
+ * assignee, priority, tag, contractor, location and a
  * planned-date range behind **Filters**.
  */
 export function TaskFilterBar({
@@ -103,7 +103,6 @@ export function TaskFilterBar({
     filters.assigneeId != null ||
     filters.priority != null ||
     filters.tagId != null ||
-    filters.departmentId != null ||
     filters.contractorId != null ||
     filters.locationId != null ||
     (filters.from ?? "") !== "" ||
@@ -160,7 +159,6 @@ export function TaskFilterBar({
                   assigneeId: null,
                   priority: null,
                   tagId: null,
-                  departmentId: null,
                   contractorId: null,
                   locationId: null,
                   from: "",
@@ -214,20 +212,6 @@ export function TaskFilterBar({
               }))}
               onChange={(tagId) => {
                 onChange({ tagId });
-              }}
-            />
-          )}
-          {options.departments.length > 0 && (
-            <FilterSelect<string>
-              label="Department"
-              anyLabel="Any Department"
-              value={filters.departmentId}
-              options={options.departments.map((item) => ({
-                value: item.id,
-                label: item.name,
-              }))}
-              onChange={(departmentId) => {
-                onChange({ departmentId });
               }}
             />
           )}

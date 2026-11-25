@@ -35,7 +35,6 @@ projectTest.describe("Daily Worksheet", () => {
       await worksheet.goto();
       await worksheet.choose("Location", location.name);
       await worksheet.choose("Contractor", contractor.name);
-      await worksheet.choose("Department", "Masonry & Plaster");
       await worksheet.chooseFirst("Work Shift");
       await worksheet.form
         .getByLabel("Skilled Labours", { exact: true })

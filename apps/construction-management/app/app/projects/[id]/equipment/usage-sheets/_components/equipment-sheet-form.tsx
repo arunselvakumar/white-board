@@ -116,7 +116,6 @@ type Values = {
   operatorName: string;
   supervisorUserId: string;
   contractorId: string;
-  departmentId: string;
   workItem: string;
   siteLocation: LocationRef | null;
   timeShifts: { startTime: string; endTime: string }[];
@@ -196,7 +195,6 @@ function blank(sheetDate: string): Values {
     operatorName: "",
     supervisorUserId: "",
     contractorId: "",
-    departmentId: "",
     workItem: "",
     siteLocation: null,
     timeShifts: [{ startTime: "", endTime: "" }],
@@ -262,7 +260,6 @@ function valuesFrom(
     operatorName: sheet.operatorName ?? "",
     supervisorUserId: sheet.supervisor?.userId ?? "",
     contractorId: sheet.contractor?.id ?? "",
-    departmentId: sheet.department?.id ?? "",
     workItem: sheet.workItem ?? "",
     siteLocation: sheet.siteLocation,
     timeShifts:
@@ -321,8 +318,6 @@ function validate(
   const figure = figureError(values, machine, settings);
   if (figure != null && errors[figure.field] == null)
     errors[figure.field] = figure.message;
-  if (values.departmentId !== "" && values.contractorId === "")
-    errors["contractorId"] = "Choose the Contractor whose Department this is.";
   if (settings.showApproxWorkDone && values.approxWorkQty.trim() !== "") {
     const qty = values.approxWorkQty.trim();
     if (!QUANTITY_PATTERN.test(qty) || Number(qty) === 0)
@@ -352,7 +347,6 @@ const FORM_FIELDS = new Set<string>([
   "operatorName",
   "supervisorUserId",
   "contractorId",
-  "departmentId",
   "workItem",
   "siteLocation",
   "openingReading",
@@ -639,19 +633,9 @@ export function EquipmentSheetForm({
     (canInSiteWork(access, "site_work.equipment_usage", "create") ||
       canInSiteWork(access, "masters.equipments", "create"));
 
-  // The Departments offered are the chosen Contractor's.
   const contractorOptions = withCurrent(
     options.contractors.map((row) => ({ value: row.id, label: row.name })),
     current?.contractor,
-  );
-  const contractor = options.contractors.find(
-    (row) => row.id === values.contractorId,
-  );
-  const departmentOptions = withCurrent(
-    options.departments
-      .filter((row) => contractor?.departmentIds.includes(row.id) === true)
-      .map((row) => ({ value: row.id, label: row.name })),
-    values.departmentId === current?.department?.id ? current.department : null,
   );
   const supervisorOptions = withCurrent(
     options.supervisors.map((row) => ({ value: row.userId, label: row.name })),
@@ -718,7 +702,6 @@ export function EquipmentSheetForm({
         ? orNull(input.supervisorUserId)
         : null,
       contractorId: orNull(input.contractorId),
-      departmentId: orNull(input.departmentId),
       workItem: orNull(input.workItem),
       siteLocation: settings.showLocation
         ? siteLocationInput(input.siteLocation)
@@ -1239,25 +1222,6 @@ export function EquipmentSheetForm({
             error={errors.contractorId?.message}
             onChange={(next) => {
               form.setValue("contractorId", next, { shouldValidate: true });
-              const picked = options.contractors.find((row) => row.id === next);
-              if (picked?.departmentIds.includes(values.departmentId) !== true)
-                form.setValue("departmentId", "");
-            }}
-          />
-          <SelectField
-            id={id("department")}
-            label="Department (optional)"
-            placeholder={
-              values.contractorId === ""
-                ? "Choose the Contractor first"
-                : "No Department"
-            }
-            disabled={values.contractorId === ""}
-            value={values.departmentId}
-            options={departmentOptions}
-            error={errors.departmentId?.message}
-            onChange={(next) => {
-              form.setValue("departmentId", next, { shouldValidate: true });
             }}
           />
           <div className="space-y-1.5 sm:col-span-2">
@@ -1271,7 +1235,7 @@ export function EquipmentSheetForm({
             />
             <FieldError message={errors.workItem?.message} />
           </div>
-          {(values.contractorId !== "" || values.departmentId !== "") && (
+          {values.contractorId !== "" && (
             <div className="sm:col-span-2">
               <Button
                 type="button"
@@ -1280,10 +1244,9 @@ export function EquipmentSheetForm({
                 className="px-0"
                 onClick={() => {
                   form.setValue("contractorId", "");
-                  form.setValue("departmentId", "");
                 }}
               >
-                Clear Contractor and Department
+                Clear Contractor
               </Button>
             </div>
           )}

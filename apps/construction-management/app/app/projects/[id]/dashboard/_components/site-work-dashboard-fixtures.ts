@@ -27,8 +27,6 @@ export function dailyWork(from: string, to: string): DailyWorkDashboard {
       {
         contractorId: "0190a000-0000-7000-8000-00000000c001",
         contractor: "Velan Constructions",
-        departmentId: "0190a000-0000-7000-8000-00000000d001",
-        department: "Masonry",
         skilled: 412,
         unskilled: 655,
         total: 1067,
@@ -36,8 +34,6 @@ export function dailyWork(from: string, to: string): DailyWorkDashboard {
       {
         contractorId: "0190a000-0000-7000-8000-00000000c002",
         contractor: "Sri Murugan Works",
-        departmentId: "0190a000-0000-7000-8000-00000000d002",
-        department: "Shuttering and centring",
         skilled: 230,
         unskilled: 180,
         total: 410,
@@ -45,8 +41,6 @@ export function dailyWork(from: string, to: string): DailyWorkDashboard {
       {
         contractorId: "0190a000-0000-7000-8000-00000000c003",
         contractor: null,
-        departmentId: "0190a000-0000-7000-8000-00000000d003",
-        department: "Bar bending",
         skilled: 40,
         unskilled: 12,
         total: 52,

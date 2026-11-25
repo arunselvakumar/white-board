@@ -72,7 +72,6 @@ const STATUS_ICONS = {
 
 type Filters = {
   status: InspectionStatus | null;
-  departmentId: string;
   contractorId: string;
   inspectorMemberId: string;
   /** `type:id`, or "". */
@@ -83,7 +82,6 @@ type Filters = {
 
 const NO_FILTERS: Filters = {
   status: null,
-  departmentId: "",
   contractorId: "",
   inspectorMemberId: "",
   location: "",
@@ -95,7 +93,6 @@ function toQuery(filters: Filters): InspectionFilters {
   const [type = "", id = ""] = filters.location.split(":");
   return {
     status: filters.status,
-    departmentId: filters.departmentId,
     contractorId: filters.contractorId,
     inspectorMemberId: filters.inspectorMemberId,
     location: isLocationType(type) && id !== "" ? { type: type, id } : null,
@@ -123,7 +120,7 @@ function outcomeText(
 
 /**
  * A Project's Inspection Requests: status tabs with counts,
- * filters (Department, Contractor, Inspector, location, date, search),
+ * filters (Contractor, Inspector, location, date, search),
  * and for approvers a bulk mode that approves or rejects (one reason, and
  * **Also raise a snag**) the selected pending requests, skipping the rest.
  */
@@ -251,18 +248,6 @@ function FilterBar({
   ];
   return (
     <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-end">
-      <FilterSelect
-        id="inspections-department"
-        label="Department"
-        value={filters.departmentId}
-        options={options.departments.map((item) => ({
-          value: item.id,
-          label: item.name,
-        }))}
-        onChange={(departmentId) => {
-          onChange({ departmentId });
-        }}
-      />
       <FilterSelect
         id="inspections-contractor"
         label="Contractor"
@@ -549,11 +534,6 @@ function Rows({
                 </TableCell>
                 <TableCell className="max-w-64">
                   <div className="truncate">{row.workDescription}</div>
-                  {row.department?.name != null && (
-                    <div className="text-muted-foreground truncate text-xs">
-                      {row.department.name}
-                    </div>
-                  )}
                 </TableCell>
                 <TableCell className="max-w-48 truncate">
                   {row.contractor?.name ?? "—"}
