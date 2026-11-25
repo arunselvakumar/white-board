@@ -1,6 +1,7 @@
 import {
   BriefcaseBusiness,
   Megaphone,
+  Network,
   Users,
   UsersRound,
   type LucideIcon,
@@ -68,6 +69,19 @@ export const MARKETING_DEPARTMENT: Department = {
     "Visits to Prospect Companies, the Follow-ups owed after them, your Marketing Team and their reports.",
   icon: Megaphone,
   areas: [MARKETING_PATH],
+};
+
+/**
+ * Manage Departments (ADR CM-0049): the Company's list of departments,
+ * last under Departments for a Role with Departments Read. Not a
+ * department itself, so the sidebar keeps the main menu on it.
+ */
+export const MANAGE_DEPARTMENTS: DepartmentCard = {
+  href: "/app/departments/manage",
+  label: "Manage Departments",
+  description:
+    "The list of your Company's departments. Add your own; Human Resources and Marketing are always there.",
+  icon: Network,
 };
 
 function card({

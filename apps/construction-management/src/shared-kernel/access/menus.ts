@@ -292,6 +292,8 @@ const DEFINITIONS = [
   ["hrms.shifts", "Shift Management", "hrms", "CRUDAEINV", false],
   // Others.
   ["reporting.central_reports", "Central Reports", "others", "R", false],
+  // Manage Departments (ADR CM-0049): the Company's list of departments.
+  ["organization.departments", "Departments", "others", "CRUD", false],
 ] as const satisfies readonly (readonly [
   string,
   string,

@@ -20,13 +20,18 @@ export default async function AppLayout({
   // A Temporary Password is replaced before anything else (ADR CM-0030 §8).
   if (mustChangePassword(auth)) redirect(CHANGE_PASSWORD_PATH);
   if (auth.workspaceId == null) redirect("/continue");
-  const { canOpenDashboard, canOpenStaffRoles, marketing } =
-    await mainMenuAccess();
+  const {
+    canOpenDashboard,
+    canOpenStaffRoles,
+    canManageDepartments,
+    marketing,
+  } = await mainMenuAccess();
 
   return (
     <AppShell
       canOpenDashboard={canOpenDashboard}
       canOpenStaffRoles={canOpenStaffRoles}
+      canManageDepartments={canManageDepartments}
       marketing={marketing}
     >
       <QuerySuspense serverFallback={null}>{children}</QuerySuspense>
