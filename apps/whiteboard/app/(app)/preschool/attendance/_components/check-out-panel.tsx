@@ -25,7 +25,7 @@ import { cn } from "@repo/ui/lib/utils";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
-import { ChildInitialsAvatar } from "@/app/(app)/preschool/_components/child-initials-avatar";
+import { PersonAvatar } from "@/app/(app)/preschool/_components/person-avatar";
 import { isClockTime } from "@/src/preschool/domain/attendance";
 import type {
   PreschoolAttendanceRosterChild,
@@ -141,7 +141,7 @@ function CheckOutForm({
       title: pickup.name,
       detail: pickup.relationship,
       leading: (
-        <ChildInitialsAvatar
+        <PersonAvatar
           id={pickup.id}
           name={pickup.name}
           photoUrl={pickup.photoUrl}

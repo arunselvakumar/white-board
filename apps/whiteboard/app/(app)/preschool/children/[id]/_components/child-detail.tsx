@@ -1,11 +1,11 @@
 "use client";
 
-import { CurrencyInrIcon, WarningIcon } from "@phosphor-icons/react/ssr";
+import { WarningIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@repo/ui/components/alert";
 import { Badge } from "@repo/ui/components/badge";
-import { Button, buttonVariants } from "@repo/ui/components/button";
+import { Button } from "@repo/ui/components/button";
 import {
   Card,
   CardContent,
@@ -20,6 +20,7 @@ import {
 } from "@repo/ui/components/tabs";
 
 import { ChildAvatar } from "@/app/(app)/preschool/_components/child-avatar";
+import { PersonAvatar } from "@/app/(app)/preschool/_components/person-avatar";
 import { PhoneLinks } from "@/app/(app)/preschool/_components/phone-links";
 import { formatDate } from "@/app/(app)/preschool/_components/preschool-format";
 import { PreschoolPage } from "@/app/(app)/preschool/_components/preschool-page";
@@ -50,6 +51,7 @@ import {
   ChildAdmissionDialog,
   type AdmissionActionKind,
 } from "./child-admission-actions";
+import { overviewCards } from "./child-overview-cards";
 import { ChildSection } from "./child-section-editor";
 
 const GENDER_LABEL = { girl: "Girl", boy: "Boy", other: "Other" } as const;
@@ -90,50 +92,6 @@ function Phone({
   return phone == null ? null : (
     <PhoneLinks phone={phone} label={name ?? undefined} />
   );
-}
-
-/** A card beside the Child's sections; other areas add theirs to `overviewCards`. */
-type OverviewCard = { key: string; node: ReactNode };
-
-/**
- * Cards in the Child page's side column. Attendance this month, the latest
- * Daily Report, Stock received and Observations each add one entry here.
- */
-function overviewCards(
-  child: PreschoolChildProfile,
-  role: PreschoolRole,
-): OverviewCard[] {
-  const managers = role === "owner" || role === "centre_head";
-  return managers
-    ? [
-        {
-          key: "fees",
-          node: (
-            <Card size="sm">
-              <CardHeader>
-                <CardTitle>
-                  <h2 className="flex items-center gap-2">
-                    <CurrencyInrIcon aria-hidden="true" className="size-4" />
-                    Fees
-                  </h2>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm">
-                <p className="text-muted-foreground">
-                  Invoices, Fee Payments and Receipts for {child.firstName}.
-                </p>
-                <Link
-                  href={`/preschool/fees/children/${child.id}`}
-                  className={buttonVariants({ variant: "outline", size: "sm" })}
-                >
-                  Open fees
-                </Link>
-              </CardContent>
-            </Card>
-          ),
-        },
-      ]
-    : [];
 }
 
 function AdmissionHistory({
@@ -459,11 +417,10 @@ export function ChildDetail({
                       key={pickup.id}
                       className="flex min-w-0 items-center gap-3 rounded-xl border p-3 text-sm"
                     >
-                      <ChildAvatar
-                        childId={pickup.id}
+                      <PersonAvatar
+                        id={pickup.id}
                         name={pickup.name}
                         photoUrl={pickup.photoUrl}
-                        className="size-10"
                       />
                       <div className="min-w-0">
                         <p className="truncate font-medium">{pickup.name}</p>
