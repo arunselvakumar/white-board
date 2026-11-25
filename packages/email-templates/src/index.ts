@@ -17,6 +17,11 @@ import {
 } from "./emails/absence-notice";
 import { ReportEmail, type ReportEmailProps } from "./emails/report";
 import {
+  AnnouncementEmail,
+  announcementSubject,
+  type AnnouncementEmailProps,
+} from "./emails/preschool/announcement";
+import {
   DailyReportReadyEmail,
   dailyReportReadySubject,
   type DailyReportReadyEmailProps,
@@ -70,6 +75,10 @@ export {
   DailyReportReadyEmail,
   type DailyReportReadyEmailProps,
 } from "./emails/preschool/daily-report-ready";
+export {
+  AnnouncementEmail,
+  type AnnouncementEmailProps,
+} from "./emails/preschool/announcement";
 
 /** A rendered email, ready for any transport. */
 export type RenderedEmail = {
@@ -170,5 +179,15 @@ export async function renderDailyReportReadyEmail(
   return {
     subject: dailyReportReadySubject(props),
     ...(await renderBoth(createElement(DailyReportReadyEmail, props))),
+  };
+}
+
+/** A Preschool Announcement emailed to the Parents it reaches. */
+export async function renderAnnouncementEmail(
+  props: AnnouncementEmailProps,
+): Promise<RenderedEmail> {
+  return {
+    subject: announcementSubject(props),
+    ...(await renderBoth(createElement(AnnouncementEmail, props))),
   };
 }

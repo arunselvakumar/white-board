@@ -23,8 +23,8 @@ const MONTHS = [
   "Dec",
 ];
 
-/** "25 Nov 2026". */
-function dateText(date: IsoDate): string {
+/** "25 Nov 2026", as emails print a date. */
+export function dateText(date: IsoDate): string {
   const [year, month, day] = date.split("-").map(Number) as [
     number,
     number,
