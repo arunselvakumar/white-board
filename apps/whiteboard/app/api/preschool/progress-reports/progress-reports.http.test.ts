@@ -322,6 +322,36 @@ describe("/api/preschool/progress-reports", () => {
     expect(bala).not.toBe(asha);
   });
 
+  it("refuses another Workspace's Domain or Academic Year", async () => {
+    teacherA();
+    const domain = await call(save, {
+      body: {
+        childId: asha,
+        term: "term_3",
+        ratings: [{ domainId: other.domainIds[0], rating: "proficient" }],
+      },
+    });
+    expect(domain.status).toBe(StatusCodes.NOT_FOUND);
+    expect(domain.body.code).toBe("DOMAIN_NOT_FOUND");
+    const year = await call(save, {
+      body: {
+        childId: asha,
+        term: "term_3",
+        academicYearId: other.academicYearId,
+        ratings: [],
+      },
+    });
+    expect(year.body.code).toBe("ACADEMIC_YEAR_NOT_FOUND");
+    const list = await call(classroom, {
+      query: {
+        classroomId: roomA,
+        term: "term_2",
+        academicYearId: other.academicYearId,
+      },
+    });
+    expect(list.status).toBe(StatusCodes.NOT_FOUND);
+  });
+
   it("keeps a report with the Centre that wrote it", async () => {
     // The Child moves to the branch; the report stays the main Centre's.
     const branch = preschool.centreIds[1] ?? "";
