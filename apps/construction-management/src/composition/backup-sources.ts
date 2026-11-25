@@ -109,12 +109,6 @@ const contractor = (sql = "t.contractor_id") =>
     "Contractor",
     nameIn("construction_masters.contractors", sql),
   );
-const department = (sql = "t.department_id") =>
-  col(
-    "department",
-    "Department",
-    nameIn("construction_masters.departments", sql),
-  );
 const unit = (field: string, label: string, sql: string) =>
   col(field, label, nameIn("construction_masters.measurement_units", sql));
 const account = (field: string, label: string, sql: string) =>
@@ -328,7 +322,6 @@ const SPECS: Record<string, EntitySpec> = {
       col("sheetDate", "Date", "t.sheet_date", "date"),
       col("shift", "Shift", "t.shift::text", "enum"),
       contractor(),
-      department(),
       col(
         "workType",
         "Work Type",
@@ -381,7 +374,6 @@ const SPECS: Record<string, EntitySpec> = {
       col("ownership", "Ownership", "t.ownership::text", "enum"),
       col("operatorName", "Operator", "t.operator_name"),
       contractor(),
-      department(),
       col("workItem", "Work Item", "t.work_item"),
       ...siteLocation(),
       col("usageHours", "Usage Hours", "t.usage_hours", "number"),
@@ -1037,7 +1029,6 @@ const SPECS: Record<string, EntitySpec> = {
       col("invoiceNumber", "Invoice No.", "t.invoice_number"),
       col("invoiceDate", "Invoice Date", "t.invoice_date", "date"),
       col("dueDate", "Due Date", "t.due_date", "date"),
-      department(),
       money("taxableAmount", "Taxable (₹)", "t.taxable_amount"),
       money("gstAmount", "GST (₹)", "t.gst_amount"),
       money("amount", "Amount (₹)", "t.amount"),
@@ -1145,7 +1136,6 @@ const SPECS: Record<string, EntitySpec> = {
         "Tags",
         `(SELECT string_agg(g.name, ', ' ORDER BY g.name) FROM ${TR}.task_tags a JOIN ${MS}.tags g ON g.id = a.tag_id WHERE a.task_id = t.id)`,
       ),
-      department(),
       contractor(),
       ...siteLocation(),
       col("totalWorkQty", "Total Work", "t.total_work_qty", "number"),
@@ -1201,7 +1191,6 @@ const SPECS: Record<string, EntitySpec> = {
       ),
       col("priority", "Priority", "t.priority::text", "enum"),
       col("status", "Status", "t.status::text", "enum"),
-      department(),
       contractor(),
       col("assignee", "Assigned To", memberName("t.assignee_member_id")),
       col("dueDate", "Due Date", "t.due_date", "date"),
@@ -1474,7 +1463,6 @@ const SPECS: Record<string, EntitySpec> = {
       col("number", "Inspection No.", "t.number"),
       col("inspectionDate", "Inspection Date", "t.inspection_date", "date"),
       col("inspectionTime", "Time", "t.inspection_time"),
-      department(),
       contractor(),
       col("inspector", "Inspector", memberName("t.inspector_member_id")),
       col("workDescription", "Work", "t.work_description"),
@@ -1633,7 +1621,6 @@ const SPECS: Record<string, EntitySpec> = {
     col("joinedAt", "Joined On", "t.joined_at", "datetime"),
     ...stamps(),
   ]),
-  departments: simpleMaster(`${MS}.departments`, "Department"),
   contractors: master(`${MS}.contractors t`, [
     id(),
     col("name", "Contractor", "t.name"),
@@ -1785,7 +1772,6 @@ const SPECS: Record<string, EntitySpec> = {
   work_types: master(`${MS}.work_types t`, [
     id(),
     col("name", "Work Type", "t.name"),
-    department(),
     col("disabled", "Disabled", "t.disabled_at IS NOT NULL", "bool"),
     ...stamps(),
   ]),

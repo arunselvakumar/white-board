@@ -34,14 +34,12 @@ export const GetConstructionSiteWorkDailyWorkDashboardResponseModel = z
         attendance: z.int(),
       }),
     ),
-    /** Labour-days per Contractor and Department, the most first. */
+    /** Labour-days per Contractor, the most first. */
     contractors: z.array(
       z.object({
         contractorId: z.uuid(),
         /** Null when the Contractor is gone. */
         contractor: z.string().nullable(),
-        departmentId: z.uuid(),
-        department: z.string().nullable(),
         skilled: z.int(),
         unskilled: z.int(),
         total: z.int(),

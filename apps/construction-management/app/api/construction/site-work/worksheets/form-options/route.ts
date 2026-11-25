@@ -12,9 +12,8 @@ export const dynamic = "force-dynamic";
 
 /**
  * What the Daily Worksheet form offers on a Project: its
- * settings, the active Contractors on it with their Departments, those
- * Departments' Work Types (with assigned Materials) and the Measurement
- * Units. Needs Daily Worksheet read on the Project.
+ * settings, the active Contractors on it, every enabled Work Type (with
+ * assigned Materials) and the Measurement Units. Needs Daily Worksheet read on the Project.
  */
 export async function GET(request: Request): Promise<Response> {
   try {

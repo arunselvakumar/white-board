@@ -21,7 +21,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * A Project's Daily Worksheets, newest first, by Sheet Date range, Filled
- * By, Contractor, Department and approval status, with the filter options.
+ * By, Contractor and approval status, with the filter options.
  * Needs Daily Worksheet read on the Project.
  */
 export async function GET(request: Request): Promise<Response> {
@@ -43,7 +43,6 @@ export async function GET(request: Request): Promise<Response> {
       to: model.to,
       createdBy: model.createdBy,
       contractorId: model.contractorId,
-      departmentId: model.departmentId,
       approvalStatus: model.approvalStatus,
       limit: model.limit,
       after: model.after == null ? undefined : decodeListCursor(model.after),

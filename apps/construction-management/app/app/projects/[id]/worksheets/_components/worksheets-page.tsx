@@ -63,7 +63,6 @@ type Filters = {
   date: DateFilterValue;
   createdBy: string;
   contractorId: string;
-  departmentId: string;
   approvalStatus: SheetApprovalStatus | "";
 };
 
@@ -71,7 +70,6 @@ const NO_FILTERS: Filters = {
   date: NO_DATE_FILTER,
   createdBy: "",
   contractorId: "",
-  departmentId: "",
   approvalStatus: "",
 };
 
@@ -82,7 +80,6 @@ function toQuery(projectId: string, filters: Filters): WorksheetFilter {
     to: filters.date.to,
     createdBy: filters.createdBy,
     contractorId: filters.contractorId,
-    departmentId: filters.departmentId,
     approvalStatus: filters.approvalStatus,
   };
 }
@@ -95,8 +92,8 @@ function materialsLine(sheet: Worksheet): string {
 }
 
 /**
- * A Project's Daily Worksheets: filters by date, Filled By, Contractor,
- * Department and approval; bulk approve / reject for approvers when
+ * A Project's Daily Worksheets: filters by date, Filled By, Contractor
+ * and approval; bulk approve / reject for approvers when
  * approval is on; the gear opens the form settings for members with Update.
  */
 export function WorksheetsPage({
@@ -307,18 +304,6 @@ function WorksheetRows({
           onFilters({ contractorId });
         }}
       />
-      <FilterSelect
-        id="worksheets-department"
-        label="Department"
-        value={filters.departmentId}
-        options={data.facets.departments.map((item) => ({
-          value: item.id,
-          label: item.name,
-        }))}
-        onChange={(departmentId) => {
-          onFilters({ departmentId });
-        }}
-      />
       {showApproval && (
         <FilterSelect
           id="worksheets-approval"
@@ -347,7 +332,7 @@ function WorksheetRows({
           title={filtered ? "No worksheets match" : "No worksheets yet"}
           description={
             filtered
-              ? "Try another date, contractor or department."
+              ? "Try another date or contractor."
               : "Record each crew's day: where they worked, how many came, and the material they used."
           }
           actions={
@@ -473,11 +458,11 @@ function WorksheetRows({
                 </TableCell>
                 <TableCell className="max-w-56">
                   <div className="truncate">{sheet.contractor.name ?? "—"}</div>
-                  <div className="text-muted-foreground truncate text-xs">
-                    {sheet.department.name ?? "—"}
-                    {sheet.workType?.name != null &&
-                      ` · ${sheet.workType.name}`}
-                  </div>
+                  {sheet.workType?.name != null && (
+                    <div className="text-muted-foreground truncate text-xs">
+                      {sheet.workType.name}
+                    </div>
+                  )}
                   {sheet.task != null && (
                     <div className="truncate text-xs">
                       <WorksheetTaskLink
@@ -535,8 +520,8 @@ function WorksheetRows({
                   {formatDate(sheet.sheetDate)} · {shiftLabel(sheet.shift)}
                 </p>
                 <p className="mt-1 truncate text-sm">
-                  {sheet.contractor.name ?? "—"} ·{" "}
-                  {sheet.department.name ?? "—"}
+                  {sheet.contractor.name ?? "—"}
+                  {sheet.workType?.name != null && ` · ${sheet.workType.name}`}
                 </p>
                 <p className="text-muted-foreground truncate text-xs">
                   {headcountText(sheet)} · {materialsLine(sheet)}

@@ -127,12 +127,6 @@ export function InvoiceDetail({
   const facts: [string, string][] = [
     ["Invoice date", formatDate(invoice.invoiceDate)],
     ["Due date", formatDate(invoice.dueDate)],
-    ...(invoice.department == null
-      ? []
-      : ([["Department", invoice.department.name ?? "—"]] as [
-          string,
-          string,
-        ][])),
     ...(invoice.taxableAmount == null
       ? []
       : ([["Taxable value", money(invoice.taxableAmount)]] as [

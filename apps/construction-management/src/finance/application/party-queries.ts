@@ -454,34 +454,6 @@ export class PartyQueries {
     return { partyType, items, totals };
   }
 
-  /** What the invoice form offers for a party: a Contractor's Departments. */
-  async invoiceFormOptions(
-    access: MemberAccess,
-    party: { type: PartyType; id: string },
-    place: PartyPlace,
-  ): Promise<{ departments: { id: string; name: string }[] }> {
-    assertOnPlace(access, "read", place);
-    if (party.type !== "contractor") return { departments: [] };
-    const { db, directory } = this.deps;
-    const facts = await loadParty(
-      this.deps,
-      db,
-      access.workspaceId,
-      party.type,
-      party.id,
-    );
-    const departments = await directory.departments(
-      db,
-      access.workspaceId,
-      facts.departmentIds,
-    );
-    return {
-      departments: [...departments.values()]
-        .map((row) => ({ id: row.id, name: row.name }))
-        .sort((a, b) => a.name.localeCompare(b.name)),
-    };
-  }
-
   /**
    * The TDS ledger of a Contractor for a financial year (CM-706, CM-0017
    * §8): each live payment with its base, rate, TDS and whether it was

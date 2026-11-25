@@ -35,7 +35,6 @@ import {
 } from "@/components/money/money-input";
 import { fieldForCode } from "@/lib/server-errors";
 import {
-  partyFormOptionsQuery,
   useCreateInvoice,
   useUpdateInvoice,
   type AwaitingGoodsReceipt,
@@ -52,8 +51,6 @@ import {
   PARTY_SCREENS,
 } from "@/app/app/_components/finance/parties/party-money";
 
-const NONE = "__none__";
-
 const optionalRupees = z
   .string()
   .trim()
@@ -68,7 +65,6 @@ const invoiceFormSchema = z
     invoiceNumber: z.string().trim().max(60, "Use at most 60 characters"),
     invoiceDate: z.iso.date({ message: "Choose the invoice date" }),
     dueDate: z.string(),
-    departmentId: z.string(),
     taxableAmount: optionalRupees,
     gstAmount: optionalRupees,
     amount: z
@@ -113,7 +109,6 @@ const ERROR_FIELDS = {
   INVOICE_BELOW_ALLOCATED: "amount",
   AMOUNT_INVALID: "amount",
   AMOUNT_TOO_LARGE: "amount",
-  DEPARTMENT_NOT_OF_CONTRACTOR: "departmentId",
   PARTY_NOT_ON_PROJECT: "partyId",
   PARTY_NOT_FOUND: "partyId",
   FINANCIAL_PERIOD_CLOSED: "invoiceDate",
@@ -127,8 +122,8 @@ export type InvoiceDialogTarget =
 
 /**
  * **New invoice** / edit an invoice: the party (fixed when opened from one),
- * the party's invoice number (a sales invoice is numbered on save), dates, a
- * Contractor's Department, taxable value and GST, amount and remarks. A
+ * the party's invoice number (a sales invoice is numbered on save), dates,
+ * taxable value and GST, amount and remarks. A
  * Supplier's invoice may gather GRNs awaiting an invoice; its amount starts at
  * their total value.
  */
@@ -194,7 +189,6 @@ function defaults(
       invoiceNumber: invoice.invoiceNumber,
       invoiceDate: invoice.invoiceDate,
       dueDate: invoice.dueDate ?? "",
-      departmentId: invoice.department?.id ?? "",
       taxableAmount: paiseToRupees(invoice.taxableAmount),
       gstAmount: paiseToRupees(invoice.gstAmount),
       amount: paiseToRupees(invoice.amount),
@@ -209,7 +203,6 @@ function defaults(
     invoiceNumber: grns.length === 1 ? (first?.invoiceNo ?? "") : "",
     invoiceDate: grns.length === 1 ? (first?.invoiceDate ?? today) : today,
     dueDate: "",
-    departmentId: "",
     taxableAmount: "",
     gstAmount: "",
     amount:
@@ -248,21 +241,11 @@ function InvoiceForm({
     defaultValues: defaults(target, localToday()),
   });
   const { errors } = form.formState;
-  const partyId = useWatch({ control: form.control, name: "partyId" });
   const direction = useWatch({ control: form.control, name: "direction" });
   const parties = useQuery({
     ...counterpartyOptionsQuery(partyType, projectId),
     enabled: !fixedParty,
   });
-  const options = useQuery({
-    ...partyFormOptionsQuery(projectId, partyType, partyId),
-    enabled: partyType === "contractor" && partyId !== "",
-  });
-  const departments = options.data?.departments ?? [];
-  const departmentItems = [
-    { value: NONE, label: "No Department" },
-    ...departments.map((item) => ({ value: item.id, label: item.name })),
-  ];
   const partyItems = (parties.data?.items ?? []).map((item) => ({
     value: item.id,
     label: item.name,
@@ -276,10 +259,6 @@ function InvoiceForm({
         values.direction === "payable" ? values.invoiceNumber.trim() : null,
       invoiceDate: values.invoiceDate,
       dueDate: values.dueDate === "" ? null : values.dueDate,
-      departmentId:
-        partyType === "contractor" && values.departmentId !== ""
-          ? values.departmentId
-          : null,
       taxableAmount: rupeesToPaise(values.taxableAmount),
       gstAmount: rupeesToPaise(values.gstAmount),
       amount: rupeesToPaise(values.amount),
@@ -468,41 +447,6 @@ function InvoiceForm({
           <FieldError message={errors.dueDate?.message} />
         </div>
       </div>
-      {partyType === "contractor" && (
-        <div className="space-y-1.5">
-          <Label htmlFor="invoice-department">Department</Label>
-          <Controller
-            name="departmentId"
-            control={form.control}
-            render={({ field }) => (
-              <Select
-                items={departmentItems}
-                value={field.value === "" ? NONE : field.value}
-                onValueChange={(next) => {
-                  if (typeof next === "string")
-                    field.onChange(next === NONE ? "" : next);
-                }}
-              >
-                <SelectTrigger
-                  id="invoice-department"
-                  className="w-full min-w-0"
-                  aria-invalid={errors.departmentId != null}
-                >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent align="start" alignItemWithTrigger={false}>
-                  {departmentItems.map((item) => (
-                    <SelectItem key={item.value} value={item.value}>
-                      {item.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-          <FieldError message={errors.departmentId?.message} />
-        </div>
-      )}
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="min-w-0 space-y-1.5">
           <Label htmlFor="invoice-taxable">Taxable value</Label>

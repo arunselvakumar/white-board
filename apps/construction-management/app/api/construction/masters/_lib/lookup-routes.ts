@@ -21,7 +21,7 @@ export function toLookupResponse(
   };
 }
 
-/** The routes of a name-only list: Labour Categories or Departments. */
+/** The routes of a name-only list: Labour Categories. */
 export function lookupRoutes(input: {
   kind: LookupKind;
   menu: MenuKey;

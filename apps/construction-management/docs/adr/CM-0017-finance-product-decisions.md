@@ -1,6 +1,7 @@
 # CM-0017 — Finance product decisions for M7
 
 - Status: accepted
+- Partly superseded by [CM-0048](CM-0048-no-department-master.md) (no Department master): Contractor invoices have no Department (§7).
 - Date: 2026-10-11
 - Tickets: CM-701 … CM-709 (M7)
 - Relates to: [CM-0003](CM-0003-permission-matrix.md) (Permission Matrix), [CM-0004](CM-0004-ledger-first-balances.md) (ledger-first balances), [CM-0008](CM-0008-statutory-figures-are-dated-tables.md) (dated statutory tables), [CM-0012](CM-0012-hrms-product-decisions.md) (salary payments), [CM-0014](CM-0014-attachments-and-gallery-index.md) (attachments), [CM-0015](CM-0015-procurement-inventory-product-decisions.md) (GRN, approval), [CM-0016](CM-0016-daily-site-work-product-decisions.md) (equipment hire)

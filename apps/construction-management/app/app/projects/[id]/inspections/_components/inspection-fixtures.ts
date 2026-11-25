@@ -29,7 +29,6 @@ import { addDays } from "@/src/shared-kernel/calendar-date";
 export const INSPECTIONS_API = "/api/construction/tracking/inspections";
 export const INSPECTION_PROJECT_ID = "0199c4a0-0000-7000-8000-0000000d0001";
 export const CONTRACTOR_ID = "0199c4a0-0000-7000-8000-0000000d0101";
-export const DEPARTMENT_ID = "0199c4a0-0000-7000-8000-0000000d0201";
 export const INSPECTOR_ID = "0199c4a0-0000-7000-8000-0000000d0301";
 export const DRAWING_ID = "0199c4a0-0000-7000-8000-0000000d0401";
 export const ALBUM_ID = "0199c4a0-0000-7000-8000-0000000d0501";
@@ -68,7 +67,6 @@ export const FORM_OPTIONS: InspectionFormOptions = {
     },
     { id: INSPECTOR_ID, name: MEENA.name, isOwner: false },
   ],
-  departments: [{ id: DEPARTMENT_ID, name: "Civil" }],
   contractors: [{ id: CONTRACTOR_ID, name: "Velan Constructions" }],
   drawings: [
     {
@@ -124,7 +122,6 @@ export function inspection(extra: Partial<Inspection> = {}): Inspection {
     inspectionDate: TODAY,
     inspectionTime: "10:30",
     status: "pending",
-    department: { id: DEPARTMENT_ID, name: "Civil" },
     contractor: { id: CONTRACTOR_ID, name: "Velan Constructions" },
     inspector: { memberId: INSPECTOR_ID, name: MEENA.name },
     workDescription: "Slab reinforcement before the pour, Block B roof",
@@ -222,7 +219,6 @@ export const REMARKS: InspectionRemark[] = [
 
 export const REINSPECTION_DRAFT: InspectionReinspection = {
   reinspectionOfId: REJECTED_ID,
-  departmentId: DEPARTMENT_ID,
   contractorId: CONTRACTOR_ID,
   inspectorMemberId: INSPECTOR_ID,
   workDescription: REJECTED.workDescription,

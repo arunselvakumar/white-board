@@ -68,8 +68,7 @@ const WorksheetBody = z.object({
   sheetDate: z.iso.date(),
   shift,
   contractorId: z.uuid(),
-  departmentId: z.uuid(),
-  /** Of the Department; ignored when Work Type is hidden. */
+  /** Any enabled Work Type; ignored when Work Type is hidden. */
   workTypeId: z.uuid().nullable().optional(),
   /** With Labour shown: whole numbers ≥ 0, at least one above zero. */
   skilledCount: count.nullable().optional(),
@@ -152,7 +151,6 @@ export const ListConstructionSiteWorkWorksheetsRequestModel = z
     /** A User id (Filled By). */
     createdBy: z.string().min(1).max(100).optional(),
     contractorId: z.uuid().optional(),
-    departmentId: z.uuid().optional(),
     approvalStatus: approvalStatus.optional(),
     limit: z.coerce.number().int().min(1).max(100).optional().default(50),
     after: z.string().min(1).optional(),
@@ -269,7 +267,6 @@ export const ConstructionSiteWorkWorksheetResponseModel = z.object({
   sheetDate: z.iso.date(),
   shift,
   contractor: named,
-  department: named,
   workType: named.nullable(),
   skilledCount: z.int().nullable(),
   unskilledCount: z.int().nullable(),
@@ -307,7 +304,6 @@ export const ListConstructionSiteWorkWorksheetsResponseModel = z.object({
   facets: z.object({
     filledBy: z.array(z.object({ userId: z.string(), name: z.string() })),
     contractors: z.array(z.object({ id: z.uuid(), name: z.string() })),
-    departments: z.array(z.object({ id: z.uuid(), name: z.string() })),
   }),
 });
 
@@ -342,21 +338,13 @@ export type ConstructionSiteWorkWorksheetSettingsResponseModel = z.infer<
 export const GetConstructionSiteWorkWorksheetFormOptionsResponseModel =
   z.object({
     settings: ConstructionSiteWorkWorksheetSettingsResponseModel,
-    /** Active Contractors on the Project, with their enabled Departments. */
-    contractors: z.array(
-      z.object({
-        id: z.uuid(),
-        name: z.string(),
-        departmentIds: z.array(z.uuid()),
-      }),
-    ),
-    departments: z.array(z.object({ id: z.uuid(), name: z.string() })),
-    /** Enabled Work Types of those Departments, with assigned Materials. */
+    /** Active Contractors on the Project. */
+    contractors: z.array(z.object({ id: z.uuid(), name: z.string() })),
+    /** Every enabled Work Type, with its assigned Materials. */
     workTypes: z.array(
       z.object({
         id: z.uuid(),
         name: z.string(),
-        departmentId: z.uuid(),
         materialIds: z.array(z.uuid()),
       }),
     ),
@@ -414,7 +402,6 @@ export function toWorksheetResponse(
     sheetDate: sheet.sheetDate,
     shift: sheet.shift,
     contractor: { id: sheet.contractorId, name: sheet.contractorName },
-    department: { id: sheet.departmentId, name: sheet.departmentName },
     workType:
       sheet.workTypeId == null
         ? null
@@ -483,7 +470,6 @@ export function toFormOptionsResponse(
   return {
     settings: toWorksheetSettingsResponse(projectId, options.settings),
     contractors: options.contractors,
-    departments: options.departments,
     workTypes: options.workTypes,
     units: options.units,
   };

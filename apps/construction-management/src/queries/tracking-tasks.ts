@@ -59,7 +59,6 @@ export type TaskFilters = {
   assigneeId?: string | null;
   priority?: TrackingPriority | null;
   tagId?: string | null;
-  departmentId?: string | null;
   contractorId?: string | null;
   locationId?: string | null;
   from?: string;
@@ -76,7 +75,6 @@ function filterParams(projectId: string, filters: TaskFilters) {
     "assigneeId",
     "priority",
     "tagId",
-    "departmentId",
     "contractorId",
     "locationId",
   ] as const) {
@@ -149,7 +147,7 @@ export function taskActivityQuery(id: string) {
   });
 }
 
-/** Team Members, Departments, Contractors, Units and Tags of the Project. */
+/** Team Members, Contractors, Units and Tags of the Project. */
 export function taskFormOptionsQuery(projectId: string) {
   const params = new URLSearchParams({ projectId });
   return queryOptions({

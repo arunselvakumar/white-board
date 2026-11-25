@@ -70,7 +70,10 @@ export const Contractors: Story = {
     await expect(rows.getByText("Murugan · +91 77081 65767")).toBeVisible();
     // The GST state column shows from md up; story tests run phone-wide.
     await expect(rows.getByText("Tamil Nadu")).toBeInTheDocument();
-    await expect(rows.getByText("Painting +1")).toBeVisible();
+    // No Departments column (ADR CM-0048).
+    await expect(
+      rows.queryByRole("columnheader", { name: "Departments" }),
+    ).toBeNull();
     await expect(rows.getByText("Tower A +1")).toBeVisible();
     await expect(rows.getByText("Inactive")).toBeVisible();
     await expect(canvas.getByText("2 Contractors")).toBeVisible();
@@ -123,10 +126,6 @@ export const SuppliersOnAPhone: Story = {
   play: async ({ canvas, canvasElement }) => {
     const table = await canvas.findByRole("table", { name: "Suppliers" });
     await expect(within(table).getByText("Kaveri Cements")).toBeVisible();
-    // Suppliers have no Departments column.
-    await expect(
-      within(table).queryByRole("columnheader", { name: "Departments" }),
-    ).toBeNull();
     await expect(canvas.getByText("1 Supplier")).toBeVisible();
     const html = canvasElement.ownerDocument.documentElement;
     await expect(html.scrollWidth).toBeLessThanOrEqual(html.clientWidth);

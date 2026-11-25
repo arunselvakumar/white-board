@@ -585,7 +585,6 @@ export type EquipmentSheetInput = {
   operatorName?: string | null;
   supervisorUserId?: string | null;
   contractorId?: string | null;
-  departmentId?: string | null;
   workItem?: string | null;
   /** Already shaped by `locationRef`; the resolver checks the Project. */
   siteLocation?: LocationRef | null;
@@ -618,7 +617,6 @@ export type EquipmentSheetContent = {
   operatorName: string | null;
   supervisorUserId: string | null;
   contractorId: string | null;
-  departmentId: string | null;
   workItem: string | null;
   siteLocation: LocationRef | null;
   timeShifts: TimeShift[];
@@ -655,9 +653,7 @@ export type EquipmentSheetFacts = {
     id: string;
     isActive: boolean;
     onProject: boolean;
-    departmentIds: readonly string[];
   } | null;
-  department: { id: string; disabled: boolean } | null;
   unit: { id: string; disabled: boolean } | null;
   materials: ReadonlyMap<string, WorksheetMaterialFacts>;
 };
@@ -742,7 +738,7 @@ export function equipmentSheetContent(
       );
   }
 
-  // Contractor and Department: optional, checked like worksheets when given.
+  // Contractor: optional, checked like worksheets when given.
   let contractorId: string | null = null;
   if (!blank(input.contractorId)) {
     const contractor = facts.contractor;
@@ -759,29 +755,6 @@ export function equipmentSheetContent(
         { field: "contractorId" },
       );
     contractorId = contractor.id;
-  }
-  let departmentId: string | null = null;
-  if (!blank(input.departmentId)) {
-    // A Department is one of the Contractor's, as on worksheets (§7).
-    if (contractorId == null || facts.contractor == null)
-      throw invalid(
-        "CONTRACTOR_REQUIRED",
-        "Choose the Contractor whose Department this is.",
-        { field: "contractorId" },
-      );
-    const department = facts.department;
-    const same = previous?.departmentId === input.departmentId;
-    if (department == null || (department.disabled && !same))
-      throw invalid("DEPARTMENT_NOT_FOUND", "This Department was not found.", {
-        field: "departmentId",
-      });
-    if (!facts.contractor.departmentIds.includes(department.id))
-      throw invalid(
-        "DEPARTMENT_NOT_CONTRACTORS",
-        "This Department is not one of the Contractor's Departments.",
-        { field: "departmentId" },
-      );
-    departmentId = department.id;
   }
 
   const workItem = text(
@@ -1028,7 +1001,6 @@ export function equipmentSheetContent(
       operatorName,
       supervisorUserId,
       contractorId,
-      departmentId,
       workItem,
       siteLocation,
       timeShifts: shifts,

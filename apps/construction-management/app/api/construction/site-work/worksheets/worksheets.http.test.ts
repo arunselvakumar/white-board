@@ -21,7 +21,6 @@ import { actAs, addMember, addProject, newCompany } from "@/test/companies";
 import { addMaterial, addOpeningStock, addUnit } from "@/test/procurement";
 import {
   worksheetContractor,
-  worksheetDepartment,
   worksheetLabourAttendance,
   worksheetLabourCategory,
   worksheetLocation,
@@ -63,7 +62,6 @@ type Sheet = {
   sheetDate: string;
   shift: string;
   contractor: { id: string; name: string | null };
-  department: { id: string; name: string | null };
   workType: { id: string; name: string | null } | null;
   skilledCount: number | null;
   unskilledCount: number | null;
@@ -106,29 +104,16 @@ async function setup() {
   const by = company.ownerId;
   const owner = { userId: by, workspaceId: ws, role: "owner" as const };
   const projectId = await addProject(ws, by, "Anugraha Towers");
-  const department = await worksheetDepartment(ws, by, {
-    name: "Masonry Crew",
-  });
-  const otherDepartment = await worksheetDepartment(ws, by, {
-    name: "Plumbing Crew",
-  });
   const contractor = await worksheetContractor(ws, by, {
     name: "Velan Constructions",
     projectIds: [projectId],
-    departmentIds: [department],
   });
   const cement = await addMaterial(ws, by, { name: "Cement OPC 53 Grade" });
   const sand = await addMaterial(ws, by, {
     name: "M Sand",
     uomId: cement.uomId,
   });
-  const workType = await worksheetWorkType(
-    ws,
-    by,
-    department,
-    [cement.id],
-    "Brickwork",
-  );
+  const workType = await worksheetWorkType(ws, by, [cement.id], "Brickwork");
   const unit = await addUnit(ws, by, "sqm");
   const locationId = await worksheetLocation(ws, by, projectId, "Pump house");
   actAs(owner);
@@ -138,8 +123,6 @@ async function setup() {
     by,
     owner,
     projectId,
-    department,
-    otherDepartment,
     contractor,
     cement,
     sand,
@@ -170,7 +153,6 @@ function body(ctx: Ctx, patch: Record<string, unknown> = {}) {
     sheetDate: TODAY,
     shift: "shift_1",
     contractorId: ctx.contractor,
-    departmentId: ctx.department,
     workTypeId: ctx.workType,
     skilledCount: 4,
     unskilledCount: 6,
@@ -263,7 +245,6 @@ describe("Daily Worksheets", () => {
       sheetDate: TODAY,
       shift: "shift_1",
       contractor: { id: ctx.contractor, name: "Velan Constructions" },
-      department: { id: ctx.department, name: "Masonry Crew" },
       workType: { id: ctx.workType, name: "Brickwork" },
       skilledCount: 4,
       unskilledCount: 6,
@@ -302,15 +283,11 @@ describe("Daily Worksheets", () => {
       facets: {
         filledBy: { userId: string }[];
         contractors: { id: string; name: string }[];
-        departments: { id: string; name: string }[];
       };
     }>(page);
     expect(listed.total).toBe(1);
     expect(listed.facets.contractors).toEqual([
       { id: ctx.contractor, name: "Velan Constructions" },
-    ]);
-    expect(listed.facets.departments).toEqual([
-      { id: ctx.department, name: "Masonry Crew" },
     ]);
     expect(listed.facets.filledBy.map((row) => row.userId)).toEqual([ctx.by]);
   });
@@ -465,11 +442,9 @@ describe("Daily Worksheets", () => {
     expect(await code(future)).toBe("SHEET_DATE_IN_FUTURE");
   });
 
-  it("checks the Contractor, Department, Work Type and the required fields", async () => {
+  it("checks the Contractor, Work Type and the required fields", async () => {
     const ctx = await setup();
-    const elsewhere = await worksheetContractor(ctx.ws, ctx.by, {
-      departmentIds: [ctx.department],
-    });
+    const elsewhere = await worksheetContractor(ctx.ws, ctx.by);
     const offProject = await save(ctx, { contractorId: elsewhere });
     expect(offProject.status).toBe(StatusCodes.BAD_REQUEST);
     expect(await json(offProject)).toMatchObject({
@@ -477,23 +452,14 @@ describe("Daily Worksheets", () => {
       details: { field: "contractorId" },
     });
 
-    const notTheirs = await save(ctx, {
-      departmentId: ctx.otherDepartment,
-      workTypeId: null,
-    });
-    expect(notTheirs.status).toBe(StatusCodes.BAD_REQUEST);
-    expect(await json(notTheirs)).toMatchObject({
-      code: "DEPARTMENT_NOT_CONTRACTORS",
-      details: { field: "departmentId" },
-    });
-
-    const plumbing = await worksheetWorkType(
-      ctx.ws,
-      ctx.by,
-      ctx.otherDepartment,
+    // Any live Work Type will do.
+    const plumbing = await worksheetWorkType(ctx.ws, ctx.by, [], "Plumbing");
+    const anyType = await save(ctx, { workTypeId: plumbing, materials: [] });
+    expect(anyType.status, await anyType.clone().text()).toBe(
+      StatusCodes.CREATED,
     );
-    const wrongType = await save(ctx, { workTypeId: plumbing });
-    expect(await code(wrongType)).toBe("WORK_TYPE_NOT_DEPARTMENTS");
+    const unknownType = await save(ctx, { workTypeId: newId() });
+    expect(await code(unknownType)).toBe("WORK_TYPE_NOT_FOUND");
 
     const noHeads = await save(ctx, { skilledCount: 0, unskilledCount: 0 });
     expect(await code(noHeads)).toBe("LABOUR_COUNT_REQUIRED");
@@ -946,10 +912,13 @@ describe("Daily Worksheets", () => {
     });
   });
 
-  it("offers the Project's Contractors, their Departments and Work Types", async () => {
+  it("offers the Project's Contractors and every enabled Work Type", async () => {
     const ctx = await setup();
-    await worksheetContractor(ctx.ws, ctx.by, {
-      departmentIds: [ctx.department],
+    await worksheetContractor(ctx.ws, ctx.by);
+    const disabled = await worksheetWorkType(ctx.ws, ctx.by, [], "Tiling");
+    await prisma.constructionMastersWorkType.update({
+      where: { id: disabled },
+      data: { disabledAt: new Date() },
     });
     const response = await formOptions(
       get(`${BASE}/form-options?projectId=${ctx.projectId}`),
@@ -957,30 +926,20 @@ describe("Daily Worksheets", () => {
     expect(response.status).toBe(StatusCodes.OK);
     const options = await json<{
       settings: { approvalEnabled: boolean };
-      contractors: { id: string; departmentIds: string[] }[];
-      departments: { id: string; name: string }[];
-      workTypes: { id: string; departmentId: string; materialIds: string[] }[];
+      contractors: { id: string; name: string }[];
+      workTypes: { id: string; name: string; materialIds: string[] }[];
       units: { id: string; name: string }[];
     }>(response);
     expect(options.settings.approvalEnabled).toBe(false);
     expect(options.contractors).toEqual([
-      {
-        id: ctx.contractor,
-        name: "Velan Constructions",
-        departmentIds: [ctx.department],
-      },
+      { id: ctx.contractor, name: "Velan Constructions" },
     ]);
-    expect(options.departments).toEqual([
-      { id: ctx.department, name: "Masonry Crew" },
-    ]);
-    expect(options.workTypes).toEqual([
-      {
-        id: ctx.workType,
-        name: "Brickwork",
-        departmentId: ctx.department,
-        materialIds: [ctx.cement.id],
-      },
-    ]);
+    expect(options.workTypes).toContainEqual({
+      id: ctx.workType,
+      name: "Brickwork",
+      materialIds: [ctx.cement.id],
+    });
+    expect(options.workTypes.map((row) => row.id)).not.toContain(disabled);
     expect(options.units.some((unit) => unit.id === ctx.unit)).toBe(true);
   });
 

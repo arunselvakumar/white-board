@@ -102,13 +102,6 @@ export const STORY_LABOUR_CATEGORIES: LookupItem[] = [
   lookup(6, "Painter", { isSeed: false, skill: "skilled" }),
 ];
 
-export const STORY_DEPARTMENTS: LookupItem[] = [
-  lookup(11, "Masonry & Plaster"),
-  lookup(12, "Plumbing"),
-  lookup(13, "RCC"),
-  lookup(14, "Fencing", { isSeed: false }),
-];
-
 const LATER = "2026-10-08T07:00:00.000Z";
 
 function conflict(code: string, message: string): Response {

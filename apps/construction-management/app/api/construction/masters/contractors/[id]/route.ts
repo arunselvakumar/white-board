@@ -2,5 +2,5 @@ import { contractorRoutes } from "../contractor-routes";
 
 export const dynamic = "force-dynamic";
 
-/** One Contractor with its Departments and Projects. */
+/** One Contractor with its Projects. */
 export const GET = contractorRoutes.get;

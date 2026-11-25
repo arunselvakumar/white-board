@@ -67,14 +67,6 @@ function writeFields(kind: PartyKind) {
       .nullable()
       .optional()
       .describe("Second contact's Indian mobile (400 MOBILE_2_INVALID)."),
-    departmentIds: z
-      .array(z.uuid())
-      .max(100)
-      .optional()
-      .default([])
-      .describe(
-        "Departments the Contractor works in: new ones must be live and enabled (400 DEPARTMENT_NOT_FOUND / DEPARTMENT_DISABLED).",
-      ),
     tdsApplicable: z
       .boolean()
       .optional()
@@ -145,9 +137,6 @@ export function partyModels(kind: PartyKind) {
     isActive: z
       .boolean()
       .describe("Inactive ones leave pickers but stay on their Projects."),
-    departments: z
-      .array(ref)
-      .describe("Live Departments, by name; always empty for a Supplier."),
     projects: z.array(ref).describe("Live Projects, by name."),
     tds: tdsModel,
     createdAt: z.iso.datetime(),
@@ -209,7 +198,6 @@ export function toPartyResponse(item: PartyReadModel): PartyResponseModel {
     contactPerson2: item.contactPerson2,
     mobile2: item.mobile2,
     isActive: item.isActive,
-    departments: item.departments,
     projects: item.projects,
     tds:
       item.kind === "contractor"

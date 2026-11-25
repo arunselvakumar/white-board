@@ -2,15 +2,14 @@ import { Prisma, prisma, type PrismaClient } from "@repo/construction-db";
 
 import type { MeasurementUnitUsage } from "@/src/masters/application/material-ports";
 import type { PartyUsage } from "@/src/masters/application/party-handlers";
-import type { MasterUsage } from "@/src/masters/application/ports";
 import type { TrackingMasterUsage } from "@/src/masters/application/tracking-master-handlers";
 import type { DrawingUsage } from "@/src/projects/application/project-drawings";
 
 /**
  * What live tracking rows point at (CM-801, ADR CM-0019 §11): masters may
  * not delete an Issue Category a live issue names, a Tag a live task
- * carries, or a Department, Contractor or Measurement Unit a live task,
- * issue or inspection uses. Masters never imports tracking; these are
+ * carries, or a Contractor or Measurement Unit a live task, issue or
+ * inspection uses. Masters never imports tracking; these are
  * plain reads of `construction_tracking`.
  */
 export function trackingMasterUsage(
@@ -43,15 +42,6 @@ async function exists(db: PrismaClient, query: Prisma.Sql): Promise<boolean> {
   return rows[0]?.used === true;
 }
 
-/** A live task, issue or inspection is booked under the Department. */
-export function trackingDepartmentUsage(
-  db: PrismaClient = prisma,
-): MasterUsage {
-  return async (kind, workspaceId, id) =>
-    kind === "department" &&
-    exists(db, trackingColumnUsed("department_id", workspaceId, id));
-}
-
 /** A live task, issue or inspection names the Contractor. */
 export function trackingPartyUsage(db: PrismaClient = prisma): PartyUsage {
   return async (kind, workspaceId, id) =>
@@ -79,7 +69,7 @@ export function trackingUnitUsage(
 
 /** `column` of a live task, issue or inspection is `id`. */
 function trackingColumnUsed(
-  column: "department_id" | "contractor_id",
+  column: "contractor_id",
   workspaceId: string,
   id: string,
 ): Prisma.Sql {

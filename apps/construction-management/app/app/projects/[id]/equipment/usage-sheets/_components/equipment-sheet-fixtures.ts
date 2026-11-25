@@ -13,7 +13,6 @@ import {
   CONTRACTOR_ID,
   LOCATION_ID,
   LOCATION_OPTIONS,
-  MASONRY_ID,
   PROJECT_ID,
   SQM_ID,
   TODAY,
@@ -174,14 +173,7 @@ export function formOptions(
       { userId: "user-karthik", name: "Karthik R" },
       { userId: SUPERVISOR_ID, name: "Senthil Kumar" },
     ],
-    contractors: [
-      {
-        id: CONTRACTOR_ID,
-        name: "Velan Constructions",
-        departmentIds: [MASONRY_ID],
-      },
-    ],
-    departments: [{ id: MASONRY_ID, name: "Masonry & Plaster" }],
+    contractors: [{ id: CONTRACTOR_ID, name: "Velan Constructions" }],
     units: [
       { id: SQM_ID, name: "sqm" },
       { id: "0199c4a0-0000-7000-8000-0000000f0002", name: "cum" },
@@ -221,7 +213,6 @@ export function equipmentSheet(
     operatorName: "Ramesh K",
     supervisor: { userId: SUPERVISOR_ID, name: "Senthil Kumar" },
     contractor: null,
-    department: null,
     workItem: "Basement excavation, Block C",
     siteLocation: { type: "location", locationId: LOCATION_ID },
     timeShifts: [

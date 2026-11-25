@@ -128,7 +128,6 @@ export const Save: Story = {
         details: "Plaster cracks on the east wall",
         priority: "high",
         categoryId: CATEGORY_ID,
-        departmentId: null,
         contractorId: CONTRACTOR_ID,
         assigneeMemberId: KARTHIK_MEMBER_ID,
         dueDate: addDays(localToday(), 3),

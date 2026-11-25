@@ -42,7 +42,6 @@ export type SharedDocumentRow = { id: string; label: string };
 /** Masters a row names; random ids when left out. */
 export type SharedRefs = {
   contractorId?: string;
-  departmentId?: string;
   workTypeId?: string;
   /** Material lines (worksheet and usage sheet). */
   materialIds?: readonly string[];
@@ -77,7 +76,6 @@ export async function sharedAddWorksheetRow(
       sheetDate: SHARED_DAY,
       shift: "shift_1",
       contractorId: refs.contractorId ?? randomUUID(),
-      departmentId: refs.departmentId ?? randomUUID(),
       workTypeId: refs.workTypeId ?? null,
       ...sharedAudit(by),
       materials: { create: sharedLines(refs.materialIds) },
@@ -139,7 +137,6 @@ export async function sharedAddEquipmentUsageRow(
       utilisationBasis: "hourly",
       workingTimeMethod: "time_shifts",
       contractorId: refs.contractorId ?? null,
-      departmentId: refs.departmentId ?? null,
       ...sharedAudit(by),
       materials: { create: sharedLines(refs.materialIds) },
     },
@@ -263,32 +260,12 @@ function audit(by: string) {
 
 const day = (date: string) => new Date(`${date}T00:00:00.000Z`);
 
-/** A Department (trade) of the Company. */
-export async function worksheetDepartment(
-  workspaceId: string,
-  by: string,
-  options: { name?: string; disabled?: boolean } = {},
-): Promise<string> {
-  const id = randomUUID();
-  await prisma.constructionMastersDepartment.create({
-    data: {
-      id,
-      workspaceId,
-      name: options.name ?? `Masonry ${randomUUID().slice(0, 6)}`,
-      disabledAt: options.disabled === true ? new Date() : null,
-      ...audit(by),
-    },
-  });
-  return id;
-}
-
-/** A Contractor on these Projects, working in these Departments. */
+/** A Contractor on these Projects. */
 export async function worksheetContractor(
   workspaceId: string,
   by: string,
   options: {
     projectIds?: readonly string[];
-    departmentIds?: readonly string[];
     name?: string;
   } = {},
 ): Promise<string> {
@@ -302,21 +279,15 @@ export async function worksheetContractor(
       projects: {
         create: (options.projectIds ?? []).map((projectId) => ({ projectId })),
       },
-      departments: {
-        create: (options.departmentIds ?? []).map((departmentId) => ({
-          departmentId,
-        })),
-      },
     },
   });
   return id;
 }
 
-/** A Work Type of a Department with assigned Materials. */
+/** A Work Type with assigned Materials. */
 export async function worksheetWorkType(
   workspaceId: string,
   by: string,
-  departmentId: string,
   materialIds: readonly string[] = [],
   name = `Brickwork ${randomUUID().slice(0, 6)}`,
 ): Promise<string> {
@@ -326,7 +297,6 @@ export async function worksheetWorkType(
       id,
       workspaceId,
       name,
-      departmentId,
       ...audit(by),
       materials: { create: materialIds.map((materialId) => ({ materialId })) },
     },
@@ -715,7 +685,6 @@ export async function reportsWorksheet(
     projectId: string;
     sheetDate: CalendarDate;
     contractorId: string;
-    departmentId: string;
     skilled?: number | null;
     unskilled?: number | null;
     shift?: "shift_1" | "shift_2" | "shift_3";
@@ -740,7 +709,6 @@ export async function reportsWorksheet(
       sheetDate: calendarDateToDb(input.sheetDate),
       shift: input.shift ?? "shift_1",
       contractorId: input.contractorId,
-      departmentId: input.departmentId,
       skilledCount: input.skilled ?? null,
       unskilledCount: input.unskilled ?? null,
       approvalStatus: input.approval ?? "not_required",
@@ -970,19 +938,6 @@ export async function reportsUsageSheet(
 
 const progressDay = (date: string) => new Date(`${date}T00:00:00.000Z`);
 
-/** A live Department (masters). */
-export async function progressAddDepartment(
-  workspaceId: string,
-  by: string,
-  name = `RCC ${randomUUID().slice(0, 6)}`,
-): Promise<string> {
-  const id = randomUUID();
-  await prisma.constructionMastersDepartment.create({
-    data: { id, workspaceId, name, ...sharedAudit(by) },
-  });
-  return id;
-}
-
 /** A Labour Category with a skill (masters). */
 export async function progressAddLabourCategory(
   workspaceId: string,
@@ -1004,7 +959,7 @@ export async function progressAddLabourCategory(
 
 /**
  * A live Daily Worksheet on `date`, created by `createdBy`, with material
- * lines. Contractor and Department are real rows so names resolve.
+ * lines. The Contractor is a real row so its name resolves.
  */
 export async function progressAddWorksheet(
   workspaceId: string,
@@ -1013,7 +968,6 @@ export async function progressAddWorksheet(
     date: string;
     createdBy: string;
     contractorId: string;
-    departmentId: string;
     skilled?: number | null;
     unskilled?: number | null;
     shift?: "shift_1" | "shift_2" | "shift_3";
@@ -1039,7 +993,6 @@ export async function progressAddWorksheet(
       sheetDate: progressDay(input.date),
       shift: input.shift ?? "shift_1",
       contractorId: input.contractorId,
-      departmentId: input.departmentId,
       skilledCount: input.skilled ?? null,
       unskilledCount: input.unskilled ?? null,
       approxWorkQty: input.approxWorkQty ?? null,

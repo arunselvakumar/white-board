@@ -230,7 +230,6 @@ export async function renderMaterialRequestPdf(
     ["Status", MATERIAL_REQUEST_STATUS_LABELS[request.status]],
     ["Receiver", request.receiverName ?? ""],
     ["Contractor", request.contractor?.name ?? ""],
-    ["Department", request.department?.name ?? ""],
   ];
   const strings = [
     input.company,

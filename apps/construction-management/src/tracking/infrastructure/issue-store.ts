@@ -36,7 +36,6 @@ function toStored(row: Row): StoredIssue {
     details: row.details,
     priority: row.priority,
     categoryId: row.categoryId,
-    departmentId: row.departmentId,
     contractorId: row.contractorId,
     assigneeMemberId: row.assigneeMemberId,
     dueDate: row.dueDate == null ? null : calendarDateFromDb(row.dueDate),
@@ -60,7 +59,6 @@ function columns(content: IssueContent) {
     details: content.details,
     priority: content.priority,
     categoryId: content.categoryId,
-    departmentId: content.departmentId,
     contractorId: content.contractorId,
     assigneeMemberId: content.assigneeMemberId,
     dueDate: content.dueDate == null ? null : calendarDateToDb(content.dueDate),
@@ -115,8 +113,6 @@ function where(
   if (params.categoryId != null) and.push({ categoryId: params.categoryId });
   if (params.assigneeMemberId != null)
     and.push({ assigneeMemberId: params.assigneeMemberId });
-  if (params.departmentId != null)
-    and.push({ departmentId: params.departmentId });
   if (params.contractorId != null)
     and.push({ contractorId: params.contractorId });
   if (params.locationType != null) {
@@ -199,7 +195,6 @@ export class PrismaIssueStore implements IssueStore {
       details: row.details,
       priority: row.priority,
       categoryId: row.categoryId,
-      departmentId: row.departmentId,
       contractorId: row.contractorId,
       assigneeMemberId: row.assigneeMemberId,
       dueDate: row.dueDate,

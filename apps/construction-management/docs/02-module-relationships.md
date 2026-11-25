@@ -65,7 +65,7 @@ flowchart TB
     M11 -- async reports --> M13
 ```
 
-Reading the arrows: **01, 02, 12 come first** (you cannot create a worksheet without a contractor, a department, a project location, and a numbering rule). **03 is the spine**: every project-level module takes a `LocationRef` from it. **07 is downstream of 06 and 08**: the only way a supplier payable or a vendor balance appears is through a GRN or an attendance day. **11 and 13 read everything.**
+Reading the arrows: **01, 02, 12 come first** (you cannot create a worksheet without a contractor, a project location, and a numbering rule). **03 is the spine**: every project-level module takes a `LocationRef` from it. **07 is downstream of 06 and 08**: the only way a supplier payable or a vendor balance appears is through a GRN or an attendance day. **11 and 13 read everything.**
 
 ## Flow 1 — Material (procure → receive → stock → consume)
 
@@ -174,7 +174,7 @@ Two parallel attendance systems coexist and must not be merged:
 
 ## Suggested build order (vertical slices)
 
-1. **01 + 12 + 02 (subset)**: company, team members, permissions, numbering, departments, contractors, suppliers, materials, UoM.
+1. **01 + 12 + 02 (subset)**: company, team members, permissions, numbering, work types, contractors, suppliers, materials, UoM.
 2. **03**: project, phases/wings/floors/units, drawings. Dashboard shell.
 3. **06 core**: PR → PO → GRN → inventory → consume/transfer. (This is the loop most customers judge first.)
 4. **04**: daily worksheet (with material consumption) + equipment usage.

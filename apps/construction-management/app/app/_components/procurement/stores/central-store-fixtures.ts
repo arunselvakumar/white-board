@@ -31,7 +31,6 @@ export const IDS = {
   keeper2: "0199c4a0-0000-7000-8000-0000000001b2",
   supplier: "0199c4a0-0000-7000-8000-0000000001d2",
   contractor: "0199c4a0-0000-7000-8000-0000000001c1",
-  department: "0199c4a0-0000-7000-8000-0000000001d1",
   request: "0199c4a0-0000-7000-8000-0000000001a1",
   cementLine: "0199c4a0-0000-7000-8000-0000000001a2",
   steelLine: "0199c4a0-0000-7000-8000-0000000001a3",
@@ -105,7 +104,6 @@ export const REQUEST: MaterialRequest = {
   storeName: "Ambattur Central Store",
   requestDate: "2026-10-08",
   contractor: { id: IDS.contractor, name: "Velan Constructions" },
-  department: null,
   siteLocation: null,
   receiverName: "Prabhu S",
   remark: "Needed for the 3rd floor slab.",
@@ -188,7 +186,6 @@ export const NOTE: DeliveryNote = {
 export const MR_FORM_OPTIONS: MaterialRequestFormOptions = {
   stores: [{ id: IDS.store, name: "Ambattur Central Store", stateCode: "33" }],
   contractors: [{ id: IDS.contractor, name: "Velan Constructions" }],
-  departments: [{ id: IDS.department, name: "Civil" }],
 };
 
 const position = (

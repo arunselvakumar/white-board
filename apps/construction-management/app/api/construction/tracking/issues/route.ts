@@ -24,7 +24,7 @@ export const dynamic = "force-dynamic";
 /**
  * A Project's Issues & Snags, newest first: by status (Pending /
  * Delayed / Solved / Closed, Delayed derived on the Company's today),
- * priority, category, assignee, Department, Contractor, location, an Issue
+ * priority, category, assignee, Contractor, location, an Issue
  * Date range and a search on the number or details. Without View all, only
  * the issues the caller created or is assigned to. Needs Issues and snags
  * read on the Project.
@@ -48,7 +48,6 @@ export async function GET(request: Request): Promise<Response> {
       priorities: model.priority,
       categoryId: model.categoryId,
       assigneeMemberId: model.assigneeMemberId,
-      departmentId: model.departmentId,
       contractorId: model.contractorId,
       locationType: model.locationType,
       placeId: model.placeId,

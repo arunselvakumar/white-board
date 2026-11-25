@@ -60,7 +60,7 @@ describe("invoice fields", () => {
     ).toBe("DUE_DATE_BEFORE_INVOICE");
   });
 
-  it("keeps taxable + GST within the amount, and Departments for Contractors", () => {
+  it("keeps taxable + GST within the amount", () => {
     expect(
       code(() =>
         invoiceFields("contractor", "payable", {
@@ -71,15 +71,6 @@ describe("invoice fields", () => {
         }),
       ),
     ).toBe("INVOICE_SPLIT_EXCEEDS_AMOUNT");
-    expect(
-      code(() =>
-        invoiceFields("supplier", "payable", {
-          ...base,
-          invoiceNumber: "A1",
-          departmentId: "d",
-        }),
-      ),
-    ).toBe("DEPARTMENT_ONLY_FOR_CONTRACTORS");
   });
 });
 

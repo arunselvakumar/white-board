@@ -38,7 +38,6 @@ function toStored(row: Row): StoredInspection {
     number: row.number,
     inspectionDate: calendarDateFromDb(row.inspectionDate),
     inspectionTime: row.inspectionTime,
-    departmentId: row.departmentId,
     contractorId: row.contractorId,
     inspectorMemberId: row.inspectorMemberId,
     workDescription: row.workDescription,
@@ -60,7 +59,6 @@ function columns(content: InspectionContent) {
   return {
     inspectionDate: calendarDateToDb(content.inspectionDate),
     inspectionTime: content.inspectionTime,
-    departmentId: content.departmentId,
     contractorId: content.contractorId,
     inspectorMemberId: content.inspectorMemberId,
     workDescription: content.workDescription,
@@ -89,8 +87,6 @@ function where(
   params: Omit<InspectionListParams, "status">,
 ): Prisma.ConstructionTrackingInspectionWhereInput {
   const and: Prisma.ConstructionTrackingInspectionWhereInput[] = [];
-  if (params.departmentId != null)
-    and.push({ departmentId: params.departmentId });
   if (params.contractorId != null)
     and.push({ contractorId: params.contractorId });
   if (params.inspectorMemberId != null)

@@ -39,8 +39,6 @@ const InspectionBody = z.object({
   inspectionDate: z.iso.date(),
   /** `HH:MM`, 24-hour, local time on site. */
   inspectionTime: z.string().max(5).nullable().optional(),
-  /** An enabled Department (an unchanged disabled one may stay on edit). */
-  departmentId: z.uuid().nullable().optional(),
   /** An active Contractor assigned to the Project, whose work is inspected. */
   contractorId: z.uuid().nullable().optional(),
   /** "Request Assign To": an active Team Member on the Project; optional. */
@@ -83,7 +81,7 @@ export const RejectConstructionTrackingInspectionRequestModel = z.object({
   reason: z.string().max(APPROVAL_LIMITS.maxTextLength),
   /**
    * **Also raise a snag**: an Issue & Snag in the same transaction
-   * (category Quality, the request's contractor, department and location,
+   * (category Quality, the request's contractor and location,
    * today's date). Needs Issues & Snags Create (403 `SNAG_NOT_ALLOWED`).
    */
   raiseSnag: z.boolean().optional().default(false),
@@ -138,7 +136,6 @@ export const ListConstructionTrackingInspectionsRequestModel = z
   .object({
     projectId: z.uuid(),
     status: status.optional(),
-    departmentId: z.uuid().optional(),
     contractorId: z.uuid().optional(),
     /** The inspector's Team Member id. */
     inspectorMemberId: z.uuid().optional(),
@@ -210,7 +207,6 @@ export const ConstructionTrackingInspectionResponseModel = z.object({
   inspectionTime: z.string().nullable(),
   /** Pending for approval, Approved or Rejected. */
   status,
-  department: named.nullable(),
   contractor: named.nullable(),
   inspector: z
     .object({ memberId: z.uuid(), name: z.string().nullable() })
@@ -286,8 +282,6 @@ export const GetConstructionTrackingInspectionFormOptionsResponseModel =
     members: z.array(
       z.object({ id: z.uuid(), name: z.string(), isOwner: z.boolean() }),
     ),
-    /** Enabled Departments. */
-    departments: z.array(z.object({ id: z.uuid(), name: z.string() })),
     /** Active Contractors assigned to the Project. */
     contractors: z.array(z.object({ id: z.uuid(), name: z.string() })),
     /** The Project's live Drawings, album then name. */
@@ -307,7 +301,6 @@ export type GetConstructionTrackingInspectionFormOptionsResponse = z.infer<
 export const GetConstructionTrackingInspectionReinspectionResponseModel =
   z.object({
     reinspectionOfId: z.uuid(),
-    departmentId: z.uuid().nullable(),
     contractorId: z.uuid().nullable(),
     inspectorMemberId: z.uuid().nullable(),
     workDescription: z.string(),
@@ -362,10 +355,6 @@ export function toInspectionResponse(
     inspectionDate: row.inspectionDate,
     inspectionTime: row.inspectionTime,
     status: row.status,
-    department:
-      row.departmentId == null
-        ? null
-        : { id: row.departmentId, name: row.departmentName },
     contractor:
       row.contractorId == null
         ? null
@@ -422,7 +411,6 @@ export function toInspectionFormOptions(
       name: m.name,
       isOwner: m.isOwner,
     })),
-    departments: options.departments.map((d) => ({ id: d.id, name: d.name })),
     contractors: options.contractors.map((c) => ({ id: c.id, name: c.name })),
     drawings: options.drawings.map((d) => ({
       id: d.id,

@@ -192,7 +192,6 @@ const DEFINITIONS = [
   // Categories went back to Masters with the sidebar (ADR CM-0035).
   ["masters.master_records", "Master Records", "master_records", "R", false],
   ["organization.team_members", "Staff", "human_resources", "CRUDF", false],
-  ["masters.departments", "Departments", "master_records", "CRUD", false],
   ["masters.contractors", "Contractors", "master_records", "CRUD", false],
   ["masters.suppliers", "Supplier", "master_records", "CRUD", false],
   ["masters.vendors", "Vendors", "human_resources", "CRUDF", false],

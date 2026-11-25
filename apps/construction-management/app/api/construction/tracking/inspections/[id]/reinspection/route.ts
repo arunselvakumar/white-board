@@ -13,8 +13,8 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * **Raise re-inspection** prefill (CM-0019 §10): department, contractor,
- * inspector, description, location and linked drawings of a rejected
+ * **Raise re-inspection** prefill (CM-0019 §10): contractor, inspector,
+ * description, location and linked drawings of a rejected
  * request, keeping only what can still be picked. Needs Create on its
  * Project; 409 `INSPECTION_NOT_REJECTED` or
  * `INSPECTION_REINSPECTION_EXISTS`.

@@ -116,7 +116,7 @@ export const trackingIssueOpenApiOperations: OpenApiOperation[] = [
     method: "get",
     path: `${ISSUES_PATH}/form-options`,
     summary:
-      "Team Members, Departments, Contractors and Issue Categories for the issue form",
+      "Team Members, Contractors and Issue Categories for the issue form",
     tags: TAGS,
     query: GetConstructionTrackingIssueFormOptionsRequestModel,
     successStatus: StatusCodes.OK,

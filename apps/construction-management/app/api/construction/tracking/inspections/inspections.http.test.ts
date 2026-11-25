@@ -9,11 +9,7 @@ import { addDays, todayIn } from "@/src/shared-kernel/calendar-date";
 import { newId } from "@/src/shared-kernel/ids";
 import { actAs, addMember, addProject, newCompany } from "@/test/companies";
 import { addContractor } from "@/test/procurement";
-import {
-  sharedAssign,
-  worksheetDepartment,
-  worksheetLocation,
-} from "@/test/site-work";
+import { sharedAssign, worksheetLocation } from "@/test/site-work";
 import { pngBytes } from "@/test/files";
 import { trackingDrawing, trackingIssueRow } from "@/test/tracking";
 
@@ -61,7 +57,6 @@ type Inspection = {
   inspectionDate: string;
   inspectionTime: string | null;
   status: string;
-  department: { id: string; name: string | null } | null;
   contractor: { id: string; name: string | null } | null;
   inspector: { memberId: string; name: string | null } | null;
   workDescription: string;
@@ -129,11 +124,8 @@ async function setup() {
   const contractorId = await addContractor(company.workspaceId, by, [
     projectId,
   ]);
-  const departmentId = await worksheetDepartment(company.workspaceId, by, {
-    name: "Civil",
-  });
   actAs(owner);
-  return { company, by, owner, projectId, contractorId, departmentId };
+  return { company, by, owner, projectId, contractorId };
 }
 
 type Ctx = Awaited<ReturnType<typeof setup>>;
@@ -163,7 +155,6 @@ function raise(ctx: Ctx, patch: Record<string, unknown> = {}) {
       inspectionTime: "10:30",
       workDescription: "Slab reinforcement before the pour",
       contractorId: ctx.contractorId,
-      departmentId: ctx.departmentId,
       ...patch,
     }),
   );
@@ -187,7 +178,6 @@ describe("Inspection Requests (CM-804)", () => {
       status: "pending",
       inspectionTime: "10:30",
       contractor: { id: ctx.contractorId },
-      department: { id: ctx.departmentId, name: "Civil" },
       inspector: null,
       reinspectionOf: null,
       actions: {
@@ -242,7 +232,7 @@ describe("Inspection Requests (CM-804)", () => {
     ).toBe("IR/26-27/00001");
   });
 
-  it("checks the inspector, contractor, department, drawings and location against the Project", async () => {
+  it("checks the inspector, contractor, drawings and location against the Project", async () => {
     const ctx = await setup();
     const inspector = await member(ctx, { [MENU]: ["read"] });
     const offProject = await member(ctx, { [MENU]: ["read"] }, false);
@@ -290,17 +280,6 @@ describe("Inspection Requests (CM-804)", () => {
         },
         "CONTRACTOR_NOT_ON_PROJECT",
         "contractorId",
-      ],
-      [
-        {
-          departmentId: await worksheetDepartment(
-            ctx.company.workspaceId,
-            ctx.by,
-            { disabled: true },
-          ),
-        },
-        "DEPARTMENT_DISABLED",
-        "departmentId",
       ],
       [
         { inspectionTime: "25:00" },
@@ -482,7 +461,6 @@ describe("Inspection Requests (CM-804)", () => {
       number: request.number,
       inspectionDate: addDays(TODAY, 1),
       inspectionTime: null,
-      department: null,
       workDescription: "Column C4 reinforcement",
       drawings: [{ id: drawing }],
     });
@@ -630,7 +608,6 @@ describe("Inspection Requests (CM-804)", () => {
       details: `Inspection ${request.number} rejected: Cover blocks missing`,
       categoryId: quality.id,
       contractorId: ctx.contractorId,
-      departmentId: ctx.departmentId,
       assigneeMemberId: null,
       status: "open",
       sourceInspectionId: request.id,
@@ -736,7 +713,6 @@ describe("Inspection Requests (CM-804)", () => {
     );
     expect(draft).toEqual({
       reinspectionOfId: request.id,
-      departmentId: ctx.departmentId,
       contractorId: ctx.contractorId,
       inspectorMemberId: null,
       workDescription: "Slab reinforcement before the pour",
@@ -929,12 +905,10 @@ describe("Inspection Requests (CM-804)", () => {
     await trackingDrawing(ctx.company.workspaceId, ctx.projectId, ctx.by);
     const options = await json<{
       members: unknown[];
-      departments: { id: string }[];
       contractors: { id: string }[];
       drawings: { albumName: string }[];
     }>(await formOptions(get(`/form-options?projectId=${ctx.projectId}`)));
     expect(options.contractors.map((c) => c.id)).toEqual([ctx.contractorId]);
-    expect(options.departments.map((d) => d.id)).toContain(ctx.departmentId);
     expect(options.drawings).toHaveLength(1);
     expect(options.members.length).toBeGreaterThan(0);
 

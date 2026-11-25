@@ -643,7 +643,6 @@ model ConstructionProcurementMaterialRequest {
   number           String
   requestDate      DateTime                                     @map("request_date") @db.Date
   contractorId     String?                                      @map("contractor_id") @db.Uuid
-  departmentId     String?                                      @map("department_id") @db.Uuid
   siteLocationType String?                                      @map("site_location_type")
   siteLocation     Json?                                        @map("site_location")
   receiverName     String?                                      @map("receiver_name")

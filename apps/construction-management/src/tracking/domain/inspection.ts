@@ -81,7 +81,6 @@ export function inspectionTime(raw: string | null | undefined): string | null {
 export type InspectionInput = {
   inspectionDate: string;
   inspectionTime?: string | null;
-  departmentId?: string | null;
   contractorId?: string | null;
   inspectorMemberId?: string | null;
   workDescription: string;
@@ -93,7 +92,6 @@ export type InspectionFields = {
   inspectionDate: CalendarDate;
   /** `HH:MM`. */
   inspectionTime: string | null;
-  departmentId: string | null;
   contractorId: string | null;
   /** A Team Member id (not a User id). */
   inspectorMemberId: string | null;
@@ -136,7 +134,6 @@ export function inspectionFields(input: InspectionInput): InspectionFields {
   return {
     inspectionDate: date,
     inspectionTime: inspectionTime(input.inspectionTime),
-    departmentId: optionalId(input.departmentId),
     contractorId: optionalId(input.contractorId),
     inspectorMemberId: optionalId(input.inspectorMemberId),
     workDescription,
@@ -243,7 +240,6 @@ export function assertReinspectable(
 /** What a re-inspection copies from the rejected request (CM-0019 §10). */
 export type ReinspectionDraft = {
   reinspectionOfId: string;
-  departmentId: string | null;
   contractorId: string | null;
   inspectorMemberId: string | null;
   workDescription: string;
@@ -252,13 +248,12 @@ export type ReinspectionDraft = {
 };
 
 /**
- * The new request's prefill: department, contractor, inspector,
- * description, location and linked drawings — not the date, time, files,
+ * The new request's prefill: contractor, inspector, description,
+ * location and linked drawings — not the date, time, files,
  * observations or remarks.
  */
 export function reinspectionDraft(original: {
   id: string;
-  departmentId: string | null;
   contractorId: string | null;
   inspectorMemberId: string | null;
   workDescription: string;
@@ -267,7 +262,6 @@ export function reinspectionDraft(original: {
 }): ReinspectionDraft {
   return {
     reinspectionOfId: original.id,
-    departmentId: original.departmentId,
     contractorId: original.contractorId,
     inspectorMemberId: original.inspectorMemberId,
     workDescription: original.workDescription,

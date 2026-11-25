@@ -40,8 +40,6 @@ const requestFields = {
   storeId: z.uuid(),
   /** Active and on the Project. */
   contractorId: z.uuid().nullable().optional(),
-  /** Enabled. */
-  departmentId: z.uuid().nullable().optional(),
   siteLocation: ConstructionProcurementSiteLocationModel.nullable().optional(),
   receiverName: z.string().max(400).nullable().optional(),
   remark: z.string().max(1000).nullable().optional(),
@@ -126,7 +124,6 @@ export const ConstructionProcurementMaterialRequestResponseModel = z.object({
   storeName: z.string().nullable(),
   requestDate: z.iso.date(),
   contractor: NamedModel.nullable(),
-  department: NamedModel.nullable(),
   siteLocation: ConstructionProcurementSiteLocationModel.nullable(),
   receiverName: z.string().nullable(),
   remark: z.string().nullable(),
@@ -165,7 +162,6 @@ export const GetConstructionProcurementMaterialRequestFormOptionsResponseModel =
   z.object({
     stores: z.array(ConstructionProcurementStoreOptionResponseModel),
     contractors: z.array(NamedModel),
-    departments: z.array(NamedModel),
   });
 export type GetConstructionProcurementMaterialRequestFormOptionsResponseModel =
   z.infer<
@@ -184,7 +180,6 @@ export function toMaterialRequestResponse(
     storeName: request.storeName,
     requestDate: request.requestDate,
     contractor: request.contractor,
-    department: request.department,
     siteLocation:
       request.siteLocation == null
         ? null

@@ -22,7 +22,6 @@ import seeds from "./seeds/masters.json";
 
 const SEED_NAMES: Record<LookupKind, readonly string[]> = {
   labour_category: seeds.labourCategories,
-  department: seeds.departments,
 };
 
 /** Seed Labour Categories whose heads count as unskilled (CM-0016 §6). */
@@ -30,11 +29,10 @@ export const SEED_UNSKILLED_CATEGORIES: readonly string[] =
   seeds.unskilledLabourCategories;
 
 /**
- * Every Company's seed Work Types, by Department name (CM-601; keep in step
+ * Every Company's seed Work Types (CM-601, ADR CM-0048 §3; keep in step
  * with migration `20261012090000_construction_masters_work_types`).
  */
-export const SEED_WORK_TYPES: readonly { name: string; department: string }[] =
-  seeds.workTypes;
+export const SEED_WORK_TYPES: readonly { name: string }[] = seeds.workTypes;
 
 const UNSKILLED = new Set(
   SEED_UNSKILLED_CATEGORIES.map((name) => name.toLowerCase()),
@@ -171,9 +169,8 @@ async function seedMaterialMasters(
 }
 
 /**
- * The seed Work Types (RCC, CM-601) under the Company's live Department of
- * that name, the seed Department first. A Company that already has a live
- * Work Type of the name, or no such Department, gets none.
+ * The seed Work Types (RCC, CM-601). A Company that already has a live
+ * Work Type of the name keeps its own.
  */
 async function seedWorkTypes(
   tx: Tx,
@@ -188,21 +185,11 @@ async function seedWorkTypes(
   );
   for (const seed of SEED_WORK_TYPES) {
     if (taken.has(seed.name.toLowerCase())) continue;
-    const department = await tx.constructionMastersDepartment.findFirst({
-      where: {
-        ...live,
-        name: { equals: seed.department, mode: "insensitive" },
-      },
-      orderBy: [{ isSeed: "desc" }, { createdAt: "asc" }],
-      select: { id: true },
-    });
-    if (department == null) continue;
     await tx.constructionMastersWorkType.create({
       data: {
         id: newId(input.now.getTime()),
         workspaceId: input.workspaceId,
         name: seed.name,
-        departmentId: department.id,
         isSeed: true,
         createdAt: input.now,
         updatedAt: input.now,
@@ -247,7 +234,7 @@ async function seedIssueCategories(
 }
 
 /**
- * Copies the seed Labour Categories and Departments (CM-203), the
+ * Copies the seed Labour Categories (CM-203), the
  * Amenities and Common Developments (CM-404) and the Measurement Units,
  * Material Categories and starter Materials (CM-501), and the Work Types
  * (CM-601) and the Issue Categories (CM-801) to a Company. Labour
@@ -274,13 +261,9 @@ export async function seedCompanyMasters(
           id: newId(now.getTime()),
           workspaceId: input.workspaceId,
           name,
-          ...(kind === "labour_category"
-            ? {
-                skill: UNSKILLED.has(name.toLowerCase())
-                  ? ("unskilled" as const)
-                  : ("skilled" as const),
-              }
-            : {}),
+          skill: UNSKILLED.has(name.toLowerCase())
+            ? ("unskilled" as const)
+            : ("skilled" as const),
           isSeed: true,
           createdAt: now,
           updatedAt: now,

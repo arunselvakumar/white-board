@@ -97,8 +97,8 @@ export function ImportTasksDialog({
           <DialogDescription>
             Fill in the sample sheet, one task per row, up to 1,000. Give a row
             a Ref and name it as another row&apos;s Parent Ref to make a
-            sub-task (three levels at most). Assignees, Department, Contractor,
-            Tags and Unit are matched by name. Rows are saved all or none.
+            sub-task (three levels at most). Assignees, Contractor, Tags and
+            Unit are matched by name. Rows are saved all or none.
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-wrap gap-3">

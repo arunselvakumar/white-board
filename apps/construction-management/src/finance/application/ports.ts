@@ -22,7 +22,6 @@ export type ContractorFacts = {
   tdsLowerRate: string | null;
   tdsNote: string | null;
   projectIds: string[];
-  departmentIds: string[];
 };
 
 export type SupplierFacts = {
@@ -106,12 +105,6 @@ export type FinanceDirectory = {
     ids: readonly string[],
   ): Promise<Map<string, NamedFacts>>;
   vendors(
-    db: Db,
-    workspaceId: string,
-    ids: readonly string[],
-  ): Promise<Map<string, NamedFacts>>;
-  /** Live Departments by id. */
-  departments(
     db: Db,
     workspaceId: string,
     ids: readonly string[],

@@ -44,7 +44,6 @@ export type InvoiceFieldsInput = {
   invoiceNumber?: string | null;
   invoiceDate: string;
   dueDate?: string | null;
-  departmentId?: string | null;
   taxableAmount?: bigint | null;
   gstAmount?: bigint | null;
   amount: bigint;
@@ -56,7 +55,6 @@ export type InvoiceFields = {
   invoiceNumber: string | null;
   invoiceDate: CalendarDate;
   dueDate: CalendarDate | null;
-  departmentId: string | null;
   taxableAmount: bigint | null;
   gstAmount: bigint | null;
   amount: bigint;
@@ -67,8 +65,7 @@ export type InvoiceFields = {
  * Checks an invoice's own fields. A bill from a party needs its typed
  * number; a sales invoice is numbered by the INV rule. The due date is on
  * or after the invoice date. Taxable value and GST are optional and
- * together at most the amount. Only a Contractor's invoice names a
- * Department.
+ * together at most the amount.
  */
 export function invoiceFields(
   partyType: PartyType,
@@ -126,18 +123,10 @@ export function invoiceFields(
       "Taxable value and GST together cannot be more than the invoice amount.",
       { details: { field: "gstAmount" } },
     );
-  const departmentId = input.departmentId ?? null;
-  if (departmentId != null && partyType !== "contractor")
-    throw new DomainError(
-      "DEPARTMENT_ONLY_FOR_CONTRACTORS",
-      "Only a Contractor's invoice names a Department.",
-      { details: { field: "departmentId" } },
-    );
   return {
     invoiceNumber,
     invoiceDate,
     dueDate,
-    departmentId,
     taxableAmount,
     gstAmount,
     amount: input.amount,

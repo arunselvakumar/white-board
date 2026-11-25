@@ -124,7 +124,6 @@ export type WorksheetListParams = {
   to?: CalendarDate;
   createdBy?: string;
   contractorId?: string;
-  departmentId?: string;
   approvalStatus?: SheetApprovalStatus;
   limit: number;
   after?: ListCursor;
@@ -173,7 +172,7 @@ export type WorksheetStore = {
     db: Db,
     params: WorksheetListParams,
   ): Promise<{ items: StoredWorksheet[]; hasMore: boolean; total: number }>;
-  /** Who filled, which Contractors and Departments: the Project's live sheets. */
+  /** Who filled and which Contractors: the Project's live sheets. */
   facets(
     db: Db,
     workspaceId: string,
@@ -181,7 +180,6 @@ export type WorksheetStore = {
   ): Promise<{
     createdBy: string[];
     contractorIds: string[];
-    departmentIds: string[];
   }>;
   /** Skilled and unskilled heads on the Project's live sheets that date. */
   headcounts(
@@ -257,7 +255,6 @@ export type WorksheetTaskModel = {
 export type WorksheetReadModel = StoredWorksheet & {
   task: WorksheetTaskModel | null;
   contractorName: string | null;
-  departmentName: string | null;
   workTypeName: string | null;
   approxWorkUnitName: string | null;
   createdByName: string | null;
@@ -266,14 +263,12 @@ export type WorksheetReadModel = StoredWorksheet & {
 
 export type WorksheetFormOptions = {
   settings: WorksheetSettings & { updatedAt: Date | null };
-  /** Active Contractors on the Project, each with its enabled Departments. */
-  contractors: { id: string; name: string; departmentIds: string[] }[];
-  departments: { id: string; name: string }[];
-  /** Enabled Work Types of those Departments, with assigned Materials. */
+  /** Active Contractors on the Project. */
+  contractors: { id: string; name: string }[];
+  /** Every enabled Work Type, with its assigned Materials. */
   workTypes: {
     id: string;
     name: string;
-    departmentId: string;
     materialIds: string[];
   }[];
   /** Enabled Measurement Units (Approx Work Done). */
@@ -307,7 +302,6 @@ function snapshot(
     sheetDate: sheet.sheetDate,
     shift: sheet.shift,
     contractorId: sheet.contractorId,
-    departmentId: sheet.departmentId,
     workTypeId: sheet.workTypeId,
     skilledCount: sheet.skilledCount,
     unskilledCount: sheet.unskilledCount,
@@ -341,7 +335,6 @@ function contentOf(sheet: StoredWorksheet): WorksheetContent {
     sheetDate: sheet.sheetDate,
     shift: sheet.shift,
     contractorId: sheet.contractorId,
-    departmentId: sheet.departmentId,
     workTypeId: sheet.workTypeId,
     skilledCount: sheet.skilledCount,
     unskilledCount: sheet.unskilledCount,
@@ -391,20 +384,16 @@ export class WorksheetHandlers {
     const id = (value: string | null | undefined) =>
       value == null || value.trim() === "" ? null : value;
     const contractorId = id(input.contractorId);
-    const departmentId = id(input.departmentId);
     const workTypeId = id(input.workTypeId);
     const unitId = id(input.approxWorkUnitId);
-    const [contractors, departments, workTypes, units, materials, places] =
+    const [contractors, workTypes, units, materials, places] =
       await Promise.all([
         contractorId == null
           ? new Map<string, WorksheetContractorFacts>()
           : directory.contractors(db, workspaceId, [contractorId]),
-        departmentId == null
-          ? new Map<string, WorksheetNamedFacts>()
-          : directory.departments(db, workspaceId, [departmentId]),
         workTypeId == null
           ? ([] as WorksheetWorkTypeFacts[])
-          : directory.workTypes(db, workspaceId, { ids: [workTypeId] }),
+          : directory.workTypes(db, workspaceId, [workTypeId]),
         unitId == null
           ? ([] as WorksheetNamedFacts[])
           : directory.units(db, workspaceId, [unitId]),
@@ -420,8 +409,6 @@ export class WorksheetHandlers {
       ]);
     const contractor =
       contractorId == null ? null : contractors.get(contractorId);
-    const department =
-      departmentId == null ? null : departments.get(departmentId);
     const workType = workTypes[0];
     const unit = units[0];
     return {
@@ -432,20 +419,11 @@ export class WorksheetHandlers {
               id: contractor.id,
               isActive: contractor.isActive,
               onProject: contractor.projectIds.includes(projectId),
-              departmentIds: contractor.departmentIds,
             },
-      department:
-        department == null
-          ? null
-          : { id: department.id, disabled: department.disabled },
       workType:
         workType == null
           ? null
-          : {
-              id: workType.id,
-              departmentId: workType.departmentId,
-              disabled: workType.disabled,
-            },
+          : { id: workType.id, disabled: workType.disabled },
       unit: unit == null ? null : { id: unit.id, disabled: unit.disabled },
       placesOffered: places,
       materials: new Map(
@@ -1083,33 +1061,29 @@ export class WorksheetHandlers {
       userIds.add(row.createdBy);
       if (row.approval.decidedBy != null) userIds.add(row.approval.decidedBy);
     }
-    const [contractors, departments, workTypes, units, names, tasks] =
-      await Promise.all([
-        directory.contractors(
-          db,
-          workspaceId,
-          ids((row) => row.contractorId),
-        ),
-        directory.departments(
-          db,
-          workspaceId,
-          ids((row) => row.departmentId),
-        ),
-        directory.workTypes(db, workspaceId, {
-          ids: ids((row) => row.workTypeId),
-        }),
-        directory.units(
-          db,
-          workspaceId,
-          ids((row) => row.approxWorkUnitId),
-        ),
-        directory.memberNames(db, workspaceId, [...userIds]),
-        this.deps.tasks.tasks(
-          db,
-          workspaceId,
-          ids((row) => row.taskId),
-        ),
-      ]);
+    const [contractors, workTypes, units, names, tasks] = await Promise.all([
+      directory.contractors(
+        db,
+        workspaceId,
+        ids((row) => row.contractorId),
+      ),
+      directory.workTypes(
+        db,
+        workspaceId,
+        ids((row) => row.workTypeId),
+      ),
+      directory.units(
+        db,
+        workspaceId,
+        ids((row) => row.approxWorkUnitId),
+      ),
+      directory.memberNames(db, workspaceId, [...userIds]),
+      this.deps.tasks.tasks(
+        db,
+        workspaceId,
+        ids((row) => row.taskId),
+      ),
+    ]);
     const workTypeNames = new Map(workTypes.map((row) => [row.id, row.name]));
     const unitNames = new Map(units.map((row) => [row.id, row.name]));
     return rows.map((row) => ({
@@ -1136,7 +1110,6 @@ export class WorksheetHandlers {
             };
       })(),
       contractorName: contractors.get(row.contractorId)?.name ?? null,
-      departmentName: departments.get(row.departmentId)?.name ?? null,
       workTypeName:
         row.workTypeId == null
           ? null
@@ -1163,7 +1136,7 @@ export class WorksheetHandlers {
 
   /**
    * A Project's sheets, newest first, filtered by date range, Filled By,
-   * Contractor, Department and approval status, with the filter options.
+   * Contractor and approval status, with the filter options.
    */
   async list(params: WorksheetListParams) {
     const { db, store, directory } = this.deps;
@@ -1171,11 +1144,10 @@ export class WorksheetHandlers {
       store.list(db, params),
       store.facets(db, params.workspaceId, params.projectId),
     ]);
-    const [items, names, contractors, departments] = await Promise.all([
+    const [items, names, contractors] = await Promise.all([
       this.readModels(params.workspaceId, page.items),
       directory.memberNames(db, params.workspaceId, facets.createdBy),
       directory.contractors(db, params.workspaceId, facets.contractorIds),
-      directory.departments(db, params.workspaceId, facets.departmentIds),
     ]);
     const byName = (a: { name: string }, b: { name: string }) =>
       a.name.localeCompare(b.name);
@@ -1189,63 +1161,39 @@ export class WorksheetHandlers {
         contractors: [...contractors.values()]
           .map(({ id, name }) => ({ id, name }))
           .sort(byName),
-        departments: [...departments.values()]
-          .map(({ id, name }) => ({ id, name }))
-          .sort(byName),
       },
     };
   }
 
   /**
    * What the form offers on a Project: its settings, the active
-   * Contractors on it with their enabled Departments, those Departments'
-   * enabled Work Types (with assigned Materials) and the units.
+   * Contractors on it, every enabled Work Type (with assigned Materials)
+   * and the units.
    */
   async formOptions(
     workspaceId: string,
     projectId: string,
   ): Promise<WorksheetFormOptions> {
     const { db, directory } = this.deps;
-    const [settings, onProject, units] = await Promise.all([
+    const [settings, onProject, workTypes, units] = await Promise.all([
       this.deps.settings.get(workspaceId, projectId),
       directory.contractorsOnProject(db, workspaceId, projectId),
+      directory.workTypes(db, workspaceId, null),
       directory.units(db, workspaceId, null),
     ]);
     const active = onProject.filter((contractor) => contractor.isActive);
-    const departmentIds = [
-      ...new Set(active.flatMap((contractor) => contractor.departmentIds)),
-    ];
-    const [departments, workTypes] = await Promise.all([
-      directory.departments(db, workspaceId, departmentIds),
-      directory.workTypes(db, workspaceId, { departmentIds }),
-    ]);
-    const enabled = new Map(
-      [...departments.values()]
-        .filter((department) => !department.disabled)
-        .map((department) => [department.id, department.name]),
-    );
     const byName = (a: { name: string }, b: { name: string }) =>
       a.name.localeCompare(b.name);
     return {
       settings: { ...settings, updatedAt: settings.updatedAt },
       contractors: active
-        .map((contractor) => ({
-          id: contractor.id,
-          name: contractor.name,
-          departmentIds: contractor.departmentIds.filter((id) =>
-            enabled.has(id),
-          ),
-        }))
-        .sort(byName),
-      departments: [...enabled]
-        .map(([id, name]) => ({ id, name }))
+        .map((contractor) => ({ id: contractor.id, name: contractor.name }))
         .sort(byName),
       workTypes: workTypes
         .filter((workType) => !workType.disabled)
         .map((workType) => ({
           id: workType.id,
           name: workType.name,
-          departmentId: workType.departmentId,
           materialIds: [...workType.materialIds],
         }))
         .sort(byName),

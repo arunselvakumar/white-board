@@ -25,7 +25,6 @@ import { actAs, addMember, addProject, newCompany } from "@/test/companies";
 import { bytesOf } from "@/test/files";
 import { addContractor, addMaterial, addUnit } from "@/test/procurement";
 import {
-  progressAddDepartment,
   progressAddLabourCategory,
   progressAddUsageSheet,
   progressAddWorksheet,
@@ -96,13 +95,8 @@ async function setup() {
     company.ownerId,
     [projectId],
   );
-  const departmentId = await progressAddDepartment(
-    company.workspaceId,
-    company.ownerId,
-    "Slab and Formwork",
-  );
   actAs(owner);
-  return { company, owner, projectId, contractorId, departmentId };
+  return { company, owner, projectId, contractorId };
 }
 
 type Ctx = Awaited<ReturnType<typeof setup>>;
@@ -151,7 +145,6 @@ describe("Progress Reports: the Daily Progress Report", () => {
       date: DAY,
       createdBy: ctx.company.ownerId,
       contractorId: ctx.contractorId,
-      departmentId: ctx.departmentId,
       skilled: 3,
       unskilled: 5,
       remark: "தளம் போடப்பட்டது / स्लैब डाली गई",
@@ -269,7 +262,6 @@ describe("Progress Reports: the Daily Progress Report", () => {
         date: DAY,
         createdBy,
         contractorId: ctx.contractorId,
-        departmentId: ctx.departmentId,
         skilled,
         unskilled: 1,
       });
@@ -294,7 +286,6 @@ describe("Progress Reports: the Daily Progress Report", () => {
       date: addDays(DAY, -1),
       createdBy: engineer.userId,
       contractorId: ctx.contractorId,
-      departmentId: ctx.departmentId,
     });
 
     const source = createProgressReportSource();
@@ -509,7 +500,6 @@ describe("Progress Reports: the Daily Progress Report", () => {
       date: DAY,
       createdBy: by,
       contractorId: ctx.contractorId,
-      departmentId: ctx.departmentId,
       skilled: 2,
       unskilled: 2,
       approxWorkQty: "12.5",
@@ -667,7 +657,6 @@ describe("Progress Reports: the Daily Progress Report", () => {
       expect.objectContaining({
         number: worksheet.number,
         shift: "Shift 1",
-        department: "Slab and Formwork",
         approxWork: { quantity: "12.500", unit: "Bag" },
         materials: [{ name: cement.name, quantity: "10.000", unit: "Bag" }],
       }),

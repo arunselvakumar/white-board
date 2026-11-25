@@ -140,7 +140,6 @@ export type TaskReadModel = TaskView & {
   /** Matches the list's filters (ancestors shown for context do not). */
   matched: boolean;
   assignees: Named[];
-  department: Named | null;
   contractor: Named | null;
   tags: Named[];
   unit: Named | null;
@@ -178,8 +177,7 @@ export type TaskListParams = Omit<TaskFilter, "today" | "workspaceId"> & {
 
 export type TaskFormOptions = {
   members: TrackingMemberFacts[];
-  departments: { id: string; name: string }[];
-  contractors: { id: string; name: string; departmentIds: readonly string[] }[];
+  contractors: { id: string; name: string }[];
   units: { id: string; name: string }[];
   tags: { id: string; name: string }[];
 };
@@ -219,7 +217,6 @@ function snapshot(content: TaskContent) {
     priority: content.priority,
     siteLocation: content.siteLocation,
     extraLocations: content.extraLocations,
-    departmentId: content.departmentId,
     contractorId: content.contractorId,
     totalWorkQty:
       content.totalWorkMilli == null
@@ -241,7 +238,6 @@ function contentOf(row: TaskRow): TaskContent {
     priority: row.priority,
     siteLocation: row.siteLocation,
     extraLocations: row.extraLocations,
-    departmentId: row.departmentId,
     contractorId: row.contractorId,
     totalWorkMilli: row.totalWorkMilli,
     totalWorkUnitId: row.totalWorkUnitId,
@@ -271,7 +267,6 @@ function changedFields(
     out.push("siteLocation");
   if (json(before.extraLocations) !== json(after.extraLocations))
     out.push("extraLocations");
-  if (before.departmentId !== after.departmentId) out.push("departmentId");
   if (before.contractorId !== after.contractorId) out.push("contractorId");
   if (!sameSet(before.tagIds, after.tagIds)) out.push("tagIds");
   if (
@@ -401,7 +396,7 @@ export class TaskHandlers {
 
   /**
    * Checks a form's fields against the Project: new Team Members active
-   * and on the Project, new Departments and Units enabled, new
+   * and on the Project, new Units enabled, new
    * Contractors active and on the Project, Tags the Company's, locations
    * on the Project (extra ones of the main one's type and Wing). Values
    * kept from `current` may stay even if they would not be offered now.
@@ -422,7 +417,6 @@ export class TaskHandlers {
       projectId,
       {
         memberIds: fields.assigneeIds,
-        departmentIds: fields.departmentId == null ? [] : [fields.departmentId],
         contractorIds: fields.contractorId == null ? [] : [fields.contractorId],
         unitIds: fields.totalWorkUnitId == null ? [] : [fields.totalWorkUnitId],
         tagIds: fields.tagIds,
@@ -448,19 +442,6 @@ export class TaskHandlers {
         "assigneeIds",
         badMembers,
       );
-    if (
-      fields.departmentId != null &&
-      fields.departmentId !== current?.departmentId
-    ) {
-      const department = refs.departments.get(fields.departmentId);
-      if (department == null || department.disabled)
-        throw refuse(
-          "DEPARTMENT_NOT_FOUND",
-          "Choose a Department in use.",
-          "departmentId",
-          [fields.departmentId],
-        );
-    }
     if (
       fields.contractorId != null &&
       fields.contractorId !== current?.contractorId
@@ -1573,9 +1554,6 @@ export class TaskHandlers {
   ): Promise<TrackingNames> {
     return this.deps.directory.names(this.deps.db, workspaceId, {
       memberIds: [...new Set(rows.flatMap((row) => row.assigneeIds))],
-      departmentIds: [
-        ...new Set(rows.flatMap((row) => row.departmentId ?? [])),
-      ],
       contractorIds: [
         ...new Set(rows.flatMap((row) => row.contractorId ?? [])),
       ],
@@ -1610,7 +1588,6 @@ export class TaskHandlers {
         id,
         name: names.members.get(id) ?? null,
       })),
-      department: named(names.departments, view.departmentId),
       contractor: named(names.contractors, view.contractorId),
       tags: view.tagIds.map((id) => ({ id, name: names.tags.get(id) ?? null })),
       unit: named(names.units, view.totalWorkUnitId),
@@ -1901,16 +1878,11 @@ export class TaskHandlers {
       this.deps.db,
       workspaceId,
       projectId,
-      ["members", "departments", "contractors", "units", "tags"],
+      ["members", "contractors", "units", "tags"],
     );
     return {
       members: options.members,
-      departments: options.departments.map(({ id, name }) => ({ id, name })),
-      contractors: options.contractors.map(({ id, name, departmentIds }) => ({
-        id,
-        name,
-        departmentIds,
-      })),
+      contractors: options.contractors.map(({ id, name }) => ({ id, name })),
       units: options.units.map(({ id, name }) => ({ id, name })),
       tags: options.tags.map(({ id, name }) => ({ id, name })),
     };

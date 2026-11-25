@@ -107,7 +107,6 @@ export function partyRoutes(config: {
         const created = await handlers.create({
           workspaceId: session.workspaceId,
           details: body,
-          departmentIds: "departmentIds" in body ? body.departmentIds : [],
           projectIds: body.projectIds,
           by: session.userId,
         });
@@ -126,7 +125,6 @@ export function partyRoutes(config: {
       return handlers.update({
         ...target,
         details: body,
-        departmentIds: "departmentIds" in body ? body.departmentIds : [],
         projectIds: body.projectIds,
         expectedUpdatedAt: new Date(body.expectedUpdatedAt),
       });

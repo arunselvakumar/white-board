@@ -58,7 +58,6 @@ function toStored(row: Row): StoredEquipmentSheet {
     operatorName: row.operatorName,
     supervisorUserId: row.supervisorUserId,
     contractorId: row.contractorId,
-    departmentId: row.departmentId,
     workItem: row.workItem,
     siteLocation: storedLocationRef(row.siteLocation),
     timeShifts: row.timeShifts.map((shift) => ({
@@ -120,7 +119,6 @@ function contentColumns(row: EquipmentSheetRow) {
     operatorName: row.operatorName,
     supervisorUserId: row.supervisorUserId,
     contractorId: row.contractorId,
-    departmentId: row.departmentId,
     workItem: row.workItem,
     siteLocationType: row.siteLocation?.type ?? null,
     // No location is left out here and written as SQL NULL by

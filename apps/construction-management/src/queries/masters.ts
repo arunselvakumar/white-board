@@ -4,7 +4,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
-import type { ConstructionMastersDepartmentResponseModel } from "@/app/api/construction/masters/departments/department-models";
+import type { LookupResponseModel } from "@/app/api/construction/masters/_lib/master-models";
 import type {
   ConstructionMastersSupervisorResponseModel,
   ListConstructionMastersSupervisorsResponseModel,
@@ -16,13 +16,11 @@ import { apiJson } from "./http";
 
 const BASE = "/api/construction/masters";
 
-/** The name-only lists; Labour Categories and Departments share one shape. */
-export type LookupList = "labour-categories" | "departments";
+/** The name-only lists with their own screen: Labour Categories. */
+export type LookupList = "labour-categories";
 
 /** A lookup row; Labour Categories carry their `skill` (CM-601). */
-export type LookupItem = ConstructionMastersDepartmentResponseModel & {
-  skill?: LabourSkill;
-};
+export type LookupItem = LookupResponseModel;
 
 export type SupervisorItem = ConstructionMastersSupervisorResponseModel;
 

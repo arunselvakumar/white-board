@@ -22,8 +22,6 @@ import {
 } from "./worksheet";
 
 const CONTRACTOR = "0199c4a0-0000-7000-8000-000000000c01";
-const DEPARTMENT = "0199c4a0-0000-7000-8000-000000000d01";
-const OTHER_DEPARTMENT = "0199c4a0-0000-7000-8000-000000000d02";
 const WORK_TYPE = "0199c4a0-0000-7000-8000-000000000e01";
 const UNIT = "0199c4a0-0000-7000-8000-000000000f01";
 const CEMENT = "0199c4a0-0000-7000-8000-00000000a001";
@@ -45,10 +43,8 @@ function facts(patch: Partial<WorksheetFacts> = {}): WorksheetFacts {
       id: CONTRACTOR,
       isActive: true,
       onProject: true,
-      departmentIds: [DEPARTMENT],
     },
-    department: { id: DEPARTMENT, disabled: false },
-    workType: { id: WORK_TYPE, departmentId: DEPARTMENT, disabled: false },
+    workType: { id: WORK_TYPE, disabled: false },
     unit: { id: UNIT, disabled: false },
     placesOffered: true,
     materials: new Map([
@@ -67,7 +63,6 @@ function input(patch: Partial<WorksheetInput> = {}): WorksheetInput {
     sheetDate: "2026-10-10",
     shift: "shift_1",
     contractorId: CONTRACTOR,
-    departmentId: DEPARTMENT,
     workTypeId: WORK_TYPE,
     skilledCount: 4,
     unskilledCount: 6,
@@ -124,7 +119,6 @@ describe("worksheet content", () => {
     expect(content).toMatchObject({
       shift: "shift_1",
       contractorId: CONTRACTOR,
-      departmentId: DEPARTMENT,
       workTypeId: WORK_TYPE,
       skilledCount: 4,
       unskilledCount: 6,
@@ -143,7 +137,7 @@ describe("worksheet content", () => {
     });
   });
 
-  it("requires Contractor, Department and Work Shift", () => {
+  it("requires Contractor and Work Shift", () => {
     expect(
       codeOf(() =>
         worksheetContent(input({ contractorId: null }), settings(), facts()),
@@ -151,17 +145,12 @@ describe("worksheet content", () => {
     ).toBe("CONTRACTOR_REQUIRED");
     expect(
       codeOf(() =>
-        worksheetContent(input({ departmentId: "" }), settings(), facts()),
-      ),
-    ).toBe("DEPARTMENT_REQUIRED");
-    expect(
-      codeOf(() =>
         worksheetContent(input({ shift: "shift_4" }), settings(), facts()),
       ),
     ).toBe("WORK_SHIFT_REQUIRED");
   });
 
-  it("refuses a Contractor off the Project and a Department not theirs", () => {
+  it("refuses a Contractor off the Project", () => {
     expect(
       codeOf(() =>
         worksheetContent(
@@ -172,7 +161,6 @@ describe("worksheet content", () => {
               id: CONTRACTOR,
               isActive: true,
               onProject: false,
-              departmentIds: [DEPARTMENT],
             },
           }),
         ),
@@ -183,33 +171,14 @@ describe("worksheet content", () => {
         worksheetContent(input(), settings(), facts({ contractor: null })),
       ),
     ).toBe("CONTRACTOR_NOT_FOUND");
-    expect(
-      codeOf(() =>
-        worksheetContent(
-          input({ departmentId: OTHER_DEPARTMENT }),
-          settings(),
-          facts({ department: { id: OTHER_DEPARTMENT, disabled: false } }),
-        ),
-      ),
-    ).toBe("DEPARTMENT_NOT_CONTRACTORS");
   });
 
-  it("refuses a Work Type of another Department", () => {
+  it("takes any live Work Type, refuses an unknown one, and allows none", () => {
     expect(
       codeOf(() =>
-        worksheetContent(
-          input(),
-          settings(),
-          facts({
-            workType: {
-              id: WORK_TYPE,
-              departmentId: OTHER_DEPARTMENT,
-              disabled: false,
-            },
-          }),
-        ),
+        worksheetContent(input(), settings(), facts({ workType: null })),
       ),
-    ).toBe("WORK_TYPE_NOT_DEPARTMENTS");
+    ).toBe("WORK_TYPE_NOT_FOUND");
     expect(
       worksheetContent(input({ workTypeId: null }), settings(), facts())
         .workTypeId,
@@ -367,27 +336,6 @@ describe("worksheet content", () => {
     });
   });
 
-  it("drops a kept Work Type when the Department changes under a hidden section", () => {
-    const OTHER = "01a12900-0000-7000-8000-0000000000ff";
-    const previous = worksheetContent(input(), settings(), facts());
-    const moved = worksheetContent(
-      input({ departmentId: OTHER, workTypeId: null }),
-      settings({ showWorkType: false }),
-      facts({
-        contractor: {
-          id: CONTRACTOR,
-          isActive: true,
-          onProject: true,
-          departmentIds: [DEPARTMENT, OTHER],
-        },
-        department: { id: OTHER, disabled: false },
-      }),
-      previous,
-    );
-    expect(moved.departmentId).toBe(OTHER);
-    expect(moved.workTypeId).toBeNull();
-  });
-
   it("keeps a saved Contractor that has since left the Project", () => {
     const previous = worksheetContent(input(), settings(), facts());
     const left = facts({
@@ -395,7 +343,6 @@ describe("worksheet content", () => {
         id: CONTRACTOR,
         isActive: true,
         onProject: false,
-        departmentIds: [DEPARTMENT],
       },
     });
     expect(
@@ -406,18 +353,17 @@ describe("worksheet content", () => {
     );
   });
 
-  it("keeps a disabled Department or Work Type the sheet already had", () => {
+  it("keeps a disabled Work Type the sheet already had", () => {
     const previous = worksheetContent(input(), settings(), facts());
     const disabled = facts({
-      department: { id: DEPARTMENT, disabled: true },
-      workType: { id: WORK_TYPE, departmentId: DEPARTMENT, disabled: true },
+      workType: { id: WORK_TYPE, disabled: true },
     });
     expect(codeOf(() => worksheetContent(input(), settings(), disabled))).toBe(
-      "DEPARTMENT_NOT_FOUND",
+      "WORK_TYPE_NOT_FOUND",
     );
     expect(
-      worksheetContent(input(), settings(), disabled, previous).departmentId,
-    ).toBe(DEPARTMENT);
+      worksheetContent(input(), settings(), disabled, previous).workTypeId,
+    ).toBe(WORK_TYPE);
   });
 
   it("refuses a sheet dated after today", () => {

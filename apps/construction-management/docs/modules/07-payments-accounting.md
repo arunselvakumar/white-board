@@ -11,6 +11,8 @@ Who uses it:
 - **Site engineer / site supervisor / store keeper** — holds a petty-cash account, raises Payment/Receipt vouchers with receipt photos, records labour payments and advances at site.
 - **Project manager** — reviews due payments and module-wise spend on the project dashboard.
 
+> **No Departments ([ADR CM-0048](../adr/CM-0048-no-department-master.md)).** Our Contractor invoices have no Department. Where the legacy sections below mention one (invoice list, invoice fields, Contractor master), they describe BuildControl only.
+
 ---
 
 ## Legacy behaviour
@@ -793,7 +795,7 @@ Product rules are in [ADR CM-0017](../adr/CM-0017-finance-product-decisions.md);
 ### CM-705
 
 - **One engine for every party.** Invoices, payments, allocations, openings, settlements and statements take a party type (Contractor, Supplier, Other Party); CM-708 builds the Other Party screens on the same API. Contractors and Suppliers must be assigned to the Project (400 `PARTY_NOT_ON_PROJECT`); Other Parties and Store suppliers are not checked against an assignment.
-- **An invoice keeps its party and place.** Editing changes the number, dates, Department, taxable value and GST, amount and remarks. Taxable value plus GST is at most the amount (400 `INVOICE_SPLIT_EXCEEDS_AMOUNT`). A settled invoice is not edited (409 `INVOICE_SETTLED`). Delete is refused once a payment or settlement points at it (409 `INVOICE_ALLOCATED`) or while a settlement is pending (409 `SETTLEMENT_PENDING`).
+- **An invoice keeps its party and place.** Editing changes the number, dates, taxable value and GST, amount and remarks. A Contractor invoice has no Department, and there is no invoice form-options endpoint (`/api/construction/finance/parties/form-options` served only a Contractor's Departments; ADR CM-0048). Taxable value plus GST is at most the amount (400 `INVOICE_SPLIT_EXCEEDS_AMOUNT`). A settled invoice is not edited (409 `INVOICE_SETTLED`). Delete is refused once a payment or settlement points at it (409 `INVOICE_ALLOCATED`) or while a settlement is pending (409 `SETTLEMENT_PENDING`).
 - **A GRN's invoice follows its GRN.** Its number, date and amount come from the GRN; changing them on the invoice is 400 `INVOICE_FROM_GOODS_RECEIPT` (due date, split and remarks stay editable). The invoice date is the GRN's invoice date, else its receipt date. An edited GRN whose invoice number was removed deletes its unallocated invoice (the GRN awaits an invoice again); a GRN moved to another Supplier or place gets its invoice re-created; a number the Supplier already used leaves the GRN awaiting an invoice. A manual invoice that gathered several GRNs keeps its amount; an edited GRN updates only the link's GRN value, a deleted one is unlinked.
 - **The GRN listener runs after commit.** Procurement dispatches `GoodsReceiptPosted` after the GRN's transaction, so finance syncs in its own transaction, reads the GRN as committed and is idempotent by GRN id. A failure is logged and never fails the GRN request. The GRN handlers use the composition's `goodsReceiptDispatcher()`, which passes every event on to `procurementEvents` and also to finance.
 - **A GRN is paid** once a live allocation points at its live invoice (`GoodsReceiptPayments`).

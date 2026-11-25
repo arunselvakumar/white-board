@@ -53,7 +53,6 @@ export type InvoiceWriteInput = {
   invoiceNumber?: string | null;
   invoiceDate: string;
   dueDate?: string | null;
-  departmentId?: string | null;
   /** Paise. */
   taxableAmount?: number | null;
   gstAmount?: number | null;
@@ -83,7 +82,6 @@ export type InvoiceView = StoredInvoice &
   InvoiceProgress & {
     partyName: string | null;
     placeName: string | null;
-    departmentName: string | null;
     allocated: bigint;
     writtenOff: bigint;
     goodsReceipts: { id: string; number: string | null; grnValue: bigint }[];
@@ -135,7 +133,6 @@ function snapshot(invoice: StoredInvoice) {
     invoiceNumber: invoice.invoiceNumber,
     invoiceDate: invoice.invoiceDate,
     dueDate: invoice.dueDate,
-    departmentId: invoice.departmentId,
     taxableAmount: invoice.taxableAmount,
     gstAmount: invoice.gstAmount,
     amount: invoice.amount,
@@ -168,24 +165,6 @@ export class InvoiceHandlers {
     );
     if (invoice == null) throw invoiceNotFound();
     return invoice;
-  }
-
-  private async checkDepartment(
-    db: FinanceTx,
-    workspaceId: string,
-    departmentIds: readonly string[],
-    departmentId: string | null,
-  ): Promise<void> {
-    if (departmentId == null) return;
-    const found = await this.deps.directory.departments(db, workspaceId, [
-      departmentId,
-    ]);
-    if (!found.has(departmentId) || !departmentIds.includes(departmentId))
-      throw new DomainError(
-        "DEPARTMENT_NOT_OF_CONTRACTOR",
-        "Choose one of the Contractor's Departments.",
-        { details: { field: "departmentId" } },
-      );
   }
 
   /** GRNs a manual supplier invoice gathers: the Supplier's, at the place, not invoiced. */
@@ -274,12 +253,6 @@ export class InvoiceHandlers {
         gstAmount: optionalPaise(input.gstAmount, "gstAmount"),
         amount,
       });
-      await this.checkDepartment(
-        tx,
-        workspaceId,
-        party.departmentIds,
-        fields.departmentId,
-      );
       check.check("party_invoice", "create", fields.invoiceDate);
       let invoiceNumber = fields.invoiceNumber;
       if (direction === "payable") {
@@ -315,7 +288,6 @@ export class InvoiceHandlers {
         invoiceNumber: invoiceNumber ?? "",
         invoiceDate: fields.invoiceDate,
         dueDate: fields.dueDate,
-        departmentId: fields.departmentId,
         taxableAmount: fields.taxableAmount,
         gstAmount: fields.gstAmount,
         amount: fields.amount,
@@ -417,13 +389,6 @@ export class InvoiceHandlers {
           "This invoice's number, date and amount come from its Goods Receipt. Edit the Goods Receipt instead.",
           { details: { field: "invoiceNumber" } },
         );
-      if (fields.departmentId !== locked.departmentId)
-        await this.checkDepartment(
-          tx,
-          workspaceId,
-          party.departmentIds,
-          fields.departmentId,
-        );
       check.check("party_invoice", "edit", locked.invoiceDate);
       if (fields.invoiceDate !== locked.invoiceDate)
         check.check("party_invoice", "edit", fields.invoiceDate);
@@ -463,7 +428,6 @@ export class InvoiceHandlers {
         invoiceNumber,
         invoiceDate: fields.invoiceDate,
         dueDate: fields.dueDate,
-        departmentId: fields.departmentId,
         taxableAmount: fields.taxableAmount,
         gstAmount: fields.gstAmount,
         amount: fields.amount,
@@ -602,11 +566,7 @@ export class InvoiceHandlers {
           rows.map((row) => row.place),
         ),
       ]);
-    const departmentIds = rows.flatMap((row) =>
-      row.departmentId == null ? [] : [row.departmentId],
-    );
-    const [departments, grns, payments] = await Promise.all([
-      directory.departments(db, workspaceId, departmentIds),
+    const [grns, payments] = await Promise.all([
       directory.goodsReceipts(
         db,
         workspaceId,
@@ -633,10 +593,6 @@ export class InvoiceHandlers {
         writtenOff: figure.writtenOff,
         partyName: parties.get(partyKey(row.partyType, row.partyId)) ?? null,
         placeName: places.get(placeKey(row.place)) ?? null,
-        departmentName:
-          row.departmentId == null
-            ? null
-            : (departments.get(row.departmentId)?.name ?? null),
         goodsReceipts: own.map((link) => ({
           id: link.goodsReceiptId,
           number: grns.get(link.goodsReceiptId)?.number ?? null,

@@ -40,8 +40,8 @@ export type LookupEntrySnapshot = {
 };
 
 /**
- * One row of a name-only lookup list: a Labour Category or a Department
- * (`modules/02`, CM-203), or an Amenity or Common Development (CM-404).
+ * One row of a name-only lookup list: a Labour Category (`modules/02`,
+ * CM-203), an Amenity or Common Development (CM-404), or a Measurement Unit.
  * Seed rows can be disabled and enabled, never renamed or deleted.
  * Disabled rows stay on old records but leave pickers.
  */

@@ -8,15 +8,6 @@ import { newId } from "@/src/shared-kernel/ids";
 import { jsonRequest, memberWith, ownerWithCompany } from "@/test/companies";
 import { TEST_ORIGIN } from "@/test/sessions";
 
-import { POST as deleteDepartment } from "./departments/[id]/delete/route";
-import { POST as disableDepartment } from "./departments/[id]/disable/route";
-import { POST as enableDepartment } from "./departments/[id]/enable/route";
-import { GET as getDepartment } from "./departments/[id]/route";
-import { POST as updateDepartment } from "./departments/[id]/update/route";
-import {
-  GET as listDepartments,
-  POST as createDepartment,
-} from "./departments/route";
 import { POST as deleteCategory } from "./labour-categories/[id]/delete/route";
 import { POST as disableCategory } from "./labour-categories/[id]/disable/route";
 import { POST as enableCategory } from "./labour-categories/[id]/enable/route";
@@ -38,7 +29,6 @@ import {
 
 const BASE = `${TEST_ORIGIN}/api/construction/masters`;
 const CATEGORIES = `${BASE}/labour-categories`;
-const DEPARTMENTS = `${BASE}/departments`;
 const SUPERVISORS = `${BASE}/supervisors`;
 
 type Lookup = {
@@ -108,7 +98,6 @@ describe("Masters HTTP (CM-203)", () => {
   it("is 401 without a Session", async () => {
     for (const [list, url] of [
       [listCategories, CATEGORIES],
-      [listDepartments, DEPARTMENTS],
       [listSupervisors, SUPERVISORS],
     ] as const) {
       const response = await list(new Request(url));
@@ -146,19 +135,6 @@ describe("Masters HTTP (CM-203)", () => {
     expect(categories.filter((item) => item.skill === "skilled")).toHaveLength(
       6,
     );
-    const departments = await listOf<Lookup>(
-      listDepartments,
-      DEPARTMENTS,
-      owner.cookie,
-    );
-    expect(departments).toHaveLength(53);
-    expect(departments.map((item) => item.name)).toEqual(
-      expect.arrayContaining([
-        "RCC",
-        "Masonry & Plaster",
-        "Soil Nail & Gunting",
-      ]),
-    );
     expect(await listOf(listSupervisors, SUPERVISORS, owner.cookie)).toEqual(
       [],
     );
@@ -173,11 +149,6 @@ describe("Masters HTTP (CM-203)", () => {
         where: { workspaceId: owner.workspaceId },
       }),
     ).toBe(9);
-    expect(
-      await prisma.constructionMastersDepartment.count({
-        where: { workspaceId: owner.workspaceId },
-      }),
-    ).toBe(53);
     // The RCC Work Type, once.
     expect(
       await prisma.constructionMastersWorkType.findMany({
@@ -287,97 +258,97 @@ describe("Masters HTTP (CM-203)", () => {
 
   it("validates names and is 409 for a name in use, any case", async () => {
     const owner = await ownerWithCompany();
-    const blank = await createDepartment(
-      jsonRequest(DEPARTMENTS, owner.cookie, { name: "  " }),
+    const blank = await createCategory(
+      jsonRequest(CATEGORIES, owner.cookie, { name: "  " }),
     );
     expect(blank.status).toBe(StatusCodes.BAD_REQUEST);
     expect(await json(blank)).toMatchObject({
-      code: "DEPARTMENT_NAME_REQUIRED",
+      code: "LABOUR_CATEGORY_NAME_REQUIRED",
     });
-    const long = await createDepartment(
-      jsonRequest(DEPARTMENTS, owner.cookie, { name: "x".repeat(101) }),
+    const long = await createCategory(
+      jsonRequest(CATEGORIES, owner.cookie, { name: "x".repeat(101) }),
     );
     expect(await json(long)).toMatchObject({
-      code: "DEPARTMENT_NAME_TOO_LONG",
+      code: "LABOUR_CATEGORY_NAME_TOO_LONG",
     });
-    const taken = await createDepartment(
-      jsonRequest(DEPARTMENTS, owner.cookie, { name: "rcc" }),
+    const taken = await createCategory(
+      jsonRequest(CATEGORIES, owner.cookie, { name: "mason" }),
     );
     expect(taken.status).toBe(StatusCodes.CONFLICT);
     expect(await json(taken)).toMatchObject({
-      code: "DEPARTMENT_NAME_IN_USE",
+      code: "LABOUR_CATEGORY_NAME_IN_USE",
     });
 
-    const fencing = await json<Lookup>(
-      await createDepartment(
-        jsonRequest(DEPARTMENTS, owner.cookie, { name: "Fencing" }),
+    const fencer = await json<Lookup>(
+      await createCategory(
+        jsonRequest(CATEGORIES, owner.cookie, { name: "Fencer" }),
       ),
     );
-    const renamed = await updateDepartment(
-      jsonRequest(`${DEPARTMENTS}/${fencing.id}/update`, owner.cookie, {
-        name: "Painting",
-        expectedUpdatedAt: fencing.updatedAt,
+    const renamed = await updateCategory(
+      jsonRequest(`${CATEGORIES}/${fencer.id}/update`, owner.cookie, {
+        name: "Plumber",
+        expectedUpdatedAt: fencer.updatedAt,
       }),
-      params(fencing.id),
+      params(fencer.id),
     );
     expect(renamed.status).toBe(StatusCodes.CONFLICT);
     expect(await json(renamed)).toMatchObject({
-      code: "DEPARTMENT_NAME_IN_USE",
+      code: "LABOUR_CATEGORY_NAME_IN_USE",
     });
-    const badId = await getDepartment(
-      jsonRequest(`${DEPARTMENTS}/not-a-uuid`, owner.cookie),
+    const badId = await getCategory(
+      jsonRequest(`${CATEGORIES}/not-a-uuid`, owner.cookie),
       params("not-a-uuid"),
     );
     expect(badId.status).toBe(StatusCodes.BAD_REQUEST);
-    const badStatus = await listDepartments(
-      jsonRequest(`${DEPARTMENTS}?status=hidden`, owner.cookie),
+    const badStatus = await listCategories(
+      jsonRequest(`${CATEGORIES}?status=hidden`, owner.cookie),
     );
     expect(badStatus.status).toBe(StatusCodes.BAD_REQUEST);
   });
 
   it("keeps seed rows read-only but lets them be disabled", async () => {
     const owner = await ownerWithCompany();
-    const departments = await listOf<Lookup>(
-      listDepartments,
-      DEPARTMENTS,
+    const categories = await listOf<Lookup>(
+      listCategories,
+      CATEGORIES,
       owner.cookie,
     );
-    const rcc = departments.find((item) => item.name === "RCC");
-    if (rcc == null) throw new Error("No RCC seed");
-    const renamed = await updateDepartment(
-      jsonRequest(`${DEPARTMENTS}/${rcc.id}/update`, owner.cookie, {
-        name: "Concrete",
-        expectedUpdatedAt: rcc.updatedAt,
+    const mason = categories.find((item) => item.name === "Mason");
+    if (mason == null) throw new Error("No Mason seed");
+    const renamed = await updateCategory(
+      jsonRequest(`${CATEGORIES}/${mason.id}/update`, owner.cookie, {
+        name: "Brick Mason",
+        expectedUpdatedAt: mason.updatedAt,
       }),
-      params(rcc.id),
+      params(mason.id),
     );
     expect(renamed.status).toBe(StatusCodes.CONFLICT);
     expect(await json(renamed)).toMatchObject({ code: "SEED_IS_READ_ONLY" });
-    const deleted = await deleteDepartment(
-      jsonRequest(`${DEPARTMENTS}/${rcc.id}/delete`, owner.cookie, {}),
-      params(rcc.id),
+    const deleted = await deleteCategory(
+      jsonRequest(`${CATEGORIES}/${mason.id}/delete`, owner.cookie, {}),
+      params(mason.id),
     );
     expect(deleted.status).toBe(StatusCodes.CONFLICT);
     expect(await json(deleted)).toMatchObject({ code: "SEED_IS_READ_ONLY" });
 
-    const disabled = await disableDepartment(
-      jsonRequest(`${DEPARTMENTS}/${rcc.id}/disable`, owner.cookie, {}),
-      params(rcc.id),
+    const disabled = await disableCategory(
+      jsonRequest(`${CATEGORIES}/${mason.id}/disable`, owner.cookie, {}),
+      params(mason.id),
     );
     expect(await json(disabled)).toMatchObject({
-      name: "RCC",
+      name: "Mason",
       isSeed: true,
       disabled: true,
     });
     // Disabling twice is a no-op, not an error.
-    const twice = await disableDepartment(
-      jsonRequest(`${DEPARTMENTS}/${rcc.id}/disable`, owner.cookie, {}),
-      params(rcc.id),
+    const twice = await disableCategory(
+      jsonRequest(`${CATEGORIES}/${mason.id}/disable`, owner.cookie, {}),
+      params(mason.id),
     );
     expect(twice.status).toBe(StatusCodes.OK);
-    const enabled = await enableDepartment(
-      jsonRequest(`${DEPARTMENTS}/${rcc.id}/enable`, owner.cookie, {}),
-      params(rcc.id),
+    const enabled = await enableCategory(
+      jsonRequest(`${CATEGORIES}/${mason.id}/enable`, owner.cookie, {}),
+      params(mason.id),
     );
     expect(await json(enabled)).toMatchObject({ disabled: false });
   });
@@ -650,10 +621,6 @@ describe("Masters HTTP (CM-203)", () => {
     );
     expect(refused.status).toBe(StatusCodes.FORBIDDEN);
     expect(await json(refused)).toMatchObject({ code: "PERMISSION_DENIED" });
-    const departments = await listDepartments(
-      jsonRequest(DEPARTMENTS, reader.cookie),
-    );
-    expect(departments.status).toBe(StatusCodes.FORBIDDEN);
     const supervisor = await createSupervisor(
       jsonRequest(SUPERVISORS, reader.cookie, { name: "Dhuresh" }),
     );
@@ -671,7 +638,7 @@ describe("Masters HTTP (CM-203)", () => {
       paths: Record<string, Record<string, { tags: string[] }>>;
       components: { schemas: Record<string, unknown> };
     }>(getOpenApi());
-    for (const list of ["labour-categories", "departments", "supervisors"]) {
+    for (const list of ["labour-categories", "supervisors"]) {
       const path = `/api/construction/masters/${list}`;
       for (const suffix of [
         "",
@@ -692,15 +659,16 @@ describe("Masters HTTP (CM-203)", () => {
         "ConstructionMastersLabourCategoryResponse",
         "CreateConstructionMastersLabourCategoryRequest",
         "UpdateConstructionMastersLabourCategoryRequest",
-        "ListConstructionMastersDepartmentsResponse",
-        "ConstructionMastersDepartmentResponse",
-        "CreateConstructionMastersDepartmentRequest",
-        "UpdateConstructionMastersDepartmentRequest",
         "ListConstructionMastersSupervisorsResponse",
         "ConstructionMastersSupervisorResponse",
         "CreateConstructionMastersSupervisorRequest",
         "UpdateConstructionMastersSupervisorRequest",
       ]),
+    );
+    // The Department master is gone (ADR CM-0048).
+    expect(spec.paths["/api/construction/masters/departments"]).toBeUndefined();
+    expect(Object.keys(spec.components.schemas)).not.toContain(
+      "ConstructionMastersDepartmentResponse",
     );
   });
 });

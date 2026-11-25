@@ -122,8 +122,6 @@ export function PartyInvoices({
                   {formatDate(invoice.invoiceDate)}
                   {invoice.dueDate != null &&
                     ` · due ${formatDate(invoice.dueDate)}`}
-                  {invoice.department?.name != null &&
-                    ` · ${invoice.department.name}`}
                   {invoice.goodsReceipts.length > 0 &&
                     ` · ${invoice.goodsReceipts.map((grn) => grn.number ?? "GRN").join(", ")}`}
                 </p>

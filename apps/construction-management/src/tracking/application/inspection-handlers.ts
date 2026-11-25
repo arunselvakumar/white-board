@@ -130,7 +130,6 @@ export type InspectionListParams = {
   workspaceId: string;
   projectId: string;
   status?: InspectionStatus;
-  departmentId?: string;
   contractorId?: string;
   inspectorMemberId?: string;
   location?: InspectionLocationFilter;
@@ -342,7 +341,6 @@ export type InspectionDrawingReadModel = {
 };
 
 export type InspectionReadModel = StoredInspection & {
-  departmentName: string | null;
   contractorName: string | null;
   inspectorName: string | null;
   drawings: InspectionDrawingReadModel[];
@@ -365,7 +363,7 @@ export type RemarkReadModel = StoredRemark & { createdByName: string | null };
 
 export type InspectionFormOptions = Pick<
   TrackingOptions,
-  "members" | "departments" | "contractors" | "drawings"
+  "members" | "contractors" | "drawings"
 >;
 
 export type InspectionBulkOutcome = {
@@ -413,7 +411,6 @@ function snapshot(content: InspectionContent) {
   return {
     inspectionDate: content.inspectionDate,
     inspectionTime: content.inspectionTime,
-    departmentId: content.departmentId,
     contractorId: content.contractorId,
     inspectorMemberId: content.inspectorMemberId,
     workDescription: content.workDescription,
@@ -496,7 +493,7 @@ export class InspectionHandlers {
     refs: TrackingReferences,
     current: StoredInspection | null,
   ): void {
-    const { inspectorMemberId, departmentId, contractorId } = fields;
+    const { inspectorMemberId, contractorId } = fields;
     if (
       inspectorMemberId != null &&
       inspectorMemberId !== current?.inspectorMemberId
@@ -513,21 +510,6 @@ export class InspectionHandlers {
           "INSPECTOR_NOT_ON_PROJECT",
           "Choose an active Team Member on this Project as the inspector.",
           "inspectorMemberId",
-        );
-    }
-    if (departmentId != null && departmentId !== current?.departmentId) {
-      const department = refs.departments.get(departmentId);
-      if (department == null)
-        throw invalid(
-          "DEPARTMENT_NOT_FOUND",
-          "This Department was not found.",
-          "departmentId",
-        );
-      if (department.disabled)
-        throw invalid(
-          "DEPARTMENT_DISABLED",
-          "This Department is disabled. Choose another.",
-          "departmentId",
         );
     }
     if (contractorId != null && contractorId !== current?.contractorId) {
@@ -572,7 +554,6 @@ export class InspectionHandlers {
     const refs = await directory.references(db, access.workspaceId, projectId, {
       memberIds:
         fields.inspectorMemberId == null ? [] : [fields.inspectorMemberId],
-      departmentIds: fields.departmentId == null ? [] : [fields.departmentId],
       contractorIds: fields.contractorId == null ? [] : [fields.contractorId],
       drawingIds: fields.drawingIds,
     });
@@ -932,7 +913,6 @@ export class InspectionHandlers {
             details: snagDetails(row.number, state.rejectionReason ?? ""),
             priority: null,
             categoryId,
-            departmentId: row.departmentId,
             contractorId: row.contractorId,
             assigneeMemberId: null,
             dueDate: null,
@@ -1131,13 +1111,11 @@ export class InspectionHandlers {
     const { directory, store, db, drawingLinks } = this.deps;
     const memberIds = new Set<string>();
     const userIds = new Set<string>();
-    const departmentIds = new Set<string>();
     const contractorIds = new Set<string>();
     const drawingIds = new Set<string>();
     const originalIds = new Set<string>();
     for (const row of rows) {
       if (row.inspectorMemberId != null) memberIds.add(row.inspectorMemberId);
-      if (row.departmentId != null) departmentIds.add(row.departmentId);
       if (row.contractorId != null) contractorIds.add(row.contractorId);
       if (row.reinspectionOfId != null) originalIds.add(row.reinspectionOfId);
       userIds.add(row.createdBy);
@@ -1149,7 +1127,6 @@ export class InspectionHandlers {
       directory.names(db, workspaceId, {
         memberIds: [...memberIds],
         userIds: [...userIds],
-        departmentIds: [...departmentIds],
         contractorIds: [...contractorIds],
         drawingIds: [...drawingIds],
       }),
@@ -1162,7 +1139,6 @@ export class InspectionHandlers {
       id == null ? null : (map.get(id) ?? null);
     return rows.map((row) => ({
       ...row,
-      departmentName: name(names.departments, row.departmentId),
       contractorName: name(names.contractors, row.contractorId),
       inspectorName: name(names.members, row.inspectorMemberId),
       drawings: row.drawingIds.map((id) => {
@@ -1246,8 +1222,8 @@ export class InspectionHandlers {
   /**
    * **Raise re-inspection** prefill (CM-0019 §10): what the new request
    * copies from a rejected one, keeping only what can still be picked —
-   * an inspector still active on the Project, an enabled Department, a
-   * Contractor still assigned, live drawings, a location still on the
+   * an inspector still active on the Project, a Contractor still
+   * assigned, live drawings, a location still on the
    * Project. Needs Create; 409 when the request is not rejected or is
    * already being inspected again.
    */
@@ -1271,7 +1247,6 @@ export class InspectionHandlers {
       {
         memberIds:
           draft.inspectorMemberId == null ? [] : [draft.inspectorMemberId],
-        departmentIds: draft.departmentId == null ? [] : [draft.departmentId],
         contractorIds: draft.contractorId == null ? [] : [draft.contractorId],
         drawingIds: draft.drawingIds,
       },
@@ -1280,10 +1255,6 @@ export class InspectionHandlers {
       draft.inspectorMemberId == null
         ? undefined
         : refs.members.get(draft.inspectorMemberId);
-    const department =
-      draft.departmentId == null
-        ? undefined
-        : refs.departments.get(draft.departmentId);
     const contractor =
       draft.contractorId == null
         ? undefined
@@ -1305,8 +1276,6 @@ export class InspectionHandlers {
       ...draft,
       inspectorMemberId:
         inspector?.active === true && inspector.onProject ? inspector.id : null,
-      departmentId:
-        department != null && !department.disabled ? department.id : null,
       contractorId:
         contractor?.isActive === true && contractor.onProject
           ? contractor.id
@@ -1318,7 +1287,7 @@ export class InspectionHandlers {
     };
   }
 
-  /** Inspectors, Departments, Contractors and Drawings the form offers. */
+  /** Inspectors, Contractors and Drawings the form offers. */
   async formOptions(
     workspaceId: string,
     projectId: string,
@@ -1327,11 +1296,10 @@ export class InspectionHandlers {
       this.deps.db,
       workspaceId,
       projectId,
-      ["members", "departments", "contractors", "drawings"],
+      ["members", "contractors", "drawings"],
     );
     return {
       members: options.members,
-      departments: options.departments,
       contractors: options.contractors,
       drawings: options.drawings,
     };

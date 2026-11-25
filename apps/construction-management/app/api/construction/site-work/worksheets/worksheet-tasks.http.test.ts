@@ -12,7 +12,7 @@ import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import { addDays, todayIn } from "@/src/shared-kernel/calendar-date";
 import { actAs, addProject, newCompany } from "@/test/companies";
 import { addUnit } from "@/test/procurement";
-import { worksheetContractor, worksheetDepartment } from "@/test/site-work";
+import { worksheetContractor } from "@/test/site-work";
 
 import { POST as saveSettings } from "../settings/worksheets/route";
 import { POST as approve } from "./[id]/approve/route";
@@ -79,11 +79,9 @@ async function setup() {
   const ws = company.workspaceId;
   const by = company.ownerId;
   const projectId = await addProject(ws, by, "Anugraha Towers");
-  const department = await worksheetDepartment(ws, by, { name: "Concrete" });
   const contractor = await worksheetContractor(ws, by, {
     name: "Velan Constructions",
     projectIds: [projectId],
-    departmentIds: [department],
   });
   const cum = await addUnit(ws, by, "cum");
   const sqm = await addUnit(ws, by, "sqm");
@@ -112,7 +110,6 @@ async function setup() {
     ws,
     by,
     projectId,
-    department,
     contractor,
     cum,
     sqm,
@@ -131,7 +128,6 @@ function body(ctx: Ctx, patch: Record<string, unknown> = {}) {
     sheetDate: TODAY,
     shift: "shift_1",
     contractorId: ctx.contractor,
-    departmentId: ctx.department,
     skilledCount: 4,
     unskilledCount: 6,
     approxWorkQty: "12.5",

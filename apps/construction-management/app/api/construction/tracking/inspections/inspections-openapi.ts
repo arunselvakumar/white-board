@@ -104,7 +104,7 @@ export const trackingInspectionOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",
     path: `${INSPECTIONS_PATH}/form-options`,
-    summary: "Inspectors, Departments, Contractors and Drawings for the form",
+    summary: "Inspectors, Contractors and Drawings for the form",
     tags: TAGS,
     query: GetConstructionTrackingInspectionFormOptionsRequestModel,
     successStatus: StatusCodes.OK,

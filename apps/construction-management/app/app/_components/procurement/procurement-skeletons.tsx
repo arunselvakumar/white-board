@@ -980,7 +980,6 @@ export function MaterialRequestDetailSkeleton({
         "Request To",
         "Project",
         "Contractor",
-        "Department",
         "Receiver",
       ]}
       sections={[
@@ -1235,7 +1234,6 @@ export function MaterialRequestFormSkeleton({
           { label: "Request Date" },
           { label: "Request To", control: "select" },
           { label: "Contractor", control: "select" },
-          { label: "Department", control: "select" },
           { label: "Receiver Name" },
           { label: "Remark", control: "textarea", wide: true },
         ]}

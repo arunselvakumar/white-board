@@ -31,8 +31,8 @@ export function expectedUpdatedAt(code: string) {
 const name = z.string().max(1000);
 
 /**
- * Request and Response models of a name-only list (Labour Categories,
- * Departments). Each call makes new schema objects, because OpenAPI
+ * Request and Response models of a name-only list (Labour Categories).
+ * Each call makes new schema objects, because OpenAPI
  * component names are per schema object.
  */
 export function lookupModels(code: string) {

@@ -23,7 +23,6 @@ import type {
 export const ISSUES_API = "/api/construction/tracking/issues";
 export const ISSUE_PROJECT_ID = "0199c4a0-0000-7000-8000-0000000e0001";
 export const CATEGORY_ID = "0199c4a0-0000-7000-8000-0000000e0101";
-export const DEPARTMENT_ID = "0199c4a0-0000-7000-8000-0000000e0102";
 export const CONTRACTOR_ID = "0199c4a0-0000-7000-8000-0000000e0103";
 export const KARTHIK_MEMBER_ID = "0199c4a0-0000-7000-8000-0000000e0104";
 export const PLACE_ID = "0199c4a0-0000-7000-8000-0000000e0105";
@@ -47,10 +46,7 @@ export const ISSUE_FORM_OPTIONS: IssueFormOptions = {
     },
     { id: KARTHIK_MEMBER_ID, name: "Karthik R", isOwner: false },
   ],
-  departments: [{ id: DEPARTMENT_ID, name: "Plastering" }],
-  contractors: [
-    { id: CONTRACTOR_ID, name: "Velan Constructions", departmentIds: [] },
-  ],
+  contractors: [{ id: CONTRACTOR_ID, name: "Velan Constructions" }],
   issueCategories: [
     { id: CATEGORY_ID, name: "Quality" },
     { id: "0199c4a0-0000-7000-8000-0000000e0108", name: "Safety" },
@@ -112,7 +108,6 @@ export function issue(extra: Partial<IssueDetail> = {}): IssueDetail {
     details: "Plaster cracks on the east wall of the stair core",
     priority: "high",
     category: { id: CATEGORY_ID, name: "Quality" },
-    department: { id: DEPARTMENT_ID, name: "Plastering" },
     contractor: { id: CONTRACTOR_ID, name: "Velan Constructions" },
     assignee: { id: KARTHIK_MEMBER_ID, name: "Karthik R" },
     dueDate: addDays(TODAY, 3),

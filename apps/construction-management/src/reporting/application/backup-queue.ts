@@ -209,9 +209,12 @@ export function createBackupQueue(deps: BackupQueueDeps) {
     part: BackupPart,
     signal: AbortSignal,
   ): Promise<BackupPart> {
+    if (backup.workspaceId == null)
+      throw new Error(`The backup module ${part.module} needs a Company.`);
     const found = backupModule(part.module);
-    if (found == null || backup.workspaceId == null)
-      throw new Error(`Unknown backup module ${part.module}.`);
+    // A module retired after the backup was queued (Departments, ADR
+    // CM-0048 §1) is skipped: an empty part the manifest leaves out.
+    if (found == null) return { ...part, rows: 0, entities: [], mediaFiles: 0 };
     const scope = {
       workspaceId: backup.workspaceId,
       // A Company backup reads every Project.

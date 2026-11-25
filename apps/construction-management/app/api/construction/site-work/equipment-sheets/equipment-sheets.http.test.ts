@@ -29,7 +29,6 @@ import {
   equipmentTransfer,
   type EquipmentJson,
   worksheetContractor,
-  worksheetDepartment,
 } from "@/test/site-work";
 
 import {
@@ -73,7 +72,6 @@ type Sheet = {
   operatorName: string | null;
   supervisor: { userId: string; name: string | null } | null;
   contractor: { id: string; name: string | null } | null;
-  department: { id: string; name: string | null } | null;
   timeShifts: { startTime: string; endTime: string; minutes: number }[];
   shiftHours: string | null;
   openingReading: string | null;
@@ -937,25 +935,19 @@ describe("Equipment Usage sheets (CM-604)", () => {
     });
   });
 
-  it("checks the supervisor, Contractor and Department; offers them in the form options", async () => {
+  it("checks the supervisor and Contractor; offers them in the form options", async () => {
     const ctx = await setup();
-    const department = await worksheetDepartment(ctx.ws, ctx.by, {
-      name: "Earthwork",
-    });
     const contractor = await worksheetContractor(ctx.ws, ctx.by, {
       name: "Velan Earthmovers",
       projectIds: [ctx.projectId],
-      departmentIds: [department],
     });
-    const offProject = await worksheetContractor(ctx.ws, ctx.by, {
-      departmentIds: [department],
-    });
+    const offProject = await worksheetContractor(ctx.ws, ctx.by);
     const supervisor = await member(ctx, ["read"]);
     const stranger = await member(ctx, ["read"], false);
     actAs(ctx.owner);
     const options = await json<{
       supervisors: { userId: string }[];
-      contractors: { id: string; departmentIds: string[] }[];
+      contractors: { id: string; name: string }[];
       settings: { approvalEnabled: boolean; updatedAt: string | null };
     }>(
       await formOptions(get(`${BASE}/form-options?projectId=${ctx.projectId}`)),
@@ -967,7 +959,7 @@ describe("Equipment Usage sheets (CM-604)", () => {
       stranger.userId,
     );
     expect(options.contractors).toEqual([
-      expect.objectContaining({ id: contractor, departmentIds: [department] }),
+      { id: contractor, name: "Velan Earthmovers" },
     ]);
     expect(options.settings).toMatchObject({
       approvalEnabled: false,
@@ -977,12 +969,10 @@ describe("Equipment Usage sheets (CM-604)", () => {
     const sheet = await saved(ctx, ctx.jcb, {
       supervisorUserId: supervisor.userId,
       contractorId: contractor,
-      departmentId: department,
     });
     expect(sheet).toMatchObject({
       supervisor: { userId: supervisor.userId },
       contractor: { id: contractor, name: "Velan Earthmovers" },
-      department: { id: department, name: "Earthwork" },
     });
     const wrongSupervisor = await save(ctx, ctx.jcb, {
       shift: "shift_2",
@@ -998,12 +988,6 @@ describe("Equipment Usage sheets (CM-604)", () => {
     expect((await refusal(notOnProject)).code).toBe(
       "CONTRACTOR_NOT_ON_PROJECT",
     );
-    const departmentAlone = await save(ctx, ctx.jcb, {
-      shift: "shift_2",
-      timeShifts: [{ startTime: "18:00", endTime: "20:00" }],
-      departmentId: department,
-    });
-    expect((await refusal(departmentAlone)).code).toBe("CONTRACTOR_REQUIRED");
 
     // The Contractor leaves the Project: the old sheet still saves with it.
     await prisma.constructionMastersContractorProject.deleteMany({
@@ -1012,7 +996,6 @@ describe("Equipment Usage sheets (CM-604)", () => {
     const kept = await edit(ctx, sheet, ctx.jcb, {
       supervisorUserId: supervisor.userId,
       contractorId: contractor,
-      departmentId: department,
       remark: "Trench backfill",
     });
     expect(kept.status, await kept.clone().text()).toBe(StatusCodes.OK);

@@ -77,9 +77,7 @@ export const EQUIPMENT_ID = "0190a000-0000-7000-8000-0000000000e1";
 /** The worksheet form options as the Daily Work card reads them (Contractors only). */
 export const WORKSHEET_OPTIONS_PATH = `/api/construction/site-work/worksheets/form-options?projectId=${PROJECT_ID}`;
 export const WORKSHEET_OPTIONS = {
-  contractors: [
-    { id: CONTRACTOR_ID, name: "Velan Constructions", departments: [] },
-  ],
+  contractors: [{ id: CONTRACTOR_ID, name: "Velan Constructions" }],
 };
 
 /** The equipment at the Project, as the usage cards read it. */

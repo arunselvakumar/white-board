@@ -62,7 +62,6 @@ const schema = z.object({
       (value) => value === "" || /^([01]\d|2[0-3]):[0-5]\d$/.test(value),
       "Enter the time as HH:MM.",
     ),
-  departmentId: z.string(),
   contractorId: z.string(),
   inspectorMemberId: z.string(),
   workDescription: z
@@ -84,7 +83,6 @@ type Values = z.infer<typeof schema>;
 const SERVER_FIELDS: Record<string, FieldPath<Values>> = {
   inspectionDate: "inspectionDate",
   inspectionTime: "inspectionTime",
-  departmentId: "departmentId",
   contractorId: "contractorId",
   inspectorMemberId: "inspectorMemberId",
   workDescription: "workDescription",
@@ -229,7 +227,6 @@ function defaults(
     return {
       inspectionDate: inspection.inspectionDate,
       inspectionTime: inspection.inspectionTime ?? "",
-      departmentId: inspection.department?.id ?? "",
       contractorId: inspection.contractor?.id ?? "",
       inspectorMemberId: inspection.inspector?.memberId ?? "",
       workDescription: inspection.workDescription,
@@ -240,7 +237,6 @@ function defaults(
   return {
     inspectionDate: today,
     inspectionTime: "",
-    departmentId: reinspection?.departmentId ?? "",
     contractorId: reinspection?.contractorId ?? "",
     inspectorMemberId: reinspection?.inspectorMemberId ?? "",
     workDescription: reinspection?.workDescription ?? "",
@@ -262,10 +258,6 @@ function choices(
       label: m.isOwner ? `${m.name} (Owner)` : m.name,
     })),
   ];
-  const departments: Option[] = [
-    { value: NONE, label: "None" },
-    ...options.departments.map((d) => ({ value: d.id, label: d.name })),
-  ];
   const contractors: Option[] = [
     { value: NONE, label: "None" },
     ...options.contractors.map((c) => ({ value: c.id, label: c.name })),
@@ -285,11 +277,6 @@ function choices(
       inspection.inspector?.name ?? "A former member",
     );
     keep(
-      departments,
-      inspection.department?.id,
-      inspection.department?.name ?? "A removed Department",
-    );
-    keep(
       contractors,
       inspection.contractor?.id,
       inspection.contractor?.name ?? "A removed Contractor",
@@ -301,12 +288,12 @@ function choices(
           label: drawing.name ?? "A removed drawing",
         });
   }
-  return { members, departments, contractors, drawings };
+  return { members, contractors, drawings };
 }
 
 /**
  * Raise or edit an Inspection Request (ADR CM-0019 §9): Inspection
- * Date (back-dated policy) and time, Department, Contractor, Inspector
+ * Date (back-dated policy) and time, Contractor, Inspector
  * (optional), Description of work, location, linked Project Drawings and,
  * on a new request, drawings and site photographs as files uploaded once
  * it is saved. **Raise re-inspection** passes the rejected request's
@@ -352,7 +339,6 @@ export function InspectionForm({
     const body = {
       inspectionDate: input.inspectionDate,
       inspectionTime: input.inspectionTime === "" ? null : input.inspectionTime,
-      departmentId: input.departmentId === "" ? null : input.departmentId,
       contractorId: input.contractorId === "" ? null : input.contractorId,
       inspectorMemberId:
         input.inspectorMemberId === "" ? null : input.inspectorMemberId,
@@ -478,24 +464,6 @@ export function InspectionForm({
               )}
             />
             <FieldError message={errors.inspectorMemberId?.message} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="inspection-department">Department</Label>
-            <Controller
-              control={form.control}
-              name="departmentId"
-              render={({ field }) => (
-                <OptionSelect
-                  id="inspection-department"
-                  value={field.value === "" ? NONE : field.value}
-                  onChange={field.onChange}
-                  placeholder="None"
-                  invalid={errors.departmentId != null}
-                  items={lists.departments}
-                />
-              )}
-            />
-            <FieldError message={errors.departmentId?.message} />
           </div>
           <div className="space-y-1.5 lg:col-span-2">
             <Label htmlFor="inspection-contractor">Contractor</Label>

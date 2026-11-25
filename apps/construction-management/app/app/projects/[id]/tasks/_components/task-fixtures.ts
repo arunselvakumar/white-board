@@ -27,7 +27,6 @@ export const KARTHIK = "0199c4a0-0000-7000-8000-0000000d0301";
 export const PRABHU = "0199c4a0-0000-7000-8000-0000000d0302";
 export const TAG_ID = "0199c4a0-0000-7000-8000-0000000d0401";
 export const CONTRACTOR_ID = "0199c4a0-0000-7000-8000-0000000d0501";
-export const DEPARTMENT_ID = "0199c4a0-0000-7000-8000-0000000d0601";
 
 export const ROOT_ID = "0199c4a0-0000-7000-8000-0000000d1001";
 export const COLUMNS_ID = "0199c4a0-0000-7000-8000-0000000d1002";
@@ -73,14 +72,7 @@ export const TASK_FORM_OPTIONS: TaskFormOptions = {
     { id: KARTHIK, name: "Karthik R", isOwner: false },
     { id: PRABHU, name: "Prabhu Saravanan", isOwner: false },
   ],
-  departments: [{ id: DEPARTMENT_ID, name: "Civil" }],
-  contractors: [
-    {
-      id: CONTRACTOR_ID,
-      name: "Velan Constructions",
-      departmentIds: [DEPARTMENT_ID],
-    },
-  ],
+  contractors: [{ id: CONTRACTOR_ID, name: "Velan Constructions" }],
   units: [
     { id: UNIT_ID, name: "Cum" },
     { id: "0199c4a0-0000-7000-8000-0000000d0202", name: "Sqm" },
@@ -148,7 +140,6 @@ export function task(extra: Partial<Task> = {}): Task {
       unitIds: [],
     },
     extraLocations: [],
-    department: { id: DEPARTMENT_ID, name: "Civil" },
     contractor: { id: CONTRACTOR_ID, name: "Velan Constructions" },
     tags: [{ id: TAG_ID, name: "Structure" }],
     kind: "quantity",

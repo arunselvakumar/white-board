@@ -1,6 +1,7 @@
 # CM-0016 — Daily site work product decisions for M6
 
 - Status: accepted
+- Partly superseded by [CM-0048](CM-0048-no-department-master.md) (no Department master): Work Types, Daily Worksheets and Equipment Usage sheets have no Department (§1, §7, §12).
 - Date: 2026-10-11
 - Tickets: CM-601 … CM-608 (M6)
 - Relates to: [CM-0003](CM-0003-permission-matrix.md) (Permission Matrix), [CM-0004](CM-0004-ledger-first-balances.md) (ledger-first balances), [CM-0013](CM-0013-projects-structure-product-decisions.md) (`LocationRef`, structure usage), [CM-0014](CM-0014-attachments-and-gallery-index.md) (attachments, Gallery), [CM-0015](CM-0015-procurement-inventory-product-decisions.md) (stock ledger, approval)

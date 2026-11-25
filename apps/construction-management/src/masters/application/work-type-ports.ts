@@ -1,7 +1,7 @@
 import type { WorkType } from "../domain/work-type";
 import type { MasterChange } from "./ports";
 
-/** A Department or Material a Work Type form picks, as the checks need it. */
+/** A Material a Work Type form picks, as the checks need it. */
 export type WorkTypePick = { id: string; name: string; disabled: boolean };
 
 /** An assigned Material with what the screens show. */
@@ -15,8 +15,6 @@ export type WorkTypeMaterial = {
 /** A Work Type with the names its screens show. */
 export type WorkTypeRow = {
   workType: WorkType;
-  departmentName: string;
-  departmentDisabled: boolean;
   /** Live assigned Materials, by name. */
   materials: WorkTypeMaterial[];
 };
@@ -37,8 +35,6 @@ export type WorkTypeStore = {
     expectedUpdatedAt: Date,
     change: MasterChange,
   ): Promise<void>;
-  /** A live Department of the Company, or null. */
-  department(workspaceId: string, id: string): Promise<WorkTypePick | null>;
   /** The live Materials of the Company among `ids`. */
   materials(
     workspaceId: string,

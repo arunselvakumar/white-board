@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { FolderSimpleIcon, WrenchIcon } from "@phosphor-icons/react/ssr";
+import { FolderSimpleIcon } from "@phosphor-icons/react/ssr";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
 import { Input } from "@repo/ui/components/input";
@@ -32,7 +32,6 @@ import {
   TDS_PAYEE_LABELS,
   tdsPayeeKind,
 } from "@/src/masters/domain/contractor-tds";
-import { lookupListQuery } from "@/src/queries/masters";
 import {
   partyQuery,
   useCreateParty,
@@ -124,45 +123,6 @@ function ProjectsChecklist({
         id: project.id,
         label: project.name,
       }))}
-      value={value}
-      onChange={onChange}
-    />
-  );
-}
-
-/** Enabled Departments, plus disabled ones the Contractor already has. */
-function DepartmentsChecklist({
-  party,
-  value,
-  onChange,
-}: {
-  party: Party | null;
-  value: string[];
-  onChange: (ids: string[]) => void;
-}) {
-  const { data } = useSuspenseQuery(lookupListQuery("departments"));
-  const kept = new Set(party?.departments.map((item) => item.id) ?? []);
-  const choices = data.items
-    .filter((item) => !item.disabled || kept.has(item.id))
-    .map((item) => ({
-      id: item.id,
-      label: item.disabled ? `${item.name} (disabled)` : item.name,
-    }));
-  if (choices.length === 0)
-    return (
-      <EmptyState
-        icon={WrenchIcon}
-        tone="orange"
-        size="sm"
-        title="No Departments yet."
-        description="Add them under Masters → Departments."
-        className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm"
-      />
-    );
-  return (
-    <Checklist
-      label="Departments"
-      choices={choices}
       value={value}
       onChange={onChange}
     />
@@ -287,7 +247,7 @@ function PartyForm({
 
   const submit = form.handleSubmit(async (values) => {
     try {
-      await onSave(partyPayload(values, screen.departments));
+      await onSave(partyPayload(values, screen.contractor));
       router.push(screen.path);
     } catch (error) {
       form.setError(partyErrorField(error) ?? "root", {
@@ -358,7 +318,7 @@ function PartyForm({
             />
             <FieldError message={errors.mobile?.message} />
           </div>
-          {screen.departments && (
+          {screen.contractor && (
             <>
               <div className="space-y-1.5">
                 <Label htmlFor={id("contact-person-2")}>Contact person 2</Label>
@@ -485,39 +445,7 @@ function PartyForm({
         </div>
       </section>
 
-      {screen.departments && <TdsSettings id={id} form={form} />}
-
-      {screen.departments && (
-        <section
-          aria-labelledby={id("departments")}
-          className="bg-card space-y-3 rounded-xl border p-4 sm:p-5"
-        >
-          <div className="space-y-1">
-            <h2 id={id("departments")} className="font-semibold">
-              Departments
-            </h2>
-            <p className="text-muted-foreground text-sm">
-              The trades this Contractor works in.
-            </p>
-          </div>
-          <Suspense
-            fallback={<ChecklistSkeleton label="Loading Departments" />}
-          >
-            <Controller
-              name="departmentIds"
-              control={form.control}
-              render={({ field }) => (
-                <DepartmentsChecklist
-                  party={party}
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-          </Suspense>
-          <FieldError message={errors.departmentIds?.message} />
-        </section>
-      )}
+      {screen.contractor && <TdsSettings id={id} form={form} />}
 
       <section
         aria-labelledby={id("projects")}

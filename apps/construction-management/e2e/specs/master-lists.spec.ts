@@ -7,12 +7,6 @@ import { MasterListPage } from "../pages/MasterListPage";
 /** Masters lists added with one name: the list, its title and its Add button. */
 const LISTS = [
   {
-    list: "departments",
-    title: "Departments",
-    add: "Add Department",
-    name: "Fabrication",
-  },
-  {
     list: "material-categories",
     title: "Material Categories",
     add: "Add Material Category",

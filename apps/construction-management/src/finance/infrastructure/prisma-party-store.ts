@@ -49,7 +49,6 @@ function toInvoice(row: InvoiceRow): StoredInvoice {
     invoiceNumber: row.invoiceNumber,
     invoiceDate: calendarDateFromDb(row.invoiceDate),
     dueDate: day(row.dueDate),
-    departmentId: row.departmentId,
     taxableAmount: row.taxableAmount,
     gstAmount: row.gstAmount,
     amount: row.amount,
@@ -361,7 +360,6 @@ export const prismaPartyStore: PartyStore = {
         invoiceNumber: row.invoiceNumber,
         invoiceDate: calendarDateToDb(row.invoiceDate),
         dueDate: toDay(row.dueDate),
-        departmentId: row.departmentId,
         taxableAmount: row.taxableAmount,
         gstAmount: row.gstAmount,
         amount: row.amount,
@@ -387,9 +385,6 @@ export const prismaPartyStore: PartyStore = {
         ...(patch.dueDate === undefined
           ? {}
           : { dueDate: toDay(patch.dueDate) }),
-        ...(patch.departmentId === undefined
-          ? {}
-          : { departmentId: patch.departmentId }),
         ...(patch.taxableAmount === undefined
           ? {}
           : { taxableAmount: patch.taxableAmount }),

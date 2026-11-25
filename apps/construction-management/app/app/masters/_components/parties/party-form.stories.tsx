@@ -9,12 +9,8 @@ import { EditPartyScreen, NewPartyScreen } from "./party-form";
 import {
   BALAJI,
   BALAJI_QUOTATIONS,
-  DEPARTMENT_LIST,
   KAVERI,
-  PAINTING,
-  PLUMBING,
   PROJECT_OPTIONS,
-  RCC,
   TOWER_A,
 } from "./party-fixtures";
 
@@ -40,10 +36,6 @@ const LOOKUPS = [
   {
     path: "/api/construction/projects/projects/options",
     respond: () => Response.json({ items: PROJECT_OPTIONS }),
-  },
-  {
-    path: "/api/construction/masters/departments",
-    respond: () => Response.json(DEPARTMENT_LIST),
   },
 ];
 
@@ -123,12 +115,13 @@ export const AddContractor: Story = {
     );
     await expect(posts()).toBe(0);
     await userEvent.type(canvas.getByLabelText("Mobile 2"), " 56789");
-    // A disabled Department is not offered for a new Contractor.
-    await userEvent.click(await canvas.findByRole("checkbox", { name: "RCC" }));
+    // Contractors have no Departments (ADR CM-0048).
     await expect(
-      canvas.queryByRole("checkbox", { name: /Painting/ }),
+      canvas.queryByRole("heading", { name: "Departments" }),
     ).toBeNull();
-    await userEvent.click(canvas.getByRole("checkbox", { name: "Tower A" }));
+    await userEvent.click(
+      await canvas.findByRole("checkbox", { name: "Tower A" }),
+    );
 
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await waitFor(() =>
@@ -146,7 +139,6 @@ export const AddContractor: Story = {
       contactPerson2: "Senthil",
       mobile2: "98400 56789",
       projectIds: [TOWER_A.id],
-      departmentIds: [RCC.id],
       tdsApplicable: true,
       tdsLowerRate: null,
       tdsNote: null,
@@ -209,7 +201,6 @@ export const AddSupplierGstinFillsState: Story = {
     });
     await expect(body).not.toHaveProperty("contactPerson2");
     await expect(body).not.toHaveProperty("mobile2");
-    await expect(body).not.toHaveProperty("departmentIds");
   },
 };
 
@@ -336,15 +327,10 @@ export const EditContractor: Story = {
       await canvas.findByRole("list", { name: "Quotations" }),
     );
     await expect(quotations.getAllByRole("listitem")).toHaveLength(2);
-    // A Department disabled since stays ticked and labelled.
     await expect(
-      await canvas.findByRole("checkbox", { name: "Painting (disabled)" }),
-    ).toBeChecked();
-    await expect(
-      canvas.getByRole("checkbox", { name: "Villa Phase 2" }),
+      await canvas.findByRole("checkbox", { name: "Villa Phase 2" }),
     ).toBeChecked();
 
-    await userEvent.click(canvas.getByRole("checkbox", { name: "Plumbing" }));
     await userEvent.click(
       canvas.getByRole("checkbox", { name: "Villa Phase 2" }),
     );
@@ -358,7 +344,6 @@ export const EditContractor: Story = {
       stateCode: "33",
       contactPerson2: "Senthil",
       mobile2: "9840056789",
-      departmentIds: [PAINTING.id, RCC.id, PLUMBING.id],
       projectIds: [TOWER_A.id],
       expectedUpdatedAt: BALAJI.updatedAt,
     });
@@ -482,10 +467,6 @@ export const EditSupplierNameTaken: Story = {
     await expect(
       await canvas.findByRole("heading", { name: "Edit Kaveri Cements" }),
     ).toBeVisible();
-    // Suppliers have no Departments.
-    await expect(
-      canvas.queryByRole("heading", { name: "Departments" }),
-    ).toBeNull();
     const name = canvas.getByLabelText("Supplier name");
     await userEvent.clear(name);
     await userEvent.type(name, "Ramco Steel");
@@ -494,11 +475,9 @@ export const EditSupplierNameTaken: Story = {
       await canvas.findByText("A Supplier with this name already exists."),
     ).toBeVisible();
     await expect(name).toHaveAttribute("aria-invalid", "true");
-    const body = sent(`${SUPPLIERS}/${KAVERI.id}/update`) as Record<
-      string,
-      unknown
-    >;
-    await expect(body).not.toHaveProperty("departmentIds");
+    await expect(sent(`${SUPPLIERS}/${KAVERI.id}/update`)).toMatchObject({
+      name: "Ramco Steel",
+    });
     await expect(getRouter().push).not.toHaveBeenCalled();
   },
 };

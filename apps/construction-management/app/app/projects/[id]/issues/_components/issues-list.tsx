@@ -78,7 +78,6 @@ type Filters = {
   priority: string;
   categoryId: string;
   assigneeMemberId: string;
-  departmentId: string;
   contractorId: string;
   /** `type:id` of a Wing, Amenity, Common Development or Location. */
   place: string;
@@ -91,7 +90,6 @@ const NO_FILTERS: Filters = {
   priority: "",
   categoryId: "",
   assigneeMemberId: "",
-  departmentId: "",
   contractorId: "",
   place: "",
   date: NO_DATE_FILTER,
@@ -106,7 +104,6 @@ function toQuery(filters: Filters): IssueFilters {
       filters.priority === "" ? [] : [filters.priority as TrackingPriority],
     categoryId: filters.categoryId,
     assigneeMemberId: filters.assigneeMemberId,
-    departmentId: filters.departmentId,
     contractorId: filters.contractorId,
     locationType: filters.place === "" ? undefined : (type as LocationType),
     placeId,
@@ -131,7 +128,7 @@ function plural(n: number, word: string): string {
 /**
  * A Project's Issues & Snags: status tabs All / Pending / Delayed / Solved
  * / Closed (Delayed is open past the Due Date), filters by priority,
- * category, assignee, Department, Contractor, location, Issue Date and a
+ * category, assignee, Contractor, location, Issue Date and a
  * search; select issues to **Mark As Solved** (Update) or **Verify**
  * (Approve) them together, the rest skipped and counted. Without View all
  * the server lists only the viewer's own and assigned issues.
@@ -287,19 +284,6 @@ function FilterBar({
         }))}
         onChange={(assigneeMemberId) => {
           onChange({ assigneeMemberId });
-        }}
-      />
-      <FilterSelect
-        id="issues-department"
-        label="Department"
-        allLabel="Any department"
-        value={filters.departmentId}
-        options={options.departments.map((item) => ({
-          value: item.id,
-          label: item.name,
-        }))}
-        onChange={(departmentId) => {
-          onChange({ departmentId });
         }}
       />
       <FilterSelect

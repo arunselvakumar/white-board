@@ -5,14 +5,13 @@ import { StatusCodes } from "http-status-codes";
 import { describe, expect, it, vi } from "vitest";
 
 import { POST as deleteContractor } from "@/app/api/construction/masters/contractors/[id]/delete/route";
-import { POST as deleteDepartment } from "@/app/api/construction/masters/departments/[id]/delete/route";
 import { POST as deleteUnit } from "@/app/api/construction/masters/measurement-units/[id]/delete/route";
 import { POST as deleteDrawing } from "@/app/api/construction/projects/projects/[id]/drawings/[drawingId]/delete/route";
 import { POST as deleteLocation } from "@/app/api/construction/projects/projects/[id]/locations/[locationId]/delete/route";
 import { PrismaStructureUsage } from "@/src/composition/structure-usage";
 import { actAs, addProject, newCompany } from "@/test/companies";
 import { addContractor } from "@/test/procurement";
-import { worksheetDepartment, worksheetLocation } from "@/test/site-work";
+import { worksheetLocation } from "@/test/site-work";
 import {
   trackingDrawing,
   trackingInspectionRow,
@@ -107,11 +106,8 @@ describe("Delete guards that grow with tracking (CM-801)", () => {
     expect(await codeOf(refused)).toBe("LOCATION_IN_USE");
   });
 
-  it("keeps Departments, Contractors and Measurement Units live tracking rows use", async () => {
+  it("keeps Contractors and Measurement Units live tracking rows use", async () => {
     const { workspaceId, by, projectId } = await setUp();
-    const onTask = await worksheetDepartment(workspaceId, by);
-    const onInspection = await worksheetDepartment(workspaceId, by);
-    const free = await worksheetDepartment(workspaceId, by);
     const contractor = await addContractor(workspaceId, by);
     const freeContractor = await addContractor(workspaceId, by);
     const unit = await prisma.constructionMastersMeasurementUnit.create({
@@ -123,33 +119,10 @@ describe("Delete guards that grow with tracking (CM-801)", () => {
         updatedBy: by,
       },
     });
-    await trackingTaskRow(workspaceId, projectId, by, {
-      departmentId: onTask,
-      unitId: unit.id,
-    });
-    await trackingInspectionRow(workspaceId, projectId, by, {
-      departmentId: onInspection,
-    });
+    await trackingTaskRow(workspaceId, projectId, by, { unitId: unit.id });
     await trackingIssueRow(workspaceId, projectId, by, {
       contractorId: contractor,
     });
-
-    for (const id of [onTask, onInspection]) {
-      const refused = await deleteDepartment(
-        post(`/api/construction/masters/departments/${id}/delete`),
-        byId(id),
-      );
-      expect(refused.status).toBe(StatusCodes.CONFLICT);
-      expect(await codeOf(refused)).toBe("DEPARTMENT_IN_USE");
-    }
-    expect(
-      (
-        await deleteDepartment(
-          post(`/api/construction/masters/departments/${free}/delete`),
-          byId(free),
-        )
-      ).status,
-    ).toBe(StatusCodes.NO_CONTENT);
 
     const contractorRefused = await deleteContractor(
       post(`/api/construction/masters/contractors/${contractor}/delete`),

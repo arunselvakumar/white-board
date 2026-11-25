@@ -96,7 +96,6 @@ type WorksheetRow = {
   shift: string;
   approvalStatus: SheetApprovalStatus;
   contractor: string | null;
-  department: string | null;
   workType: string | null;
   siteLocation: unknown;
   skilled: number | null;
@@ -110,7 +109,7 @@ type WorksheetRow = {
 /**
  * The day's live worksheets that are not rejected (as the Daily Work
  * report and the dashboard count them, CM-608), by shift then number, with Contractor,
- * Department, Work Type and Measurement Unit names and their material
+ * Work Type and Measurement Unit names and their material
  * lines. `filledBy` keeps only worksheets that User created.
  */
 export async function dprWorksheets(
@@ -121,7 +120,7 @@ export async function dprWorksheets(
   const rows = await db.$queryRaw<WorksheetRow[]>(Prisma.sql`
     SELECT w.id::text AS id, w.number, w.shift::text AS shift,
            w.approval_status::text AS "approvalStatus",
-           c.name AS contractor, d.name AS department, wt.name AS "workType",
+           c.name AS contractor, wt.name AS "workType",
            w.site_location AS "siteLocation",
            w.skilled_count AS skilled, w.unskilled_count AS unskilled,
            w.approx_work_qty::text AS "approxQty", u.name AS "approxUnit",
@@ -136,8 +135,6 @@ export async function dprWorksheets(
       FROM construction_site_work.worksheets w
       LEFT JOIN construction_masters.contractors c
              ON c.id = w.contractor_id AND c.workspace_id = w.workspace_id
-      LEFT JOIN construction_masters.departments d
-             ON d.id = w.department_id AND d.workspace_id = w.workspace_id
       LEFT JOIN construction_masters.work_types wt
              ON wt.id = w.work_type_id AND wt.workspace_id = w.workspace_id
       LEFT JOIN construction_masters.measurement_units u
@@ -156,7 +153,6 @@ export async function dprWorksheets(
     shift: shiftLabel(row.shift),
     approvalStatus: row.approvalStatus,
     contractor: row.contractor ?? "Contractor not available",
-    department: row.department ?? "Department not available",
     workType: row.workType,
     location: label(row.siteLocation),
     skilled: row.skilled,

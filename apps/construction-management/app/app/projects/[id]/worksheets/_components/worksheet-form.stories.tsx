@@ -10,7 +10,6 @@ import {
   CEMENT,
   CONTRACTOR_ID,
   LOCATION_ID,
-  MASONRY_ID,
   mockWorksheetApi,
   NO_PLACES,
   PROJECT_ID,
@@ -102,13 +101,12 @@ async function newForm(canvas: Canvas) {
   );
 }
 
-/** Contractor, Department, Work Shift, location and a headcount are needed. */
+/** Contractor, Work Shift, location and a headcount are needed. */
 export const Validation: Story = {
   play: async ({ canvas, userEvent }) => {
     const form = await newForm(canvas);
     await userEvent.click(form.getByRole("button", { name: "Save" }));
     await expect(await form.findByText("Choose the Contractor.")).toBeVisible();
-    await expect(form.getByText("Choose the Department.")).toBeVisible();
     await expect(form.getByText("Choose the Work Shift.")).toBeVisible();
     await expect(
       form.getByText("Choose where the work was done."),
@@ -129,7 +127,7 @@ export const Validation: Story = {
 };
 
 /**
- * The Contractor, Department and Work Type cascade, the attendance panel's
+ * Contractor and any Work Type, the attendance panel's
  * **Use remaining**, Bulk Select (the Work Type's materials first) with
  * the stock on the date, then Save.
  */
@@ -144,12 +142,6 @@ export const PrefillAndSave: Story = {
       userEvent,
       "Contractor",
       "Velan Constructions",
-    );
-    // Only the Contractor's Departments are offered.
-    await userEvent.click(form.getByRole("combobox", { name: "Department" }));
-    await expect(body.queryByRole("option", { name: "Centering" })).toBeNull();
-    await userEvent.click(
-      await body.findByRole("option", { name: "Masonry & Plaster" }),
     );
     await choose(form, canvasElement, userEvent, "Work Type", "Brickwork");
     await choose(form, canvasElement, userEvent, "Work Shift", "Shift 2");
@@ -213,7 +205,6 @@ export const PrefillAndSave: Story = {
       sheetDate: TODAY,
       shift: "shift_2",
       contractorId: CONTRACTOR_ID,
-      departmentId: MASONRY_ID,
       workTypeId: BRICKWORK_ID,
       skilledCount: 8,
       unskilledCount: 12,
@@ -272,13 +263,6 @@ export const NoPlacesYet: Story = {
       userEvent,
       "Contractor",
       "Velan Constructions",
-    );
-    await choose(
-      form,
-      canvasElement,
-      userEvent,
-      "Department",
-      "Masonry & Plaster",
     );
     await choose(form, canvasElement, userEvent, "Work Shift", "Shift 1");
     await userEvent.type(form.getByLabelText("Skilled Labours"), "3");
@@ -341,8 +325,8 @@ export const SaveAndAddNew: Story = {
       form.getByRole("combobox", { name: "Work Shift" }),
     ).toHaveTextContent("Shift 3");
     await expect(
-      form.getByRole("combobox", { name: "Department" }),
-    ).not.toHaveTextContent("Masonry");
+      form.getByRole("combobox", { name: "Work Type" }),
+    ).not.toHaveTextContent("Brickwork");
     await expect(form.getByLabelText("Skilled Labours")).toHaveValue("");
   },
 };

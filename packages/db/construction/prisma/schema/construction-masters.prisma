@@ -1,6 +1,6 @@
 /// Construction Management — masters context (ADR CM-0001, `modules/02`):
 /// the Company's lookup lists other contexts pick from. M2 adds the labour
-/// subset: Labour Categories, Departments and Supervisors; M4 adds Amenities
+/// subset: Labour Categories and Supervisors (Departments went, CM-0048); M4 adds Amenities
 /// and Common Developments and minimal Contractors and Suppliers with their
 /// Projects (ADR CM-0013 §5–6). Each Company gets
 /// its own copy of the seed sets when it is created (CM-203). Names are
@@ -35,29 +35,6 @@ model ConstructionMastersLabourCategory {
 
   @@index([workspaceId])
   @@map("labour_categories")
-  @@schema("construction_masters")
-}
-
-/// A trade or work category (not an org unit): Masonry & Plaster, RCC, …
-/// Used by contractors, worksheets, issues and tasks in later milestones.
-model ConstructionMastersDepartment {
-  id          String    @id @db.Uuid
-  workspaceId String    @map("workspace_id")
-  name        String
-  isSeed      Boolean   @default(false) @map("is_seed")
-  disabledAt  DateTime? @map("disabled_at") @db.Timestamptz(3)
-  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
-  createdBy   String    @map("created_by")
-  updatedBy   String    @map("updated_by")
-  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
-  deletedBy   String?   @map("deleted_by")
-
-  contractors ConstructionMastersContractorDepartment[]
-  workTypes   ConstructionMastersWorkType[]
-
-  @@index([workspaceId])
-  @@map("departments")
   @@schema("construction_masters")
 }
 
@@ -197,25 +174,10 @@ model ConstructionMastersContractor {
   deletedAt      DateTime? @map("deleted_at") @db.Timestamptz(3)
   deletedBy      String?   @map("deleted_by")
 
-  departments ConstructionMastersContractorDepartment[]
-  projects    ConstructionMastersContractorProject[]
+  projects ConstructionMastersContractorProject[]
 
   @@index([workspaceId, name])
   @@map("contractors")
-  @@schema("construction_masters")
-}
-
-/// Departments (trades) a Contractor works in.
-model ConstructionMastersContractorDepartment {
-  contractorId String @map("contractor_id") @db.Uuid
-  departmentId String @map("department_id") @db.Uuid
-
-  contractor ConstructionMastersContractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
-  department ConstructionMastersDepartment @relation(fields: [departmentId], references: [id], onDelete: Cascade)
-
-  @@id([contractorId, departmentId])
-  @@index([departmentId])
-  @@map("contractor_departments")
   @@schema("construction_masters")
 }
 
@@ -426,28 +388,25 @@ model ConstructionMastersQuotation {
   @@schema("construction_masters")
 }
 
-/// A Work Type (`modules/02`, CM-601): what a crew does within a Department.
+/// A Work Type (`modules/02`, CM-601): what a crew does.
 /// Its assigned Materials are offered first on a worksheet (CM-0016 §5).
 model ConstructionMastersWorkType {
-  id           String    @id @db.Uuid
-  workspaceId  String    @map("workspace_id")
-  name         String
-  departmentId String    @map("department_id") @db.Uuid
-  isSeed       Boolean   @default(false) @map("is_seed")
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  name        String
+  isSeed      Boolean   @default(false) @map("is_seed")
   /// Disabled Work Types stay on old worksheets but leave the pickers.
-  disabledAt   DateTime? @map("disabled_at") @db.Timestamptz(3)
-  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt    DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
-  createdBy    String    @map("created_by")
-  updatedBy    String    @map("updated_by")
-  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(3)
-  deletedBy    String?   @map("deleted_by")
+  disabledAt  DateTime? @map("disabled_at") @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy   String    @map("created_by")
+  updatedBy   String    @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  deletedBy   String?   @map("deleted_by")
 
-  department ConstructionMastersDepartment         @relation(fields: [departmentId], references: [id])
-  materials  ConstructionMastersWorkTypeMaterial[]
+  materials ConstructionMastersWorkTypeMaterial[]
 
   @@index([workspaceId])
-  @@index([departmentId])
   @@map("work_types")
   @@schema("construction_masters")
 }

@@ -77,17 +77,15 @@ export function labourAvailability(
   return days;
 }
 
-/** Worksheet labour summed per Contractor and Department. */
+/** Worksheet labour summed per Contractor. */
 export type ContractorLabour = {
   contractorId: string;
-  departmentId: string;
   skilled: number;
   unskilled: number;
 };
 
 export type ContractorLabourRow = ContractorLabour & {
   contractor: string | null;
-  department: string | null;
   total: number;
 };
 
@@ -96,21 +94,18 @@ export function contractorWiseLabour(
   rows: readonly ContractorLabour[],
   names: {
     contractors: ReadonlyMap<string, string>;
-    departments: ReadonlyMap<string, string>;
   },
 ): ContractorLabourRow[] {
   return rows
     .map((row) => ({
       ...row,
       contractor: names.contractors.get(row.contractorId) ?? null,
-      department: names.departments.get(row.departmentId) ?? null,
       total: row.skilled + row.unskilled,
     }))
     .sort(
       (a, b) =>
         b.total - a.total ||
-        (a.contractor ?? "").localeCompare(b.contractor ?? "") ||
-        (a.department ?? "").localeCompare(b.department ?? ""),
+        (a.contractor ?? "").localeCompare(b.contractor ?? ""),
     );
 }
 

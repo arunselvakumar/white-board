@@ -21,8 +21,8 @@ export const dynamic = "force-dynamic";
 
 /**
  * What the Material Request form offers on a Project: stores serving it
- * (Request To), its active Contractors and enabled Departments (Material
- * Requests create or update, and on the Project).
+ * (Request To) and its active Contractors (Material Requests create or
+ * update, and on the Project).
  */
 export async function GET(request: Request): Promise<Response> {
   try {

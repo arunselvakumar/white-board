@@ -27,7 +27,6 @@ export type ReportWorksheetMaterial = {
 export type ReportWorksheet = {
   date: CalendarDate;
   number: string;
-  department: string;
   contractor: string;
   skilled: number | null;
   unskilled: number | null;
@@ -82,7 +81,6 @@ export function buildDailyWorkReport(input: {
   const columns: ReportColumn[] = [
     column("Date", "text", 11),
     column("Number", "text", 14),
-    column("Department", "text", 14),
     column("Contractor", "text", 18),
     column("Skilled", "count"),
     column("Unskilled", "count", 8),
@@ -100,7 +98,6 @@ export function buildDailyWorkReport(input: {
   const rows: Cell[][] = sheets.map((sheet) => [
     dateLabel(sheet.date),
     sheet.number,
-    sheet.department,
     sheet.contractor,
     sheet.skilled ?? 0,
     sheet.unskilled ?? 0,

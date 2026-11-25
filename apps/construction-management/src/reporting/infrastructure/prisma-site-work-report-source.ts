@@ -222,47 +222,34 @@ export function prismaSiteWorkReportSource(
         orderBy: [{ sheetDate: "asc" }, { number: "asc" }],
       });
       const ids = rows.map((row) => row.id);
-      const [contractors, departments, units, photos, locations] =
-        await Promise.all([
-          contractorNames(
-            workspaceId,
-            uniq(rows.map((row) => row.contractorId)),
-          ),
-          db.constructionMastersDepartment
-            .findMany({
+      const [contractors, units, photos, locations] = await Promise.all([
+        contractorNames(workspaceId, uniq(rows.map((row) => row.contractorId))),
+        db.constructionMastersMeasurementUnit
+          .findMany({
+            where: {
+              workspaceId,
+              id: { in: uniq(rows.map((row) => row.approxWorkUnitId)) },
+            },
+            select: { id: true, name: true },
+          })
+          .then(names),
+        ids.length === 0
+          ? []
+          : db.constructionSiteWorkDocumentFile.groupBy({
+              by: ["documentId"],
               where: {
                 workspaceId,
-                id: { in: uniq(rows.map((row) => row.departmentId)) },
+                documentType: "worksheet",
+                documentId: { in: ids },
+                deletedAt: null,
               },
-              select: { id: true, name: true },
-            })
-            .then(names),
-          db.constructionMastersMeasurementUnit
-            .findMany({
-              where: {
-                workspaceId,
-                id: { in: uniq(rows.map((row) => row.approxWorkUnitId)) },
-              },
-              select: { id: true, name: true },
-            })
-            .then(names),
-          ids.length === 0
-            ? []
-            : db.constructionSiteWorkDocumentFile.groupBy({
-                by: ["documentId"],
-                where: {
-                  workspaceId,
-                  documentType: "worksheet",
-                  documentId: { in: ids },
-                  deletedAt: null,
-                },
-                _count: { _all: true },
-              }),
-          locationLabels(
-            workspaceId,
-            rows.map((row) => row.siteLocation),
-          ),
-        ]);
+              _count: { _all: true },
+            }),
+        locationLabels(
+          workspaceId,
+          rows.map((row) => row.siteLocation),
+        ),
+      ]);
       const photoCounts = new Map(
         photos.map((row) => [row.documentId, row._count._all]),
       );
@@ -273,7 +260,6 @@ export function prismaSiteWorkReportSource(
           return {
             date: calendarDateFromDb(row.sheetDate),
             number: row.number,
-            department: departments.get(row.departmentId) ?? "",
             contractor: contractors.get(row.contractorId) ?? "",
             skilled: row.skilledCount,
             unskilled: row.unskilledCount,

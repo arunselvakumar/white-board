@@ -53,7 +53,6 @@ export type WorksheetFilter = {
   to?: string;
   createdBy?: string;
   contractorId?: string;
-  departmentId?: string;
   approvalStatus?: SheetApprovalStatus | "";
   cursor?: { after: string } | { before: string } | null;
 };
@@ -65,7 +64,6 @@ export function worksheetsQuery(filter: WorksheetFilter) {
     "to",
     "createdBy",
     "contractorId",
-    "departmentId",
     "approvalStatus",
   ] as const) {
     const value = filter[key];
@@ -90,7 +88,6 @@ export function worksheetQuery(id: string) {
   });
 }
 
-/** Settings, Contractors with Departments, Work Types and units for the form. */
 /** A task the Daily Worksheet form's picker offers (CM-806). */
 export type WorksheetTaskOption =
   GetConstructionSiteWorkWorksheetTaskOptionsResponseModel["items"][number];
@@ -110,6 +107,7 @@ export function worksheetTaskOptionsQuery(projectId: string, search = "") {
   });
 }
 
+/** Settings, Contractors, Work Types and units for the form. */
 export function worksheetFormOptionsQuery(projectId: string) {
   return queryOptions({
     queryKey: [...WORKSHEETS_KEY, "form-options", projectId] as const,

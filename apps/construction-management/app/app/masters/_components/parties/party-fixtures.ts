@@ -1,4 +1,3 @@
-import type { LookupItem } from "@/src/queries/masters";
 import type { Party } from "@/src/queries/parties";
 import type { ProjectOption } from "@/src/queries/projects";
 import type { Quotation } from "@/src/queries/quotations";
@@ -21,26 +20,6 @@ export const VILLA: ProjectOption = {
 
 export const PROJECT_OPTIONS: ProjectOption[] = [TOWER_A, VILLA];
 
-function department(id: string, name: string, disabled = false): LookupItem {
-  return { id, name, isSeed: true, disabled, createdAt: AT, updatedAt: AT };
-}
-
-export const RCC = department("0199a1b2-0000-7000-8000-0000000000d1", "RCC");
-export const PLUMBING = department(
-  "0199a1b2-0000-7000-8000-0000000000d2",
-  "Plumbing",
-);
-export const PAINTING = department(
-  "0199a1b2-0000-7000-8000-0000000000d3",
-  "Painting",
-  true,
-);
-
-export const DEPARTMENT_LIST = {
-  items: [PAINTING, PLUMBING, RCC],
-  total: 3,
-};
-
 export const BALAJI: Party = {
   id: "0199a1b2-0000-7000-8000-0000000000e1",
   name: "Sri Balaji Constructions",
@@ -62,10 +41,6 @@ export const BALAJI: Party = {
     payeeKind: "other",
     payeeLabel: "Firm/Company/other — 2%",
   },
-  departments: [
-    { id: PAINTING.id, name: PAINTING.name },
-    { id: RCC.id, name: RCC.name },
-  ],
   projects: [
     { id: TOWER_A.id, name: TOWER_A.name },
     { id: VILLA.id, name: VILLA.name },
@@ -95,7 +70,6 @@ export const RAMCO: Party = {
     payeeKind: "no_pan",
     payeeLabel: "No PAN — 20%",
   },
-  departments: [],
   projects: [],
   createdAt: AT,
   updatedAt: AT,
@@ -116,7 +90,6 @@ export const KAVERI: Party = {
   mobile2: null,
   isActive: true,
   tds: null,
-  departments: [],
   projects: [{ id: TOWER_A.id, name: TOWER_A.name }],
   createdAt: AT,
   updatedAt: AT,

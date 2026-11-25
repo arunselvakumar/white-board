@@ -45,7 +45,6 @@ export type TaskInput = {
   startDate?: string | null;
   dueDate?: string | null;
   priority?: string | null;
-  departmentId?: string | null;
   contractorId?: string | null;
   tagIds?: readonly string[] | null;
   /** "Total work": a quantity above 0, with its unit. */
@@ -63,7 +62,6 @@ export type TaskFields = {
   startDate: CalendarDate | null;
   dueDate: CalendarDate | null;
   priority: TrackingPriority | null;
-  departmentId: string | null;
   contractorId: string | null;
   tagIds: string[];
   totalWorkMilli: bigint | null;
@@ -205,7 +203,6 @@ export function taskFields(input: TaskInput): TaskFields {
     startDate,
     dueDate,
     priority: priorityText,
-    departmentId: text(input.departmentId)?.toLowerCase() ?? null,
     contractorId: text(input.contractorId)?.toLowerCase() ?? null,
     tagIds,
     totalWorkMilli,
@@ -479,7 +476,6 @@ export const TASK_FIELD_LABELS = {
   priority: "Priority",
   siteLocation: "Location",
   extraLocations: "Other locations",
-  departmentId: "Department",
   contractorId: "Contractor",
   tagIds: "Tags",
   totalWork: "Total work",

@@ -266,7 +266,7 @@ export type EquipmentSheetDeps = {
   store: EquipmentSheetStore;
   settings: EquipmentSheetSettingsHandlers;
   register: SheetEquipmentRegister;
-  /** Contractors, Departments, units, Materials, Project and member names. */
+  /** Contractors, units, Materials, Project and member names. */
   directory: WorksheetDirectory;
   /** Who may supervise on the Project (Team Members on it, the Owner). */
   team: Pick<SiteRecordDirectory, "projectTeamMembers">;
@@ -311,7 +311,6 @@ export type EquipmentSheetActions = {
 export type EquipmentSheetReadModel = StoredEquipmentSheet & {
   equipment: SheetEquipmentSummary & { hirePartyName: string | null };
   contractorName: string | null;
-  departmentName: string | null;
   approxWorkUnitName: string | null;
   supervisorName: string | null;
   createdByName: string | null;
@@ -327,9 +326,8 @@ export type EquipmentSheetFormOptions = {
   settings: EquipmentSheetSettings & { updatedAt: Date | null };
   /** Active Team Members on the Project, and the Owner. */
   supervisors: { userId: string; name: string }[];
-  /** Active Contractors on the Project, each with its enabled Departments. */
-  contractors: { id: string; name: string; departmentIds: string[] }[];
-  departments: { id: string; name: string }[];
+  /** Active Contractors on the Project. */
+  contractors: { id: string; name: string }[];
   /** Enabled Measurement Units (Approx Work Done). */
   units: { id: string; name: string }[];
 };
@@ -368,7 +366,6 @@ function snapshot(
     operatorName: sheet.operatorName,
     supervisorUserId: sheet.supervisorUserId,
     contractorId: sheet.contractorId,
-    departmentId: sheet.departmentId,
     workItem: sheet.workItem,
     siteLocation: sheet.siteLocation,
     timeShifts: sheet.timeShifts.map(({ startTime, endTime }) => ({
@@ -421,7 +418,6 @@ function contentOf(sheet: StoredEquipmentSheet): EquipmentSheetContent {
     operatorName: sheet.operatorName,
     supervisorUserId: sheet.supervisorUserId,
     contractorId: sheet.contractorId,
-    departmentId: sheet.departmentId,
     workItem: sheet.workItem,
     siteLocation: sheet.siteLocation,
     timeShifts: sheet.timeShifts.map((shift) => ({ ...shift })),
@@ -510,33 +506,26 @@ export class EquipmentSheetHandlers {
     const id = (value: string | null | undefined) =>
       value == null || value.trim() === "" ? null : value;
     const contractorId = id(input.contractorId);
-    const departmentId = id(input.departmentId);
     const unitId = id(input.approxWorkUnitId);
     const supervisorId = id(input.supervisorUserId);
-    const [contractors, departments, units, materials, members] =
-      await Promise.all([
-        contractorId == null
-          ? new Map<string, WorksheetContractorFacts>()
-          : directory.contractors(db, workspaceId, [contractorId]),
-        departmentId == null
-          ? new Map<string, WorksheetNamedFacts>()
-          : directory.departments(db, workspaceId, [departmentId]),
-        unitId == null
-          ? ([] as WorksheetNamedFacts[])
-          : directory.units(db, workspaceId, [unitId]),
-        directory.materials(
-          db,
-          workspaceId,
-          (input.materials ?? []).map((line) => line.materialId),
-        ),
-        supervisorId == null
-          ? []
-          : team.projectTeamMembers(workspaceId, projectId),
-      ]);
+    const [contractors, units, materials, members] = await Promise.all([
+      contractorId == null
+        ? new Map<string, WorksheetContractorFacts>()
+        : directory.contractors(db, workspaceId, [contractorId]),
+      unitId == null
+        ? ([] as WorksheetNamedFacts[])
+        : directory.units(db, workspaceId, [unitId]),
+      directory.materials(
+        db,
+        workspaceId,
+        (input.materials ?? []).map((line) => line.materialId),
+      ),
+      supervisorId == null
+        ? []
+        : team.projectTeamMembers(workspaceId, projectId),
+    ]);
     const contractor =
       contractorId == null ? null : contractors.get(contractorId);
-    const department =
-      departmentId == null ? null : departments.get(departmentId);
     const unit = units[0];
     return {
       equipment,
@@ -551,12 +540,7 @@ export class EquipmentSheetHandlers {
               id: contractor.id,
               isActive: contractor.isActive,
               onProject: contractor.projectIds.includes(projectId),
-              departmentIds: contractor.departmentIds,
             },
-      department:
-        department == null
-          ? null
-          : { id: department.id, disabled: department.disabled },
       unit: unit == null ? null : { id: unit.id, disabled: unit.disabled },
       materials: new Map(
         [...materials.values()].map((material) => [
@@ -1273,15 +1257,10 @@ export class EquipmentSheetHandlers {
     const hirePartyIds = [...equipment.values()]
       .map((item) => item.hirePartyId)
       .filter((id): id is string => id != null);
-    const [contractors, departments, units, names] = await Promise.all([
+    const [contractors, units, names] = await Promise.all([
       directory.contractors(db, workspaceId, [
         ...new Set([...ids((row) => row.contractorId), ...hirePartyIds]),
       ]),
-      directory.departments(
-        db,
-        workspaceId,
-        ids((row) => row.departmentId),
-      ),
       directory.units(
         db,
         workspaceId,
@@ -1322,7 +1301,6 @@ export class EquipmentSheetHandlers {
           ),
         },
         contractorName: nameOf(contractors, row.contractorId, (c) => c.name),
-        departmentName: nameOf(departments, row.departmentId, (d) => d.name),
         approxWorkUnitName:
           row.approxWorkUnitId == null
             ? null
@@ -1395,7 +1373,7 @@ export class EquipmentSheetHandlers {
   /**
    * What the form offers on a Project besides the equipment (which comes
    * from `GET /equipment/sheet-options`): its settings, supervisors, the
-   * active Contractors with their enabled Departments, and the units.
+   * active Contractors, and the units.
    */
   async formOptions(
     workspaceId: string,
@@ -1409,14 +1387,6 @@ export class EquipmentSheetHandlers {
       team.projectTeamMembers(workspaceId, projectId),
     ]);
     const active = onProject.filter((contractor) => contractor.isActive);
-    const departments = await directory.departments(db, workspaceId, [
-      ...new Set(active.flatMap((contractor) => contractor.departmentIds)),
-    ]);
-    const enabled = new Map(
-      [...departments.values()]
-        .filter((department) => !department.disabled)
-        .map((department) => [department.id, department.name]),
-    );
     const byName = (a: { name: string }, b: { name: string }) =>
       a.name.localeCompare(b.name);
     return {
@@ -1425,16 +1395,7 @@ export class EquipmentSheetHandlers {
         .map(({ userId, name }) => ({ userId, name }))
         .sort(byName),
       contractors: active
-        .map((contractor) => ({
-          id: contractor.id,
-          name: contractor.name,
-          departmentIds: contractor.departmentIds.filter((id) =>
-            enabled.has(id),
-          ),
-        }))
-        .sort(byName),
-      departments: [...enabled]
-        .map(([id, name]) => ({ id, name }))
+        .map((contractor) => ({ id: contractor.id, name: contractor.name }))
         .sort(byName),
       units: units
         .filter((unit) => !unit.disabled)

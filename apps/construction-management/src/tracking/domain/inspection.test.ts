@@ -34,7 +34,6 @@ describe("inspectionFields (CM-804)", () => {
       inspectionFields({
         inspectionDate: "2026-10-15",
         inspectionTime: " 09:30 ",
-        departmentId: "",
         contractorId: " c-1 ",
         inspectorMemberId: null,
         workDescription: "  Slab reinforcement  ",
@@ -43,7 +42,6 @@ describe("inspectionFields (CM-804)", () => {
     ).toEqual({
       inspectionDate: "2026-10-15",
       inspectionTime: "09:30",
-      departmentId: null,
       contractorId: "c-1",
       inspectorMemberId: null,
       workDescription: "Slab reinforcement",
@@ -199,7 +197,6 @@ describe("re-inspection", () => {
   it("copies what is inspected again, not the date or files", () => {
     const draft = reinspectionDraft({
       id: "ir-1",
-      departmentId: "dep",
       contractorId: "con",
       inspectorMemberId: "mem",
       workDescription: "Column C4 reinforcement",
@@ -208,7 +205,6 @@ describe("re-inspection", () => {
     });
     expect(draft).toEqual({
       reinspectionOfId: "ir-1",
-      departmentId: "dep",
       contractorId: "con",
       inspectorMemberId: "mem",
       workDescription: "Column C4 reinforcement",

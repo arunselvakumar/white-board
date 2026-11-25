@@ -34,7 +34,11 @@ export function buildBackupManifest(input: {
   generatedAt: Date;
 }): BackupManifest {
   const { job } = input;
-  const modules = input.parts.map((part) => ({
+  // Modules retired since the backup was queued are skipped (ADR CM-0048).
+  const kept = input.parts.filter(
+    (part) => part.module === "my_data" || backupModule(part.module) != null,
+  );
+  const modules = kept.map((part) => ({
     key: part.module,
     label:
       backupModule(part.module)?.label ??

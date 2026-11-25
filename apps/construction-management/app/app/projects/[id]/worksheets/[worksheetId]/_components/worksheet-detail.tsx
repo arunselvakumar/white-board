@@ -129,7 +129,6 @@ export function WorksheetDetailPage({
           )}
         </Fact>
         <Fact label="Contractor">{sheet.contractor.name ?? "—"}</Fact>
-        <Fact label="Department">{sheet.department.name ?? "—"}</Fact>
         <Fact label="Work Type">{sheet.workType?.name ?? "—"}</Fact>
         <Fact label="Labour">{headcountText(sheet)}</Fact>
         <Fact label="Approx Work Done">

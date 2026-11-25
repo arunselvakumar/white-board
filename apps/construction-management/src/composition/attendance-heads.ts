@@ -88,19 +88,11 @@ export const dashboardAttendance: DashboardAttendance = {
   },
 };
 
-/** Contractor and Department names by id, removed rows included. */
+/** Contractor names by id, removed rows included. */
 export const dashboardNames: DashboardNames = {
   async contractors(db, workspaceId, ids) {
     if (ids.length === 0) return new Map();
     const rows = await db.constructionMastersContractor.findMany({
-      where: { workspaceId, id: { in: [...ids] } },
-      select: { id: true, name: true },
-    });
-    return new Map(rows.map((row) => [row.id, row.name]));
-  },
-  async departments(db, workspaceId, ids) {
-    if (ids.length === 0) return new Map();
-    const rows = await db.constructionMastersDepartment.findMany({
       where: { workspaceId, id: { in: [...ids] } },
       select: { id: true, name: true },
     });

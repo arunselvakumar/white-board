@@ -405,7 +405,6 @@ export function InspectionDetail({
               : (inspection.inspector.name ?? "A former member")}
           </Fact>
           <Fact label="Contractor">{inspection.contractor?.name ?? "—"}</Fact>
-          <Fact label="Department">{inspection.department?.name ?? "—"}</Fact>
           <Fact label="Location">
             {inspection.siteLocation == null ? (
               "—"

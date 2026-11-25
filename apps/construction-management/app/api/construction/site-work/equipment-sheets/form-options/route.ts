@@ -16,8 +16,7 @@ export const dynamic = "force-dynamic";
 /**
  * What the Equipment Usage sheet form offers on a Project besides
  * the equipment (`GET /equipment/sheet-options`): its settings, the
- * supervisors, the active Contractors with their Departments, and the
- * units. Needs Equipment Usage read on the Project.
+ * supervisors, the active Contractors, and the units. Needs Equipment Usage read on the Project.
  */
 export async function GET(request: Request): Promise<Response> {
   try {

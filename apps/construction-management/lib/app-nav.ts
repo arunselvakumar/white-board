@@ -44,7 +44,7 @@ export const APP_NAV = [
     label: "Masters",
     title: "Masters",
     description:
-      "Your Company's lists: Contractors, Suppliers, Materials, Measurement Units, Terms & Conditions and Departments.",
+      "Your Company's lists: Contractors, Suppliers, Materials, Measurement Units, Terms & Conditions and Work Types.",
   },
   {
     href: "/app/settings",

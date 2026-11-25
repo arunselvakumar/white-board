@@ -49,7 +49,6 @@ export async function trackingTaskRow(
     name?: string;
     siteLocation?: LocationRef | null;
     extraLocations?: readonly LocationRef[];
-    departmentId?: string | null;
     contractorId?: string | null;
     unitId?: string | null;
     tagIds?: readonly string[];
@@ -88,7 +87,6 @@ export async function trackingTaskRow(
               JSON.stringify(options.extraLocations),
             ) as Prisma.InputJsonValue,
           }),
-      departmentId: options.departmentId ?? null,
       contractorId: options.contractorId ?? null,
       ...(options.unitId == null
         ? {}
@@ -127,7 +125,6 @@ export async function trackingIssueRow(
       details: "Plaster cracks on the east wall",
       priority: null,
       categoryId: null,
-      departmentId: null,
       contractorId: null,
       assigneeMemberId: null,
       dueDate: null,
@@ -152,7 +149,6 @@ export async function trackingInspectionRow(
   by: string,
   options: {
     siteLocation?: LocationRef | null;
-    departmentId?: string | null;
     contractorId?: string | null;
     drawingIds?: readonly string[];
     deleted?: boolean;
@@ -168,7 +164,6 @@ export async function trackingInspectionRow(
       inspectionDate: calendarDateToDb(TODAY),
       workDescription: "Slab reinforcement before the pour",
       ...json(options.siteLocation),
-      departmentId: options.departmentId ?? null,
       contractorId: options.contractorId ?? null,
       drawings: {
         create: (options.drawingIds ?? []).map((drawingId) => ({ drawingId })),

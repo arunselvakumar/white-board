@@ -53,7 +53,6 @@ export const INSPECTIONS_KEY = [...TRACKING_KEY, "inspections"] as const;
 
 export type InspectionFilters = {
   status?: InspectionStatus | null;
-  departmentId?: string | null;
   contractorId?: string | null;
   inspectorMemberId?: string | null;
   location?: { type: LocationType; id: string } | null;
@@ -70,8 +69,6 @@ export function inspectionsQuery(
 ) {
   const params = new URLSearchParams({ projectId, limit: "25" });
   if (filters.status != null) params.set("status", filters.status);
-  if (filters.departmentId != null && filters.departmentId !== "")
-    params.set("departmentId", filters.departmentId);
   if (filters.contractorId != null && filters.contractorId !== "")
     params.set("contractorId", filters.contractorId);
   if (filters.inspectorMemberId != null && filters.inspectorMemberId !== "")
@@ -131,7 +128,7 @@ export function inspectionReinspectionQuery(id: string) {
   });
 }
 
-/** Inspectors, Departments, Contractors and Drawings on the Project. */
+/** Inspectors, Contractors and Drawings on the Project. */
 export function inspectionFormOptionsQuery(projectId: string) {
   const params = new URLSearchParams({ projectId });
   return queryOptions({

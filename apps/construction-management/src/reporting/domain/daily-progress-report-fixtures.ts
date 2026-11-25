@@ -14,7 +14,6 @@ export function dprWorksheet(
     shift: "Shift 1",
     approvalStatus: "not_required",
     contractor: "Sri Balaji Builders",
-    department: "RCC",
     workType: "Slab casting",
     location: "Wing A · Floor 3",
     skilled: 4,

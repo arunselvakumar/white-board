@@ -13,7 +13,6 @@ import { masterChanged, masterNameInUse } from "../domain/master-kind";
 import { WorkType } from "../domain/work-type";
 
 const INCLUDE = {
-  department: { select: { name: true, disabledAt: true } },
   materials: {
     select: {
       material: {
@@ -45,7 +44,6 @@ function toRow(row: Row): WorkTypeRow {
       id: row.id,
       workspaceId: row.workspaceId,
       name: row.name,
-      departmentId: row.departmentId,
       materialIds: live.map((material) => material.id),
       isSeed: row.isSeed,
       disabledAt: row.disabledAt,
@@ -56,8 +54,6 @@ function toRow(row: Row): WorkTypeRow {
       deletedAt: row.deletedAt,
       deletedBy: row.deletedBy,
     }),
-    departmentName: row.department.name,
-    departmentDisabled: row.department.disabledAt != null,
     materials: live.map((material) => ({
       id: material.id,
       name: material.name,
@@ -116,7 +112,6 @@ export class PrismaWorkTypeStore implements WorkTypeStore {
             id: workType.id,
             workspaceId: workType.workspaceId,
             name: workType.name,
-            departmentId: workType.departmentId,
             isSeed: workType.isSeed,
             disabledAt: workType.disabledAt,
             createdAt: workType.createdAt,
@@ -154,7 +149,6 @@ export class PrismaWorkTypeStore implements WorkTypeStore {
           },
           data: {
             name: workType.name,
-            departmentId: workType.departmentId,
             disabledAt: workType.disabledAt,
             updatedAt: workType.updatedAt,
             updatedBy: workType.updatedBy,
@@ -179,19 +173,6 @@ export class PrismaWorkTypeStore implements WorkTypeStore {
       if (isUniqueViolation(error)) throw masterNameInUse("work_type");
       throw error;
     }
-  }
-
-  async department(
-    workspaceId: string,
-    id: string,
-  ): Promise<WorkTypePick | null> {
-    const row = await this.db.constructionMastersDepartment.findFirst({
-      where: { id, workspaceId, deletedAt: null },
-      select: { id: true, name: true, disabledAt: true },
-    });
-    return row == null
-      ? null
-      : { id: row.id, name: row.name, disabled: row.disabledAt != null };
   }
 
   async materials(

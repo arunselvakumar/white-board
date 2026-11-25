@@ -70,7 +70,6 @@ function invoice(patch: Partial<Invoice> & Pick<Invoice, "id">): Invoice {
     invoiceNumber: "CC/2026/118",
     invoiceDate: "2026-09-01",
     dueDate: "2026-10-01",
-    department: null,
     taxableAmount: null,
     gstAmount: null,
     amount: 47_200_00,
@@ -181,7 +180,6 @@ export const CONTRACTOR_INVOICE = invoice({
   dueDate: null,
   overdue: false,
   daysOverdue: 0,
-  department: { id: "0199a000-0000-7000-8000-0000000000e1", name: "RCC" },
   taxableAmount: 1_00_000_00,
   gstAmount: 18_000_00,
   amount: 1_18_000_00,
@@ -676,13 +674,6 @@ export function partyMoneyHandler(
     }
     const lookups = financeLookupsHandler(call);
     if (lookups != null) return lookups;
-    if (path.startsWith(`${API}/parties/form-options`))
-      return Response.json({
-        departments: [
-          { id: "0199a000-0000-7000-8000-0000000000e1", name: "RCC" },
-          { id: "0199a000-0000-7000-8000-0000000000e2", name: "Plumbing" },
-        ],
-      });
     if (
       path.startsWith(`${API}/parties`) &&
       query.get("partyType") === "other_party"

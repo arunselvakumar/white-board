@@ -6,16 +6,14 @@ import {
   StoryQueryClient,
 } from "@/app/app/_components/masters/masters-story-support";
 
-import { DepartmentsList, LabourCategoriesList } from "./lookup-list";
+import { LabourCategoriesList } from "./lookup-list";
 import {
   chooseFromMenu,
   serveMasters,
-  STORY_DEPARTMENTS,
   STORY_LABOUR_CATEGORIES,
 } from "@/app/app/_components/masters/masters-story-support";
 
 const CATEGORIES = "/api/construction/masters/labour-categories";
-const DEPARTMENTS = "/api/construction/masters/departments";
 
 let api: ReturnType<typeof serveMasters>;
 
@@ -182,50 +180,5 @@ export const Empty: Story = {
         dialog.getByRole("heading", { name: "Add Labour Category" }),
       ).toBeVisible(),
     );
-  },
-};
-
-export const Departments: Story = {
-  beforeEach: () => {
-    api = serveMasters({
-      base: DEPARTMENTS,
-      code: "DEPARTMENT",
-      initial: STORY_DEPARTMENTS,
-    });
-    return api.restore;
-  },
-  render: () => (
-    <StoryQueryClient>
-      <DepartmentsList />
-    </StoryQueryClient>
-  ),
-  play: async ({ canvas }) => {
-    await expect(
-      await canvas.findByRole("heading", { name: "Departments" }),
-    ).toBeVisible();
-    const list = await canvas.findByRole("list", { name: "Departments" });
-    await expect(
-      within(list)
-        .getAllByRole("listitem")
-        .map((row) => row.querySelector("p")?.textContent),
-    ).toEqual(["Fencing", "Masonry & Plaster", "Plumbing", "RCC"]);
-    await expect(
-      canvas.getByRole("button", { name: "Add Department" }),
-    ).toBeVisible();
-  },
-};
-
-export const DepartmentsEmpty: Story = {
-  beforeEach: () => {
-    api = serveMasters({ base: DEPARTMENTS, code: "DEPARTMENT", initial: [] });
-    return api.restore;
-  },
-  render: () => (
-    <StoryQueryClient>
-      <DepartmentsList />
-    </StoryQueryClient>
-  ),
-  play: async ({ canvas }) => {
-    await expect(await canvas.findByText("No Departments yet")).toBeVisible();
   },
 };

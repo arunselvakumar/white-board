@@ -3,7 +3,6 @@ import type { Prisma } from "@repo/construction-db";
 import type {
   BillingAddressFacts,
   ContractorFacts,
-  DepartmentFacts,
   MaterialFacts,
   ProcurementDirectory,
   ProjectFacts,
@@ -92,21 +91,6 @@ export const procurementDirectory: ProcurementDirectory = {
         name: row.name,
         isActive: row.isActive,
         projectIds: row.projects.map((project) => project.projectId),
-      })),
-    );
-  },
-
-  async departments(db, workspaceId, ids) {
-    if (ids.length === 0) return new Map();
-    const rows = await db.constructionMastersDepartment.findMany({
-      where: live(workspaceId, ids),
-      select: { id: true, name: true, disabledAt: true },
-    });
-    return byId(
-      rows.map((row): DepartmentFacts => ({
-        id: row.id,
-        name: row.name,
-        disabled: row.disabledAt != null,
       })),
     );
   },

@@ -61,8 +61,6 @@ const TaskBody = z.object({
     .array(ConstructionProcurementSiteLocationModel)
     .max(TASK_LIMITS.extraLocations)
     .optional(),
-  /** An enabled Department. */
-  departmentId: z.uuid().nullable().optional(),
   /** An active Contractor assigned to the Project. */
   contractorId: z.uuid().nullable().optional(),
   tagIds: z.array(z.uuid()).max(TASK_LIMITS.tags).optional(),
@@ -152,7 +150,6 @@ const TaskFilters = z.object({
   assigneeId: z.uuid().optional(),
   priority: priority.optional(),
   tagId: z.uuid().optional(),
-  departmentId: z.uuid().optional(),
   contractorId: z.uuid().optional(),
   /** A Wing, Amenity, Common Development or Location id. */
   locationId: z.uuid().optional(),
@@ -219,7 +216,6 @@ export const ConstructionTrackingTaskResponseModel = z.object({
   priority: priority.nullable(),
   siteLocation: ConstructionProcurementSiteLocationResponseModel.nullable(),
   extraLocations: z.array(ConstructionProcurementSiteLocationResponseModel),
-  department: named.nullable(),
   contractor: named.nullable(),
   tags: z.array(named),
   /** `quantity` (Total work), `percent`, or null for a summary task. */
@@ -373,15 +369,8 @@ export const GetConstructionTrackingTaskFormOptionsResponseModel = z.object({
   members: z.array(
     z.object({ id: z.uuid(), name: z.string(), isOwner: z.boolean() }),
   ),
-  departments: z.array(z.object({ id: z.uuid(), name: z.string() })),
   /** Active Contractors assigned to the Project. */
-  contractors: z.array(
-    z.object({
-      id: z.uuid(),
-      name: z.string(),
-      departmentIds: z.array(z.uuid()),
-    }),
-  ),
+  contractors: z.array(z.object({ id: z.uuid(), name: z.string() })),
   units: z.array(z.object({ id: z.uuid(), name: z.string() })),
   tags: z.array(z.object({ id: z.uuid(), name: z.string() })),
 });
@@ -426,7 +415,6 @@ export function toTaskResponse(
     priority: t.priority,
     siteLocation: t.siteLocation as SiteLocation | null,
     extraLocations: t.extraLocations as SiteLocation[],
-    department: t.department,
     contractor: t.contractor,
     tags: t.tags,
     kind: t.isSummary
@@ -532,11 +520,7 @@ export function toTaskFormOptions(
       name: member.name,
       isOwner: member.isOwner,
     })),
-    departments: options.departments,
-    contractors: options.contractors.map((contractor) => ({
-      ...contractor,
-      departmentIds: [...contractor.departmentIds],
-    })),
+    contractors: options.contractors,
     units: options.units,
     tags: options.tags,
   };

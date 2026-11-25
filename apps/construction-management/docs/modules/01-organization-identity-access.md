@@ -10,6 +10,8 @@ Who uses it:
 
 Legacy stack (for reference only): Flutter web (CanvasKit) at `web.buildcontrol.in`, Laravel API at `prodbuild.buildcontrol.in/api`, JWT issued by OTP login (`iss otp-login`), Firebase RTDB and FCM for chat and push.
 
+> **No Departments ([ADR CM-0048](../adr/CM-0048-no-department-master.md)).** The trade list (RCC, Plumbing…) and its `masters.departments` menu are gone. The Departments row in the legacy permission matrix below describes BuildControl only. The main menu's **Departments** (Human Resources, Marketing; ADR CM-0046) is a different thing.
+
 ---
 
 ## Legacy behaviour

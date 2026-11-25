@@ -29,8 +29,6 @@ export const TODAY = "2026-10-10";
 
 export const CONTRACTOR_ID = "0199c4a0-0000-7000-8000-0000000c0001";
 export const OTHER_CONTRACTOR_ID = "0199c4a0-0000-7000-8000-0000000c0002";
-export const MASONRY_ID = "0199c4a0-0000-7000-8000-0000000d0001";
-export const CENTERING_ID = "0199c4a0-0000-7000-8000-0000000d0002";
 export const BRICKWORK_ID = "0199c4a0-0000-7000-8000-0000000e0001";
 export const SQM_ID = "0199c4a0-0000-7000-8000-0000000f0001";
 export const LOCATION_ID = "0199c4a0-0000-7000-8000-0000000a0101";
@@ -89,26 +87,13 @@ export function formOptions(
   return {
     settings: worksheetSettings(settings),
     contractors: [
-      {
-        id: CONTRACTOR_ID,
-        name: "Velan Constructions",
-        departmentIds: [MASONRY_ID],
-      },
-      {
-        id: OTHER_CONTRACTOR_ID,
-        name: "Sri Balaji Centering Works",
-        departmentIds: [CENTERING_ID],
-      },
-    ],
-    departments: [
-      { id: CENTERING_ID, name: "Centering" },
-      { id: MASONRY_ID, name: "Masonry & Plaster" },
+      { id: CONTRACTOR_ID, name: "Velan Constructions" },
+      { id: OTHER_CONTRACTOR_ID, name: "Sri Balaji Centering Works" },
     ],
     workTypes: [
       {
         id: BRICKWORK_ID,
         name: "Brickwork",
-        departmentId: MASONRY_ID,
         materialIds: [SAND.id],
       },
     ],
@@ -168,7 +153,6 @@ export function worksheet(patch: Partial<Worksheet> = {}): Worksheet {
     sheetDate: TODAY,
     shift: "shift_1",
     contractor: { id: CONTRACTOR_ID, name: "Velan Constructions" },
-    department: { id: MASONRY_ID, name: "Masonry & Plaster" },
     workType: { id: BRICKWORK_ID, name: "Brickwork" },
     skilledCount: 4,
     unskilledCount: 6,
@@ -336,7 +320,6 @@ export function worksheetHandler(options: WorksheetApiOptions = {}) {
         facets: {
           filledBy: [{ userId: "user-karthik", name: "Karthik R" }],
           contractors: [{ id: CONTRACTOR_ID, name: "Velan Constructions" }],
-          departments: [{ id: MASONRY_ID, name: "Masonry & Plaster" }],
         },
       } satisfies WorksheetPage);
     }

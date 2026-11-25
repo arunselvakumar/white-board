@@ -87,14 +87,13 @@ describe("buildDailyProgressReport", () => {
     }
   });
 
-  it("sums labour per Contractor and Department and shows attendance against the worksheets", () => {
+  it("sums labour per Contractor and shows attendance against the worksheets", () => {
     const worksheets = [
       dprWorksheet(),
       dprWorksheet({ id: "ws-2", skilled: 1, unskilled: null }),
       dprWorksheet({
         id: "ws-3",
         contractor: "Annai Electricals",
-        department: "Electrical",
         skilled: 2,
         unskilled: 0,
       }),
@@ -102,12 +101,10 @@ describe("buildDailyProgressReport", () => {
     expect(labourByContractor(worksheets)).toEqual([
       {
         contractor: "Annai Electricals",
-        department: "Electrical",
         heads: { skilled: 2, unskilled: 0 },
       },
       {
         contractor: "Sri Balaji Builders",
-        department: "RCC",
         heads: { skilled: 5, unskilled: 6 },
       },
     ]);
@@ -116,7 +113,7 @@ describe("buildDailyProgressReport", () => {
       "Labour",
     );
     const byContractor = table(labour.blocks[0]);
-    expect(byContractor.totals).toEqual(["Total", "", "7", "6", "13"]);
+    expect(byContractor.totals).toEqual(["Total", "7", "6", "13"]);
     const attendance = table(labour.blocks[1]);
     // Attendance: 3+0+2+0 skilled, 5+1+2+0 unskilled.
     expect(attendance.rows.at(-2)).toEqual(["Attendance", "5", "8", "13"]);
@@ -148,7 +145,7 @@ describe("buildDailyProgressReport", () => {
     const row = table(worksheets.blocks[0]).rows[0];
     expect(row).toEqual([
       "WS/26-27/00001\nShift 1\nRejected",
-      "Sri Balaji Builders\nRCC",
+      "Sri Balaji Builders",
       "Slab casting",
       "Wing A · Floor 3",
       "4",

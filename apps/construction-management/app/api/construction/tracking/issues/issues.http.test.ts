@@ -10,7 +10,6 @@ import { actAs, addMember, addProject, newCompany } from "@/test/companies";
 import {
   sharedAssign,
   worksheetContractor,
-  worksheetDepartment,
   worksheetLocation,
 } from "@/test/site-work";
 import { uploadTrackingFile } from "@/app/api/construction/tracking/documents/document-test-fixtures";
@@ -53,7 +52,6 @@ type Issue = {
   details: string;
   priority: string | null;
   category: Named;
-  department: Named;
   contractor: Named;
   assignee: Named;
   dueDate: string | null;
@@ -107,7 +105,6 @@ async function setup() {
   const by = company.ownerId;
   const owner = { userId: by, workspaceId: ws, role: "owner" as const };
   const projectId = await addProject(ws, by, "Tower A");
-  const department = await worksheetDepartment(ws, by, { name: "Plastering" });
   const contractor = await worksheetContractor(ws, by, {
     name: "Velan Constructions",
     projectIds: [projectId],
@@ -123,7 +120,6 @@ async function setup() {
     by,
     owner,
     projectId,
-    department,
     contractor,
     category,
     locationId,
@@ -171,7 +167,6 @@ const edit = (issue: Issue, patch: Record<string, unknown> = {}) =>
       details: issue.details,
       priority: issue.priority,
       categoryId: issue.category?.id ?? null,
-      departmentId: issue.department?.id ?? null,
       contractorId: issue.contractor?.id ?? null,
       assigneeMemberId: issue.assignee?.id ?? null,
       dueDate: issue.dueDate,
@@ -197,7 +192,6 @@ describe("Issues & Snags (CM-803)", () => {
     const assignee = await member(ctx, ["read"]);
     const first = await raised(ctx, {
       categoryId: ctx.category,
-      departmentId: ctx.department,
       contractorId: ctx.contractor,
       assigneeMemberId: assignee.memberId,
       dueDate: addDays(TODAY, 3),
@@ -209,7 +203,6 @@ describe("Issues & Snags (CM-803)", () => {
       storedStatus: "open",
       priority: "high",
       category: { id: ctx.category, name: "Workmanship" },
-      department: { id: ctx.department, name: "Plastering" },
       contractor: { id: ctx.contractor, name: "Velan Constructions" },
       assignee: { id: assignee.memberId, name: "Prabhu Saravanan" },
       siteLocation: { type: "location", locationId: ctx.locationId },
@@ -420,12 +413,11 @@ describe("Issues & Snags (CM-803)", () => {
     expect(bad.status).toBe(StatusCodes.BAD_REQUEST);
   });
 
-  it("filters by category, assignee, Department, Contractor and location", async () => {
+  it("filters by category, assignee, Contractor and location", async () => {
     const ctx = await setup();
     const assignee = await member(ctx, ["read"]);
     const tagged = await raised(ctx, {
       categoryId: ctx.category,
-      departmentId: ctx.department,
       contractorId: ctx.contractor,
       assigneeMemberId: assignee.memberId,
       siteLocation: { type: "location", locationId: ctx.locationId },
@@ -434,7 +426,6 @@ describe("Issues & Snags (CM-803)", () => {
     for (const query of [
       `&categoryId=${ctx.category}`,
       `&assigneeMemberId=${assignee.memberId}`,
-      `&departmentId=${ctx.department}`,
       `&contractorId=${ctx.contractor}`,
       `&locationType=location`,
       `&locationType=location&placeId=${ctx.locationId}`,

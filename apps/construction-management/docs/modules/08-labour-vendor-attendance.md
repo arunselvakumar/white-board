@@ -11,6 +11,8 @@ Who uses it:
 - **Accountant** — uses attendance-derived wages to pay labour and vendors (module 07), reads labour payment and vendor payment status.
 - **Owner** — sees labour present at site and payment status on the project dashboard and central vendor attendance report.
 
+> **No Departments ([ADR CM-0048](../adr/CM-0048-no-department-master.md)).** Where the legacy sections below mention a Department (contractor-wise labour from worksheets), they describe BuildControl only. Our dashboard counts worksheet labour per Contractor.
+
 ---
 
 ## Legacy behaviour
@@ -513,8 +515,8 @@ These settle the open questions below for M2. Where this section and the legacy 
 
 **Where things live**
 
-- **Labour and Vendor registers live in the `labour` context** (`construction_labour`), with attendance, the ledger and wage payments. The opening balance must be written in the same transaction as the party (ADR CM-0004). Labour Categories, Departments and Supervisors are lookups in the `masters` context (`construction_masters`). The Project is in `projects` (`construction_projects`). Other contexts are referenced by id only; the labour context reads them through ports (`ProjectDirectory`, `LabourCategoryDirectory`, `SupervisorDirectory`) that its infrastructure implements with plain reads of those tables.
-- **Menus.** Labour register: `masters.labours`. Vendor register: `masters.vendors`. Labour Categories: `masters.labour_categories`. Departments: `masters.departments`. Supervisors: `masters.labours` (there is no separate menu). Project-scoped work is under `labour.attendance` (mark labour and vendor attendance), `labour.labour` (labour transfer, labour payments, and labour reports; `transfer` and `financial` flags), and `labour.vendor` (vendor payments and vendor reports). Projects: `projects.project`. Without `financial`, every wage, rate, OT rate, earned amount, pay, balance and payment amount is `null` in Response models (`financialValue`).
+- **Labour and Vendor registers live in the `labour` context** (`construction_labour`), with attendance, the ledger and wage payments. The opening balance must be written in the same transaction as the party (ADR CM-0004). Labour Categories and Supervisors are lookups in the `masters` context (`construction_masters`). The Project is in `projects` (`construction_projects`). Other contexts are referenced by id only; the labour context reads them through ports (`ProjectDirectory`, `LabourCategoryDirectory`, `SupervisorDirectory`) that its infrastructure implements with plain reads of those tables.
+- **Menus.** Labour register: `masters.labours`. Vendor register: `masters.vendors`. Labour Categories: `masters.labour_categories`. Supervisors: `masters.labours` (there is no separate menu). Project-scoped work is under `labour.attendance` (mark labour and vendor attendance), `labour.labour` (labour transfer, labour payments, and labour reports; `transfer` and `financial` flags), and `labour.vendor` (vendor payments and vendor reports). Projects: `projects.project`. Without `financial`, every wage, rate, OT rate, earned amount, pay, balance and payment amount is `null` in Response models (`financialValue`).
 
 **Money and wages** (ADR CM-0004)
 

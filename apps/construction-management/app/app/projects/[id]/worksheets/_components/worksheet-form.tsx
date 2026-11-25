@@ -88,7 +88,6 @@ type Values = {
   sheetDate: string;
   siteLocation: LocationRef | null;
   contractorId: string;
-  departmentId: string;
   workTypeId: string;
   shift: string;
   skilledCount: string;
@@ -114,7 +113,6 @@ function schemaFor(settings: Settings) {
       sheetDate: z.string().min(1, "Choose the date."),
       siteLocation: z.custom<LocationRef | null>(),
       contractorId: z.string().min(1, "Choose the Contractor."),
-      departmentId: z.string().min(1, "Choose the Department."),
       workTypeId: z.string(),
       shift: z.string().min(1, "Choose the Work Shift."),
       skilledCount: z.string(),
@@ -197,7 +195,6 @@ function blank(sheetDate: string): Values {
     sheetDate,
     siteLocation: null,
     contractorId: "",
-    departmentId: "",
     workTypeId: "",
     shift: "",
     skilledCount: "",
@@ -217,7 +214,6 @@ function valuesFrom(sheet: Worksheet, sheetDate: string): Values {
     sheetDate,
     siteLocation: sheet.siteLocation,
     contractorId: sheet.contractor.id,
-    departmentId: sheet.department.id,
     workTypeId: sheet.workType?.id ?? "",
     shift: sheet.shift,
     skilledCount: sheet.skilledCount == null ? "" : String(sheet.skilledCount),
@@ -266,12 +262,7 @@ function fieldFor(error: QueryHttpError): FieldPath<Values> | null {
     case "CONTRACTOR_NOT_FOUND":
     case "CONTRACTOR_NOT_ON_PROJECT":
       return "contractorId";
-    case "DEPARTMENT_REQUIRED":
-    case "DEPARTMENT_NOT_FOUND":
-    case "DEPARTMENT_NOT_CONTRACTORS":
-      return "departmentId";
     case "WORK_TYPE_NOT_FOUND":
-    case "WORK_TYPE_NOT_DEPARTMENTS":
       return "workTypeId";
     case "LABOUR_COUNT_REQUIRED":
       return "skilledCount";
@@ -368,7 +359,7 @@ function SelectField({
 /**
  * New, edit or duplicated Daily Worksheet: a date stepper under the
  * back-dated rules, the Project's sections in their configured order —
- * Location, Basic (Contractor, then its Department, then Work Type; Work
+ * Location, Basic (Contractor, then Work Type; Work
  * Shift, headcounts with the attendance panel, Approx Work Done), Material
  * consumption with the stock on that date and Bulk Select, and Other
  * (remark, photos). **Save**, **Save & Add New** (keeps the date,
@@ -440,24 +431,11 @@ export function WorksheetForm({
   const current = worksheet ?? source;
 
   // Options, with the sheet's own choices kept when they left the lists.
-  const contractors = withCurrent(options.contractors, current?.contractor, {
-    departmentIds: current == null ? [] : [current.department.id],
-  });
-  const departments = withCurrent(options.departments, current?.department, {});
+  const contractors = withCurrent(options.contractors, current?.contractor, {});
   const workTypes = withCurrent(options.workTypes, current?.workType, {
-    departmentId: current?.department.id ?? "",
     materialIds: [] as string[],
   });
   const units = withCurrent(options.units, current?.approxWorkUnit, {});
-  const contractor = contractors.find((row) => row.id === values.contractorId);
-  const departmentOptions = departments.filter(
-    (row) =>
-      contractor?.departmentIds.includes(row.id) === true ||
-      row.id === values.departmentId,
-  );
-  const workTypeOptions = workTypes.filter(
-    (row) => row.departmentId === values.departmentId,
-  );
   const workType = workTypes.find((row) => row.id === values.workTypeId);
 
   const canApprove =
@@ -500,7 +478,6 @@ export function WorksheetForm({
       sheetDate: input.sheetDate,
       shift: input.shift as (typeof WORK_SHIFTS)[number],
       contractorId: input.contractorId,
-      departmentId: input.departmentId,
       workTypeId:
         settings.showWorkType && input.workTypeId !== ""
           ? input.workTypeId
@@ -646,39 +623,6 @@ export function WorksheetForm({
             error={errors.contractorId?.message}
             onChange={(next) => {
               form.setValue("contractorId", next, { shouldValidate: true });
-              const picked = contractors.find((row) => row.id === next);
-              if (
-                picked?.departmentIds.includes(values.departmentId) !== true
-              ) {
-                form.setValue("departmentId", "");
-                form.setValue("workTypeId", "");
-              }
-            }}
-          />
-          <SelectField
-            id={id("department")}
-            label="Department"
-            required
-            placeholder={
-              values.contractorId === ""
-                ? "Choose the Contractor first"
-                : "Choose a Department"
-            }
-            disabled={values.contractorId === ""}
-            value={values.departmentId}
-            options={departmentOptions.map((row) => ({
-              value: row.id,
-              label: row.name,
-            }))}
-            invalid={errors.departmentId != null}
-            error={errors.departmentId?.message}
-            onChange={(next) => {
-              form.setValue("departmentId", next, { shouldValidate: true });
-              if (
-                workTypes.find((row) => row.id === values.workTypeId)
-                  ?.departmentId !== next
-              )
-                form.setValue("workTypeId", "");
             }}
           />
           {settings.showWorkType && (
@@ -686,17 +630,13 @@ export function WorksheetForm({
               id={id("work-type")}
               label="Work Type"
               placeholder={
-                values.departmentId === ""
-                  ? "Choose the Department first"
-                  : workTypeOptions.length === 0
-                    ? "No Work Types for this Department"
-                    : "Choose a Work Type"
+                workTypes.length === 0
+                  ? "No Work Types yet"
+                  : "Choose a Work Type"
               }
-              disabled={
-                values.departmentId === "" || workTypeOptions.length === 0
-              }
+              disabled={workTypes.length === 0}
               value={values.workTypeId}
-              options={workTypeOptions.map((row) => ({
+              options={workTypes.map((row) => ({
                 value: row.id,
                 label: row.name,
               }))}

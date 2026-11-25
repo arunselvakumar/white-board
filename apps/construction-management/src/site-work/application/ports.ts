@@ -125,13 +125,12 @@ export type SiteRecordDirectory = {
 // implements both ports by table, without importing those contexts.
 // ---------------------------------------------------------------------------
 
-/** A Contractor with its Projects and Departments (masters, CM-406). */
+/** A Contractor with its Projects (masters, CM-406). */
 export type WorksheetContractorFacts = {
   id: string;
   name: string;
   isActive: boolean;
   projectIds: readonly string[];
-  departmentIds: readonly string[];
 };
 
 export type WorksheetNamedFacts = {
@@ -142,7 +141,6 @@ export type WorksheetNamedFacts = {
 
 /** A Work Type (masters, CM-601) with the Materials assigned to it. */
 export type WorksheetWorkTypeFacts = WorksheetNamedFacts & {
-  departmentId: string;
   materialIds: readonly string[];
 };
 
@@ -166,7 +164,7 @@ export type WorksheetDirectory = {
    * location picker offers).
    */
   hasPlaces(workspaceId: string, projectId: string): Promise<boolean>;
-  /** Contractors assigned to the Project (Resources), with their Departments. */
+  /** Contractors assigned to the Project (Resources). */
   contractorsOnProject(
     db: SiteWorkTx,
     workspaceId: string,
@@ -177,16 +175,11 @@ export type WorksheetDirectory = {
     workspaceId: string,
     ids: readonly string[],
   ): Promise<Map<string, WorksheetContractorFacts>>;
-  departments(
-    db: SiteWorkTx,
-    workspaceId: string,
-    ids: readonly string[],
-  ): Promise<Map<string, WorksheetNamedFacts>>;
-  /** Work Types by id, or every Work Type of these Departments. */
+  /** Work Types by id (disabled included), or every live one when `ids` is null. */
   workTypes(
     db: SiteWorkTx,
     workspaceId: string,
-    filter: { ids: readonly string[] } | { departmentIds: readonly string[] },
+    ids: readonly string[] | null,
   ): Promise<WorksheetWorkTypeFacts[]>;
   materials(
     db: SiteWorkTx,
@@ -385,14 +378,9 @@ export type DashboardAttendance = {
   ): Promise<{ date: CalendarDate; heads: number }[]>;
 };
 
-/** Contractor and Department names for the dashboard (removed ones too). */
+/** Contractor names for the dashboard (removed ones too). */
 export type DashboardNames = {
   contractors(
-    db: SiteWorkTx,
-    workspaceId: string,
-    ids: readonly string[],
-  ): Promise<Map<string, string>>;
-  departments(
     db: SiteWorkTx,
     workspaceId: string,
     ids: readonly string[],

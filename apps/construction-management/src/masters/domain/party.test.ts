@@ -8,7 +8,6 @@ const NOW = new Date("2026-10-10T06:30:00.000Z");
 const LATER = new Date("2026-10-10T07:00:00.000Z");
 const PROJECT = "0199a1b2-0000-7000-8000-0000000000p1";
 const OTHER = "0199a1b2-0000-7000-8000-0000000000p2";
-const RCC = "0199a1b2-0000-7000-8000-0000000000d1";
 
 function codeOf(run: () => unknown): string | undefined {
   try {
@@ -33,8 +32,7 @@ function party(kind: PartyKind = "contractor") {
       gstin: "33aapfa0939f1zm",
       pan: "aapfa0939f",
     },
-    departmentIds: [RCC, RCC],
-    projectIds: [PROJECT],
+    projectIds: [PROJECT, PROJECT],
     by: "user_1",
     now: NOW,
   });
@@ -50,7 +48,6 @@ describe("partyDetails", () => {
       gstin: "33AAPFA0939F1ZM",
       pan: "AAPFA0939F",
       isActive: true,
-      departmentIds: [RCC],
       projectIds: [PROJECT],
     });
   });
@@ -98,10 +95,6 @@ describe("partyDetails", () => {
 });
 
 describe("Party", () => {
-  it("keeps Departments only for a Contractor", () => {
-    expect(party("supplier").departmentIds).toEqual([]);
-  });
-
   it("joins and leaves a Project, touching updatedAt", () => {
     const made = party();
     made.joinProject(OTHER, "user_2", LATER);

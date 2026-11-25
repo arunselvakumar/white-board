@@ -1,6 +1,7 @@
 # CM-0046 — Departments: Human Resources and Marketing as pages of cards
 
 - Status: accepted (2026-11-19, the owner asked for it and chose the options below); the sidebar on a department's screens is changed by [CM-0047](CM-0047-department-sidebar-menus.md)
+- Partly superseded by [CM-0048](CM-0048-no-department-master.md) (no Department master): §5 no longer applies, as the name "Departments" is no longer shared with a Masters list.
 - Date: 2026-11-19
 - Relates to: [CM-0034](CM-0034-hr-main-menu.md) (Human Resources in the main menu), [CM-0039](CM-0039-full-page-menu-layout.md) (the full-page menu), [CM-0040](CM-0040-marketing-context-role-and-own-entries.md) (Marketing's entries per Role); repo-wide [ADR-0049](../../../../docs/adr/0049-ink-sidebar.md) (the ink sidebar)
 
