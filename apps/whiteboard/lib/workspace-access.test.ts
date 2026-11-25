@@ -281,12 +281,14 @@ describe("Preschool role access", () => {
       "/preschool/centres",
       "/preschool/centres/abc",
       "/preschool/programmes",
-      "/preschool/fees/structures",
       "/preschool/stock/items",
     ])
       expect(isAllowedPreschoolPath(path, "centre_head")).toBe(false);
     for (const path of [
       "/preschool/fees",
+      "/preschool/fees/structures",
+      "/preschool/fees/children/abc",
+      "/preschool/fees/receipts/abc",
       "/preschool/fees/dues",
       "/preschool/stock",
       "/preschool/staff",
@@ -299,6 +301,8 @@ describe("Preschool role access", () => {
   it("keeps a Teacher away from fees and masters", () => {
     for (const path of [
       "/preschool/fees",
+      "/preschool/fees/structures",
+      "/preschool/fees/receipts/abc",
       "/preschool/centres",
       "/preschool/staff",
       "/preschool/head-office",
