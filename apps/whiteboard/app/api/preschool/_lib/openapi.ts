@@ -2,6 +2,7 @@ import type { z } from "zod";
 
 import type { OpenApiOperation } from "@/app/api/_lib/openapi";
 
+import { academicYearsOpenApi } from "../academic-years/openapi";
 import { announcementsOpenApi } from "../announcements/openapi";
 import { attendanceOpenApi } from "../attendance/openapi";
 import { centresOpenApi } from "../centres/openapi";
@@ -46,6 +47,7 @@ const AREAS: PreschoolOpenApi[] = [
   dashboardOpenApi,
   royaltyOpenApi,
   stockOpenApi,
+  academicYearsOpenApi,
 ];
 
 export const preschoolOperations: OpenApiOperation[] = AREAS.flatMap(
