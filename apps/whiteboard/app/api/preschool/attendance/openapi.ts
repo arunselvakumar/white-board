@@ -134,5 +134,6 @@ export const attendanceOpenApi: PreschoolOpenApi = {
     MarkPreschoolAttendanceRequestModel,
     PreschoolCheckInRequestModel,
     PreschoolCheckOutRequestModel,
+    PreschoolAttendanceChildDayRequestModel,
   },
 };
