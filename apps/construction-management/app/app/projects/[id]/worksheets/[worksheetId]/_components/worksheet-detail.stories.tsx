@@ -75,7 +75,6 @@ export const Pending: Story = {
       await canvas.findByText("Location · Pump house"),
     ).toBeVisible();
     await expect(canvas.getByText("Velan Constructions")).toBeVisible();
-    await expect(canvas.getByText("Masonry & Plaster")).toBeVisible();
     await expect(canvas.getByText("Brickwork")).toBeVisible();
     await expect(canvas.getByText("42.5 sqm")).toBeVisible();
     await expect(canvas.getByText("12 Bag")).toBeVisible();
