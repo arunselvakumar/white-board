@@ -138,7 +138,6 @@ export type WorksheetInput = {
   sheetDate: CalendarDate;
   shift: string;
   contractorId?: string | null;
-  departmentId?: string | null;
   workTypeId?: string | null;
   skilledCount?: number | null;
   unskilledCount?: number | null;
@@ -155,7 +154,6 @@ export type WorksheetContent = {
   sheetDate: CalendarDate;
   shift: WorkShift;
   contractorId: string;
-  departmentId: string;
   workTypeId: string | null;
   skilledCount: number | null;
   unskilledCount: number | null;
@@ -172,10 +170,8 @@ export type WorksheetFacts = {
     id: string;
     isActive: boolean;
     onProject: boolean;
-    departmentIds: readonly string[];
   } | null;
-  department: { id: string; disabled: boolean } | null;
-  workType: { id: string; departmentId: string; disabled: boolean } | null;
+  workType: { id: string; disabled: boolean } | null;
   unit: { id: string; disabled: boolean } | null;
   materials: ReadonlyMap<string, WorksheetMaterialFacts>;
   /**
@@ -299,8 +295,8 @@ export function worksheetLines(
 }
 
 /**
- * The content a create or an edit saves (§2, §7). Contractor\*, Department\*
- * and Work Shift\* always; each shown section is validated and stored, and
+ * The content a create or an edit saves (§2, §7). Contractor\* and Work
+ * Shift\* always; each shown section is validated and stored, and
  * a hidden one is neither: it keeps what the sheet already had (`previous`,
  * on edit) or stays empty (create). Ids the facts do not know are 400
  * `*_NOT_FOUND` with `details.field`; a disabled master is refused unless
@@ -318,7 +314,7 @@ export function worksheetContent(
       field: "shift",
     });
 
-  // Contractor* on the Project (Resources), then one of its Departments.
+  // Contractor* on the Project (Resources).
   if (blank(input.contractorId))
     throw invalid("CONTRACTOR_REQUIRED", "Choose the Contractor.", {
       field: "contractorId",
@@ -336,22 +332,6 @@ export function worksheetContent(
       "This Contractor is not assigned to the Project. Add them under Teams first.",
       { field: "contractorId" },
     );
-  if (blank(input.departmentId))
-    throw invalid("DEPARTMENT_REQUIRED", "Choose the Department.", {
-      field: "departmentId",
-    });
-  const department = facts.department;
-  const sameDepartment = previous?.departmentId === input.departmentId;
-  if (department == null || (department.disabled && !sameDepartment))
-    throw invalid("DEPARTMENT_NOT_FOUND", "This Department was not found.", {
-      field: "departmentId",
-    });
-  if (!contractor.departmentIds.includes(department.id))
-    throw invalid(
-      "DEPARTMENT_NOT_CONTRACTORS",
-      "This Department is not one of the Contractor's Departments.",
-      { field: "departmentId" },
-    );
 
   // Location: required when shown and the Project has somewhere to pick.
   let siteLocation = previous?.siteLocation ?? null;
@@ -363,12 +343,8 @@ export function worksheetContent(
     siteLocation = input.siteLocation ?? null;
   }
 
-  // Work Type: optional, of the Department. A hidden section keeps the
-  // sheet's Work Type only while the Department stays the same.
-  let workTypeId =
-    previous?.departmentId === department.id
-      ? (previous.workTypeId ?? null)
-      : null;
+  // Work Type: optional, any live one. A hidden section keeps the sheet's.
+  let workTypeId = previous?.workTypeId ?? null;
   if (settings.showWorkType) {
     workTypeId = null;
     if (!blank(input.workTypeId)) {
@@ -378,12 +354,6 @@ export function worksheetContent(
         throw invalid("WORK_TYPE_NOT_FOUND", "This Work Type was not found.", {
           field: "workTypeId",
         });
-      if (workType.departmentId !== department.id)
-        throw invalid(
-          "WORK_TYPE_NOT_DEPARTMENTS",
-          "This Work Type belongs to another Department.",
-          { field: "workTypeId" },
-        );
       workTypeId = workType.id;
     }
   }
@@ -446,7 +416,6 @@ export function worksheetContent(
     sheetDate: input.sheetDate,
     shift,
     contractorId: contractor.id,
-    departmentId: department.id,
     workTypeId,
     skilledCount,
     unskilledCount,

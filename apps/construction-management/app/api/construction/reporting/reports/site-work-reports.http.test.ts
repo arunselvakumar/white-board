@@ -17,7 +17,6 @@ import {
   reportsUsageSheet,
   reportsWorksheet,
   worksheetContractor,
-  worksheetDepartment,
   worksheetLocation,
 } from "@/test/site-work";
 import { TEST_ORIGIN } from "@/test/sessions";
@@ -137,21 +136,13 @@ async function seed() {
   const owner: Actor = { userId: by, workspaceId: ws, role: "owner" };
   const tower = await addProject(ws, by, "Tower A");
   const villa = await addProject(ws, by, "Villa B");
-  const masonry = await worksheetDepartment(ws, by, {
-    name: "Brick masonry crew",
-  });
-  const shuttering = await worksheetDepartment(ws, by, {
-    name: "Formwork crew",
-  });
   const velan = await worksheetContractor(ws, by, {
     name: "Velan Constructions",
     projectIds: [tower, villa],
-    departmentIds: [masonry],
   });
   const murugan = await worksheetContractor(ws, by, {
     name: "Sri Murugan Works",
     projectIds: [tower],
-    departmentIds: [shuttering],
   });
   const pumpHouse = await worksheetLocation(ws, by, tower, "Pump house");
   const cum = await addUnit(ws, by, `cum ${randomUUID().slice(0, 4)}`);
@@ -160,7 +151,6 @@ async function seed() {
     projectId: tower,
     sheetDate: "2026-08-03",
     contractorId: velan,
-    departmentId: masonry,
     skilled: 4,
     unskilled: 6,
     location: { type: "location", locationId: pumpHouse },
@@ -177,7 +167,6 @@ async function seed() {
     projectId: tower,
     sheetDate: "2026-08-04",
     contractorId: murugan,
-    departmentId: shuttering,
     skilled: 2,
     unskilled: 3,
     shift: "shift_2",
@@ -189,7 +178,6 @@ async function seed() {
     projectId: tower,
     sheetDate: "2026-08-05",
     contractorId: velan,
-    departmentId: masonry,
     skilled: 50,
     approval: "rejected",
   });
@@ -197,7 +185,6 @@ async function seed() {
     projectId: tower,
     sheetDate: "2026-08-05",
     contractorId: velan,
-    departmentId: masonry,
     skilled: 60,
     deleted: true,
   });
@@ -205,14 +192,12 @@ async function seed() {
     projectId: villa,
     sheetDate: "2026-08-05",
     contractorId: velan,
-    departmentId: masonry,
     skilled: 70,
   });
   await reportsWorksheet(ws, by, {
     projectId: tower,
     sheetDate: "2026-09-01",
     contractorId: velan,
-    departmentId: masonry,
     skilled: 80,
   });
 
@@ -388,7 +373,6 @@ describe("site-work report jobs HTTP (CM-605, CM-608)", () => {
     expect(table.lines).toHaveLength(2);
     const first = table.find(s.ws1.number);
     expect(table.cell(first, "Contractor")).toBe("Velan Constructions");
-    expect(table.cell(first, "Department")).toBe("Brick masonry crew");
     expect(table.cell(first, "Skilled")).toBe(4);
     expect(table.cell(first, "Location type")).toBe("Location");
     expect(table.cell(first, "Location")).toBe("Location · Pump house");

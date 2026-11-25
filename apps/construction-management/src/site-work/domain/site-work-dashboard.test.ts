@@ -51,27 +51,21 @@ describe("contractor-wise labour", () => {
   it("names each row, totals it and puts the most labour first", () => {
     const rows = contractorWiseLabour(
       [
-        { contractorId: "c1", departmentId: "d1", skilled: 2, unskilled: 3 },
-        { contractorId: "c2", departmentId: "d2", skilled: 8, unskilled: 1 },
-        { contractorId: "gone", departmentId: "d1", skilled: 0, unskilled: 5 },
+        { contractorId: "c1", skilled: 2, unskilled: 3 },
+        { contractorId: "c2", skilled: 8, unskilled: 1 },
+        { contractorId: "gone", skilled: 0, unskilled: 5 },
       ],
       {
         contractors: new Map([
           ["c1", "Velan Constructions"],
           ["c2", "Sri Murugan Works"],
         ]),
-        departments: new Map([
-          ["d1", "Masonry"],
-          ["d2", "Shuttering"],
-        ]),
       },
     );
-    expect(
-      rows.map((row) => [row.contractor, row.department, row.total]),
-    ).toEqual([
-      ["Sri Murugan Works", "Shuttering", 9],
-      [null, "Masonry", 5],
-      ["Velan Constructions", "Masonry", 5],
+    expect(rows.map((row) => [row.contractor, row.total])).toEqual([
+      ["Sri Murugan Works", 9],
+      [null, 5],
+      ["Velan Constructions", 5],
     ]);
   });
 });

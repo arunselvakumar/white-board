@@ -6,7 +6,7 @@ import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
  * out as sections in the order the ADR fixes. The PDF writer prints the
  * sections; nothing here reads a database or draws a page.
  *
- * Labels arrive resolved (Contractor, Department, Work Type, location,
+ * Labels arrive resolved (Contractor, Work Type, location,
  * shift, weather, cause and party names), so reporting imports no
  * site-work, masters or procurement code.
  */
@@ -29,7 +29,6 @@ export type DprWorksheet = {
   shift: string;
   approvalStatus: "not_required" | "pending" | "approved" | "rejected";
   contractor: string;
-  department: string;
   workType: string | null;
   /** One line from the projects context's names ("Wing A · Floor 1"). */
   location: string | null;
@@ -317,19 +316,15 @@ function weatherSection(model: DprReadModel): DprSection {
   };
 }
 
-/** Skilled and unskilled per Contractor and Department, from the worksheets. */
+/** Skilled and unskilled per Contractor, from the worksheets. */
 export function labourByContractor(
   worksheets: readonly DprWorksheet[],
-): { contractor: string; department: string; heads: DprHeadcount }[] {
-  const rows = new Map<
-    string,
-    { contractor: string; department: string; heads: DprHeadcount }
-  >();
+): { contractor: string; heads: DprHeadcount }[] {
+  const rows = new Map<string, { contractor: string; heads: DprHeadcount }>();
   for (const sheet of worksheets) {
-    const key = `${sheet.contractor}\u0000${sheet.department}`;
+    const key = sheet.contractor;
     const row = rows.get(key) ?? {
       contractor: sheet.contractor,
-      department: sheet.department,
       heads: ZERO,
     };
     row.heads = sum(row.heads, {
@@ -338,10 +333,8 @@ export function labourByContractor(
     });
     rows.set(key, row);
   }
-  return [...rows.values()].sort(
-    (a, b) =>
-      a.contractor.localeCompare(b.contractor) ||
-      a.department.localeCompare(b.department),
+  return [...rows.values()].sort((a, b) =>
+    a.contractor.localeCompare(b.contractor),
   );
 }
 
@@ -369,27 +362,24 @@ function labourSection(model: DprReadModel): DprSection {
   ];
   const blocks: DprBlock[] = [
     byContractor.length === 0
-      ? { type: "text", text: `By Contractor and Department: ${NONE_RECORDED}` }
+      ? { type: "text", text: `By Contractor: ${NONE_RECORDED}` }
       : {
           type: "table",
-          title: "By Contractor and Department (worksheets)",
+          title: "By Contractor (worksheets)",
           columns: [
-            { label: "Contractor", width: 30 },
-            { label: "Department", width: 22 },
+            { label: "Contractor", width: 52 },
             { label: "Skilled", width: 10, align: "right" },
             { label: "Unskilled", width: 10, align: "right" },
             { label: "Total", width: 10, align: "right" },
           ],
           rows: byContractor.map((row) => [
             row.contractor,
-            row.department,
             String(row.heads.skilled),
             String(row.heads.unskilled),
             String(row.heads.skilled + row.heads.unskilled),
           ]),
           totals: [
             "Total",
-            "",
             String(onSheets.skilled),
             String(onSheets.unskilled),
             String(onSheets.skilled + onSheets.unskilled),
@@ -432,7 +422,7 @@ function worksheetSection(model: DprReadModel): DprSection {
         type: "table",
         columns: [
           { label: "Number", width: 15 },
-          { label: "Contractor / Department", width: 17 },
+          { label: "Contractor", width: 17 },
           { label: "Work Type", width: 11 },
           { label: "Location", width: 14 },
           { label: "Skilled", width: 7, align: "right" },
@@ -443,7 +433,7 @@ function worksheetSection(model: DprReadModel): DprSection {
         ],
         rows: model.worksheets.map((sheet) => [
           numbered(sheet),
-          `${sheet.contractor}\n${sheet.department}`,
+          sheet.contractor,
           text(sheet.workType),
           text(sheet.location),
           count(sheet.skilled),
@@ -710,7 +700,7 @@ function photoSection(model: DprReadModel): DprSection {
 
 /**
  * Lays the day out in the ADR's order: weather and site condition; labour
- * (by Contractor and Department, then attendance against worksheets and
+ * (by Contractor, then attendance against worksheets and
  * the difference); worksheets; equipment usage (hire cost only with
  * money); materials received and consumed; visitors; instructions;
  * hindrances; notes; and photos when Include images was ticked. An empty

@@ -69,7 +69,6 @@ const updateNotFound = () =>
 /** What a save writes besides the number, status and bookkeeping columns. */
 export type IssueContent = IssueFields & {
   categoryId: string | null;
-  departmentId: string | null;
   contractorId: string | null;
   /** A Team Member id (not a User id). */
   assigneeMemberId: string | null;
@@ -151,7 +150,6 @@ export type IssueListParams = {
   priorities?: readonly TrackingPriority[];
   categoryId?: string;
   assigneeMemberId?: string;
-  departmentId?: string;
   contractorId?: string;
   locationType?: LocationType;
   /** The Wing, Amenity, Common Development or Location id (with its type). */
@@ -324,7 +322,6 @@ export type IssueDeps = {
 
 export type IssueWriteInput = IssueInput & {
   categoryId?: string | null;
-  departmentId?: string | null;
   contractorId?: string | null;
   assigneeMemberId?: string | null;
   siteLocation?: LocationRefInput | null;
@@ -351,7 +348,6 @@ export type IssueReadModel = StoredIssue & {
   /** Pending / Delayed / Solved / Closed on the Company's today. */
   displayStatus: IssueStatus;
   category: Named | null;
-  department: Named | null;
   contractor: Named | null;
   assignee: Named | null;
   createdByPerson: Person;
@@ -376,7 +372,6 @@ export type IssueUpdateReadModel = StoredIssueUpdate & {
 
 export type IssueFormOptions = {
   members: TrackingMemberFacts[];
-  departments: TrackingNamedFacts[];
   contractors: TrackingContractorFacts[];
   issueCategories: TrackingNamedFacts[];
 };
@@ -421,7 +416,6 @@ function snapshot(issue: IssueContent) {
     details: issue.details,
     priority: issue.priority,
     categoryId: issue.categoryId,
-    departmentId: issue.departmentId,
     contractorId: issue.contractorId,
     assigneeMemberId: issue.assigneeMemberId,
     dueDate: issue.dueDate,
@@ -458,8 +452,8 @@ export type BulkResult = {
  * Issues & Snags commands and queries (CM-803, ADR CM-0019 §7, §8). Every
  * write is one transaction: the row lock, the back-dated check on the
  * Issue Date (create, edit, delete), the history row and the audit event;
- * domain events are dispatched after commit. Category, Department,
- * Contractor and assignee are checked when they are set or changed, so an
+ * domain events are dispatched after commit. Category, Contractor and
+ * assignee are checked when they are set or changed, so an
  * old issue stays editable after a category is disabled.
  */
 export class IssueHandlers {
@@ -490,14 +484,12 @@ export class IssueHandlers {
     const workspaceId = access.workspaceId;
     const fields = issueFields(input, await this.deps.today(workspaceId));
     const categoryId = clean(input.categoryId);
-    const departmentId = clean(input.departmentId);
     const contractorId = clean(input.contractorId);
     const assigneeMemberId = clean(input.assigneeMemberId);
     const changed = (id: string | null, old: string | null | undefined) =>
       id != null && id !== old ? [id] : [];
     const refs = await directory.references(db, workspaceId, projectId, {
       issueCategoryIds: changed(categoryId, current?.categoryId),
-      departmentIds: changed(departmentId, current?.departmentId),
       contractorIds: changed(contractorId, current?.contractorId),
       memberIds: changed(assigneeMemberId, current?.assigneeMemberId),
     });
@@ -515,21 +507,6 @@ export class IssueHandlers {
           "ISSUE_CATEGORY_DISABLED",
           "This Issue Category is disabled. Choose another.",
           "categoryId",
-        );
-    }
-    if (departmentId != null && departmentId !== current?.departmentId) {
-      const department = refs.departments.get(departmentId);
-      if (department == null)
-        throw refused(
-          "DEPARTMENT_NOT_FOUND",
-          "This Department was not found.",
-          "departmentId",
-        );
-      if (department.disabled)
-        throw refused(
-          "DEPARTMENT_DISABLED",
-          "This Department is disabled. Choose another.",
-          "departmentId",
         );
     }
     if (contractorId != null && contractorId !== current?.contractorId) {
@@ -573,7 +550,6 @@ export class IssueHandlers {
     return {
       ...fields,
       categoryId,
-      departmentId,
       contractorId,
       assigneeMemberId,
       siteLocation,
@@ -1141,7 +1117,6 @@ export class IssueHandlers {
     const [names, inspections] = await Promise.all([
       directory.names(db, workspaceId, {
         issueCategoryIds: ids((row) => row.categoryId),
-        departmentIds: ids((row) => row.departmentId),
         contractorIds: ids((row) => row.contractorId),
         memberIds: ids((row) => row.assigneeMemberId),
         userIds: [
@@ -1164,7 +1139,6 @@ export class IssueHandlers {
       ...row,
       displayStatus: issueStatus(row, today),
       category: named(row.categoryId, names.issueCategories),
-      department: named(row.departmentId, names.departments),
       contractor: named(row.contractorId, names.contractors),
       assignee: named(row.assigneeMemberId, names.members),
       createdByPerson: person(row.createdBy) ?? {
@@ -1253,7 +1227,7 @@ export class IssueHandlers {
     };
   }
 
-  /** Assignees, Departments, Contractors and enabled Issue Categories on the Project. */
+  /** Assignees, Contractors and enabled Issue Categories on the Project. */
   async formOptions(
     workspaceId: string,
     projectId: string,
@@ -1262,11 +1236,10 @@ export class IssueHandlers {
       this.deps.db,
       workspaceId,
       projectId,
-      ["members", "departments", "contractors", "issueCategories"],
+      ["members", "contractors", "issueCategories"],
     );
     return {
       members: options.members,
-      departments: options.departments,
       contractors: options.contractors,
       issueCategories: options.issueCategories,
     };

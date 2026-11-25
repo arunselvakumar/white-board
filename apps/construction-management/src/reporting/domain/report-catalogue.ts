@@ -287,7 +287,7 @@ const DEFINITIONS = {
   daily_work: {
     title: "Daily Work",
     description:
-      "Every worksheet in the period: contractor, department, skilled and unskilled labour, location, work done, shift, photos and consumed material.",
+      "Every worksheet in the period: contractor, skilled and unskilled labour, location, work done, shift, photos and consumed material.",
     needs: "Needs Daily Worksheet Report.",
     group: "site_work",
     scopes: PROJECT,
@@ -385,7 +385,7 @@ const DEFINITIONS = {
   task_report: {
     title: "Task Report",
     description:
-      "Tasks added in the period in tree order: level, assignees, planned, baseline and actual dates, variance, progress, status, location, department and contractor; Total and Completed Price with Financial.",
+      "Tasks added in the period in tree order: level, assignees, planned, baseline and actual dates, variance, progress, status, location and contractor; Total and Completed Price with Financial.",
     needs:
       "Needs Task Report; prices need Financial; without View all, your own and assigned tasks.",
     group: "tracking",
@@ -403,7 +403,7 @@ const DEFINITIONS = {
   issue_snag_report: {
     title: "Issue & Snag Report",
     description:
-      "Issues and snags by Issue Date: number, details, priority, category, department, contractor, assignee, due date, location, status, solved on and by, closed on.",
+      "Issues and snags by Issue Date: number, details, priority, category, contractor, assignee, due date, location, status, solved on and by, closed on.",
     needs:
       "Needs Issues and snags Report; without View all, your own and assigned issues.",
     group: "tracking",
@@ -421,7 +421,7 @@ const DEFINITIONS = {
   inspection_request_report: {
     title: "Inspection Request Report",
     description:
-      "Inspection Requests by Inspection Date: number, date and time, department, contractor, inspector, description, location, status, decided by and on, reason and re-inspection of; the Success Rate.",
+      "Inspection Requests by Inspection Date: number, date and time, contractor, inspector, description, location, status, decided by and on, reason and re-inspection of; the Success Rate.",
     needs: "Needs Inspection Request Report.",
     group: "tracking",
     scopes: PROJECT,

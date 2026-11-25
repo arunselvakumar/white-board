@@ -9,8 +9,8 @@ import { toInspectionFormOptions } from "../inspection-models";
 export const dynamic = "force-dynamic";
 
 /**
- * The inspectors (active Team Members on the Project), enabled
- * Departments, Contractors on the Project and the Project's Drawings, for
+ * The inspectors (active Team Members on the Project), Contractors on
+ * the Project and the Project's Drawings, for
  * the request form and the list's filters. Needs Inspection Request read.
  */
 export async function GET(request: Request): Promise<Response> {

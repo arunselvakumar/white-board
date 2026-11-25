@@ -11,7 +11,6 @@ import {
   reportsUsageSheet,
   reportsWorksheet,
   worksheetContractor,
-  worksheetDepartment,
   worksheetLabourAttendance,
   worksheetLabourCategory,
   worksheetVendorAttendance,
@@ -68,19 +67,13 @@ async function seed() {
   const owner: Actor = { userId: by, workspaceId: ws, role: "owner" };
   const tower = await addProject(ws, by, "Tower A");
   const villa = await addProject(ws, by, "Villa B");
-  const masonry = await worksheetDepartment(ws, by, {
-    name: "Brick masonry crew",
-  });
-  const formwork = await worksheetDepartment(ws, by, { name: "Formwork crew" });
   const velan = await worksheetContractor(ws, by, {
     name: "Velan Constructions",
     projectIds: [tower],
-    departmentIds: [masonry],
   });
   const murugan = await worksheetContractor(ws, by, {
     name: "Sri Murugan Works",
     projectIds: [tower],
-    departmentIds: [formwork],
   });
   const sheet = (input: Parameters<typeof reportsWorksheet>[2]) =>
     reportsWorksheet(ws, by, input);
@@ -88,7 +81,6 @@ async function seed() {
     projectId: tower,
     sheetDate: "2026-08-03",
     contractorId: velan,
-    departmentId: masonry,
     skilled: 4,
     unskilled: 6,
   });
@@ -96,7 +88,6 @@ async function seed() {
     projectId: tower,
     sheetDate: "2026-08-03",
     contractorId: murugan,
-    departmentId: formwork,
     skilled: 2,
     unskilled: 1,
     approval: "pending",
@@ -105,7 +96,6 @@ async function seed() {
     projectId: tower,
     sheetDate: "2026-08-04",
     contractorId: velan,
-    departmentId: masonry,
     skilled: 3,
     unskilled: 5,
     approval: "approved",
@@ -115,7 +105,6 @@ async function seed() {
     projectId: tower,
     sheetDate: "2026-08-04",
     contractorId: velan,
-    departmentId: masonry,
     skilled: 40,
     approval: "rejected",
   });
@@ -123,7 +112,6 @@ async function seed() {
     projectId: tower,
     sheetDate: "2026-08-04",
     contractorId: velan,
-    departmentId: masonry,
     skilled: 50,
     deleted: true,
   });
@@ -131,7 +119,6 @@ async function seed() {
     projectId: villa,
     sheetDate: "2026-08-04",
     contractorId: velan,
-    departmentId: masonry,
     skilled: 60,
   });
   // Pending in July: outside the period, still awaiting approval.
@@ -139,7 +126,6 @@ async function seed() {
     projectId: tower,
     sheetDate: "2026-07-30",
     contractorId: murugan,
-    departmentId: formwork,
     skilled: 70,
     approval: "pending",
   });
@@ -309,14 +295,13 @@ describe("site-work dashboard HTTP (CM-608)", () => {
     expect(
       body.contractors.map((row) => [
         row.contractor,
-        row.department,
         row.skilled,
         row.unskilled,
         row.total,
       ]),
     ).toEqual([
-      ["Velan Constructions", "Brick masonry crew", 7, 11, 18],
-      ["Sri Murugan Works", "Formwork crew", 2, 1, 3],
+      ["Velan Constructions", 7, 11, 18],
+      ["Sri Murugan Works", 2, 1, 3],
     ]);
   });
 

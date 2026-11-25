@@ -32,7 +32,6 @@ export type NewIssueRow = {
   priority: TrackingPriority | null;
   /** An enabled Issue Category. */
   categoryId: string | null;
-  departmentId: string | null;
   contractorId: string | null;
   /** A Team Member id (not a User id) on the Project. */
   assigneeMemberId: string | null;
@@ -58,7 +57,6 @@ function snapshot(row: NewIssueRow, number: string) {
     details: row.details,
     priority: row.priority,
     categoryId: row.categoryId,
-    departmentId: row.departmentId,
     contractorId: row.contractorId,
     assigneeMemberId: row.assigneeMemberId,
     dueDate: row.dueDate,
@@ -102,7 +100,6 @@ export async function insertIssueRow(
       details: row.details,
       priority: row.priority,
       categoryId: row.categoryId,
-      departmentId: row.departmentId,
       contractorId: row.contractorId,
       assigneeMemberId: row.assigneeMemberId,
       dueDate: row.dueDate == null ? null : calendarDateToDb(row.dueDate),

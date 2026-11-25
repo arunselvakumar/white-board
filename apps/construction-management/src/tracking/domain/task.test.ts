@@ -58,7 +58,6 @@ describe("taskFields", () => {
       startDate: "2026-10-01",
       dueDate: "2026-10-10",
       priority: "high",
-      departmentId: null,
       contractorId: null,
       tagIds: [],
       totalWorkMilli: 120_500n,

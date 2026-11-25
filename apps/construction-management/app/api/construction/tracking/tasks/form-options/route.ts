@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * What the task form and the list's filters offer: Team Members
- * on the Project, enabled Departments and Units, active Contractors on the
+ * on the Project, enabled Units, active Contractors on the
  * Project, the Company's Tags. Needs Task read on the Project.
  */
 export async function GET(request: Request): Promise<Response> {

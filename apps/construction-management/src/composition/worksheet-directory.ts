@@ -6,7 +6,6 @@ import type {
   AttendanceHeadcounts,
   WorksheetContractorFacts,
   WorksheetDirectory,
-  WorksheetNamedFacts,
 } from "@/src/site-work/application/ports";
 
 const projectLocations = createProjectLocations();
@@ -23,7 +22,6 @@ function byId<T extends { id: string }>(rows: readonly T[]): Map<string, T> {
 
 const contractorInclude = {
   projects: { select: { projectId: true } },
-  departments: { select: { departmentId: true } },
 } satisfies Prisma.ConstructionMastersContractorInclude;
 
 function contractorFacts(
@@ -36,13 +34,12 @@ function contractorFacts(
     name: row.name,
     isActive: row.isActive,
     projectIds: row.projects.map((project) => project.projectId),
-    departmentIds: row.departments.map((department) => department.departmentId),
   };
 }
 
 /**
- * What Daily Worksheets read from masters (Contractors, Departments, Work
- * Types, Materials, Measurement Units), projects and organization (Team
+ * What Daily Worksheets read from masters (Contractors, Work Types,
+ * Materials, Measurement Units), projects and organization (Team
  * Member names), by table (ADR CM-0001, CM-0016 §7). Site-work only sees
  * the `WorksheetDirectory` port.
  */
@@ -82,34 +79,11 @@ export const worksheetDirectory: WorksheetDirectory = {
     return byId(rows.map(contractorFacts));
   },
 
-  async departments(db, workspaceId, ids) {
-    if (ids.length === 0) return new Map();
-    const rows = await db.constructionMastersDepartment.findMany({
-      where: live(workspaceId, ids),
-      select: { id: true, name: true, disabledAt: true },
-    });
-    return byId(
-      rows.map((row): WorksheetNamedFacts => ({
-        id: row.id,
-        name: row.name,
-        disabled: row.disabledAt != null,
-      })),
-    );
-  },
-
-  async workTypes(db, workspaceId, filter) {
-    const where =
-      "ids" in filter
-        ? live(workspaceId, filter.ids)
-        : {
-            workspaceId,
-            deletedAt: null,
-            departmentId: { in: [...filter.departmentIds] },
-          };
-    if (("ids" in filter ? filter.ids : filter.departmentIds).length === 0)
-      return [];
+  async workTypes(db, workspaceId, ids) {
+    if (ids?.length === 0) return [];
     const rows = await db.constructionMastersWorkType.findMany({
-      where,
+      where:
+        ids == null ? { workspaceId, deletedAt: null } : live(workspaceId, ids),
       include: {
         materials: {
           where: { material: { deletedAt: null } },
@@ -121,7 +95,6 @@ export const worksheetDirectory: WorksheetDirectory = {
     return rows.map((row) => ({
       id: row.id,
       name: row.name,
-      departmentId: row.departmentId,
       disabled: row.disabledAt != null,
       materialIds: row.materials.map((material) => material.materialId),
     }));

@@ -24,8 +24,8 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * A Project's Inspection Requests, newest first, by status, Department,
- * Contractor, inspector, location, Inspection Date range and a search on
+ * A Project's Inspection Requests, newest first, by status, Contractor,
+ * inspector, location, Inspection Date range and a search on
  * the Request No or description, with the counts by status.
  * Needs Inspection Request read on the Project (no View-all scoping).
  */
@@ -46,7 +46,6 @@ export async function GET(request: Request): Promise<Response> {
       workspaceId: session.workspaceId,
       projectId: model.projectId,
       status: model.status,
-      departmentId: model.departmentId,
       contractorId: model.contractorId,
       inspectorMemberId: model.inspectorMemberId,
       location:

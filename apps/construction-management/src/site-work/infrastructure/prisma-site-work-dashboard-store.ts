@@ -41,7 +41,7 @@ export const prismaSiteWorkDashboardStore: SiteWorkDashboardStore = {
 
   async contractorLabour(db, workspaceId, projectId, range) {
     const rows = await db.constructionSiteWorkWorksheet.groupBy({
-      by: ["contractorId", "departmentId"],
+      by: ["contractorId"],
       where: {
         workspaceId,
         projectId,
@@ -52,7 +52,6 @@ export const prismaSiteWorkDashboardStore: SiteWorkDashboardStore = {
     });
     return rows.map((row) => ({
       contractorId: row.contractorId,
-      departmentId: row.departmentId,
       skilled: row._sum.skilledCount ?? 0,
       unskilled: row._sum.unskilledCount ?? 0,
     }));

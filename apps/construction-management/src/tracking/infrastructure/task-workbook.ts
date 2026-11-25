@@ -69,7 +69,6 @@ export async function taskImportSample(example: {
     "High",
     "",
     "",
-    "",
     "Structure",
     "",
     "",
@@ -85,7 +84,6 @@ export async function taskImportSample(example: {
     "Medium",
     example.memberName,
     "",
-    "",
     "Structure",
     48,
     example.unitName,
@@ -100,7 +98,6 @@ export async function taskImportSample(example: {
     day(30),
     "High",
     example.memberName,
-    "",
     "",
     "",
     "",
@@ -183,7 +180,7 @@ export async function readTaskSheet(
   });
   if (![...columns.values()].includes("name"))
     throw fileInvalid(
-      "The first row must be the sample's headers (Ref, Parent Ref, Task Name*, Description, Start Date, Due Date, Priority, Assignees, Department, Contractor, Tags, Total Work, Unit, Total Price). Download the sample and fill it in.",
+      "The first row must be the sample's headers (Ref, Parent Ref, Task Name*, Description, Start Date, Due Date, Priority, Assignees, Contractor, Tags, Total Work, Unit, Total Price). Download the sample and fill it in.",
     );
   const rows: TaskSheetRow[] = [];
   sheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {

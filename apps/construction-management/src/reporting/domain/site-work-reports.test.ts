@@ -43,7 +43,6 @@ function labels(table: ReportTable | undefined): string[] {
 const SHEET: ReportWorksheet = {
   date: "2026-09-02",
   number: "WS/2",
-  department: "Masonry",
   contractor: "Velan Constructions",
   skilled: 4,
   unskilled: 6,
@@ -70,7 +69,6 @@ describe("Daily Work report", () => {
           date: "2026-09-01",
           number: "WS/1",
           contractor: "Sri Murugan Works",
-          department: "Shuttering",
           skilled: null,
           unskilled: 3,
           locationType: null,
@@ -90,7 +88,6 @@ describe("Daily Work report", () => {
     expect(labels(work)).toEqual([
       "Date",
       "Number",
-      "Department",
       "Contractor",
       "Skilled",
       "Unskilled",

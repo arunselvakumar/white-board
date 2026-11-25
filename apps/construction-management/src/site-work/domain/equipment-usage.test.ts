@@ -85,7 +85,6 @@ const facts = (
   financial: true,
   supervisor: null,
   contractor: null,
-  department: null,
   unit: null,
   materials: new Map(),
   ...patch,

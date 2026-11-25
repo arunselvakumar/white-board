@@ -96,7 +96,6 @@ export function createTrackingReportSource(
       );
       const names = await trackingDirectory.names(db, workspaceId, {
         memberIds: picked.flatMap((row) => row.assigneeIds),
-        departmentIds: picked.flatMap((row) => row.departmentId ?? []),
         contractorIds: picked.flatMap((row) => row.contractorId ?? []),
       });
       return picked.flatMap((row) => {
@@ -121,10 +120,6 @@ export function createTrackingReportSource(
             progressPct: percentValue(row.pct),
             status: TASK_STATUS_LABELS[view.status],
             location: label(row.siteLocation),
-            department:
-              row.departmentId == null
-                ? null
-                : (names.departments.get(row.departmentId) ?? null),
             contractor:
               row.contractorId == null
                 ? null
@@ -158,7 +153,6 @@ export function createTrackingReportSource(
       ]);
       const names = await trackingDirectory.names(db, workspaceId, {
         issueCategoryIds: rows.flatMap((row) => row.categoryId ?? []),
-        departmentIds: rows.flatMap((row) => row.departmentId ?? []),
         contractorIds: rows.flatMap((row) => row.contractorId ?? []),
         memberIds: rows.flatMap((row) => row.assigneeMemberId ?? []),
         userIds: rows.flatMap((row) => row.solvedBy ?? []),
@@ -174,7 +168,6 @@ export function createTrackingReportSource(
             ? null
             : (PRIORITY_LABELS.get(row.priority) ?? null),
         category: name(names.issueCategories, row.categoryId),
-        department: name(names.departments, row.departmentId),
         contractor: name(names.contractors, row.contractorId),
         assignee: name(names.members, row.assigneeMemberId),
         dueDate: day(row.dueDate),
@@ -211,7 +204,6 @@ export function createTrackingReportSource(
         projectLocationLabeller(workspaceId, projectId, db),
       ]);
       const names = await trackingDirectory.names(db, workspaceId, {
-        departmentIds: rows.flatMap((row) => row.departmentId ?? []),
         contractorIds: rows.flatMap((row) => row.contractorId ?? []),
         memberIds: rows.flatMap((row) => row.inspectorMemberId ?? []),
         userIds: rows.flatMap((row) => row.decidedBy ?? []),
@@ -222,7 +214,6 @@ export function createTrackingReportSource(
         number: row.number,
         inspectionDate: calendarDateFromDb(row.inspectionDate),
         inspectionTime: row.inspectionTime,
-        department: name(names.departments, row.departmentId),
         contractor: name(names.contractors, row.contractorId),
         inspector: name(names.members, row.inspectorMemberId),
         description: row.workDescription,

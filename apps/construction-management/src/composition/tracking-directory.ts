@@ -63,7 +63,6 @@ type ContractorRow = {
   name: string;
   isActive: boolean;
   projects: { projectId: string }[];
-  departments: { departmentId: string }[];
 };
 
 function toContractor(
@@ -75,7 +74,6 @@ function toContractor(
     name: row.name,
     isActive: row.isActive,
     onProject: row.projects.some((item) => item.projectId === projectId),
-    departmentIds: row.departments.map((item) => item.departmentId),
   };
 }
 
@@ -156,7 +154,6 @@ export const trackingDirectory: TrackingDirectory = {
     const [
       projectFacts,
       members,
-      departments,
       contractors,
       units,
       issueCategories,
@@ -173,12 +170,6 @@ export const trackingDirectory: TrackingDirectory = {
             },
           })
         : [],
-      want(ids.departmentIds)
-        ? db.constructionMastersDepartment.findMany({
-            where: live(ids.departmentIds),
-            select: { id: true, name: true, disabledAt: true },
-          })
-        : [],
       want(ids.contractorIds)
         ? db.constructionMastersContractor.findMany({
             where: live(ids.contractorIds),
@@ -187,7 +178,6 @@ export const trackingDirectory: TrackingDirectory = {
               name: true,
               isActive: true,
               projects: { where: { projectId }, select: { projectId: true } },
-              departments: { select: { departmentId: true } },
             },
           })
         : [],
@@ -222,7 +212,6 @@ export const trackingDirectory: TrackingDirectory = {
     const result: TrackingReferences = {
       project: projectFacts,
       members: byId(members.map((row) => toMember(row, projectId))),
-      departments: byId(departments.map(named)),
       contractors: byId(contractors.map((row) => toContractor(row, projectId))),
       units: byId(units.map(named)),
       issueCategories: byId(issueCategories.map(named)),
@@ -243,7 +232,6 @@ export const trackingDirectory: TrackingDirectory = {
     const [
       members,
       users,
-      departments,
       contractors,
       units,
       issueCategories,
@@ -262,12 +250,6 @@ export const trackingDirectory: TrackingDirectory = {
             select: { userId: true, name: true, deletedAt: true },
             // A removed Team Member's name still says who; a live row wins.
             orderBy: [{ deletedAt: { sort: "desc", nulls: "last" } }],
-          })
-        : [],
-      want(ids.departmentIds)
-        ? db.constructionMastersDepartment.findMany({
-            where: any(ids.departmentIds),
-            select,
           })
         : [],
       want(ids.contractorIds)
@@ -313,7 +295,6 @@ export const trackingDirectory: TrackingDirectory = {
           ),
         ),
       ),
-      departments: nameMap(departments),
       contractors: nameMap(contractors),
       units: nameMap(units),
       issueCategories: nameMap(issueCategories),
@@ -327,85 +308,69 @@ export const trackingDirectory: TrackingDirectory = {
     const want = new Set(kinds);
     const base = { workspaceId, deletedAt: null };
     const byName = { name: "asc" } as const;
-    const [
-      members,
-      departments,
-      contractors,
-      units,
-      issueCategories,
-      tags,
-      drawings,
-    ] = await Promise.all([
-      want.has("members")
-        ? db.constructionOrganizationTeamMember.findMany({
-            where: {
-              ...base,
-              status: "active",
-              OR: [{ isOwner: true }, { projects: { some: { projectId } } }],
-            },
-            select: {
-              ...MEMBER_SELECT,
-              projects: { where: { projectId }, select: { projectId: true } },
-            },
-            orderBy: byName,
-          })
-        : [],
-      want.has("departments")
-        ? db.constructionMastersDepartment.findMany({
-            where: { ...base, disabledAt: null },
-            select: { id: true, name: true, disabledAt: true },
-            orderBy: byName,
-          })
-        : [],
-      want.has("contractors")
-        ? db.constructionMastersContractor.findMany({
-            where: {
-              ...base,
-              isActive: true,
-              projects: { some: { projectId } },
-            },
-            select: {
-              id: true,
-              name: true,
-              isActive: true,
-              projects: { where: { projectId }, select: { projectId: true } },
-              departments: { select: { departmentId: true } },
-            },
-            orderBy: byName,
-          })
-        : [],
-      want.has("units")
-        ? db.constructionMastersMeasurementUnit.findMany({
-            where: { ...base, disabledAt: null },
-            select: { id: true, name: true, disabledAt: true },
-            orderBy: byName,
-          })
-        : [],
-      want.has("issueCategories")
-        ? db.constructionMastersIssueCategory.findMany({
-            where: { ...base, disabledAt: null },
-            select: { id: true, name: true, disabledAt: true },
-            orderBy: byName,
-          })
-        : [],
-      want.has("tags")
-        ? db.constructionMastersTag.findMany({
-            where: base,
-            select: { id: true, name: true },
-            orderBy: byName,
-          })
-        : [],
-      want.has("drawings")
-        ? db.constructionProjectsDrawing.findMany({
-            where: { ...base, projectId, album: { deletedAt: null } },
-            select: DRAWING_SELECT,
-            orderBy: [{ album: { name: "asc" } }, { name: "asc" }],
-          })
-        : [],
-    ]);
+    const [members, contractors, units, issueCategories, tags, drawings] =
+      await Promise.all([
+        want.has("members")
+          ? db.constructionOrganizationTeamMember.findMany({
+              where: {
+                ...base,
+                status: "active",
+                OR: [{ isOwner: true }, { projects: { some: { projectId } } }],
+              },
+              select: {
+                ...MEMBER_SELECT,
+                projects: { where: { projectId }, select: { projectId: true } },
+              },
+              orderBy: byName,
+            })
+          : [],
+        want.has("contractors")
+          ? db.constructionMastersContractor.findMany({
+              where: {
+                ...base,
+                isActive: true,
+                projects: { some: { projectId } },
+              },
+              select: {
+                id: true,
+                name: true,
+                isActive: true,
+                projects: { where: { projectId }, select: { projectId: true } },
+              },
+              orderBy: byName,
+            })
+          : [],
+        want.has("units")
+          ? db.constructionMastersMeasurementUnit.findMany({
+              where: { ...base, disabledAt: null },
+              select: { id: true, name: true, disabledAt: true },
+              orderBy: byName,
+            })
+          : [],
+        want.has("issueCategories")
+          ? db.constructionMastersIssueCategory.findMany({
+              where: { ...base, disabledAt: null },
+              select: { id: true, name: true, disabledAt: true },
+              orderBy: byName,
+            })
+          : [],
+        want.has("tags")
+          ? db.constructionMastersTag.findMany({
+              where: base,
+              select: { id: true, name: true },
+              orderBy: byName,
+            })
+          : [],
+        want.has("drawings")
+          ? db.constructionProjectsDrawing.findMany({
+              where: { ...base, projectId, album: { deletedAt: null } },
+              select: DRAWING_SELECT,
+              orderBy: [{ album: { name: "asc" } }, { name: "asc" }],
+            })
+          : [],
+      ]);
     const result: TrackingOptions = {
       members: members.map((row) => toMember(row, projectId)),
-      departments: departments.map(named),
       contractors: contractors.map((row) => toContractor(row, projectId)),
       units: units.map(named),
       issueCategories: issueCategories.map(named),

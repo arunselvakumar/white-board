@@ -55,7 +55,6 @@ const IssueBody = z.object({
   priority: priority.nullable().optional(),
   /** An enabled Issue Category (an unchanged disabled one may stay on edit). */
   categoryId: z.uuid().nullable().optional(),
-  departmentId: z.uuid().nullable().optional(),
   /** An active Contractor assigned to the Project: whose work the snag is. */
   contractorId: z.uuid().nullable().optional(),
   /** "Assign To": a Team Member id (not a User id) on the Project. */
@@ -126,7 +125,6 @@ export const ListConstructionTrackingIssuesRequestModel = z
     categoryId: z.uuid().optional(),
     /** A Team Member id. */
     assigneeMemberId: z.uuid().optional(),
-    departmentId: z.uuid().optional(),
     contractorId: z.uuid().optional(),
     locationType: locationType.optional(),
     /** The Wing, Amenity, Common Development or Location id; needs `locationType`. */
@@ -177,7 +175,6 @@ export const ConstructionTrackingIssueResponseModel = z.object({
   details: z.string(),
   priority: priority.nullable(),
   category: named.nullable(),
-  department: named.nullable(),
   contractor: named.nullable(),
   /** The Team Member it is assigned to. */
   assignee: named.nullable(),
@@ -275,10 +272,8 @@ const option = z.object({ id: z.uuid(), name: z.string() });
 export const GetConstructionTrackingIssueFormOptionsResponseModel = z.object({
   /** Active Team Members on the Project (the Owner included): "Assign To". */
   members: z.array(option.extend({ isOwner: z.boolean() })),
-  /** Enabled Departments. */
-  departments: z.array(option),
   /** Active Contractors assigned to the Project. */
-  contractors: z.array(option.extend({ departmentIds: z.array(z.uuid()) })),
+  contractors: z.array(option),
   /** Enabled Issue Categories. */
   issueCategories: z.array(option),
 });
@@ -301,7 +296,6 @@ export function toIssueResponse(
     details: issue.details,
     priority: issue.priority,
     category: issue.category,
-    department: issue.department,
     contractor: issue.contractor,
     assignee: issue.assignee,
     dueDate: issue.dueDate,
@@ -367,12 +361,7 @@ export function toIssueFormOptions(
       name: member.name,
       isOwner: member.isOwner,
     })),
-    departments: options.departments.map(({ id, name }) => ({ id, name })),
-    contractors: options.contractors.map((contractor) => ({
-      id: contractor.id,
-      name: contractor.name,
-      departmentIds: [...contractor.departmentIds],
-    })),
+    contractors: options.contractors.map(({ id, name }) => ({ id, name })),
     issueCategories: options.issueCategories.map(({ id, name }) => ({
       id,
       name,

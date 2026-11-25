@@ -109,7 +109,7 @@ export const worksheetOpenApiOperations: OpenApiOperation[] = [
     method: "get",
     path: `${WORKSHEETS_PATH}/form-options`,
     summary:
-      "What the worksheet form offers on a Project: settings, Contractors, Departments, Work Types, units",
+      "What the worksheet form offers on a Project: settings, Contractors, Work Types, units",
     tags: TAGS,
     query: GetConstructionSiteWorkWorksheetFormOptionsRequestModel,
     successStatus: StatusCodes.OK,

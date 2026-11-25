@@ -28,12 +28,21 @@ const HEADERS = [
   "Due Date",
   "Priority",
   "Assignees",
-  "Department",
   "Contractor",
   "Tags",
   "Total Work",
   "Unit",
   "Total Price",
+];
+
+/**
+ * The uploads below use a workbook from before ADR CM-0048: the sample's
+ * headers with a "Department" column after Assignees, which import ignores.
+ */
+const UPLOAD_HEADERS = [
+  ...HEADERS.slice(0, 8),
+  "Department",
+  ...HEADERS.slice(8),
 ];
 
 type Task = {
@@ -60,7 +69,7 @@ type ImportError = {
 async function workbook(rows: unknown[][]): Promise<Uint8Array> {
   const book = new ExcelJS.Workbook();
   const sheet = book.addWorksheet("Tasks");
-  sheet.addRow(HEADERS);
+  sheet.addRow(UPLOAD_HEADERS);
   for (const row of rows) sheet.addRow(row);
   return new Uint8Array(await book.xlsx.writeBuffer());
 }
@@ -162,7 +171,7 @@ describe("Task import (CM-802)", () => {
         "09/11/2099",
         "medium",
         "karthik raja",
-        "",
+        "No such Department",
         ctx.contractorName.toUpperCase(),
         "Structure, New Tag",
         48,

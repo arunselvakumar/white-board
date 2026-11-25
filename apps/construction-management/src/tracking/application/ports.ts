@@ -40,7 +40,7 @@ export type TrackingMemberFacts = {
   onProject: boolean;
 };
 
-/** A name-only master row: Departments, Measurement Units, Issue Categories, Tags. */
+/** A name-only master row: Measurement Units, Issue Categories, Tags. */
 export type TrackingNamedFacts = {
   id: string;
   name: string;
@@ -54,7 +54,6 @@ export type TrackingContractorFacts = {
   name: string;
   isActive: boolean;
   onProject: boolean;
-  departmentIds: readonly string[];
 };
 
 /** A Project Drawing (ADR CM-0013 §8) an inspection can link. */
@@ -71,7 +70,6 @@ export type TrackingDrawingFacts = {
 /** Ids a request names; omit what it does not use. */
 export type TrackingReferenceIds = {
   memberIds?: readonly string[];
-  departmentIds?: readonly string[];
   contractorIds?: readonly string[];
   unitIds?: readonly string[];
   issueCategoryIds?: readonly string[];
@@ -91,7 +89,6 @@ export type TrackingReferences = {
   /** Null when the Project is not a live Project of the Company. */
   project: TrackingProjectFacts | null;
   members: ReadonlyMap<string, TrackingMemberFacts>;
-  departments: ReadonlyMap<string, TrackingNamedFacts>;
   contractors: ReadonlyMap<string, TrackingContractorFacts>;
   units: ReadonlyMap<string, TrackingNamedFacts>;
   issueCategories: ReadonlyMap<string, TrackingNamedFacts>;
@@ -109,7 +106,6 @@ export type TrackingNameIds = TrackingReferenceIds & {
 export type TrackingNames = {
   members: ReadonlyMap<string, string>;
   users: ReadonlyMap<string, string>;
-  departments: ReadonlyMap<string, string>;
   contractors: ReadonlyMap<string, string>;
   units: ReadonlyMap<string, string>;
   issueCategories: ReadonlyMap<string, string>;
@@ -120,7 +116,6 @@ export type TrackingNames = {
 /** The pickers a tracking form can ask for. */
 export const TRACKING_OPTION_KINDS = [
   "members",
-  "departments",
   "contractors",
   "units",
   "issueCategories",
@@ -131,13 +126,12 @@ export type TrackingOptionKind = (typeof TRACKING_OPTION_KINDS)[number];
 
 /**
  * Picker options on a Project, by name: active Team Members on the Project
- * (the Owner included), enabled Departments, Units and Issue Categories,
+ * (the Owner included), enabled Units and Issue Categories,
  * active Contractors assigned to the Project, every Tag, the Project's live
  * Drawings (album, then name). Kinds not asked for are empty.
  */
 export type TrackingOptions = {
   members: TrackingMemberFacts[];
-  departments: TrackingNamedFacts[];
   contractors: TrackingContractorFacts[];
   units: TrackingNamedFacts[];
   issueCategories: TrackingNamedFacts[];

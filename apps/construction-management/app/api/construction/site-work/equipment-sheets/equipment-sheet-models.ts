@@ -58,8 +58,6 @@ const EquipmentSheetBody = z.object({
   supervisorUserId: userId.nullable().optional(),
   /** Optional; on the Project when given. */
   contractorId: z.uuid().nullable().optional(),
-  /** Optional; one of the Contractor's Departments (needs the Contractor). */
-  departmentId: z.uuid().nullable().optional(),
   /** Free text, ≤ 200. */
   workItem: z
     .string()
@@ -245,7 +243,6 @@ export const ConstructionSiteWorkEquipmentSheetResponseModel = z
     operatorName: z.string().nullable(),
     supervisor: person.nullable(),
     contractor: named.nullable(),
-    department: named.nullable(),
     workItem: z.string().nullable(),
     siteLocation: ConstructionSiteWorkWorksheetLocationResponseModel.nullable(),
     timeShifts: z.array(
@@ -389,15 +386,8 @@ export const GetConstructionSiteWorkEquipmentSheetFormOptionsResponseModel = z
     settings: ConstructionSiteWorkEquipmentSheetSettingsResponseModel,
     /** Active Team Members on the Project, and the Owner. */
     supervisors: z.array(z.object({ userId: z.string(), name: z.string() })),
-    /** Active Contractors on the Project, with their enabled Departments. */
-    contractors: z.array(
-      z.object({
-        id: z.uuid(),
-        name: z.string(),
-        departmentIds: z.array(z.uuid()),
-      }),
-    ),
-    departments: z.array(z.object({ id: z.uuid(), name: z.string() })),
+    /** Active Contractors on the Project. */
+    contractors: z.array(z.object({ id: z.uuid(), name: z.string() })),
     units: z.array(z.object({ id: z.uuid(), name: z.string() })),
   })
   .meta({
@@ -468,10 +458,6 @@ export function toEquipmentSheetResponse(
       sheet.contractorId == null
         ? null
         : { id: sheet.contractorId, name: sheet.contractorName },
-    department:
-      sheet.departmentId == null
-        ? null
-        : { id: sheet.departmentId, name: sheet.departmentName },
     workItem: sheet.workItem,
     siteLocation:
       sheet.siteLocation == null
@@ -580,7 +566,6 @@ export function toEquipmentSheetFormOptionsResponse(
     settings: toEquipmentSheetSettingsResponse(projectId, options.settings),
     supervisors: options.supervisors,
     contractors: options.contractors,
-    departments: options.departments,
     units: options.units,
   };
 }

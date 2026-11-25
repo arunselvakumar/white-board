@@ -43,7 +43,6 @@ function toStored(row: Row): StoredWorksheet {
     sheetDate: calendarDateFromDb(row.sheetDate),
     shift: row.shift,
     contractorId: row.contractorId,
-    departmentId: row.departmentId,
     workTypeId: row.workTypeId,
     skilledCount: row.skilledCount,
     unskilledCount: row.unskilledCount,
@@ -88,7 +87,6 @@ function contentColumns(row: WorksheetRow) {
     sheetDate: calendarDateToDb(row.sheetDate),
     shift: row.shift,
     contractorId: row.contractorId,
-    departmentId: row.departmentId,
     workTypeId: row.workTypeId,
     skilledCount: row.skilledCount,
     unskilledCount: row.unskilledCount,
@@ -235,8 +233,6 @@ export class PrismaWorksheetStore implements WorksheetStore {
     if (params.createdBy != null) filters.push({ createdBy: params.createdBy });
     if (params.contractorId != null)
       filters.push({ contractorId: params.contractorId });
-    if (params.departmentId != null)
-      filters.push({ departmentId: params.departmentId });
     if (params.approvalStatus != null)
       filters.push({ approvalStatus: params.approvalStatus });
     const backwards = params.before != null;
@@ -280,13 +276,12 @@ export class PrismaWorksheetStore implements WorksheetStore {
   async facets(db: Db, workspaceId: string, projectId: string) {
     const rows = await db.constructionSiteWorkWorksheet.findMany({
       where: { workspaceId, projectId, deletedAt: null },
-      select: { createdBy: true, contractorId: true, departmentId: true },
-      distinct: ["createdBy", "contractorId", "departmentId"],
+      select: { createdBy: true, contractorId: true },
+      distinct: ["createdBy", "contractorId"],
     });
     return {
       createdBy: [...new Set(rows.map((row) => row.createdBy))],
       contractorIds: [...new Set(rows.map((row) => row.contractorId))],
-      departmentIds: [...new Set(rows.map((row) => row.departmentId))],
     };
   }
 

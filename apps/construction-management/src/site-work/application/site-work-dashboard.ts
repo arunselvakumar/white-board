@@ -76,13 +76,8 @@ export class SiteWorkDashboard {
       store.pendingWorksheets(db, workspaceId, projectId),
       this.deps.attendance.headsByDate(db, workspaceId, projectId, checked),
     ]);
-    const [contractors, departments] = await Promise.all([
-      this.deps.names.contractors(db, workspaceId, [
-        ...new Set(labour.map((row) => row.contractorId)),
-      ]),
-      this.deps.names.departments(db, workspaceId, [
-        ...new Set(labour.map((row) => row.departmentId)),
-      ]),
+    const contractors = await this.deps.names.contractors(db, workspaceId, [
+      ...new Set(labour.map((row) => row.contractorId)),
     ]);
     return {
       worksheets: days.reduce((sum, day) => sum + day.sheets, 0),
@@ -92,7 +87,7 @@ export class SiteWorkDashboard {
       ),
       pendingApprovals: pending,
       trend: labourAvailability(checked, days, heads),
-      contractors: contractorWiseLabour(labour, { contractors, departments }),
+      contractors: contractorWiseLabour(labour, { contractors }),
     };
   }
 

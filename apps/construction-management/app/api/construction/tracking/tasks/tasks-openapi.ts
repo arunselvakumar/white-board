@@ -112,8 +112,7 @@ export const trackingTaskOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",
     path: `${TASKS_PATH}/form-options`,
-    summary:
-      "Team Members, Departments, Contractors, Units and Tags for the form",
+    summary: "Team Members, Contractors, Units and Tags for the form",
     tags: TAGS,
     query: GetConstructionTrackingTaskFormOptionsRequestModel,
     successStatus: StatusCodes.OK,

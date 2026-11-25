@@ -27,7 +27,6 @@ export type TaskRow = {
   priority: TrackingPriority | null;
   siteLocation: LocationRef | null;
   extraLocations: LocationRef[];
-  departmentId: string | null;
   contractorId: string | null;
   totalWorkMilli: bigint | null;
   totalWorkUnitId: string | null;
@@ -59,7 +58,6 @@ export type TaskContent = {
   priority: TrackingPriority | null;
   siteLocation: LocationRef | null;
   extraLocations: readonly LocationRef[];
-  departmentId: string | null;
   contractorId: string | null;
   totalWorkMilli: bigint | null;
   totalWorkUnitId: string | null;
@@ -159,7 +157,6 @@ export type TaskFilter = {
   assigneeId?: string;
   priority?: TrackingPriority;
   tagId?: string;
-  departmentId?: string;
   contractorId?: string;
   /** A Wing, Amenity, Common Development or Location id, in the main or another location. */
   locationId?: string;

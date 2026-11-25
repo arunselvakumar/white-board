@@ -73,7 +73,6 @@ function toRow(row: Row): TaskRow {
     priority: row.priority,
     siteLocation: storedLocationRef(row.siteLocation),
     extraLocations: locations(row.extraLocations),
-    departmentId: row.departmentId,
     contractorId: row.contractorId,
     totalWorkMilli:
       row.totalWorkQty == null ? null : quantityFromDb(row.totalWorkQty),
@@ -113,7 +112,6 @@ function columns(content: TaskContent) {
       ? {}
       : { siteLocation: json(content.siteLocation) }),
     extraLocations: json(content.extraLocations),
-    departmentId: content.departmentId,
     contractorId: content.contractorId,
     totalWorkQty:
       content.totalWorkMilli == null
@@ -187,8 +185,6 @@ function filterSql(filter: TaskFilter): Prisma.Sql {
     parts.push(Prisma.sql`EXISTS (
       SELECT 1 FROM construction_tracking.task_tags g
       WHERE g.task_id = t.id AND g.tag_id = ${filter.tagId}::uuid)`);
-  if (filter.departmentId != null)
-    parts.push(Prisma.sql`t.department_id = ${filter.departmentId}::uuid`);
   if (filter.contractorId != null)
     parts.push(Prisma.sql`t.contractor_id = ${filter.contractorId}::uuid`);
   if (filter.locationId != null) {

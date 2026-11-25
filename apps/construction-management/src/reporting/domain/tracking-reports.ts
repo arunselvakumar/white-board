@@ -74,7 +74,6 @@ export type TaskReportRow = {
   /** "Not Started", "In Progress", "Delayed", "Completed". */
   status: string;
   location: string | null;
-  department: string | null;
   contractor: string | null;
   /** Paise; null without a price (and always without Financial). */
   totalPrice: number | null;
@@ -91,7 +90,7 @@ export const TASK_REPORT_STATUSES = [
 /**
  * Task Report (CM-805): every task added in the period in tree order, with
  * its level, assignees, planned / baseline / actual dates, variance,
- * progress, status, location, department and contractor; Total and
+ * progress, status, location and contractor; Total and
  * Completed Price with Task Financial. The price totals count leaf tasks
  * only (a summary's price is its leaves').
  */
@@ -117,7 +116,6 @@ export function buildTaskReport(input: {
     column("Progress %", "percent", 8),
     column("Status", "text", 11),
     column("Location", "text", 16),
-    column("Department", "text", 13),
     column("Contractor", "text", 15),
   ];
   if (input.financial)
@@ -141,7 +139,6 @@ export function buildTaskReport(input: {
       task.progressPct,
       task.status,
       task.location,
-      task.department,
       task.contractor,
     ];
     if (input.financial) row.push(task.totalPrice, task.completedPrice);
@@ -190,7 +187,6 @@ export type IssueReportRow = {
   /** "High", "Medium", "Low" or null. */
   priority: string | null;
   category: string | null;
-  department: string | null;
   contractor: string | null;
   assignee: string | null;
   dueDate: CalendarDate | null;
@@ -212,8 +208,8 @@ export const ISSUE_REPORT_STATUSES = [
 
 /**
  * Issue & Snag Report (CM-805): the issues of the period by Issue Date,
- * with number, date, details, priority, category, department, contractor,
- * assignee, due date, location, status (Delayed derived), solved on / by
+ * with number, date, details, priority, category, contractor, assignee,
+ * due date, location, status (Delayed derived), solved on / by
  * and closed on.
  */
 export function buildIssueSnagReport(input: {
@@ -227,7 +223,6 @@ export function buildIssueSnagReport(input: {
     column("Details", "text", 30),
     column("Priority", "text", 8),
     column("Category", "text", 12),
-    column("Department", "text", 12),
     column("Contractor", "text", 14),
     column("Assigned To", "text", 14),
     column("Due Date", "text", 11),
@@ -248,7 +243,6 @@ export function buildIssueSnagReport(input: {
     issue.details,
     issue.priority,
     issue.category,
-    issue.department,
     issue.contractor,
     issue.assignee,
     day(issue.dueDate),
@@ -292,7 +286,6 @@ export type InspectionReportRow = {
   inspectionDate: CalendarDate;
   /** "HH:MM" or null. */
   inspectionTime: string | null;
-  department: string | null;
   contractor: string | null;
   inspector: string | null;
   description: string;
@@ -315,8 +308,8 @@ export const INSPECTION_REPORT_STATUSES = [
 
 /**
  * Inspection Request Report (CM-805): the requests of the period by
- * Inspection Date, with number, date and time, department, contractor,
- * inspector, description, location, status, decided by / on, reason and
+ * Inspection Date, with number, date and time, contractor, inspector,
+ * description, location, status, decided by / on, reason and
  * the request it re-inspects; the Success Rate under it.
  */
 export function buildInspectionRequestReport(input: {
@@ -326,7 +319,6 @@ export function buildInspectionRequestReport(input: {
     column("Request No", "text", 15),
     column("Date", "text", 11),
     column("Time", "text", 6),
-    column("Department", "text", 12),
     column("Contractor", "text", 14),
     column("Inspector", "text", 14),
     column("Description of work", "text", 28),
@@ -347,7 +339,6 @@ export function buildInspectionRequestReport(input: {
     inspection.number,
     dateLabel(inspection.inspectionDate),
     inspection.inspectionTime,
-    inspection.department,
     inspection.contractor,
     inspection.inspector,
     inspection.description,

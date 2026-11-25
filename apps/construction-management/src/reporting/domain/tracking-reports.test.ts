@@ -27,7 +27,6 @@ function task(overrides: Partial<TaskReportRow> = {}): TaskReportRow {
     progressPct: 0,
     status: "Delayed",
     location: null,
-    department: null,
     contractor: null,
     totalPrice: 100_00,
     completedPrice: 0,
@@ -98,7 +97,6 @@ describe("tracking report builders (CM-805)", () => {
       details: "Crack",
       priority: null,
       category: null,
-      department: null,
       contractor: null,
       assignee: null,
       dueDate: null,
@@ -141,7 +139,6 @@ describe("tracking report builders (CM-805)", () => {
     const inspection = {
       inspectionDate: "2026-10-02",
       inspectionTime: null,
-      department: null,
       contractor: null,
       inspector: null,
       description: "Slab",

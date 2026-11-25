@@ -35,7 +35,6 @@ export const TASK_IMPORT_COLUMNS = [
   { key: "dueDate", header: "Due Date", width: 14 },
   { key: "priority", header: "Priority", width: 10 },
   { key: "assignees", header: "Assignees", width: 28 },
-  { key: "department", header: "Department", width: 20 },
   { key: "contractor", header: "Contractor", width: 24 },
   { key: "tags", header: "Tags", width: 20 },
   { key: "totalWork", header: "Total Work", width: 12 },
@@ -131,7 +130,6 @@ type Planned = {
   dueDate: CalendarDate | null;
   priority: TrackingPriority | null;
   assigneeIds: string[];
-  departmentId: string | null;
   contractorId: string | null;
   tagIds: string[];
   /** Tag names to create (Tags Create), by lower-cased name. */
@@ -170,7 +168,7 @@ export async function importTasks(
     deps.db,
     workspaceId,
     projectId,
-    ["members", "departments", "contractors", "units", "tags"],
+    ["members", "contractors", "units", "tags"],
   );
   const members = new Map<string, string[]>();
   for (const member of options.members)
@@ -180,7 +178,6 @@ export async function importTasks(
     ]);
   const byName = (list: readonly { id: string; name: string }[]) =>
     new Map(list.map((item) => [key(item.name), item.id]));
-  const departments = byName(options.departments);
   const contractors = byName(options.contractors);
   const units = byName(options.units);
   const tags = byName(options.tags);
@@ -237,7 +234,7 @@ export async function importTasks(
         );
     }
     const matched = (
-      column: "department" | "contractor" | "unit",
+      column: "contractor" | "unit",
       map: ReadonlyMap<string, string>,
       what: string,
     ) => {
@@ -247,11 +244,6 @@ export async function importTasks(
       if (id == null) fail(column, `No ${what} is named “${value}”.`);
       return id ?? null;
     };
-    const departmentId = matched(
-      "department",
-      departments,
-      "Department in use",
-    );
     const contractorId = matched(
       "contractor",
       contractors,
@@ -320,7 +312,6 @@ export async function importTasks(
       dueDate,
       priority: priorityText === "" ? null : (priorityText as TrackingPriority),
       assigneeIds: [...new Set(assigneeIds)],
-      departmentId,
       contractorId,
       tagIds: [...new Set(tagIds)],
       newTags,
@@ -438,7 +429,6 @@ export async function importTasks(
           priority: item.priority,
           siteLocation: null,
           extraLocations: [],
-          departmentId: item.departmentId,
           contractorId: item.contractorId,
           totalWorkMilli: item.totalWorkMilli,
           totalWorkUnitId: item.totalWorkUnitId,
