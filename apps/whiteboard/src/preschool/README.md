@@ -39,3 +39,17 @@ One area's files belong to one ticket. Do not edit another area's files; if you 
 - Follow `.grok/skills/frontend-patterns` and `.grok/skills/tanstack-query`: `@repo/ui` components, react-hook-form + zod, `useSuspenseQuery` + `queryOptions`, `EmptyState` (ADR-0054), skeletons that match the page (ADR-0047).
 - Teacher screens (attendance, Daily Report, Observations) must work at 375 px.
 - Say Centre, Programme, Classroom, Child, Parent, Authorised Pickup, Admission, Enquiry, Fee Head, Fee Structure, Invoice, Fee Payment, Receipt, Daily Report, Announcement, Observation, Progress Report, Stock Item. Never Student, Batch, Course or Enrollment.
+
+## Demo data
+
+`bun run seed:preschool` (from `apps/whiteboard`, with `DATABASE_URL` in `.env`) deletes and rebuilds two demo Workspaces through the real handlers: **Little Steps Preschool**, a franchise with Anna Nagar, Velachery and Coimbatore – RS Puram, and **Tiny Tots Playschool**, a single Centre. Dates are relative to today in India, and the same data comes back on every run. The script is `scripts/seed-preschool-demo.ts`, one function per area.
+
+Every login's password is `Preschool@123`:
+
+| Login                             | Who                                                 |
+| --------------------------------- | --------------------------------------------------- |
+| `meera@littlesteps.demo`          | Owner, Little Steps (Head Office)                   |
+| `head.velachery@littlesteps.demo` | Centre Head and franchisee, Velachery               |
+| `teacher.anna@littlesteps.demo`   | Teacher, Class Teacher of Nursery A at Anna Nagar   |
+| `parent.sharma@littlesteps.demo`  | Parent of Aarav (Nursery A) and Anika (Playgroup A) |
+| `owner@tinytots.demo`             | Owner, Tiny Tots Playschool                         |

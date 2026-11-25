@@ -217,7 +217,11 @@ export class PrismaFeePaymentStore implements FeePaymentStore {
         recordedByName: true,
         createdAt: true,
         allocations: {
-          orderBy: [{ invoice: { dueOn: "asc" } }, { invoiceId: "asc" }],
+          orderBy: [
+            { invoice: { dueOn: "asc" } },
+            { invoice: { label: "asc" } },
+            { invoiceId: "asc" },
+          ],
           select: {
             invoiceId: true,
             amountPaise: true,

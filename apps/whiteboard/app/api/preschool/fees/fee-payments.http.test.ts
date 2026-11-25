@@ -161,7 +161,7 @@ describe("Fee Payments, Receipts, Dues", () => {
         receivedByName: "fp-head",
         balanceDuePaise: 3_100_000,
       });
-      expect(body.lines.map((line) => line.label).sort()).toEqual([
+      expect(body.lines.map((line) => line.label)).toEqual([
         "Admission fee",
         "Tuition — Term 1",
       ]);
@@ -495,6 +495,46 @@ describe("Fee Payments, Receipts, Dues", () => {
           await dues(getRequest("/dues", { centreId: preschool.centreId })),
         ),
       ).toBe("CENTRE_FORBIDDEN");
+    });
+  });
+
+  describe("Receipt lines", () => {
+    it("lists a Receipt's lines by due date, then label", async () => {
+      signInAsOwner(preschool);
+      const child = await addChild(preschool, { classroomId: lkg });
+      for (const label of ["Uniform", "Admission fee", "Kit & books"])
+        await addInvoice(preschool, {
+          ...child,
+          label,
+          dueOn: "2026-07-01",
+          amountPaise: 1000,
+        });
+      await addInvoice(preschool, {
+        ...child,
+        label: "Activity fee",
+        dueOn: "2026-06-01",
+        amountPaise: 1000,
+      });
+      const { body } = await record({
+        childId: child.childId,
+        amountPaise: 4000,
+        method: "cash",
+      });
+      expect(body.lines.map((line) => line.label)).toEqual([
+        "Activity fee",
+        "Admission fee",
+        "Kit & books",
+        "Uniform",
+      ]);
+      const reread = (await (
+        await receipt(getRequest(""), idContext(body.id))
+      ).json()) as ReceiptView;
+      expect(reread.lines.map((line) => line.label)).toEqual([
+        "Activity fee",
+        "Admission fee",
+        "Kit & books",
+        "Uniform",
+      ]);
     });
   });
 });
