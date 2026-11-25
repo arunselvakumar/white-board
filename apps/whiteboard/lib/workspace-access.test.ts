@@ -287,6 +287,7 @@ describe("Preschool role access", () => {
     ])
       expect(isAllowedPreschoolPath(path, "centre_head")).toBe(false);
     for (const path of [
+      "/preschool/stock/items/abc",
       "/preschool/fees",
       "/preschool/fees/structures",
       "/preschool/fees/children/abc",
