@@ -2,6 +2,7 @@
 
 import {
   CalendarCheckIcon,
+  ChartLineUpIcon,
   CurrencyInrIcon,
   NotebookIcon,
 } from "@phosphor-icons/react/ssr";
@@ -32,6 +33,8 @@ import {
   preschoolChildDailyReportsQueryOptions,
 } from "@/src/queries/preschool/daily-reports";
 import type { PreschoolRole } from "@/src/queries/preschool/me";
+import { preschoolObservationsQueryOptions } from "@/src/queries/preschool/observations";
+import { preschoolChildProgressReportsQueryOptions } from "@/src/queries/preschool/progress-reports";
 
 /** A card in the Child page's side column. */
 export type OverviewCard = { key: string; node: ReactNode };
@@ -161,6 +164,59 @@ function DailyReportCard({ childId }: { childId: string }) {
   );
 }
 
+function ProgressCard({ childId }: { childId: string }) {
+  const reports = useQuery(preschoolChildProgressReportsQueryOptions(childId));
+  const observations = useQuery(
+    preschoolObservationsQueryOptions({ childId, limit: 1 }),
+  );
+  const latestYear = reports.data?.items[0]?.academicYearId;
+  const thisYear = (reports.data?.items ?? [])
+    .filter((item) => item.academicYearId === latestYear)
+    .sort((a, b) => a.term.term.localeCompare(b.term.term));
+  return (
+    <SideCard title="Progress" icon={ChartLineUpIcon}>
+      {reports.isPending || observations.isPending ? (
+        <Skeleton className="h-12 w-full" />
+      ) : reports.isError ? (
+        <Quiet>Progress could not be loaded.</Quiet>
+      ) : (
+        <>
+          <p>
+            {observations.data?.total ?? 0} Observation
+            {observations.data?.total === 1 ? "" : "s"}
+          </p>
+          {thisYear.length === 0 ? (
+            <Quiet>No Progress Report yet.</Quiet>
+          ) : (
+            <ul className="space-y-1">
+              {thisYear.map((item) => (
+                <li
+                  key={item.id}
+                  className="flex items-center justify-between gap-2"
+                >
+                  <Link
+                    href={`/preschool/progress/reports/${item.id}`}
+                    className="underline-offset-4 hover:underline"
+                  >
+                    {item.term.label}, {item.academicYearName}
+                  </Link>
+                  <Badge
+                    variant={
+                      item.status === "published" ? "secondary" : "outline"
+                    }
+                  >
+                    {item.status === "published" ? "Published" : "Draft"}
+                  </Badge>
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      )}
+    </SideCard>
+  );
+}
+
 function FeesCard({ child }: { child: PreschoolChildProfile }) {
   return (
     <SideCard title="Fees" icon={CurrencyInrIcon}>
@@ -190,6 +246,7 @@ export function overviewCards(
     cards.push(
       { key: "attendance", node: <AttendanceCard childId={child.id} /> },
       { key: "daily-report", node: <DailyReportCard childId={child.id} /> },
+      { key: "progress", node: <ProgressCard childId={child.id} /> },
     );
   if (manager) cards.push({ key: "fees", node: <FeesCard child={child} /> });
   return cards;
