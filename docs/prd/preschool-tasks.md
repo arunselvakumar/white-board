@@ -18,21 +18,21 @@ Tickets for [preschool-p0.md](./preschool-p0.md). Architecture: [ADR-0055](../ad
 
 ## Board
 
-| ID     | Title                                                        | Status | Blocked by    |
-| ------ | ------------------------------------------------------------ | ------ | ------------- |
-| PS-001 | Schema, access rules, setup seeding, test fixtures           | `done` |               |
-| PS-002 | Workspace Creation, shell and navigation by Institution Type | `todo` | PS-001        |
-| PS-003 | Centres and franchise details                                | `todo` | PS-001        |
-| PS-004 | Academic Years, Programmes and Classrooms                    | `todo` | PS-001        |
-| PS-005 | Staff and Class Teachers                                     | `todo` | PS-001        |
-| PS-006 | Enquiries and follow-ups                                     | `todo` | PS-001        |
-| PS-007 | Child and Admission                                          | `todo` | PS-004        |
-| PS-008 | Attendance: check-in, check-out, who collected               | `todo` | PS-007        |
-| PS-009 | Daily Report                                                 | `todo` | PS-007        |
-| PS-010 | Fees: Fee Structure, Invoices, Fee Payment, Receipt, Dues    | `todo` | PS-007        |
-| PS-011 | Announcements and events                                     | `todo` | PS-002        |
-| PS-012 | Parent Home                                                  | `todo` | PS-008–PS-011 |
-| PS-013 | Observations and Progress Report                             | `todo` | PS-007        |
-| PS-014 | Stock                                                        | `todo` | PS-007        |
-| PS-015 | Centre Dashboard, Head Office dashboard, Royalty Statement   | `todo` | PS-008–PS-014 |
-| PS-016 | Demo data and browser walkthrough                            | `todo` | all           |
+| ID     | Title                                                        | Status        | Blocked by    |
+| ------ | ------------------------------------------------------------ | ------------- | ------------- |
+| PS-001 | Schema, access rules, setup seeding, test fixtures           | `done`        |               |
+| PS-002 | Workspace Creation, shell and navigation by Institution Type | `done`        | PS-001        |
+| PS-003 | Centres and franchise details                                | `done`        | PS-001        |
+| PS-004 | Academic Years, Programmes and Classrooms                    | `done`        | PS-001        |
+| PS-005 | Staff and Class Teachers                                     | `done`        | PS-001        |
+| PS-006 | Enquiries and follow-ups                                     | `done`        | PS-001        |
+| PS-007 | Child and Admission                                          | `done`        | PS-004        |
+| PS-008 | Attendance: check-in, check-out, who collected               | `done`        | PS-007        |
+| PS-009 | Daily Report                                                 | `done`        | PS-007        |
+| PS-010 | Fees: Fee Structure, Invoices, Fee Payment, Receipt, Dues    | `done`        | PS-007        |
+| PS-011 | Announcements and events                                     | `in_progress` | PS-002        |
+| PS-012 | Parent Home                                                  | `in_progress` | PS-008–PS-011 |
+| PS-013 | Observations and Progress Report                             | `in_progress` | PS-007        |
+| PS-014 | Stock                                                        | `done`        | PS-007        |
+| PS-015 | Centre Dashboard, Head Office dashboard, Royalty Statement   | `done`        | PS-008–PS-014 |
+| PS-016 | Demo data and browser walkthrough                            | `in_progress` | all           |
