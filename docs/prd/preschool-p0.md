@@ -1,7 +1,7 @@
 ---
 title: Preschool P0 — Run the centre from a phone
 slug: preschool-p0
-status: draft
+status: built — defaults awaiting the owner's review
 phase: P0
 product: Whiteboard
 institution_type: preschool
@@ -109,11 +109,12 @@ Each item is a ticket in [preschool-tasks.md](./preschool-tasks.md).
 12. **Observations and Progress Report** — Development Domains seeded from NEP 2020 / NCF Foundational Stage (Physical, Socio-emotional and ethical, Cognitive, Language and literacy, Aesthetic and cultural, Learning habits); Observations; term Progress Report with a 3-point rating (Beginning / Progressing / Proficient), printable.
 13. **Dashboards and royalty** — Centre Dashboard (children present today, seats filled per Classroom, collected this month, dues, open Enquiries, follow-ups due today). Head Office dashboard (the same per Centre, side by side) and monthly Royalty Statement per Franchised Centre.
 14. **Stock** — books, notebooks, stationery, uniforms, kits, toys and learning aids, housekeeping supplies, furniture and equipment. Stock Items with category, unit and reorder level, defined once for the Workspace; stock on hand per Centre; receive stock (supplier, bill number, cost), issue to a Child (kit, books, uniform — the Child's record shows what they have received), issue to a Classroom or Staff, transfer between Centres (Head Office sends kits to a franchisee), adjust for damage or count corrections. Low-stock list on the Centre Dashboard; a stock ledger per item.
-15. **Demo data and walkthrough** — a seed script that builds a franchise Workspace with three Centres and a standalone one, so the suite can be tried immediately.
+15. **Cancel a Receipt** — a Fee Payment entered by mistake is cancelled with a reason; it keeps its number, is marked CANCELLED, and counts for nothing in dues, dashboards and royalty.
+16. **Demo data and walkthrough** — a seed script that builds a franchise Workspace with three Centres and a standalone one, so the suite can be tried immediately.
 
 ## Not in P0 (next, in this order)
 
-Weekly lesson plan published by Head Office · daycare hourly billing and late pick-up charges · transport routes · incident and medication log · staff attendance and leave · late-fee rules · WhatsApp Business API and SMS · online payment gateway · GST invoices for goods · CCTV · native mobile app · child-to-staff ratio alerts.
+Photo uploads in Daily Reports (links only today) · weekly lesson plan published by Head Office · daycare hourly billing and late pick-up charges · transport routes · incident and medication log · staff attendance and leave · late-fee rules · WhatsApp Business API and SMS · online payment gateway · GST invoices for goods · CCTV · native mobile app · child-to-staff ratio alerts.
 
 ## Decisions taken by default (change any of these in the morning)
 
