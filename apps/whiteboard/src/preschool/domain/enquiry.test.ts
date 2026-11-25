@@ -147,41 +147,71 @@ describe("moveEnquiry", () => {
 
 describe("closed Enquiries", () => {
   it("are never edited once admitted", () => {
-    expect(codeOf(() => assertEnquiryEditable("admitted"))).toBe(
-      "ENQUIRY_ADMITTED",
-    );
-    expect(codeOf(() => assertEnquiryEditable("lost"))).toBeNull();
-    expect(codeOf(() => assertEnquiryOpen("lost"))).toBe("ENQUIRY_LOST");
+    expect(
+      codeOf(() => {
+        assertEnquiryEditable("admitted");
+      }),
+    ).toBe("ENQUIRY_ADMITTED");
+    expect(
+      codeOf(() => {
+        assertEnquiryEditable("lost");
+      }),
+    ).toBeNull();
+    expect(
+      codeOf(() => {
+        assertEnquiryOpen("lost");
+      }),
+    ).toBe("ENQUIRY_LOST");
   });
 
   it("are marked lost once and reopened only from lost", () => {
-    expect(codeOf(() => assertCanMarkLost("visited"))).toBeNull();
-    expect(codeOf(() => assertCanMarkLost("lost"))).toBe("ENQUIRY_LOST");
-    expect(codeOf(() => assertCanReopen("lost"))).toBeNull();
-    expect(codeOf(() => assertCanReopen("new"))).toBe("ENQUIRY_NOT_LOST");
-    expect(codeOf(() => assertCanReopen("admitted"))).toBe("ENQUIRY_ADMITTED");
+    expect(
+      codeOf(() => {
+        assertCanMarkLost("visited");
+      }),
+    ).toBeNull();
+    expect(
+      codeOf(() => {
+        assertCanMarkLost("lost");
+      }),
+    ).toBe("ENQUIRY_LOST");
+    expect(
+      codeOf(() => {
+        assertCanReopen("lost");
+      }),
+    ).toBeNull();
+    expect(
+      codeOf(() => {
+        assertCanReopen("new");
+      }),
+    ).toBe("ENQUIRY_NOT_LOST");
+    expect(
+      codeOf(() => {
+        assertCanReopen("admitted");
+      }),
+    ).toBe("ENQUIRY_ADMITTED");
   });
 
   it("become an Admission only while open and in the same Centre", () => {
     expect(
-      codeOf(() =>
-        assertCanAdmitEnquiry({ status: "visited", centreId: "a" }, "a"),
-      ),
+      codeOf(() => {
+        assertCanAdmitEnquiry({ status: "visited", centreId: "a" }, "a");
+      }),
     ).toBeNull();
     expect(
-      codeOf(() =>
-        assertCanAdmitEnquiry({ status: "new", centreId: "a" }, "b"),
-      ),
+      codeOf(() => {
+        assertCanAdmitEnquiry({ status: "new", centreId: "a" }, "b");
+      }),
     ).toBe("ENQUIRY_OTHER_CENTRE");
     expect(
-      codeOf(() =>
-        assertCanAdmitEnquiry({ status: "admitted", centreId: "a" }, "a"),
-      ),
+      codeOf(() => {
+        assertCanAdmitEnquiry({ status: "admitted", centreId: "a" }, "a");
+      }),
     ).toBe("ENQUIRY_ALREADY_ADMITTED");
     expect(
-      codeOf(() =>
-        assertCanAdmitEnquiry({ status: "lost", centreId: "a" }, "a"),
-      ),
+      codeOf(() => {
+        assertCanAdmitEnquiry({ status: "lost", centreId: "a" }, "a");
+      }),
     ).toBe("ENQUIRY_LOST");
   });
 });

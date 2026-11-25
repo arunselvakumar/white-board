@@ -82,36 +82,36 @@ const classroom: ClassroomFacts = {
 describe("assertClassroomFor", () => {
   it("accepts a Classroom of the Centre, Programme and year", () => {
     expect(
-      errorOf(() =>
+      errorOf(() => {
         assertClassroomFor(classroom, {
           centreId: "centre",
           programmeId: "nursery",
           academicYearId: "2026",
-        }),
-      ),
+        });
+      }),
     ).toBeNull();
   });
 
   it("refuses another Centre, Programme or year, and an archived Classroom", () => {
     const want = { centreId: "centre", programmeId: "nursery" };
     expect(
-      errorOf(() =>
-        assertClassroomFor(classroom, { ...want, centreId: "other" }),
-      )?.code,
+      errorOf(() => {
+        assertClassroomFor(classroom, { ...want, centreId: "other" });
+      })?.code,
     ).toBe("CLASSROOM_OTHER_CENTRE");
     expect(
-      errorOf(() =>
-        assertClassroomFor(classroom, { ...want, programmeId: "lkg" }),
-      )?.code,
+      errorOf(() => {
+        assertClassroomFor(classroom, { ...want, programmeId: "lkg" });
+      })?.code,
     ).toBe("CLASSROOM_PROGRAMME_MISMATCH");
     expect(
-      errorOf(() =>
-        assertClassroomFor(classroom, { ...want, academicYearId: "2027" }),
-      )?.code,
+      errorOf(() => {
+        assertClassroomFor(classroom, { ...want, academicYearId: "2027" });
+      })?.code,
     ).toBe("CLASSROOM_YEAR_MISMATCH");
-    const archived = errorOf(() =>
-      assertClassroomFor({ ...classroom, archived: true }, want),
-    );
+    const archived = errorOf(() => {
+      assertClassroomFor({ ...classroom, archived: true }, want);
+    });
     expect(archived?.code).toBe("CLASSROOM_ARCHIVED");
     expect(archived?.kind).toBe("conflict");
   });
@@ -119,10 +119,14 @@ describe("assertClassroomFor", () => {
 
 describe("assertSeatAvailable", () => {
   it("is a conflict with the seats when the Classroom is full", () => {
-    expect(errorOf(() => assertSeatAvailable({ capacity: 2, filled: 1 }))).toBe(
-      null,
-    );
-    const full = errorOf(() => assertSeatAvailable({ capacity: 2, filled: 2 }));
+    expect(
+      errorOf(() => {
+        assertSeatAvailable({ capacity: 2, filled: 1 });
+      }),
+    ).toBe(null);
+    const full = errorOf(() => {
+      assertSeatAvailable({ capacity: 2, filled: 2 });
+    });
     expect(full?.code).toBe("CLASSROOM_FULL");
     expect(full?.kind).toBe("conflict");
     expect(full?.details).toEqual({ capacity: 2, filled: 2, seatsLeft: 0 });
@@ -138,48 +142,58 @@ describe("moving and promoting", () => {
 
   it("moves only to another Classroom of the same Programme and year", () => {
     expect(
-      errorOf(() =>
-        assertClassroomMove(current, { ...classroom, id: "room-b" }),
-      ),
+      errorOf(() => {
+        assertClassroomMove(current, { ...classroom, id: "room-b" });
+      }),
     ).toBeNull();
-    expect(errorOf(() => assertClassroomMove(current, classroom))?.code).toBe(
-      "SAME_CLASSROOM",
-    );
     expect(
-      errorOf(() =>
+      errorOf(() => {
+        assertClassroomMove(current, classroom);
+      })?.code,
+    ).toBe("SAME_CLASSROOM");
+    expect(
+      errorOf(() => {
         assertClassroomMove(current, {
           ...classroom,
           id: "room-b",
           programmeId: "lkg",
-        }),
-      )?.code,
+        });
+      })?.code,
     ).toBe("CLASSROOM_PROGRAMME_MISMATCH");
     expect(
-      errorOf(() =>
+      errorOf(() => {
         assertClassroomMove(current, {
           ...classroom,
           id: "room-b",
           academicYearId: "2027",
-        }),
-      )?.code,
+        });
+      })?.code,
     ).toBe("CLASSROOM_YEAR_MISMATCH");
   });
 
   it("promotes only into a later Academic Year", () => {
     expect(
-      errorOf(() => assertPromotionYear("2026-04-01", "2027-04-01")),
+      errorOf(() => {
+        assertPromotionYear("2026-04-01", "2027-04-01");
+      }),
     ).toBeNull();
     expect(
-      errorOf(() => assertPromotionYear("2026-04-01", "2026-04-01"))?.code,
+      errorOf(() => {
+        assertPromotionYear("2026-04-01", "2026-04-01");
+      })?.code,
     ).toBe("PROMOTION_YEAR_NOT_LATER");
   });
 
   it("never ends an Admission before it began", () => {
     expect(
-      errorOf(() => assertEndsAfterAdmission("2026-06-01", "2026-06-01")),
+      errorOf(() => {
+        assertEndsAfterAdmission("2026-06-01", "2026-06-01");
+      }),
     ).toBeNull();
     expect(
-      errorOf(() => assertEndsAfterAdmission("2026-06-01", "2026-05-31"))?.code,
+      errorOf(() => {
+        assertEndsAfterAdmission("2026-06-01", "2026-05-31");
+      })?.code,
     ).toBe("DATE_BEFORE_ADMISSION");
   });
 });

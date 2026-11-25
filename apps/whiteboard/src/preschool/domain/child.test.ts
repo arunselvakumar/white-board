@@ -37,12 +37,14 @@ describe("formatAdmissionNumber", () => {
 describe("parents", () => {
   it("need at least one phone", () => {
     expect(
-      codeOf(() => assertParentPhone({ fatherPhone: null, motherPhone: null })),
+      codeOf(() => {
+        assertParentPhone({ fatherPhone: null, motherPhone: null });
+      }),
     ).toBe("PARENT_PHONE_REQUIRED");
     expect(
-      codeOf(() =>
-        assertParentPhone({ fatherPhone: null, motherPhone: "9876543210" }),
-      ),
+      codeOf(() => {
+        assertParentPhone({ fatherPhone: null, motherPhone: "9876543210" });
+      }),
     ).toBeNull();
   });
 
@@ -91,18 +93,34 @@ describe("Indian mobile numbers", () => {
 
 describe("a Child's record", () => {
   it("can only be read after withdrawal or graduation", () => {
-    expect(codeOf(() => assertChildActive("active"))).toBeNull();
-    expect(codeOf(() => assertChildActive("withdrawn"))).toBe(
-      "CHILD_NOT_ACTIVE",
-    );
-    expect(codeOf(() => assertChildActive("graduated"))).toBe(
-      "CHILD_NOT_ACTIVE",
-    );
+    expect(
+      codeOf(() => {
+        assertChildActive("active");
+      }),
+    ).toBeNull();
+    expect(
+      codeOf(() => {
+        assertChildActive("withdrawn");
+      }),
+    ).toBe("CHILD_NOT_ACTIVE");
+    expect(
+      codeOf(() => {
+        assertChildActive("graduated");
+      }),
+    ).toBe("CHILD_NOT_ACTIVE");
   });
 
   it("has at most six Authorised Pickups", () => {
-    expect(codeOf(() => assertPickupCount(6))).toBeNull();
-    expect(codeOf(() => assertPickupCount(7))).toBe("TOO_MANY_PICKUPS");
+    expect(
+      codeOf(() => {
+        assertPickupCount(6);
+      }),
+    ).toBeNull();
+    expect(
+      codeOf(() => {
+        assertPickupCount(7);
+      }),
+    ).toBe("TOO_MANY_PICKUPS");
   });
 
   it("names and ages the Child", () => {
