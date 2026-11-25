@@ -178,9 +178,12 @@ const TEACHER_CLOSED_AREAS = new Set([
   "enquiries",
 ]);
 
-/** Head Office screens and Workspace-wide masters: the Owner only. */
+/**
+ * Head Office screens and Workspace-wide masters: the Owner only. Fee
+ * Structures stay open to a Centre Head, who sees their Centre's amounts.
+ */
 const OWNER_ONLY_PATH =
-  /^\/preschool\/(?:head-office|centres|programmes|fees\/structures|stock\/items)(?:\/|$)/;
+  /^\/preschool\/(?:head-office|centres|programmes|stock\/items)(?:\/|$)/;
 
 /**
  * Whether a Preschool role may open a path under `/preschool` (ADR-0055).
