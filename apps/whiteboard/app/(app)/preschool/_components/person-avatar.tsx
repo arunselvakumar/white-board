@@ -22,10 +22,10 @@ function toneFor(seed: string): string {
 }
 
 /**
- * A Child's (or an Authorised Pickup's) photo, or their initials on a
- * colour picked from their id. Stands in for the shared Child avatar.
+ * A person who is not a Child (an Authorised Pickup): their photo, or their
+ * initials on a colour picked from their id. Children use `ChildAvatar`.
  */
-export function ChildInitialsAvatar({
+export function PersonAvatar({
   id,
   name,
   photoUrl,

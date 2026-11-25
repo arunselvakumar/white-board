@@ -6,7 +6,7 @@ import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { cn } from "@repo/ui/lib/utils";
 
-import { ChildInitialsAvatar } from "@/app/(app)/preschool/_components/child-initials-avatar";
+import { ChildAvatar } from "@/app/(app)/preschool/_components/child-avatar";
 import { isClockTime } from "@/src/preschool/domain/attendance";
 import {
   PRESCHOOL_ATTENDANCE_STATUS_LABELS,
@@ -150,10 +150,11 @@ export function AttendanceRow({
   return (
     <li className="bg-card flex min-w-0 flex-col gap-3 rounded-xl border p-3 sm:flex-row sm:flex-wrap sm:items-center">
       <div className="flex min-w-0 flex-1 items-center gap-3">
-        <ChildInitialsAvatar
-          id={child.childId}
+        <ChildAvatar
+          childId={child.childId}
           name={child.name}
           photoUrl={child.photoUrl}
+          className="size-10 shrink-0"
         />
         <p className="flex min-w-0 items-center gap-2 font-medium">
           <span className="truncate">{child.name}</span>

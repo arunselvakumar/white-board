@@ -18,6 +18,8 @@ import {
   NURSERY_B_ID,
   NURSERY_ID,
 } from "@/app/(app)/preschool/_components/preschool-story-fixtures";
+import { daysOfMonth } from "@/src/preschool/domain/attendance";
+import { todayInIndia } from "@/src/preschool/domain/dates";
 import type {
   PreschoolChild,
   PreschoolChildPage,
@@ -148,6 +150,49 @@ function profile(
     ...overrides,
   };
 }
+
+/** Aarav's November so far: present today and twice before, absent once. */
+function attendanceMonth() {
+  const today = todayInIndia(new Date());
+  const days = daysOfMonth(today.slice(0, 7)).map((date) => ({
+    date,
+    status: null as "present" | "absent" | null,
+    checkInTime: null as string | null,
+    checkOutTime: null,
+    collectedByName: null,
+    collectedByKind: null,
+  }));
+  const todayRow = days.find((day) => day.date === today);
+  if (todayRow != null) {
+    todayRow.status = "present";
+    todayRow.checkInTime = "09:05";
+  }
+  return {
+    childId: CHILD_ID,
+    name: "Aarav Kumar",
+    month: today.slice(0, 7),
+    days,
+    totals: { present: 3, absent: 1, leave: 0 },
+  };
+}
+
+const latestReport = {
+  id: "9d0e8400-e29b-41d4-a716-446655440001",
+  childId: CHILD_ID,
+  classroomId: NURSERY_A_ID,
+  date: "2026-11-24",
+  status: "published" as const,
+  publishedAt: NOW,
+  updatedAt: NOW,
+  meals: [{ meal: "lunch" as const, menu: "Curd rice", ate: "some" as const }],
+  napFrom: null,
+  napTo: null,
+  toilet: [],
+  mood: "happy" as const,
+  activities: [],
+  note: "Played well with blocks.",
+  photos: [],
+};
 
 const calls: PreschoolApiCall[] = [];
 
@@ -447,6 +492,17 @@ export const ChildPage: Story = {
       calls,
       centreId: CENTRE_IDS.annaNagar,
       routes: {
+        [`GET /attendance/children/${CHILD_ID}`]: () => ({
+          json: attendanceMonth(),
+        }),
+        [`GET /daily-reports/children/${CHILD_ID}`]: () => ({
+          json: {
+            childId: CHILD_ID,
+            name: "Aarav Kumar",
+            items: [latestReport],
+            nextBefore: null,
+          },
+        }),
         [`GET /children/${CHILD_ID}`]: () => ({ json: profile() }),
         [`POST /children/${CHILD_ID}/health`]: () => ({
           status: 409,
@@ -484,6 +540,16 @@ export const ChildPage: Story = {
     await expect(
       canvas.getByRole("link", { name: "Open fees" }),
     ).toHaveAttribute("href", `/preschool/fees/children/${CHILD_ID}`);
+
+    const glance = within(
+      canvas.getByRole("complementary", { name: "At a glance" }),
+    );
+    await expect(
+      await glance.findByText("Today: Present, in 09:05"),
+    ).toBeVisible();
+    await expect(glance.getByText("Mood: Happy")).toBeVisible();
+    await expect(glance.getByText("Published")).toBeVisible();
+    await expect(glance.getByText("Lunch: ate some")).toBeVisible();
 
     await userEvent.click(canvas.getByRole("tab", { name: "Family" }));
     await expect(

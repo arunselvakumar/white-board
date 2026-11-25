@@ -6,7 +6,7 @@ import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
 
-import { ChildInitialsAvatar } from "@/app/(app)/preschool/_components/child-initials-avatar";
+import { ChildAvatar } from "@/app/(app)/preschool/_components/child-avatar";
 import type { DailyReportContent } from "@/src/preschool/domain/daily-report";
 import type { PreschoolClassroomDailyReports } from "@/src/queries/preschool/daily-reports";
 
@@ -69,11 +69,11 @@ export function ChildReportCard({
     >
       {away ? (
         <div className="flex min-h-16 items-center gap-3 px-3 py-2">
-          <ChildInitialsAvatar
-            id={child.childId}
+          <ChildAvatar
+            childId={child.childId}
             name={child.name}
             photoUrl={child.photoUrl}
-            className="opacity-60"
+            className="size-10 shrink-0 opacity-60"
           />
           <p className="min-w-0 flex-1 truncate font-medium">{child.name}</p>
           <Badge variant="outline">
@@ -93,10 +93,11 @@ export function ChildReportCard({
               setOpened(true);
             }}
           >
-            <ChildInitialsAvatar
-              id={child.childId}
+            <ChildAvatar
+              childId={child.childId}
               name={child.name}
               photoUrl={child.photoUrl}
+              className="size-10 shrink-0"
             />
             <span className="min-w-0 flex-1 truncate font-medium">
               {child.name}
