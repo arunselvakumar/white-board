@@ -32,11 +32,11 @@ function codeOf(run: () => unknown): string | undefined {
 
 describe("cleanMasterName", () => {
   it("trims, collapses spaces, and limits to 100 characters", () => {
-    expect(cleanMasterName("department", "  Masonry   &  Plaster ")).toBe(
+    expect(cleanMasterName("work_type", "  Masonry   &  Plaster ")).toBe(
       "Masonry & Plaster",
     );
-    expect(codeOf(() => cleanMasterName("department", "   "))).toBe(
-      "DEPARTMENT_NAME_REQUIRED",
+    expect(codeOf(() => cleanMasterName("work_type", "   "))).toBe(
+      "WORK_TYPE_NAME_REQUIRED",
     );
     expect(codeOf(() => cleanMasterName("supervisor", "x".repeat(101)))).toBe(
       "SUPERVISOR_NAME_TOO_LONG",
@@ -68,18 +68,18 @@ describe("LookupEntry", () => {
     expect(seed.skill).toBe("unskilled");
     expect(seed.updatedAt).toEqual(LATER);
     expect(seed.setSkill("unskilled", "user_2", LATER)).toBe(false);
-    const department = LookupEntry.create({
+    const amenity = LookupEntry.create({
       id: "0199a1b2-0000-7000-8000-000000000002",
-      kind: "department",
+      kind: "amenity",
       workspaceId: "ws_1",
-      name: "RCC",
+      name: "Gym",
       skill: "unskilled",
       by: "user_1",
       now: NOW,
     });
-    expect(department.skill).toBeNull();
-    expect(department.snapshot()).toEqual({
-      name: "RCC",
+    expect(amenity.skill).toBeNull();
+    expect(amenity.snapshot()).toEqual({
+      name: "Gym",
       isSeed: false,
       disabled: false,
     });

@@ -51,7 +51,6 @@ export type MaterialRequestReadModel = {
   storeName: string | null;
   requestDate: CalendarDate;
   contractor: Named | null;
-  department: Named | null;
   siteLocation: LocationRef | null;
   receiverName: string | null;
   remark: string | null;
@@ -90,7 +89,6 @@ export type MaterialRequestInput = {
   requestDate: CalendarDate;
   storeId: string;
   contractorId?: string | null;
-  departmentId?: string | null;
   siteLocation?: LocationRefInput | null;
   receiverName?: string | null;
   remark?: string | null;
@@ -112,7 +110,6 @@ export type MaterialRequestDraft = Omit<
 
 export type MaterialRequestFormPartyOptions = {
   contractors: Named[];
-  departments: Named[];
 };
 
 export type MaterialRequestFormOptions = MaterialRequestFormPartyOptions & {

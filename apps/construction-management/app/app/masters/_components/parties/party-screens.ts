@@ -18,8 +18,8 @@ export type PartyScreen = {
   empty: string;
   icon: Icon;
   tone: EmptyStateTone;
-  /** Contractors work in Departments; Suppliers have none. */
-  departments: boolean;
+  /** Contractors have a second contact and TDS; Suppliers have neither. */
+  contractor: boolean;
 };
 
 /** The words and paths of the two party masters. */
@@ -30,12 +30,11 @@ export const PARTY_SCREENS: Record<PartyList, PartyScreen> = {
     plural: "Contractors",
     path: "/app/masters/contractors",
     newPath: "/app/masters/contractors/new",
-    meta: "Parties that execute work on your Projects, by Department.",
-    empty:
-      "Add the Contractors you give work to, with the Departments they work in and their Projects.",
+    meta: "Parties that execute work on your Projects.",
+    empty: "Add the Contractors you give work to, and their Projects.",
     icon: HammerIcon,
     tone: "orange",
-    departments: true,
+    contractor: true,
   },
   suppliers: {
     list: "suppliers",
@@ -48,7 +47,7 @@ export const PARTY_SCREENS: Record<PartyList, PartyScreen> = {
       "Add the Suppliers you buy cement, steel, bricks and other material from, and their Projects.",
     icon: TruckIcon,
     tone: "orange",
-    departments: false,
+    contractor: false,
   },
 };
 

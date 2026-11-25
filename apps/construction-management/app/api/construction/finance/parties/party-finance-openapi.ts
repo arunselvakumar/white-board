@@ -67,8 +67,6 @@ import {
 } from "../party-balances/party-balance-workspace-models";
 import {
   ConstructionFinancePartyBalanceResponseModel,
-  GetConstructionFinancePartyFormOptionsRequestModel,
-  GetConstructionFinancePartyFormOptionsResponseModel,
   ListConstructionFinancePartyBalancesRequestModel,
   ListConstructionFinancePartyBalancesResponseModel,
   PARTIES_PATH,
@@ -125,7 +123,6 @@ export const partyFinanceOpenApiComponents: OpenApiComponents = {
   GetConstructionFinanceTdsLedgerResponseModel,
   ConstructionFinancePartyBalanceResponseModel,
   ListConstructionFinancePartyBalancesResponseModel,
-  GetConstructionFinancePartyFormOptionsResponseModel,
   ListConstructionFinanceWorkspacePartyBalancesResponseModel,
 };
 
@@ -155,17 +152,6 @@ export const partyFinanceOpenApiOperations: OpenApiOperation[] = [
     successStatus: StatusCodes.OK,
     successDescription: "Balances with the split by Project",
     successSchema: ListConstructionFinanceWorkspacePartyBalancesResponseModel,
-    errors: READ_ERRORS,
-  },
-  {
-    method: "get",
-    path: `${PARTIES_PATH}/form-options`,
-    summary: "What the invoice form offers for a party (Departments)",
-    tags: TAGS,
-    query: GetConstructionFinancePartyFormOptionsRequestModel,
-    successStatus: StatusCodes.OK,
-    successDescription: "The options",
-    successSchema: GetConstructionFinancePartyFormOptionsResponseModel,
     errors: READ_ERRORS,
   },
   {

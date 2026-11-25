@@ -23,9 +23,9 @@ export const WORK_TYPES_API = "/api/construction/masters/work-types";
 export const WORK_TYPES_KEY = ["masters", "work-types"] as const;
 
 /**
- * The Company's live Work Types by name, each with its Department and
- * Materials; `enabled` for pickers (a worksheet's Work Type), `all` for the
- * master's screen.
+ * The Company's live Work Types by name, each with its Materials;
+ * `enabled` for pickers (a worksheet's Work Type), `all` for the master's
+ * screen.
  */
 export function workTypesQuery(status: "all" | "enabled" = "all") {
   return queryOptions({

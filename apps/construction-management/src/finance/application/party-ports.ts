@@ -119,7 +119,6 @@ export type StoredInvoice = {
   invoiceNumber: string;
   invoiceDate: CalendarDate;
   dueDate: CalendarDate | null;
-  departmentId: string | null;
   taxableAmount: bigint | null;
   gstAmount: bigint | null;
   amount: bigint;
@@ -367,7 +366,6 @@ export type PartyStore = {
         | "invoiceNumber"
         | "invoiceDate"
         | "dueDate"
-        | "departmentId"
         | "taxableAmount"
         | "gstAmount"
         | "amount"

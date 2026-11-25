@@ -18,7 +18,6 @@ import {
 
 import { LookupNameDialog } from "./lookup-name-dialog";
 import {
-  DEPARTMENTS_SCREEN,
   LABOUR_CATEGORIES_SCREEN,
   SKILL_LABELS,
   type LookupScreenConfig,
@@ -222,8 +221,4 @@ function LookupListContent({ config }: { config: LookupScreenConfig }) {
 /** See ADR CM-0035. */
 export function LabourCategoriesList() {
   return <LookupListScreen config={LABOUR_CATEGORIES_SCREEN} />;
-}
-
-export function DepartmentsList() {
-  return <LookupListScreen config={DEPARTMENTS_SCREEN} />;
 }

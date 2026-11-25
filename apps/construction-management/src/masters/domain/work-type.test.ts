@@ -6,8 +6,6 @@ import { WorkType, cleanMaterialIds, cleanWorkTypeName } from "./work-type";
 
 const NOW = new Date("2026-10-08T06:30:00.000Z");
 const LATER = new Date("2026-10-08T07:00:00.000Z");
-const RCC = "0199a1b2-0000-7000-8000-0000000000d1";
-const PLUMBING = "0199a1b2-0000-7000-8000-0000000000d2";
 const CEMENT = "0199a1b2-0000-7000-8000-0000000000m1";
 const STEEL = "0199a1b2-0000-7000-8000-0000000000m2";
 
@@ -27,7 +25,6 @@ function made() {
     workspaceId: "ws_1",
     details: {
       name: "  Column   casting ",
-      departmentId: RCC,
       materialIds: [CEMENT, STEEL, CEMENT],
     },
     by: "user_1",
@@ -40,7 +37,6 @@ function seed() {
     id: "0199a1b2-0000-7000-8000-000000000002",
     workspaceId: "ws_1",
     name: "RCC",
-    departmentId: RCC,
     materialIds: [],
     isSeed: true,
     disabledAt: null,
@@ -75,13 +71,12 @@ describe("WorkType (CM-601)", () => {
   it("changes, disables, enables and deletes a Company Work Type", () => {
     const workType = made();
     workType.update(
-      { name: "Plumbing lines", departmentId: PLUMBING, materialIds: [] },
+      { name: "Plumbing lines", materialIds: [] },
       "user_2",
       LATER,
     );
     expect(workType.snapshot()).toEqual({
       name: "Plumbing lines",
-      departmentId: PLUMBING,
       materialIds: [],
       isSeed: false,
       disabled: false,
@@ -97,30 +92,13 @@ describe("WorkType (CM-601)", () => {
     );
   });
 
-  it("keeps the seed's name and Department, but lets it take Materials and be disabled", () => {
+  it("keeps the seed's name, but lets it take Materials and be disabled", () => {
     const rcc = seed();
-    rcc.update(
-      { name: "RCC", departmentId: RCC, materialIds: [CEMENT] },
-      "user_2",
-      LATER,
-    );
+    rcc.update({ name: "RCC", materialIds: [CEMENT] }, "user_2", LATER);
     expect(rcc.materialIds).toEqual([CEMENT]);
     expect(
       codeOf(() => {
-        rcc.update(
-          { name: "Concrete", departmentId: RCC, materialIds: [] },
-          "user_2",
-          LATER,
-        );
-      }),
-    ).toBe("SEED_IS_READ_ONLY");
-    expect(
-      codeOf(() => {
-        rcc.update(
-          { name: "RCC", departmentId: PLUMBING, materialIds: [] },
-          "user_2",
-          LATER,
-        );
+        rcc.update({ name: "Concrete", materialIds: [] }, "user_2", LATER);
       }),
     ).toBe("SEED_IS_READ_ONLY");
     expect(rcc.setDisabled(true, "user_2", LATER)).toBe(true);

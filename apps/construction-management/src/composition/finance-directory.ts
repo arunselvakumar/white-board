@@ -91,10 +91,7 @@ export const financeDirectory: FinanceDirectory = {
     if (ids.length === 0) return new Map();
     const rows = await db.constructionMastersContractor.findMany({
       where: live(workspaceId, ids),
-      include: {
-        projects: { select: { projectId: true } },
-        departments: { select: { departmentId: true } },
-      },
+      include: { projects: { select: { projectId: true } } },
     });
     return byId(
       rows.map((row): ContractorFacts => ({
@@ -108,7 +105,6 @@ export const financeDirectory: FinanceDirectory = {
         tdsLowerRate: row.tdsLowerRate?.toFixed(2) ?? null,
         tdsNote: row.tdsNote,
         projectIds: row.projects.map((project) => project.projectId),
-        departmentIds: row.departments.map((item) => item.departmentId),
       })),
     );
   },
@@ -196,16 +192,6 @@ export const financeDirectory: FinanceDirectory = {
     return named(
       await db.constructionLabourVendor.findMany({
         where: live(workspaceId, ids),
-        select: { id: true, name: true },
-      }),
-    );
-  },
-
-  async departments(db, workspaceId, ids) {
-    if (ids.length === 0) return new Map();
-    return named(
-      await db.constructionMastersDepartment.findMany({
-        where: { workspaceId, id: { in: [...new Set(ids)] } },
         select: { id: true, name: true },
       }),
     );

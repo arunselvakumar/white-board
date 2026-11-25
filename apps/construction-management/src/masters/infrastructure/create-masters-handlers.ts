@@ -31,9 +31,9 @@ import { PrismaTrackingMasterStore } from "./prisma-tracking-master-store";
 import { PrismaWorkTypeStore } from "./prisma-work-type-store";
 
 /**
- * Labour Categories (`labour_category`) or Departments (`department`).
- * `usage` adds other contexts' references (site work's, wired by the
- * routes from `src/composition`) to the masters' own.
+ * Labour Categories (`labour_category`). `usage` adds other contexts'
+ * references (wired by the routes from `src/composition`) to the masters'
+ * own.
  */
 export function createLookupHandlers(
   kind: LookupKind,

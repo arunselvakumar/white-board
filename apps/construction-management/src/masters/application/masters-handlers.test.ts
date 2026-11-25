@@ -111,13 +111,9 @@ function lookupStore(): LookupStore & { memory: Memory<LookupEntry> } {
     });
   return {
     memory,
-    list: (kind: LookupKind, workspaceId: string) =>
-      Promise.resolve(
-        memory
-          .live(workspaceId)
-          .filter((row) => row.kind === kind)
-          .map(copy),
-      ),
+    // One lookup list now: Labour Categories.
+    list: (_kind: LookupKind, workspaceId: string) =>
+      Promise.resolve(memory.live(workspaceId).map(copy)),
     find: (kind: LookupKind, workspaceId: string, id: string) => {
       const row = memory.rows.get(id);
       return Promise.resolve(
@@ -277,7 +273,7 @@ describe("LookupHandlers", () => {
 
   it("is 409 CHANGED for a stale expectedUpdatedAt", async () => {
     const store = lookupStore();
-    const handlers = new LookupHandlers("department", store, ticking());
+    const handlers = new LookupHandlers("labour_category", store, ticking());
     const made = await handlers.create({
       workspaceId: WS,
       name: "Fencing",
@@ -300,7 +296,7 @@ describe("LookupHandlers", () => {
           by: OWNER,
         }),
       ),
-    ).toBe("DEPARTMENT_CHANGED");
+    ).toBe("LABOUR_CATEGORY_CHANGED");
   });
 
   it("keeps seed rows read-only but lets them be disabled", async () => {
@@ -367,7 +363,7 @@ describe("LookupHandlers", () => {
 
   it("does not show another Company's rows", async () => {
     const store = lookupStore();
-    const handlers = new LookupHandlers("department", store, ticking());
+    const handlers = new LookupHandlers("labour_category", store, ticking());
     const theirs = await handlers.create({
       workspaceId: "ws_2",
       name: "RCC",
@@ -375,7 +371,7 @@ describe("LookupHandlers", () => {
     });
     expect(await handlers.list(WS)).toEqual([]);
     expect(await codeOf(() => handlers.get(WS, theirs.id))).toBe(
-      "DEPARTMENT_NOT_FOUND",
+      "LABOUR_CATEGORY_NOT_FOUND",
     );
   });
 });

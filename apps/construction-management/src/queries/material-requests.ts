@@ -89,7 +89,6 @@ export type MaterialRequestInput = {
   requestDate: string;
   storeId: string;
   contractorId: string | null;
-  departmentId: string | null;
   siteLocation: LocationRefInput | null;
   receiverName: string | null;
   remark: string | null;

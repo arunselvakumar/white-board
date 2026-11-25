@@ -51,10 +51,10 @@ export async function createSupplier(
   return { id: created.id, name };
 }
 
-/** The id of a seeded entry of a Masters list, e.g. a Department. */
+/** The id of a seeded entry of a Masters list, e.g. a Labour Category. */
 export async function lookupId(
   api: ApiClient,
-  list: "departments" | "labour-categories" | "issue-categories" | "work-types",
+  list: "labour-categories" | "issue-categories" | "work-types",
   name: string,
 ): Promise<string> {
   const { items } = await api.get<{ items: { id: string; name: string }[] }>(
@@ -65,28 +65,21 @@ export async function lookupId(
   return found.id;
 }
 
-/** A Contractor on `projectIds`, working in `departments`. */
+/** A Contractor on `projectIds`. */
 export async function createContractor(
   api: ApiClient,
   input: {
     name?: string;
     projectIds?: string[];
     pan?: string;
-    departments?: string[];
   } = {},
 ): Promise<{ id: string; name: string }> {
   const name = input.name ?? unique("Kumar Constructions");
-  const departmentIds = await Promise.all(
-    (input.departments ?? ["Masonry & Plaster"]).map((department) =>
-      lookupId(api, "departments", department),
-    ),
-  );
   const created = await api.post<{ id: string }>(`${MASTERS}/contractors`, {
     name,
     pan: input.pan ?? null,
     stateCode: "33",
     projectIds: input.projectIds ?? [],
-    departmentIds,
   });
   return { id: created.id, name };
 }

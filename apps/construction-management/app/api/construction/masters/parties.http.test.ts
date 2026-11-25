@@ -39,7 +39,6 @@ type Party = {
   gstin: string | null;
   pan: string | null;
   isActive: boolean;
-  departments: Ref[];
   projects: Ref[];
   updatedAt: string;
 };
@@ -69,38 +68,16 @@ async function seedProject(workspaceId: string, name: string) {
   return id;
 }
 
-async function seedDepartment(
-  workspaceId: string,
-  name: string,
-  disabled = false,
-) {
-  const id = newId();
-  await prisma.constructionMastersDepartment.create({
-    data: {
-      id,
-      workspaceId,
-      name: `${name} ${id.slice(-6)}`,
-      disabledAt: disabled ? new Date() : null,
-      createdBy: "test",
-      updatedBy: "test",
-    },
-  });
-  return id;
-}
-
 async function addContractor(company: Company, body: Record<string, unknown>) {
   return createContractor(jsonRequest(CONTRACTORS, company.cookie, body));
 }
 
 describe("Contractors and Suppliers (CM-406)", () => {
-  it("adds, reads, edits, lists and deletes a Contractor with Departments and Projects", async () => {
+  it("adds, reads, edits, lists and deletes a Contractor with Projects", async () => {
     const company = await ownerWithCompany();
-    const [tower, villa, rcc, plumbing, painting] = await Promise.all([
+    const [tower, villa] = await Promise.all([
       seedProject(company.workspaceId, "Tower A"),
       seedProject(company.workspaceId, "Villa Phase 2"),
-      seedDepartment(company.workspaceId, "RCC"),
-      seedDepartment(company.workspaceId, "Plumbing"),
-      seedDepartment(company.workspaceId, "Painting", true),
     ]);
 
     const created = await addContractor(company, {
@@ -111,7 +88,8 @@ describe("Contractors and Suppliers (CM-406)", () => {
       address: "12, Anna Nagar, Chennai",
       gstin: "33aapfa0939f1zm",
       pan: "AAPFA0939F",
-      departmentIds: [rcc],
+      // An old form still sending Departments is not refused (ADR CM-0048).
+      departmentIds: [newId()],
       projectIds: [tower],
     });
     expect(created.status).toBe(StatusCodes.CREATED);
@@ -126,7 +104,7 @@ describe("Contractors and Suppliers (CM-406)", () => {
       isActive: true,
       projects: [{ id: tower, name: "Tower A" }],
     });
-    expect(contractor.departments.map((item) => item.id)).toEqual([rcc]);
+    expect(contractor).not.toHaveProperty("departments");
 
     const read = await getContractor(
       jsonRequest(`${CONTRACTORS}/${contractor.id}`, company.cookie),
@@ -134,26 +112,10 @@ describe("Contractors and Suppliers (CM-406)", () => {
     );
     expect(read.status).toBe(StatusCodes.OK);
 
-    // A disabled Department cannot be added; one already on it may stay.
-    const disabled = await updateContractor(
-      jsonRequest(`${CONTRACTORS}/${contractor.id}/update`, company.cookie, {
-        name: "Sri Balaji Constructions",
-        departmentIds: [rcc, painting],
-        projectIds: [tower],
-        expectedUpdatedAt: contractor.updatedAt,
-      }),
-      params(contractor.id),
-    );
-    expect(disabled.status).toBe(StatusCodes.BAD_REQUEST);
-    expect(await json<{ code: string }>(disabled)).toMatchObject({
-      code: "DEPARTMENT_DISABLED",
-    });
-
     const edited = await updateContractor(
       jsonRequest(`${CONTRACTORS}/${contractor.id}/update`, company.cookie, {
         name: "Sri Balaji Constructions",
         mobile: null,
-        departmentIds: [rcc, plumbing],
         projectIds: [tower, villa],
         expectedUpdatedAt: contractor.updatedAt,
       }),
@@ -163,7 +125,6 @@ describe("Contractors and Suppliers (CM-406)", () => {
     const after = await json<Party>(edited);
     expect(after.mobile).toBeNull();
     expect(after.gstin).toBeNull();
-    expect(after.departments).toHaveLength(2);
     expect(after.projects.map((item) => item.name)).toEqual([
       "Tower A",
       "Villa Phase 2",
@@ -256,13 +217,10 @@ describe("Contractors and Suppliers (CM-406)", () => {
     ]);
   });
 
-  it("checks names, contacts, tax ids, Projects and Departments", async () => {
+  it("checks names, contacts, tax ids and Projects", async () => {
     const company = await ownerWithCompany();
     const other = await ownerWithCompany("Other Builders");
-    const [foreignProject, foreignDepartment] = await Promise.all([
-      seedProject(other.workspaceId, "Theirs"),
-      seedDepartment(other.workspaceId, "RCC"),
-    ]);
+    const foreignProject = await seedProject(other.workspaceId, "Theirs");
     const cases: [Record<string, unknown>, number, string][] = [
       [{ name: " " }, StatusCodes.BAD_REQUEST, "CONTRACTOR_NAME_REQUIRED"],
       [
@@ -296,11 +254,6 @@ describe("Contractors and Suppliers (CM-406)", () => {
         { name: "A", projectIds: [foreignProject] },
         StatusCodes.BAD_REQUEST,
         "PROJECT_NOT_FOUND",
-      ],
-      [
-        { name: "A", departmentIds: [foreignDepartment] },
-        StatusCodes.BAD_REQUEST,
-        "DEPARTMENT_NOT_FOUND",
       ],
     ];
     for (const [body, status, code] of cases) {
@@ -351,7 +304,6 @@ describe("Contractors and Suppliers (CM-406)", () => {
       "Ramco Steel",
       "Kaveri Cements",
     ]);
-    expect(all.items[0]?.departments).toEqual([]);
     expect((await list("q=selvam")).items.map((item) => item.name)).toEqual([
       "Kaveri Cements",
     ]);

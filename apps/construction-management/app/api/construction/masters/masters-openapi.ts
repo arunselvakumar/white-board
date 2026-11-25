@@ -11,12 +11,6 @@ import {
   ListConstructionMastersQueryModel,
 } from "./_lib/master-models";
 import {
-  ConstructionMastersDepartmentResponseModel,
-  CreateConstructionMastersDepartmentRequestModel,
-  ListConstructionMastersDepartmentsResponseModel,
-  UpdateConstructionMastersDepartmentRequestModel,
-} from "./departments/department-models";
-import {
   ConstructionMastersLabourCategoryResponseModel,
   CreateConstructionMastersLabourCategoryRequestModel,
   ListConstructionMastersLabourCategoriesResponseModel,
@@ -49,10 +43,6 @@ export const mastersOpenApiComponents: OpenApiComponents = {
   ConstructionMastersLabourCategoryResponseModel,
   CreateConstructionMastersLabourCategoryRequestModel,
   UpdateConstructionMastersLabourCategoryRequestModel,
-  ListConstructionMastersDepartmentsResponseModel,
-  ConstructionMastersDepartmentResponseModel,
-  CreateConstructionMastersDepartmentRequestModel,
-  UpdateConstructionMastersDepartmentRequestModel,
   ListConstructionMastersSupervisorsResponseModel,
   ConstructionMastersSupervisorResponseModel,
   CreateConstructionMastersSupervisorRequestModel,
@@ -181,18 +171,6 @@ export const mastersOpenApiOperations: OpenApiOperation[] = [
     item: ConstructionMastersLabourCategoryResponseModel,
     create: CreateConstructionMastersLabourCategoryRequestModel,
     update: UpdateConstructionMastersLabourCategoryRequestModel,
-  }),
-  ...masterOperations({
-    path: `${BASE}/departments`,
-    label: "Department",
-    plural: "Departments",
-    menu: "masters.departments",
-    inUse:
-      "409 SEED_IS_READ_ONLY for a seed row, DEPARTMENT_IN_USE while a Work Type, a live Daily Worksheet or Equipment Usage sheet, or a live Task, Issue or Inspection Request uses it.",
-    list: ListConstructionMastersDepartmentsResponseModel,
-    item: ConstructionMastersDepartmentResponseModel,
-    create: CreateConstructionMastersDepartmentRequestModel,
-    update: UpdateConstructionMastersDepartmentRequestModel,
   }),
   ...masterOperations({
     path: `${BASE}/supervisors`,

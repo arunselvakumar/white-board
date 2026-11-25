@@ -33,18 +33,16 @@ function errorMessage(error: unknown): string {
   return fieldForCode(error, {}).message;
 }
 
-/** "RCC · 3 Materials" under a Work Type's name. */
+/** "3 Materials" under a Work Type's name. */
 function detailsOf(item: WorkTypeItem): string {
   const count = item.materials.length;
-  const materials =
-    count === 0
-      ? "No Materials"
-      : `${String(count)} Material${count === 1 ? "" : "s"}`;
-  return `${item.departmentName} · ${materials}`;
+  return count === 0
+    ? "No Materials"
+    : `${String(count)} Material${count === 1 ? "" : "s"}`;
 }
 
 /**
- * Search by name or Department, Add, and per row Edit / Disable / Enable /
+ * Search by name, Add, and per row Edit / Disable / Enable /
  * Delete. The Default Work Type (RCC) is edited for its Materials only and
  * never deleted; disabled rows stay listed, muted.
  */
@@ -65,8 +63,7 @@ export function WorkTypesList() {
   );
 }
 
-const WORK_TYPES_META =
-  "What crews do within a Department, with the Materials they use.";
+const WORK_TYPES_META = "What crews do, with the Materials they use.";
 
 function WorkTypesListContent() {
   const { data } = useSuspenseQuery(workTypesQuery());
@@ -81,11 +78,7 @@ function WorkTypesListContent() {
   const items = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return data.items
-      .filter(
-        (item) =>
-          item.name.toLowerCase().includes(needle) ||
-          item.departmentName.toLowerCase().includes(needle),
-      )
+      .filter((item) => item.name.toLowerCase().includes(needle))
       .sort((a, b) => byName.compare(a.name, b.name));
   }, [data.items, query]);
 
@@ -115,7 +108,7 @@ function WorkTypesListContent() {
             icon={HammerIcon}
             tone="orange"
             title="No Work Types yet"
-            description="Add the kinds of work your crews do, like Column casting under RCC."
+            description="Add the kinds of work your crews do, like Column casting or Plastering."
             action={addButton}
           />
         ) : (

@@ -17,12 +17,12 @@ import { apiJson } from "./http";
 export type PartyList = "contractors" | "suppliers";
 
 /**
- * A Contractor or Supplier as the API returns it. The two share one shape;
- * a Supplier's `departments` is always empty.
+ * A Contractor or Supplier as the API returns it. The two share one
+ * shape.
  */
 export type Party = ConstructionMastersContractorResponseModel;
 export type PartyPage = ListConstructionMastersContractorsResponseModel;
-/** Add form; Suppliers ignore `departmentIds`. */
+/** Add form. */
 export type PartyInput = CreateConstructionMastersContractorRequestModel;
 export type PartyUpdateInput = UpdateConstructionMastersContractorRequestModel;
 

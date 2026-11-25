@@ -257,7 +257,6 @@ function PartyRows({
               <TableHead>Name</TableHead>
               <TableHead>Contact</TableHead>
               <TableHead className="hidden md:table-cell">GST state</TableHead>
-              {screen.departments && <TableHead>Departments</TableHead>}
               <TableHead>Projects</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="w-12">
@@ -282,16 +281,6 @@ function PartyRows({
                 <TableCell className="text-muted-foreground hidden md:table-cell">
                   {party.stateName ?? "—"}
                 </TableCell>
-                {screen.departments && (
-                  <TableCell
-                    className="text-muted-foreground max-w-48 truncate"
-                    title={party.departments
-                      .map((item) => item.name)
-                      .join(", ")}
-                  >
-                    {namesText(party.departments)}
-                  </TableCell>
-                )}
                 <TableCell
                   className="text-muted-foreground max-w-48 truncate"
                   title={party.projects.map((item) => item.name).join(", ")}

@@ -61,7 +61,7 @@ export type PartyStore = {
   /** Inserts and audits; 409 `<KIND>_NAME_IN_USE` for a live name. */
   insert(party: Party, change: MasterChange): Promise<void>;
   /**
-   * Writes the party, its Departments and Projects when its stored
+   * Writes the party and its Projects when its stored
    * `updatedAt` is still `expectedUpdatedAt`, and audits; 409
    * `<KIND>_CHANGED` otherwise, `<KIND>_NAME_IN_USE` for a live name.
    */
@@ -95,11 +95,6 @@ export type PartyDirectory = {
     workspaceId: string,
     ids: readonly string[],
   ): Promise<Map<string, { id: string; name: string }>>;
-  /** The live Departments among `ids`; `disabled` ones leave pickers. */
-  departments(
-    workspaceId: string,
-    ids: readonly string[],
-  ): Promise<Map<string, { id: string; name: string; disabled: boolean }>>;
 };
 
 export type PartyRef = { id: string; name: string };
@@ -124,8 +119,6 @@ export type PartyReadModel = {
   tdsLowerRate: string | null;
   tdsNote: string | null;
   isActive: boolean;
-  /** Live Departments, by name; empty for a Supplier. */
-  departments: PartyRef[];
   /** Live Projects, by name. */
   projects: PartyRef[];
   createdAt: Date;
@@ -136,7 +129,7 @@ export type PartyReadModel = {
 export type ProjectPartyReadModel = {
   id: string;
   name: string;
-  /** Departments for a Contractor, the contact person for a Supplier, else the mobile. */
+  /** The contact person, else the mobile (ADR CM-0048 §2). */
   detail: string | null;
   isActive: boolean;
 };
@@ -144,7 +137,6 @@ export type ProjectPartyReadModel = {
 export type PartyWriteInput = {
   workspaceId: string;
   details: PartyDetailsInput;
-  departmentIds: readonly string[];
   projectIds: readonly string[];
   by: string;
 };
@@ -202,49 +194,14 @@ export class PartyHandlers {
       );
   }
 
-  /**
-   * Departments new to the Contractor must be live and enabled; ones it
-   * already has stay even if Masters disabled them since.
-   */
-  private async assertDepartments(
-    workspaceId: string,
-    ids: readonly string[],
-    existing: readonly string[],
-  ): Promise<void> {
-    if (this.kind !== "contractor") return;
-    const added = [...new Set(ids)].filter((id) => !existing.includes(id));
-    const found = await this.directory.departments(workspaceId, added);
-    for (const id of added) {
-      const department = found.get(id);
-      if (department == null)
-        throw new DomainError(
-          "DEPARTMENT_NOT_FOUND",
-          "Choose Departments from the list. One of them was not found.",
-          { details: { departmentId: id } },
-        );
-      if (department.disabled)
-        throw new DomainError(
-          "DEPARTMENT_DISABLED",
-          `${department.name} is disabled in Masters, so it cannot be added.`,
-          { details: { departmentId: id } },
-        );
-    }
-  }
-
   private async readModels(
     workspaceId: string,
     parties: readonly Party[],
   ): Promise<PartyReadModel[]> {
-    const [projects, departments] = await Promise.all([
-      this.directory.projects(
-        workspaceId,
-        parties.flatMap((party) => party.projectIds),
-      ),
-      this.directory.departments(
-        workspaceId,
-        parties.flatMap((party) => party.departmentIds),
-      ),
-    ]);
+    const projects = await this.directory.projects(
+      workspaceId,
+      parties.flatMap((party) => party.projectIds),
+    );
     const refs = (
       ids: readonly string[],
       found: Map<string, { id: string; name: string }>,
@@ -260,7 +217,6 @@ export class PartyHandlers {
       kind: party.kind,
       ...party.details,
       isActive: party.isActive,
-      departments: refs(party.departmentIds, departments),
       projects: refs(party.projectIds, projects),
       createdAt: party.createdAt,
       updatedAt: party.updatedAt,
@@ -280,14 +236,10 @@ export class PartyHandlers {
     const models = await this.readModels(workspaceId, parties);
     return models.map((model) => {
       const mobile = model.mobile == null ? null : formatMobile(model.mobile);
-      const departments = model.departments.map((item) => item.name).join(", ");
       return {
         id: model.id,
         name: model.name,
-        detail:
-          (departments === "" ? null : departments) ??
-          model.contactPerson ??
-          mobile,
+        detail: model.contactPerson ?? mobile,
         isActive: model.isActive,
       };
     });
@@ -317,13 +269,11 @@ export class PartyHandlers {
       workspaceId: input.workspaceId,
       kind: this.kind,
       details: input.details,
-      departmentIds: input.departmentIds,
       projectIds: input.projectIds,
       by: input.by,
       now,
     });
     await this.assertProjects(input.workspaceId, party.projectIds);
-    await this.assertDepartments(input.workspaceId, party.departmentIds, []);
     await this.store.insert(party, {
       action: `${this.kind}.created`,
       before: null,
@@ -347,11 +297,6 @@ export class PartyHandlers {
     await this.assertProjects(
       input.workspaceId,
       party.projectIds.filter((id) => !keptProjects.has(id)),
-    );
-    await this.assertDepartments(
-      input.workspaceId,
-      party.departmentIds,
-      before.departmentIds,
     );
     await this.store.update(party, input.expectedUpdatedAt, {
       action: `${this.kind}.updated`,

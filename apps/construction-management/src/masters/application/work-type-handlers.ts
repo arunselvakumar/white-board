@@ -23,9 +23,6 @@ export type WorkTypeStatusFilter = "all" | "enabled" | "disabled";
 export type WorkTypeReadModel = {
   id: string;
   name: string;
-  departmentId: string;
-  departmentName: string;
-  departmentDisabled: boolean;
   materials: WorkTypeMaterial[];
   isSeed: boolean;
   disabled: boolean;
@@ -38,9 +35,6 @@ function toReadModel(row: WorkTypeRow): WorkTypeReadModel {
   return {
     id: workType.id,
     name: workType.name,
-    departmentId: workType.departmentId,
-    departmentName: row.departmentName,
-    departmentDisabled: row.departmentDisabled,
     materials: row.materials,
     isSeed: workType.isSeed,
     disabled: workType.disabled,
@@ -51,7 +45,7 @@ function toReadModel(row: WorkTypeRow): WorkTypeReadModel {
 
 /**
  * Work Types (CM-601, menu `masters.work_types`): a name unique among live
- * rows (any case), a live Department, and assigned Materials. Access is
+ * rows (any case) and assigned Materials (ADR CM-0048 §3). Access is
  * checked by the caller.
  */
 export class WorkTypeHandlers {
@@ -69,33 +63,18 @@ export class WorkTypeHandlers {
   }
 
   /**
-   * 400 `DEPARTMENT_NOT_FOUND` / `DEPARTMENT_DISABLED` and
-   * `MATERIAL_NOT_FOUND` / `MATERIAL_DISABLED`; a disabled pick the Work
-   * Type already had is kept.
+   * 400 `MATERIAL_NOT_FOUND` / `MATERIAL_DISABLED`; a disabled Material the
+   * Work Type already had is kept.
    */
   private async checkPicks(
     workspaceId: string,
-    details: { departmentId: string; materialIds: readonly string[] },
-    current: { departmentId: string; materialIds: readonly string[] } | null,
+    details: { materialIds: readonly string[] },
+    current: { materialIds: readonly string[] } | null,
   ): Promise<void> {
-    const [department, materials] = await Promise.all([
-      this.store.department(workspaceId, details.departmentId),
+    const materials =
       details.materialIds.length === 0
         ? []
-        : this.store.materials(workspaceId, details.materialIds),
-    ]);
-    if (department == null)
-      throw new DomainError(
-        "DEPARTMENT_NOT_FOUND",
-        "Choose the Department from the list. It was not found.",
-        { details: { field: "departmentId", id: details.departmentId } },
-      );
-    if (department.disabled && current?.departmentId !== details.departmentId)
-      throw new DomainError(
-        "DEPARTMENT_DISABLED",
-        `${department.name} is disabled in Masters, so it cannot be chosen.`,
-        { details: { field: "departmentId", id: details.departmentId } },
-      );
+        : await this.store.materials(workspaceId, details.materialIds);
     const found = new Map(materials.map((item) => [item.id, item]));
     const missing = details.materialIds.filter((id) => !found.has(id));
     if (missing.length > 0)

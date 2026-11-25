@@ -44,7 +44,6 @@ type Row = {
   deletedAt: Date | null;
   deletedBy: string | null;
   projects: { projectId: string }[];
-  departments?: { departmentId: string }[];
 };
 
 /** Where clause shared by both tables (their columns are the same). */
@@ -103,13 +102,7 @@ type PartyTable = {
 };
 
 function table(db: PrismaClient | Tx, kind: PartyKind): PartyTable {
-  const include =
-    kind === "contractor"
-      ? {
-          projects: { select: { projectId: true } },
-          departments: { select: { departmentId: true } },
-        }
-      : { projects: { select: { projectId: true } } };
+  const include = { projects: { select: { projectId: true } } };
   const delegate = (kind === "contractor"
     ? db.constructionMastersContractor
     : db.constructionMastersSupplier) as unknown as {
@@ -145,9 +138,6 @@ function toParty(kind: PartyKind, row: Row): Party {
     tdsLowerRate: row.tdsLowerRate?.toFixed(2) ?? null,
     tdsNote: row.tdsNote ?? null,
     isActive: row.isActive,
-    departmentIds: (row.departments ?? [])
-      .map((item) => item.departmentId)
-      .sort(),
     projectIds: row.projects.map((item) => item.projectId).sort(),
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
@@ -204,27 +194,16 @@ function columns(party: Party): Data {
   };
 }
 
-async function insertLinks(
-  tx: Tx,
-  party: Party,
-  links: { projects: boolean; departments: boolean },
-): Promise<void> {
-  if (party.kind === "contractor") {
-    if (links.projects && party.projectIds.length > 0)
-      await tx.constructionMastersContractorProject.createMany({
-        data: party.projectIds.map((projectId) => ({
-          contractorId: party.id,
-          projectId,
-        })),
-      });
-    if (links.departments && party.departmentIds.length > 0)
-      await tx.constructionMastersContractorDepartment.createMany({
-        data: party.departmentIds.map((departmentId) => ({
-          contractorId: party.id,
-          departmentId,
-        })),
-      });
-  } else if (links.projects && party.projectIds.length > 0)
+async function insertLinks(tx: Tx, party: Party): Promise<void> {
+  if (party.projectIds.length === 0) return;
+  if (party.kind === "contractor")
+    await tx.constructionMastersContractorProject.createMany({
+      data: party.projectIds.map((projectId) => ({
+        contractorId: party.id,
+        projectId,
+      })),
+    });
+  else
     await tx.constructionMastersSupplierProject.createMany({
       data: party.projectIds.map((projectId) => ({
         supplierId: party.id,
@@ -234,18 +213,15 @@ async function insertLinks(
 }
 
 async function replaceLinks(tx: Tx, party: Party): Promise<void> {
-  if (party.kind === "contractor") {
+  if (party.kind === "contractor")
     await tx.constructionMastersContractorProject.deleteMany({
       where: { contractorId: party.id },
     });
-    await tx.constructionMastersContractorDepartment.deleteMany({
-      where: { contractorId: party.id },
-    });
-  } else
+  else
     await tx.constructionMastersSupplierProject.deleteMany({
       where: { supplierId: party.id },
     });
-  await insertLinks(tx, party, { projects: true, departments: true });
+  await insertLinks(tx, party);
 }
 
 async function linkProject(
@@ -397,7 +373,7 @@ export class PrismaPartyStore implements PartyStore {
         if (party.kind === "contractor")
           await tx.constructionMastersContractor.create({ data });
         else await tx.constructionMastersSupplier.create({ data });
-        await insertLinks(tx, party, { projects: true, departments: true });
+        await insertLinks(tx, party);
         await recordAudit(tx, audit(party, change));
       });
     } catch (error) {
@@ -454,8 +430,8 @@ export class PrismaPartyStore implements PartyStore {
 }
 
 /**
- * Projects and Departments by id: the projects context's table is read
- * directly (no import of its code); Departments are this context's own.
+ * Projects by id: the projects context's table is read directly (no
+ * import of its code).
  */
 export class PrismaPartyDirectory implements PartyDirectory {
   constructor(private readonly db: PrismaClient) {}
@@ -470,22 +446,5 @@ export class PrismaPartyDirectory implements PartyDirectory {
       select: { id: true, name: true },
     });
     return new Map(rows.map((row) => [row.id, row]));
-  }
-
-  async departments(
-    workspaceId: string,
-    ids: readonly string[],
-  ): Promise<Map<string, { id: string; name: string; disabled: boolean }>> {
-    if (ids.length === 0) return new Map();
-    const rows = await this.db.constructionMastersDepartment.findMany({
-      where: { workspaceId, id: { in: [...new Set(ids)] }, deletedAt: null },
-      select: { id: true, name: true, disabledAt: true },
-    });
-    return new Map(
-      rows.map((row) => [
-        row.id,
-        { id: row.id, name: row.name, disabled: row.disabledAt != null },
-      ]),
-    );
   }
 }

@@ -81,7 +81,6 @@ export const partyFormSchema = z
     /** Checked only while TDS applies; ignored (and sent as null) when off. */
     tdsLowerRate: z.string().trim(),
     tdsNote: z.string().trim().max(500, "Use at most 500 characters"),
-    departmentIds: z.array(z.string()),
     projectIds: z.array(z.string()),
   })
   .superRefine((values, ctx) => {
@@ -134,7 +133,6 @@ export function partyFormDefaults(party: Party | null): PartyFormValues {
     tdsApplicable: party?.tds?.applicable ?? true,
     tdsLowerRate: party?.tds?.lowerRate ?? "",
     tdsNote: party?.tds?.note ?? "",
-    departmentIds: party?.departments.map((item) => item.id) ?? [],
     projectIds: party?.projects.map((item) => item.id) ?? [],
   };
 }
@@ -146,7 +144,7 @@ function orNull(value: string): string | null {
 
 /**
  * What Add and Edit send. With a valid GSTIN the state is the GSTIN's; a
- * Supplier has no Departments and no second contact (Contractors only).
+ * Supplier has no second contact and no TDS (Contractors only).
  */
 export function partyPayload(
   values: PartyFormValues,
@@ -169,7 +167,6 @@ export function partyPayload(
       ? {
           contactPerson2: orNull(values.contactPerson2),
           mobile2: orNull(values.mobile2),
-          departmentIds: values.departmentIds,
           tdsApplicable: values.tdsApplicable,
           tdsLowerRate: values.tdsApplicable
             ? orNull(values.tdsLowerRate)
@@ -192,8 +189,6 @@ const FIELD_BY_CODE: Record<string, keyof PartyFormValues> = {
   GSTIN_STATE_MISMATCH: "stateCode",
   CONTACT_PERSON_2_TOO_LONG: "contactPerson2",
   MOBILE_2_INVALID: "mobile2",
-  DEPARTMENT_NOT_FOUND: "departmentIds",
-  DEPARTMENT_DISABLED: "departmentIds",
   PROJECT_NOT_FOUND: "projectIds",
   TDS_LOWER_RATE_INVALID: "tdsLowerRate",
   TDS_NOTE_TOO_LONG: "tdsNote",

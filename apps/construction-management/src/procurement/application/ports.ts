@@ -81,9 +81,6 @@ export type TeamMemberFacts = {
   name: string;
 };
 
-/** Names of the Department master (MR "Department"). */
-export type DepartmentFacts = { id: string; name: string; disabled: boolean };
-
 type Db = Prisma.TransactionClient;
 
 export type ProcurementDirectory = {
@@ -102,11 +99,6 @@ export type ProcurementDirectory = {
     workspaceId: string,
     ids: readonly string[],
   ): Promise<Map<string, ContractorFacts>>;
-  departments(
-    db: Db,
-    workspaceId: string,
-    ids: readonly string[],
-  ): Promise<Map<string, DepartmentFacts>>;
   billingAddresses(
     db: Db,
     workspaceId: string,

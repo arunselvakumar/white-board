@@ -123,10 +123,6 @@ export const SuppliersOnAPhone: Story = {
   play: async ({ canvas, canvasElement }) => {
     const table = await canvas.findByRole("table", { name: "Suppliers" });
     await expect(within(table).getByText("Kaveri Cements")).toBeVisible();
-    // Suppliers have no Departments column.
-    await expect(
-      within(table).queryByRole("columnheader", { name: "Departments" }),
-    ).toBeNull();
     await expect(canvas.getByText("1 Supplier")).toBeVisible();
     const html = canvasElement.ownerDocument.documentElement;
     await expect(html.scrollWidth).toBeLessThanOrEqual(html.clientWidth);

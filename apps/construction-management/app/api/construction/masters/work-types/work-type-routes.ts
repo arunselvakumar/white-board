@@ -15,9 +15,6 @@ export function toWorkTypeResponse(
   return {
     id: item.id,
     name: item.name,
-    departmentId: item.departmentId,
-    departmentName: item.departmentName,
-    departmentDisabled: item.departmentDisabled,
     materials: item.materials,
     isSeed: item.isSeed,
     disabled: item.disabled,

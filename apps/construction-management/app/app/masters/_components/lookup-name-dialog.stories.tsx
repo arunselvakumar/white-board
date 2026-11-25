@@ -7,18 +7,13 @@ import {
 } from "@/app/app/_components/masters/masters-story-support";
 
 import { LookupNameDialog } from "./lookup-name-dialog";
-import {
-  DEPARTMENTS_SCREEN,
-  LABOUR_CATEGORIES_SCREEN,
-} from "@/app/app/_components/masters/lookup-screens";
+import { LABOUR_CATEGORIES_SCREEN } from "@/app/app/_components/masters/lookup-screens";
 import {
   serveMasters,
-  STORY_DEPARTMENTS,
   STORY_LABOUR_CATEGORIES,
 } from "@/app/app/_components/masters/masters-story-support";
 
 const CATEGORIES = "/api/construction/masters/labour-categories";
-const DEPARTMENTS = "/api/construction/masters/departments";
 
 let api: ReturnType<typeof serveMasters>;
 
@@ -187,31 +182,5 @@ export const RenameSendsLoadedUpdatedAt: Story = {
       expectedUpdatedAt: BAR_BENDER?.updatedAt,
       skill: "skilled",
     });
-  },
-};
-
-export const AddDepartment: Story = {
-  args: { config: DEPARTMENTS_SCREEN },
-  beforeEach: () => {
-    api = serveMasters({
-      base: DEPARTMENTS,
-      code: "DEPARTMENT",
-      initial: STORY_DEPARTMENTS,
-    });
-    return api.restore;
-  },
-  play: async ({ args, canvasElement, userEvent }) => {
-    const dialog = within(
-      await within(canvasElement.ownerDocument.body).findByRole("dialog"),
-    );
-    await userEvent.type(dialog.getByLabelText("Department name"), "rcc");
-    await userEvent.click(dialog.getByRole("button", { name: "Save" }));
-    await expect(
-      await dialog.findByText("A row with this name already exists."),
-    ).toBeVisible();
-    await userEvent.clear(dialog.getByLabelText("Department name"));
-    await userEvent.type(dialog.getByLabelText("Department name"), "Glazing");
-    await userEvent.click(dialog.getByRole("button", { name: "Save" }));
-    await waitFor(() => expect(args.onClose).toHaveBeenCalled());
   },
 };

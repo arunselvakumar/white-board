@@ -46,7 +46,7 @@ export function assertOnPlace(
 export const partyNotFound = (type: PartyType) =>
   notFound("PARTY_NOT_FOUND", `This ${PARTY_TYPE_LABELS[type]} was not found.`);
 
-/** A live party of any type, with its Projects (and Departments). */
+/** A live party of any type, with its Projects. */
 export async function loadParty(
   deps: Pick<PartyFinanceDeps, "directory" | "store">,
   db: FinanceTx,
@@ -65,7 +65,6 @@ export async function loadParty(
       name: row.name,
       pan: row.pan,
       projectIds: row.projectIds,
-      departmentIds: row.departmentIds,
     };
   }
   if (type === "supplier") {
@@ -77,7 +76,6 @@ export async function loadParty(
       name: row.name,
       pan: row.pan,
       projectIds: row.projectIds,
-      departmentIds: [],
     };
   }
   const row = (await deps.store.otherParties(db, workspaceId, [id])).get(id);
@@ -88,7 +86,6 @@ export async function loadParty(
     name: row.name,
     pan: row.pan,
     projectIds: row.projectIds,
-    departmentIds: [],
   };
 }
 

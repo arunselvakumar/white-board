@@ -86,18 +86,3 @@ export function toPartyBalancesResponse(
     totals: figures(balances.totals),
   };
 }
-
-export const GetConstructionFinancePartyFormOptionsRequestModel = z.object({
-  partyType: PartyTypeModel,
-  partyId: z.uuid(),
-  projectId: z.uuid().optional(),
-  storeId: z.uuid().optional(),
-});
-
-export const GetConstructionFinancePartyFormOptionsResponseModel = z.object({
-  /** A Contractor's Departments, for its invoices. */
-  departments: z.array(z.object({ id: z.uuid(), name: z.string() })),
-});
-export type GetConstructionFinancePartyFormOptionsResponse = z.infer<
-  typeof GetConstructionFinancePartyFormOptionsResponseModel
->;

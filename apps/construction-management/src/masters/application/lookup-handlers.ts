@@ -14,7 +14,7 @@ import type { LookupStore, MasterUsage } from "./ports";
 export type LookupEntryReadModel = {
   id: string;
   name: string;
-  /** A Labour Category's skill; null for Departments. */
+  /** A Labour Category's skill. */
   skill: LabourSkill | null;
   isSeed: boolean;
   disabled: boolean;
@@ -40,8 +40,8 @@ export function toLookupEntryReadModel(
 }
 
 /**
- * Labour Categories and Departments (CM-203): the same commands over two
- * lists. Access is checked by the caller.
+ * Labour Categories (CM-203): a name-only list with a skill. Access is
+ * checked by the caller.
  */
 export class LookupHandlers {
   constructor(
@@ -129,7 +129,7 @@ export class LookupHandlers {
       entry.rename(input.name, input.by, now);
       changed = true;
     }
-    if (input.skill != null && this.kind === "labour_category")
+    if (input.skill != null)
       changed = entry.setSkill(input.skill, input.by, now) || changed;
     if (changed)
       await this.store.update(entry, input.expectedUpdatedAt, {

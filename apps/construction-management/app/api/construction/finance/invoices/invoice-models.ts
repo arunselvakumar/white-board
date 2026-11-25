@@ -33,8 +33,6 @@ const InvoiceBody = z.object({
   invoiceDate: z.iso.date(),
   /** On or after the invoice date. */
   dueDate: z.iso.date().nullable().optional(),
-  /** Contractor invoices: one of the Contractor's Departments. */
-  departmentId: z.uuid().nullable().optional(),
   /** Paise; with GST at most the amount. */
   taxableAmount: Paise.min(0).nullable().optional(),
   gstAmount: Paise.min(0).nullable().optional(),
@@ -137,9 +135,6 @@ export const ConstructionFinanceInvoiceResponseModel = z.object({
   invoiceNumber: z.string(),
   invoiceDate: z.iso.date(),
   dueDate: z.iso.date().nullable(),
-  department: z
-    .object({ id: z.uuid(), name: z.string().nullable() })
-    .nullable(),
   taxableAmount: Paise.nullable(),
   gstAmount: Paise.nullable(),
   amount: Paise,
@@ -238,10 +233,6 @@ export function toInvoiceResponse(
     invoiceNumber: view.invoiceNumber,
     invoiceDate: view.invoiceDate,
     dueDate: view.dueDate,
-    department:
-      view.departmentId == null
-        ? null
-        : { id: view.departmentId, name: view.departmentName },
     taxableAmount: moneyOrNull(view.taxableAmount),
     gstAmount: moneyOrNull(view.gstAmount),
     amount: money(view.amount),

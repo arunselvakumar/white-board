@@ -142,7 +142,7 @@ export const PaymentsAndStatement: Story = {
   },
 };
 
-/** A Contractor with nothing yet: empty lists, Set opening and New invoice with a Department. */
+/** A Contractor with nothing yet: empty lists, Set opening and New invoice with no Department. */
 export const ContractorEmptyThenInvoice: Story = {
   args: { partyType: "contractor", partyId: CONTRACTOR_ID },
   beforeEach: () => {
@@ -186,8 +186,9 @@ export const ContractorEmptyThenInvoice: Story = {
       await dialog.findByText("Enter the party's invoice number"),
     ).toBeVisible();
     await userEvent.type(dialog.getByLabelText("Invoice number"), "RA-4");
-    await userEvent.click(dialog.getByRole("combobox", { name: "Department" }));
-    await userEvent.click(await body.findByRole("option", { name: "RCC" }));
+    await expect(
+      dialog.queryByRole("combobox", { name: "Department" }),
+    ).toBeNull();
     await userEvent.type(dialog.getByLabelText("Taxable value"), "100000");
     await userEvent.type(dialog.getByLabelText("GST"), "18000");
     await userEvent.type(dialog.getByLabelText("Amount"), "100000");
@@ -205,7 +206,6 @@ export const ContractorEmptyThenInvoice: Story = {
         partyType: "contractor",
         partyId: CONTRACTOR_ID,
         invoiceNumber: "RA-4",
-        departmentId: "0199a000-0000-7000-8000-0000000000e1",
         taxableAmount: 1_00_000_00,
         gstAmount: 18_000_00,
         amount: 1_18_000_00,

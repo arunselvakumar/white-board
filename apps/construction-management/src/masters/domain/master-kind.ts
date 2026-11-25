@@ -4,8 +4,8 @@ import {
   notFound,
 } from "@/src/shared-kernel/domain-error";
 
-/** The name-only lookup lists: same fields, same rules, their own table. */
-export const LOOKUP_KINDS = ["labour_category", "department"] as const;
+/** The name-only lookup list with its own table: Labour Categories. */
+export const LOOKUP_KINDS = ["labour_category"] as const;
 export type LookupKind = (typeof LOOKUP_KINDS)[number];
 
 /**
@@ -68,11 +68,6 @@ export const MASTER_KINDS: Record<MasterKind, MasterKindInfo> = {
     code: "LABOUR_CATEGORY",
     label: "Labour Category",
     plural: "Labour Categories",
-  },
-  department: {
-    code: "DEPARTMENT",
-    label: "Department",
-    plural: "Departments",
   },
   supervisor: {
     code: "SUPERVISOR",
@@ -182,11 +177,6 @@ export function masterInUse(kind: MasterKind): DomainError {
     return conflict(
       `${code}_IN_USE`,
       "Daily Worksheets use this Work Type, so it cannot be deleted. Disable it instead.",
-    );
-  if (kind === "department")
-    return conflict(
-      `${code}_IN_USE`,
-      "Work Types, Daily Worksheets, Equipment Usage sheets, Tasks, Issues & Snags or Inspection Requests use this Department, so it cannot be deleted. Disable it instead.",
     );
   if (kind === "amenity" || kind === "common_development")
     return conflict(

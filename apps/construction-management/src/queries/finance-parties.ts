@@ -12,10 +12,7 @@ import type {
   ListConstructionFinanceOutstandingInvoicesResponse,
   UpdateConstructionFinanceInvoiceRequestModel,
 } from "@/app/api/construction/finance/invoices/invoice-models";
-import type {
-  GetConstructionFinancePartyFormOptionsResponse,
-  ListConstructionFinancePartyBalancesResponse,
-} from "@/app/api/construction/finance/parties/party-balance-models";
+import type { ListConstructionFinancePartyBalancesResponse } from "@/app/api/construction/finance/parties/party-balance-models";
 import type {
   ConstructionFinancePartyOpeningResponse,
   ListConstructionFinancePartyOpeningsResponse,
@@ -95,22 +92,6 @@ export function partyBalancesQuery(projectId: string, partyType: PartyType) {
   return queryOptions({
     queryKey: [...FINANCE_PARTIES_KEY, "balances", query],
     queryFn: () => apiJson<PartyBalances>(`${FINANCE_API}/parties?${query}`),
-  });
-}
-
-export function partyFormOptionsQuery(
-  projectId: string,
-  partyType: PartyType,
-  partyId: string,
-) {
-  const query = search({ projectId, partyType, partyId });
-  return queryOptions({
-    queryKey: [...FINANCE_PARTIES_KEY, "form-options", query],
-    queryFn: () =>
-      apiJson<GetConstructionFinancePartyFormOptionsResponse>(
-        `${FINANCE_API}/parties/form-options?${query}`,
-      ),
-    staleTime: 60_000,
   });
 }
 

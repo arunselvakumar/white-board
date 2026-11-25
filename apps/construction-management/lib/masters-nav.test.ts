@@ -28,6 +28,8 @@ describe("MASTERS_GROUPS", () => {
     // Designations are gone (ADR CM-0033).
     expect(activeMastersSection("/app/masters/team-members")).toBeUndefined();
     expect(activeMastersSection("/app/masters/designations")).toBeUndefined();
+    // The Department master is gone too (ADR CM-0048).
+    expect(activeMastersSection("/app/masters/departments")).toBeUndefined();
     // Labours, Site Engineers and Vendors are in Human Resources → Staff.
     expect(activeMastersSection("/app/staff/labours")).toBeUndefined();
     expect(MASTERS_GROUPS.map((group) => group.label)).not.toContain(

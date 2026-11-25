@@ -1,11 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { PackageIcon } from "@phosphor-icons/react/ssr";
 import { X } from "lucide-react";
 import { useId } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
@@ -19,20 +18,12 @@ import {
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@repo/ui/components/select";
 import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MaterialPicker } from "@/app/app/_components/procurement/material-picker";
 import { fieldForCode } from "@/lib/server-errors";
-import { lookupListQuery } from "@/src/queries/masters";
 import {
   useWorkTypeCommand,
   type WorkTypeItem,
@@ -46,7 +37,6 @@ const schema = z.object({
     .trim()
     .min(1, "Enter the Work Type name")
     .max(NAME_MAX, `Use at most ${String(NAME_MAX)} characters`),
-  departmentId: z.string().min(1, "Choose a Department"),
   materials: z.array(
     z.object({
       materialId: z.string(),
@@ -63,17 +53,15 @@ const SERVER_FIELDS: Record<string, keyof Values> = {
   WORK_TYPE_NAME_REQUIRED: "name",
   WORK_TYPE_NAME_TOO_LONG: "name",
   WORK_TYPE_NAME_IN_USE: "name",
-  DEPARTMENT_NOT_FOUND: "departmentId",
-  DEPARTMENT_DISABLED: "departmentId",
   MATERIAL_NOT_FOUND: "materials",
   MATERIAL_DISABLED: "materials",
   WORK_TYPE_MATERIALS_TOO_MANY: "materials",
 };
 
 /**
- * Add a Work Type or change one: its name, Department and the Materials a
- * worksheet offers first. The Default Work Type (RCC) keeps its name and
- * Department; its Materials can change.
+ * Add a Work Type or change one: its name and the Materials a worksheet
+ * offers first. The Default Work Type (RCC) keeps its name; its Materials
+ * can change.
  */
 export function WorkTypeDialog({
   item,
@@ -84,16 +72,12 @@ export function WorkTypeDialog({
   onClose: () => void;
 }) {
   const id = useId();
-  const { data: departments } = useSuspenseQuery(
-    lookupListQuery("departments"),
-  );
   const command = useWorkTypeCommand();
   const locked = item?.isSeed === true;
   const form = useForm<Values>({
     resolver: zodResolver(schema),
     defaultValues: {
       name: item?.name ?? "",
-      departmentId: item?.departmentId ?? "",
       materials: (item?.materials ?? []).map((material) => ({
         materialId: material.id,
         name: material.name,
@@ -105,23 +89,9 @@ export function WorkTypeDialog({
   const materials = useFieldArray({ control: form.control, name: "materials" });
   const errors = form.formState.errors;
 
-  // Enabled Departments, and the one the Work Type already has.
-  const departmentItems = departments.items
-    .filter(
-      (department) =>
-        !department.disabled || department.id === item?.departmentId,
-    )
-    .map((department) => ({
-      value: department.id,
-      label: department.disabled
-        ? `${department.name} (disabled)`
-        : department.name,
-    }));
-
   const submit = form.handleSubmit(async (values) => {
     const input = {
       name: values.name,
-      departmentId: values.departmentId,
       materialIds: values.materials.map((material) => material.materialId),
     };
     try {
@@ -162,74 +132,32 @@ export function WorkTypeDialog({
               {item == null ? "Add Work Type" : `Edit ${item.name}`}
             </DialogTitle>
             <DialogDescription>
-              What a crew does within a Department. Its Materials are offered
-              first on a Daily Worksheet.
+              What a crew does. Its Materials are offered first on a Daily
+              Worksheet.
             </DialogDescription>
           </DialogHeader>
           <div className="min-h-0 space-y-5 overflow-y-auto">
             {locked ? (
               <p className="text-muted-foreground text-sm">
-                This Default Work Type keeps its name and Department. You can
-                change its Materials.
+                This Default Work Type keeps its name. You can change its
+                Materials.
               </p>
             ) : null}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-1.5">
-                <Label htmlFor={`${id}-name`} required>
-                  Work Type name
-                </Label>
-                <Input
-                  id={`${id}-name`}
-                  className="h-10"
-                  autoComplete="off"
-                  aria-required
-                  placeholder="Column casting"
-                  readOnly={locked}
-                  aria-invalid={errors.name != null}
-                  {...form.register("name")}
-                />
-                <FieldError message={errors.name?.message} />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor={`${id}-department`} required>
-                  Department
-                </Label>
-                <Controller
-                  control={form.control}
-                  name="departmentId"
-                  render={({ field }) => (
-                    <Select
-                      items={departmentItems}
-                      value={field.value === "" ? null : field.value}
-                      disabled={locked}
-                      onValueChange={(next) => {
-                        if (next != null) field.onChange(next);
-                      }}
-                    >
-                      <SelectTrigger
-                        id={`${id}-department`}
-                        className="w-full min-w-0"
-                        aria-required
-                        aria-invalid={errors.departmentId != null}
-                      >
-                        <SelectValue placeholder="Choose…" />
-                      </SelectTrigger>
-                      <SelectContent
-                        align="start"
-                        alignItemWithTrigger={false}
-                        aria-label="Departments"
-                      >
-                        {departmentItems.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                <FieldError message={errors.departmentId?.message} />
-              </div>
+            <div className="space-y-1.5">
+              <Label htmlFor={`${id}-name`} required>
+                Work Type name
+              </Label>
+              <Input
+                id={`${id}-name`}
+                className="h-10"
+                autoComplete="off"
+                aria-required
+                placeholder="Column casting"
+                readOnly={locked}
+                aria-invalid={errors.name != null}
+                {...form.register("name")}
+              />
+              <FieldError message={errors.name?.message} />
             </div>
             <section aria-labelledby={`${id}-materials`} className="space-y-3">
               <div className="space-y-1">

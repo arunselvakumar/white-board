@@ -16,7 +16,7 @@ export {
 
 /**
  * The two minimal party masters M4 ships for Project Resources (ADR
- * CM-0013 §6): Contractors (who execute work, by Department) and Suppliers
+ * CM-0013 §6): Contractors (who execute work) and Suppliers
  * (who sell material). CM-501 adds quotations, opening balances and the
  * procurement fields.
  */
@@ -113,8 +113,6 @@ export type PartyProps = PartyDetails & {
   workspaceId: string;
   kind: PartyKind;
   isActive: boolean;
-  /** Departments a Contractor works in; always empty for a Supplier. */
-  departmentIds: string[];
   /** Projects the party is assigned to (Resources). */
   projectIds: string[];
   createdAt: Date;
@@ -127,7 +125,6 @@ export type PartyProps = PartyDetails & {
 
 export type PartySnapshot = PartyDetails & {
   isActive: boolean;
-  departmentIds: string[];
   projectIds: string[];
 };
 
@@ -288,7 +285,6 @@ export class Party {
     workspaceId: string;
     kind: PartyKind;
     details: PartyDetailsInput;
-    departmentIds: readonly string[];
     projectIds: readonly string[];
     by: string;
     now: Date;
@@ -299,8 +295,6 @@ export class Party {
       kind: input.kind,
       ...partyDetails(input.kind, input.details),
       isActive: true,
-      departmentIds:
-        input.kind === "contractor" ? unique(input.departmentIds) : [],
       projectIds: unique(input.projectIds),
       createdAt: input.now,
       updatedAt: input.now,
@@ -362,9 +356,6 @@ export class Party {
   get isActive(): boolean {
     return this.props.isActive;
   }
-  get departmentIds(): readonly string[] {
-    return this.props.departmentIds;
-  }
   get projectIds(): readonly string[] {
     return this.props.projectIds;
   }
@@ -391,7 +382,6 @@ export class Party {
     return {
       ...this.details,
       isActive: this.props.isActive,
-      departmentIds: [...this.props.departmentIds],
       projectIds: [...this.props.projectIds],
     };
   }
@@ -404,11 +394,10 @@ export class Party {
     this.props = { ...this.props, updatedAt: now, updatedBy: by };
   }
 
-  /** The master form: details, Departments and Projects together. */
+  /** The master form: details and Projects together. */
   update(
     input: {
       details: PartyDetailsInput;
-      departmentIds: readonly string[];
       projectIds: readonly string[];
     },
     by: string,
@@ -431,8 +420,6 @@ export class Party {
     this.props = {
       ...this.props,
       ...partyDetails(this.props.kind, details),
-      departmentIds:
-        this.props.kind === "contractor" ? unique(input.departmentIds) : [],
       projectIds: unique(input.projectIds),
     };
     this.touch(by, now);

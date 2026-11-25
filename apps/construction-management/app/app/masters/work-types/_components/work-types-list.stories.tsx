@@ -43,7 +43,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** The RCC default, Company Work Types with their Department and Materials. */
+/** The RCC default, Company Work Types with their Materials. */
 export const WithWorkTypes: Story = {
   beforeEach: serve({ inUse: ["Column casting"] }),
   play: async ({ canvas, canvasElement, userEvent }) => {
@@ -52,14 +52,14 @@ export const WithWorkTypes: Story = {
       within(rowNamed(list, "RCC")).getByText("Default"),
     ).toBeVisible();
     await expect(
-      within(rowNamed(list, "Column casting")).getByText("RCC · 2 Materials"),
+      within(rowNamed(list, "Column casting")).getByText("2 Materials"),
     ).toBeVisible();
     await expect(
       within(rowNamed(list, "Pipe laying")).getByText("Disabled"),
     ).toBeVisible();
 
-    // Search matches the Department too.
-    await userEvent.type(canvas.getByLabelText("Search Work Types"), "plumb");
+    // Search matches the name.
+    await userEvent.type(canvas.getByLabelText("Search Work Types"), "pipe");
     await expect(within(list).getAllByRole("listitem")).toHaveLength(1);
     await userEvent.clear(canvas.getByLabelText("Search Work Types"));
 

@@ -5,19 +5,10 @@ import {
 } from "@/app/app/_components/procurement/material-options-fixtures";
 import type { WorkTypeItem } from "@/src/queries/work-types";
 
-import { STORY_DEPARTMENTS } from "@/app/app/_components/masters/masters-story-support";
-
 const AT = "2026-10-08T06:30:00.000Z";
 const LATER = "2026-10-08T07:00:00.000Z";
 
 const BASE = "/api/construction/masters/work-types";
-const DEPARTMENTS = "/api/construction/masters/departments";
-
-function department(name: string) {
-  const found = STORY_DEPARTMENTS.find((item) => item.name === name);
-  if (found == null) throw new Error(`No story department ${name}`);
-  return found;
-}
 
 const [CEMENT, STEEL, SAND] = MATERIAL_OPTIONS;
 
@@ -34,16 +25,11 @@ function material(option: (typeof MATERIAL_OPTIONS)[number] | undefined) {
 function workType(
   n: number,
   name: string,
-  departmentName: string,
   extra: Partial<WorkTypeItem> = {},
 ): WorkTypeItem {
-  const dept = department(departmentName);
   return {
     id: `0199a1b2-0000-7000-8000-0000000006${String(n).padStart(2, "0")}`,
     name,
-    departmentId: dept.id,
-    departmentName: dept.name,
-    departmentDisabled: dept.disabled,
     materials: [],
     isSeed: false,
     disabled: false,
@@ -54,14 +40,14 @@ function workType(
 }
 
 export const STORY_WORK_TYPES: WorkTypeItem[] = [
-  workType(1, "RCC", "RCC", { isSeed: true }),
-  workType(2, "Column casting", "RCC", {
+  workType(1, "RCC", { isSeed: true }),
+  workType(2, "Column casting", {
     materials: [material(CEMENT), material(STEEL)],
   }),
-  workType(3, "Brick work", "Masonry & Plaster", {
+  workType(3, "Brick work", {
     materials: [material(SAND)],
   }),
-  workType(4, "Pipe laying", "Plumbing", { disabled: true }),
+  workType(4, "Pipe laying", { disabled: true }),
 ];
 
 function conflict(code: string, message: string): Response {
@@ -69,8 +55,7 @@ function conflict(code: string, message: string): Response {
 }
 
 /**
- * An in-memory Work Types API for one story, with the departments list and
- * the material picker: list, create, update, disable, enable, delete, with
+ * An in-memory Work Types API for one story, with the material picker: list, create, update, disable, enable, delete, with
  * the server's 409s for a taken name, the seed, and Work Types in `inUse`.
  */
 export function workTypesHandler(
@@ -83,12 +68,9 @@ export function workTypesHandler(
         item.id !== id && item.name.toLowerCase() === name.trim().toLowerCase(),
     );
   const build = (
-    body: { name: string; departmentId: string; materialIds?: string[] },
+    body: { name: string; materialIds?: string[] },
     current: WorkTypeItem | null,
   ): WorkTypeItem => {
-    const dept =
-      STORY_DEPARTMENTS.find((item) => item.id === body.departmentId) ??
-      department("RCC");
     const known = new Map(
       [
         ...(current?.materials ?? []),
@@ -96,10 +78,8 @@ export function workTypesHandler(
       ].map((item) => [item.id, item]),
     );
     return {
-      ...(current ?? workType(99, "", dept.name)),
+      ...(current ?? workType(99, "")),
       name: body.name.trim(),
-      departmentId: dept.id,
-      departmentName: dept.name,
       materials: (body.materialIds ?? []).flatMap((id) => {
         const found = known.get(id);
         return found == null ? [] : [found];
@@ -109,20 +89,11 @@ export function workTypesHandler(
   };
   return (call) => {
     const path = call.path.split("?")[0] ?? "";
-    if (call.method === "GET" && path === DEPARTMENTS)
-      return Response.json({
-        items: STORY_DEPARTMENTS,
-        total: STORY_DEPARTMENTS.length,
-      });
     const picked = materialOptionsHandler(call);
     if (picked != null) return picked;
     if (call.method === "GET" && path === BASE)
       return Response.json({ items, total: items.length });
-    const body = call.body as {
-      name: string;
-      departmentId: string;
-      materialIds?: string[];
-    };
+    const body = call.body as { name: string; materialIds?: string[] };
     if (call.method === "POST" && path === BASE) {
       if (taken(body.name))
         return conflict(

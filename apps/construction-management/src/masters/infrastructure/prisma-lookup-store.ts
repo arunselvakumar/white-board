@@ -15,18 +15,12 @@ import {
 
 type Row = Prisma.ConstructionMastersLabourCategoryGetPayload<object>;
 
-type Tables = Pick<
-  PrismaClient,
-  "constructionMastersLabourCategory" | "constructionMastersDepartment"
->;
+type Tables = Pick<PrismaClient, "constructionMastersLabourCategory">;
 
-/** `labour_categories` and `departments` have the same columns. */
 type LookupTable = Tables["constructionMastersLabourCategory"];
 
-export function lookupTable(db: Tables, kind: LookupKind): LookupTable {
-  return kind === "labour_category"
-    ? db.constructionMastersLabourCategory
-    : (db.constructionMastersDepartment as unknown as LookupTable);
+export function lookupTable(db: Tables, _kind: LookupKind): LookupTable {
+  return db.constructionMastersLabourCategory;
 }
 
 function toEntry(kind: LookupKind, row: Row): LookupEntry {
@@ -35,8 +29,7 @@ function toEntry(kind: LookupKind, row: Row): LookupEntry {
     kind,
     workspaceId: row.workspaceId,
     name: row.name,
-    // Departments have no skill column.
-    skill: kind === "labour_category" ? row.skill : null,
+    skill: row.skill,
     isSeed: row.isSeed,
     disabledAt: row.disabledAt,
     createdAt: row.createdAt,
@@ -79,14 +72,12 @@ function audit(entry: LookupEntry, change: MasterChange) {
   };
 }
 
-/** A Labour Category's `skill` column; nothing for Departments. */
+/** A Labour Category's `skill` column. */
 function skillData(entry: LookupEntry): { skill?: LabourSkill } {
-  return entry.kind === "labour_category" && entry.skill != null
-    ? { skill: entry.skill }
-    : {};
+  return entry.skill == null ? {} : { skill: entry.skill };
 }
 
-/** Labour Categories and Departments in `construction_masters` (CM-203). */
+/** Labour Categories in `construction_masters` (CM-203). */
 export class PrismaLookupStore implements LookupStore {
   constructor(private readonly db: PrismaClient) {}
 

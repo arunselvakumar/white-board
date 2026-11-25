@@ -167,7 +167,6 @@ export class GoodsReceiptInvoices {
       invoiceNumber: number,
       invoiceDate,
       dueDate,
-      departmentId: null,
       taxableAmount: null,
       gstAmount: null,
       amount,

@@ -1,6 +1,6 @@
 import type { EmptyStateTone } from "@repo/ui/components/empty-state";
 import type { Icon } from "@phosphor-icons/react";
-import { HardHatIcon, WrenchIcon } from "@phosphor-icons/react/ssr";
+import { HardHatIcon } from "@phosphor-icons/react/ssr";
 
 import type { PageHeaderBack } from "@/app/app/_components/app-shell/page-header";
 import type { LookupList } from "@/src/queries/masters";
@@ -52,21 +52,4 @@ export const LABOUR_CATEGORIES_SCREEN: LookupScreenConfig = {
   tone: "violet",
   back: { label: "Masters", href: "/app/masters" },
   withSkill: true,
-};
-
-export const DEPARTMENTS_SCREEN: LookupScreenConfig = {
-  list: "departments",
-  code: "DEPARTMENT",
-  singular: "Department",
-  plural: "Departments",
-  description: "Trades and work categories: RCC, Plumbing, Painting…",
-  dialogDescription:
-    "A trade or work category Contractors, worksheets and issues are booked under.",
-  placeholder: "Fencing",
-  emptyDescription:
-    "Add the trades and work categories you book work under, like RCC or Plumbing.",
-  deleteDescription: "It will no longer be offered anywhere.",
-  icon: WrenchIcon,
-  tone: "orange",
-  back: { label: "Masters", href: "/app/masters" },
 };

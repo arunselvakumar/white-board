@@ -45,7 +45,6 @@ import {
   reportsWorksheet,
   sharedAssign,
   worksheetContractor,
-  worksheetDepartment,
 } from "@/test/site-work";
 
 import type {
@@ -125,19 +124,12 @@ function csvLines(
     .split("\r\n");
 }
 
-/** A Project with a Contractor and a Department for worksheets. */
+/** A Project with a Contractor for worksheets. */
 async function siteOf(company: Company) {
   const projectId = await addProject(
     company.workspaceId,
     company.userId,
     "Tower A",
-  );
-  const departmentId = await worksheetDepartment(
-    company.workspaceId,
-    company.userId,
-    {
-      name: "Masonry",
-    },
   );
   const contractorId = await worksheetContractor(
     company.workspaceId,
@@ -145,10 +137,9 @@ async function siteOf(company: Company) {
     {
       name: "Velan Constructions",
       projectIds: [projectId],
-      departmentIds: [departmentId],
     },
   );
-  return { projectId, departmentId, contractorId };
+  return { projectId, contractorId };
 }
 
 /** A worksheet photo stored for real, as the document thread stores one. */
@@ -318,7 +309,6 @@ describe("backups: Project scope (CM-906)", () => {
       projectId: site.projectId,
       sheetDate: "2026-09-12",
       contractorId: site.contractorId,
-      departmentId: site.departmentId,
       skilled: 4,
       unskilled: 6,
       remark: "Slab, first floor",
@@ -328,14 +318,12 @@ describe("backups: Project scope (CM-906)", () => {
       projectId: site.projectId,
       sheetDate: "2026-09-13",
       contractorId: site.contractorId,
-      departmentId: site.departmentId,
       deleted: true,
     });
     const early = await reportsWorksheet(owner.workspaceId, owner.userId, {
       projectId: site.projectId,
       sheetDate: "2026-08-01",
       contractorId: site.contractorId,
-      departmentId: site.departmentId,
     });
     await attachPhoto(owner, live.id);
     await attachPhoto(owner, gone.id);
@@ -389,7 +377,7 @@ describe("backups: Project scope (CM-906)", () => {
 
     const sheets = csvLines(files, "daily-worksheets/worksheets.csv");
     expect(sheets[0]).toContain(
-      "Worksheet No.,Date,Shift,Contractor,Department",
+      "Worksheet No.,Date,Shift,Contractor,Work Type",
     );
     expect(sheets).toHaveLength(2);
     expect(sheets[1]).toContain(live.number);
@@ -972,13 +960,12 @@ describe("signed links (CM-906)", () => {
 describe("backup limits and retention (CM-906)", () => {
   it("fails a backup over the size limit with the size message, and tells the requester", async () => {
     const owner = await ownerWithCompany();
-    const { projectId, contractorId, departmentId } = await siteOf(owner);
+    const { projectId, contractorId } = await siteOf(owner);
     for (const date of ["2026-09-01", "2026-09-02", "2026-09-03"])
       await reportsWorksheet(owner.workspaceId, owner.userId, {
         projectId,
         sheetDate: date,
         contractorId,
-        departmentId,
         remark: "x".repeat(400),
       });
     const small = createBackupJobs({ maxBytes: 600 });
@@ -1002,6 +989,52 @@ describe("backup limits and retention (CM-906)", () => {
     });
     const failed = await notificationsOf(owner.userId, "backup.failed");
     expect(failed.map((row) => row.body)).toContain(BACKUP_TOO_LARGE_MESSAGE);
+  });
+
+  it("skips a module retired after the backup was queued (ADR CM-0048)", async () => {
+    const owner = await ownerWithCompany();
+    const tags = backupModule("masters.tags");
+    if (tags == null) throw new Error("No tags module");
+    const job = await createBackupJobs().request({
+      workspaceId: owner.workspaceId,
+      projectId: null,
+      scope: "masters",
+      modules: [
+        // As a job queued before the release still names it.
+        {
+          module: {
+            ...tags,
+            key: "masters.departments",
+            label: "Departments",
+            folder: "masters/departments",
+            entities: ["departments"],
+          },
+          money: false,
+        },
+        { module: tags, money: false },
+      ],
+      fromDate: null,
+      toDate: null,
+      includeData: true,
+      includeMedia: false,
+      requestedBy: owner.userId,
+      notify: { workspaceId: owner.workspaceId, email: null },
+    });
+    expect(job).toMatchObject({ status: "done", error: null });
+    const read = await getBackup(
+      jsonRequest(`${BASE}/${job.id}`, owner.cookie),
+      { params: Promise.resolve({ id: job.id }) },
+    );
+    const files = await zipOf(owner.cookie, await json<Backup>(read));
+    const manifest = JSON.parse(text(files, "manifest.json")) as {
+      modules: { key: string }[];
+    };
+    expect(manifest.modules.map((module) => module.key)).toEqual([
+      "masters.tags",
+    ]);
+    expect(
+      Object.keys(files).some((path) => path.includes("departments")),
+    ).toBe(false);
   });
 
   it("expires a backup after 7 days: file deleted, row expired, link gone", async () => {

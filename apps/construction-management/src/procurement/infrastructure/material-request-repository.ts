@@ -128,7 +128,6 @@ function snapshot(draft: MaterialRequestDraft) {
     requestDate: draft.requestDate,
     storeId: draft.storeId,
     contractorId: draft.contractorId ?? null,
-    departmentId: draft.departmentId ?? null,
     siteLocation: draft.siteLocation ?? null,
     receiverName: draft.receiverName,
     remark: draft.remark ?? null,
@@ -236,7 +235,6 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
           number,
           requestDate: calendarDateToDb(draft.requestDate),
           contractorId: draft.contractorId ?? null,
-          departmentId: draft.departmentId ?? null,
           siteLocationType: site?.type ?? null,
           siteLocation:
             site == null ? Prisma.DbNull : (site as Prisma.InputJsonValue),
@@ -320,7 +318,6 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
           storeId: draft.storeId,
           requestDate: calendarDateToDb(draft.requestDate),
           contractorId: draft.contractorId ?? null,
-          departmentId: draft.departmentId ?? null,
           siteLocationType: site?.type ?? null,
           siteLocation:
             site == null ? Prisma.DbNull : (site as Prisma.InputJsonValue),
@@ -479,7 +476,7 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
     return ref;
   }
 
-  /** Request To, Contractor and Department (400s naming the field). */
+  /** Request To and Contractor (400s naming the field). */
   private async checkParties(
     tx: Tx,
     workspaceId: string,
@@ -527,23 +524,6 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
           "CONTRACTOR_NOT_ON_PROJECT",
           `${contractor.name} is not assigned to this Project.`,
           { details: { field: "contractorId" } },
-        );
-    }
-    if (draft.departmentId != null) {
-      const department = (
-        await this.directory.departments(tx, workspaceId, [draft.departmentId])
-      ).get(draft.departmentId);
-      if (department == null)
-        throw new DomainError(
-          "DEPARTMENT_NOT_FOUND",
-          "This Department was not found.",
-          { details: { field: "departmentId" } },
-        );
-      if (department.disabled)
-        throw new DomainError(
-          "DEPARTMENT_DISABLED",
-          `${department.name} is disabled.`,
-          { details: { field: "departmentId" } },
         );
     }
   }
@@ -606,37 +586,24 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
         ),
       ),
     ];
-    const departmentIds = [
-      ...new Set(
-        rows.flatMap((row) =>
-          row.departmentId == null ? [] : [row.departmentId],
-        ),
+    const [projects, stores, contractors, inFlight] = await Promise.all([
+      this.directory.projects(tx, workspaceId, projectIds),
+      db.constructionProcurementStore.findMany({
+        where: { workspaceId, id: { in: storeIds } },
+        select: { id: true, name: true },
+      }),
+      this.directory.contractors(tx, workspaceId, contractorIds),
+      inFlightByItem(
+        db,
+        rows.map((row) => row.id),
       ),
-    ];
-    const [projects, stores, contractors, departments, inFlight] =
-      await Promise.all([
-        this.directory.projects(tx, workspaceId, projectIds),
-        db.constructionProcurementStore.findMany({
-          where: { workspaceId, id: { in: storeIds } },
-          select: { id: true, name: true },
-        }),
-        this.directory.contractors(tx, workspaceId, contractorIds),
-        this.directory.departments(tx, workspaceId, departmentIds),
-        inFlightByItem(
-          db,
-          rows.map((row) => row.id),
-        ),
-      ]);
+    ]);
     const storeNames = new Map(stores.map((store) => [store.id, store.name]));
     return rows.map((row) => {
       const contractor =
         row.contractorId == null
           ? undefined
           : contractors.get(row.contractorId);
-      const department =
-        row.departmentId == null
-          ? undefined
-          : departments.get(row.departmentId);
       return {
         id: row.id,
         number: row.number,
@@ -649,10 +616,6 @@ export class PrismaMaterialRequestRepository implements MaterialRequestRepositor
           contractor == null
             ? null
             : { id: contractor.id, name: contractor.name },
-        department:
-          department == null
-            ? null
-            : { id: department.id, name: department.name },
         siteLocation: (row.siteLocation as LocationRef | null) ?? null,
         receiverName: row.receiverName,
         remark: row.remark,
@@ -733,7 +696,6 @@ function rowSnapshot(row: Row) {
     requestDate: calendarDateFromDb(row.requestDate),
     storeId: row.storeId,
     contractorId: row.contractorId,
-    departmentId: row.departmentId,
     siteLocation: row.siteLocation,
     receiverName: row.receiverName,
     remark: row.remark,

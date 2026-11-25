@@ -68,24 +68,6 @@ async function invoiceOf(id: string): Promise<Invoice> {
   );
 }
 
-async function department(world: PartyWorld, linked: boolean) {
-  const id = randomUUID();
-  await prisma.constructionMastersDepartment.create({
-    data: {
-      id,
-      workspaceId: world.workspaceId,
-      name: `Masonry ${id.slice(0, 6)}`,
-      createdBy: world.ownerId,
-      updatedBy: world.ownerId,
-    },
-  });
-  if (linked)
-    await prisma.constructionMastersContractorDepartment.create({
-      data: { contractorId: world.contractorId, departmentId: id },
-    });
-  return id;
-}
-
 afterEach(() => {
   vi.restoreAllMocks();
 });
@@ -151,10 +133,8 @@ describe("Party invoices (CM-705, CM-706, CM-708)", () => {
     expect(await codeOf(offProject)).toBe("PARTY_NOT_ON_PROJECT");
   });
 
-  it("takes a Contractor's own Department, taxable value and GST", async () => {
+  it("takes a Contractor's taxable value and GST, and no Department", async () => {
     const world = await partyWorld();
-    const own = await department(world, true);
-    const other = await department(world, false);
     const base = {
       partyType: "contractor",
       partyId: world.contractorId,
@@ -165,23 +145,21 @@ describe("Party invoices (CM-705, CM-706, CM-708)", () => {
       taxableAmount: 1_00_000_00,
       gstAmount: 18_000_00,
     };
-    const wrong = await createInvoice(
-      postTo("/invoices", { ...base, departmentId: other }),
-    );
-    expect(await codeOf(wrong)).toBe("DEPARTMENT_NOT_OF_CONTRACTOR");
     const split = await createInvoice(
       postTo("/invoices", { ...base, gstAmount: 18_000_01 }),
     );
     expect(await codeOf(split)).toBe("INVOICE_SPLIT_EXCEEDS_AMOUNT");
+    // An old form still sending a Department is not refused (ADR CM-0048).
     const ok = await createInvoice(
-      postTo("/invoices", { ...base, departmentId: own }),
+      postTo("/invoices", { ...base, departmentId: randomUUID() }),
     );
     expect(ok.status).toBe(StatusCodes.CREATED);
-    expect(await json<Invoice>(ok)).toMatchObject({
-      department: { id: own },
+    const invoice = await json<Invoice>(ok);
+    expect(invoice).toMatchObject({
       taxableAmount: 1_00_000_00,
       gstAmount: 18_000_00,
     });
+    expect(invoice).not.toHaveProperty("department");
   });
 
   it("numbers an Other Party sales invoice by the INV rule and posts it as owed to the Company", async () => {

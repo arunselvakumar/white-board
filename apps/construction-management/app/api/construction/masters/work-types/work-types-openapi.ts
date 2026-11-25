@@ -40,7 +40,7 @@ export const workTypeOpenApiOperations: OpenApiOperation[] = [
     method: "get",
     path: PATH,
     summary:
-      "Every live Work Type of the Active Company by name, with its Department and Materials; disabled ones included unless `status=enabled` (menu `masters.work_types`, read)",
+      "Every live Work Type of the Active Company by name, with its Materials; disabled ones included unless `status=enabled` (menu `masters.work_types`, read)",
     tags: TAGS,
     query: ListConstructionMastersQueryModel,
     successStatus: StatusCodes.OK,
@@ -52,7 +52,7 @@ export const workTypeOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: PATH,
     summary:
-      "Add a Work Type under a Department, with its Materials (409 WORK_TYPE_NAME_IN_USE when a live one has the name)",
+      "Add a Work Type with its Materials (409 WORK_TYPE_NAME_IN_USE when a live one has the name)",
     tags: TAGS,
     body: CreateConstructionMastersWorkTypeRequestModel,
     successStatus: StatusCodes.CREATED,
@@ -75,7 +75,7 @@ export const workTypeOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: `${PATH}/{id}/update`,
     summary:
-      "Change a Work Type's name, Department and Materials with the `updatedAt` you loaded (409 WORK_TYPE_CHANGED when stale, WORK_TYPE_NAME_IN_USE, SEED_IS_READ_ONLY when the seed's name or Department changes)",
+      "Change a Work Type's name and Materials with the `updatedAt` you loaded (409 WORK_TYPE_CHANGED when stale, WORK_TYPE_NAME_IN_USE, SEED_IS_READ_ONLY when the seed's name changes)",
     tags: TAGS,
     params,
     body: UpdateConstructionMastersWorkTypeRequestModel,

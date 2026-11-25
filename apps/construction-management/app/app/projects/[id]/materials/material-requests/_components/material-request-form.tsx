@@ -55,7 +55,6 @@ const schema = z.object({
   requestDate: z.iso.date("Choose the request date."),
   storeId: z.string().min(1, "Choose the store to ask."),
   contractorId: z.string(),
-  departmentId: z.string(),
   siteLocation: z.custom<LocationRef | null>(),
   receiverName: z.string().max(200, "Use at most 200 characters."),
   remark: z.string().max(500, "Use at most 500 characters."),
@@ -70,8 +69,6 @@ const SERVER_FIELDS = {
   CONTRACTOR_NOT_FOUND: "contractorId",
   CONTRACTOR_INACTIVE: "contractorId",
   CONTRACTOR_NOT_ON_PROJECT: "contractorId",
-  DEPARTMENT_NOT_FOUND: "departmentId",
-  DEPARTMENT_DISABLED: "departmentId",
   DATE_IN_FUTURE: "requestDate",
   BACKDATED_CREATE_BLOCKED: "requestDate",
   BACKDATED_EDIT_BLOCKED: "requestDate",
@@ -147,8 +144,8 @@ function OptionSelect({
 
 /**
  * Raise / Edit Material Request: the Project asks a store that serves
- * it — request date, Request To, contractor, department, site
- * location, receiver, remark and the materials with their Ask Qty.
+ * it — request date, Request To, contractor, site location, receiver,
+ * remark and the materials with their Ask Qty.
  */
 export function MaterialRequestForm({
   projectId,
@@ -171,7 +168,6 @@ export function MaterialRequestForm({
         request?.storeId ??
         (options.stores.length === 1 ? (options.stores[0]?.id ?? "") : ""),
       contractorId: request?.contractor?.id ?? NONE,
-      departmentId: request?.department?.id ?? NONE,
       siteLocation: (request?.siteLocation as LocationRef | null) ?? null,
       receiverName: request?.receiverName ?? "",
       remark: request?.remark ?? "",
@@ -210,7 +206,6 @@ export function MaterialRequestForm({
       requestDate: values.requestDate,
       storeId: values.storeId,
       contractorId: values.contractorId === NONE ? null : values.contractorId,
-      departmentId: values.departmentId === NONE ? null : values.departmentId,
       siteLocation: values.siteLocation,
       receiverName:
         values.receiverName.trim() === "" ? null : values.receiverName,
@@ -326,24 +321,6 @@ export function MaterialRequestForm({
                 )}
               />
               <FieldError message={errors.contractorId?.message} />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="mr-department">Department</Label>
-              <Controller
-                name="departmentId"
-                control={form.control}
-                render={({ field }) => (
-                  <OptionSelect
-                    id="mr-department"
-                    label="Departments"
-                    value={field.value}
-                    onChange={field.onChange}
-                    items={withNone(options.departments, request?.department)}
-                    invalid={errors.departmentId != null}
-                  />
-                )}
-              />
-              <FieldError message={errors.departmentId?.message} />
             </div>
             <div className="space-y-1.5 sm:col-span-2">
               <QuietBoundary>

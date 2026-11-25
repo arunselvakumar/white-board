@@ -59,7 +59,7 @@ export const materialRequestOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: MATERIAL_REQUESTS_PATH,
     summary:
-      "Raise a Material Request to a store serving the Project (create, on the Project; STORE_NOT_ON_PROJECT, CONTRACTOR_NOT_ON_PROJECT, DEPARTMENT_DISABLED, MATERIAL_REQUEST_ITEMS_REQUIRED, QUANTITY_INVALID, DATE_IN_FUTURE 400; back-dated 403)",
+      "Raise a Material Request to a store serving the Project (create, on the Project; STORE_NOT_ON_PROJECT, CONTRACTOR_NOT_ON_PROJECT, MATERIAL_REQUEST_ITEMS_REQUIRED, QUANTITY_INVALID, DATE_IN_FUTURE 400; back-dated 403)",
     tags: PROCUREMENT_TAGS,
     body: CreateConstructionProcurementMaterialRequestRequestModel,
     successStatus: StatusCodes.CREATED,
@@ -71,7 +71,7 @@ export const materialRequestOpenApiOperations: OpenApiOperation[] = [
     method: "get",
     path: `${MATERIAL_REQUESTS_PATH}/form-options`,
     summary:
-      "Stores serving the Project, its active Contractors and enabled Departments (create or update, on the Project)",
+      "Stores serving the Project and its active Contractors (create or update, on the Project)",
     tags: PROCUREMENT_TAGS,
     query: GetConstructionProcurementMaterialRequestFormOptionsRequestModel,
     successStatus: StatusCodes.OK,

@@ -16,7 +16,6 @@ import {
   Tractor,
   Truck,
   Waves,
-  Wrench,
   type LucideIcon,
 } from "lucide-react";
 import type { AppHref } from "@/lib/page-href";
@@ -48,8 +47,7 @@ export const MASTERS_GROUPS: readonly MastersGroup[] = [
         href: "/app/masters/contractors",
         label: "Contractors",
         title: "Contractors",
-        description:
-          "Parties that execute work, by Department, and their Projects.",
+        description: "Parties that execute work, and their Projects.",
         icon: Hammer,
       },
       {
@@ -137,18 +135,10 @@ export const MASTERS_GROUPS: readonly MastersGroup[] = [
     label: "Work",
     sections: [
       {
-        href: "/app/masters/departments",
-        label: "Departments",
-        title: "Departments",
-        description: "Trades and work categories: RCC, Plumbing, Painting…",
-        icon: Wrench,
-      },
-      {
         href: "/app/masters/work-types",
         label: "Work Types",
         title: "Work Types",
-        description:
-          "What a crew does within a Department, and the materials it uses.",
+        description: "What a crew does, and the materials it uses.",
         icon: Layers,
       },
       {

@@ -13,7 +13,6 @@ export type WorkTypeProps = {
   id: string;
   workspaceId: string;
   name: string;
-  departmentId: string;
   /** Assigned Materials, offered first on a worksheet (CM-0016 §5). */
   materialIds: string[];
   /** Copied from the seed set when the Company was created (RCC). */
@@ -30,7 +29,6 @@ export type WorkTypeProps = {
 /** What the audit log keeps of a Work Type. */
 export type WorkTypeSnapshot = {
   name: string;
-  departmentId: string;
   materialIds: string[];
   isSeed: boolean;
   disabled: boolean;
@@ -38,7 +36,6 @@ export type WorkTypeSnapshot = {
 
 export type WorkTypeInput = {
   name: string;
-  departmentId: string;
   materialIds: readonly string[];
 };
 
@@ -75,10 +72,10 @@ export function cleanMaterialIds(ids: readonly string[]): string[] {
 }
 
 /**
- * A Work Type (`modules/02`, ADR CM-0016 §1): what a crew does within a
- * Department, with the Materials a worksheet offers first. The seed (RCC)
- * keeps its name and Department and is never deleted, but can be disabled
- * and given Materials. Disabled Work Types stay on old worksheets and leave
+ * A Work Type (`modules/02`, ADR CM-0016 §1, CM-0048 §3): what a crew
+ * does, with the Materials a worksheet offers first. One flat list. The
+ * seed (RCC) keeps its name and is never deleted, but can be disabled and
+ * given Materials. Disabled Work Types stay on old worksheets and leave
  * the pickers.
  */
 export class WorkType {
@@ -95,7 +92,6 @@ export class WorkType {
       id: input.id,
       workspaceId: input.workspaceId,
       name: cleanWorkTypeName(input.details.name),
-      departmentId: input.details.departmentId,
       materialIds: cleanMaterialIds(input.details.materialIds),
       isSeed: false,
       disabledAt: null,
@@ -120,9 +116,6 @@ export class WorkType {
   }
   get name(): string {
     return this.props.name;
-  }
-  get departmentId(): string {
-    return this.props.departmentId;
   }
   get materialIds(): readonly string[] {
     return this.props.materialIds;
@@ -158,7 +151,6 @@ export class WorkType {
   snapshot(): WorkTypeSnapshot {
     return {
       name: this.props.name,
-      departmentId: this.props.departmentId,
       materialIds: [...this.props.materialIds],
       isSeed: this.props.isSeed,
       disabled: this.disabled,
@@ -174,24 +166,18 @@ export class WorkType {
   }
 
   /**
-   * Changes the name, Department and Materials. A seed keeps its name and
-   * Department (409 `SEED_IS_READ_ONLY` when either changes); its Materials
-   * may change.
+   * Changes the name and Materials. A seed keeps its name (409
+   * `SEED_IS_READ_ONLY` when it changes); its Materials may change.
    */
   update(details: WorkTypeInput, by: string, now: Date): void {
     this.assertLive();
     const name = cleanWorkTypeName(details.name);
     const materialIds = cleanMaterialIds(details.materialIds);
-    if (
-      this.props.isSeed &&
-      (name !== this.props.name ||
-        details.departmentId !== this.props.departmentId)
-    )
+    if (this.props.isSeed && name !== this.props.name)
       throw seedIsReadOnly("Work Type");
     this.props = {
       ...this.props,
       name,
-      departmentId: details.departmentId,
       materialIds,
     };
     this.touch(by, now);

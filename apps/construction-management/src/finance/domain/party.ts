@@ -78,8 +78,6 @@ export type PartyFacts = {
   pan: string | null;
   /** Projects it is assigned to; Other Parties carry theirs too. */
   projectIds: readonly string[];
-  /** A Contractor's Departments; empty otherwise. */
-  departmentIds: readonly string[];
 };
 
 /**

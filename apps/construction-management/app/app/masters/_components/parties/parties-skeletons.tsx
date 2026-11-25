@@ -23,15 +23,12 @@ const ACTIONS: SkeletonColumn = {
   className: "w-12",
 };
 
-/** The Contractors / Suppliers table; only Contractors have Departments. */
+/** The Contractors / Suppliers table. */
 export function PartyRowsSkeleton({ screen }: { screen: PartyScreen }) {
   const columns: SkeletonColumn[] = [
     { header: "Name" },
     { header: "Contact", kind: "muted" },
     { header: "GST state", kind: "muted", className: "hidden md:table-cell" },
-    ...(screen.departments
-      ? [{ header: "Departments", kind: "muted" } as const]
-      : []),
     { header: "Projects", kind: "muted" },
     { header: "Status", kind: "badge" },
     ACTIONS,
@@ -106,14 +103,6 @@ export function PartyFormSkeleton({ screen }: { screen: PartyScreen }) {
             ]}
           />
         </FormSectionSkeleton>
-        {screen.departments ? (
-          <FormSectionSkeleton
-            title="Departments"
-            description="The trades this Contractor works in."
-          >
-            <ChecklistSkeleton label="Loading Departments" />
-          </FormSectionSkeleton>
-        ) : null}
         <FormSectionSkeleton
           title="Projects"
           description={`The ${screen.label} is on these Projects' Teams.`}

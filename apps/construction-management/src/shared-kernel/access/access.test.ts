@@ -72,8 +72,8 @@ describe("the menu catalogue", () => {
       // CRUD (ADR CM-0019 §1) + Role Management CRUD (ADR CM-0030) + Staff
       // Financial (ADR CM-0032) − Designations CRUD (ADR CM-0033) − the 23
       // cells of Human Resources (ADR CM-0034) + Labour Categories CRUD back
-      // from Human Resources (ADR CM-0035).
-      master_records: 82,
+      // from Human Resources (ADR CM-0035) − Departments CRUD (ADR CM-0048).
+      master_records: 78,
       central_store: 20,
       // Staff (5), Role Management (4), Labours (5) and Vendors (5), out of
       // Master records (ADR CM-0034, CM-0035).
