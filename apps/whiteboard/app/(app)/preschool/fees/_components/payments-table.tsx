@@ -2,6 +2,7 @@
 
 import { ReceiptIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
+import { Badge } from "@repo/ui/components/badge";
 import { EmptyState } from "@repo/ui/components/empty-state";
 import {
   Table,
@@ -43,7 +44,10 @@ export function PaymentsTable({ page }: { page: PreschoolFeePaymentList }) {
       </TableHeader>
       <TableBody>
         {page.items.map((payment) => (
-          <TableRow key={payment.id}>
+          <TableRow
+            key={payment.id}
+            className={payment.cancelled ? "text-muted-foreground" : undefined}
+          >
             <TableCell>
               <Link
                 href={`/preschool/fees/receipts/${payment.id}`}
@@ -51,6 +55,11 @@ export function PaymentsTable({ page }: { page: PreschoolFeePaymentList }) {
               >
                 {payment.receiptNumber}
               </Link>
+              {payment.cancelled ? (
+                <Badge variant="destructive" className="ml-2">
+                  Cancelled
+                </Badge>
+              ) : null}
             </TableCell>
             <TableCell className="whitespace-nowrap">
               {feeDateLabel(payment.receivedOn)}
@@ -74,7 +83,13 @@ export function PaymentsTable({ page }: { page: PreschoolFeePaymentList }) {
                 </div>
               )}
             </TableCell>
-            <TableCell className="text-right tabular-nums">
+            <TableCell
+              className={
+                payment.cancelled
+                  ? "text-right tabular-nums line-through"
+                  : "text-right tabular-nums"
+              }
+            >
               {formatPaiseAsRupees(payment.amountPaise)}
             </TableCell>
           </TableRow>
@@ -84,7 +99,7 @@ export function PaymentsTable({ page }: { page: PreschoolFeePaymentList }) {
         <TableRow>
           <TableCell colSpan={4}>
             {page.total} {page.total === 1 ? "payment" : "payments"} in these
-            dates
+            dates; cancelled ones are not counted
           </TableCell>
           <TableCell className="text-right font-semibold tabular-nums">
             {formatPaiseAsRupees(page.totalPaise)}

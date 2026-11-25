@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   feeDateLabel,
   feeReferenceLabel,
+  feeTimeLabel,
+  feeTimestampLabel,
   frequencyOptions,
   monthStartOf,
   parentContact,
@@ -81,6 +83,15 @@ describe("preschool fee helpers", () => {
     expect(url.origin + url.pathname).toBe("https://wa.me/");
     expect(url.searchParams.get("text")).toBe(
       "Little Steps: Fee Receipt LS/2026-27/00001 — ₹12,500 received for Aarav on 25 Nov 2026. Balance due: ₹31,000. Thank you.",
+    );
+  });
+
+  it("writes clock times 12-hour, in India", () => {
+    expect(feeTimeLabel("2026-11-26T05:52:00Z")).toBe("11:22 am");
+    expect(feeTimeLabel("2026-11-26T18:20:00Z")).toBe("11:50 pm");
+    expect(feeTimeLabel("2026-11-26T06:35:00Z")).toBe("12:05 pm");
+    expect(feeTimestampLabel("2026-11-26T19:00:00Z")).toBe(
+      "27 Nov 2026, 12:30 am",
     );
   });
 });

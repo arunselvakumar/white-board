@@ -4,6 +4,7 @@
 import { formatPaiseAsRupees } from "@/lib/money";
 import { FREQUENCIES_BY_KIND } from "@/src/preschool/domain/fee-structure";
 import type { FeeFrequency, InvoiceStatus } from "@/src/preschool/domain/fees";
+import { todayInIndia } from "@/src/preschool/domain/dates";
 import { indianMobileNumber } from "@/src/preschool/domain/fee-reminder";
 import type { FeePaymentMethod } from "@/src/preschool/application/fee-views";
 
@@ -90,6 +91,32 @@ export function feeDateLabel(date: string): string {
     year: "numeric",
   }).format(new Date(`${date}T00:00:00.000Z`));
 }
+
+/** "11:22 pm" — a clock time in India, 12-hour style. */
+export function feeTimeLabel(instant: string): string {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Kolkata",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  }).formatToParts(new Date(instant));
+  const part = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((entry) => entry.type === type)?.value ?? "";
+  return `${part("hour")}:${part("minute")} ${part("dayPeriod").toLowerCase()}`;
+}
+
+/** "26 Nov 2026, 11:22 pm" — an instant as a date and time in India. */
+export function feeTimestampLabel(instant: string): string {
+  return `${feeDateLabel(todayInIndia(new Date(instant)))}, ${feeTimeLabel(instant)}`;
+}
+
+/** Quick reasons on the Cancel Receipt dialog. */
+export const CANCEL_RECEIPT_REASONS = [
+  "Wrong amount",
+  "Wrong Child",
+  "Duplicate entry",
+  "Cheque bounced",
+] as const;
 
 /** The 1st of the month a date falls in. */
 export function monthStartOf(date: string): string {
