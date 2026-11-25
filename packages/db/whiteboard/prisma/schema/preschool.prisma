@@ -730,22 +730,28 @@ model PreschoolInvoice {
 }
 
 model PreschoolFeePayment {
-  id               String                    @id @db.Uuid
-  workspaceId      String                    @map("workspace_id")
-  centreId         String                    @map("centre_id") @db.Uuid
-  childId          String                    @map("child_id") @db.Uuid
+  id                String                    @id @db.Uuid
+  workspaceId       String                    @map("workspace_id")
+  centreId          String                    @map("centre_id") @db.Uuid
+  childId           String                    @map("child_id") @db.Uuid
   /// "<centre code>/<academic year>/<5-digit sequence>", unique in the Workspace.
-  receiptNumber    String                    @map("receipt_number") @db.VarChar(40)
-  receivedOn       DateTime                  @map("received_on") @db.Date
-  amountPaise      Int                       @map("amount_paise")
-  method           PreschoolFeePaymentMethod
+  receiptNumber     String                    @map("receipt_number") @db.VarChar(40)
+  receivedOn        DateTime                  @map("received_on") @db.Date
+  amountPaise       Int                       @map("amount_paise")
+  method            PreschoolFeePaymentMethod
   /// UPI reference, cheque number, or bank reference.
-  reference        String?                   @db.VarChar(100)
-  note             String?                   @db.VarChar(300)
-  recordedByUserId String                    @map("recorded_by_user_id")
-  recordedByName   String                    @map("recorded_by_name") @db.VarChar(200)
-  createdAt        DateTime                  @default(now()) @map("created_at")
-  updatedAt        DateTime                  @updatedAt @map("updated_at")
+  reference         String?                   @db.VarChar(100)
+  note              String?                   @db.VarChar(300)
+  recordedByUserId  String                    @map("recorded_by_user_id")
+  recordedByName    String                    @map("recorded_by_name") @db.VarChar(200)
+  /// A cancelled payment keeps its Receipt number and allocations but counts
+  /// for nothing: its Invoices' paid amounts were reduced when it was cancelled.
+  cancelledAt       DateTime?                 @map("cancelled_at")
+  cancelledByUserId String?                   @map("cancelled_by_user_id")
+  cancelledByName   String?                   @map("cancelled_by_name") @db.VarChar(200)
+  cancelReason      String?                   @map("cancel_reason") @db.VarChar(300)
+  createdAt         DateTime                  @default(now()) @map("created_at")
+  updatedAt         DateTime                  @updatedAt @map("updated_at")
 
   child       PreschoolChild                  @relation(fields: [childId], references: [id], onDelete: Restrict)
   allocations PreschoolFeePaymentAllocation[]
