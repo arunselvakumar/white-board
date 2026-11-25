@@ -10,6 +10,11 @@ import {
   openSwitchWorkspace,
 } from "@/.storybook/expect-app-shell";
 import { authFailure, authMocks, signInAs } from "@/.storybook/mocks/auth";
+import {
+  DEFAULT_TEST_VIEWPORT,
+  setTestViewport,
+} from "@/.storybook/test-viewport";
+import { mockPreschoolApi } from "@/app/(app)/preschool/_components/preschool-story-api";
 
 const meta = {
   title: "Workspace/AppShell",
@@ -509,5 +514,97 @@ export const TeacherBell: Story = {
     });
     await expect(bell).toBeVisible();
     await expect(bell.parentElement).toBe(account.parentElement);
+  },
+};
+
+/** The desktop the Head Office problem was seen on. */
+const DESKTOP = { width: 1360, height: 900 } as const;
+
+async function atDesktop(cleanup?: () => void): Promise<() => Promise<void>> {
+  await setTestViewport(DESKTOP.width, DESKTOP.height);
+  return async () => {
+    cleanup?.();
+    await setTestViewport(
+      DEFAULT_TEST_VIEWPORT.width,
+      DEFAULT_TEST_VIEWPORT.height,
+    );
+  };
+}
+
+function menuScrollArea(canvasElement: HTMLElement): HTMLElement {
+  const area = canvasElement.ownerDocument.querySelector<HTMLElement>(
+    '[data-slot="sidebar-content"]',
+  );
+  if (area == null) throw new Error("The sidebar's menu is missing");
+  return area;
+}
+
+/**
+ * The Owner of several Centres on a 1360 × 900 screen: Head Office comes
+ * first, in view without scrolling, and the menu fades at the bottom while
+ * more is below.
+ */
+export const PreschoolOwnerSeesHeadOffice: Story = {
+  beforeEach: async () => atDesktop(mockPreschoolApi()),
+  render: () => (
+    <AppShell>
+      <p>Centre Dashboard</p>
+    </AppShell>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    await expect(window.innerWidth).toBe(DESKTOP.width);
+    const headOfficeNav = await canvas.findByRole("navigation", {
+      name: "Head Office",
+    });
+    const area = menuScrollArea(canvasElement);
+    await expect(area.scrollTop).toBe(0);
+    const bounds = area.getBoundingClientRect();
+    for (const label of ["Head Office", "Royalty"]) {
+      const link = within(headOfficeNav)
+        .getByRole("link", { name: label })
+        .getBoundingClientRect();
+      await expect(link.top).toBeGreaterThanOrEqual(bounds.top);
+      await expect(link.bottom).toBeLessThanOrEqual(bounds.bottom);
+    }
+    const groups = [...area.querySelectorAll("nav")].map((nav) =>
+      nav.getAttribute("aria-label"),
+    );
+    await expect(groups).toEqual(["Head Office", "This Centre", "Setup"]);
+    await waitFor(() => expect(area).toHaveAttribute("data-fade-bottom"));
+    await expect(area).not.toHaveAttribute("data-fade-top");
+    area.scrollTop = area.scrollHeight;
+    area.dispatchEvent(new Event("scroll"));
+    await waitFor(() => expect(area).toHaveAttribute("data-fade-top"));
+    await expect(area).not.toHaveAttribute("data-fade-bottom");
+  },
+};
+
+/**
+ * A Training Institute Owner's menu when it fits (1360 × 1200): no fade, so
+ * it looks as it always did. At 1360 × 900 it does not fit (the Today card
+ * takes room) and fades at the bottom like any long menu.
+ */
+export const TrainingInstituteMenuFadesOnlyWhenItOverflows: Story = {
+  beforeEach: async () => {
+    await setTestViewport(DESKTOP.width, 1200);
+    return async () => {
+      await setTestViewport(
+        DEFAULT_TEST_VIEWPORT.width,
+        DEFAULT_TEST_VIEWPORT.height,
+      );
+    };
+  },
+  play: async ({ canvas, canvasElement }) => {
+    await expect(window.innerWidth).toBe(DESKTOP.width);
+    await canvas.findByRole("navigation", { name: "Main" });
+    const area = menuScrollArea(canvasElement);
+    await expect(area.scrollHeight).toBeLessThanOrEqual(area.clientHeight);
+    await expect(area).not.toHaveAttribute("data-fade-bottom");
+    await expect(area).not.toHaveAttribute("data-fade-top");
+    await expect(getComputedStyle(area).maskImage).toBe("none");
+
+    await setTestViewport(DESKTOP.width, DESKTOP.height);
+    await waitFor(() => expect(area).toHaveAttribute("data-fade-bottom"));
+    await expect(getComputedStyle(area).maskImage).not.toBe("none");
   },
 };

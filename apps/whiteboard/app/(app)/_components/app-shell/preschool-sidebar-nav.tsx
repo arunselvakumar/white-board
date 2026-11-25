@@ -60,8 +60,9 @@ function NavLinks({
 
 /**
  * A Preschool Workspace's menu (ADR-0055), by the Preschool role from
- * `/api/preschool/me`: the Main menu, and for the Owner a Head Office group.
- * Rows wait for that answer, so a Teacher never sees the Owner's menu.
+ * `/api/preschool/me`: Head Office first for the Owner of several Centres,
+ * then the Centre's daily work, then Setup. Rows wait for that answer, so a
+ * Teacher never sees the Owner's menu.
  */
 export function PreschoolSidebarNav({ query }: { query: string }) {
   const pathname = usePathname() || "/";
@@ -89,38 +90,41 @@ export function PreschoolSidebarNav({ query }: { query: string }) {
   }
 
   const nav = preschoolNavFor(me);
-  const main = filterMenu(nav.main, query);
-  const headOffice = filterMenu(nav.headOffice, query);
+  const manager = me.role === "owner" || me.role === "centre_head";
+  const groups = [
+    { label: "Head Office", items: filterMenu(nav.headOffice, query) },
+    {
+      label: manager ? "This Centre" : "Main menu",
+      items: filterMenu(nav.main, query),
+    },
+    { label: "Setup", items: filterMenu(nav.setup, query) },
+  ];
   const activeHref = activePreschoolHref(
     pathname,
-    [...nav.main, ...nav.headOffice].map((item) => item.href),
+    [...nav.headOffice, ...nav.main, ...nav.setup].map((item) => item.href),
   );
 
+  if (groups.every((group) => group.items.length === 0))
+    return (
+      <SidebarGroup className="px-3 pt-2">
+        <p className="text-sidebar-foreground/55 px-3 py-2 text-sm">
+          {noMatchMessage(query)}
+        </p>
+      </SidebarGroup>
+    );
   return (
     <>
-      <SidebarGroup className="px-3 pt-2">
-        <SidebarSectionLabel>Main menu</SidebarSectionLabel>
-        <SidebarGroupContent>
-          <nav aria-label="Main">
-            {main.length === 0 && headOffice.length === 0 ? (
-              <p className="text-sidebar-foreground/55 px-3 py-2 text-sm">
-                {noMatchMessage(query)}
-              </p>
-            ) : (
-              <NavLinks items={main} activeHref={activeHref} />
-            )}
-          </nav>
-        </SidebarGroupContent>
-      </SidebarGroup>
-      {headOffice.length === 0 ? null : (
-        <SidebarGroup className="px-3 pt-2">
-          <SidebarSectionLabel>Head Office</SidebarSectionLabel>
-          <SidebarGroupContent>
-            <nav aria-label="Head Office">
-              <NavLinks items={headOffice} activeHref={activeHref} />
-            </nav>
-          </SidebarGroupContent>
-        </SidebarGroup>
+      {groups.map((group) =>
+        group.items.length === 0 ? null : (
+          <SidebarGroup key={group.label} className="px-3 pt-2">
+            <SidebarSectionLabel>{group.label}</SidebarSectionLabel>
+            <SidebarGroupContent>
+              <nav aria-label={group.label}>
+                <NavLinks items={group.items} activeHref={activeHref} />
+              </nav>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ),
       )}
     </>
   );

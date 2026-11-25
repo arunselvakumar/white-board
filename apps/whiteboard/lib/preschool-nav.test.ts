@@ -11,25 +11,29 @@ import { isAllowedPreschoolPath } from "./workspace-access";
 const hrefs = (items: readonly { href: string }[]) =>
   items.map((item) => item.href);
 
+const THIS_CENTRE = [
+  "/preschool",
+  "/preschool/enquiries",
+  "/preschool/children",
+  "/preschool/attendance",
+  "/preschool/daily-reports",
+  "/preschool/fees",
+  "/preschool/announcements",
+  "/preschool/progress",
+  "/preschool/stock",
+];
+
 describe("preschoolNavFor", () => {
-  it("gives the Owner the Centre menu and the Head Office group", () => {
+  it("puts Head Office first for the Owner of several Centres, Setup last", () => {
     const nav = preschoolNavFor({ role: "owner", hasSeveralCentres: true });
-    expect(hrefs(nav.main)).toEqual([
-      "/preschool",
-      "/preschool/enquiries",
-      "/preschool/children",
-      "/preschool/attendance",
-      "/preschool/daily-reports",
-      "/preschool/fees",
-      "/preschool/announcements",
-      "/preschool/progress",
-      "/preschool/stock",
-      "/preschool/classrooms",
-      "/preschool/staff",
-    ]);
     expect(hrefs(nav.headOffice)).toEqual([
       "/preschool/head-office",
       "/preschool/head-office/royalty",
+    ]);
+    expect(hrefs(nav.main)).toEqual(THIS_CENTRE);
+    expect(hrefs(nav.setup)).toEqual([
+      "/preschool/classrooms",
+      "/preschool/staff",
       "/preschool/centres",
       "/preschool/programmes",
       "/preschool/fees/structures",
@@ -37,23 +41,24 @@ describe("preschoolNavFor", () => {
     ]);
   });
 
-  it("leaves out Head Office and Royalty with one Centre", () => {
+  it("has no Head Office group with one Centre, and keeps Centres under Setup", () => {
     const nav = preschoolNavFor({ role: "owner", hasSeveralCentres: false });
-    expect(hrefs(nav.headOffice)).toEqual([
-      "/preschool/centres",
-      "/preschool/programmes",
-      "/preschool/fees/structures",
-      "/preschool/stock/items",
-    ]);
+    expect(nav.headOffice).toEqual([]);
+    expect(hrefs(nav.setup)).toContain("/preschool/centres");
   });
 
-  it("gives a Centre Head no Head Office group", () => {
+  it("gives a Centre Head their Centre's Setup only", () => {
     const nav = preschoolNavFor({
       role: "centre_head",
       hasSeveralCentres: true,
     });
-    expect(nav.main).toHaveLength(11);
     expect(nav.headOffice).toEqual([]);
+    expect(hrefs(nav.main)).toEqual(THIS_CENTRE);
+    expect(hrefs(nav.setup)).toEqual([
+      "/preschool/classrooms",
+      "/preschool/staff",
+      "/preschool/fees/structures",
+    ]);
   });
 
   it("gives Teachers and Parents their own menus", () => {
@@ -82,7 +87,7 @@ describe("preschoolNavFor", () => {
   it("links every role only to pages it may open", () => {
     for (const role of ["owner", "centre_head", "teacher", "parent"] as const) {
       const nav = preschoolNavFor({ role, hasSeveralCentres: true });
-      for (const item of [...nav.main, ...nav.headOffice])
+      for (const item of [...nav.headOffice, ...nav.main, ...nav.setup])
         expect(isAllowedPreschoolPath(item.href, role), item.href).toBe(true);
     }
   });

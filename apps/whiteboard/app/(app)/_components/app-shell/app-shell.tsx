@@ -39,6 +39,7 @@ import { SidebarTodayCard } from "./sidebar-today-card";
 import { SwitchCentre } from "./switch-centre";
 import { SwitchWorkspace } from "./switch-workspace";
 import { ThemeToggle } from "./theme-toggle";
+import { scrollFadeClass, useScrollFade } from "./use-scroll-fade";
 import { SidebarUserAccount } from "./user-menu";
 
 /** The bell on the sidebar's account row, in the sidebar's colours. */
@@ -78,6 +79,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { workspace } = useWorkspace();
   const preschool = isPreschool(workspace?.institutionType);
   const teacherBell = role === "teacher" && !preschool;
+  const { ref: menuRef, fade: menuFade } = useScrollFade<HTMLDivElement>();
   const pathname = usePathname() || "/";
   const [menuQuery, setMenuQuery] = useState("");
   // Picking a row clears the search, so the next time the menu opens (the
@@ -115,7 +117,12 @@ export function AppShell({ children }: { children: ReactNode }) {
             }}
           />
         </SidebarHeader>
-        <SidebarContent>
+        <SidebarContent
+          ref={menuRef}
+          data-fade-top={menuFade.top || undefined}
+          data-fade-bottom={menuFade.bottom || undefined}
+          className={scrollFadeClass(menuFade)}
+        >
           {/* One hover pill per scrolling region (ADR-0050). */}
           <SidebarGlide>
             {preschool ? (
