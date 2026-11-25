@@ -121,46 +121,64 @@ export class ClassroomHandlers {
     return store.view(actor.workspaceId, id);
   }
 
+  /** Under the Classroom's row lock, so no admission lands between the count and the write. */
   async updateDetails(
     actor: PreschoolActor,
     id: string,
     input: { name: string; capacity: number },
   ): Promise<ClassroomView> {
-    const classroom = await this.findOpen(actor, id);
+    await this.findOpen(actor, id);
     const name = classroomName(input.name);
     assertCapacity(input.capacity);
-    const { store } = this.deps;
-    assertCapacityHolds(
-      input.capacity,
-      await store.childCount(actor.workspaceId, id),
+    return this.deps.store.withLockedClassroom(
+      actor.workspaceId,
+      id,
+      async (store) => {
+        const classroom = await this.findOpen(actor, id, store);
+        assertCapacityHolds(
+          input.capacity,
+          await store.childCount(actor.workspaceId, id),
+        );
+        await this.assertNameFree(
+          actor.workspaceId,
+          {
+            centreId: classroom.centreId,
+            academicYearId: classroom.academicYearId,
+            name,
+            exceptId: id,
+          },
+          store,
+        );
+        await store.update(actor.workspaceId, id, {
+          name,
+          capacity: input.capacity,
+        });
+        return store.view(actor.workspaceId, id);
+      },
     );
-    await this.assertNameFree(actor.workspaceId, {
-      centreId: classroom.centreId,
-      academicYearId: classroom.academicYearId,
-      name,
-      exceptId: id,
-    });
-    await store.update(actor.workspaceId, id, {
-      name,
-      capacity: input.capacity,
-    });
-    return store.view(actor.workspaceId, id);
   }
 
+  /** Under the Classroom's row lock, so no admission lands in it as it is archived. */
   async archive(actor: PreschoolActor, id: string): Promise<ClassroomView> {
-    const classroom = await this.find(actor.workspaceId, id);
-    assertManagerOf(actor, classroom.centreId);
-    const { store } = this.deps;
-    if (classroom.isArchived) return store.view(actor.workspaceId, id);
-    const children = await store.childCount(actor.workspaceId, id);
-    if (children > 0)
-      throw conflict(
-        "CLASSROOM_HAS_CHILDREN",
-        `${classroom.name} has ${children} ${children === 1 ? "Child" : "Children"}. Move or withdraw them first.`,
-        { childCount: children },
-      );
-    await store.archive(actor.workspaceId, id, this.deps.now());
-    return store.view(actor.workspaceId, id);
+    const found = await this.find(actor.workspaceId, id);
+    assertManagerOf(actor, found.centreId);
+    return this.deps.store.withLockedClassroom(
+      actor.workspaceId,
+      id,
+      async (store) => {
+        const classroom = await this.find(actor.workspaceId, id, store);
+        if (classroom.isArchived) return store.view(actor.workspaceId, id);
+        const children = await store.childCount(actor.workspaceId, id);
+        if (children > 0)
+          throw conflict(
+            "CLASSROOM_HAS_CHILDREN",
+            `${classroom.name} has ${children} ${children === 1 ? "Child" : "Children"}. Move or withdraw them first.`,
+            { childCount: children },
+          );
+        await store.archive(actor.workspaceId, id, this.deps.now());
+        return store.view(actor.workspaceId, id);
+      },
+    );
   }
 
   async setTeachers(
@@ -183,8 +201,9 @@ export class ClassroomHandlers {
   private async findOpen(
     actor: PreschoolActor,
     id: string,
+    store: ClassroomStore = this.deps.store,
   ): Promise<ClassroomRecord> {
-    const classroom = await this.find(actor.workspaceId, id);
+    const classroom = await this.find(actor.workspaceId, id, store);
     assertManagerOf(actor, classroom.centreId);
     if (classroom.isArchived)
       throw conflict("CLASSROOM_ARCHIVED", `${classroom.name} is archived.`);
@@ -194,8 +213,9 @@ export class ClassroomHandlers {
   private async find(
     workspaceId: string,
     id: string,
+    store: ClassroomStore = this.deps.store,
   ): Promise<ClassroomRecord> {
-    const classroom = await this.deps.store.find(workspaceId, id);
+    const classroom = await store.find(workspaceId, id);
     if (classroom == null)
       throw notFound("CLASSROOM_NOT_FOUND", "Classroom not found.");
     return classroom;
@@ -220,8 +240,9 @@ export class ClassroomHandlers {
       name: string;
       exceptId?: string;
     },
+    store: ClassroomStore = this.deps.store,
   ): Promise<void> {
-    if (await this.deps.store.nameTaken(workspaceId, query))
+    if (await store.nameTaken(workspaceId, query))
       throw conflict(
         "CLASSROOM_NAME_IN_USE",
         `This Centre already has a Classroom called ${query.name} this Academic Year.`,

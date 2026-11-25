@@ -773,6 +773,51 @@ describe("/api/preschool/children", () => {
     ]);
   });
 
+  it("shows siblings only where the reader may open them", async () => {
+    const phone = nextPhone();
+    const sibling = (
+      firstName: string,
+      classroomId: string,
+      centreId = preschool.centreId,
+    ) =>
+      admit({
+        child: { firstName, lastName: null },
+        father: { phone },
+        admission: { classroomId },
+        rest: { centreId },
+      });
+    const { child: xavi } = await sibling("Xavi", nurseryB);
+    await sibling("Sia", nurseryA);
+    await sibling("Tara", nurseryB);
+    const { child: sam } = await sibling(
+      "Sam",
+      branchNursery,
+      preschool.centreIds[1],
+    );
+    await addStaff(preschool, {
+      role: "centre_head",
+      email: "main-head@example.test",
+    });
+    const names = async () => {
+      const read = await call<ChildProfileView>(getChild, { id: xavi.id });
+      expect(read.status).toBe(StatusCodes.OK);
+      return read.body.siblings.map((entry) => entry.name);
+    };
+
+    signInAsOwner(preschool);
+    expect(await names()).toEqual(["Sam", "Sia", "Tara"]);
+
+    signInWithEmail(preschool, "teacher", "main-head@example.test");
+    expect(await names()).toEqual(["Sia", "Tara"]);
+
+    signInWithEmail(preschool, "teacher", "teacher@example.test");
+    expect(await names()).toEqual(["Tara"]);
+
+    signInWithEmail(preschool, "teacher", "branch-head@example.test");
+    const fromBranch = await call<ChildProfileView>(getChild, { id: sam.id });
+    expect(fromBranch.body.siblings).toEqual([]);
+  });
+
   it("offers the Centre's Classrooms with seats left, Programmes and years", async () => {
     signInAsOwner(preschool);
     const result = await call<ChildFormOptionsView>(getOptions, {

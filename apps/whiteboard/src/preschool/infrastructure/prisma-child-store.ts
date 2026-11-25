@@ -8,6 +8,7 @@ import type {
   ChildStore,
   LockedChild,
   PickupFields,
+  SiblingScope,
 } from "../application/child-ports";
 import type {
   AdmissionView,
@@ -118,14 +119,21 @@ export class PrismaChildStore implements ChildStore, ChildReader {
   }
 
   async lockSeats(classroomId: string) {
-    const rows = await this.db.$queryRaw<{ capacity: number }[]>`
-      SELECT capacity FROM preschool.classrooms
+    const rows = await this.db.$queryRaw<
+      { capacity: number; archived: boolean }[]
+    >`
+      SELECT capacity, archived_at IS NOT NULL AS archived
+      FROM preschool.classrooms
       WHERE id = ${classroomId}::uuid
       FOR UPDATE`;
     const filled = await this.db.preschoolAdmission.count({
       where: { classroomId, status: "active" },
     });
-    return { capacity: rows[0]?.capacity ?? 0, filled };
+    return {
+      capacity: rows[0]?.capacity ?? 0,
+      filled,
+      archived: rows[0]?.archived ?? true,
+    };
   }
 
   async programme(workspaceId: string, id: string) {
@@ -485,6 +493,7 @@ export class PrismaChildStore implements ChildStore, ChildReader {
     workspaceId: string,
     childId: string,
     match: { phones: string[]; emails: string[] },
+    scope: SiblingScope,
   ): Promise<SiblingView[]> {
     if (match.phones.length === 0 && match.emails.length === 0) return [];
     const rows = await this.db.preschoolChild.findMany({
@@ -492,6 +501,7 @@ export class PrismaChildStore implements ChildStore, ChildReader {
         workspaceId,
         deletedAt: null,
         id: { not: childId },
+        AND: [scopeWhere(scope)],
         OR: [
           { fatherPhone: { in: match.phones } },
           { motherPhone: { in: match.phones } },
@@ -575,6 +585,26 @@ export class PrismaChildStore implements ChildStore, ChildReader {
         seatsLeft: Math.max(0, classroom.capacity - _count.admissions),
       })),
     };
+  }
+}
+
+function scopeWhere(scope: SiblingScope): Prisma.PreschoolChildWhereInput {
+  switch (scope.kind) {
+    case "all":
+      return {};
+    case "centres":
+      return { centreId: { in: [...scope.centreIds] } };
+    case "classrooms":
+      return {
+        admissions: {
+          some: {
+            status: "active",
+            classroomId: { in: [...scope.classroomIds] },
+          },
+        },
+      };
+    case "children":
+      return { id: { in: [...scope.childIds] } };
   }
 }
 
