@@ -60,10 +60,10 @@ The Whiteboard-wide rule that the In-app Home requires an Active Workspace. Afte
 The screen at `/select-workspace` where a User with a Session and more than one Workspace, but no Active Workspace, chooses which Workspace to activate.
 
 **Workspace Creation**:
-The onboarding screen at `/create-workspace` where a User with a Session and zero Workspaces creates their first Workspace by giving it a name and an **Institution Type**. Training Institute is selected by default and is the only type that can be chosen. School, Preschool, College, University, and Other are listed as coming soon and cannot be selected. Not offered once the User already belongs to a Workspace.
+The onboarding screen at `/create-workspace` where a User with a Session and zero Workspaces creates their first Workspace by giving it a name and an **Institution Type**. Training Institute is selected by default; **Preschool** can also be chosen, and then the screen asks which month the **Academic Year** starts in (April by default). School, College, University, and Other are listed as coming soon and cannot be selected. Not offered once the User already belongs to a Workspace.
 
 **Institution Type**:
-The kind of educational body a Workspace represents. Chosen at Workspace Creation. Values: School, Preschool, College, University, Training Institute, Other. Only **Training Institute** is available today; it is the default. The other values are coming soon and cannot be selected. Stored on the Workspace and cannot be changed after Workspace Creation.
+The kind of educational body a Workspace represents. Chosen at Workspace Creation. Values: School, Preschool, College, University, Training Institute, Other. **Training Institute** (the default) and **Preschool** are available; the other values are coming soon and cannot be selected. Stored on the Workspace and cannot be changed after Workspace Creation. The sidebar, the In-app Home and which screens open follow the Institution Type first, then the role.
 _Avoid_: education type, organization type, workspace type, category
 
 **Workspace Owner**:
@@ -75,7 +75,7 @@ The Institution Type Whiteboard sells today. A Workspace of this type is a compu
 _Avoid_: academy (as the type name), coaching (as the type name), institute ERP
 
 **Bounded Context**:
-One Institution Type's product inside Whiteboard, with its own words and rules. Today there is one: **Training Institute**. A future School context has its own Student, separate from a Training Institute Student. Each Bounded Context has one code folder (`src/training-institute`), one Postgres schema (`training_institute`), one API path prefix (`/api/training-institute`), and one name prefix for Prisma models and OpenAPI components (`TrainingInstitute…`). See ADR-0030.
+One Institution Type's product inside Whiteboard, with its own words and rules. Today there are two: **Training Institute** and **Preschool** (`src/preschool`, schema `preschool`, `/api/preschool`, `Preschool…`; ADR-0055). A future School context has its own Student, separate from a Training Institute Student. Each Bounded Context has one code folder (`src/training-institute`), one Postgres schema (`training_institute`), one API path prefix (`/api/training-institute`), and one name prefix for Prisma models and OpenAPI components (`TrainingInstitute…`). See ADR-0030.
 _Avoid_: module, product line, tenant type (in code comments)
 
 **Student**:
@@ -277,7 +277,7 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - A **Workspace** has exactly one **Workspace Owner**
 - The **Workspace Owner** is the User who created that Workspace
 - A **Workspace** has one **Institution Type**
-- Workspace Creation can only set **Institution Type** to Training Institute; other values are coming soon
+- Workspace Creation can set **Institution Type** to Training Institute or Preschool; other values are coming soon
 - Tenant data is read and written only for the **Active Workspace** on the **Session**. The client does not send which Workspace.
 - **User** and **Workspace** identity live in the `identity` schema (ADR-0034). Other contexts reference them by opaque id and never join to them.
 - A **Student** belongs to one **Workspace**. A Student is not a **User**.
@@ -343,7 +343,7 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - “organization” in product language — resolved: **Workspace**. Better Auth's "organization" is the backing, not the word Users see.
 - “selected workspace” / “log them into that workspace” — resolved: **Active Workspace**. The three-way routing is the **Workspace Gate**.
 - “owner role” — resolved: **Workspace Owner** is the creating User, with role `owner`.
-- Workspace Creation fields — resolved: **name** and **Institution Type**. **Training Institute** is the default and the only selectable value. School, Preschool, College, University, and Other are shown as coming soon. Address and board are not collected in this slice. Institution Type is a column on `identity.workspaces`.
+- Workspace Creation fields — resolved: **name** and **Institution Type**. **Training Institute** is the default; **Preschool** is also selectable and adds the **Academic Year** start month. School, College, University, and Other are shown as coming soon. Address and board are not collected in this slice. Institution Type is a column on `identity.workspaces`.
 - Creating a second Workspace — resolved: out of scope. **Workspace Creation** is onboarding only (zero Workspaces).
 - Creation / Selection chrome — resolved: **Onboarding Layout** (no header, no photos, sign-out available).
 - Redirect URL vs Workspace Gate — resolved: **Workspace Gate** always first; **Redirect URL** only after an **Active Workspace** exists.
@@ -363,3 +363,84 @@ A future Sign-up step that would confirm Phone with an SMS code. Not part of the
 - Enquiry, attendance, certificates, WhatsApp, GST, live classroom, franchise royalty — resolved: not P0. P1/P2.
 - Advance absence notice ([issue #61](https://github.com/arunselvakumar/white-board/issues/61)) — resolved: an **Absence Notice** per Class, given by the Student or a linked Parent, never approved; Teachers get a **Notification** under the bell and an email; the Register pre-selects **Informed absent**. See [ADR-0041](docs/adr/0041-absence-notice-product-decisions.md).
 - Cancellations, holidays, and moved classes ([issue #13](https://github.com/white-board-io/white-board-v3/issues/13)) — resolved: **Cancelled Class**, **Moved Class**, and **Holiday** are exceptions over weekly **Timings**, not a session calendar. Owner and assigned Teachers change Classes; Holidays are Owner-only and Workspace-wide. See [ADR-0028](docs/adr/0028-class-changes-are-exceptions-over-weekly-timings.md) and [ADR-0029](docs/adr/0029-class-change-product-decisions.md).
+
+## Preschool
+
+Words of the Preschool Bounded Context (ADR-0055, [docs/prd/preschool-p0.md](docs/prd/preschool-p0.md)). In a Preschool Workspace the learner is a **Child**, never a Student.
+
+**Centre**:
+One physical preschool. A branch or a franchisee's unit. Every Preschool Workspace has at least one; a standalone preschool has exactly one and never chooses it. A Centre is **Company-owned** or **Franchised**; a Franchised Centre records its franchisee, agreement dates and **Royalty %**.
+_Avoid_: branch (as the entity name), school, campus
+
+**Head Office**:
+The Owner's view across all Centres.
+
+**Programme**:
+What a Child is admitted to: Playgroup, Nursery (Pre-KG), LKG, UKG, Daycare. Seeded, renameable, with an age range. Defined once for the Workspace.
+_Avoid_: course, class (as the catalog entity)
+
+**Academic Year**:
+The year Classrooms, Admissions and fees belong to. April to March by default; the start month is chosen at Workspace Creation.
+
+**Classroom**:
+A section of a Programme in a Centre for an Academic Year ("Nursery A"), with capacity and Class Teachers.
+_Avoid_: batch, section (as the entity name)
+
+**Child**:
+The learner. A Centre-scoped record, never a User.
+_Avoid_: student, pupil, kid
+
+**Parent**:
+Father or mother on the Child's record. With an email they are invited to sign in (existing `parent` role).
+
+**Authorised Pickup**:
+A person allowed to collect the Child (name, relationship, phone, photo).
+
+**Enquiry**:
+A family asking about admission. Moves New → Contacted → Visit scheduled → Visited → Admitted / Lost.
+
+**Admission**:
+A Child placed in a Programme and Classroom for an Academic Year. Carries the fee plan.
+_Avoid_: enrollment
+
+**Fee Head**:
+A kind of charge: Admission fee, Tuition, Kit & books, Uniform, Activity, Daycare, Transport, Security deposit.
+
+**Fee Structure**:
+The amounts per Fee Head for a Programme in an Academic Year, and the schedule (one-time, monthly, quarterly, per term, annual). Workspace default; a Centre may override if allowed.
+
+**Invoice**:
+One amount due on a date for one Admission (e.g. "Term 2 tuition").
+
+**Fee Payment**:
+Money received from a family. Partial allowed. Cash, UPI, Card, Cheque, Bank transfer. Produces a **Receipt**.
+
+**Check-in / out**:
+The time a Child arrived and left, who dropped and who collected.
+
+**Daily Report**:
+The day's diary for one Child: meals, nap, toilet/diaper, mood, activities, a note, photos. Sent to the Parent.
+
+**Announcement**:
+A notice from the Centre or Head Office to Parents (circular, event, holiday).
+
+**Observation**:
+A Teacher's note on a Child against a Development Domain.
+
+**Progress Report**:
+The term report: a rating per Development Domain plus Teacher remarks. Printable.
+
+**Stock Item**:
+Something the Centre keeps and hands out or uses: a book, notebook, uniform, kit, crayon box, toy, chair. Consumable (used up or given away) or Asset (kept).
+
+**Stock Movement**:
+One change to stock on hand at a Centre: Received, Issued to a Child, Issued to a Classroom or Staff, Transferred to another Centre, Adjusted.
+
+**Royalty Statement**:
+Per Franchised Centre per month: collections on royalty-bearing Fee Heads × Royalty %.
+
+**Centre Head**:
+The Preschool role of a `teacher` member whose Staff record says Centre Head (usually the franchisee). Sees only their Centre(s) and can do everything inside them, fees included. The other Preschool roles are Owner (Head Office), Teacher and Parent.
+
+**Active Centre**:
+The Centre a User with several Centres is working in, picked with Switch Centre in the sidebar and remembered in the browser.
