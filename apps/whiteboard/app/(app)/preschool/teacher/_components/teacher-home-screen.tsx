@@ -1,7 +1,7 @@
 "use client";
 
 import { ChalkboardIcon } from "@phosphor-icons/react/ssr";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { CalendarCheck, NotebookPen } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@repo/ui/components/button";
@@ -9,7 +9,39 @@ import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { useActiveCentre } from "@/app/(app)/preschool/_components/active-centre-provider";
 import { PreschoolPage } from "@/app/(app)/preschool/_components/preschool-page";
-import { classroomsQueryOptions } from "@/src/queries/preschool/classrooms";
+import {
+  classroomsQueryOptions,
+  type PreschoolClassroom,
+} from "@/src/queries/preschool/classrooms";
+import { preschoolDailyReportsDayQueryOptions } from "@/src/queries/preschool/daily-reports";
+
+/**
+ * Today's figures for one Classroom, from its Daily Reports day (which
+ * carries each Child's attendance): one request per card. Nothing shows
+ * until it answers.
+ */
+function TodayLine({ classroom }: { classroom: PreschoolClassroom }) {
+  const { data } = useQuery(preschoolDailyReportsDayQueryOptions(classroom.id));
+  if (data == null) return null;
+  const present = data.children.filter(
+    (child) => child.attendance === "present",
+  ).length;
+  const marked = data.children.some((child) => child.attendance != null);
+  return (
+    <p className="text-sm">
+      Today:{" "}
+      <span className="font-medium">
+        {marked
+          ? `${String(present)} of ${String(data.children.length)} present`
+          : "attendance not taken"}
+      </span>
+      {" · "}
+      <span className="font-medium">
+        {data.counts.published} of {data.children.length} reports sent
+      </span>
+    </p>
+  );
+}
 
 /**
  * A Teacher's Home: their Classrooms in the active Centre this Academic
@@ -51,6 +83,7 @@ export function TeacherHomeScreen() {
                     {classroom.programmeName} · {classroom.childCount}{" "}
                     {classroom.childCount === 1 ? "Child" : "Children"}
                   </p>
+                  <TodayLine classroom={classroom} />
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <Button
