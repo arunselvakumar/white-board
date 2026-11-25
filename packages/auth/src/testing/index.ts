@@ -1,3 +1,4 @@
+import { hashPassword } from "better-auth/crypto";
 import { prisma } from "@repo/whiteboard-db";
 
 import { outbox, type OutgoingEmail } from "../email/sender";
@@ -105,6 +106,54 @@ export async function seedWorkspaceMember(input: {
       userId: input.userId,
       role: input.role ?? "owner",
       createdAt: now,
+    },
+  });
+}
+
+/**
+ * A User who signs in with email and password, for demo data and local
+ * testing: the identity User (email verified) and its `credential` account,
+ * hashed as sign-up hashes it. Re-running replaces the name and password.
+ */
+export async function seedUserWithPassword(input: {
+  id: string;
+  email: string;
+  name: string;
+  password: string;
+}): Promise<void> {
+  const now = new Date();
+  const email = input.email.trim().toLowerCase();
+  // "meera@littlesteps.demo" → "meera_littlesteps": unique across demo domains.
+  const [local = "", domain = ""] = email.split("@");
+  const username = `${local}_${domain.split(".")[0] ?? ""}`
+    .replace(/[^a-z0-9_.]/g, "_")
+    .slice(0, 30);
+  const user = {
+    name: input.name,
+    email,
+    emailVerified: true,
+    username,
+    displayUsername: username,
+    updatedAt: now,
+  };
+  await prisma.identityUser.upsert({
+    where: { id: input.id },
+    update: user,
+    create: { id: input.id, ...user, createdAt: now },
+  });
+  const password = await hashPassword(input.password);
+  const accountId = `account_${input.id}`;
+  await prisma.identityAccount.upsert({
+    where: { id: accountId },
+    update: { password, updatedAt: now },
+    create: {
+      id: accountId,
+      userId: input.id,
+      accountId: input.id,
+      providerId: "credential",
+      password,
+      createdAt: now,
+      updatedAt: now,
     },
   });
 }
