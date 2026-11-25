@@ -63,9 +63,12 @@ const ActiveCentreContext = createContext<ActiveCentre | null>(null);
 export function ActiveCentreProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname() || "/preschool";
   const router = useRouter();
-  const { data: me, error, isPending, refetch } = useQuery(
-    preschoolMeQueryOptions(),
-  );
+  const {
+    data: me,
+    error,
+    isPending,
+    refetch,
+  } = useQuery(preschoolMeQueryOptions());
   const rememberedId = useActiveCentreId();
   const allowed = me == null || isAllowedPreschoolPath(pathname, me.role);
 

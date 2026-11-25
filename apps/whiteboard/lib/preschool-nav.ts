@@ -165,7 +165,10 @@ export const PRESCHOOL_TEACHER_NAV = [
   ANNOUNCEMENTS,
 ] as const;
 
-export const PRESCHOOL_PARENT_NAV = [FAMILY_HOME, FAMILY_ANNOUNCEMENTS] as const;
+export const PRESCHOOL_PARENT_NAV = [
+  FAMILY_HOME,
+  FAMILY_ANNOUNCEMENTS,
+] as const;
 
 export type PreschoolNavItem =
   | (typeof PRESCHOOL_MANAGER_NAV)[number]
@@ -199,7 +202,8 @@ export function preschoolNavFor(me: {
   role: PreschoolRole;
   hasSeveralCentres: boolean;
 }): PreschoolNav {
-  if (me.role === "parent") return { main: PRESCHOOL_PARENT_NAV, headOffice: [] };
+  if (me.role === "parent")
+    return { main: PRESCHOOL_PARENT_NAV, headOffice: [] };
   if (me.role === "teacher")
     return { main: PRESCHOOL_TEACHER_NAV, headOffice: [] };
   if (me.role === "centre_head")

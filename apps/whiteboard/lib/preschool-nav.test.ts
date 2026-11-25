@@ -58,9 +58,7 @@ describe("preschoolNavFor", () => {
 
   it("gives Teachers and Parents their own menus", () => {
     expect(
-      hrefs(
-        preschoolNavFor({ role: "teacher", hasSeveralCentres: true }).main,
-      ),
+      hrefs(preschoolNavFor({ role: "teacher", hasSeveralCentres: true }).main),
     ).toEqual([
       "/preschool/teacher",
       "/preschool/attendance",

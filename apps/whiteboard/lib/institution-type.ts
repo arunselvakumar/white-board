@@ -41,6 +41,8 @@ export const INSTITUTION_TYPES: readonly {
   { value: "other", label: "Other", available: false },
 ];
 
-export function isPreschool(institutionType: string | null | undefined): boolean {
+export function isPreschool(
+  institutionType: string | null | undefined,
+): boolean {
   return institutionType === "preschool";
 }

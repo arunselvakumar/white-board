@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  useAuth,
-  useSignOut,
-  useUser,
-  useWorkspace,
-} from "@repo/auth/react";
+import { useAuth, useSignOut, useUser, useWorkspace } from "@repo/auth/react";
 import { LogOut } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
