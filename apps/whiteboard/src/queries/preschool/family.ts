@@ -1,5 +1,6 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 
+import type { FamilyAnnouncementsView } from "@/src/preschool/application/announcement-views";
 import type { ChildDailyReportsView } from "@/src/preschool/application/daily-report-views";
 import type { FamilyHomeView } from "@/src/preschool/application/family-views";
 
@@ -14,6 +15,7 @@ export const preschoolFamilyKeys = {
   home: () => [...preschoolFamilyKeys.all, "home"] as const,
   reports: (childId: string) =>
     [...preschoolFamilyKeys.all, "reports", childId] as const,
+  announcements: () => [...preschoolFamilyKeys.all, "announcements"] as const,
 };
 
 /** The Parent Home: every one of the Parent's Children. */
@@ -39,5 +41,22 @@ export function preschoolFamilyReportsInfiniteOptions(childId: string) {
         meta,
       ),
     getNextPageParam: (page) => page.nextBefore,
+  });
+}
+
+/** What reaches the Parent's Children, newest first, a page at a time; each page repeats what is coming up. */
+export function preschoolFamilyAnnouncementsInfiniteOptions() {
+  return infiniteQueryOptions({
+    queryKey: preschoolFamilyKeys.announcements(),
+    initialPageParam: null as string | null,
+    queryFn: ({ pageParam, meta }) =>
+      apiJson<FamilyAnnouncementsView>(
+        `/api/preschool/announcements/family${
+          pageParam == null ? "" : `?cursor=${encodeURIComponent(pageParam)}`
+        }`,
+        {},
+        meta,
+      ),
+    getNextPageParam: (page) => page.nextCursor,
   });
 }

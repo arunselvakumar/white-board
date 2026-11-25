@@ -23,6 +23,7 @@ import {
   formatClockTime,
   formatDate,
 } from "@/app/(app)/preschool/_components/preschool-format";
+import { ChildStockIssued } from "@/app/(app)/preschool/stock/_components/child-stock-issued";
 import { todayInIndia } from "@/src/preschool/domain/dates";
 import {
   PRESCHOOL_ATTENDANCE_STATUS_LABELS,
@@ -254,5 +255,7 @@ export function overviewCards(
       { key: "progress", node: <ProgressCard childId={child.id} /> },
     );
   if (manager) cards.push({ key: "fees", node: <FeesCard child={child} /> });
+  if (staff)
+    cards.push({ key: "stock", node: <ChildStockIssued childId={child.id} /> });
   return cards;
 }

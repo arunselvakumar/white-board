@@ -10,6 +10,7 @@ import {
 } from "@repo/ui/components/card";
 
 import { ChildAvatar } from "@/app/(app)/preschool/_components/child-avatar";
+import { ChildStockIssued } from "@/app/(app)/preschool/stock/_components/child-stock-issued";
 import { shortDate } from "@/app/(app)/preschool/family/_components/family-format";
 import { FamilyPage } from "@/app/(app)/preschool/family/_components/family-page";
 import type { MeChildView } from "@/src/preschool/application/me";
@@ -164,6 +165,9 @@ function ChildDetails({ child }: { child: MeChildView }) {
   return (
     <div className="space-y-4">
       <Profile profile={data} />
+      <section aria-label="Books, kit and uniform received">
+        <ChildStockIssued childId={child.id} />
+      </section>
       <p className="bg-muted/50 rounded-xl p-3 text-sm">
         To change anything, tell the Centre.
       </p>

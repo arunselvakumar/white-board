@@ -12,6 +12,7 @@ import { GET as childProfile } from "../children/[id]/route";
 import { GET as childReports } from "../daily-reports/children/[childId]/route";
 import { GET as childProgressReports } from "../progress-reports/children/[childId]/route";
 import { GET as progressReport } from "../progress-reports/[id]/route";
+import { GET as childStock } from "../stock/children/[childId]/route";
 import { addPayment } from "../dashboard/testing";
 import { GET as feeAccount } from "../fees/children/[childId]/route";
 import { GET as receipt } from "../fees/payments/[id]/route";
@@ -321,6 +322,7 @@ describe("the Parent's view of a Preschool", () => {
           childContext(aarav.childId),
         ),
         progressReport: await progressReport(get("/"), idContext(aaravTerm1)),
+        stock: await childStock(get("/"), childContext(aarav.childId)),
       };
       for (const [name, response] of Object.entries(responses))
         expect(response.status, name).toBe(StatusCodes.OK);
@@ -366,6 +368,7 @@ describe("the Parent's view of a Preschool", () => {
           get("/"),
           childContext(other.childId),
         ),
+        stock: await childStock(get("/"), childContext(other.childId)),
       };
       for (const [name, response] of Object.entries(responses))
         expect(response.status, name).toBe(StatusCodes.FORBIDDEN);

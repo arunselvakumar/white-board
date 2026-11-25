@@ -1,6 +1,6 @@
 "use client";
 
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowRight, Phone } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -14,11 +14,16 @@ import {
 import { cn } from "@repo/ui/lib/utils";
 
 import { formatClockTime } from "@/app/(app)/preschool/_components/preschool-format";
+import { formatDate } from "@/app/(app)/preschool/_components/preschool-format";
 import { formatPaiseAsRupees } from "@/lib/money";
+import { preschoolFamilyAnnouncementsQueryOptions } from "@/src/queries/preschool/announcements";
 import {
   preschoolFamilyHomeQueryOptions,
   type PreschoolFamilyChild,
 } from "@/src/queries/preschool/family";
+import { preschoolChildProgressReportsQueryOptions } from "@/src/queries/preschool/progress-reports";
+
+import { announcementDates } from "./announcement-card";
 
 import { DailyReportSummary } from "./daily-report-summary";
 import { dayLabel, shortDate } from "./family-format";
@@ -120,6 +125,76 @@ export function feesLine(fees: PreschoolFamilyChild["fees"]): {
   };
 }
 
+/**
+ * The latest two Announcements and the next event or holiday. Loads on its
+ * own, so the rest of the Home never waits for it; hidden when there is
+ * nothing to say.
+ */
+function AnnouncementsCard() {
+  const { data } = useQuery(preschoolFamilyAnnouncementsQueryOptions());
+  if (data == null) return null;
+  const next = data.upcoming[0];
+  const latest = data.items.slice(0, 2);
+  if (next == null && latest.length === 0) return null;
+  return (
+    <HomeCard
+      title="Announcements"
+      link={{
+        href: "/preschool/family/announcements",
+        label: "All announcements",
+      }}
+    >
+      {next == null ? null : (
+        <p className="bg-primary/5 border-primary/30 rounded-xl border p-3 text-sm">
+          <span className="font-semibold">{next.title}</span> —{" "}
+          {announcementDates(next)}
+        </p>
+      )}
+      <ul className="space-y-2">
+        {latest.map((item) => (
+          <li key={item.id} className="text-sm">
+            <p className="font-medium">{item.title}</p>
+            <p className="text-muted-foreground line-clamp-2 whitespace-pre-line">
+              {item.body}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </HomeCard>
+  );
+}
+
+/** The newest published Progress Report, when there is one. */
+function ProgressCard({
+  childId,
+  childQuery,
+}: {
+  childId: string;
+  childQuery: string;
+}) {
+  const { data } = useQuery(preschoolChildProgressReportsQueryOptions(childId));
+  const report = data?.items.find((item) => item.status === "published");
+  if (report == null) return null;
+  return (
+    <HomeCard
+      title="Progress"
+      link={{
+        href: `/preschool/family/progress/${report.id}${childQuery}`,
+        label: "Read the report",
+      }}
+    >
+      <p className="font-semibold">
+        {report.term.label} Progress Report · {report.academicYearName}
+      </p>
+      {report.publishedAt == null ? null : (
+        <p className="text-muted-foreground text-sm">
+          Published {formatDate(report.publishedAt.slice(0, 10))}
+        </p>
+      )}
+    </HomeCard>
+  );
+}
+
 function ChildHome({
   entry,
   date,
@@ -214,7 +289,8 @@ function ChildHome({
         )}
       </HomeCard>
 
-      {/* Announcements and Progress Report cards go here once Parents can read them. */}
+      <AnnouncementsCard />
+      <ProgressCard childId={child.id} childQuery={childQuery} />
     </div>
   );
 }
