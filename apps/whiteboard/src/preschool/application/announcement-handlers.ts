@@ -162,6 +162,10 @@ export class AnnouncementHandlers {
       actor.workspaceId,
       actor.childIds,
     );
+    // Announcements reach active Children; a family whose Children have all
+    // left gets none, not even Head Office's.
+    if (reach.centres.length === 0)
+      return { items: [], nextCursor: null, total: 0, upcoming: [] };
     const [page, upcoming] = await Promise.all([
       this.page(actor, reach, input),
       this.upcomingFor(actor, reach),

@@ -5,6 +5,7 @@ import {
   emailsTo,
   outbox,
 } from "@repo/auth/testing";
+import { prisma } from "@repo/whiteboard-db";
 import { StatusCodes } from "http-status-codes";
 import {
   afterAll,
@@ -394,6 +395,30 @@ describe("/api/preschool/announcements", () => {
 
     owner();
     expect((await call(family)).status).toBe(StatusCodes.FORBIDDEN);
+  });
+
+  it("gives a family whose Children have left nothing", async () => {
+    const left = await addChild(preschool, {
+      classroomId: roomA,
+      motherEmail: "gone-mother@example.test",
+    });
+    await prisma.preschoolChild.update({
+      where: { id: left.childId },
+      data: { status: "withdrawn" },
+    });
+    await prisma.preschoolAdmission.update({
+      where: { id: left.admissionId },
+      data: { status: "ended", endReason: "withdrawn" },
+    });
+    as("gone-mother@example.test", "parent");
+    const result = await call<FamilyAnnouncementsView>(family);
+    expect(result.status).toBe(StatusCodes.OK);
+    expect(result.body).toEqual({
+      items: [],
+      nextCursor: null,
+      total: 0,
+      upcoming: [],
+    });
   });
 
   it("lets only the author or a manager change or remove it", async () => {
