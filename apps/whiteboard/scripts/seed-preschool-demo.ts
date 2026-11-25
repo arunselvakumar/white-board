@@ -21,11 +21,21 @@ import {
   type IsoDate,
 } from "@/src/preschool/domain/dates";
 import type { FeeFrequency } from "@/src/preschool/domain/fees";
+import {
+  termOn,
+  termSpan,
+  type ProgressRating,
+} from "@/src/preschool/domain/progress";
+import { createAnnouncementHandlers } from "@/src/preschool/infrastructure/create-announcement-handlers";
 import { createAttendanceHandlers } from "@/src/preschool/infrastructure/create-attendance-handlers";
 import { createCentreHandlers } from "@/src/preschool/infrastructure/create-centre-handlers";
 import { createClassroomHandlers } from "@/src/preschool/infrastructure/create-classroom-handlers";
 import { createEnquiryHandlers } from "@/src/preschool/infrastructure/create-enquiry-handlers";
 import { createFeeHandlers } from "@/src/preschool/infrastructure/create-fee-handlers";
+import {
+  createObservationHandlers,
+  createProgressReportHandlers,
+} from "@/src/preschool/infrastructure/create-progress-handlers";
 import { createStockHandlers } from "@/src/preschool/infrastructure/create-stock-handlers";
 import { createAdmissionInvoicer } from "@/src/preschool/infrastructure/fee-admission-invoicer";
 import { PrismaAccessReader } from "@/src/preschool/infrastructure/prisma-access-reader";
@@ -386,6 +396,17 @@ function handlersFor(now: () => Date) {
     }),
     enquiries: createEnquiryHandlers({ prisma, now }),
     stock: createStockHandlers({ prisma, now }),
+    announcements: createAnnouncementHandlers({
+      prisma,
+      notifier: { published: () => Promise.resolve() },
+      now,
+    }),
+    observations: createObservationHandlers({ prisma, now }),
+    progressReports: createProgressReportHandlers({
+      prisma,
+      notifier: { published: () => Promise.resolve() },
+      now,
+    }),
   };
 }
 
@@ -1407,7 +1428,16 @@ async function seedStock(
 
 // ---------------------------------------------------------------- Little Steps
 
-async function seedLittleSteps(today: IsoDate): Promise<void> {
+/** What the Little Steps areas after the first pass build on. */
+type LittleSteps = {
+  actor: PreschoolActor;
+  annaNagar: Centre;
+  velachery: Centre;
+  children: SeededChild[];
+  year: { id: string; startsOn: IsoDate; endsOn: IsoDate };
+};
+
+async function seedLittleSteps(today: IsoDate): Promise<LittleSteps> {
   const setup = await createSetUpPreschool({ now: () => new Date() }).execute({
     workspaceId: LITTLE_STEPS,
     name: "Little Steps Preschool",
@@ -1835,11 +1865,24 @@ async function seedLittleSteps(today: IsoDate): Promise<void> {
     annaNagar,
     velachery,
   });
+  return {
+    actor,
+    annaNagar,
+    velachery,
+    children,
+    year: {
+      id: setup.academicYearId,
+      startsOn: yearStartsOn,
+      endsOn: year.endsOn.toISOString().slice(0, 10),
+    },
+  };
 }
 
 // ---------------------------------------------------------------- Tiny Tots
 
-async function seedTinyTots(today: IsoDate): Promise<void> {
+async function seedTinyTots(
+  today: IsoDate,
+): Promise<{ actor: PreschoolActor; centreId: string }> {
   const setup = await createSetUpPreschool({ now: () => new Date() }).execute({
     workspaceId: TINY_TOTS,
     name: "Tiny Tots Playschool",
@@ -1939,6 +1982,472 @@ async function seedTinyTots(today: IsoDate): Promise<void> {
     lost: 1,
     dueToday: 1,
   });
+  return { actor, centreId: centre.id };
+}
+
+// ---------------------------------------------------------------- Class Teachers
+
+/**
+ * The Class Teacher of a Classroom as a signed-in Teacher: Kavitha through
+ * her real login, the others as Staff without one.
+ */
+async function classTeacher(
+  workspaceId: string,
+  centreId: string,
+  classroomId: string,
+): Promise<PreschoolActor> {
+  const link = await prisma.preschoolClassroomTeacher.findFirstOrThrow({
+    where: { classroomId, staff: { role: "teacher", deletedAt: null } },
+    orderBy: { staff: { name: "asc" } },
+    select: { staff: { select: { id: true, name: true, email: true } } },
+  });
+  if (link.staff.email === USERS.kavitha.email) {
+    const result = await new PrismaAccessReader(prisma).resolve({
+      workspaceId,
+      userId: USERS.kavitha.id,
+      userName: USERS.kavitha.name,
+      memberRole: "teacher",
+      verifiedEmails: [USERS.kavitha.email],
+    });
+    if (result.kind === "actor") return result.actor;
+  }
+  return {
+    workspaceId,
+    userId: `staff_${link.staff.id}`,
+    userName: link.staff.name,
+    role: "teacher",
+    centreIds: [centreId],
+    classroomIds: [classroomId],
+    childIds: [],
+  };
+}
+
+function roomOf(
+  centre: Centre,
+  name: string,
+): { id: string; programme: string } {
+  const room = centre.classrooms.get(name);
+  if (room == null) throw new Error(`No ${name} at ${centre.name}`);
+  return room;
+}
+
+/** Children still in a Classroom, in the order they were admitted. */
+function stillIn(
+  children: readonly SeededChild[],
+  centre: Centre,
+  classroomName: string,
+  withdrawn: ReadonlySet<string>,
+): SeededChild[] {
+  return children.filter(
+    (child) =>
+      child.centreId === centre.id &&
+      child.classroomName === classroomName &&
+      !withdrawn.has(child.id),
+  );
+}
+
+async function withdrawnIds(workspaceId: string): Promise<Set<string>> {
+  const rows = await prisma.preschoolChild.findMany({
+    where: { workspaceId, status: { not: "active" } },
+    select: { id: true },
+  });
+  return new Set(rows.map((row) => row.id));
+}
+
+// ---------------------------------------------------------------- announcements
+
+/** Public holidays that fall in the next 60 days. */
+function holidaysAhead(
+  today: IsoDate,
+): { title: string; startsOn: IsoDate; endsOn: IsoDate; body: string }[] {
+  const year = Number(today.slice(0, 4));
+  const candidates = [year, year + 1].flatMap((y) => [
+    {
+      title: "Christmas holiday",
+      startsOn: `${String(y)}-12-25`,
+      endsOn: `${String(y)}-12-25`,
+      body: "The Centre is closed for Christmas. Merry Christmas to all our families!",
+    },
+    {
+      title: "Pongal holidays",
+      startsOn: `${String(y)}-01-14`,
+      endsOn: `${String(y)}-01-16`,
+      body: "The Centre is closed for Pongal, Mattu Pongal and Kaanum Pongal. Classes resume on the 17th.",
+    },
+    {
+      title: "Republic Day",
+      startsOn: `${String(y)}-01-26`,
+      endsOn: `${String(y)}-01-26`,
+      body: "The Centre is closed for Republic Day. Children may come dressed in tricolour on the day before.",
+    },
+    {
+      title: "Independence Day",
+      startsOn: `${String(y)}-08-15`,
+      endsOn: `${String(y)}-08-15`,
+      body: "The Centre is closed for Independence Day.",
+    },
+    {
+      title: "Gandhi Jayanti",
+      startsOn: `${String(y)}-10-02`,
+      endsOn: `${String(y)}-10-02`,
+      body: "The Centre is closed for Gandhi Jayanti.",
+    },
+    {
+      title: "Tamil New Year",
+      startsOn: `${String(y)}-04-14`,
+      endsOn: `${String(y)}-04-14`,
+      body: "The Centre is closed for Tamil New Year (Puthandu).",
+    },
+  ]);
+  return candidates
+    .filter(
+      (holiday) =>
+        holiday.startsOn > today && holiday.startsOn <= addDays(today, 60),
+    )
+    .sort((a, b) => a.startsOn.localeCompare(b.startsOn));
+}
+
+/** The first Saturday on or after a date. */
+function saturdayFrom(date: IsoDate): IsoDate {
+  let day = date;
+  while (new Date(`${day}T00:00:00Z`).getUTCDay() !== 6) day = addDays(day, 1);
+  return day;
+}
+
+async function backDate(id: string, at: Date): Promise<void> {
+  await prisma.preschoolAnnouncement.update({
+    where: { id },
+    data: { publishedAt: at, createdAt: at },
+  });
+}
+
+async function seedAnnouncements(
+  littleSteps: LittleSteps,
+  tinyTots: { actor: PreschoolActor; centreId: string },
+  today: IsoDate,
+): Promise<void> {
+  const h = handlersFor(() => new Date());
+  const { actor, annaNagar, velachery } = littleSteps;
+
+  const older = await h.announcements.create(actor, {
+    centreId: null,
+    kind: "notice",
+    title: "Term 2 begins",
+    body: "Welcome back! Term 2 begins on 1 August. Term 2 fees are due by the 10th; Receipts are in the app.",
+  });
+  await backDate(older.id, instantInIndia(addDays(today, -35), "09:30"));
+  const photos = await h.announcements.create(actor, {
+    centreId: annaNagar.id,
+    kind: "notice",
+    title: "Sports Day photos",
+    body: "Thank you for cheering at Sports Day! The photos are with the Class Teachers; ask for a copy at pick-up.",
+  });
+  await backDate(photos.id, instantInIndia(addDays(today, -18), "16:00"));
+
+  await h.announcements.create(actor, {
+    centreId: null,
+    kind: "notice",
+    title: "Fee reminder for Term 3",
+    body: "Term 3 fees fall due on 1 December. Pay at the office by cash, UPI or card, and collect your Receipt. Thank you!",
+  });
+  for (const holiday of holidaysAhead(today).slice(0, 2))
+    await h.announcements.create(actor, {
+      centreId: null,
+      kind: "holiday",
+      ...holiday,
+    });
+  const annualDay = saturdayFrom(addDays(today, 21));
+  await h.announcements.create(actor, {
+    centreId: null,
+    kind: "event",
+    title: "Annual Day",
+    body: "Our Annual Day at every Centre: songs, a dance by each Classroom and a small play. Families welcome from 4:30 pm.",
+    startsOn: annualDay,
+    endsOn: annualDay,
+  });
+
+  await h.announcements.create(actor, {
+    centreId: annaNagar.id,
+    kind: "notice",
+    title: "Winter uniform from Monday",
+    body: "From Monday, children may wear the full-sleeve sweater with the uniform. Please label it with your child's name.",
+  });
+  const ptm = saturdayFrom(addDays(today, 1));
+  await h.announcements.create(actor, {
+    centreId: annaNagar.id,
+    kind: "event",
+    title: "Parent–Teacher Meeting",
+    body: "Meet your child's Class Teacher between 10 am and 1 pm to talk about Term 2. No appointment needed.",
+    startsOn: ptm,
+    endsOn: ptm,
+  });
+  for (const name of ["Nursery A", "Playgroup A"]) {
+    const room = roomOf(annaNagar, name);
+    const teacher = await classTeacher(
+      actor.workspaceId,
+      annaNagar.id,
+      room.id,
+    );
+    await h.announcements.create(teacher, {
+      centreId: annaNagar.id,
+      classroomId: room.id,
+      kind: "notice",
+      title: "Show and tell on Friday",
+      body: "Show and tell on Friday: bring a favourite toy and tell us one thing about it. Please send it in a bag with your child's name.",
+    });
+  }
+
+  await h.announcements.create(actor, {
+    centreId: velachery.id,
+    kind: "notice",
+    title: "Water tank cleaning",
+    body: "The water tank will be cleaned on Saturday. Please send a water bottle with your child on Monday.",
+  });
+  const fieldTrip = saturdayFrom(addDays(today, 10));
+  await h.announcements.create(actor, {
+    centreId: velachery.id,
+    kind: "event",
+    title: "Field trip to the Children's Park, Guindy",
+    body: "UKG and LKG go to the Children's Park in the morning. Send a snack box and a cap; we return by 12:30 pm.",
+    startsOn: fieldTrip,
+    endsOn: fieldTrip,
+  });
+
+  const tiny = handlersFor(() => new Date()).announcements;
+  await tiny.create(tinyTots.actor, {
+    centreId: tinyTots.centreId,
+    kind: "notice",
+    title: "Snack box ideas",
+    body: "Please pack fruit, idli or a sandwich; no chips or chocolates. Thank you for helping us keep snack time healthy.",
+  });
+  await tiny.create(tinyTots.actor, {
+    centreId: tinyTots.centreId,
+    kind: "notice",
+    title: "December fees",
+    body: "December tuition is due by the 5th. You can pay by UPI at the office.",
+  });
+  const holiday = holidaysAhead(today)[0];
+  if (holiday != null)
+    await tiny.create(tinyTots.actor, {
+      centreId: tinyTots.centreId,
+      kind: "holiday",
+      ...holiday,
+    });
+}
+
+// ---------------------------------------------------------------- observations
+
+/** What a Teacher writes, per Development Domain in their seeded order. */
+const OBSERVATION_NOTES: readonly (readonly string[])[] = [
+  [
+    "Climbs the slide ladder on her own and comes down feet first.",
+    "Holds the crayon with a tripod grip for most of the drawing.",
+    "Hops on one foot for three hops before steadying herself.",
+    "Threads six large beads on a string without help.",
+    "Washes and dries his hands before lunch without a reminder.",
+  ],
+  [
+    "Shares crayons when asked; still needs a reminder to wait for a turn.",
+    "Comforted a friend who was crying at drop-off and held her hand.",
+    "Says sorry on her own after bumping into a classmate.",
+    "Settles quickly at drop-off now; waves goodbye at the gate.",
+    "Plays happily in a group of three during block time.",
+  ],
+  [
+    "Stacks eight blocks and names the colours.",
+    "Sorts buttons by size into three bowls.",
+    "Counts objects to ten, touching each one.",
+    "Completes a six-piece jigsaw of the farm animals.",
+    "Points out which tower is taller and which is shorter.",
+  ],
+  [
+    "Recites 'Chubby Cheeks' with the actions, all the way through.",
+    "Tells what happened in the story of the thirsty crow in his own words.",
+    "Recognises the letters of his name on the cubby label.",
+    "Asks 'why' questions during story time and listens to the answer.",
+    "Uses Tamil and English words together to describe her drawing.",
+  ],
+  [
+    "Mixed blue and yellow and was delighted to find green.",
+    "Dances to the music with big, joyful movements.",
+    "Made a kolam pattern with rice flour, copying the teacher's dots.",
+    "Sang the Pongal song and kept the beat with a tambourine.",
+    "Drew her family: four people, a cat and a big sun.",
+  ],
+  [
+    "Puts the blocks back in the box when the song starts.",
+    "Stays with the puzzle for ten minutes until it is done.",
+    "Waits for his name before taking a plate at lunch.",
+    "Tries again after the tower falls instead of walking away.",
+    "Follows the three-step handwash routine on his own.",
+  ],
+];
+
+async function seedObservations(
+  littleSteps: LittleSteps,
+  today: IsoDate,
+): Promise<void> {
+  const h = handlersFor(() => new Date());
+  const { actor, annaNagar, velachery, children } = littleSteps;
+  const domains = await h.observations.domains(actor);
+  const withdrawn = await withdrawnIds(actor.workspaceId);
+  const write = async (
+    teacher: PreschoolActor,
+    child: SeededChild,
+    count: number,
+  ) => {
+    const from = minDate(
+      addDays(today, -1),
+      child.admittedOn > addDays(today, -70)
+        ? child.admittedOn
+        : addDays(today, -70),
+    );
+    const offset = rnd.int(0, domains.length - 1);
+    for (let n = 0; n < count; n += 1) {
+      const index = (offset + n) % domains.length;
+      const domain = domains[index];
+      if (domain == null) continue;
+      const span = Math.max(
+        0,
+        Math.round(
+          (new Date(`${today}T00:00:00Z`).getTime() -
+            new Date(`${from}T00:00:00Z`).getTime()) /
+            86_400_000,
+        ) - 1,
+      );
+      const observedOn = addDays(from, rnd.int(0, span));
+      await h.observations.create(teacher, {
+        childId: child.id,
+        domainId: domain.id,
+        observedOn,
+        note: rnd.pick(
+          OBSERVATION_NOTES[index % OBSERVATION_NOTES.length] ?? [
+            "Had a good day.",
+          ],
+        ),
+      });
+    }
+  };
+  for (const name of ["Nursery A", "Playgroup A"]) {
+    const room = roomOf(annaNagar, name);
+    const teacher = await classTeacher(
+      actor.workspaceId,
+      annaNagar.id,
+      room.id,
+    );
+    for (const child of stillIn(children, annaNagar, name, withdrawn))
+      await write(
+        teacher,
+        child,
+        child.name.endsWith("Sharma") ? 6 : rnd.int(3, 6),
+      );
+  }
+  const velacheryRoom = roomOf(velachery, "Nursery A");
+  const velacheryTeacher = await classTeacher(
+    actor.workspaceId,
+    velachery.id,
+    velacheryRoom.id,
+  );
+  for (const child of stillIn(
+    children,
+    velachery,
+    "Nursery A",
+    withdrawn,
+  ).slice(0, 4))
+    await write(velacheryTeacher, child, 2);
+}
+
+// ---------------------------------------------------------------- progress reports
+
+const RATING_WEIGHTS: readonly ProgressRating[] = [
+  "beginning",
+  "progressing",
+  "progressing",
+  "progressing",
+  "proficient",
+  "proficient",
+];
+
+const DOMAIN_REMARKS = [
+  "Runs, climbs and balances with confidence.",
+  "Makes friends easily; learning to take turns.",
+  "Enjoys sorting and counting games.",
+  "Speaks in full sentences and loves story time.",
+  "Very expressive with colours and music.",
+  "Settles to a task and finishes it.",
+] as const;
+
+function teacherRemark(firstName: string): string {
+  return rnd.pick([
+    `${firstName} has settled in beautifully this term and comes in smiling every morning. We are proud of how much more ${firstName} now joins in at circle time.`,
+    `${firstName} is curious and kind, and asks wonderful questions. Next term we will work on waiting for a turn and on holding the pencil.`,
+    `It has been a joy to watch ${firstName} grow in confidence this term. Please keep reading a story together at bedtime; it shows in class.`,
+    `${firstName} loves rhymes, building and the sand pit. We will keep encouraging ${firstName} to use words to share feelings with friends.`,
+  ]);
+}
+
+async function seedProgressReports(
+  littleSteps: LittleSteps,
+  today: IsoDate,
+): Promise<void> {
+  const { actor, annaNagar, children, year } = littleSteps;
+  const h = handlersFor(() => new Date());
+  const domains = await h.observations.domains(actor);
+  const withdrawn = await withdrawnIds(actor.workspaceId);
+  const termOne = termSpan(year, "term_1");
+  const current = termOn(year, today);
+  for (const name of ["Nursery A", "Playgroup A"]) {
+    const room = roomOf(annaNagar, name);
+    const teacher = await classTeacher(
+      actor.workspaceId,
+      annaNagar.id,
+      room.id,
+    );
+    const roster = stillIn(children, annaNagar, name, withdrawn);
+    if (termOne.endsOn < today)
+      for (const child of roster) {
+        if (child.admittedOn > termOne.endsOn) continue;
+        const firstName = child.name.split(" ")[0] ?? child.name;
+        const report = await h.progressReports.save(teacher, {
+          childId: child.id,
+          term: "term_1",
+          academicYearId: year.id,
+          ratings: domains.map((domain, index) => ({
+            domainId: domain.id,
+            rating: rnd.pick(RATING_WEIGHTS),
+            remark: rnd.chance(0.35) ? (DOMAIN_REMARKS[index] ?? null) : null,
+          })),
+          teacherRemarks: teacherRemark(firstName),
+        });
+        const publishedAt = instantInIndia(
+          addDays(termOne.endsOn, rnd.int(3, 9)),
+          "16:00",
+        );
+        await handlersFor(() => publishedAt).progressReports.publish(
+          actor,
+          report.id,
+        );
+      }
+    if (name !== "Nursery A" || current == null || current === "term_1")
+      continue;
+    for (const [index, child] of roster.entries()) {
+      if (index % 2 === 1) continue;
+      const rated = index % 4 === 0 ? domains : domains.slice(0, rnd.int(2, 4));
+      await h.progressReports.save(teacher, {
+        childId: child.id,
+        term: current,
+        academicYearId: year.id,
+        ratings: rated.map((domain) => ({
+          domainId: domain.id,
+          rating: rnd.pick(RATING_WEIGHTS),
+        })),
+        teacherRemarks:
+          index % 4 === 0
+            ? teacherRemark(child.name.split(" ")[0] ?? child.name)
+            : null,
+      });
+    }
+  }
 }
 
 // ---------------------------------------------------------------- main
@@ -1970,7 +2479,57 @@ async function counts(today: IsoDate): Promise<void> {
     say(
       `  ${centre.name}: ${String(children)} active Children, ₹${String((collected._sum.amountPaise ?? 0) / 100)} collected this month, ${String(present)} present today`,
     );
+    const [announcements, observations, published, drafts] = await Promise.all([
+      prisma.preschoolAnnouncement.count({ where: { centreId: centre.id } }),
+      prisma.preschoolObservation.count({ where: { centreId: centre.id } }),
+      prisma.preschoolProgressReport.count({
+        where: { centreId: centre.id, status: "published" },
+      }),
+      prisma.preschoolProgressReport.count({
+        where: { centreId: centre.id, status: "draft" },
+      }),
+    ]);
+    say(
+      `    ${String(announcements)} Centre Announcements, ${String(observations)} Observations, ${String(published)} Progress Reports published, ${String(drafts)} drafts`,
+    );
   }
+  const everyCentre = await prisma.preschoolAnnouncement.count({
+    where: { workspaceId: LITTLE_STEPS, centreId: null },
+  });
+  say(
+    `  Little Steps Head Office: ${String(everyCentre)} Announcements to every Centre`,
+  );
+
+  const parent = await new PrismaAccessReader(prisma).resolve({
+    workspaceId: LITTLE_STEPS,
+    userId: USERS.sharma.id,
+    userName: USERS.sharma.name,
+    memberRole: "parent",
+    verifiedEmails: [USERS.sharma.email],
+  });
+  if (parent.kind !== "actor") throw new Error("The Sharma login sees nothing");
+  const feed = await handlersFor(() => new Date()).announcements.family(
+    parent.actor,
+    {},
+  );
+  const reports = await prisma.preschoolProgressReport.groupBy({
+    by: ["childId"],
+    where: { childId: { in: [...parent.actor.childIds] }, status: "published" },
+    _count: true,
+  });
+  const names = await prisma.preschoolChild.findMany({
+    where: { id: { in: [...parent.actor.childIds] } },
+    orderBy: { firstName: "asc" },
+    select: { id: true, firstName: true },
+  });
+  say(
+    `  ${USERS.sharma.email}: ${String(feed.total)} Announcements (${String(feed.upcoming.length)} coming up); published Progress Reports: ${names
+      .map(
+        (child) =>
+          `${child.firstName} ${String(reports.find((row) => row.childId === child.id)?._count ?? 0)}`,
+      )
+      .join(", ")}`,
+  );
 }
 
 async function main(): Promise<void> {
@@ -1978,8 +2537,11 @@ async function main(): Promise<void> {
   say(`Seeding Preschool demo data for ${today}…`);
   await reset();
   await seedIdentity();
-  await seedLittleSteps(today);
-  await seedTinyTots(today);
+  const littleSteps = await seedLittleSteps(today);
+  const tinyTots = await seedTinyTots(today);
+  await seedAnnouncements(littleSteps, tinyTots, today);
+  await seedObservations(littleSteps, today);
+  await seedProgressReports(littleSteps, today);
   await counts(today);
   say(`
 Sign in with password ${PASSWORD}:
