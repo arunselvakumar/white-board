@@ -19,6 +19,10 @@ import type {
 import type { PreschoolClassroom } from "@/src/queries/preschool/classrooms";
 
 import { AttendanceScreen } from "./attendance-screen";
+import {
+  expectFitsPhone,
+  withPhoneFrame,
+} from "@/app/(app)/preschool/_components/phone-frame";
 
 const id = (n: number) =>
   `be0e8400-e29b-41d4-a716-4466554400${String(n).padStart(2, "0")}`;
@@ -454,19 +458,15 @@ export const MonthlyRegister: Story = {
 /** At 375 px the register fits the screen: no sideways page scroll. */
 export const Phone: Story = {
   beforeEach: () => api(),
-  globals: { viewport: { value: "mobile1" } },
+  decorators: [withPhoneFrame],
   play: async ({ canvas, canvasElement, userEvent }) => {
-    // The story runs at a phone's width, not the desktop's.
-    await expect(window.innerWidth).toBeLessThanOrEqual(414);
     await userEvent.click(
       await canvas.findByRole("button", { name: "Mark everyone present" }),
     );
     await expect(
       await canvas.findByRole("button", { name: "Check out Ishaan Rao" }),
     ).toBeVisible();
-    await expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(
-      document.documentElement.clientWidth,
-    );
+    await expectFitsPhone(canvasElement);
     // On a phone, Check out opens a bottom sheet.
     await userEvent.click(
       canvas.getByRole("button", { name: "Check out Ishaan Rao" }),
@@ -481,9 +481,7 @@ export const Phone: Story = {
     );
     await userEvent.click(canvas.getByRole("tab", { name: "Month" }));
     await canvas.findByRole("region", { name: "Register grid" });
-    await expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(
-      document.documentElement.clientWidth,
-    );
+    await expectFitsPhone(canvasElement);
   },
 };
 

@@ -257,6 +257,7 @@ const SINGULAR: Partial<Record<PreschoolNavHref, string>> = {
   [FEE_STRUCTURES.href]: "Fee Structure",
   [STOCK_ITEMS.href]: "Stock Item",
   [FAMILY_ANNOUNCEMENTS.href]: "Announcement",
+  [ROYALTY.href]: "Centre statement",
 };
 
 /**
