@@ -280,12 +280,12 @@ export const NotSetUpYet: Story = {
   },
 };
 
-/** A member the Preschool has no Staff record or Child for. */
+/** A staff member the Preschool has no Staff record for. */
 export const NoAccess: Story = {
   beforeEach() {
     return mockPreschoolApi({
       me: null,
-      memberRole: "parent",
+      memberRole: "teacher",
       routes: {
         "GET /me": () => ({
           status: 403,

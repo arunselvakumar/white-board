@@ -99,7 +99,7 @@ export function ActiveCentreProvider({ children }: { children: ReactNode }) {
   if (value == null)
     return (
       <EmptyState
-        className="m-6 border"
+        className="m-4 w-auto border sm:m-6"
         icon={ProhibitIcon}
         tone="neutral"
         orbit={false}

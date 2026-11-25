@@ -5,7 +5,10 @@ import { MessageCircle, Printer } from "lucide-react";
 import { Button, buttonVariants } from "@repo/ui/components/button";
 
 import { RoleGate } from "@/app/(app)/preschool/_components/active-centre-provider";
-import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
+import {
+  PageHeader,
+  type PageHeaderBack,
+} from "@/app/(app)/_components/app-shell/page-header";
 import {
   childFullName,
   RECEIPT_PRINT_CSS,
@@ -18,8 +21,19 @@ import {
 
 import { FeeReceipt } from "./fee-receipt";
 
-/** The Receipt with Print, WhatsApp share and the way back to the account. */
-export function FeeReceiptView({ receipt }: { receipt: PreschoolReceipt }) {
+/**
+ * The Receipt with Print, WhatsApp share and the way back to the account.
+ * `back` and `share` let the family pages reuse it.
+ */
+export function FeeReceiptView({
+  receipt,
+  back,
+  share = true,
+}: {
+  receipt: PreschoolReceipt;
+  back?: PageHeaderBack;
+  share?: boolean;
+}) {
   const shareUrl = receiptShareUrl({
     centreName: receipt.centre.name,
     childName: childFullName(receipt.child),
@@ -36,21 +50,25 @@ export function FeeReceiptView({ receipt }: { receipt: PreschoolReceipt }) {
           title={`Receipt ${receipt.receiptNumber}`}
           meta={childFullName(receipt.child)}
           watermark="Receipt"
-          back={{
-            href: `/preschool/fees/children/${receipt.child.id}`,
-            label: "fee account",
-          }}
+          back={
+            back ?? {
+              href: `/preschool/fees/children/${receipt.child.id}`,
+              label: "fee account",
+            }
+          }
           actions={
             <>
-              <a
-                href={shareUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={buttonVariants({ variant: "outline" })}
-              >
-                <MessageCircle aria-hidden="true" />
-                Share on WhatsApp
-              </a>
+              {share ? (
+                <a
+                  href={shareUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={buttonVariants({ variant: "outline" })}
+                >
+                  <MessageCircle aria-hidden="true" />
+                  Share on WhatsApp
+                </a>
+              ) : null}
               <Button
                 type="button"
                 onClick={() => {

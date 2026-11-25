@@ -124,11 +124,35 @@ const FAMILY_HOME = {
   title: "Parent Home",
   description: "Today's status, Daily Reports, attendance and dues.",
 } as const;
+const FAMILY_DAILY_REPORTS = {
+  href: "/preschool/family/daily-reports",
+  label: "Daily Reports",
+  title: "Daily Reports",
+  description: "Meals, nap, mood and activities, day by day.",
+} as const;
+const FAMILY_ATTENDANCE = {
+  href: "/preschool/family/attendance",
+  label: "Attendance",
+  title: "Attendance",
+  description: "Days at school, and who collected your Child.",
+} as const;
+const FAMILY_FEES = {
+  href: "/preschool/family/fees",
+  label: "Fees",
+  title: "Fees",
+  description: "Fees due and Receipts for what you have paid.",
+} as const;
 const FAMILY_ANNOUNCEMENTS = {
   href: "/preschool/family/announcements",
   label: "Announcements",
   title: "Announcements",
   description: "Notices, events and holidays from the Centre.",
+} as const;
+const FAMILY_PROGRESS = {
+  href: "/preschool/family/progress",
+  label: "Progress",
+  title: "Progress",
+  description: "Progress Reports from your Child's Teachers.",
 } as const;
 
 /** The Owner's and a Centre Head's Main menu. */
@@ -167,7 +191,11 @@ export const PRESCHOOL_TEACHER_NAV = [
 
 export const PRESCHOOL_PARENT_NAV = [
   FAMILY_HOME,
+  FAMILY_DAILY_REPORTS,
+  FAMILY_ATTENDANCE,
+  FAMILY_FEES,
   FAMILY_ANNOUNCEMENTS,
+  FAMILY_PROGRESS,
 ] as const;
 
 export type PreschoolNavItem =

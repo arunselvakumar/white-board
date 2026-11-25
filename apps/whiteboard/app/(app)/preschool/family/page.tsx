@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
-import { PreschoolEmptyPage } from "@/app/(app)/preschool/_components/preschool-empty-page";
+import { FamilyHomeScreen } from "@/app/(app)/preschool/family/_components/family-home-screen";
 
-export const metadata: Metadata = { title: "Parent Home" };
+export const metadata: Metadata = { title: "Home" };
 
-export default function Page() {
-  return <PreschoolEmptyPage href="/preschool/family" />;
+export default function FamilyHomePage() {
+  return <FamilyHomeScreen />;
 }

@@ -248,7 +248,7 @@ export const BrandNewCentre: Story = {
     ).not.toBeInTheDocument();
     await expect(
       canvas.getByRole("link", { name: /Admit the first Child/ }),
-    ).toHaveAttribute("href", "/preschool/children");
+    ).toHaveAttribute("href", "/preschool/children/new");
     await expect(
       canvas.queryByRole("region", { name: "Today's figures" }),
     ).not.toBeInTheDocument();
