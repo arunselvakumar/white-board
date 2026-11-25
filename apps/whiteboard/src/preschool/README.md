@@ -42,7 +42,7 @@ One area's files belong to one ticket. Do not edit another area's files; if you 
 
 ## Demo data
 
-`bun run seed:preschool` (from `apps/whiteboard`, with `DATABASE_URL` in `.env`) deletes and rebuilds two demo Workspaces through the real handlers: **Little Steps Preschool**, a franchise with Anna Nagar, Velachery and Coimbatore – RS Puram, and **Tiny Tots Playschool**, a single Centre. Dates are relative to today in India, and the same data comes back on every run. The script is `scripts/seed-preschool-demo.ts`, one function per area.
+`bun run seed:preschool` (from `apps/whiteboard`, with `DATABASE_URL` in `.env`) deletes and rebuilds two demo Workspaces through the real handlers: **Little Steps Preschool**, a franchise with Anna Nagar, Velachery and Coimbatore – RS Puram, and **Tiny Tots Playschool**, a single Centre. Fees, attendance, Daily Reports, Enquiries, Stock, Announcements, Observations and Progress Reports are all filled in. Dates are relative to today in India, and the same data comes back on every run. The script is `scripts/seed-preschool-demo.ts`, one function per area.
 
 Every login's password is `Preschool@123`:
 
