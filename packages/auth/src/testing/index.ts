@@ -64,6 +64,8 @@ export async function seedWorkspaceMember(input: {
   role?: WorkspaceRole;
   email?: string;
   workspaceName?: string;
+  /** Defaults to `training_institute`. Applied only when the Workspace is created. */
+  institutionType?: string;
 }): Promise<void> {
   const now = new Date();
   await prisma.identityUser.upsert({
@@ -85,7 +87,7 @@ export async function seedWorkspaceMember(input: {
       id: input.workspaceId,
       name: input.workspaceName ?? `Workspace ${input.workspaceId}`,
       slug: `test-${input.workspaceId}`.toLowerCase(),
-      institutionType: "training_institute",
+      institutionType: input.institutionType ?? "training_institute",
       createdAt: now,
     },
   });

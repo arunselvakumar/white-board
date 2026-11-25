@@ -11,6 +11,7 @@ export type InstitutionType = (typeof INSTITUTION_TYPE_VALUES)[number];
 
 export const AVAILABLE_INSTITUTION_TYPE_VALUES = [
   "training_institute",
+  "preschool",
 ] as const satisfies readonly InstitutionType[];
 
 export type AvailableInstitutionType =
@@ -33,9 +34,13 @@ export const INSTITUTION_TYPES: readonly {
   available: boolean;
 }[] = [
   { value: "training_institute", label: "Training Institute", available: true },
+  { value: "preschool", label: "Preschool", available: true },
   { value: "school", label: "School", available: false },
-  { value: "preschool", label: "Preschool", available: false },
   { value: "college", label: "College", available: false },
   { value: "university", label: "University", available: false },
   { value: "other", label: "Other", available: false },
 ];
+
+export function isPreschool(institutionType: string | null | undefined): boolean {
+  return institutionType === "preschool";
+}

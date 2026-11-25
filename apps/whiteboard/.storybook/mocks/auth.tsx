@@ -113,16 +113,19 @@ export function resetAuthMocks(): void {
   Object.assign(authMocks, createState());
 }
 
-/** Signs the story in as `role` in a Workspace named `name`. */
+/**
+ * Signs the story in as `role` in a Workspace named `name`, a Training
+ * Institute unless `institutionType` says otherwise.
+ */
 export function signInAs(
   role: WorkspaceRole,
-  workspace: { id?: string; name?: string } = {},
+  workspace: { id?: string; name?: string; institutionType?: string } = {},
 ): void {
   const summary: WorkspaceSummary = {
     id: workspace.id ?? "org_riverside",
     name: workspace.name ?? "Riverside Computer Centre",
     role,
-    institutionType: "training_institute",
+    institutionType: workspace.institutionType ?? "training_institute",
   };
   authMocks.userId = storyUser.id;
   authMocks.user = storyUser;
