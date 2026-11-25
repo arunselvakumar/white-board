@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import { clearOutbox, emailsTo, seedWorkspaceMember } from "@repo/auth/testing";
 import { prisma } from "@repo/whiteboard-db";
 import { StatusCodes } from "http-status-codes";
@@ -796,6 +798,66 @@ describe("/api/preschool/children", () => {
       (await call(getOptions, { query: { centreId: preschool.centreId } }))
         .status,
     ).toBe(StatusCodes.FORBIDDEN);
+  });
+
+  it("raises the Fee Structure's Invoices on admission and keeps them through a Classroom move", async () => {
+    const structureId = randomUUID();
+    const tuition = preschool.feeHeadIds["Tuition"];
+    const admissionFee = preschool.feeHeadIds["Admission fee"];
+    const programmeId = preschool.programmeIds["Nursery (Pre-KG)"];
+    if (tuition == null || admissionFee == null || programmeId == null)
+      throw new Error("The fixture has no Tuition, Admission fee or Nursery.");
+    await prisma.preschoolFeeStructure.create({
+      data: {
+        id: structureId,
+        workspaceId: preschool.workspaceId,
+        academicYearId: preschool.academicYearId,
+        programmeId,
+        items: {
+          create: [
+            {
+              id: randomUUID(),
+              workspaceId: preschool.workspaceId,
+              feeHeadId: admissionFee,
+              amountPaise: 500_000,
+              frequency: "one_time",
+            },
+            {
+              id: randomUUID(),
+              workspaceId: preschool.workspaceId,
+              feeHeadId: tuition,
+              amountPaise: 1_200_000,
+              frequency: "term",
+            },
+          ],
+        },
+      },
+    });
+    try {
+      const { child } = await admit();
+      const invoices = await prisma.preschoolInvoice.findMany({
+        where: { childId: child.id },
+      });
+      expect(invoices.length).toBeGreaterThanOrEqual(2);
+      expect(invoices.map((invoice) => invoice.label)).toContain(
+        "Admission fee",
+      );
+
+      signInAsOwner(preschool);
+      const moved = await call<ChildProfileView>(moveClassroom, {
+        id: child.id,
+        body: { classroomId: nurseryB },
+      });
+      const after = await prisma.preschoolInvoice.findMany({
+        where: { childId: child.id },
+      });
+      expect(after).toHaveLength(invoices.length);
+      expect(new Set(after.map((invoice) => invoice.admissionId))).toEqual(
+        new Set([moved.body.currentAdmission?.id]),
+      );
+    } finally {
+      await prisma.preschoolFeeStructure.delete({ where: { id: structureId } });
+    }
   });
 
   it("tells the AdmissionInvoicer about admissions and promotions", async () => {

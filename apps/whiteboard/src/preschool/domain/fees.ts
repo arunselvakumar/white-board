@@ -148,19 +148,30 @@ export type Allocation = { invoiceId: string; amountPaise: number };
 
 /**
  * Spreads a Fee Payment over a Child's unpaid Invoices, oldest due date
- * first. A payment larger than everything owed is refused: the Centre has no
+ * first; Invoices due the same day are paid in label order, as the Child's
+ * account lists them. A payment larger than everything owed is refused: the Centre has no
  * advance or credit balance to hold it in.
  * @param invoices unpaid Invoices in any order
  */
 export function allocatePayment(
   amountPaise: number,
-  invoices: readonly { id: string; dueOn: IsoDate; duePaise: number }[],
+  invoices: readonly {
+    id: string;
+    dueOn: IsoDate;
+    duePaise: number;
+    label?: string;
+  }[],
 ): Allocation[] {
   if (!Number.isInteger(amountPaise) || amountPaise <= 0)
     throw invalid("FEE_PAYMENT_AMOUNT_INVALID", "Enter an amount above ₹0.");
   const open = invoices
     .filter((invoice) => invoice.duePaise > 0)
-    .sort((a, b) => a.dueOn.localeCompare(b.dueOn) || a.id.localeCompare(b.id));
+    .sort(
+      (a, b) =>
+        a.dueOn.localeCompare(b.dueOn) ||
+        (a.label ?? "").localeCompare(b.label ?? "") ||
+        a.id.localeCompare(b.id),
+    );
   const owed = open.reduce((sum, invoice) => sum + invoice.duePaise, 0);
   if (amountPaise > owed)
     throw conflict("FEE_OVERPAY", "The amount is more than this Child owes.", {

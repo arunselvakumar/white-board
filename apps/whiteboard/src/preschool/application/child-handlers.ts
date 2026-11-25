@@ -451,7 +451,7 @@ export class ChildHandlers {
   /**
    * Into another Classroom of the same Programme and Academic Year: the
    * current Admission ends `classroom_changed` and a new one starts the same
-   * day, so the history shows the move.
+   * day, so the history shows the move. Its Invoices move to the new one.
    */
   async moveClassroom(
     actor: PreschoolActor,
@@ -470,8 +470,9 @@ export class ChildHandlers {
       assertEndsAfterAdmission(current.admittedOn, movedOn);
       assertSeatAvailable(await store.lockSeats(target.id));
       await store.endAdmission(current.id, movedOn, "classroom_changed");
+      const admissionId = this.id();
       await store.insertAdmission({
-        id: this.id(),
+        id: admissionId,
         workspaceId: actor.workspaceId,
         centreId: child.centreId,
         childId: id,
@@ -480,6 +481,8 @@ export class ChildHandlers {
         classroomId: target.id,
         admittedOn: movedOn,
       });
+      // Same Programme and year, so the fees are the same: they follow the Child.
+      await store.moveInvoices(current.id, admissionId);
       await store.updateChild(id, {});
     });
     return this.get(actor, id);

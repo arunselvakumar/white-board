@@ -199,7 +199,12 @@ export type RecordPaymentInput = {
   invoiceIds: readonly string[] | null;
   /** Given the Child's locked unpaid Invoices, how the payment is spread. */
   allocate: (
-    invoices: readonly { id: string; dueOn: string; duePaise: number }[],
+    invoices: readonly {
+      id: string;
+      label: string;
+      dueOn: string;
+      duePaise: number;
+    }[],
   ) => Allocation[];
 };
 

@@ -193,6 +193,8 @@ export type ChildStore = {
     childId: string,
     pickups: PickupFields[],
   ): Promise<void>;
+  /** Moves an Admission's Invoices to the Admission that replaces it. */
+  moveInvoices(fromAdmissionId: string, toAdmissionId: string): Promise<void>;
   endAdmission(
     id: string,
     endedOn: IsoDate,

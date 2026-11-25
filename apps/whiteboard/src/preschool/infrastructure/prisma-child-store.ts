@@ -306,6 +306,16 @@ export class PrismaChildStore implements ChildStore, ChildReader {
     await this.insertPickups(workspaceId, childId, pickups);
   }
 
+  async moveInvoices(
+    fromAdmissionId: string,
+    toAdmissionId: string,
+  ): Promise<void> {
+    await this.db.preschoolInvoice.updateMany({
+      where: { admissionId: fromAdmissionId },
+      data: { admissionId: toAdmissionId },
+    });
+  }
+
   async endAdmission(
     id: string,
     endedOn: IsoDate,

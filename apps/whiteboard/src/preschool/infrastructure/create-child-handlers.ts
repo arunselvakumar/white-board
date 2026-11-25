@@ -5,13 +5,9 @@ import type {
   AdmissionInvoicer,
   ParentInviter,
 } from "../application/child-ports";
+import { createAdmissionInvoicer } from "./fee-admission-invoicer";
 import { PrismaChildStore } from "./prisma-child-store";
 import { WorkspaceParentInviter } from "./workspace-parent-inviter";
-
-/** Raises nothing: Admissions get no Invoices until Fees are wired in here. */
-const noInvoices: AdmissionInvoicer = {
-  onAdmitted: () => Promise.resolve(),
-};
 
 export function createChildHandlers(deps?: {
   prisma?: PrismaClient;
@@ -19,11 +15,12 @@ export function createChildHandlers(deps?: {
   inviter?: ParentInviter;
   now?: () => Date;
 }): ChildHandlers {
-  const store = new PrismaChildStore(deps?.prisma ?? prisma);
+  const db = deps?.prisma ?? prisma;
+  const store = new PrismaChildStore(db);
   return new ChildHandlers({
     store,
     reader: store,
-    invoicer: deps?.invoicer ?? noInvoices,
+    invoicer: deps?.invoicer ?? createAdmissionInvoicer({ prisma: db }),
     inviter: deps?.inviter ?? new WorkspaceParentInviter(),
     now: deps?.now ?? (() => new Date()),
   });

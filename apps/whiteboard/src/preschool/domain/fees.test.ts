@@ -170,6 +170,18 @@ describe("allocatePayment", () => {
     ]);
   });
 
+  it("pays Invoices due the same day in label order, whatever their ids", () => {
+    expect(
+      allocatePayment(150_000, [
+        { id: "a", dueOn: "2026-06-01", duePaise: 300_000, label: "Tuition" },
+        { id: "z", dueOn: "2026-06-01", duePaise: 100_000, label: "Admission" },
+      ]),
+    ).toEqual([
+      { invoiceId: "z", amountPaise: 100_000 },
+      { invoiceId: "a", amountPaise: 50_000 },
+    ]);
+  });
+
   it("refuses more than the Child owes and says how much that is", () => {
     try {
       allocatePayment(700_001, invoices);

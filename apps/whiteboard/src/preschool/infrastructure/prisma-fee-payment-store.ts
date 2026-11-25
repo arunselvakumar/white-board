@@ -18,6 +18,7 @@ type LockedInvoice = {
   amount_paise: number;
   concession_paise: number;
   paid_paise: number;
+  label: string;
 };
 
 export class PrismaFeePaymentStore implements FeePaymentStore {
@@ -31,13 +32,13 @@ export class PrismaFeePaymentStore implements FeePaymentStore {
       // Locked oldest first, so two payments for one Child queue in the same
       // order and the second sees what the first paid.
       const locked = await tx.$queryRaw<LockedInvoice[]>`
-        SELECT id::text AS id, due_on, amount_paise, concession_paise, paid_paise
+        SELECT id::text AS id, label, due_on, amount_paise, concession_paise, paid_paise
         FROM preschool.invoices
         WHERE workspace_id = ${workspaceId}
           AND child_id = ${input.childId}::uuid
           AND cancelled_at IS NULL
           AND amount_paise - concession_paise - paid_paise > 0
-        ORDER BY due_on, id
+        ORDER BY due_on, label, id
         FOR UPDATE`;
       let open = locked;
       if (input.invoiceIds != null) {
@@ -56,6 +57,7 @@ export class PrismaFeePaymentStore implements FeePaymentStore {
       const allocations = input.allocate(
         open.map((invoice) => ({
           id: invoice.id,
+          label: invoice.label,
           dueOn: toIsoDate(invoice.due_on),
           duePaise: invoiceDuePaise({
             amountPaise: invoice.amount_paise,
