@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { getRouter } from "@storybook/nextjs-vite/navigation.mock";
-import { expect, waitFor } from "storybook/test";
+import { expect, waitFor, within } from "storybook/test";
 
 import { CreateWorkspaceForm } from "@/app/(onboarding)/create-workspace/_components/create-workspace-form";
 import { withAuthFormFrame } from "@/.storybook/decorators";
@@ -78,6 +78,72 @@ export const SubmitsName: Story = {
       institutionType: "training_institute",
     });
     await expect(authMocks.setActive).toHaveBeenCalledWith("org_new", "/");
+  },
+};
+
+/** Training Institute is not asked for an Academic Year. */
+export const NoAcademicYearForTrainingInstitute: Story = {
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.queryByLabelText("Academic Year starts in"),
+    ).not.toBeInTheDocument();
+  },
+};
+
+export const SubmitsPreschool: Story = {
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.type(
+      canvas.getByLabelText("Workspace name"),
+      "Little Steps Preschool",
+    );
+    await userEvent.click(canvas.getByText("Preschool"));
+    await expect(
+      canvas.getByRole("radio", { name: "Preschool" }),
+    ).toHaveAttribute("aria-checked", "true");
+    const month = canvas.getByLabelText("Academic Year starts in");
+    await expect(month).toHaveTextContent("April");
+    await userEvent.click(month);
+    await userEvent.click(
+      await within(canvasElement.ownerDocument.body).findByRole("option", {
+        name: "June",
+      }),
+    );
+    await waitFor(() => expect(month).toHaveTextContent("June"));
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Create workspace" }),
+    );
+    await expect(createWorkspace).toHaveBeenCalledWith({
+      name: "Little Steps Preschool",
+      institutionType: "preschool",
+      academicYearStartMonth: 6,
+    });
+    await waitFor(() =>
+      expect(authMocks.setActive).toHaveBeenCalledWith("org_new", "/"),
+    );
+  },
+};
+
+/** The Workspace exists but its Preschool setup failed: the form says so. */
+export const PreschoolSetupFails: Story = {
+  beforeEach() {
+    createWorkspace.mockImplementation(() =>
+      Promise.resolve({
+        ok: false as const,
+        message:
+          "Your workspace was created, but setting up the Preschool did not finish. Reload the page to open it and finish setting up.",
+      }),
+    );
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.type(canvas.getByLabelText("Workspace name"), "Tiny Toes");
+    await userEvent.click(canvas.getByText("Preschool"));
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Create workspace" }),
+    );
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "setting up the Preschool did not finish",
+    );
+    await expect(authMocks.setActive).not.toHaveBeenCalled();
   },
 };
 

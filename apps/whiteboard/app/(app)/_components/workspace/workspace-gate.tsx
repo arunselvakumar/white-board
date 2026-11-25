@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth, useWorkspaceList } from "@repo/auth/react";
+import { useAuth, useWorkspace, useWorkspaceList } from "@repo/auth/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Button } from "@repo/ui/components/button";
@@ -22,20 +22,24 @@ function withRedirect(path: string, redirectUrl: string): string {
 /**
  * The Workspace Gate (CONTEXT.md): zero Workspaces → Workspace Creation, one
  * and none active → activate it, several and none active → Workspace
- * Selection, an Active Workspace → the page. A screen the role may not use
- * sends the User to the In-app Home instead.
+ * Selection, an Active Workspace → the page. A screen the role or the
+ * Institution Type may not use sends the User to the In-app Home instead;
+ * roles inside a Preschool are checked by the Preschool layout.
  */
 export function WorkspaceGate({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { workspaceId, role } = useAuth();
+  const { workspace } = useWorkspace();
   const { workspaces, setActive } = useWorkspaceList();
   const [activationError, setActivationError] = useState<string | undefined>();
   const [retryNonce, setRetryNonce] = useState(0);
   const attempted = useRef<number | null>(null);
 
   const redirectUrl = postWorkspacePath(pathname);
-  const leavePage = workspaceId != null && mustLeaveAppPath(pathname, role);
+  const leavePage =
+    workspaceId != null &&
+    mustLeaveAppPath(pathname, role, workspace?.institutionType);
 
   useEffect(() => {
     if (leavePage) router.replace("/");

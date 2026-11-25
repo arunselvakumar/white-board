@@ -1,8 +1,9 @@
 "use client";
 
-import { useAuth } from "@repo/auth/react";
+import { useAuth, useWorkspace } from "@repo/auth/react";
 import { useQuery } from "@tanstack/react-query";
 
+import { isPreschool } from "@/lib/institution-type";
 import { dashboardQueries } from "@/src/queries/dashboard";
 
 /**
@@ -20,10 +21,13 @@ export const SIDEBAR_DASHBOARD_REFETCH_MS = 5 * 60 * 1000;
  */
 export function useSidebarDashboard() {
   const { role } = useAuth();
+  const { workspace } = useWorkspace();
+  // The Owner Dashboard is a Training Institute screen.
+  const enabled = role === "owner" && !isPreschool(workspace?.institutionType);
   const { data, isError } = useQuery({
     ...dashboardQueries.get(),
-    enabled: role === "owner",
+    enabled,
     refetchInterval: SIDEBAR_DASHBOARD_REFETCH_MS,
   });
-  return role === "owner" && !isError ? data : undefined;
+  return enabled && !isError ? data : undefined;
 }

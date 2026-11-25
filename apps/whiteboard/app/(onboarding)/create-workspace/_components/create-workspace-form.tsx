@@ -13,12 +13,19 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Label, RequiredIndicator } from "@repo/ui/components/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/ui/components/select";
 import {
   Tooltip,
   TooltipContent,
@@ -38,6 +45,22 @@ import {
   type InstitutionType,
 } from "@/lib/institution-type";
 import { postWorkspacePath } from "@/lib/safe-redirect";
+import { DEFAULT_ACADEMIC_YEAR_START_MONTH } from "@/src/preschool/domain/defaults";
+
+const MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+].map((label, index) => ({ value: String(index + 1), label }));
 
 const schema = z.object({
   name: z
@@ -48,6 +71,8 @@ const schema = z.object({
   institutionType: z.enum(AVAILABLE_INSTITUTION_TYPE_VALUES, {
     error: "Select an institution type",
   }),
+  /** "1"–"12"; asked only for a Preschool. */
+  academicYearStartMonth: z.string(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -65,7 +90,8 @@ const INSTITUTION_TYPE_TOOLTIPS: Record<InstitutionType, string> = {
   training_institute:
     "For computer education centres, home tuition, and skill training.",
   school: "For primary and secondary education. Coming soon.",
-  preschool: "For early childhood education. Coming soon.",
+  preschool:
+    "For playschools, preschools and daycares, with one Centre or many.",
   college: "For higher education colleges. Coming soon.",
   university: "For universities. Coming soon.",
   other: "For institutions outside these categories. Coming soon.",
@@ -77,6 +103,8 @@ export type CreateWorkspaceResult =
 export type CreateWorkspaceFn = (input: {
   name: string;
   institutionType: AvailableInstitutionType;
+  /** Preschool only: 1–12. */
+  academicYearStartMonth?: number;
 }) => Promise<CreateWorkspaceResult>;
 
 export function CreateWorkspaceForm({
@@ -103,8 +131,10 @@ export function CreateWorkspaceForm({
     defaultValues: {
       name: "",
       institutionType: DEFAULT_INSTITUTION_TYPE,
+      academicYearStartMonth: String(DEFAULT_ACADEMIC_YEAR_START_MONTH),
     },
   });
+  const institutionType = useWatch({ control, name: "institutionType" });
 
   // Workspace Creation is not offered once the User belongs to a Workspace.
   useEffect(() => {
@@ -113,10 +143,15 @@ export function CreateWorkspaceForm({
 
   const onSubmit = async (values: FormValues) => {
     try {
-      const result = await createWorkspace({
-        name: values.name,
-        institutionType: values.institutionType,
-      });
+      const result = await createWorkspace(
+        values.institutionType === "preschool"
+          ? {
+              name: values.name,
+              institutionType: values.institutionType,
+              academicYearStartMonth: Number(values.academicYearStartMonth),
+            }
+          : { name: values.name, institutionType: values.institutionType },
+      );
       if (!result.ok) {
         setError("root", { message: result.message });
         return;
@@ -247,6 +282,49 @@ export function CreateWorkspaceForm({
           />
           <FieldError message={errors.institutionType?.message} />
         </fieldset>
+        {institutionType === "preschool" ? (
+          <div className="space-y-1.5">
+            <Label htmlFor="academicYearStartMonth" required>
+              Academic Year starts in
+            </Label>
+            <Controller
+              name="academicYearStartMonth"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  items={MONTHS}
+                  value={field.value}
+                  onValueChange={(value) => {
+                    if (value != null) field.onChange(value);
+                  }}
+                >
+                  <SelectTrigger
+                    id="academicYearStartMonth"
+                    size="lg"
+                    aria-required
+                    aria-describedby="academicYearStartMonth-hint"
+                    className="w-full min-w-0"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent align="start" alignItemWithTrigger={false}>
+                    {MONTHS.map((month) => (
+                      <SelectItem key={month.value} value={month.value}>
+                        {month.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            <p
+              id="academicYearStartMonth-hint"
+              className="text-muted-foreground text-xs"
+            >
+              Most preschools start in April; many in the south start in June.
+            </p>
+          </div>
+        ) : null}
         <FormAlert message={errors.root?.message} />
         <Button
           type="submit"

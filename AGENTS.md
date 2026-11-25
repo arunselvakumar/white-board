@@ -6,7 +6,7 @@ Instructions for anyone (human or agent) changing this repository.
 
 **Whiteboard** is an education-management product. The authenticated app is Whiteboard. The public site is the **Marketing Site**. They are not one app.
 
-We sell first to **Training Institutes** (computer education centres, home tuition, skill/vocational shops). School, Preschool, College, University, and Other exist on Workspace Creation as **Coming soon** and cannot be selected.
+We sell first to **Training Institutes** (computer education centres, home tuition, skill/vocational shops). **Preschool** can also be chosen at Workspace Creation; it is a second bounded context (`src/preschool`, ADR-0055, [`docs/prd/preschool-p0.md`](./docs/prd/preschool-p0.md)) with its own words (Child, Centre, Programme, Classroom, Admission). School, College, University, and Other exist as **Coming soon** and cannot be selected.
 
 Current slice is **P0 — Replace the register**: an Owner can add a **Student**, put them on a **Course**/**Batch** with **Timings** and **Class Mode**, take a **Fee Payment**, issue a **Receipt**, and see today’s Batches on the **Owner Dashboard**.
 
@@ -60,7 +60,7 @@ A **Student** remains a Workspace record, distinct from a User. Add Student invi
 - Import from `@repo/ui`. No native `<select>`, `<input>`, `<textarea>`, or raw `<button>` for product chrome.
 - Forms: react-hook-form + zod. Select via `Controller`.
 - Visual tokens: ADR-0002, ADR-0003.
-- In-app chrome: `AppShell` with nav from `lib/app-nav.ts`. Page reads: `useSuspenseQuery` + `queryOptions` in `src/queries` (ADR-0026).
+- In-app chrome: `AppShell` with nav from `lib/app-nav.ts` (Training Institute) or `lib/preschool-nav.ts` (Preschool), picked by the Workspace's Institution Type. Page reads: `useSuspenseQuery` + `queryOptions` in `src/queries` (ADR-0026).
 - Patterns: [`.grok/skills/frontend-patterns/SKILL.md`](./.grok/skills/frontend-patterns/SKILL.md), [`.grok/skills/tanstack-query/SKILL.md`](./.grok/skills/tanstack-query/SKILL.md).
 - Storybook play functions for every P0 form and empty state. Select options portal to `document.body`.
 - Student photos and initials use `app/(app)/_components/students/student-avatar.tsx`; see [`docs/ui/student-avatar.md`](./docs/ui/student-avatar.md) for the color rule. Do not choose avatar colors in individual screens.

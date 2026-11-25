@@ -403,6 +403,19 @@ export const workspaces = {
     return workspace?.name ?? "Workspace";
   },
 
+  /**
+   * A Workspace's Institution Type (`training_institute`, `preschool`), or
+   * null when there is no such Workspace. Product code branches on it; it
+   * never changes after Workspace Creation.
+   */
+  async institutionType(workspaceId: string): Promise<string | null> {
+    const workspace = await prisma.identityWorkspace.findUnique({
+      where: { id: workspaceId },
+      select: { institutionType: true },
+    });
+    return workspace?.institutionType ?? null;
+  },
+
   /** A User's display name for screens such as the Class pre-join page. */
   async displayName(userId: string): Promise<string> {
     const user = await prisma.identityUser.findUnique({
