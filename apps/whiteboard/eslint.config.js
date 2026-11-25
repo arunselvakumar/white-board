@@ -5,7 +5,7 @@ import { nextJsConfig } from "@repo/eslint-config/next-js";
 // Bounded contexts under `src/` (ADR-0009, ADR-0030). A context refers to
 // another context by ID only, so it never imports another context's folder.
 // Layer folders are flat, so `../../` from a context file leaves the context.
-const BOUNDED_CONTEXTS = ["training-institute"];
+const BOUNDED_CONTEXTS = ["training-institute", "preschool"];
 
 // The auth vendor stays behind @repo/auth (ADR-0034).
 const AUTH_VENDOR_PATTERNS = [

@@ -1,0 +1,939 @@
+/// The Preschool bounded context (ADR-0030, ADR-0055). Every row carries the
+/// Workspace id as an opaque string; rows that belong to one Centre carry
+/// `centreId` too. Money is whole paise. Dates without a time are `@db.Date`.
+
+enum PreschoolCentreOwnership {
+  company_owned
+  franchised
+
+  @@map("centre_ownership")
+  @@schema("preschool")
+}
+
+enum PreschoolCentreStatus {
+  active
+  closed
+
+  @@map("centre_status")
+  @@schema("preschool")
+}
+
+enum PreschoolStaffRole {
+  centre_head
+  teacher
+  helper
+
+  @@map("staff_role")
+  @@schema("preschool")
+}
+
+enum PreschoolStaffStatus {
+  active
+  inactive
+
+  @@map("staff_status")
+  @@schema("preschool")
+}
+
+enum PreschoolGender {
+  girl
+  boy
+  other
+
+  @@map("gender")
+  @@schema("preschool")
+}
+
+enum PreschoolEnquiryStatus {
+  new
+  contacted
+  visit_scheduled
+  visited
+  admitted
+  lost
+
+  @@map("enquiry_status")
+  @@schema("preschool")
+}
+
+enum PreschoolEnquirySource {
+  walk_in
+  referral
+  google
+  social_media
+  flyer
+  head_office
+  other
+
+  @@map("enquiry_source")
+  @@schema("preschool")
+}
+
+enum PreschoolEnquiryActivityKind {
+  note
+  call
+  visit
+  status_change
+
+  @@map("enquiry_activity_kind")
+  @@schema("preschool")
+}
+
+enum PreschoolChildStatus {
+  active
+  withdrawn
+  graduated
+
+  @@map("child_status")
+  @@schema("preschool")
+}
+
+enum PreschoolAdmissionStatus {
+  active
+  ended
+
+  @@map("admission_status")
+  @@schema("preschool")
+}
+
+enum PreschoolAdmissionEndReason {
+  promoted
+  withdrawn
+  classroom_changed
+  graduated
+
+  @@map("admission_end_reason")
+  @@schema("preschool")
+}
+
+enum PreschoolAttendanceStatus {
+  present
+  absent
+  leave
+
+  @@map("attendance_status")
+  @@schema("preschool")
+}
+
+enum PreschoolCollectedByKind {
+  father
+  mother
+  authorised_pickup
+  other
+
+  @@map("collected_by_kind")
+  @@schema("preschool")
+}
+
+enum PreschoolDailyReportStatus {
+  draft
+  published
+
+  @@map("daily_report_status")
+  @@schema("preschool")
+}
+
+enum PreschoolMood {
+  happy
+  calm
+  tired
+  fussy
+  unwell
+
+  @@map("mood")
+  @@schema("preschool")
+}
+
+enum PreschoolFeeHeadKind {
+  one_time
+  recurring
+
+  @@map("fee_head_kind")
+  @@schema("preschool")
+}
+
+enum PreschoolFeeFrequency {
+  one_time
+  monthly
+  quarterly
+  term
+  annual
+
+  @@map("fee_frequency")
+  @@schema("preschool")
+}
+
+enum PreschoolFeePaymentMethod {
+  cash
+  upi
+  card
+  cheque
+  bank_transfer
+
+  @@map("fee_payment_method")
+  @@schema("preschool")
+}
+
+enum PreschoolAnnouncementKind {
+  notice
+  event
+  holiday
+
+  @@map("announcement_kind")
+  @@schema("preschool")
+}
+
+enum PreschoolTerm {
+  term_1
+  term_2
+  term_3
+
+  @@map("term")
+  @@schema("preschool")
+}
+
+enum PreschoolProgressRating {
+  beginning
+  progressing
+  proficient
+
+  @@map("progress_rating")
+  @@schema("preschool")
+}
+
+enum PreschoolProgressReportStatus {
+  draft
+  published
+
+  @@map("progress_report_status")
+  @@schema("preschool")
+}
+
+enum PreschoolStockItemKind {
+  consumable
+  asset
+
+  @@map("stock_item_kind")
+  @@schema("preschool")
+}
+
+enum PreschoolStockCategory {
+  books
+  notebooks
+  stationery
+  uniform
+  kit
+  toys_learning_aids
+  housekeeping
+  furniture_equipment
+  other
+
+  @@map("stock_category")
+  @@schema("preschool")
+}
+
+enum PreschoolStockMovementKind {
+  received
+  issued_to_child
+  issued_to_classroom
+  issued_to_staff
+  transfer_out
+  transfer_in
+  adjusted
+
+  @@map("stock_movement_kind")
+  @@schema("preschool")
+}
+
+/// One row per Preschool Workspace, written by Workspace Creation. Its
+/// presence is what makes a Workspace a Preschool to this context.
+model PreschoolSettings {
+  workspaceId            String   @id @map("workspace_id")
+  /// 1–12; the Academic Year starts on the 1st of this month.
+  academicYearStartMonth Int      @map("academic_year_start_month") @db.SmallInt
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+
+  @@map("settings")
+  @@schema("preschool")
+}
+
+model PreschoolCentre {
+  id               String                   @id @db.Uuid
+  workspaceId      String                   @map("workspace_id")
+  name             String                   @db.VarChar(200)
+  /// 2–6 letters or digits, upper case; prefixes Admission and Receipt numbers.
+  code             String                   @db.VarChar(6)
+  ownership        PreschoolCentreOwnership @default(company_owned)
+  status           PreschoolCentreStatus    @default(active)
+  phone            String?                  @db.VarChar(32)
+  email            String?                  @db.VarChar(320)
+  addressLine      String?                  @map("address_line") @db.VarChar(300)
+  city             String?                  @db.VarChar(100)
+  state            String?                  @db.VarChar(100)
+  pincode          String?                  @db.VarChar(10)
+  franchiseeName   String?                  @map("franchisee_name") @db.VarChar(200)
+  franchiseePhone  String?                  @map("franchisee_phone") @db.VarChar(32)
+  franchiseeEmail  String?                  @map("franchisee_email") @db.VarChar(320)
+  agreementStartOn DateTime?                @map("agreement_start_on") @db.Date
+  agreementEndOn   DateTime?                @map("agreement_end_on") @db.Date
+  /// Royalty in basis points: 1000 is 10%. 0–10000.
+  royaltyBps       Int                      @default(0) @map("royalty_bps")
+  mayOverrideFees  Boolean                  @default(true) @map("may_override_fees")
+  /// The next Admission and Receipt sequence numbers; taken with an atomic increment.
+  nextAdmissionSeq Int                      @default(1) @map("next_admission_seq")
+  nextReceiptSeq   Int                      @default(1) @map("next_receipt_seq")
+  createdAt        DateTime                 @default(now()) @map("created_at")
+  updatedAt        DateTime                 @updatedAt @map("updated_at")
+  deletedAt        DateTime?                @map("deleted_at")
+
+  classrooms     PreschoolClassroom[]
+  staff          PreschoolStaff[]
+  children       PreschoolChild[]
+  enquiries      PreschoolEnquiry[]
+  stockMovements PreschoolStockMovement[]
+
+  @@unique([workspaceId, code])
+  @@index([workspaceId, deletedAt, name])
+  @@map("centres")
+  @@schema("preschool")
+}
+
+model PreschoolAcademicYear {
+  id          String   @id @db.Uuid
+  workspaceId String   @map("workspace_id")
+  /// "2026–27"
+  name        String   @db.VarChar(20)
+  startsOn    DateTime @map("starts_on") @db.Date
+  endsOn      DateTime @map("ends_on") @db.Date
+  /// Exactly one per Workspace is current.
+  isCurrent   Boolean  @default(false) @map("is_current")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  classrooms    PreschoolClassroom[]
+  admissions    PreschoolAdmission[]
+  feeStructures PreschoolFeeStructure[]
+
+  @@unique([workspaceId, startsOn])
+  @@map("academic_years")
+  @@schema("preschool")
+}
+
+model PreschoolProgramme {
+  id           String    @id @db.Uuid
+  workspaceId  String    @map("workspace_id")
+  name         String    @db.VarChar(100)
+  /// Age in completed months on the first day of the Academic Year. Null is no limit.
+  minAgeMonths Int?      @map("min_age_months")
+  maxAgeMonths Int?      @map("max_age_months")
+  isDaycare    Boolean   @default(false) @map("is_daycare")
+  sortOrder    Int       @default(0) @map("sort_order")
+  archivedAt   DateTime? @map("archived_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  classrooms    PreschoolClassroom[]
+  admissions    PreschoolAdmission[]
+  enquiries     PreschoolEnquiry[]
+  feeStructures PreschoolFeeStructure[]
+
+  @@index([workspaceId, archivedAt, sortOrder])
+  @@map("programmes")
+  @@schema("preschool")
+}
+
+model PreschoolClassroom {
+  id             String    @id @db.Uuid
+  workspaceId    String    @map("workspace_id")
+  centreId       String    @map("centre_id") @db.Uuid
+  academicYearId String    @map("academic_year_id") @db.Uuid
+  programmeId    String    @map("programme_id") @db.Uuid
+  name           String    @db.VarChar(100)
+  capacity       Int
+  archivedAt     DateTime? @map("archived_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
+
+  centre       PreschoolCentre             @relation(fields: [centreId], references: [id], onDelete: Restrict)
+  academicYear PreschoolAcademicYear       @relation(fields: [academicYearId], references: [id], onDelete: Restrict)
+  programme    PreschoolProgramme          @relation(fields: [programmeId], references: [id], onDelete: Restrict)
+  teachers     PreschoolClassroomTeacher[]
+  admissions   PreschoolAdmission[]
+
+  @@index([workspaceId, centreId, academicYearId, deletedAt])
+  @@map("classrooms")
+  @@schema("preschool")
+}
+
+/// A person who works at a Centre. A Staff member signs in when a User with
+/// the same verified email belongs to the Workspace; helpers have no sign-in.
+model PreschoolStaff {
+  id          String               @id @db.Uuid
+  workspaceId String               @map("workspace_id")
+  centreId    String               @map("centre_id") @db.Uuid
+  name        String               @db.VarChar(200)
+  role        PreschoolStaffRole
+  status      PreschoolStaffStatus @default(active)
+  phone       String?              @db.VarChar(32)
+  /// Lower case.
+  email       String?              @db.VarChar(320)
+  designation String?              @db.VarChar(100)
+  joinedOn    DateTime?            @map("joined_on") @db.Date
+  invitedAt   DateTime?            @map("invited_at")
+  createdAt   DateTime             @default(now()) @map("created_at")
+  updatedAt   DateTime             @updatedAt @map("updated_at")
+  deletedAt   DateTime?            @map("deleted_at")
+
+  centre     PreschoolCentre             @relation(fields: [centreId], references: [id], onDelete: Restrict)
+  classrooms PreschoolClassroomTeacher[]
+
+  @@index([workspaceId, email, deletedAt])
+  @@index([workspaceId, centreId, deletedAt])
+  @@map("staff")
+  @@schema("preschool")
+}
+
+model PreschoolClassroomTeacher {
+  classroomId String   @map("classroom_id") @db.Uuid
+  staffId     String   @map("staff_id") @db.Uuid
+  workspaceId String   @map("workspace_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  classroom PreschoolClassroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  staff     PreschoolStaff     @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  @@id([classroomId, staffId])
+  @@index([staffId])
+  @@map("classroom_teachers")
+  @@schema("preschool")
+}
+
+model PreschoolEnquiry {
+  id               String                 @id @db.Uuid
+  workspaceId      String                 @map("workspace_id")
+  centreId         String                 @map("centre_id") @db.Uuid
+  createdByUserId  String                 @map("created_by_user_id")
+  childName        String                 @map("child_name") @db.VarChar(200)
+  childDateOfBirth DateTime?              @map("child_date_of_birth") @db.Date
+  childGender      PreschoolGender?       @map("child_gender")
+  parentName       String                 @map("parent_name") @db.VarChar(200)
+  parentPhone      String                 @map("parent_phone") @db.VarChar(32)
+  parentEmail      String?                @map("parent_email") @db.VarChar(320)
+  programmeId      String?                @map("programme_id") @db.Uuid
+  source           PreschoolEnquirySource @default(walk_in)
+  status           PreschoolEnquiryStatus @default(new)
+  visitOn          DateTime?              @map("visit_on") @db.Date
+  nextFollowUpOn   DateTime?              @map("next_follow_up_on") @db.Date
+  lostReason       String?                @map("lost_reason") @db.VarChar(200)
+  notes            String?                @db.Text
+  convertedChildId String?                @unique @map("converted_child_id") @db.Uuid
+  convertedAt      DateTime?              @map("converted_at")
+  createdAt        DateTime               @default(now()) @map("created_at")
+  updatedAt        DateTime               @updatedAt @map("updated_at")
+  deletedAt        DateTime?              @map("deleted_at")
+
+  centre     PreschoolCentre            @relation(fields: [centreId], references: [id], onDelete: Restrict)
+  programme  PreschoolProgramme?        @relation(fields: [programmeId], references: [id], onDelete: Restrict)
+  activities PreschoolEnquiryActivity[]
+
+  @@index([workspaceId, centreId, deletedAt, status, createdAt])
+  @@index([workspaceId, centreId, deletedAt, nextFollowUpOn])
+  @@map("enquiries")
+  @@schema("preschool")
+}
+
+model PreschoolEnquiryActivity {
+  id              String                       @id @db.Uuid
+  workspaceId     String                       @map("workspace_id")
+  enquiryId       String                       @map("enquiry_id") @db.Uuid
+  kind            PreschoolEnquiryActivityKind
+  note            String?                      @db.Text
+  /// Set on a status change.
+  toStatus        PreschoolEnquiryStatus?      @map("to_status")
+  createdByUserId String                       @map("created_by_user_id")
+  createdByName   String                       @map("created_by_name") @db.VarChar(200)
+  createdAt       DateTime                     @default(now()) @map("created_at")
+
+  enquiry PreschoolEnquiry @relation(fields: [enquiryId], references: [id], onDelete: Cascade)
+
+  @@index([enquiryId, createdAt])
+  @@map("enquiry_activities")
+  @@schema("preschool")
+}
+
+model PreschoolChild {
+  id                           String               @id @db.Uuid
+  workspaceId                  String               @map("workspace_id")
+  centreId                     String               @map("centre_id") @db.Uuid
+  /// "<centre code>-<4-digit sequence>", unique in the Workspace.
+  admissionNumber              String               @map("admission_number") @db.VarChar(32)
+  firstName                    String               @map("first_name") @db.VarChar(100)
+  lastName                     String?              @map("last_name") @db.VarChar(100)
+  dateOfBirth                  DateTime             @map("date_of_birth") @db.Date
+  gender                       PreschoolGender
+  bloodGroup                   String?              @map("blood_group") @db.VarChar(8)
+  photoUrl                     String?              @map("photo_url") @db.VarChar(2048)
+  motherTongue                 String?              @map("mother_tongue") @db.VarChar(60)
+  addressLine                  String?              @map("address_line") @db.VarChar(300)
+  city                         String?              @db.VarChar(100)
+  state                        String?              @db.VarChar(100)
+  pincode                      String?              @db.VarChar(10)
+  fatherName                   String?              @map("father_name") @db.VarChar(200)
+  fatherPhone                  String?              @map("father_phone") @db.VarChar(32)
+  /// Parent emails are lower case; a Parent User is linked by verified email.
+  fatherEmail                  String?              @map("father_email") @db.VarChar(320)
+  fatherOccupation             String?              @map("father_occupation") @db.VarChar(100)
+  motherName                   String?              @map("mother_name") @db.VarChar(200)
+  motherPhone                  String?              @map("mother_phone") @db.VarChar(32)
+  motherEmail                  String?              @map("mother_email") @db.VarChar(320)
+  motherOccupation             String?              @map("mother_occupation") @db.VarChar(100)
+  emergencyContactName         String?              @map("emergency_contact_name") @db.VarChar(200)
+  emergencyContactPhone        String?              @map("emergency_contact_phone") @db.VarChar(32)
+  emergencyContactRelationship String?              @map("emergency_contact_relationship") @db.VarChar(60)
+  allergies                    String?              @db.Text
+  medicalConditions            String?              @map("medical_conditions") @db.Text
+  doctorName                   String?              @map("doctor_name") @db.VarChar(200)
+  doctorPhone                  String?              @map("doctor_phone") @db.VarChar(32)
+  immunisationUpToDate         Boolean?             @map("immunisation_up_to_date")
+  /// Documents the family has shown. A tick, never a file or a number.
+  hasBirthCertificate          Boolean              @default(false) @map("has_birth_certificate")
+  hasAadhaar                   Boolean              @default(false) @map("has_aadhaar")
+  hasImmunisationCard          Boolean              @default(false) @map("has_immunisation_card")
+  hasPhotos                    Boolean              @default(false) @map("has_photos")
+  hasAddressProof              Boolean              @default(false) @map("has_address_proof")
+  status                       PreschoolChildStatus @default(active)
+  withdrawnOn                  DateTime?            @map("withdrawn_on") @db.Date
+  withdrawReason               String?              @map("withdraw_reason") @db.VarChar(300)
+  createdAt                    DateTime             @default(now()) @map("created_at")
+  updatedAt                    DateTime             @updatedAt @map("updated_at")
+  deletedAt                    DateTime?            @map("deleted_at")
+
+  centre            PreschoolCentre             @relation(fields: [centreId], references: [id], onDelete: Restrict)
+  authorisedPickups PreschoolAuthorisedPickup[]
+  admissions        PreschoolAdmission[]
+  attendance        PreschoolAttendance[]
+  dailyReports      PreschoolDailyReport[]
+  invoices          PreschoolInvoice[]
+  feePayments       PreschoolFeePayment[]
+  observations      PreschoolObservation[]
+  progressReports   PreschoolProgressReport[]
+  stockMovements    PreschoolStockMovement[]
+
+  @@unique([workspaceId, admissionNumber])
+  @@index([workspaceId, centreId, deletedAt, status, firstName])
+  @@index([workspaceId, fatherEmail])
+  @@index([workspaceId, motherEmail])
+  @@map("children")
+  @@schema("preschool")
+}
+
+model PreschoolAuthorisedPickup {
+  id           String   @id @db.Uuid
+  workspaceId  String   @map("workspace_id")
+  childId      String   @map("child_id") @db.Uuid
+  name         String   @db.VarChar(200)
+  relationship String   @db.VarChar(60)
+  phone        String   @db.VarChar(32)
+  photoUrl     String?  @map("photo_url") @db.VarChar(2048)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  child PreschoolChild @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@index([childId])
+  @@map("authorised_pickups")
+  @@schema("preschool")
+}
+
+/// A Child's place in a Programme and Classroom for one Academic Year. A Child
+/// has at most one active Admission.
+model PreschoolAdmission {
+  id             String                       @id @db.Uuid
+  workspaceId    String                       @map("workspace_id")
+  centreId       String                       @map("centre_id") @db.Uuid
+  childId        String                       @map("child_id") @db.Uuid
+  academicYearId String                       @map("academic_year_id") @db.Uuid
+  programmeId    String                       @map("programme_id") @db.Uuid
+  classroomId    String                       @map("classroom_id") @db.Uuid
+  admittedOn     DateTime                     @map("admitted_on") @db.Date
+  status         PreschoolAdmissionStatus     @default(active)
+  endedOn        DateTime?                    @map("ended_on") @db.Date
+  endReason      PreschoolAdmissionEndReason? @map("end_reason")
+  createdAt      DateTime                     @default(now()) @map("created_at")
+  updatedAt      DateTime                     @updatedAt @map("updated_at")
+
+  child        PreschoolChild        @relation(fields: [childId], references: [id], onDelete: Restrict)
+  academicYear PreschoolAcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Restrict)
+  programme    PreschoolProgramme    @relation(fields: [programmeId], references: [id], onDelete: Restrict)
+  classroom    PreschoolClassroom    @relation(fields: [classroomId], references: [id], onDelete: Restrict)
+  invoices     PreschoolInvoice[]
+
+  @@index([workspaceId, centreId, status, classroomId])
+  @@index([childId, status])
+  @@map("admissions")
+  @@schema("preschool")
+}
+
+/// One row per Child per day. No row means not marked.
+model PreschoolAttendance {
+  id                  String                    @id @db.Uuid
+  workspaceId         String                    @map("workspace_id")
+  centreId            String                    @map("centre_id") @db.Uuid
+  classroomId         String                    @map("classroom_id") @db.Uuid
+  childId             String                    @map("child_id") @db.Uuid
+  date                DateTime                  @db.Date
+  status              PreschoolAttendanceStatus
+  checkInAt           DateTime?                 @map("check_in_at")
+  droppedBy           String?                   @map("dropped_by") @db.VarChar(200)
+  checkOutAt          DateTime?                 @map("check_out_at")
+  collectedByKind     PreschoolCollectedByKind? @map("collected_by_kind")
+  collectedByName     String?                   @map("collected_by_name") @db.VarChar(200)
+  collectedByPickupId String?                   @map("collected_by_pickup_id") @db.Uuid
+  /// Required when the Child is collected by someone who is neither a Parent nor an Authorised Pickup.
+  note                String?                   @db.VarChar(500)
+  markedByUserId      String                    @map("marked_by_user_id")
+  createdAt           DateTime                  @default(now()) @map("created_at")
+  updatedAt           DateTime                  @updatedAt @map("updated_at")
+
+  child PreschoolChild @relation(fields: [childId], references: [id], onDelete: Restrict)
+
+  @@unique([childId, date])
+  @@index([workspaceId, centreId, date, classroomId])
+  @@map("attendance")
+  @@schema("preschool")
+}
+
+/// One row per Child per day.
+model PreschoolDailyReport {
+  id                String                     @id @db.Uuid
+  workspaceId       String                     @map("workspace_id")
+  centreId          String                     @map("centre_id") @db.Uuid
+  classroomId       String                     @map("classroom_id") @db.Uuid
+  childId           String                     @map("child_id") @db.Uuid
+  date              DateTime                   @db.Date
+  status            PreschoolDailyReportStatus @default(draft)
+  /// `[{ meal: "breakfast" | "snack" | "lunch", menu: string | null, ate: "all" | "some" | "none" }]`
+  meals             Json                       @default("[]")
+  /// "HH:mm", centre local time.
+  napFrom           String?                    @map("nap_from") @db.VarChar(5)
+  napTo             String?                    @map("nap_to") @db.VarChar(5)
+  /// `[{ time: "HH:mm", kind: "diaper_wet" | "diaper_soiled" | "potty" | "toilet" }]`
+  toilet            Json                       @default("[]")
+  mood              PreschoolMood?
+  activities        String[]                   @default([])
+  note              String?                    @db.Text
+  /// Photo URLs.
+  photos            String[]                   @default([])
+  publishedAt       DateTime?                  @map("published_at")
+  publishedByUserId String?                    @map("published_by_user_id")
+  createdByUserId   String                     @map("created_by_user_id")
+  createdAt         DateTime                   @default(now()) @map("created_at")
+  updatedAt         DateTime                   @updatedAt @map("updated_at")
+
+  child PreschoolChild @relation(fields: [childId], references: [id], onDelete: Restrict)
+
+  @@unique([childId, date])
+  @@index([workspaceId, centreId, date, classroomId])
+  @@map("daily_reports")
+  @@schema("preschool")
+}
+
+model PreschoolFeeHead {
+  id             String               @id @db.Uuid
+  workspaceId    String               @map("workspace_id")
+  name           String               @db.VarChar(100)
+  kind           PreschoolFeeHeadKind
+  /// Collections on this Fee Head count towards a Franchised Centre's royalty.
+  royaltyBearing Boolean              @default(false) @map("royalty_bearing")
+  refundable     Boolean              @default(false)
+  sortOrder      Int                  @default(0) @map("sort_order")
+  archivedAt     DateTime?            @map("archived_at")
+  createdAt      DateTime             @default(now()) @map("created_at")
+  updatedAt      DateTime             @updatedAt @map("updated_at")
+
+  structureItems PreschoolFeeStructureItem[]
+  invoices       PreschoolInvoice[]
+
+  @@index([workspaceId, archivedAt, sortOrder])
+  @@map("fee_heads")
+  @@schema("preschool")
+}
+
+/// Amounts for a Programme in an Academic Year. `centreId` null is the
+/// Workspace default; a row with a Centre overrides it for that Centre.
+model PreschoolFeeStructure {
+  id             String   @id @db.Uuid
+  workspaceId    String   @map("workspace_id")
+  centreId       String?  @map("centre_id") @db.Uuid
+  academicYearId String   @map("academic_year_id") @db.Uuid
+  programmeId    String   @map("programme_id") @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  academicYear PreschoolAcademicYear       @relation(fields: [academicYearId], references: [id], onDelete: Restrict)
+  programme    PreschoolProgramme          @relation(fields: [programmeId], references: [id], onDelete: Restrict)
+  items        PreschoolFeeStructureItem[]
+
+  @@index([workspaceId, academicYearId, programmeId, centreId])
+  @@map("fee_structures")
+  @@schema("preschool")
+}
+
+model PreschoolFeeStructureItem {
+  id             String                @id @db.Uuid
+  workspaceId    String                @map("workspace_id")
+  feeStructureId String                @map("fee_structure_id") @db.Uuid
+  feeHeadId      String                @map("fee_head_id") @db.Uuid
+  /// The amount of one instalment at `frequency`, in paise.
+  amountPaise    Int                   @map("amount_paise")
+  frequency      PreschoolFeeFrequency
+
+  feeStructure PreschoolFeeStructure @relation(fields: [feeStructureId], references: [id], onDelete: Cascade)
+  feeHead      PreschoolFeeHead      @relation(fields: [feeHeadId], references: [id], onDelete: Restrict)
+
+  @@unique([feeStructureId, feeHeadId])
+  @@map("fee_structure_items")
+  @@schema("preschool")
+}
+
+/// One amount due on a date for one Admission. Due = amount − concession − paid.
+model PreschoolInvoice {
+  id               String    @id @db.Uuid
+  workspaceId      String    @map("workspace_id")
+  centreId         String    @map("centre_id") @db.Uuid
+  childId          String    @map("child_id") @db.Uuid
+  admissionId      String    @map("admission_id") @db.Uuid
+  feeHeadId        String    @map("fee_head_id") @db.Uuid
+  /// "Tuition — Term 2"
+  label            String    @db.VarChar(200)
+  dueOn            DateTime  @map("due_on") @db.Date
+  amountPaise      Int       @map("amount_paise")
+  concessionPaise  Int       @default(0) @map("concession_paise")
+  concessionReason String?   @map("concession_reason") @db.VarChar(200)
+  /// The sum of this Invoice's allocations, kept in step inside the payment transaction.
+  paidPaise        Int       @default(0) @map("paid_paise")
+  cancelledAt      DateTime? @map("cancelled_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  child       PreschoolChild                  @relation(fields: [childId], references: [id], onDelete: Restrict)
+  admission   PreschoolAdmission              @relation(fields: [admissionId], references: [id], onDelete: Restrict)
+  feeHead     PreschoolFeeHead                @relation(fields: [feeHeadId], references: [id], onDelete: Restrict)
+  allocations PreschoolFeePaymentAllocation[]
+
+  @@index([workspaceId, centreId, cancelledAt, dueOn])
+  @@index([childId, cancelledAt, dueOn])
+  @@map("invoices")
+  @@schema("preschool")
+}
+
+model PreschoolFeePayment {
+  id               String                    @id @db.Uuid
+  workspaceId      String                    @map("workspace_id")
+  centreId         String                    @map("centre_id") @db.Uuid
+  childId          String                    @map("child_id") @db.Uuid
+  /// "<centre code>/<academic year>/<5-digit sequence>", unique in the Workspace.
+  receiptNumber    String                    @map("receipt_number") @db.VarChar(40)
+  receivedOn       DateTime                  @map("received_on") @db.Date
+  amountPaise      Int                       @map("amount_paise")
+  method           PreschoolFeePaymentMethod
+  /// UPI reference, cheque number, or bank reference.
+  reference        String?                   @db.VarChar(100)
+  note             String?                   @db.VarChar(300)
+  recordedByUserId String                    @map("recorded_by_user_id")
+  recordedByName   String                    @map("recorded_by_name") @db.VarChar(200)
+  createdAt        DateTime                  @default(now()) @map("created_at")
+  updatedAt        DateTime                  @updatedAt @map("updated_at")
+
+  child       PreschoolChild                  @relation(fields: [childId], references: [id], onDelete: Restrict)
+  allocations PreschoolFeePaymentAllocation[]
+
+  @@unique([workspaceId, receiptNumber])
+  @@index([workspaceId, centreId, receivedOn])
+  @@index([childId, receivedOn])
+  @@map("fee_payments")
+  @@schema("preschool")
+}
+
+model PreschoolFeePaymentAllocation {
+  id          String @id @db.Uuid
+  workspaceId String @map("workspace_id")
+  paymentId   String @map("payment_id") @db.Uuid
+  invoiceId   String @map("invoice_id") @db.Uuid
+  amountPaise Int    @map("amount_paise")
+
+  payment PreschoolFeePayment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  invoice PreschoolInvoice    @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+
+  @@index([paymentId])
+  @@index([invoiceId])
+  @@map("fee_payment_allocations")
+  @@schema("preschool")
+}
+
+/// A notice to Parents. `centreId` null is every Centre (Head Office);
+/// `classroomId` null is the whole Centre.
+model PreschoolAnnouncement {
+  id              String                    @id @db.Uuid
+  workspaceId     String                    @map("workspace_id")
+  centreId        String?                   @map("centre_id") @db.Uuid
+  classroomId     String?                   @map("classroom_id") @db.Uuid
+  kind            PreschoolAnnouncementKind @default(notice)
+  title           String                    @db.VarChar(200)
+  body            String                    @db.Text
+  /// For an event or holiday: the first and last day.
+  startsOn        DateTime?                 @map("starts_on") @db.Date
+  endsOn          DateTime?                 @map("ends_on") @db.Date
+  publishedAt     DateTime                  @default(now()) @map("published_at")
+  createdByUserId String                    @map("created_by_user_id")
+  createdByName   String                    @map("created_by_name") @db.VarChar(200)
+  createdAt       DateTime                  @default(now()) @map("created_at")
+  updatedAt       DateTime                  @updatedAt @map("updated_at")
+  deletedAt       DateTime?                 @map("deleted_at")
+
+  @@index([workspaceId, deletedAt, publishedAt])
+  @@index([workspaceId, centreId, deletedAt, publishedAt])
+  @@map("announcements")
+  @@schema("preschool")
+}
+
+model PreschoolDevelopmentDomain {
+  id          String    @id @db.Uuid
+  workspaceId String    @map("workspace_id")
+  name        String    @db.VarChar(100)
+  description String?   @db.VarChar(500)
+  sortOrder   Int       @default(0) @map("sort_order")
+  archivedAt  DateTime? @map("archived_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  observations PreschoolObservation[]
+  ratings      PreschoolProgressReportRating[]
+
+  @@index([workspaceId, archivedAt, sortOrder])
+  @@map("development_domains")
+  @@schema("preschool")
+}
+
+model PreschoolObservation {
+  id              String    @id @db.Uuid
+  workspaceId     String    @map("workspace_id")
+  centreId        String    @map("centre_id") @db.Uuid
+  childId         String    @map("child_id") @db.Uuid
+  domainId        String    @map("domain_id") @db.Uuid
+  observedOn      DateTime  @map("observed_on") @db.Date
+  note            String    @db.Text
+  createdByUserId String    @map("created_by_user_id")
+  createdByName   String    @map("created_by_name") @db.VarChar(200)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
+
+  child  PreschoolChild             @relation(fields: [childId], references: [id], onDelete: Restrict)
+  domain PreschoolDevelopmentDomain @relation(fields: [domainId], references: [id], onDelete: Restrict)
+
+  @@index([childId, deletedAt, observedOn])
+  @@map("observations")
+  @@schema("preschool")
+}
+
+model PreschoolProgressReport {
+  id              String                        @id @db.Uuid
+  workspaceId     String                        @map("workspace_id")
+  centreId        String                        @map("centre_id") @db.Uuid
+  childId         String                        @map("child_id") @db.Uuid
+  academicYearId  String                        @map("academic_year_id") @db.Uuid
+  term            PreschoolTerm
+  status          PreschoolProgressReportStatus @default(draft)
+  teacherRemarks  String?                       @map("teacher_remarks") @db.Text
+  publishedAt     DateTime?                     @map("published_at")
+  createdByUserId String                        @map("created_by_user_id")
+  createdAt       DateTime                      @default(now()) @map("created_at")
+  updatedAt       DateTime                      @updatedAt @map("updated_at")
+
+  child   PreschoolChild                  @relation(fields: [childId], references: [id], onDelete: Restrict)
+  ratings PreschoolProgressReportRating[]
+
+  @@unique([childId, academicYearId, term])
+  @@index([workspaceId, centreId, academicYearId, term])
+  @@map("progress_reports")
+  @@schema("preschool")
+}
+
+model PreschoolProgressReportRating {
+  id          String                  @id @db.Uuid
+  workspaceId String                  @map("workspace_id")
+  reportId    String                  @map("report_id") @db.Uuid
+  domainId    String                  @map("domain_id") @db.Uuid
+  rating      PreschoolProgressRating
+  remark      String?                 @db.VarChar(500)
+
+  report PreschoolProgressReport    @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  domain PreschoolDevelopmentDomain @relation(fields: [domainId], references: [id], onDelete: Restrict)
+
+  @@unique([reportId, domainId])
+  @@map("progress_report_ratings")
+  @@schema("preschool")
+}
+
+/// Something a Centre keeps and hands out or uses. Defined once for the
+/// Workspace; quantities live in Stock Movements per Centre.
+model PreschoolStockItem {
+  id           String                 @id @db.Uuid
+  workspaceId  String                 @map("workspace_id")
+  name         String                 @db.VarChar(200)
+  category     PreschoolStockCategory
+  kind         PreschoolStockItemKind @default(consumable)
+  /// "piece", "set", "box", "packet"
+  unit         String                 @db.VarChar(20)
+  /// A Centre at or below this quantity is low on the item. Null is never.
+  reorderLevel Int?                   @map("reorder_level")
+  archivedAt   DateTime?              @map("archived_at")
+  createdAt    DateTime               @default(now()) @map("created_at")
+  updatedAt    DateTime               @updatedAt @map("updated_at")
+
+  movements PreschoolStockMovement[]
+
+  @@index([workspaceId, archivedAt, category, name])
+  @@map("stock_items")
+  @@schema("preschool")
+}
+
+/// An append-only ledger. Stock on hand at a Centre is the sum of
+/// `quantityDelta` for the item there; it never goes below zero.
+model PreschoolStockMovement {
+  id               String                     @id @db.Uuid
+  workspaceId      String                     @map("workspace_id")
+  centreId         String                     @map("centre_id") @db.Uuid
+  itemId           String                     @map("item_id") @db.Uuid
+  kind             PreschoolStockMovementKind
+  /// Positive adds to stock on hand, negative takes from it. Never zero.
+  quantityDelta    Int                        @map("quantity_delta")
+  movedOn          DateTime                   @map("moved_on") @db.Date
+  /// Received: the supplier, their bill number, and what one unit cost.
+  supplierName     String?                    @map("supplier_name") @db.VarChar(200)
+  billNumber       String?                    @map("bill_number") @db.VarChar(60)
+  unitCostPaise    Int?                       @map("unit_cost_paise")
+  /// Issued: to whom.
+  childId          String?                    @map("child_id") @db.Uuid
+  classroomId      String?                    @map("classroom_id") @db.Uuid
+  staffId          String?                    @map("staff_id") @db.Uuid
+  /// A transfer writes two rows that share this id; this is the other Centre.
+  transferId       String?                    @map("transfer_id") @db.Uuid
+  otherCentreId    String?                    @map("other_centre_id") @db.Uuid
+  note             String?                    @db.VarChar(300)
+  recordedByUserId String                     @map("recorded_by_user_id")
+  recordedByName   String                     @map("recorded_by_name") @db.VarChar(200)
+  createdAt        DateTime                   @default(now()) @map("created_at")
+
+  centre PreschoolCentre    @relation(fields: [centreId], references: [id], onDelete: Restrict)
+  item   PreschoolStockItem @relation(fields: [itemId], references: [id], onDelete: Restrict)
+  child  PreschoolChild?    @relation(fields: [childId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, centreId, itemId, movedOn])
+  @@index([childId])
+  @@map("stock_movements")
+  @@schema("preschool")
+}
