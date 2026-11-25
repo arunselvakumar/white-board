@@ -8,7 +8,7 @@ import {
   type ProgressRating,
   type Term,
 } from "../domain/progress";
-import { assertManagerOf, type PreschoolActor } from "./access";
+import { assertCentre, assertManagerOf, type PreschoolActor } from "./access";
 import { openClassroom, readableChild } from "./attendance-access";
 import type {
   AcademicYearFacts,
@@ -144,6 +144,7 @@ export class ProgressReportHandlers {
     if (report == null) throw reportNotFound();
     await readableChild(this.deps.store, actor, report.childId, this.today());
     const parent = actor.role === "parent";
+    if (!parent) assertCentre(actor, report.centreId);
     if (parent && report.status !== "published") throw reportNotFound();
     const year = await this.year(actor, report.academicYearId);
     const term = termView(year, report.term);
@@ -256,6 +257,7 @@ export class ProgressReportHandlers {
     const report = await this.deps.store.report(actor.workspaceId, id);
     if (report == null) throw reportNotFound();
     await readableChild(this.deps.store, actor, report.childId, this.today());
+    assertCentre(actor, report.centreId);
     return report;
   }
 

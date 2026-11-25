@@ -112,7 +112,7 @@ describe("/api/preschool/progress-reports", () => {
   beforeAll(async () => {
     vi.useFakeTimers({ toFake: ["Date"] });
     vi.setSystemTime(FIXTURE_NOW);
-    preschool = await seedPreschool();
+    preschool = await seedPreschool({ centres: 2 });
     other = await seedPreschool({ name: "Other Preschool" });
     roomA = await addClassroom(preschool, { name: "Nursery A" });
     const roomB = await addClassroom(preschool, { name: "Nursery B" });
@@ -320,6 +320,74 @@ describe("/api/preschool/progress-reports", () => {
       StatusCodes.FORBIDDEN,
     );
     expect(bala).not.toBe(asha);
+  });
+
+  it("refuses another Workspace's Domain or Academic Year", async () => {
+    teacherA();
+    const domain = await call(save, {
+      body: {
+        childId: asha,
+        term: "term_3",
+        ratings: [{ domainId: other.domainIds[0], rating: "proficient" }],
+      },
+    });
+    expect(domain.status).toBe(StatusCodes.NOT_FOUND);
+    expect(domain.body.code).toBe("DOMAIN_NOT_FOUND");
+    const year = await call(save, {
+      body: {
+        childId: asha,
+        term: "term_3",
+        academicYearId: other.academicYearId,
+        ratings: [],
+      },
+    });
+    expect(year.body.code).toBe("ACADEMIC_YEAR_NOT_FOUND");
+    const list = await call(classroom, {
+      query: {
+        classroomId: roomA,
+        term: "term_2",
+        academicYearId: other.academicYearId,
+      },
+    });
+    expect(list.status).toBe(StatusCodes.NOT_FOUND);
+  });
+
+  it("keeps a report with the Centre that wrote it", async () => {
+    // The Child moves to the branch; the report stays the main Centre's.
+    const branch = preschool.centreIds[1] ?? "";
+    const branchRoom = await addClassroom(preschool, {
+      centreId: branch,
+      name: "Branch Nursery",
+    });
+    await addStaff(preschool, {
+      role: "centre_head",
+      email: "branch-head@example.test",
+      centreId: branch,
+    });
+    const moved = await addChild(preschool, {
+      classroomId: roomA,
+      firstName: "Mover",
+    });
+    teacherA();
+    const written = await call<ProgressReportView>(save, {
+      body: { childId: moved.childId, term: "term_2", ratings: ratings(1) },
+    });
+    await prisma.preschoolChild.update({
+      where: { id: moved.childId },
+      data: { centreId: branch },
+    });
+    await prisma.preschoolAdmission.update({
+      where: { id: moved.admissionId },
+      data: { centreId: branch, classroomId: branchRoom },
+    });
+
+    signInWithEmail(preschool, "teacher", "branch-head@example.test");
+    const read = await call(getReport, { id: written.body.id });
+    expect(read.status).toBe(StatusCodes.FORBIDDEN);
+    expect(read.body.code).toBe("CENTRE_FORBIDDEN");
+    expect((await call(publish, { id: written.body.id })).body.code).toBe(
+      "CENTRE_FORBIDDEN",
+    );
   });
 
   it("lets managers unpublish, and answers 404 across Workspaces", async () => {
