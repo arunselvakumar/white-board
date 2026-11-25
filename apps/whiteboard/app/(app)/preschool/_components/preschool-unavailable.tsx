@@ -40,7 +40,7 @@ function FinishSetup() {
   if (setUp.isError)
     return (
       <EmptyState
-        className="m-6 border"
+        className="m-4 w-auto border sm:m-6"
         icon={WarningCircleIcon}
         tone="danger"
         orbit={false}
@@ -82,7 +82,7 @@ export function PreschoolUnavailable({
       return <FinishSetup />;
     return (
       <EmptyState
-        className="m-6 border"
+        className="m-4 w-auto border sm:m-6"
         icon={HourglassIcon}
         tone="neutral"
         orbit={false}
@@ -98,7 +98,7 @@ export function PreschoolUnavailable({
   )
     return (
       <EmptyState
-        className="m-6 border"
+        className="m-4 w-auto border sm:m-6"
         icon={ProhibitIcon}
         tone="neutral"
         orbit={false}
@@ -109,7 +109,7 @@ export function PreschoolUnavailable({
   if (error instanceof QueryHttpError && error.status === 403)
     return (
       <EmptyState
-        className="m-6 border"
+        className="m-4 w-auto border sm:m-6"
         icon={ProhibitIcon}
         tone="neutral"
         orbit={false}
@@ -119,7 +119,7 @@ export function PreschoolUnavailable({
     );
   return (
     <EmptyState
-      className="m-6 border"
+      className="m-4 w-auto border sm:m-6"
       icon={WarningCircleIcon}
       tone="danger"
       orbit={false}

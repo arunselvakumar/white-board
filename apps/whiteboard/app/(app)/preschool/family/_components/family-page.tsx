@@ -16,7 +16,7 @@ export function NoChildLinked() {
   const { user } = useUser();
   return (
     <EmptyState
-      className="m-4 border sm:m-6"
+      className="m-4 w-auto border sm:m-6"
       icon={SmileyIcon}
       tone="neutral"
       orbit={false}
