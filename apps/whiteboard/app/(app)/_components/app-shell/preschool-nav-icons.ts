@@ -42,5 +42,9 @@ export const PRESCHOOL_NAV_ICONS: Record<PreschoolNavHref, LucideIcon> = {
   "/preschool/stock/items": Boxes,
   "/preschool/teacher": House,
   "/preschool/family": House,
+  "/preschool/family/daily-reports": NotebookPen,
+  "/preschool/family/attendance": CalendarCheck,
+  "/preschool/family/fees": Banknote,
   "/preschool/family/announcements": Megaphone,
+  "/preschool/family/progress": Sprout,
 };

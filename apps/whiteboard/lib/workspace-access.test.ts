@@ -335,6 +335,21 @@ describe("Preschool role access", () => {
       false,
     );
     expect(isAllowedPreschoolPath("/preschool/children", "parent")).toBe(false);
+    for (const path of [
+      "/preschool/family/daily-reports",
+      "/preschool/family/attendance",
+      "/preschool/family/fees",
+      "/preschool/family/receipts/abc",
+      "/preschool/family/child",
+      "/preschool/family/progress",
+    ]) {
+      expect(isAllowedPreschoolPath(path, "parent")).toBe(true);
+      for (const role of ["owner", "centre_head", "teacher"] as const)
+        expect(isAllowedPreschoolPath(path, role)).toBe(false);
+    }
+    expect(
+      isAllowedPreschoolPath("/preschool/fees/receipts/abc", "parent"),
+    ).toBe(false);
     expect(isAllowedPreschoolPath("/students", "parent")).toBe(false);
   });
 });

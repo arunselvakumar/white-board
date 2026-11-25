@@ -5,7 +5,7 @@ import {
   ProhibitIcon,
   WarningCircleIcon,
 } from "@phosphor-icons/react/ssr";
-import { useAuth, useWorkspace } from "@repo/auth/react";
+import { useAuth, useUser, useWorkspace } from "@repo/auth/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { Button } from "@repo/ui/components/button";
@@ -74,6 +74,7 @@ export function PreschoolUnavailable({
   onRetry: () => void;
 }) {
   const { role } = useAuth();
+  const { user } = useUser();
   const { workspace } = useWorkspace();
 
   if (isNotAPreschool(error)) {
@@ -90,6 +91,21 @@ export function PreschoolUnavailable({
       />
     );
   }
+  if (
+    error instanceof QueryHttpError &&
+    error.status === 403 &&
+    role === "parent"
+  )
+    return (
+      <EmptyState
+        className="m-6 border"
+        icon={ProhibitIcon}
+        tone="neutral"
+        orbit={false}
+        title="We couldn't find your Child"
+        description={`We couldn't find a Child linked to ${user?.email ?? "your email"}. Ask the Centre to check the email on your Child's record.`}
+      />
+    );
   if (error instanceof QueryHttpError && error.status === 403)
     return (
       <EmptyState

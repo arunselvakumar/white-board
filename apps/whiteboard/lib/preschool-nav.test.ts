@@ -69,7 +69,14 @@ describe("preschoolNavFor", () => {
     ]);
     expect(
       hrefs(preschoolNavFor({ role: "parent", hasSeveralCentres: true }).main),
-    ).toEqual(["/preschool/family", "/preschool/family/announcements"]);
+    ).toEqual([
+      "/preschool/family",
+      "/preschool/family/daily-reports",
+      "/preschool/family/attendance",
+      "/preschool/family/fees",
+      "/preschool/family/announcements",
+      "/preschool/family/progress",
+    ]);
   });
 
   it("links every role only to pages it may open", () => {

@@ -85,8 +85,8 @@ const STEPS = [
   {
     key: "hasChildren",
     title: "Admit the first Child",
-    detail: "From an Enquiry or straight from the Children list.",
-    href: "/preschool/children",
+    detail: "From an Enquiry or straight from the admission form.",
+    href: "/preschool/children/new",
   },
 ] as const;
 
