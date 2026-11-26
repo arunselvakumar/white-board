@@ -20,6 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { TableCard } from "@/app/(app)/preschool/_components/table-card";
 
 import { feeDateLabel } from "@/lib/preschool-fees";
 import { STOCK_CATEGORY_LABELS } from "@/src/queries/preschool/stock";
@@ -55,99 +56,103 @@ export function StockTable({
       />
     );
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Item</TableHead>
-          <TableHead className="hidden sm:table-cell">Category</TableHead>
-          <TableHead className="text-right">On hand</TableHead>
-          <TableHead className="hidden text-right sm:table-cell">
-            Reorder at
-          </TableHead>
-          <TableHead className="hidden md:table-cell">Last movement</TableHead>
-          <TableHead>
-            <span className="sr-only">Actions</span>
-          </TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {rows.map((row) => (
-          <TableRow key={row.itemId}>
-            <TableCell>
-              <Link
-                href={`/preschool/stock/items/${row.itemId}`}
-                className="font-medium hover:underline"
-              >
-                {row.name}
-              </Link>
-              <div className="text-muted-foreground text-xs sm:hidden">
-                {STOCK_CATEGORY_LABELS[row.category]}
-              </div>
-            </TableCell>
-            <TableCell className="hidden sm:table-cell">
-              {STOCK_CATEGORY_LABELS[row.category]}
-            </TableCell>
-            <TableCell className="text-right whitespace-nowrap tabular-nums">
-              <span className="inline-flex items-center gap-1.5">
-                {row.low ? <Badge variant="destructive">Low</Badge> : null}
-                {row.onHand} {row.unit}
-              </span>
-            </TableCell>
-            <TableCell className="hidden text-right tabular-nums sm:table-cell">
-              {row.reorderLevel ?? "—"}
-            </TableCell>
-            <TableCell className="hidden whitespace-nowrap md:table-cell">
-              {row.lastMovedOn == null ? "—" : feeDateLabel(row.lastMovedOn)}
-            </TableCell>
-            <TableCell className="text-right">
-              <DropdownMenu>
-                <DropdownMenuTrigger
-                  render={
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      aria-label={`Actions for ${row.name}`}
-                    />
-                  }
+    <TableCard>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Item</TableHead>
+            <TableHead className="hidden sm:table-cell">Category</TableHead>
+            <TableHead className="text-right">On hand</TableHead>
+            <TableHead className="hidden text-right sm:table-cell">
+              Reorder at
+            </TableHead>
+            <TableHead className="hidden md:table-cell">
+              Last movement
+            </TableHead>
+            <TableHead>
+              <span className="sr-only">Actions</span>
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {rows.map((row) => (
+            <TableRow key={row.itemId}>
+              <TableCell>
+                <Link
+                  href={`/preschool/stock/items/${row.itemId}`}
+                  className="font-medium hover:underline"
                 >
-                  <MoreHorizontal aria-hidden="true" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    disabled={row.onHand === 0}
-                    onClick={() => {
-                      onAction({ kind: "issue", itemId: row.itemId });
-                    }}
-                  >
-                    Issue
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      onAction({ kind: "receive", itemId: row.itemId });
-                    }}
-                  >
-                    Receive
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      onAction({ kind: "adjust", itemId: row.itemId });
-                    }}
-                  >
-                    Adjust
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
+                  {row.name}
+                </Link>
+                <div className="text-muted-foreground text-xs sm:hidden">
+                  {STOCK_CATEGORY_LABELS[row.category]}
+                </div>
+              </TableCell>
+              <TableCell className="hidden sm:table-cell">
+                {STOCK_CATEGORY_LABELS[row.category]}
+              </TableCell>
+              <TableCell className="text-right whitespace-nowrap tabular-nums">
+                <span className="inline-flex items-center gap-1.5">
+                  {row.low ? <Badge variant="destructive">Low</Badge> : null}
+                  {row.onHand} {row.unit}
+                </span>
+              </TableCell>
+              <TableCell className="hidden text-right tabular-nums sm:table-cell">
+                {row.reorderLevel ?? "—"}
+              </TableCell>
+              <TableCell className="hidden whitespace-nowrap md:table-cell">
+                {row.lastMovedOn == null ? "—" : feeDateLabel(row.lastMovedOn)}
+              </TableCell>
+              <TableCell className="text-right">
+                <DropdownMenu>
+                  <DropdownMenuTrigger
                     render={
-                      <Link href={`/preschool/stock/items/${row.itemId}`} />
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label={`Actions for ${row.name}`}
+                      />
                     }
                   >
-                    Ledger
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+                    <MoreHorizontal aria-hidden="true" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      disabled={row.onHand === 0}
+                      onClick={() => {
+                        onAction({ kind: "issue", itemId: row.itemId });
+                      }}
+                    >
+                      Issue
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        onAction({ kind: "receive", itemId: row.itemId });
+                      }}
+                    >
+                      Receive
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        onAction({ kind: "adjust", itemId: row.itemId });
+                      }}
+                    >
+                      Adjust
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      render={
+                        <Link href={`/preschool/stock/items/${row.itemId}`} />
+                      }
+                    >
+                      Ledger
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableCard>
   );
 }

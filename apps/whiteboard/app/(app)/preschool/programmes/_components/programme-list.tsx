@@ -147,7 +147,7 @@ export function ProgrammeList() {
           description="Add Playgroup, Nursery, LKG, UKG or Daycare to admit Children to."
         />
       ) : (
-        <ol className="divide-y rounded-xl border">
+        <ol className="bg-card divide-y rounded-xl border">
           {shown.map((programme) => {
             const index = active.indexOf(programme);
             return (

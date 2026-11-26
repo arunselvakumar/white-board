@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { TableCard } from "@/app/(app)/preschool/_components/table-card";
 
 import {
   MonthStepper,
@@ -108,9 +109,9 @@ export function CentreRoyaltyStatement({ centreId }: { centreId: string }) {
             </p>
           </div>
         </header>
-        <div className="overflow-hidden rounded-xl border">
+        <TableCard>
           <Table>
-            <TableHeader className="bg-muted/40">
+            <TableHeader>
               <TableRow className="hover:bg-transparent">
                 <TableHead className={`pl-4 ${HEAD}`}>Receipt</TableHead>
                 <TableHead className={HEAD}>Date</TableHead>
@@ -167,7 +168,7 @@ export function CentreRoyaltyStatement({ centreId }: { centreId: string }) {
               </TableRow>
             </TableFooter>
           </Table>
-        </div>
+        </TableCard>
         <p className="flex flex-wrap items-baseline justify-between gap-2 rounded-xl border p-4">
           <span>
             Royalty due: {data.royaltyPercent}% of{" "}

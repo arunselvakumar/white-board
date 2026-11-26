@@ -127,7 +127,7 @@ export function AcademicYearList() {
           description="Setting up the Preschool adds the current Academic Year."
         />
       ) : (
-        <ul className="divide-y rounded-xl border">
+        <ul className="bg-card divide-y rounded-xl border">
           {data.items.map((year) => (
             <li
               key={year.id}

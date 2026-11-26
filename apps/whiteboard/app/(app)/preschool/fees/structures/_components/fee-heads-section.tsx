@@ -38,6 +38,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { TableCard } from "@/app/(app)/preschool/_components/table-card";
 
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -250,70 +251,74 @@ export function FeeHeadsSection() {
             : undefined
         }
       />
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Fee Head</TableHead>
-            <TableHead>Charged</TableHead>
-            <TableHead>
-              <span className="sr-only">Actions</span>
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.items.map((head) => (
-            <TableRow
-              key={head.id}
-              className={head.isArchived ? "text-muted-foreground" : undefined}
-            >
-              <TableCell>
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="font-medium">{head.name}</span>
-                  {head.royaltyBearing ? (
-                    <Badge variant="secondary">Royalty-bearing</Badge>
-                  ) : null}
-                  {head.refundable ? (
-                    <Badge variant="outline">Refundable</Badge>
-                  ) : null}
-                  {head.isArchived ? (
-                    <Badge variant="outline">Archived</Badge>
-                  ) : null}
-                </div>
-              </TableCell>
-              <TableCell>{KIND_LABEL[head.kind]}</TableCell>
-              <TableCell>
-                <div className="flex justify-end gap-2">
-                  {head.isArchived ? null : (
+      <TableCard>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Fee Head</TableHead>
+              <TableHead>Charged</TableHead>
+              <TableHead>
+                <span className="sr-only">Actions</span>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.items.map((head) => (
+              <TableRow
+                key={head.id}
+                className={
+                  head.isArchived ? "text-muted-foreground" : undefined
+                }
+              >
+                <TableCell>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="font-medium">{head.name}</span>
+                    {head.royaltyBearing ? (
+                      <Badge variant="secondary">Royalty-bearing</Badge>
+                    ) : null}
+                    {head.refundable ? (
+                      <Badge variant="outline">Refundable</Badge>
+                    ) : null}
+                    {head.isArchived ? (
+                      <Badge variant="outline">Archived</Badge>
+                    ) : null}
+                  </div>
+                </TableCell>
+                <TableCell>{KIND_LABEL[head.kind]}</TableCell>
+                <TableCell>
+                  <div className="flex justify-end gap-2">
+                    {head.isArchived ? null : (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        aria-label={`Edit ${head.name}`}
+                        onClick={() => {
+                          setEditing(head);
+                        }}
+                      >
+                        Edit
+                      </Button>
+                    )}
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
-                      aria-label={`Edit ${head.name}`}
+                      disabled={toggle.isPending}
+                      aria-label={`${head.isArchived ? "Restore" : "Archive"} ${head.name}`}
                       onClick={() => {
-                        setEditing(head);
+                        toggle.mutate(head);
                       }}
                     >
-                      Edit
+                      {head.isArchived ? "Restore" : "Archive"}
                     </Button>
-                  )}
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    disabled={toggle.isPending}
-                    aria-label={`${head.isArchived ? "Restore" : "Archive"} ${head.name}`}
-                    onClick={() => {
-                      toggle.mutate(head);
-                    }}
-                  >
-                    {head.isArchived ? "Restore" : "Archive"}
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableCard>
       <Dialog
         open={editing != null}
         onOpenChange={(open) => {

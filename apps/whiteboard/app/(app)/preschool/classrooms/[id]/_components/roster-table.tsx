@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { TableCard } from "@/app/(app)/preschool/_components/table-card";
 
 import { ageInMonths, formatAge } from "@/src/preschool/domain/dates";
 import type { PreschoolClassroomDetail } from "@/src/queries/preschool/classrooms";
@@ -45,9 +46,9 @@ export function RosterTable({
       />
     );
   return (
-    <div className="overflow-hidden rounded-xl border">
+    <TableCard>
       <Table>
-        <TableHeader className="bg-muted/40">
+        <TableHeader>
           <TableRow className="hover:bg-transparent">
             <TableHead className={`pl-4 ${HEAD}`}>Child</TableHead>
             <TableHead className={HEAD}>Admission no.</TableHead>
@@ -84,6 +85,6 @@ export function RosterTable({
           })}
         </TableBody>
       </Table>
-    </div>
+    </TableCard>
   );
 }

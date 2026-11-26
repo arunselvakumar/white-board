@@ -25,6 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { TableCard } from "@/app/(app)/preschool/_components/table-card";
 
 import { useActiveCentre } from "@/app/(app)/preschool/_components/active-centre-provider";
 import { ChildAvatar } from "@/app/(app)/preschool/_components/child-avatar";
@@ -176,7 +177,7 @@ function ChildRows({
           );
         })}
       </ul>
-      <div className="hidden rounded-xl border md:block">
+      <TableCard className="hidden md:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -229,7 +230,7 @@ function ChildRows({
             })}
           </TableBody>
         </Table>
-      </div>
+      </TableCard>
       <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
         <p className="text-muted-foreground tabular-nums">
           {first}–{first + data.items.length - 1} of {data.total}

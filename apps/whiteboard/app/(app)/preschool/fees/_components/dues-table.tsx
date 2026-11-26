@@ -13,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { TableCard } from "@/app/(app)/preschool/_components/table-card";
 
 import { formatPaiseAsRupees } from "@/lib/money";
 import {
@@ -101,89 +102,91 @@ export function DuesTable({
       />
     );
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Child</TableHead>
-          <TableHead>Classroom</TableHead>
-          <TableHead>Parent</TableHead>
-          <TableHead className="text-right">Due</TableHead>
-          <TableHead className="text-right">Overdue</TableHead>
-          <TableHead>Oldest due</TableHead>
-          <TableHead>
-            <span className="sr-only">Actions</span>
-          </TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {rows.map((row) => {
-          const name = childFullName(row);
-          const contact = parentContact(row);
-          return (
-            <TableRow key={row.childId}>
-              <TableCell>
-                <Link
-                  href={`/preschool/fees/children/${row.childId}`}
-                  className="font-medium hover:underline"
-                >
-                  {name}
-                </Link>
-                <div className="text-muted-foreground text-xs">
-                  {row.admissionNumber}
-                </div>
-              </TableCell>
-              <TableCell>{row.classroom?.name ?? "—"}</TableCell>
-              <TableCell>
-                {contact == null ? (
-                  <span className="text-muted-foreground">—</span>
-                ) : (
-                  <>
-                    <div>{contact.name ?? "Parent"}</div>
-                    <div className="text-muted-foreground text-xs tabular-nums">
-                      {contact.phone}
-                    </div>
-                  </>
-                )}
-              </TableCell>
-              <TableCell className="text-right tabular-nums">
-                {formatPaiseAsRupees(row.duePaise)}
-              </TableCell>
-              <TableCell
-                className={
-                  row.overduePaise > 0
-                    ? "text-destructive text-right font-medium tabular-nums"
-                    : "text-muted-foreground text-right tabular-nums"
-                }
-              >
-                {formatPaiseAsRupees(row.overduePaise)}
-              </TableCell>
-              <TableCell className="whitespace-nowrap">
-                {feeDateLabel(row.oldestDueOn)}
-              </TableCell>
-              <TableCell>
-                <div className="flex flex-wrap items-start justify-end gap-2">
-                  <Button
-                    type="button"
-                    size="sm"
-                    aria-label={`Collect from ${name}`}
-                    onClick={() => {
-                      onCollect({
-                        childId: row.childId,
-                        childName: name,
-                        duePaise: row.duePaise,
-                        overduePaise: row.overduePaise,
-                      });
-                    }}
+    <TableCard>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Child</TableHead>
+            <TableHead>Classroom</TableHead>
+            <TableHead>Parent</TableHead>
+            <TableHead className="text-right">Due</TableHead>
+            <TableHead className="text-right">Overdue</TableHead>
+            <TableHead>Oldest due</TableHead>
+            <TableHead>
+              <span className="sr-only">Actions</span>
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {rows.map((row) => {
+            const name = childFullName(row);
+            const contact = parentContact(row);
+            return (
+              <TableRow key={row.childId}>
+                <TableCell>
+                  <Link
+                    href={`/preschool/fees/children/${row.childId}`}
+                    className="font-medium hover:underline"
                   >
-                    Collect
-                  </Button>
-                  <ReminderLink row={row} centreName={centreName} />
-                </div>
-              </TableCell>
-            </TableRow>
-          );
-        })}
-      </TableBody>
-    </Table>
+                    {name}
+                  </Link>
+                  <div className="text-muted-foreground text-xs">
+                    {row.admissionNumber}
+                  </div>
+                </TableCell>
+                <TableCell>{row.classroom?.name ?? "—"}</TableCell>
+                <TableCell>
+                  {contact == null ? (
+                    <span className="text-muted-foreground">—</span>
+                  ) : (
+                    <>
+                      <div>{contact.name ?? "Parent"}</div>
+                      <div className="text-muted-foreground text-xs tabular-nums">
+                        {contact.phone}
+                      </div>
+                    </>
+                  )}
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {formatPaiseAsRupees(row.duePaise)}
+                </TableCell>
+                <TableCell
+                  className={
+                    row.overduePaise > 0
+                      ? "text-destructive text-right font-medium tabular-nums"
+                      : "text-muted-foreground text-right tabular-nums"
+                  }
+                >
+                  {formatPaiseAsRupees(row.overduePaise)}
+                </TableCell>
+                <TableCell className="whitespace-nowrap">
+                  {feeDateLabel(row.oldestDueOn)}
+                </TableCell>
+                <TableCell>
+                  <div className="flex flex-wrap items-start justify-end gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      aria-label={`Collect from ${name}`}
+                      onClick={() => {
+                        onCollect({
+                          childId: row.childId,
+                          childName: name,
+                          duePaise: row.duePaise,
+                          overduePaise: row.overduePaise,
+                        });
+                      }}
+                    >
+                      Collect
+                    </Button>
+                    <ReminderLink row={row} centreName={centreName} />
+                  </div>
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </TableCard>
   );
 }

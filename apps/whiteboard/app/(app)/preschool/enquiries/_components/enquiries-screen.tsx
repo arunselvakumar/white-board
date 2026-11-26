@@ -29,6 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { TableCard } from "@/app/(app)/preschool/_components/table-card";
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";
@@ -273,7 +274,7 @@ function EnquiryTable({
   const first = filters.cursors.length * PAGE_SIZE + 1;
   return (
     <div className="space-y-3">
-      <div className="rounded-xl border">
+      <TableCard>
         <Table>
           <TableHeader>
             <TableRow>
@@ -343,7 +344,7 @@ function EnquiryTable({
             })}
           </TableBody>
         </Table>
-      </div>
+      </TableCard>
       <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
         <p className="text-muted-foreground tabular-nums">
           {first}–{first + data.items.length - 1} of {data.total}

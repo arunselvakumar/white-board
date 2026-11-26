@@ -23,6 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { TableCard } from "@/app/(app)/preschool/_components/table-card";
 import { cn } from "@repo/ui/lib/utils";
 
 import { feeDateLabel } from "@/lib/preschool-fees";
@@ -58,57 +59,59 @@ export function StockLedgerTable({
     );
   const balance = ledger.items.some((row) => row.balanceAfter != null);
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Date</TableHead>
-          {showItem ? <TableHead>Item</TableHead> : null}
-          <TableHead>Movement</TableHead>
-          <TableHead className="text-right">Qty</TableHead>
-          {balance ? (
-            <TableHead className="text-right">Balance</TableHead>
-          ) : null}
-          <TableHead className="hidden md:table-cell">By</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {ledger.items.map((row) => {
-          const who = stockCounterparty(row);
-          return (
-            <TableRow key={row.id}>
-              <TableCell className="whitespace-nowrap">
-                {feeDateLabel(row.movedOn)}
-              </TableCell>
-              {showItem ? <TableCell>{row.itemName}</TableCell> : null}
-              <TableCell>
-                <div>{STOCK_MOVEMENT_KIND_LABELS[row.kind]}</div>
-                {who == null && row.note == null ? null : (
-                  <div className="text-muted-foreground text-xs">
-                    {[who, row.note].filter(Boolean).join(" · ")}
-                  </div>
-                )}
-              </TableCell>
-              <TableCell
-                className={cn(
-                  "text-right whitespace-nowrap tabular-nums",
-                  row.quantityDelta < 0 && "text-destructive",
-                )}
-              >
-                {formatQuantityDelta(row.quantityDelta)} {row.unit}
-              </TableCell>
-              {balance ? (
-                <TableCell className="text-right tabular-nums">
-                  {row.balanceAfter}
+    <TableCard>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Date</TableHead>
+            {showItem ? <TableHead>Item</TableHead> : null}
+            <TableHead>Movement</TableHead>
+            <TableHead className="text-right">Qty</TableHead>
+            {balance ? (
+              <TableHead className="text-right">Balance</TableHead>
+            ) : null}
+            <TableHead className="hidden md:table-cell">By</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {ledger.items.map((row) => {
+            const who = stockCounterparty(row);
+            return (
+              <TableRow key={row.id}>
+                <TableCell className="whitespace-nowrap">
+                  {feeDateLabel(row.movedOn)}
                 </TableCell>
-              ) : null}
-              <TableCell className="text-muted-foreground hidden md:table-cell">
-                {row.recordedByName}
-              </TableCell>
-            </TableRow>
-          );
-        })}
-      </TableBody>
-    </Table>
+                {showItem ? <TableCell>{row.itemName}</TableCell> : null}
+                <TableCell>
+                  <div>{STOCK_MOVEMENT_KIND_LABELS[row.kind]}</div>
+                  {who == null && row.note == null ? null : (
+                    <div className="text-muted-foreground text-xs">
+                      {[who, row.note].filter(Boolean).join(" · ")}
+                    </div>
+                  )}
+                </TableCell>
+                <TableCell
+                  className={cn(
+                    "text-right whitespace-nowrap tabular-nums",
+                    row.quantityDelta < 0 && "text-destructive",
+                  )}
+                >
+                  {formatQuantityDelta(row.quantityDelta)} {row.unit}
+                </TableCell>
+                {balance ? (
+                  <TableCell className="text-right tabular-nums">
+                    {row.balanceAfter}
+                  </TableCell>
+                ) : null}
+                <TableCell className="text-muted-foreground hidden md:table-cell">
+                  {row.recordedByName}
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </TableCard>
   );
 }
 

@@ -39,6 +39,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { TableCard } from "@/app/(app)/preschool/_components/table-card";
 
 import { RoleGate } from "@/app/(app)/preschool/_components/active-centre-provider";
 import { PreschoolPage } from "@/app/(app)/preschool/_components/preschool-page";
@@ -355,83 +356,85 @@ export function StockItemsMaster() {
             >
               {group.label}
             </h2>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Item</TableHead>
-                  <TableHead className="hidden sm:table-cell">Unit</TableHead>
-                  <TableHead className="hidden text-right sm:table-cell">
-                    Reorder at
-                  </TableHead>
-                  <TableHead>
-                    <span className="sr-only">Actions</span>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {group.items.map((item) => (
-                  <TableRow
-                    key={item.id}
-                    className={
-                      item.isArchived ? "text-muted-foreground" : undefined
-                    }
-                  >
-                    <TableCell>
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <span className="font-medium">{item.name}</span>
-                        <Badge variant="outline">
-                          {item.kind === "asset" ? "Asset" : "Consumable"}
-                        </Badge>
-                        {item.isArchived ? (
-                          <Badge variant="secondary">Archived</Badge>
-                        ) : null}
-                      </div>
-                      <div className="text-muted-foreground text-xs sm:hidden">
+            <TableCard>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Item</TableHead>
+                    <TableHead className="hidden sm:table-cell">Unit</TableHead>
+                    <TableHead className="hidden text-right sm:table-cell">
+                      Reorder at
+                    </TableHead>
+                    <TableHead>
+                      <span className="sr-only">Actions</span>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {group.items.map((item) => (
+                    <TableRow
+                      key={item.id}
+                      className={
+                        item.isArchived ? "text-muted-foreground" : undefined
+                      }
+                    >
+                      <TableCell>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className="font-medium">{item.name}</span>
+                          <Badge variant="outline">
+                            {item.kind === "asset" ? "Asset" : "Consumable"}
+                          </Badge>
+                          {item.isArchived ? (
+                            <Badge variant="secondary">Archived</Badge>
+                          ) : null}
+                        </div>
+                        <div className="text-muted-foreground text-xs sm:hidden">
+                          {item.unit}
+                          {item.reorderLevel == null
+                            ? null
+                            : ` · reorder at ${item.reorderLevel}`}
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
                         {item.unit}
-                        {item.reorderLevel == null
-                          ? null
-                          : ` · reorder at ${item.reorderLevel}`}
-                      </div>
-                    </TableCell>
-                    <TableCell className="hidden sm:table-cell">
-                      {item.unit}
-                    </TableCell>
-                    <TableCell className="hidden text-right tabular-nums sm:table-cell">
-                      {item.reorderLevel ?? "—"}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex justify-end gap-1">
-                        {item.isArchived ? null : (
+                      </TableCell>
+                      <TableCell className="hidden text-right tabular-nums sm:table-cell">
+                        {item.reorderLevel ?? "—"}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex justify-end gap-1">
+                          {item.isArchived ? null : (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              aria-label={`Edit ${item.name}`}
+                              onClick={() => {
+                                setEditing(item);
+                              }}
+                            >
+                              Edit
+                            </Button>
+                          )}
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
-                            aria-label={`Edit ${item.name}`}
+                            disabled={toggle.isPending}
+                            aria-label={`${item.isArchived ? "Restore" : "Archive"} ${item.name}`}
                             onClick={() => {
-                              setEditing(item);
+                              toggle.mutate(item);
                             }}
                           >
-                            Edit
+                            {item.isArchived ? "Restore" : "Archive"}
                           </Button>
-                        )}
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          disabled={toggle.isPending}
-                          aria-label={`${item.isArchived ? "Restore" : "Archive"} ${item.name}`}
-                          onClick={() => {
-                            toggle.mutate(item);
-                          }}
-                        >
-                          {item.isArchived ? "Restore" : "Archive"}
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableCard>
           </section>
         ))
       )}

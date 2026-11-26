@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { TableCard } from "@/app/(app)/preschool/_components/table-card";
 import { useIsMobile } from "@repo/ui/hooks/use-mobile";
 
 import { useActiveCentre } from "@/app/(app)/preschool/_components/active-centre-provider";
@@ -208,9 +209,9 @@ export function HeadOfficeScreen() {
           ))}
         </ul>
       ) : (
-        <div className="overflow-hidden rounded-xl border">
+        <TableCard>
           <Table>
-            <TableHeader className="bg-muted/40">
+            <TableHeader>
               <TableRow className="hover:bg-transparent">
                 <TableHead className={`pl-4 ${HEAD}`}>Centre</TableHead>
                 <TableHead className={HEAD}>Children</TableHead>
@@ -285,7 +286,7 @@ export function HeadOfficeScreen() {
               ))}
             </TableBody>
           </Table>
-        </div>
+        </TableCard>
       )}
     </PreschoolPage>
   );

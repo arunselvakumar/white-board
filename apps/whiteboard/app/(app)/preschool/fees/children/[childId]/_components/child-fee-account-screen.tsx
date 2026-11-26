@@ -26,6 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { TableCard } from "@/app/(app)/preschool/_components/table-card";
 import { cn } from "@repo/ui/lib/utils";
 
 import { RoleGate } from "@/app/(app)/preschool/_components/active-centre-provider";
@@ -189,117 +190,119 @@ export function ChildFeeAccount({
         {invoices.length === 0 ? (
           <GenerateInvoices childId={child.id} />
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Invoice</TableHead>
-                <TableHead>Due date</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-                <TableHead className="text-right">Concession</TableHead>
-                <TableHead className="text-right">Paid</TableHead>
-                <TableHead className="text-right">Due</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>
-                  <span className="sr-only">Actions</span>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {invoices.map((invoice) => {
-                const cancelled = invoice.status === "cancelled";
-                return (
-                  <TableRow
-                    key={invoice.id}
-                    className={cn(cancelled && "text-muted-foreground")}
-                  >
-                    <TableCell>
-                      <div
-                        className={cn(
-                          "font-medium",
-                          cancelled && "line-through",
-                        )}
-                      >
-                        {invoice.label}
-                      </div>
-                      <div className="text-muted-foreground text-xs">
-                        {invoice.feeHeadName}
-                      </div>
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap">
-                      {feeDateLabel(invoice.dueOn)}
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {formatPaiseAsRupees(invoice.amountPaise)}
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {invoice.concessionPaise === 0 ? (
-                        "—"
-                      ) : (
-                        <>
-                          {formatPaiseAsRupees(invoice.concessionPaise)}
-                          <div className="text-muted-foreground text-xs">
-                            {invoice.concessionReason}
-                          </div>
-                        </>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {formatPaiseAsRupees(invoice.paidPaise)}
-                    </TableCell>
-                    <TableCell className="text-right font-medium tabular-nums">
-                      {formatPaiseAsRupees(invoice.duePaise)}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={INVOICE_STATUS_VARIANT[invoice.status]}>
-                        {INVOICE_STATUS_LABEL[invoice.status]}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger
-                          disabled={cancelled}
-                          render={
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              aria-label={`Actions for ${invoice.label}`}
-                            />
-                          }
+          <TableCard>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Invoice</TableHead>
+                  <TableHead>Due date</TableHead>
+                  <TableHead className="text-right">Amount</TableHead>
+                  <TableHead className="text-right">Concession</TableHead>
+                  <TableHead className="text-right">Paid</TableHead>
+                  <TableHead className="text-right">Due</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {invoices.map((invoice) => {
+                  const cancelled = invoice.status === "cancelled";
+                  return (
+                    <TableRow
+                      key={invoice.id}
+                      className={cn(cancelled && "text-muted-foreground")}
+                    >
+                      <TableCell>
+                        <div
+                          className={cn(
+                            "font-medium",
+                            cancelled && "line-through",
+                          )}
                         >
-                          <MoreHorizontal aria-hidden="true" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setDialog({ kind: "edit", invoice });
-                            }}
+                          {invoice.label}
+                        </div>
+                        <div className="text-muted-foreground text-xs">
+                          {invoice.feeHeadName}
+                        </div>
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        {feeDateLabel(invoice.dueOn)}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {formatPaiseAsRupees(invoice.amountPaise)}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {invoice.concessionPaise === 0 ? (
+                          "—"
+                        ) : (
+                          <>
+                            {formatPaiseAsRupees(invoice.concessionPaise)}
+                            <div className="text-muted-foreground text-xs">
+                              {invoice.concessionReason}
+                            </div>
+                          </>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {formatPaiseAsRupees(invoice.paidPaise)}
+                      </TableCell>
+                      <TableCell className="text-right font-medium tabular-nums">
+                        {formatPaiseAsRupees(invoice.duePaise)}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={INVOICE_STATUS_VARIANT[invoice.status]}>
+                          {INVOICE_STATUS_LABEL[invoice.status]}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger
+                            disabled={cancelled}
+                            render={
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                aria-label={`Actions for ${invoice.label}`}
+                              />
+                            }
                           >
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setDialog({ kind: "concession", invoice });
-                            }}
-                          >
-                            Concession
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            variant="destructive"
-                            disabled={invoice.paidPaise > 0}
-                            onClick={() => {
-                              setDialog({ kind: "cancel", invoice });
-                            }}
-                          >
-                            Cancel Invoice
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+                            <MoreHorizontal aria-hidden="true" />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setDialog({ kind: "edit", invoice });
+                              }}
+                            >
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setDialog({ kind: "concession", invoice });
+                              }}
+                            >
+                              Concession
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              variant="destructive"
+                              disabled={invoice.paidPaise > 0}
+                              onClick={() => {
+                                setDialog({ kind: "cancel", invoice });
+                              }}
+                            >
+                              Cancel Invoice
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableCard>
         )}
       </section>
 
@@ -310,55 +313,57 @@ export function ChildFeeAccount({
         {payments.length === 0 ? (
           <p className="text-muted-foreground text-sm">No Fee Payments yet.</p>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Receipt</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Method</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {payments.map((payment) => (
-                <TableRow
-                  key={payment.id}
-                  className={cn(payment.cancelled && "text-muted-foreground")}
-                >
-                  <TableCell>
-                    <Link
-                      href={`/preschool/fees/receipts/${payment.id}`}
-                      className="font-medium tabular-nums hover:underline"
-                    >
-                      {payment.receiptNumber}
-                    </Link>
-                    {payment.cancelled ? (
-                      <Badge variant="destructive" className="ml-2">
-                        Cancelled
-                      </Badge>
-                    ) : null}
-                  </TableCell>
-                  <TableCell className="whitespace-nowrap">
-                    {feeDateLabel(payment.receivedOn)}
-                  </TableCell>
-                  <TableCell>
-                    {FEE_PAYMENT_METHOD_LABEL[payment.method]}
-                    {payment.reference == null
-                      ? null
-                      : ` · ${payment.reference}`}
-                  </TableCell>
-                  <TableCell
-                    className={cn(
-                      "text-right tabular-nums",
-                      payment.cancelled && "line-through",
-                    )}
-                  >
-                    {formatPaiseAsRupees(payment.amountPaise)}
-                  </TableCell>
+          <TableCard>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Receipt</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Method</TableHead>
+                  <TableHead className="text-right">Amount</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {payments.map((payment) => (
+                  <TableRow
+                    key={payment.id}
+                    className={cn(payment.cancelled && "text-muted-foreground")}
+                  >
+                    <TableCell>
+                      <Link
+                        href={`/preschool/fees/receipts/${payment.id}`}
+                        className="font-medium tabular-nums hover:underline"
+                      >
+                        {payment.receiptNumber}
+                      </Link>
+                      {payment.cancelled ? (
+                        <Badge variant="destructive" className="ml-2">
+                          Cancelled
+                        </Badge>
+                      ) : null}
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      {feeDateLabel(payment.receivedOn)}
+                    </TableCell>
+                    <TableCell>
+                      {FEE_PAYMENT_METHOD_LABEL[payment.method]}
+                      {payment.reference == null
+                        ? null
+                        : ` · ${payment.reference}`}
+                    </TableCell>
+                    <TableCell
+                      className={cn(
+                        "text-right tabular-nums",
+                        payment.cancelled && "line-through",
+                      )}
+                    >
+                      {formatPaiseAsRupees(payment.amountPaise)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableCard>
         )}
       </section>
 

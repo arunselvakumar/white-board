@@ -340,7 +340,7 @@ export function DailyReportEditor({
           {content.toilet.length === 0 ? null : (
             <ul
               aria-label="Toilet entries"
-              className="divide-y rounded-lg border"
+              className="bg-card divide-y rounded-lg border"
             >
               {content.toilet.map((entry, index) => (
                 <li

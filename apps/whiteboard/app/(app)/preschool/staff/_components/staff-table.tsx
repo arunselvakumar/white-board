@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { TableCard } from "@/app/(app)/preschool/_components/table-card";
 
 import type { PreschoolStaff } from "@/src/queries/preschool/staff";
 
@@ -54,9 +55,9 @@ export function StaffTable({
   onToggleStatus: (member: PreschoolStaff) => void;
 }) {
   return (
-    <div className="overflow-hidden rounded-xl border">
+    <TableCard>
       <Table>
-        <TableHeader className="bg-muted/40">
+        <TableHeader>
           <TableRow className="hover:bg-transparent">
             <TableHead className={`pl-4 ${HEAD}`}>Name</TableHead>
             <TableHead className={HEAD}>Role</TableHead>
@@ -169,6 +170,6 @@ export function StaffTable({
           })}
         </TableBody>
       </Table>
-    </div>
+    </TableCard>
   );
 }

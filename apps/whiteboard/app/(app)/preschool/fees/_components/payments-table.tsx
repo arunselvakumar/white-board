@@ -13,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { TableCard } from "@/app/(app)/preschool/_components/table-card";
 
 import { formatPaiseAsRupees } from "@/lib/money";
 import { FEE_PAYMENT_METHOD_LABEL, feeDateLabel } from "@/lib/preschool-fees";
@@ -32,80 +33,84 @@ export function PaymentsTable({ page }: { page: PreschoolFeePaymentList }) {
       />
     );
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Receipt</TableHead>
-          <TableHead>Date</TableHead>
-          <TableHead>Child</TableHead>
-          <TableHead>Method</TableHead>
-          <TableHead className="text-right">Amount</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {page.items.map((payment) => (
-          <TableRow
-            key={payment.id}
-            className={payment.cancelled ? "text-muted-foreground" : undefined}
-          >
-            <TableCell>
-              <Link
-                href={`/preschool/fees/receipts/${payment.id}`}
-                className="font-medium tabular-nums hover:underline"
-              >
-                {payment.receiptNumber}
-              </Link>
-              {payment.cancelled ? (
-                <Badge variant="destructive" className="ml-2">
-                  Cancelled
-                </Badge>
-              ) : null}
-            </TableCell>
-            <TableCell className="whitespace-nowrap">
-              {feeDateLabel(payment.receivedOn)}
-            </TableCell>
-            <TableCell>
-              <Link
-                href={`/preschool/fees/children/${payment.childId}`}
-                className="hover:underline"
-              >
-                {payment.childName}
-              </Link>
-              <div className="text-muted-foreground text-xs">
-                {payment.admissionNumber}
-              </div>
-            </TableCell>
-            <TableCell>
-              {FEE_PAYMENT_METHOD_LABEL[payment.method]}
-              {payment.reference == null ? null : (
-                <div className="text-muted-foreground text-xs">
-                  {payment.reference}
-                </div>
-              )}
-            </TableCell>
-            <TableCell
+    <TableCard>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Receipt</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Child</TableHead>
+            <TableHead>Method</TableHead>
+            <TableHead className="text-right">Amount</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {page.items.map((payment) => (
+            <TableRow
+              key={payment.id}
               className={
-                payment.cancelled
-                  ? "text-right tabular-nums line-through"
-                  : "text-right tabular-nums"
+                payment.cancelled ? "text-muted-foreground" : undefined
               }
             >
-              {formatPaiseAsRupees(payment.amountPaise)}
+              <TableCell>
+                <Link
+                  href={`/preschool/fees/receipts/${payment.id}`}
+                  className="font-medium tabular-nums hover:underline"
+                >
+                  {payment.receiptNumber}
+                </Link>
+                {payment.cancelled ? (
+                  <Badge variant="destructive" className="ml-2">
+                    Cancelled
+                  </Badge>
+                ) : null}
+              </TableCell>
+              <TableCell className="whitespace-nowrap">
+                {feeDateLabel(payment.receivedOn)}
+              </TableCell>
+              <TableCell>
+                <Link
+                  href={`/preschool/fees/children/${payment.childId}`}
+                  className="hover:underline"
+                >
+                  {payment.childName}
+                </Link>
+                <div className="text-muted-foreground text-xs">
+                  {payment.admissionNumber}
+                </div>
+              </TableCell>
+              <TableCell>
+                {FEE_PAYMENT_METHOD_LABEL[payment.method]}
+                {payment.reference == null ? null : (
+                  <div className="text-muted-foreground text-xs">
+                    {payment.reference}
+                  </div>
+                )}
+              </TableCell>
+              <TableCell
+                className={
+                  payment.cancelled
+                    ? "text-right tabular-nums line-through"
+                    : "text-right tabular-nums"
+                }
+              >
+                {formatPaiseAsRupees(payment.amountPaise)}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TableCell colSpan={4}>
+              {page.total} {page.total === 1 ? "payment" : "payments"} in these
+              dates; cancelled ones are not counted
+            </TableCell>
+            <TableCell className="text-right font-semibold tabular-nums">
+              {formatPaiseAsRupees(page.totalPaise)}
             </TableCell>
           </TableRow>
-        ))}
-      </TableBody>
-      <TableFooter>
-        <TableRow>
-          <TableCell colSpan={4}>
-            {page.total} {page.total === 1 ? "payment" : "payments"} in these
-            dates; cancelled ones are not counted
-          </TableCell>
-          <TableCell className="text-right font-semibold tabular-nums">
-            {formatPaiseAsRupees(page.totalPaise)}
-          </TableCell>
-        </TableRow>
-      </TableFooter>
-    </Table>
+        </TableFooter>
+      </Table>
+    </TableCard>
   );
 }

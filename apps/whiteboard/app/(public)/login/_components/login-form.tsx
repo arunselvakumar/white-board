@@ -138,17 +138,9 @@ export function LoginForm({
         </div>
 
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="password" required>
-              Password
-            </Label>
-            <Link
-              href="/forgot-password"
-              className="text-primary text-xs hover:underline"
-            >
-              Forgot password?
-            </Link>
-          </div>
+          <Label htmlFor="password" required>
+            Password
+          </Label>
           <PasswordField
             id="password"
             aria-required
@@ -162,6 +154,14 @@ export function LoginForm({
               authErrorMessage(signIn.error, "password")
             }
           />
+          <div className="flex justify-end">
+            <Link
+              href="/forgot-password"
+              className="text-primary text-xs hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </div>
         </div>
 
         <FormAlert

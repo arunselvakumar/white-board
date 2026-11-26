@@ -128,7 +128,7 @@ function Account({
         {data.payments.length === 0 ? (
           <p className="text-muted-foreground text-sm">No payments yet.</p>
         ) : (
-          <ul className="divide-y rounded-xl border">
+          <ul className="bg-card divide-y rounded-xl border">
             {data.payments.map((payment) => (
               <li key={payment.id}>
                 <Link

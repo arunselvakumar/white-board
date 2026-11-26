@@ -108,7 +108,7 @@ function CentreCard({ centre, month }: { centre: CentreRow; month: string }) {
             ) : (
               <ul
                 aria-label={`Collections by Fee Head at ${centre.name}`}
-                className="divide-y rounded-lg border"
+                className="bg-card divide-y rounded-lg border"
               >
                 {centre.byFeeHead.map((head) => (
                   <li

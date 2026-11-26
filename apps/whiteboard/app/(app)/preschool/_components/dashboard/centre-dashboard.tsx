@@ -243,7 +243,7 @@ function AttentionList({
       <h3 className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
         {title}
       </h3>
-      <ul className="divide-y rounded-lg border">{children}</ul>
+      <ul className="bg-card divide-y rounded-lg border">{children}</ul>
     </section>
   );
 }

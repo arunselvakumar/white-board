@@ -144,7 +144,7 @@ export function AttendanceMonth({
           tabIndex={0}
           role="region"
           aria-label="Register grid"
-          className="max-w-full overflow-x-auto rounded-xl border"
+          className="bg-card max-w-full overflow-x-auto rounded-xl border"
         >
           <table className="border-collapse text-xs">
             <thead>
