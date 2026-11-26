@@ -18,6 +18,7 @@ import {
 import { parseAsString, useQueryState } from "nuqs";
 import { Component, Suspense, useEffect, useMemo, type ReactNode } from "react";
 import { Button } from "@repo/ui/components/button";
+import { cn } from "@repo/ui/lib/utils";
 import { EmptyState } from "@repo/ui/components/empty-state";
 import { MetricCard } from "@repo/ui/components/metric-card";
 import {
@@ -250,6 +251,13 @@ function placeCaption(figures: MonthFigures): string {
     : names.join(", ");
 }
 
+/** One row of cards on a wide screen, however many the person has. */
+const WIDE_COLUMNS: Record<number, string> = {
+  3: "xl:grid-cols-3",
+  4: "xl:grid-cols-4",
+  5: "xl:grid-cols-5",
+};
+
 function MonthCards({
   figures,
   measure,
@@ -350,7 +358,10 @@ function MonthCards({
   return (
     <ul
       aria-label="This month in figures"
-      className="grid grid-cols-2 gap-3 md:grid-cols-[repeat(auto-fit,minmax(11rem,1fr))]"
+      className={cn(
+        "grid grid-cols-2 gap-3 md:grid-cols-3",
+        WIDE_COLUMNS[cards.length],
+      )}
     >
       {cards.map((card, i) => (
         <li key={i} className="flex min-w-0 [&>*]:w-full">
