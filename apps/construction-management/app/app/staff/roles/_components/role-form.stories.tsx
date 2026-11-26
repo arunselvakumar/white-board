@@ -212,6 +212,57 @@ export const EditRoleDepartment: Story = {
   },
 };
 
+/**
+ * The departments list fails to load: the Role keeps its own Department,
+ * the field says so, and Retry brings the whole list back.
+ */
+export const DepartmentsFailToLoad: Story = {
+  args: { id: ACCOUNTANT_ROLE.id },
+  beforeEach() {
+    let failures = 1;
+    api = mockApi((call) => {
+      const { method, path } = call;
+      if (method === "GET" && path === ACCOUNTANT)
+        return Response.json(ACCOUNTANT_ROLE);
+      const departments = departmentsResponse(call);
+      if (departments != null && failures > 0) {
+        failures -= 1;
+        return Response.json(
+          { code: "INTERNAL", message: "Something went wrong." },
+          { status: 500 },
+        );
+      }
+      return departments;
+    });
+    return api.restore;
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const alert = await canvas.findByRole("alert");
+    await expect(alert).toHaveTextContent(
+      "Your departments did not load, so only some are listed.",
+    );
+    const department = canvas.getByRole("combobox", { name: "Department" });
+    await expect(department).toHaveTextContent(ACCOUNTS?.name ?? "");
+    await expect(department).toBeEnabled();
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(department);
+    await expect(
+      await page.findByRole("option", { name: "No department" }),
+    ).toBeVisible();
+    await expect(
+      page.queryByRole("option", { name: PURCHASE?.name ?? "" }),
+    ).toBeNull();
+    await userEvent.keyboard("{Escape}");
+
+    await userEvent.click(within(alert).getByRole("button", { name: "Retry" }));
+    await waitFor(() => expect(canvas.queryByRole("alert")).toBeNull());
+    await userEvent.click(department);
+    await expect(
+      await page.findByRole("option", { name: PURCHASE?.name ?? "" }),
+    ).toBeVisible();
+  },
+};
+
 /** The Department went away after the form loaded: said on the field. */
 export const DepartmentGone: Story = {
   beforeEach() {

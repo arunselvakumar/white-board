@@ -90,7 +90,8 @@ function inputOf(values: Values): RoleInput {
 /**
  * The Department a Role is under: optional, so the list starts with "No
  * department" (ADR CM-0050). The Role's own Department is offered while
- * the list loads, so Edit shows it at once.
+ * the list loads, so Edit shows it at once, and stays offered with a
+ * Retry when the list fails to load.
  */
 function DepartmentField({
   form,
@@ -126,8 +127,7 @@ function DepartmentField({
           >
             <SelectTrigger
               id="role-department"
-              size="lg"
-              className="w-full min-w-0 sm:max-w-sm"
+              className="w-full min-w-0"
               aria-invalid={error != null}
               aria-describedby="role-department-hint"
             >
@@ -150,6 +150,27 @@ function DepartmentField({
       <p id="role-department-hint" className="text-muted-foreground text-xs">
         Optional. The Department this Role belongs to.
       </p>
+      {query.isError ? (
+        <div
+          role="alert"
+          className="text-destructive flex flex-wrap items-center gap-x-2 text-sm"
+        >
+          Your departments did not load, so only some are listed.
+          <Button
+            type="button"
+            variant="link"
+            size="xs"
+            className="h-auto px-0"
+            disabled={query.isFetching}
+            onClick={() => {
+              void query.refetch();
+            }}
+          >
+            <RefreshCw aria-hidden />
+            {query.isFetching ? "Retrying…" : "Retry"}
+          </Button>
+        </div>
+      ) : null}
       <FieldError message={error} />
     </div>
   );

@@ -42,6 +42,20 @@ export class RoleHandlers {
     return role;
   }
 
+  /**
+   * A Role just added (Add or Duplicate): nobody is on it yet. The
+   * Department names are read before the save, so nothing is read after
+   * the commit and a failed read cannot turn a saved Role into an error.
+   */
+  private async saveNew(role: Role, audit: AuditEvent): Promise<RoleReadModel> {
+    const departments =
+      role.departmentId == null
+        ? new Map<string, string>()
+        : await this.roles.departmentNames(role.workspaceId);
+    await this.roles.save(role, { audit });
+    return toRoleReadModel(role, 0, departments);
+  }
+
   private async view(role: Role): Promise<RoleReadModel> {
     const [counts, departments] = await Promise.all([
       this.roles.userCounts(role.workspaceId),
@@ -109,10 +123,7 @@ export class RoleHandlers {
       by: input.by,
       now,
     });
-    await this.roles.save(role, {
-      audit: this.audit(role, input.by, "role.created"),
-    });
-    return this.view(role);
+    return this.saveNew(role, this.audit(role, input.by, "role.created"));
   }
 
   /**
@@ -190,12 +201,12 @@ export class RoleHandlers {
       by: input.by,
       now,
     });
-    await this.roles.save(copy, {
-      audit: this.audit(copy, input.by, "role.duplicated", {
+    return this.saveNew(
+      copy,
+      this.audit(copy, input.by, "role.duplicated", {
         sourceRoleId: source.id,
       }),
-    });
-    return this.view(copy);
+    );
   }
 
   /**
