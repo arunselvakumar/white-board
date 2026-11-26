@@ -203,7 +203,7 @@ export function TeacherDetailScreen({ id }: { id: string }) {
               No Batches assigned.
             </p>
           ) : (
-            <div className="divide-y rounded-xl border">
+            <div className="bg-card divide-y rounded-xl border">
               {assigned.items.map((batch) => (
                 <div
                   key={batch.id}

@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
-import { TableCard } from "@/app/(app)/preschool/_components/table-card";
+import { TableCard } from "@/app/(app)/_components/table-card";
 import { useIsMobile } from "@repo/ui/hooks/use-mobile";
 
 import { useActiveCentre } from "@/app/(app)/preschool/_components/active-centre-provider";

@@ -287,7 +287,7 @@ function TableSection({ section }: { section: ReportTableSection }) {
           {section.emptyText}
         </p>
       ) : (
-        <div className="rounded-xl border print:rounded-none print:border-0">
+        <div className="bg-card rounded-xl border print:rounded-none print:border-0 print:bg-transparent">
           <Table aria-labelledby={headingId}>
             <TableHeader>
               <TableRow className="hover:bg-transparent">

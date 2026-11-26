@@ -156,7 +156,7 @@ export function TeacherDocumentsSection({
       {documents.length === 0 ? (
         <p className="text-muted-foreground text-sm">No documents added.</p>
       ) : (
-        <ul className="divide-y rounded-xl border">
+        <ul className="bg-card divide-y rounded-xl border">
           {documents.map((document) => (
             <li
               key={document.id}

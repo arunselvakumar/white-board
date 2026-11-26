@@ -29,7 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
-import { TableCard } from "@/app/(app)/preschool/_components/table-card";
+import { TableCard } from "@/app/(app)/_components/table-card";
 import { cn } from "@repo/ui/lib/utils";
 
 import { FormAlert } from "@/components/auth/form-alert";

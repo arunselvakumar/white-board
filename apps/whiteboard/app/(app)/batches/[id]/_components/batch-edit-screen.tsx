@@ -16,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { TableCard } from "@/app/(app)/_components/table-card";
 
 import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import {
@@ -87,39 +88,41 @@ export function BatchEditScreen({ batchId }: { batchId: string }) {
               No Students enrolled in this Batch yet.
             </p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Student</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {roster.map((enrollment) => (
-                  <TableRow key={enrollment.id}>
-                    <TableCell className="font-medium">
-                      {studentNameById.get(enrollment.studentId) ?? "Student"}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">Active</Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          router.push(`/enrollments/${enrollment.id}`);
-                        }}
-                      >
-                        Open
-                      </Button>
-                    </TableCell>
+            <TableCard>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Student</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {roster.map((enrollment) => (
+                    <TableRow key={enrollment.id}>
+                      <TableCell className="font-medium">
+                        {studentNameById.get(enrollment.studentId) ?? "Student"}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">Active</Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            router.push(`/enrollments/${enrollment.id}`);
+                          }}
+                        >
+                          Open
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableCard>
           )}
         </section>
         <BatchForm

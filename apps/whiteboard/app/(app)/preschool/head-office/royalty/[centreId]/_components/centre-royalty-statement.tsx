@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
-import { TableCard } from "@/app/(app)/preschool/_components/table-card";
+import { TableCard } from "@/app/(app)/_components/table-card";
 
 import {
   MonthStepper,

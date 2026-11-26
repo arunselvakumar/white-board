@@ -39,7 +39,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
-import { TableCard } from "@/app/(app)/preschool/_components/table-card";
+import { TableCard } from "@/app/(app)/_components/table-card";
 
 import { RoleGate } from "@/app/(app)/preschool/_components/active-centre-provider";
 import { PreschoolPage } from "@/app/(app)/preschool/_components/preschool-page";

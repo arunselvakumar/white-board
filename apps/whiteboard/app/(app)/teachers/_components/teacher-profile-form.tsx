@@ -665,7 +665,7 @@ export function TeacherForm({
           </div>
           <FieldError message={documentError ?? undefined} />
           {documents.length > 0 && (
-            <ul className="mt-4 divide-y rounded-xl border">
+            <ul className="bg-card mt-4 divide-y rounded-xl border">
               {documents.map((document) => (
                 <li
                   key={document.id}

@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
-import { TableCard } from "@/app/(app)/preschool/_components/table-card";
+import { TableCard } from "@/app/(app)/_components/table-card";
 
 import { feeDateLabel } from "@/lib/preschool-fees";
 import { STOCK_CATEGORY_LABELS } from "@/src/queries/preschool/stock";
