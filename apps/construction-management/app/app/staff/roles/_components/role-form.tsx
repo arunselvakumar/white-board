@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { RefreshCw, TriangleAlert, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,6 +17,13 @@ import {
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/ui/components/select";
 import { Textarea } from "@repo/ui/components/textarea";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
@@ -25,6 +32,7 @@ import { FormAlert } from "@/components/auth/form-alert";
 import { PermissionMatrix } from "@/app/app/staff/_components/permission-matrix";
 import { fieldForCode } from "@/lib/server-errors";
 import { ROLES_PATH, staffCount } from "@/lib/staff-nav";
+import { departmentsQuery } from "@/src/queries/departments";
 import { QueryHttpError } from "@/src/queries/http";
 import {
   roleQuery,
@@ -42,8 +50,13 @@ const schema = z.object({
     .min(1, "Enter the Role name")
     .max(100, "Use at most 100 characters"),
   description: z.string().trim().max(300, "Use at most 300 characters"),
+  /** A Department id, or "" for none: the field is optional (ADR CM-0050). */
+  departmentId: z.string(),
   permissions: z.custom<PermissionGrants>(),
 });
+
+/** The "No department" row; the form holds "" for it. */
+const NO_DEPARTMENT = "__none__";
 
 type Values = z.infer<typeof schema>;
 
@@ -53,12 +66,14 @@ const SERVER_FIELDS: Record<string, keyof Values> = {
   ROLE_NAME_TAKEN: "name",
   ROLE_DEFAULT_NAME_LOCKED: "name",
   ROLE_DESCRIPTION_TOO_LONG: "description",
+  ROLE_DEPARTMENT_NOT_FOUND: "departmentId",
 };
 
 function valuesOf(role: Role | null): Values {
   return {
     name: role?.name ?? "",
     description: role?.description ?? "",
+    departmentId: role?.department?.id ?? "",
     permissions: role?.permissions ?? {},
   };
 }
@@ -67,11 +82,80 @@ function inputOf(values: Values): RoleInput {
   return {
     name: values.name,
     description: values.description === "" ? null : values.description,
+    departmentId: values.departmentId === "" ? null : values.departmentId,
     permissions: values.permissions,
   };
 }
 
-/** Name, description and the Permission Matrix; Save adds or updates. */
+/**
+ * The Department a Role is under: optional, so the list starts with "No
+ * department" (ADR CM-0050). The Role's own Department is offered while
+ * the list loads, so Edit shows it at once.
+ */
+function DepartmentField({
+  form,
+  current,
+  readOnly,
+}: {
+  form: UseFormReturn<Values>;
+  current: Role["department"];
+  readOnly: boolean;
+}) {
+  const query = useQuery(departmentsQuery);
+  const departments = query.data?.items ?? (current == null ? [] : [current]);
+  const items = [
+    { value: NO_DEPARTMENT, label: "No department" },
+    ...departments.map((item) => ({ value: item.id, label: item.name })),
+  ];
+  const error = form.formState.errors.departmentId?.message;
+  return (
+    <div className="space-y-1.5">
+      <Label htmlFor="role-department">Department</Label>
+      <Controller
+        name="departmentId"
+        control={form.control}
+        render={({ field }) => (
+          <Select
+            items={items}
+            value={field.value === "" ? NO_DEPARTMENT : field.value}
+            onValueChange={(next) => {
+              if (typeof next === "string")
+                field.onChange(next === NO_DEPARTMENT ? "" : next);
+            }}
+            disabled={readOnly || query.isPending}
+          >
+            <SelectTrigger
+              id="role-department"
+              size="lg"
+              className="w-full min-w-0 sm:max-w-sm"
+              aria-invalid={error != null}
+              aria-describedby="role-department-hint"
+            >
+              <SelectValue placeholder="No department" />
+            </SelectTrigger>
+            <SelectContent
+              align="start"
+              alignItemWithTrigger={false}
+              aria-label="Departments"
+            >
+              {items.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      />
+      <p id="role-department-hint" className="text-muted-foreground text-xs">
+        Optional. The Department this Role belongs to.
+      </p>
+      <FieldError message={error} />
+    </div>
+  );
+}
+
+/** Name, Department, description and the Permission Matrix; Save adds or updates. */
 function RoleForm({
   role,
   readOnly,
@@ -141,6 +225,11 @@ function RoleForm({
             ) : null}
             <FieldError message={errors.name?.message} />
           </div>
+          <DepartmentField
+            form={form}
+            current={role?.department ?? null}
+            readOnly={readOnly}
+          />
           <div className="space-y-1.5">
             <Label htmlFor="role-description">Description</Label>
             <Textarea

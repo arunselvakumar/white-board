@@ -16,6 +16,8 @@ export type Role = ConstructionOrganizationRoleResponseModel;
 export type RoleInput = {
   name: string;
   description: string | null;
+  /** The Department the Role is under, or null for none (ADR CM-0050). */
+  departmentId: string | null;
   permissions: PermissionGrants;
 };
 

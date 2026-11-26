@@ -5,7 +5,7 @@ import {
   MagnifyingGlassIcon,
   ShieldCheckIcon,
 } from "@phosphor-icons/react/ssr";
-import { MoreHorizontal, Plus, Search } from "lucide-react";
+import { Building2, MoreHorizontal, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, useMemo, useState } from "react";
@@ -111,6 +111,13 @@ function RoleRow({
             {role.name}
           </Link>
           {role.isSeed ? <Badge variant="secondary">Default</Badge> : null}
+          {role.department != null ? (
+            <Badge variant="outline">
+              <Building2 aria-hidden="true" />
+              <span className="sr-only">Department: </span>
+              {role.department.name}
+            </Badge>
+          ) : null}
         </div>
         {role.description != null && role.description !== "" ? (
           <p className="text-muted-foreground line-clamp-2 text-sm">
@@ -208,7 +215,8 @@ function RolesListContent({ actions }: { actions: RoleActions }) {
       .filter(
         (item) =>
           item.name.toLowerCase().includes(needle) ||
-          (item.description ?? "").toLowerCase().includes(needle),
+          (item.description ?? "").toLowerCase().includes(needle) ||
+          (item.department?.name ?? "").toLowerCase().includes(needle),
       )
       .sort((a, b) => byName.compare(a.name, b.name));
   }, [data, query]);

@@ -18,6 +18,7 @@ function snapshot(role: Role) {
   return {
     name: role.name,
     description: role.description,
+    departmentId: role.departmentId,
     permissions: role.permissions.toGrants(),
   };
 }
@@ -26,7 +27,7 @@ function snapshot(role: Role) {
  * Role Management (ADR CM-0030). Routes check `organization.roles` before
  * calling these; `grantor` is who acts, and the Owner when omitted (seeds,
  * tests). A Member saves only cells they hold themselves and never the
- * Role they are on.
+ * Role they are on. A Role may be under a Department, or none (ADR CM-0050).
  */
 export class RoleHandlers {
   constructor(
@@ -42,8 +43,11 @@ export class RoleHandlers {
   }
 
   private async view(role: Role): Promise<RoleReadModel> {
-    const counts = await this.roles.userCounts(role.workspaceId);
-    return toRoleReadModel(role, counts.get(role.id) ?? 0);
+    const [counts, departments] = await Promise.all([
+      this.roles.userCounts(role.workspaceId),
+      this.roles.departmentNames(role.workspaceId),
+    ]);
+    return toRoleReadModel(role, counts.get(role.id) ?? 0, departments);
   }
 
   private audit(
@@ -65,24 +69,31 @@ export class RoleHandlers {
 
   /** Every live Role, by name, with how many Users are on each. */
   async list(workspaceId: string): Promise<RoleReadModel[]> {
-    const [roles, counts] = await Promise.all([
+    const [roles, counts, departments] = await Promise.all([
       this.roles.listAll(workspaceId),
       this.roles.userCounts(workspaceId),
+      this.roles.departmentNames(workspaceId),
     ]);
-    return roles.map((role) => toRoleReadModel(role, counts.get(role.id) ?? 0));
+    return roles.map((role) =>
+      toRoleReadModel(role, counts.get(role.id) ?? 0, departments),
+    );
   }
 
   async get(workspaceId: string, id: string): Promise<RoleReadModel> {
     return this.view(await this.load(workspaceId, id));
   }
 
-  /** 409 `ROLE_NAME_TAKEN`; 403 `CANNOT_GRANT` for a cell the grantor lacks. */
+  /**
+   * 409 `ROLE_NAME_TAKEN`; 403 `CANNOT_GRANT` for a cell the grantor lacks;
+   * 400 `ROLE_DEPARTMENT_NOT_FOUND` for a Department not live in the Company.
+   */
   async create(input: {
     workspaceId: string;
     by: string;
     grantor?: MemberAccess;
     name: string;
     description?: string | null;
+    departmentId?: string | null;
     permissions: Grants;
   }): Promise<RoleReadModel> {
     const now = this.clock();
@@ -93,6 +104,7 @@ export class RoleHandlers {
       workspaceId: input.workspaceId,
       name: input.name,
       description: input.description,
+      departmentId: input.departmentId,
       permissions,
       by: input.by,
       now,
@@ -100,14 +112,15 @@ export class RoleHandlers {
     await this.roles.save(role, {
       audit: this.audit(role, input.by, "role.created"),
     });
-    return toRoleReadModel(role, 0);
+    return this.view(role);
   }
 
   /**
-   * Replaces name, description and matrix. Everyone on the Role has the
-   * new access from their next request. 409 `STALE_ROLE` when `updatedAt`
-   * is not the stored one; 403 `OWN_ROLE` for the grantor's own Role and
-   * `CANNOT_GRANT` for a changed cell they do not hold.
+   * Replaces name, description, Department and matrix. Everyone on the
+   * Role has the new access from their next request. 409 `STALE_ROLE` when
+   * `updatedAt` is not the stored one; 403 `OWN_ROLE` for the grantor's own
+   * Role and `CANNOT_GRANT` for a changed cell they do not hold; 400
+   * `ROLE_DEPARTMENT_NOT_FOUND`.
    */
   async update(input: {
     workspaceId: string;
@@ -116,6 +129,7 @@ export class RoleHandlers {
     grantor?: MemberAccess;
     name: string;
     description?: string | null;
+    departmentId?: string | null;
     permissions: Grants;
     updatedAt: Date;
   }): Promise<RoleReadModel> {
@@ -138,6 +152,7 @@ export class RoleHandlers {
     role.update({
       name: input.name,
       description: input.description,
+      departmentId: input.departmentId,
       permissions,
       by: input.by,
       now: this.clock(),
@@ -149,7 +164,10 @@ export class RoleHandlers {
     return this.view(role);
   }
 
-  /** A copy named "<name> (copy)" (then "(copy 2)", …), with nobody on it. */
+  /**
+   * A copy named "<name> (copy)" (then "(copy 2)", …), under the same
+   * Department, with nobody on it.
+   */
   async duplicate(input: {
     workspaceId: string;
     id: string;
@@ -177,7 +195,7 @@ export class RoleHandlers {
         sourceRoleId: source.id,
       }),
     });
-    return toRoleReadModel(copy, 0);
+    return this.view(copy);
   }
 
   /**

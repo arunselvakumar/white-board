@@ -1,6 +1,6 @@
 # CM-0049 — Manage Departments: the Company's list of departments
 
-- Status: accepted (2026-11-25, the owner asked for it and chose the options below)
+- Status: accepted (2026-11-25, the owner asked for it and chose the options below); §6 amended by [CM-0050](CM-0050-role-department.md) (a Role may be under a department)
 - Date: 2026-11-25
 - Relates to: [CM-0046](CM-0046-departments-menu.md) (Departments in the main menu), [CM-0047](CM-0047-department-sidebar-menus.md) (a department's sidebar menu), [CM-0048](CM-0048-no-department-master.md) (the trade list called Departments, removed), [CM-0030](CM-0030-users-and-roles.md) (Roles and the Permission Matrix)
 

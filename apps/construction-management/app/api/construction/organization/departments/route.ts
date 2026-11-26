@@ -1,7 +1,10 @@
 import { StatusCodes } from "http-status-codes";
 
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
-import { requireAccess } from "@/app/api/_lib/require-access";
+import {
+  requireAccess,
+  requireAnyMenuRead,
+} from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
 
 import {
@@ -13,14 +16,17 @@ import { departmentHandlers as handlers } from "./handlers";
 
 export const dynamic = "force-dynamic";
 
-/** Every live department of the Active Company, by name (ADR CM-0049). */
+/**
+ * Every live department of the Active Company, by name (ADR CM-0049).
+ * Manage Departments reads it, and so does Add Role / Edit Role to offer
+ * the Departments a Role may be under (ADR CM-0050).
+ */
 export async function GET(request: Request): Promise<Response> {
   try {
-    const session = await requireAccess(
-      request,
+    const session = await requireAnyMenuRead(request, [
       "organization.departments",
-      "read",
-    );
+      "organization.roles",
+    ]);
     if (isResponse(session)) return session;
     const items = await handlers.list(session.workspaceId);
     const body: ListConstructionOrganizationDepartmentsResponseModel = {

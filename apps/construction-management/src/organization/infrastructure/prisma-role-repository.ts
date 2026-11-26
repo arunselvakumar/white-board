@@ -2,7 +2,7 @@ import type { Prisma, PrismaClient } from "@repo/construction-db";
 
 import { PermissionSet } from "@/src/shared-kernel/access";
 import { recordAudit, type AuditEvent } from "@/src/shared-kernel/audit";
-import { conflict } from "@/src/shared-kernel/domain-error";
+import { DomainError, conflict } from "@/src/shared-kernel/domain-error";
 import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import { Role } from "../domain/role";
@@ -25,6 +25,7 @@ function toRole(row: Row): Role {
     name: row.name,
     description: row.description,
     isSeed: row.isSeed,
+    departmentId: row.departmentId,
     permissions: PermissionSet.fromMasks(masks),
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
@@ -40,6 +41,7 @@ function columns(role: Role) {
     name: role.name,
     description: role.description,
     isSeed: role.isSeed,
+    departmentId: role.departmentId,
     updatedAt: role.updatedAt,
     updatedBy: role.updatedBy,
     deletedAt: role.deletedAt,
@@ -68,6 +70,30 @@ function stale() {
     "STALE_ROLE",
     "Someone else changed this Role after you opened it. Reload to see their changes.",
   );
+}
+
+/**
+ * 400 `ROLE_DEPARTMENT_NOT_FOUND` unless the Role's Department is live in
+ * its Company. `FOR SHARE` holds the Department row until `tx` ends, so a
+ * Department delete (which updates the row, then counts its Roles) waits
+ * for this save and then sees the Role (ADR CM-0050).
+ */
+async function lockDepartment(
+  tx: Prisma.TransactionClient,
+  role: Role,
+): Promise<void> {
+  if (role.departmentId == null) return;
+  const rows = await tx.$queryRaw<{ id: string }[]>`
+    SELECT "id" FROM "construction_organization"."departments"
+     WHERE "id" = ${role.departmentId}::uuid
+       AND "workspace_id" = ${role.workspaceId}
+       AND "deleted_at" IS NULL
+       FOR SHARE`;
+  if (rows.length === 0)
+    throw new DomainError(
+      "ROLE_DEPARTMENT_NOT_FOUND",
+      "Choose a Department from the list.",
+    );
 }
 
 /** Inserts new Roles and their matrices (the seed copy) inside `tx`. */
@@ -105,6 +131,7 @@ export class PrismaRoleRepository implements RoleRepository {
     expectedUpdatedAt?: Date,
   ): Promise<void> {
     const data = columns(role);
+    if (role.deletedAt == null) await lockDepartment(tx, role);
     try {
       if (expectedUpdatedAt == null)
         await tx.constructionOrganizationRole.upsert({
@@ -167,6 +194,14 @@ export class PrismaRoleRepository implements RoleRepository {
       orderBy: [{ name: "asc" }, { id: "asc" }],
     });
     return rows.map(toRole);
+  }
+
+  async departmentNames(workspaceId: string): Promise<Map<string, string>> {
+    const rows = await this.db.constructionOrganizationDepartment.findMany({
+      where: { workspaceId, deletedAt: null },
+      select: { id: true, name: true },
+    });
+    return new Map(rows.map((row) => [row.id, row.name]));
   }
 
   async userCounts(workspaceId: string): Promise<Map<string, number>> {

@@ -33,7 +33,7 @@ export const departmentOpenApiOperations: OpenApiOperation[] = [
     method: "get",
     path: DEPARTMENTS_PATH,
     summary:
-      "Every live department of the Active Company, by name (organization.departments read)",
+      "Every live department of the Active Company, by name (organization.departments or organization.roles read: Add Role offers them)",
     tags: ORGANIZATION,
     successStatus: StatusCodes.OK,
     successDescription: "Departments, the system ones marked",
@@ -73,7 +73,7 @@ export const departmentOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: `${ITEM}/delete`,
     summary:
-      "Delete a Company-made department (409 DEPARTMENT_IS_SYSTEM for Human Resources and Marketing)",
+      "Delete a Company-made department (409 DEPARTMENT_IS_SYSTEM for Human Resources and Marketing; 409 DEPARTMENT_IN_USE with `{ roleCount }` while Roles are under it)",
     tags: ORGANIZATION,
     params: ConstructionOrganizationDepartmentParamsModel,
     successStatus: StatusCodes.NO_CONTENT,

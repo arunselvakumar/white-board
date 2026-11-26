@@ -1,18 +1,23 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { getRouter } from "@storybook/nextjs-vite/navigation.mock";
-import { expect, waitFor } from "storybook/test";
+import { expect, waitFor, within } from "storybook/test";
 
 import type { Role } from "@/src/queries/roles";
 
 import { mockApi, StoryQueries } from "@/.storybook/mocks/api";
 import {
+  ACCOUNTANT_ROLE,
+  DEPARTMENTS,
   ROLES_URL,
   SITE_ENGINEER_ROLE,
   STORE_HELPER_ROLE,
+  departmentsResponse,
 } from "@/app/app/staff/_components/role-fixtures";
 import { EditRoleScreen, NewRoleScreen } from "./role-form";
 
 const ONE = `${ROLES_URL}/${SITE_ENGINEER_ROLE.id}`;
+const ACCOUNTANT = `${ROLES_URL}/${ACCOUNTANT_ROLE.id}`;
+const [ACCOUNTS, , , PURCHASE] = DEPARTMENTS;
 const NEWER = "2026-10-24T09:15:00.000Z";
 
 let api: ReturnType<typeof mockApi> | null = null;
@@ -39,7 +44,9 @@ type Story = StoryObj<typeof meta>;
 
 export const AddRole: Story = {
   beforeEach() {
-    api = mockApi(({ method, path, body }) => {
+    api = mockApi((call) => {
+      const { method, path, body } = call;
+      if (method === "GET") return departmentsResponse(call);
       if (method === "POST" && path === ROLES_URL) {
         const input = body as Pick<Role, "name">;
         if (input.name === "Store helper")
@@ -64,7 +71,7 @@ export const AddRole: Story = {
       <NewRoleScreen />
     </StoryQueries>
   ),
-  play: async ({ canvas, userEvent }) => {
+  play: async ({ canvas, canvasElement, userEvent }) => {
     await userEvent.click(
       await canvas.findByRole("button", { name: "Add Role" }),
     );
@@ -75,6 +82,17 @@ export const AddRole: Story = {
       canvas.getByLabelText("Description"),
       "Receives material at the site store.",
     );
+    // The Department is optional: it starts at "No department".
+    const department = canvas.getByRole("combobox", { name: "Department" });
+    await expect(department).toHaveTextContent("No department");
+    await waitFor(() => expect(department).toBeEnabled());
+    await userEvent.click(department);
+    await userEvent.click(
+      await within(canvasElement.ownerDocument.body).findByRole("option", {
+        name: "Purchase",
+      }),
+    );
+    await expect(department).toHaveTextContent("Purchase");
     await userEvent.click(
       canvas.getByRole("checkbox", { name: "Add — Purchase Request" }),
     );
@@ -96,6 +114,7 @@ export const AddRole: Story = {
     ).toEqual({
       name: "Store keeper 2",
       description: "Receives material at the site store.",
+      departmentId: PURCHASE?.id,
       permissions: { "procurement.purchase_requests": ["create"] },
     });
   },
@@ -103,12 +122,13 @@ export const AddRole: Story = {
 
 export const EditRole: Story = {
   beforeEach() {
-    api = mockApi(({ method, path, body }) => {
+    api = mockApi((call) => {
+      const { method, path, body } = call;
       if (method === "GET" && path === ONE)
         return Response.json(SITE_ENGINEER_ROLE);
       if (method === "POST" && path === `${ONE}/update`)
         return Response.json({ ...SITE_ENGINEER_ROLE, ...(body as object) });
-      return undefined;
+      return departmentsResponse(call);
     });
     return api.restore;
   },
@@ -116,6 +136,9 @@ export const EditRole: Story = {
     await expect(
       await canvas.findByRole("heading", { name: "Edit Site Engineer" }),
     ).toBeVisible();
+    await expect(
+      canvas.getByRole("combobox", { name: "Department" }),
+    ).toHaveTextContent("No department");
     await expect(
       canvas.getByText("Changes apply to the 3 Staff on this Role."),
     ).toBeVisible();
@@ -142,12 +165,91 @@ export const EditRole: Story = {
     await expect(bodyOf(`${ONE}/update`)).toEqual({
       name: "Site Engineer",
       description: SITE_ENGINEER_ROLE.description,
+      departmentId: null,
       permissions: {
         "labour.attendance": ["create", "read", "update", "delete"],
         "procurement.purchase_requests": ["create", "read"],
       },
       updatedAt: SITE_ENGINEER_ROLE.updatedAt,
     });
+  },
+};
+
+/** A Role under a Department shows it, and can be taken out of it (ADR CM-0050). */
+export const EditRoleDepartment: Story = {
+  args: { id: ACCOUNTANT_ROLE.id },
+  beforeEach() {
+    api = mockApi((call) => {
+      const { method, path, body } = call;
+      if (method === "GET" && path === ACCOUNTANT)
+        return Response.json(ACCOUNTANT_ROLE);
+      if (method === "POST" && path === `${ACCOUNTANT}/update`)
+        return Response.json({ ...ACCOUNTANT_ROLE, ...(body as object) });
+      return departmentsResponse(call);
+    });
+    return api.restore;
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const department = await canvas.findByRole("combobox", {
+      name: "Department",
+    });
+    await expect(department).toHaveTextContent(ACCOUNTS?.name ?? "");
+    await waitFor(() => expect(department).toBeEnabled());
+    await userEvent.click(department);
+    await userEvent.click(
+      await within(canvasElement.ownerDocument.body).findByRole("option", {
+        name: "No department",
+      }),
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+    await waitFor(() =>
+      expect(getRouter().push).toHaveBeenCalledWith("/app/staff/roles"),
+    );
+    await expect(bodyOf(`${ACCOUNTANT}/update`)).toMatchObject({
+      name: "Accountant",
+      departmentId: null,
+    });
+  },
+};
+
+/** The Department went away after the form loaded: said on the field. */
+export const DepartmentGone: Story = {
+  beforeEach() {
+    api = mockApi((call) => {
+      const { method, path } = call;
+      if (method === "POST" && path === ROLES_URL)
+        return Response.json(
+          {
+            code: "ROLE_DEPARTMENT_NOT_FOUND",
+            message: "Choose a Department from the list.",
+          },
+          { status: 400 },
+        );
+      return departmentsResponse(call);
+    });
+    return api.restore;
+  },
+  render: () => (
+    <StoryQueries>
+      <NewRoleScreen />
+    </StoryQueries>
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.type(await canvas.findByLabelText("Role name"), "Cashier");
+    const department = canvas.getByRole("combobox", { name: "Department" });
+    await waitFor(() => expect(department).toBeEnabled());
+    await userEvent.click(department);
+    await userEvent.click(
+      await within(canvasElement.ownerDocument.body).findByRole("option", {
+        name: "Accounts",
+      }),
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Add Role" }));
+    await expect(
+      await canvas.findByText("Choose a Department from the list."),
+    ).toBeVisible();
+    await expect(department).toHaveAttribute("aria-invalid", "true");
+    await expect(getRouter().push).not.toHaveBeenCalled();
   },
 };
 
@@ -176,7 +278,7 @@ export const StaleVersion: Story = {
         }
         return Response.json({ ...current, ...input });
       }
-      return undefined;
+      return departmentsResponse({ method, path });
     });
     return api.restore;
   },
@@ -221,7 +323,7 @@ export const CannotGrant: Story = {
           },
           { status: 403 },
         );
-      return undefined;
+      return departmentsResponse({ method, path });
     });
     return api.restore;
   },
@@ -243,7 +345,7 @@ export const ReadOnly: Story = {
     api = mockApi(({ method, path }) =>
       method === "GET" && path === ONE
         ? Response.json(SITE_ENGINEER_ROLE)
-        : undefined,
+        : departmentsResponse({ method, path }),
     );
     return api.restore;
   },
@@ -255,6 +357,9 @@ export const ReadOnly: Story = {
     await expect(canvas.getByLabelText("Role name")).toHaveAttribute(
       "readonly",
     );
+    await expect(
+      canvas.getByRole("combobox", { name: "Department" }),
+    ).toBeDisabled();
     await expect(
       canvas.queryByRole("button", { name: "Save" }),
     ).not.toBeInTheDocument();

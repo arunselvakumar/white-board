@@ -18,6 +18,10 @@ export const ConstructionOrganizationRoleResponseModel = z.object({
   description: z.string().nullable(),
   /** Copied from the seed set when the Company was created ("Default"). */
   isSeed: z.boolean(),
+  department: z
+    .object({ id: z.uuid(), name: z.string() })
+    .nullable()
+    .describe("The Department the Role is under, or null (ADR CM-0050)"),
   permissions: PermissionGrantsModel,
   userCount: z
     .int()
@@ -42,12 +46,18 @@ export type ListConstructionOrganizationRolesResponseModel = z.infer<
 /**
  * Name (unique among the Company's live Roles, ignoring case; 400
  * `ROLE_NAME_REQUIRED` / `ROLE_NAME_TOO_LONG` over 100), an optional
- * description and the whole matrix. Unknown menus or flags are a 400;
- * flags a menu does not support are dropped.
+ * description, an optional Department and the whole matrix. Unknown menus
+ * or flags are a 400; flags a menu does not support are dropped.
  */
 const roleFields = {
   name: z.string().max(1000),
   description: z.string().max(ROLE_DESCRIPTION_MAX).nullish(),
+  departmentId: z
+    .uuid()
+    .nullish()
+    .describe(
+      "A live Department of the Company (400 `ROLE_DEPARTMENT_NOT_FOUND` otherwise), or null for none. On update, leaving it out keeps the Role's Department (ADR CM-0050)",
+    ),
   permissions: PermissionGrantsModel,
 };
 

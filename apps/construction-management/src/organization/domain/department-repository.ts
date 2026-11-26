@@ -7,7 +7,8 @@ export type DepartmentRepository = {
    * Writes the department and its audit event atomically. 409
    * `DEPARTMENT_NAME_TAKEN` when a live one has the name (any case). With
    * `expectedUpdatedAt`, 409 `STALE_DEPARTMENT` unless the stored row still
-   * has that `updatedAt`.
+   * has that `updatedAt`. Deleting one with live Roles under it is 409
+   * `DEPARTMENT_IN_USE` (ADR CM-0050).
    */
   save(
     department: Department,

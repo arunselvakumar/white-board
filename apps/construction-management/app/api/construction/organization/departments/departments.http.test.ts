@@ -9,6 +9,9 @@ import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import { jsonRequest, memberWith, ownerWithCompany } from "@/test/companies";
 import { TEST_ORIGIN } from "@/test/sessions";
 
+import { POST as deleteRole } from "../roles/[id]/delete/route";
+import { POST as updateRole } from "../roles/[id]/update/route";
+import { POST as createRole } from "../roles/route";
 import { POST as deleteDepartment } from "./[id]/delete/route";
 import { POST as updateDepartment } from "./[id]/update/route";
 import { GET as listDepartments, POST as createDepartment } from "./route";
@@ -195,6 +198,55 @@ describe("Manage Departments HTTP (ADR CM-0049)", () => {
     );
     expect((await remove(maker.cookie, accounts)).status).toBe(
       StatusCodes.FORBIDDEN,
+    );
+  });
+
+  it("will not delete a department while Roles are under it (ADR CM-0050)", async () => {
+    const owner = await ownerWithCompany();
+    const accounts = await json<Department>(
+      await create(owner.cookie, "Accounts"),
+    );
+    const roles = `${TEST_ORIGIN}/api/construction/organization/roles`;
+    const addRole = async (name: string) =>
+      json<{ id: string; updatedAt: string }>(
+        await createRole(
+          jsonRequest(roles, owner.cookie, {
+            name,
+            departmentId: accounts.id,
+            permissions: {},
+          }),
+        ),
+      );
+    const cashier = await addRole("Cashier");
+    const clerk = await addRole("Clerk");
+
+    const refused = await remove(owner.cookie, accounts);
+    expect(refused.status).toBe(StatusCodes.CONFLICT);
+    expect(await json(refused)).toMatchObject({
+      code: "DEPARTMENT_IN_USE",
+      details: { roleCount: 2 },
+    });
+
+    // A deleted Role does not count; a Role moved to none does not either.
+    await deleteRole(
+      jsonRequest(`${roles}/${cashier.id}/delete`, owner.cookie, {}),
+      params(cashier.id),
+    );
+    await updateRole(
+      jsonRequest(`${roles}/${clerk.id}/update`, owner.cookie, {
+        name: "Clerk",
+        departmentId: null,
+        permissions: {},
+        updatedAt: clerk.updatedAt,
+      }),
+      params(clerk.id),
+    );
+    const [current] = (await list(owner.cookie)).filter(
+      (item) => item.id === accounts.id,
+    );
+    if (current == null) throw new Error("No Accounts");
+    expect((await remove(owner.cookie, current)).status).toBe(
+      StatusCodes.NO_CONTENT,
     );
   });
 

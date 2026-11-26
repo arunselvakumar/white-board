@@ -59,6 +59,7 @@ export async function POST(request: Request): Promise<Response> {
       grantor: session.access,
       name: model.name,
       description: model.description,
+      departmentId: model.departmentId,
       permissions: model.permissions,
     });
     return Response.json(toRoleResponse(created), {

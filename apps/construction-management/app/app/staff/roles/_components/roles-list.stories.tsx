@@ -111,6 +111,11 @@ export const WithRoles: Story = {
     await expect(engineer.getByText(/Runs the site day to day/)).toBeVisible();
     const helper = await rowOf(canvas, "Store helper");
     await expect(helper.queryByText("Default")).not.toBeInTheDocument();
+    // The Department a Role is under (ADR CM-0050); none shows nothing.
+    const accountant = await rowOf(canvas, "Accountant");
+    await expect(accountant.getByText("Accounts")).toBeVisible();
+    await expect(accountant.getByText("Department:")).toHaveClass("sr-only");
+    await expect(helper.queryByText("Department:")).not.toBeInTheDocument();
     await expect(
       canvas.getByRole("link", { name: "Add Role" }),
     ).toHaveAttribute("href", "/app/staff/roles/new");
@@ -272,6 +277,15 @@ export const Search: Story = {
     // Description matches count too.
     await expect(
       canvas.getByRole("link", { name: "HRMS Staff" }),
+    ).toBeVisible();
+    await expect(
+      canvas.queryByRole("link", { name: "Admin" }),
+    ).not.toBeInTheDocument();
+    // So do Department names.
+    await userEvent.clear(canvas.getByLabelText("Search Roles"));
+    await userEvent.type(canvas.getByLabelText("Search Roles"), "accounts");
+    await expect(
+      canvas.getByRole("link", { name: "Accountant" }),
     ).toBeVisible();
     await expect(
       canvas.queryByRole("link", { name: "Admin" }),

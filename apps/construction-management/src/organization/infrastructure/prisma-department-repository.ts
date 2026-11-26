@@ -61,6 +61,33 @@ export async function insertDepartments(
   });
 }
 
+/**
+ * 409 `DEPARTMENT_IN_USE` (details `{ roleCount }`) while live Roles are
+ * under the Department (ADR CM-0050). Runs after the delete's update, which
+ * locks the row: a Role save holding it `FOR SHARE` finishes first and is
+ * counted, and a later one finds the Department deleted.
+ */
+async function assertNoRoles(
+  tx: Prisma.TransactionClient,
+  department: Department,
+): Promise<void> {
+  const roleCount = await tx.constructionOrganizationRole.count({
+    where: {
+      workspaceId: department.workspaceId,
+      departmentId: department.id,
+      deletedAt: null,
+    },
+  });
+  if (roleCount > 0)
+    throw conflict(
+      "DEPARTMENT_IN_USE",
+      roleCount === 1
+        ? "A Role is under this Department. Move it to another Department, or to none, first."
+        : `${String(roleCount)} Roles are under this Department. Move them to another Department, or to none, first.`,
+      { roleCount },
+    );
+}
+
 export class PrismaDepartmentRepository implements DepartmentRepository {
   constructor(private readonly db: PrismaClient) {}
 
@@ -99,6 +126,7 @@ export class PrismaDepartmentRepository implements DepartmentRepository {
               "Someone else changed this Department after you opened it. Reload to see their changes.",
             );
         }
+        if (department.deletedAt != null) await assertNoRoles(tx, department);
         if (options.audit != null) await recordAudit(tx, options.audit);
       });
     } catch (error) {

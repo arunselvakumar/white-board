@@ -41,10 +41,10 @@ export type DepartmentProps = {
 };
 
 /**
- * A department of the Company (Manage Departments, ADR CM-0049): a name,
- * linked to nothing else for now. A system department (Human Resources,
- * Marketing) keeps its name and is never deleted; a Company-made one can
- * be renamed and deleted.
+ * A department of the Company (Manage Departments, ADR CM-0049): a name.
+ * A Role may be under one (ADR CM-0050). A system department (Human
+ * Resources, Marketing) keeps its name and is never deleted; a Company-made
+ * one can be renamed, and deleted once no Role is under it.
  */
 export class Department {
   private constructor(private props: DepartmentProps) {}

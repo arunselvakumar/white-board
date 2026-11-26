@@ -1,3 +1,4 @@
+import type { DepartmentItem } from "@/src/queries/departments";
 import type { Role } from "@/src/queries/roles";
 import { hrmsDefaultPermissions } from "@/src/shared-kernel/access";
 
@@ -6,12 +7,43 @@ export const ROLES_URL = "/api/construction/organization/roles";
 
 const AT = "2026-10-08T06:30:00.000Z";
 
+export const DEPARTMENTS_URL = "/api/construction/organization/departments";
+
+function department(
+  id: string,
+  name: string,
+  isSystem = false,
+): DepartmentItem {
+  return { id, name, isSystem, createdAt: AT, updatedAt: AT };
+}
+
+/** The Company's Departments, offered on Add Role and Edit Role (ADR CM-0050). */
+export const DEPARTMENTS: DepartmentItem[] = [
+  department("0199c3a0-0000-7000-8000-000000000401", "Accounts"),
+  department("0199c3a0-0000-7000-8000-000000000402", "Human Resources", true),
+  department("0199c3a0-0000-7000-8000-000000000403", "Marketing", true),
+  department("0199c3a0-0000-7000-8000-000000000404", "Purchase"),
+];
+
+const [ACCOUNTS] = DEPARTMENTS as [DepartmentItem];
+
+/** The departments list for a story's `mockApi` handler, else undefined. */
+export function departmentsResponse(call: {
+  method: string;
+  path: string;
+}): Response | undefined {
+  return call.method === "GET" && call.path === DEPARTMENTS_URL
+    ? Response.json({ items: DEPARTMENTS })
+    : undefined;
+}
+
 export function role(overrides: Partial<Role> = {}): Role {
   return {
     id: "0199c3a0-0000-7000-8000-000000000301",
     name: "Site Engineer",
     description: "Runs the site day to day: worksheets, attendance, requests.",
     isSeed: true,
+    department: null,
     permissions: {
       "labour.attendance": ["create", "read", "update"],
       "procurement.purchase_requests": ["create", "read"],
@@ -47,6 +79,7 @@ export const ACCOUNTANT_ROLE = role({
   id: "0199c3a0-0000-7000-8000-000000000302",
   name: "Accountant",
   description: null,
+  department: { id: ACCOUNTS.id, name: ACCOUNTS.name },
   permissions: { "finance.transactions": ["create", "read"] },
   userCount: 0,
 });

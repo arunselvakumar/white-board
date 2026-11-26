@@ -41,6 +41,7 @@ export async function POST(
       grantor: session.access,
       name: model.name,
       description: model.description,
+      departmentId: model.departmentId,
       permissions: model.permissions,
       updatedAt: new Date(model.updatedAt),
     });

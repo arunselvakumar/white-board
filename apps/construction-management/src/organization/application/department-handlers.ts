@@ -26,8 +26,8 @@ function toReadModel(department: Department): DepartmentReadModel {
 
 /**
  * Manage Departments (ADR CM-0049). Routes check `organization.departments`
- * before calling these. A department is linked to nothing, so nothing
- * blocks a rename or a delete but the system rule.
+ * before calling these. Roles may be under a department (ADR CM-0050):
+ * a rename shows on them at once, and a delete waits until none is.
  */
 export class DepartmentHandlers {
   constructor(
@@ -112,7 +112,10 @@ export class DepartmentHandlers {
     return toReadModel(department);
   }
 
-  /** 409 `DEPARTMENT_IS_SYSTEM` for Human Resources and Marketing. */
+  /**
+   * 409 `DEPARTMENT_IS_SYSTEM` for Human Resources and Marketing; 409
+   * `DEPARTMENT_IN_USE` while live Roles are under it.
+   */
   async delete(input: {
     workspaceId: string;
     id: string;
