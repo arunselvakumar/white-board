@@ -142,6 +142,21 @@ export function AttendanceCalendar({
     };
   }, [hasEarlier]);
 
+  // A month picked off-screen (the month switcher, or loaded for it)
+  // scrolls into view; only the strip moves, never the page (the strip is the offset parent).
+  useEffect(() => {
+    const el = scrollerRef.current;
+    const block = el?.querySelector<HTMLElement>(
+      `[data-month="${selectedMonth}"]`,
+    );
+    if (el == null || block == null) return;
+    const left = block.offsetLeft;
+    const right = left + block.offsetWidth;
+    if (left < el.scrollLeft) el.scrollLeft = left - 8;
+    else if (right > el.scrollLeft + el.clientWidth)
+      el.scrollLeft = right - el.clientWidth + 8;
+  }, [selectedMonth, firstMonth]);
+
   function page(direction: -1 | 1) {
     const el = scrollerRef.current;
     if (el == null) return;
@@ -188,7 +203,7 @@ export function AttendanceCalendar({
       </div>
       <div
         ref={scrollerRef}
-        className="-mx-1 [scrollbar-width:thin] overflow-x-auto overscroll-x-contain px-1 pb-2"
+        className="relative -mx-1 [scrollbar-width:thin] overflow-x-auto overscroll-x-contain px-1 pb-2"
       >
         <ol className="flex w-max items-start gap-5">
           {hasEarlier ? (
