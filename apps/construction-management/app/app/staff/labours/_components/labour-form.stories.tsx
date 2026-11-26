@@ -7,18 +7,17 @@ import { StoryQueryClient } from "@/app/app/_components/masters/masters-story-su
 import { mockFetch } from "@/.storybook/mock-fetch";
 import {
   CATEGORY_LIST,
-  MALL,
   MASON,
-  PROJECT_OPTIONS,
   DHURESH,
   MEENA,
   RAVI,
   listOf,
-  TOWER,
-  VILLA,
   withoutAmounts,
 } from "./labour-fixtures";
 import { EditLabourScreen, NewLabourScreen } from "./labour-form";
+import { fakeCamera } from "@/app/app/_components/camera/fake-camera";
+import { CameraContext } from "@/app/app/_components/camera/use-camera";
+import { STILL_JPEG_BASE64 } from "@/app/app/projects/[id]/attendance/check-in/_components/check-in-fixtures";
 
 const LABOURS = "/api/construction/labour/labours";
 
@@ -38,10 +37,6 @@ function posts(): number {
 }
 
 const LOOKUPS = [
-  {
-    path: "/api/construction/projects/projects/options",
-    respond: () => Response.json({ items: PROJECT_OPTIONS }),
-  },
   {
     path: "/api/construction/masters/labour-categories",
     respond: () => Response.json(CATEGORY_LIST),
@@ -154,16 +149,10 @@ export const AddValidatesAndSaves: Story = {
     await expect(
       canvas.queryByRole("combobox", { name: "Site Engineer" }),
     ).toBeNull();
+    // Nor Projects: a Labour is put on a Project from its Resources.
     await expect(
-      canvas.getByText("They answer to the Site Engineers on their Projects."),
-    ).toBeVisible();
-    await userEvent.click(canvas.getByRole("combobox", { name: "Projects" }));
-    await userEvent.click(await body.findByRole("option", { name: "Tower A" }));
-    await userEvent.click(body.getByRole("option", { name: "Mall Block C" }));
-    await userEvent.keyboard("{Escape}");
-    await expect(
-      canvas.getByRole("button", { name: "Remove Tower A" }),
-    ).toBeVisible();
+      canvas.queryByRole("combobox", { name: "Projects" }),
+    ).toBeNull();
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
 
     await waitFor(() => expect(sent(LABOURS)).toBeDefined());
@@ -179,10 +168,12 @@ export const AddValidatesAndSaves: Story = {
       weeklyHolidays: [0, 6],
       workingHoursPerDay: "8",
       labourCategoryId: MASON.id,
-      projectIds: [TOWER.id, MALL.id],
       aadhaar: null,
     });
     await expect(sent(LABOURS)).not.toHaveProperty("supervisorId");
+    await expect(sent(LABOURS)).not.toHaveProperty("projectIds");
+    // No photo was chosen, so none is sent.
+    await expect(posts()).toBe(1);
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith("/app/staff/labours"),
     );
@@ -331,10 +322,21 @@ export const EditWithoutFinancial: Story = {
     await expect(
       canvas.getByText("Leave blank to keep XXXXXXXX2346."),
     ).toBeVisible();
-    // Edit shows their Projects too (ADR CM-0033).
+    // Photo & documents come first; Projects are not on this page.
     await expect(
-      canvas.getByRole("button", { name: "Remove Tower A" }),
-    ).toBeVisible();
+      canvas
+        .getAllByRole("heading", { level: 2 })
+        .map((heading) => heading.textContent),
+    ).toEqual([
+      "Photo & documents",
+      "Basic",
+      "Wage",
+      "Statutory",
+      "Category & contact",
+    ]);
+    await expect(
+      canvas.queryByRole("combobox", { name: "Projects" }),
+    ).toBeNull();
     await expect(
       await canvas.findByRole("link", { name: "Aadhaar card.pdf" }),
     ).toBeVisible();
@@ -352,17 +354,31 @@ export const EditWithoutFinancial: Story = {
     await expect(update).toMatchObject({
       name: "Dhuresh P.",
       workingHoursPerDay: "9.5",
-      projectIds: [TOWER.id],
       expectedUpdatedAt: DHURESH.updatedAt,
     });
+    // Left out, so their Projects are kept.
+    await expect("projectIds" in update).toBe(false);
     await expect("wagePerDay" in update).toBe(false);
     await expect("openingBalance" in update).toBe(false);
     await expect("aadhaar" in update).toBe(false);
   },
 };
 
-/** Projects are not required: they can be ticked later (ADR CM-0033). */
-export const AddWithoutProject: Story = {
+function jpeg(name: string): File {
+  return new File(
+    [Uint8Array.from(atob(STILL_JPEG_BASE64), (c) => c.charCodeAt(0))],
+    name,
+    {
+      type: "image/jpeg",
+    },
+  );
+}
+
+/**
+ * Add Labour starts with the photo: chosen (or taken) before Save, then
+ * uploaded once the Labour is saved.
+ */
+export const AddWithPhoto: Story = {
   beforeEach: () => {
     api = mockFetch([
       ...LOOKUPS,
@@ -371,36 +387,109 @@ export const AddWithoutProject: Story = {
         path: LABOURS,
         respond: () => Response.json(DHURESH, { status: 201 }),
       },
+      {
+        method: "POST",
+        path: `${LABOURS}/${DHURESH.id}/photo`,
+        respond: () =>
+          Response.json({ photoUrl: `${LABOURS}/${DHURESH.id}/photo?v=1` }),
+      },
     ]);
     return api.restore;
   },
   play: async ({ canvas, userEvent }) => {
-    await userEvent.type(
-      await canvas.findByLabelText("Labour name"),
-      "Ravi Kumar",
-    );
-    await userEvent.type(canvas.getByLabelText("Joining date"), "2026-09-01");
-    await userEvent.type(canvas.getByLabelText("Wage per day"), "650");
+    await expect(
+      (await canvas.findAllByRole("heading", { level: 2 }))[0],
+    ).toHaveTextContent("Photo & documents");
     await expect(
       canvas.getByText(
-        "Where they work from the joining date. Leave empty to choose later.",
+        "The photo is saved with them. Add documents after you save.",
       ),
     ).toBeVisible();
+    await expect(
+      canvas.getByRole("button", { name: "Take photo" }),
+    ).toBeVisible();
+    await userEvent.type(canvas.getByLabelText("Labour name"), "Ravi Kumar");
+    // The initials follow the name typed.
+    await expect(canvas.getByText("RK")).toBeVisible();
+    await userEvent.upload(
+      canvas.getByLabelText("Choose photo file"),
+      jpeg("ravi.jpg"),
+    );
+    await expect(
+      await canvas.findByRole("button", { name: "Replace photo" }),
+    ).toBeVisible();
+    await expect(posts()).toBe(0);
+
+    await userEvent.type(canvas.getByLabelText("Joining date"), "2026-09-01");
+    await userEvent.type(canvas.getByLabelText("Wage per day"), "650");
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
-    await waitFor(() => expect(sent(LABOURS)).toBeDefined());
-    await expect(sent(LABOURS)).toMatchObject({
-      name: "Ravi Kumar",
-      projectIds: [],
-    });
+    await waitFor(() =>
+      expect(
+        api.spy.mock.calls.some(
+          ([input, init]) =>
+            init?.method === "POST" &&
+            input === `${LABOURS}/${DHURESH.id}/photo`,
+        ),
+      ).toBe(true),
+    );
+    await expect(sent(LABOURS)).toMatchObject({ name: "Ravi Kumar" });
+    await waitFor(() =>
+      expect(getRouter().push).toHaveBeenCalledWith("/app/staff/labours"),
+    );
   },
 };
 
-/** Edit ticks and unticks Projects; Transfer still moves on a date. */
-export const EditProjects: Story = {
+/** The Labour is saved but the photo is not: their page opens, to try again. */
+export const AddPhotoFails: Story = {
+  beforeEach: () => {
+    api = mockFetch([
+      ...LOOKUPS,
+      {
+        method: "POST",
+        path: LABOURS,
+        respond: () => Response.json(DHURESH, { status: 201 }),
+      },
+      {
+        method: "POST",
+        path: `${LABOURS}/${DHURESH.id}/photo`,
+        respond: () =>
+          Response.json(
+            { code: "STORAGE_UNAVAILABLE", message: "Try again." },
+            { status: 503 },
+          ),
+      },
+    ]);
+    return api.restore;
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.upload(
+      await canvas.findByLabelText("Choose photo file"),
+      jpeg("ravi.jpg"),
+    );
+    await userEvent.type(canvas.getByLabelText("Labour name"), "Ravi Kumar");
+    await userEvent.type(canvas.getByLabelText("Joining date"), "2026-09-01");
+    await userEvent.type(canvas.getByLabelText("Wage per day"), "650");
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+    await waitFor(() =>
+      expect(getRouter().push).toHaveBeenCalledWith(
+        `/app/staff/labours/${DHURESH.id}`,
+      ),
+    );
+    await expect(posts()).toBe(2);
+  },
+};
+
+/**
+ * Edit Labour: Photo & documents first. Take photo opens the camera (a
+ * stand-in here); Use photo uploads the frame as a JPEG.
+ */
+export const EditTakesPhoto: Story = {
   render: () => (
-    <StoryQueryClient>
-      <EditLabourScreen id={DHURESH.id} />
-    </StoryQueryClient>
+    <CameraContext value={fakeCamera()}>
+      <StoryQueryClient>
+        <EditLabourScreen id={DHURESH.id} />
+      </StoryQueryClient>
+    </CameraContext>
   ),
   beforeEach: () => {
     api = mockFetch([
@@ -415,8 +504,9 @@ export const EditProjects: Story = {
       },
       {
         method: "POST",
-        path: `${LABOURS}/${DHURESH.id}/update`,
-        respond: () => Response.json(DHURESH),
+        path: `${LABOURS}/${DHURESH.id}/photo`,
+        respond: () =>
+          Response.json({ photoUrl: `${LABOURS}/${DHURESH.id}/photo?v=1` }),
       },
     ]);
     return api.restore;
@@ -426,25 +516,28 @@ export const EditProjects: Story = {
     await expect(
       await canvas.findByRole("heading", { name: "Edit Dhuresh Nawin" }),
     ).toBeVisible();
-    await expect(canvas.getByText(/counts from today/)).toBeVisible();
-    await expect(
-      canvas.getByText("Site Engineers on their Projects: Sundar Rajan."),
-    ).toBeVisible();
-    await userEvent.click(canvas.getByRole("combobox", { name: "Projects" }));
-    await userEvent.click(
-      await body.findByRole("option", { name: "Villa Phase 2" }),
+    await userEvent.click(canvas.getByRole("button", { name: "Take photo" }));
+    const dialog = within(
+      await body.findByRole("dialog", { name: "Take photo" }),
     );
-    await userEvent.keyboard("{Escape}");
+    await expect(dialog.getByLabelText("Camera")).toBeInTheDocument();
+    await userEvent.click(dialog.getByRole("button", { name: "Take photo" }));
+    await expect(await dialog.findByAltText("The frame taken")).toBeVisible();
+    await userEvent.click(dialog.getByRole("button", { name: "Retake" }));
+    await expect(dialog.queryByAltText("The frame taken")).toBeNull();
+    await userEvent.click(dialog.getByRole("button", { name: "Take photo" }));
     await userEvent.click(
-      canvas.getByRole("button", { name: "Remove Tower A" }),
+      await dialog.findByRole("button", { name: "Use photo" }),
     );
-    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await waitFor(() =>
-      expect(sent(`${LABOURS}/${DHURESH.id}/update`)).toBeDefined(),
+      expect(body.queryByRole("dialog", { name: "Take photo" })).toBeNull(),
     );
-    await expect(sent(`${LABOURS}/${DHURESH.id}/update`)).toMatchObject({
-      projectIds: [VILLA.id],
-    });
+    const upload = api.spy.mock.calls.find(
+      ([input, init]) =>
+        init?.method === "POST" && input === `${LABOURS}/${DHURESH.id}/photo`,
+    );
+    await expect(upload?.[1]?.body).toBeInstanceOf(File);
+    await expect((upload?.[1]?.body as File).type).toBe("image/jpeg");
   },
 };
 

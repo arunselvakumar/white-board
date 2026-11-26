@@ -73,6 +73,10 @@ export function fakeCamera({
     const capture = useCallback(() => {
       onEvent?.("capture");
       return Promise.resolve({
+        blob: new Blob(
+          [Uint8Array.from(atob(STILL_JPEG_BASE64), (c) => c.charCodeAt(0))],
+          { type: "image/jpeg" },
+        ),
         base64: STILL_JPEG_BASE64,
         previewUrl: `data:image/jpeg;base64,${STILL_JPEG_BASE64}`,
       });

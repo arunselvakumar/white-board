@@ -11,7 +11,6 @@ import {
   CATEGORY_LIST,
   HELPER,
   MASON,
-  PROJECT_OPTIONS,
   MUTHU_GANG,
 } from "./vendor-fixtures";
 
@@ -33,10 +32,6 @@ function posts(): number {
 }
 
 const LOOKUPS = [
-  {
-    path: "/api/construction/projects/projects/options",
-    respond: () => Response.json({ items: PROJECT_OPTIONS }),
-  },
   {
     path: "/api/construction/masters/labour-categories",
     respond: () => Response.json(CATEGORY_LIST),
@@ -103,9 +98,18 @@ export const AddWithRateCard: Story = {
     await userEvent.type(canvas.getByLabelText("Vendor name"), "Muthu Gang");
     await userEvent.type(canvas.getByLabelText("Contact number"), "7708165767");
     await userEvent.type(canvas.getByLabelText("Opening balance"), "25000");
-    await userEvent.click(
-      await canvas.findByRole("checkbox", { name: "Tower A" }),
-    );
+    // Photo & documents come first; Projects are set from the Project.
+    await expect(
+      canvas
+        .getAllByRole("heading", { level: 2 })
+        .map((heading) => heading.textContent),
+    ).toEqual(["Photo & documents", "Details", "Rate card"]);
+    await expect(
+      canvas.getByRole("button", { name: "Take photo" }),
+    ).toBeVisible();
+    await expect(
+      canvas.queryByRole("checkbox", { name: "Tower A" }),
+    ).toBeNull();
 
     await choose(
       canvas,
@@ -177,7 +181,6 @@ export const AddWithRateCard: Story = {
       name: "Muthu Gang",
       contactNumber: "7708165767",
       address: null,
-      projectIds: [PROJECT_OPTIONS[0]?.id],
       openingBalance: 2_500_000,
       shifts: [
         {
@@ -317,6 +320,10 @@ export const EditReplacesTheRateCard: Story = {
       ...LOOKUPS,
       { path: EDIT_PATH, respond: () => Response.json(MUTHU_GANG) },
       {
+        path: `${EDIT_PATH}/documents`,
+        respond: () => Response.json({ items: [] }),
+      },
+      {
         method: "POST",
         path: `${EDIT_PATH}/update`,
         respond: () => Response.json(MUTHU_GANG),
@@ -343,10 +350,14 @@ export const EditReplacesTheRateCard: Story = {
     await waitFor(() =>
       expect(getRouter().push).toHaveBeenCalledWith("/app/staff/vendors"),
     );
+    // Left out, so their Projects are kept.
+    await expect(sent(`${EDIT_PATH}/update`)).not.toHaveProperty("projectIds");
+    await expect(
+      canvas.getByRole("heading", { name: "Photo & documents" }),
+    ).toBeVisible();
     await expect(sent(`${EDIT_PATH}/update`)).toMatchObject({
       expectedUpdatedAt: MUTHU_GANG.updatedAt,
       openingBalance: 2_500_000,
-      projectIds: [PROJECT_OPTIONS[0]?.id],
       shifts: [
         {
           id: MUTHU_GANG.shifts[0]?.id,
@@ -394,6 +405,10 @@ export const EditWithoutFinancialHidesAmounts: Story = {
     api = mockFetch([
       ...LOOKUPS,
       { path: EDIT_PATH, respond: () => Response.json(hidden) },
+      {
+        path: `${EDIT_PATH}/documents`,
+        respond: () => Response.json({ items: [] }),
+      },
       {
         method: "POST",
         path: `${EDIT_PATH}/update`,

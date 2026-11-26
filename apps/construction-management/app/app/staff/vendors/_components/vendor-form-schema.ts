@@ -40,7 +40,6 @@ const baseSchema = z.object({
       message: "Enter a valid 10-digit mobile number",
     }),
   address: z.string().max(500, "Use at most 500 characters"),
-  projectIds: z.array(z.string()),
   /** Rupees as typed; negative for an advance given before the app. */
   openingBalance: z.string(),
   shifts: z.array(shiftSchema),
@@ -153,7 +152,6 @@ export function vendorFormDefaults(
       joiningDate: today(),
       contactNumber: "",
       address: "",
-      projectIds: [],
       openingBalance: "",
       shifts: [emptyShift(0)],
     };
@@ -162,7 +160,6 @@ export function vendorFormDefaults(
     joiningDate: vendor.joiningDate,
     contactNumber: nationalMobile(vendor.contactNumber),
     address: vendor.address ?? "",
-    projectIds: vendor.projects.map((project) => project.id),
     openingBalance:
       vendor.openingBalance == null || vendor.openingBalance === 0
         ? ""
@@ -190,7 +187,7 @@ function blankToNull(value: string): string | null {
 export function vendorPayload(
   values: VendorFormValues,
   showAmounts: boolean,
-): Required<Omit<VendorInput, "contactNumber" | "address">> & {
+): Required<Omit<VendorInput, "contactNumber" | "address" | "projectIds">> & {
   contactNumber: string | null;
   address: string | null;
 } {
@@ -199,7 +196,6 @@ export function vendorPayload(
     joiningDate: values.joiningDate,
     contactNumber: blankToNull(values.contactNumber),
     address: blankToNull(values.address),
-    projectIds: values.projectIds,
     shifts: values.shifts.map((shift) => ({
       id: shift.shiftId,
       name: shift.name.trim(),

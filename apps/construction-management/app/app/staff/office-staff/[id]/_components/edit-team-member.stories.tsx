@@ -455,19 +455,20 @@ export const AttendanceWithoutHrmsAccess: Story = {
   },
 };
 
-/** The tab is kept in the address: Projects opens from `?tab=projects`. */
-export const ProjectsTabFromAddress: Story = {
-  parameters: { searchParams: "?tab=projects" },
-  beforeEach: serve(MEMBER, [
-    {
-      path: "/api/construction/projects/projects/options",
-      respond: () => Response.json({ items: [] }),
-    },
-  ]),
+/**
+ * The tab is kept in the address: Role opens from `?tab=role`. There is no
+ * Projects tab: Team Members are put on a Project from its Resources.
+ */
+export const RoleTabFromAddress: Story = {
+  parameters: { searchParams: "?tab=role" },
+  beforeEach: serve(MEMBER),
   play: async ({ canvas }) => {
     await expect(
-      await canvas.findByRole("tab", { name: "Projects", selected: true }),
+      await canvas.findByRole("tab", { name: "Role", selected: true }),
     ).toBeVisible();
+    await expect(
+      canvas.queryByRole("tab", { name: "Projects" }),
+    ).not.toBeInTheDocument();
   },
 };
 

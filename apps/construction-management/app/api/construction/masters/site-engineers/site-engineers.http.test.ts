@@ -245,7 +245,8 @@ describe("Site Engineers HTTP (ADR CM-0037)", () => {
       params(engineer.id),
     );
     expect(saved.status).toBe(StatusCodes.OK);
-    expect(await json(saved)).toMatchObject({
+    const savedBody = await json<SiteEngineer>(saved);
+    expect(savedBody).toMatchObject({
       name: "Karthik Raja S",
       address: "4 KK Nagar, Madurai",
       aadhaarMasked: "XXXXXXXX0124",
@@ -258,6 +259,20 @@ describe("Site Engineers HTTP (ADR CM-0037)", () => {
         where: { id: engineer.signIn.memberId ?? "" },
       });
     expect(member.name).toBe("Karthik Raja S");
+
+    // Projects left out are kept: the form no longer sends them (Site
+    // Engineers are put on a Project from the Project's Resources).
+    const kept = await update(
+      jsonRequest(`${BASE}/${engineer.id}/update`, owner.cookie, {
+        name: "Karthik Raja S",
+        mobile: engineer.mobile,
+        profile: { ...PROFILE, specialisation: "Civil" },
+        expectedUpdatedAt: savedBody.updatedAt,
+      }),
+      params(engineer.id),
+    );
+    expect(kept.status).toBe(StatusCodes.OK);
+    expect(await json(kept)).toMatchObject({ projectIds: [projectId] });
 
     const stale = await update(
       jsonRequest(`${BASE}/${engineer.id}/update`, owner.cookie, {

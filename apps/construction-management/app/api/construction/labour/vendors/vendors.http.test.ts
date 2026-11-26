@@ -401,17 +401,22 @@ describe("Vendors HTTP (CM-208, CM-209)", () => {
     expect(stale.status).toBe(StatusCodes.CONFLICT);
     expect((await json<{ code: string }>(stale)).code).toBe("VENDOR_CHANGED");
 
-    // An unchanged opening balance writes no entries.
-    await updateVendor(
+    // An unchanged opening balance writes no entries. Projects left out
+    // are kept: the Vendor form no longer sends them (they are set from
+    // the Project's Resources).
+    const kept = await updateVendor(
       jsonRequest(`${BASE}/${created.id}/update`, company.cookie, {
         name: "Muthu Gang (Nagercoil)",
         joiningDate: "2026-04-02",
-        projectIds: [f.villa],
         shifts: [],
         expectedUpdatedAt: updated.updatedAt,
       }),
       params(created.id),
     );
+    expect(kept.status).toBe(StatusCodes.OK);
+    expect(
+      (await json<Vendor>(kept)).projects.map((project) => project.id),
+    ).toEqual([f.villa]);
     expect(await ledger(company.workspaceId, created.id)).toHaveLength(3);
   });
 

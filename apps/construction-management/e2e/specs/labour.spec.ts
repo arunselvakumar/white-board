@@ -10,6 +10,7 @@ import { labourAttendancePageTest } from "../helpers/labourAttendancePageTest";
 import { AddLabourPage } from "../pages/AddLabourPage";
 import { LabourAttendancePage } from "../pages/LabourAttendancePage";
 import { LaboursPage } from "../pages/LaboursPage";
+import { ResourcesPage } from "../pages/ResourcesPage";
 import { WagesPage } from "../pages/WagesPage";
 
 labourAttendancePageTest.describe("Labour", () => {
@@ -23,13 +24,17 @@ labourAttendancePageTest.describe("Labour", () => {
       await addLabourPage.fill({
         name,
         wagePerDay: "850",
-        projects: [project.name],
         joiningDate: todayInIndia(-10),
       });
       await addLabourPage.saveButton.click();
       const laboursPage = new LaboursPage(page);
       await expect(page).toHaveURL(laboursPage.url);
       await expect(laboursPage.row(name)).toContainText("₹850.00 / day");
+
+      // Projects are set from the Project, not on Add Labour.
+      const resourcesPage = new ResourcesPage(page, project.id);
+      await resourcesPage.goto();
+      await resourcesPage.addLabours([name]);
 
       const attendancePage = new LabourAttendancePage(page, project.id);
       await attendancePage.goto();

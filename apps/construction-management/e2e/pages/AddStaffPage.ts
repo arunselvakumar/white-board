@@ -41,10 +41,6 @@ export class AddStaffPage extends AppShellPage {
     return this.page.getByRole("link", { name: "Cancel" });
   }
 
-  public projectCheckbox(name: string) {
-    return this.page.getByRole("checkbox", { name });
-  }
-
   public async fillDetails(input: {
     name: string;
     email?: string;

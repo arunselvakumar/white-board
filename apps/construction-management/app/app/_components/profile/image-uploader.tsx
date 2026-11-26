@@ -1,6 +1,6 @@
 "use client";
 
-import { ImageUp, Trash2 } from "lucide-react";
+import { Camera, ImageUp, Trash2 } from "lucide-react";
 import { useRef, useState, type ReactNode } from "react";
 import {
   Avatar,
@@ -10,6 +10,7 @@ import {
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 
+import { TakePhotoDialog } from "@/app/app/_components/camera/take-photo-dialog";
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";
 import {
@@ -32,7 +33,10 @@ export function imageFileProblem(file: File, kind: ImageKind): string | null {
 
 /**
  * Preview, upload, replace and remove for one image (Company logo, My
- * Profile photo). The file goes to our own route, never straight to storage.
+ * Profile photo, a Labour's or Vendor's photo). With `camera`, Take photo
+ * opens the device camera (a phone's, or a laptop's webcam) as another
+ * way to set it. The file goes to our own route, never straight to
+ * storage.
  */
 export function ImageUploader({
   kind,
@@ -42,6 +46,7 @@ export function ImageUploader({
   shape,
   hint,
   disabled = false,
+  camera = false,
   onUpload,
   onRemove,
 }: {
@@ -53,12 +58,15 @@ export function ImageUploader({
   shape: "square" | "circle";
   hint: string;
   disabled?: boolean;
+  /** Offer Take photo beside Upload: for photos of people. */
+  camera?: boolean;
   onUpload: (file: File) => Promise<unknown>;
   onRemove: () => Promise<unknown>;
 }) {
   const input = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<"upload" | "remove" | null>(null);
+  const [taking, setTaking] = useState(false);
   const hasImage = imageUrl != null;
 
   const run = async (
@@ -136,6 +144,21 @@ export function ImageUploader({
                 ? `Replace ${noun}`
                 : `Upload ${noun}`}
           </Button>
+          {camera && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={disabled || busy != null}
+              onClick={() => {
+                setError(null);
+                setTaking(true);
+              }}
+            >
+              <Camera />
+              Take {noun}
+            </Button>
+          )}
           {hasImage && (
             <Button
               type="button"
@@ -154,6 +177,14 @@ export function ImageUploader({
         <p className="text-muted-foreground text-xs">{hint}</p>
         <FormAlert message={error ?? undefined} />
       </div>
+      {camera && (
+        <TakePhotoDialog
+          open={taking}
+          onOpenChange={setTaking}
+          noun={noun}
+          onTaken={onUpload}
+        />
+      )}
     </div>
   );
 }

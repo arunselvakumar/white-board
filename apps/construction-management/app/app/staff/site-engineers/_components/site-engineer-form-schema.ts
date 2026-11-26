@@ -120,8 +120,6 @@ const siteEngineerObject = z.object({
       message: "Enter an IFSC like HDFC0001234",
     }),
   bankName: upto(100, "Bank name is too long"),
-
-  projectIds: z.array(z.string()),
 });
 
 export type SiteEngineerFormValues = z.infer<typeof siteEngineerObject>;
@@ -133,7 +131,7 @@ export type SiteEngineerFormValues = z.infer<typeof siteEngineerObject>;
  * - `signIn`: the Sign-in card (Add, and Edit of one without a sign-in);
  *   one of Invite them or a password is required (ADR CM-0037).
  * - `membership`: the details their sign-in holds (email, address, KYC,
- *   salary, Projects). Off for a Site Engineer who is Office Staff.
+ *   salary). Off for a Site Engineer who is Office Staff.
  */
 export type SiteEngineerFormMode = {
   financial: boolean;
@@ -239,7 +237,6 @@ export function siteEngineerDefaults(
     accountNumber: "",
     ifsc: text(engineer?.bank?.ifsc),
     bankName: text(engineer?.bank?.bankName),
-    projectIds: engineer?.projectIds ?? [],
   };
 }
 
@@ -306,7 +303,6 @@ function detailsInput(
   details.emergencyContact = orNull(values.emergencyContact);
   details.aadhaar = secret(values.aadhaar, keepWhenBlank);
   details.pan = secret(values.pan, keepWhenBlank);
-  details.projectIds = values.projectIds;
   if (mode.financial) {
     const salary = wagePayload(values.salary);
     details.salaryType = salary.type;

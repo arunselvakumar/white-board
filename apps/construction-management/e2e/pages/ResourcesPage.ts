@@ -23,6 +23,17 @@ export class ResourcesPage extends ProjectPage {
     return this.button(`Edit ${name}`);
   }
 
+  /** Ticks one in a section's Edit dialog (Team Members, Vendors…) and saves. */
+  public async assign(
+    section: "Team Members" | "Contractors" | "Suppliers" | "Vendors",
+    name: string,
+  ) {
+    await this.editButton(section).click();
+    await this.dialog.getByRole("checkbox", { name: new RegExp(name) }).check();
+    await this.dialog.getByRole("button", { name: /Save/ }).click();
+    await this.dialog.waitFor({ state: "hidden" });
+  }
+
   /** Ticks Labours in Add Labours and saves them from today. */
   public async addLabours(names: string[], remark?: string) {
     await this.button("Add Labours").click();

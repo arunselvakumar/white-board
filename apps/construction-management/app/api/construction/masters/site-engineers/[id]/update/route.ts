@@ -40,7 +40,7 @@ export async function POST(
     await assertKnownProjects(
       projectDirectory,
       session.workspaceId,
-      model.projectIds,
+      model.projectIds ?? [],
     );
     const item = await handlers.update({
       workspaceId: session.workspaceId,

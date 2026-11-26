@@ -25,6 +25,8 @@ export type CameraStatus =
   "idle" | "starting" | "live" | "denied" | "unavailable" | "in_use" | "error";
 
 export type CapturedPhoto = {
+  /** The JPEG, for an upload that takes the file itself. */
+  blob: Blob;
   /** The JPEG as base64, without a `data:` prefix. */
   base64: string;
   /** For showing the photo taken; released when the camera unmounts. */
@@ -116,7 +118,8 @@ function base64Of(blob: Blob): Promise<string> {
 }
 
 /**
- * The device camera for a check-in photo (ADR CM-0043 §6): the rear camera
+ * The device camera, for a check-in photo (ADR CM-0043 §6) or a staff
+ * photo taken in place of an upload: the rear camera
  * first, any camera when there is none. Every track is stopped on `stop()`,
  * on unmount, when the page is left and while the tab is hidden; a camera
  * that was live starts again when the tab is back. When the browser has
@@ -292,7 +295,7 @@ export function useCamera(): Camera {
     const base64 = await base64Of(blob);
     const previewUrl = URL.createObjectURL(blob);
     previews.current.push(previewUrl);
-    return { base64, previewUrl };
+    return { blob, base64, previewUrl };
   }, []);
 
   // Already allowed: no tap needed to see the picture.
@@ -363,12 +366,12 @@ export function useCamera(): Camera {
 }
 
 /**
- * The camera the capture screen uses: the real one, or a stand-in a story
- * provides (Storybook cannot open a camera).
+ * The camera a screen uses (check-in capture, Take photo): the real one,
+ * or a stand-in a story provides (Storybook cannot open a camera).
  */
 export const CameraContext = createContext<() => Camera>(useCamera);
 
-export function useCheckInCamera(): Camera {
+export function useProvidedCamera(): Camera {
   const useProvidedCamera = use(CameraContext);
   return useProvidedCamera();
 }

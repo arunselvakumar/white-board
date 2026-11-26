@@ -49,8 +49,8 @@ import {
   stateSentence,
 } from "@/app/app/projects/[id]/attendance/check-in/_components/check-in-format";
 
-import { CameraCaptureError } from "./camera-frame";
-import { CaptureCameraPanel } from "./capture-camera-panel";
+import { CameraCaptureError } from "@/app/app/_components/camera/camera-frame";
+import { CaptureCameraPanel } from "@/app/app/_components/camera/capture-camera-panel";
 import { CaptureConfirmation } from "./capture-confirmation";
 import { CaptureSkeleton } from "./capture-skeletons";
 import {
@@ -59,7 +59,10 @@ import {
   TodayEntries,
   useDeviceLocation,
 } from "./capture-parts";
-import { useCheckInCamera, type CapturedPhoto } from "./use-camera";
+import {
+  useProvidedCamera,
+  type CapturedPhoto,
+} from "@/app/app/_components/camera/use-camera";
 import type { AppHref } from "@/lib/page-href";
 
 export const PRIVACY_LINE =
@@ -189,7 +192,7 @@ function Capture({
     checkInPersonQuery(projectId, kind, personId),
   );
   const { person, timeZone } = data;
-  const camera = useCheckInCamera();
+  const camera = useProvidedCamera();
   const [location, askLocation] = useDeviceLocation();
   // Leaving while a frame is still being encoded must not send an entry
   // the operator never sees confirmed.

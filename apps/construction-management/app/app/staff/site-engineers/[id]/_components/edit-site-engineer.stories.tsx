@@ -111,7 +111,7 @@ export const OwnSignIn: Story = {
     await expect(
       await canvas.findByRole("heading", { level: 1, name: "Karthik Raja" }),
     ).toBeVisible();
-    await canvas.findByRole("heading", { name: /^Projects/ });
+    await canvas.findByRole("heading", { name: /^KYC/ });
     await expect(cardTitles(canvas)).toEqual([
       "Details",
       "Sign-in",
@@ -120,7 +120,6 @@ export const OwnSignIn: Story = {
       "KYC",
       "Salary",
       "Bank",
-      "Projects",
     ]);
     await expect(
       canvas.getByText("Signs in with the Site Engineer Role"),
@@ -150,8 +149,8 @@ export const OwnSignIn: Story = {
       canvas.getByText("Leave blank to keep the account ending 6789."),
     ).toBeVisible();
     await expect(
-      await canvas.findByRole("checkbox", { name: /Sri Heights/ }),
-    ).toBeChecked();
+      canvas.queryByRole("checkbox", { name: /Sri Heights/ }),
+    ).not.toBeInTheDocument();
 
     await userEvent.clear(canvas.getByLabelText("Name"));
     await userEvent.type(canvas.getByLabelText("Name"), "Karthik Raja S");
@@ -163,7 +162,6 @@ export const OwnSignIn: Story = {
       email: "karthik@anugraha.in",
       expectedUpdatedAt: KARTHIK.updatedAt,
       salaryPerMonth: 4_500_000,
-      projectIds: [KARTHIK.projectIds[0]],
       bank: {
         accountHolder: "Karthik Raja",
         ifsc: "HDFC0001234",
@@ -173,6 +171,7 @@ export const OwnSignIn: Story = {
     await expect(body).not.toHaveProperty("aadhaar");
     await expect(body).not.toHaveProperty("pan");
     await expect(body).not.toHaveProperty("signIn");
+    await expect(body).not.toHaveProperty("projectIds");
     await expect(body["bank"]).not.toHaveProperty("accountNumber");
 
     // A Temporary Password from the Sign-in card.
@@ -356,14 +355,13 @@ export const WithoutFinancial: Story = {
     }),
   ),
   play: async ({ canvas, userEvent }) => {
-    await canvas.findByRole("heading", { name: /^Projects/ });
+    await canvas.findByRole("heading", { name: /^KYC/ });
     await expect(cardTitles(canvas)).toEqual([
       "Details",
       "Sign-in",
       "Personal",
       "Employment",
       "KYC",
-      "Projects",
     ]);
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await expect(await canvas.findByText("Saved.")).toBeVisible();

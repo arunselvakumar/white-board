@@ -490,7 +490,9 @@ export class VendorHandlers {
   }
 
   async update(
-    input: VendorWriteInput & {
+    input: Omit<VendorWriteInput, "projectIds"> & {
+      /** Left out keeps the vendor's Projects. */
+      projectIds?: readonly string[];
       id: string;
       expectedUpdatedAt: Date;
       /** Null keeps the current opening balance. */
@@ -499,7 +501,9 @@ export class VendorHandlers {
   ): Promise<VendorReadModel> {
     assertOpening(input.openingBalance);
     const vendor = await this.load(input.workspaceId, input.id);
-    await this.assertProjects(input.workspaceId, input.projectIds);
+    const projectIds = input.projectIds ?? vendor.projectIds;
+    if (input.projectIds !== undefined)
+      await this.assertProjects(input.workspaceId, input.projectIds);
     await this.assertCategories(
       input.workspaceId,
       input.shifts,
@@ -508,7 +512,7 @@ export class VendorHandlers {
     const now = this.clock();
     vendor.update({
       details: input.details,
-      projectIds: input.projectIds,
+      projectIds,
       shifts: input.shifts,
       newShiftId: () => newId(now.getTime()),
       by: input.by,

@@ -22,10 +22,16 @@ import {
   RAVI,
   STILL_JPEG_BASE64,
 } from "@/app/app/projects/[id]/attendance/check-in/_components/check-in-fixtures";
-import { CAMERA_MESSAGES } from "./capture-camera-panel";
+import { CAMERA_MESSAGES } from "@/app/app/_components/camera/capture-camera-panel";
 import { CheckInCaptureScreen, PRIVACY_LINE } from "./check-in-capture-screen";
-import { fakeCamera, type FakeCameraEvent } from "./fake-camera";
-import { CameraContext, type Camera } from "./use-camera";
+import {
+  fakeCamera,
+  type FakeCameraEvent,
+} from "@/app/app/_components/camera/fake-camera";
+import {
+  CameraContext,
+  type Camera,
+} from "@/app/app/_components/camera/use-camera";
 import { pageHref } from "@/lib/page-href";
 
 const FIND = pageHref("/app/projects/[id]/attendance/check-in", {

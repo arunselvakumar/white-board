@@ -1,5 +1,5 @@
 /*
- * The arithmetic of a check-in photo (ADR CM-0043 §6), kept apart from the
+ * The arithmetic of a camera photo (ADR CM-0043 §6), kept apart from the
  * browser so it can be tested as plain functions.
  */
 

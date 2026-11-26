@@ -16,6 +16,7 @@ import { AddStaffPage } from "../pages/AddStaffPage";
 import { EditStaffPage } from "../pages/EditStaffPage";
 import { JoinPage } from "../pages/JoinPage";
 import { ProjectsPage } from "../pages/ProjectsPage";
+import { ResourcesPage } from "../pages/ResourcesPage";
 import { SignUpPage } from "../pages/SignUpPage";
 import { StaffPage } from "../pages/StaffPage";
 import { signInByMobile } from "../api/session";
@@ -76,9 +77,8 @@ staffPageTest.describe("Staff", () => {
         password: PASSWORD,
         salary: "18,000",
       });
-      // One page: Details, Salary, Projects, Role and Sign-in together.
+      // One page: Details, Salary, Role and Sign-in together.
       await addStaffPage.workingHoursField.fill("9");
-      await addStaffPage.projectCheckbox(project.name).check();
       await addStaffPage.chooseRole("Site Supervisor");
       await addStaffPage.button("Add Staff").click();
       await expect(
@@ -94,10 +94,12 @@ staffPageTest.describe("Staff", () => {
       const editStaffPage = new EditStaffPage(page);
       await expect(editStaffPage.salaryField).toHaveValue("18000");
       await expect(editStaffPage.workingHoursField).toHaveValue("9");
-      await editStaffPage.tab("Projects").click();
-      await expect(
-        page.getByRole("checkbox", { name: project.name }),
-      ).toBeChecked();
+
+      // Projects are set from the Project's Team Members, not here.
+      const resourcesPage = new ResourcesPage(page, project.id);
+      await resourcesPage.goto();
+      await resourcesPage.assign("Team Members", name);
+      await expect(resourcesPage.section("Team Members")).toContainText(name);
     },
   );
 

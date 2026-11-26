@@ -56,7 +56,7 @@ export async function POST(request: Request): Promise<Response> {
     await assertKnownProjects(
       projectDirectory,
       session.workspaceId,
-      model.projectIds,
+      model.projectIds ?? [],
     );
     const created = await handlers.create({
       workspaceId: session.workspaceId,
