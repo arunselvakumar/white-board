@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { TableCard } from "@/app/(app)/_components/table-card";
 
 import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import { addMonths, dateKeyInZone, formatDate } from "@/lib/calendar-dates";
@@ -191,7 +192,7 @@ function SourcesTable({
           No Enquiries this month.
         </p>
       ) : (
-        <div className="overflow-hidden rounded-xl border">
+        <TableCard>
           <Table className="text-[13px] sm:text-sm">
             <TableHeader>
               <TableRow className="hover:bg-transparent">
@@ -244,7 +245,7 @@ function SourcesTable({
               })}
             </TableBody>
           </Table>
-        </div>
+        </TableCard>
       )}
     </section>
   );
@@ -265,7 +266,7 @@ function NotInterestedReasons({
           No Enquiries were closed as Not interested this month.
         </p>
       ) : (
-        <ol className="divide-y rounded-xl border">
+        <ol className="bg-card divide-y rounded-xl border">
           {reasons.map((item, index) => (
             <li
               key={item.reason}

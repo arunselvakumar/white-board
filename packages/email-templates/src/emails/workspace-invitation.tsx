@@ -11,6 +11,8 @@ export type WorkspaceInvitationEmailProps = {
   role: InvitationRole;
   acceptUrl: string;
   expiresInDays: number;
+  /** The Workspace's Institution Type. A Preschool has its own wording. */
+  institutionType?: string;
 };
 
 const ROLE_COPY: Record<InvitationRole, { noun: string; what: string }> = {
@@ -28,14 +30,34 @@ const ROLE_COPY: Record<InvitationRole, { noun: string; what: string }> = {
   },
 };
 
+/** In a Preschool the `teacher` member role covers Centre Heads and Teachers. */
+const PRESCHOOL_ROLE_COPY: Record<
+  InvitationRole,
+  { noun: string; what: string }
+> = {
+  teacher: {
+    noun: "a member of staff",
+    what: "mark attendance, send Daily Reports to Parents, and keep up with your Centre",
+  },
+  student: ROLE_COPY.student,
+  parent: {
+    noun: "a Parent",
+    what: "see your child's Daily Reports, attendance, fee dues, and Announcements",
+  },
+};
+
 export function WorkspaceInvitationEmail({
   workspaceName,
   inviterName,
   role,
   acceptUrl,
   expiresInDays,
+  institutionType,
 }: WorkspaceInvitationEmailProps) {
-  const copy = ROLE_COPY[role];
+  const copy =
+    institutionType === "preschool"
+      ? PRESCHOOL_ROLE_COPY[role]
+      : ROLE_COPY[role];
   return (
     <EmailLayout preview={`Join ${workspaceName} on Whiteboard`}>
       <Heading as="h1" style={styles.heading}>

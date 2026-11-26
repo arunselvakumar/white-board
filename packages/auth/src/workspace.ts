@@ -3,7 +3,10 @@
  * ADR-0034). The full catalog, with the coming-soon types, lives in the app's
  * `lib/institution-type.ts`; only these are accepted by the auth server.
  */
-export const AVAILABLE_INSTITUTION_TYPES = ["training_institute"] as const;
+export const AVAILABLE_INSTITUTION_TYPES = [
+  "training_institute",
+  "preschool",
+] as const;
 
 export type AvailableInstitutionType =
   (typeof AVAILABLE_INSTITUTION_TYPES)[number];

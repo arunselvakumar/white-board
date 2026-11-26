@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth, useSignOut, useUser } from "@repo/auth/react";
+import { useAuth, useSignOut, useUser, useWorkspace } from "@repo/auth/react";
 import { LogOut } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -30,12 +30,16 @@ import { SidebarGlide } from "@repo/ui/components/sidebar-glide";
 
 import { NotificationBell } from "@/app/(app)/_components/notifications/notification-bell";
 import { navForRole } from "@/lib/app-nav";
+import { isPreschool } from "@/lib/institution-type";
 
 import { AppBreadcrumbs } from "./app-breadcrumbs";
+import { PreschoolSidebarNav } from "./preschool-sidebar-nav";
 import { SIDEBAR_ROW_CLASS, SidebarMainNav } from "./sidebar-nav";
 import { SidebarTodayCard } from "./sidebar-today-card";
+import { SwitchCentre } from "./switch-centre";
 import { SwitchWorkspace } from "./switch-workspace";
 import { ThemeToggle } from "./theme-toggle";
+import { scrollFadeClass, useScrollFade } from "./use-scroll-fade";
 import { SidebarUserAccount } from "./user-menu";
 
 /** The bell on the sidebar's account row, in the sidebar's colours. */
@@ -64,8 +68,18 @@ function SidebarSignOut() {
   );
 }
 
+/**
+ * The in-app chrome. The menu follows the Institution Type, then the role
+ * (ADR-0055): a Preschool Workspace gets the Preschool menu and Switch
+ * Centre, and none of the Training Institute pieces (the Today card, the
+ * Notification bell), so it calls no Training Institute API.
+ */
 export function AppShell({ children }: { children: ReactNode }) {
   const { role } = useAuth();
+  const { workspace } = useWorkspace();
+  const preschool = isPreschool(workspace?.institutionType);
+  const teacherBell = role === "teacher" && !preschool;
+  const { ref: menuRef, fade: menuFade } = useScrollFade<HTMLDivElement>();
   const pathname = usePathname() || "/";
   const [menuQuery, setMenuQuery] = useState("");
   // Picking a row clears the search, so the next time the menu opens (the
@@ -88,8 +102,8 @@ export function AppShell({ children }: { children: ReactNode }) {
         <SidebarHeader className="gap-3 px-3 pt-4 pb-2">
           <SidebarUserAccount
             before={
-              // Only Teachers receive Notifications (ADR-0041 §1).
-              role === "teacher" ? (
+              // Only Training Institute Teachers receive Notifications (ADR-0041 §1).
+              teacherBell ? (
                 <NotificationBell className={SIDEBAR_BELL_CLASS} />
               ) : null
             }
@@ -103,21 +117,31 @@ export function AppShell({ children }: { children: ReactNode }) {
             }}
           />
         </SidebarHeader>
-        <SidebarContent>
+        <SidebarContent
+          ref={menuRef}
+          data-fade-top={menuFade.top || undefined}
+          data-fade-bottom={menuFade.bottom || undefined}
+          className={scrollFadeClass(menuFade)}
+        >
           {/* One hover pill per scrolling region (ADR-0050). */}
           <SidebarGlide>
-            <SidebarGroup className="px-3 pt-2">
-              <SidebarSectionLabel>Main menu</SidebarSectionLabel>
-              <SidebarGroupContent>
-                <SidebarMainNav items={navigation} query={menuQuery} />
-              </SidebarGroupContent>
-            </SidebarGroup>
+            {preschool ? (
+              <PreschoolSidebarNav query={menuQuery} />
+            ) : (
+              <SidebarGroup className="px-3 pt-2">
+                <SidebarSectionLabel>Main menu</SidebarSectionLabel>
+                <SidebarGroupContent>
+                  <SidebarMainNav items={navigation} query={menuQuery} />
+                </SidebarGroupContent>
+              </SidebarGroup>
+            )}
           </SidebarGlide>
         </SidebarContent>
         <SidebarFooter className="gap-2 px-3 pt-2 pb-3">
-          {role === "owner" ? <SidebarTodayCard /> : null}
+          {role === "owner" && !preschool ? <SidebarTodayCard /> : null}
           <SidebarGlide>
             <SidebarMenu className="gap-1">
+              {preschool ? <SwitchCentre /> : null}
               <SidebarMenuItem>
                 <SwitchWorkspace />
               </SidebarMenuItem>
@@ -144,7 +168,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             />
             <span className="truncate text-sm font-semibold">Whiteboard</span>
           </p>
-          {role === "teacher" ? (
+          {teacherBell ? (
             <div className="ml-auto">
               <NotificationBell />
             </div>

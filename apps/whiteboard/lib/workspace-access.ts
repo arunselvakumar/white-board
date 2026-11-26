@@ -1,5 +1,6 @@
 import type { WorkspaceRole as Role } from "@repo/auth/roles";
 
+import type { PreschoolRole } from "@/src/queries/preschool/me";
 import {
   isReportKey,
   reportDefinition,
@@ -128,19 +129,87 @@ const ROLE_GATED_AREAS = new Set([
   "reports",
 ]);
 
+/** `/preschool` and everything under it: the Preschool screens (ADR-0055). */
+export function isPreschoolPath(pathname: string): boolean {
+  return pathname === "/preschool" || pathname.startsWith("/preschool/");
+}
+
 /**
  * True when a User with `role` must be sent from this in-app path to the
  * In-app Home. The Workspace Gate checks it on every navigation; the APIs
  * behind each screen enforce the same roles with 403 (ADR-0013).
+ *
+ * Screens follow the Institution Type first (ADR-0055): a Preschool
+ * Workspace opens only the In-app Home and `/preschool/**`, and no other
+ * Workspace opens `/preschool/**`. Without a type, a Training Institute.
  */
 export function mustLeaveAppPath(
   pathname: string,
   role: WorkspaceRole,
+  institutionType?: string | null,
 ): boolean {
+  if (institutionType === "preschool")
+    return pathname !== "/" && !isPreschoolPath(pathname);
+  if (isPreschoolPath(pathname)) return true;
   const area = pathname.split("/")[1];
   return (
     area != null &&
     ROLE_GATED_AREAS.has(area) &&
     !isAllowedAppPath(pathname, role)
   );
+}
+
+/** Where each Preschool role lands: the In-app Home sends them here. */
+export function preschoolHomeFor(role: PreschoolRole): string {
+  if (role === "teacher") return "/preschool/teacher";
+  if (role === "parent") return "/preschool/family";
+  return "/preschool";
+}
+
+/** Areas under `/preschool` a Teacher may not open: fee amounts and masters. */
+const TEACHER_CLOSED_AREAS = new Set([
+  "",
+  "fees",
+  "centres",
+  "staff",
+  "head-office",
+  "programmes",
+  "stock",
+  "enquiries",
+]);
+
+/** Screens inside an open area that still only managers use: admitting a Child. */
+const TEACHER_CLOSED_PATH = /^\/preschool\/children\/new(?:\/|$)/;
+
+/**
+ * Head Office screens and Workspace-wide masters: the Owner only. Fee
+ * Structures stay open to a Centre Head, who sees their Centre's amounts,
+ * and so does one Stock Item's ledger (`/preschool/stock/items/<id>`); the
+ * Stock Items list itself is the Owner's.
+ */
+const OWNER_ONLY_PATH =
+  /^\/preschool\/(?:(?:head-office|centres|programmes)(?:\/|$)|stock\/items\/?$)/;
+
+/**
+ * Whether a Preschool role may open a path under `/preschool` (ADR-0055).
+ * Parents open only the family area; Teachers their Home and the Classroom
+ * screens, never fees or masters; Centre Heads everything inside a Centre;
+ * the Owner everything but the Teacher and family Homes. The APIs enforce
+ * the same with 403.
+ */
+export function isAllowedPreschoolPath(
+  pathname: string,
+  role: PreschoolRole,
+): boolean {
+  if (!isPreschoolPath(pathname)) return false;
+  const area = pathname.split("/")[2] ?? "";
+  if (role === "parent") return area === "family";
+  if (area === "family") return false;
+  if (role === "teacher")
+    return (
+      !TEACHER_CLOSED_AREAS.has(area) && !TEACHER_CLOSED_PATH.test(pathname)
+    );
+  if (area === "teacher") return false;
+  if (role === "centre_head") return !OWNER_ONLY_PATH.test(pathname);
+  return true;
 }

@@ -143,3 +143,38 @@ export const RoleCanOpenScreen: Story = {
     await expect(getRouter().replace).not.toHaveBeenCalled();
   },
 };
+
+/** A Preschool Workspace leaves Training Institute screens for the In-app Home. */
+export const PreschoolLeavesTrainingInstituteScreens: Story = {
+  parameters: { nextjs: { navigation: { pathname: "/students" } } },
+  beforeEach() {
+    signInAs("owner", { name: "Little Steps", institutionType: "preschool" });
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.queryByText("In-app home")).not.toBeInTheDocument();
+    await waitFor(() => expect(getRouter().replace).toHaveBeenCalledWith("/"));
+  },
+};
+
+export const PreschoolOpensPreschoolScreens: Story = {
+  parameters: { nextjs: { navigation: { pathname: "/preschool/centres" } } },
+  beforeEach() {
+    signInAs("owner", { name: "Little Steps", institutionType: "preschool" });
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("In-app home")).toBeVisible();
+    await expect(getRouter().replace).not.toHaveBeenCalled();
+  },
+};
+
+/** A Training Institute Workspace leaves Preschool screens. */
+export const TrainingInstituteLeavesPreschoolScreens: Story = {
+  parameters: { nextjs: { navigation: { pathname: "/preschool" } } },
+  beforeEach() {
+    signInAs("owner", { name: "Riverside School" });
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.queryByText("In-app home")).not.toBeInTheDocument();
+    await waitFor(() => expect(getRouter().replace).toHaveBeenCalledWith("/"));
+  },
+};

@@ -77,7 +77,7 @@ async function requireOwner(workspaceId: string, userId: string) {
     select: {
       role: true,
       user: { select: { name: true, username: true, email: true } },
-      workspace: { select: { name: true } },
+      workspace: { select: { name: true, institutionType: true } },
     },
   });
   if (member == null)
@@ -89,6 +89,25 @@ async function requireOwner(workspaceId: string, userId: string) {
     throw new WorkspaceAccessError(
       "NOT_WORKSPACE_OWNER",
       "Only the Workspace Owner can do this.",
+    );
+  return member;
+}
+
+/** The Workspace Owner's member row; there is exactly one per Workspace. */
+async function findOwner(workspaceId: string) {
+  const member = await prisma.identityWorkspaceMember.findFirst({
+    where: { organizationId: workspaceId, role: "owner" },
+    orderBy: { createdAt: "asc" },
+    select: {
+      userId: true,
+      user: { select: { name: true, username: true, email: true } },
+      workspace: { select: { name: true, institutionType: true } },
+    },
+  });
+  if (member == null)
+    throw new WorkspaceAccessError(
+      "WORKSPACE_NOT_FOUND",
+      "The Workspace was not found.",
     );
   return member;
 }
@@ -151,6 +170,11 @@ export const workspaces = {
    * Invites an email to a Workspace and sends the invitation email. A pending
    * invitation for the same email is reused unless `replacePending` is set, in
    * which case it is cancelled and a new one is sent.
+   *
+   * Only the Owner may invite. With `onBehalfOfOwner`, the caller has already
+   * decided that `inviterUserId` may invite for the Workspace (a Preschool
+   * Centre Head adding Staff or admitting a Child); the invitation is then
+   * recorded and sent as coming from the Owner.
    */
   async invite(input: {
     workspaceId: string;
@@ -158,6 +182,7 @@ export const workspaces = {
     email: string;
     role: InvitableRole;
     replacePending?: boolean;
+    onBehalfOfOwner?: boolean;
   }): Promise<InviteResult> {
     if (!isInvitableRole(input.role))
       throw new WorkspaceAccessError(
@@ -170,7 +195,12 @@ export const workspaces = {
         "INVALID_EMAIL",
         "Enter a valid email address.",
       );
-    const owner = await requireOwner(input.workspaceId, input.inviterUserId);
+    const owner = input.onBehalfOfOwner
+      ? await findOwner(input.workspaceId)
+      : {
+          ...(await requireOwner(input.workspaceId, input.inviterUserId)),
+          userId: input.inviterUserId,
+        };
 
     const now = new Date();
     let outcome: InviteResult;
@@ -209,7 +239,7 @@ export const workspaces = {
             expiresAt: new Date(
               now.getTime() + INVITATION_EXPIRES_IN_SECONDS * 1000,
             ),
-            inviterId: input.inviterUserId,
+            inviterId: owner.userId,
             createdAt: now,
           },
         });
@@ -243,6 +273,7 @@ export const workspaces = {
         role: input.role,
         workspaceName: owner.workspace.name,
         inviterName: inviterDisplayName(owner.user),
+        institutionType: owner.workspace.institutionType,
       });
     } catch (error) {
       // An invitation nobody received must not block a later retry.
@@ -401,6 +432,19 @@ export const workspaces = {
       select: { name: true },
     });
     return workspace?.name ?? "Workspace";
+  },
+
+  /**
+   * A Workspace's Institution Type (`training_institute`, `preschool`), or
+   * null when there is no such Workspace. Product code branches on it; it
+   * never changes after Workspace Creation.
+   */
+  async institutionType(workspaceId: string): Promise<string | null> {
+    const workspace = await prisma.identityWorkspace.findUnique({
+      where: { id: workspaceId },
+      select: { institutionType: true },
+    });
+    return workspace?.institutionType ?? null;
   },
 
   /** A User's display name for screens such as the Class pre-join page. */

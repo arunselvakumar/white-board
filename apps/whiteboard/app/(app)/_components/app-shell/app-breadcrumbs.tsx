@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@repo/auth/react";
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -13,10 +14,21 @@ import {
 } from "@repo/ui/components/breadcrumb";
 
 import { getAppBreadcrumbs } from "@/lib/app-breadcrumbs";
+import { preschoolBreadcrumbs } from "@/lib/preschool-nav";
+import { isPreschoolPath } from "@/lib/workspace-access";
+import { preschoolMeQueryOptions } from "@/src/queries/preschool/me";
 
 export function AppBreadcrumbs() {
   const { role } = useAuth();
-  const crumbs = getAppBreadcrumbs(usePathname() || "/", role);
+  const pathname = usePathname() || "/";
+  const preschool = isPreschoolPath(pathname);
+  const { data: me } = useQuery({
+    ...preschoolMeQueryOptions(),
+    enabled: preschool,
+  });
+  const crumbs = preschool
+    ? preschoolBreadcrumbs(pathname, me?.role)
+    : getAppBreadcrumbs(pathname, role);
 
   return (
     <Breadcrumb className="min-w-0 overflow-x-auto" aria-label="Breadcrumb">

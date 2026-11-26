@@ -218,6 +218,10 @@ import {
   TrainingInstituteNotificationModel,
   TrainingInstituteUnreadNotificationsResponseModel,
 } from "../training-institute/notifications/notification-models";
+import {
+  preschoolComponents,
+  preschoolOperations,
+} from "../preschool/_lib/openapi";
 import { buildOpenApiDocument } from "./openapi";
 
 export const openApiDocument = buildOpenApiDocument(
@@ -1865,6 +1869,7 @@ export const openApiDocument = buildOpenApiDocument(
       successDescription: "Saved",
       errors: [400, 401, 403, 404, 500],
     },
+    ...preschoolOperations,
   ],
   {
     DownloadTrainingInstituteReportRequestModel,
@@ -2001,5 +2006,6 @@ export const openApiDocument = buildOpenApiDocument(
     ListTrainingInstituteNotificationsResponseModel,
     TrainingInstituteNotificationModel,
     TrainingInstituteUnreadNotificationsResponseModel,
+    ...preschoolComponents,
   },
 );

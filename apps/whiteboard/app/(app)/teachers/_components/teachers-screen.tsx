@@ -28,7 +28,7 @@ export function TeachersScreen() {
         {data.items.length === 0 ? (
           <TeachersEmptyState />
         ) : (
-          <div className="divide-y rounded-xl border">
+          <div className="bg-card divide-y rounded-xl border">
             {data.items.map((teacher) => (
               <Link
                 key={teacher.id}

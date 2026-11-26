@@ -32,6 +32,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/table";
+import { TableCard } from "@/app/(app)/_components/table-card";
 
 import { PageHeader } from "@/app/(app)/_components/app-shell/page-header";
 import { CollectPaymentForm } from "@/app/(app)/enrollments/[id]/_components/collect-payment-form";
@@ -211,39 +212,43 @@ export function EnrollmentDetailScreen({
         {payments.items.length === 0 ? (
           <p className="text-muted-foreground text-sm">No Fee Payments yet.</p>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Receipt</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Method</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {payments.items.map((payment) => (
-                <TableRow key={payment.id}>
-                  <TableCell>{payment.receiptNumber}</TableCell>
-                  <TableCell>
-                    {formatPaiseAsRupees(payment.amountPaise)}
-                  </TableCell>
-                  <TableCell className="capitalize">{payment.method}</TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        router.push(`/payments/${payment.id}/receipt`);
-                      }}
-                    >
-                      Receipt
-                    </Button>
-                  </TableCell>
+          <TableCard>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Receipt</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Method</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {payments.items.map((payment) => (
+                  <TableRow key={payment.id}>
+                    <TableCell>{payment.receiptNumber}</TableCell>
+                    <TableCell>
+                      {formatPaiseAsRupees(payment.amountPaise)}
+                    </TableCell>
+                    <TableCell className="capitalize">
+                      {payment.method}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          router.push(`/payments/${payment.id}/receipt`);
+                        }}
+                      >
+                        Receipt
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableCard>
         )}
       </div>
       <FeeFollowUpsCard enrollmentId={enrollmentId} timezone={batch.timezone} />
