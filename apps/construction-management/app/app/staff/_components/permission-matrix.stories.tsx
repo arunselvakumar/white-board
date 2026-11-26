@@ -105,6 +105,7 @@ export const SelectsACategoryAndClearsAll: Story = {
       canvas.getByRole("checkbox", { name: "Select all in Others" }),
     );
     await expect(args.onChange).toHaveBeenLastCalledWith({
+      "organization.departments": ["create", "read", "update", "delete"],
       "reporting.central_reports": ["read"],
     });
     await userEvent.click(
