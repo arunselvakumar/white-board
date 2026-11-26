@@ -4,7 +4,7 @@ Turborepo monorepo for Whiteboard, managed with [Bun](https://bun.com).
 
 ## Apps and packages
 
-- `apps/whiteboard` — Next.js application (port 3000) with TanStack Query and HTTP APIs, plus Storybook (port 6006)
+- `apps/whiteboard` — Next.js application (port 3000) with TanStack Query and HTTP APIs
 - `apps/marketing` — Next.js marketing site (port 3001)
 - `apps/construction-management` — Next.js Construction Management app (port 3002)
 - `packages/db/whiteboard` (`@repo/whiteboard-db`) — Whiteboard's Prisma schema, migrations, and client
@@ -78,11 +78,11 @@ import { Button } from "@repo/ui/components/button";
 
 Type-checking uses TypeScript 7. ESLint still uses TypeScript 6 because typescript-eslint needs the compiler API, which TypeScript 7.0 does not have (ADR-0045).
 
-| Tool                                     | TypeScript | From                                                          |
-| ---------------------------------------- | ---------- | ------------------------------------------------------------- |
-| `bun run check-types` (`tsc`)            | 7.0.2      | `@typescript/native` alias at the root and in the packages    |
-| `next build` type check                  | 7.0.2      | `typescript` in each Next app; Next runs that package's `tsc` |
-| ESLint (typescript-eslint), Storybook, … | 6.0.2      | `typescript` at the root and in the packages                  |
+| Tool                          | TypeScript | From                                                          |
+| ----------------------------- | ---------- | ------------------------------------------------------------- |
+| `bun run check-types` (`tsc`) | 7.0.2      | `@typescript/native` alias at the root and in the packages    |
+| `next build` type check       | 7.0.2      | `typescript` in each Next app; Next runs that package's `tsc` |
+| ESLint (typescript-eslint), … | 6.0.2      | `typescript` at the root and in the packages                  |
 
 `check-versions` skips `typescript` because of this split. typescript-eslint loads `typescript` from the root, so the apps' lint still gets 6.0.2; check that it still does after changing either version.
 

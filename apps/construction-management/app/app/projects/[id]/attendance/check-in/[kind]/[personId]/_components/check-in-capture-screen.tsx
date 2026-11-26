@@ -60,7 +60,7 @@ import {
   useDeviceLocation,
 } from "./capture-parts";
 import {
-  useProvidedCamera,
+  useCamera,
   type CapturedPhoto,
 } from "@/app/app/_components/camera/use-camera";
 import type { AppHref } from "@/lib/page-href";
@@ -192,7 +192,7 @@ function Capture({
     checkInPersonQuery(projectId, kind, personId),
   );
   const { person, timeZone } = data;
-  const camera = useProvidedCamera();
+  const camera = useCamera();
   const [location, askLocation] = useDeviceLocation();
   // Leaving while a frame is still being encoded must not send an entry
   // the operator never sees confirmed.

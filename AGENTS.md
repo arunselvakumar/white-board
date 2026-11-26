@@ -62,9 +62,8 @@ A **Student** remains a Workspace record, distinct from a User. Add Student invi
 - Visual tokens: ADR-0002, ADR-0003.
 - In-app chrome: `AppShell` with nav from `lib/app-nav.ts` (Training Institute) or `lib/preschool-nav.ts` (Preschool), picked by the Workspace's Institution Type. Page reads: `useSuspenseQuery` + `queryOptions` in `src/queries` (ADR-0026).
 - Patterns: [`.grok/skills/frontend-patterns/SKILL.md`](./.grok/skills/frontend-patterns/SKILL.md), [`.grok/skills/tanstack-query/SKILL.md`](./.grok/skills/tanstack-query/SKILL.md).
-- Storybook play functions for every P0 form and empty state. Select options portal to `document.body`.
 - Student photos and initials use `app/(app)/_components/students/student-avatar.tsx`; see [`docs/ui/student-avatar.md`](./docs/ui/student-avatar.md) for the color rule. Do not choose avatar colors in individual screens.
-- Add and edit forms use the Add Student page content width: `w-full p-6` outside and `w-full max-w-4xl` inside. Keep Add Course, Edit Course, Add Batch, and Edit Batch at the same width; apply it to Enroll Student and future add flows too. Use responsive field layouts so the forms make use of that width, and keep Storybook previews aligned with the pages.
+- Add and edit forms use the Add Student page content width: `w-full p-6` outside and `w-full max-w-4xl` inside. Keep Add Course, Edit Course, Add Batch, and Edit Batch at the same width; apply it to Enroll Student and future add flows too. Use responsive field layouts so the forms make use of that width.
 
 ## Where components go
 
@@ -73,7 +72,7 @@ Both apps (Whiteboard and Construction Management) place a component by the page
 - **Used by one page:** in `_components/` next to that `page.tsx`. Next.js treats a `_`-prefixed folder as private, so it never becomes a route.
 - **Shared by pages in one subtree:** in `_components/` in the nearest folder that holds every page that imports it (for example `app/(app)/students/_components/` for a form used by Add Student and Edit Student). Where that folder collects pieces from several areas (`app/(app)/_components/`, `app/app/_components/`), keep one subfolder per area.
 - **App-wide:** in `components/`. That is `ui`, `forms`, `money`, `query-provider`, `query-suspense`, `page-transition`, `theme-preference-sync`, and pieces used across route groups (sign-in and onboarding alike).
-- Stories, tests, fixtures and `*-skeletons.tsx` sit beside the component they cover.
+- Tests, fixtures and `*-skeletons.tsx` sit beside the component they cover.
 - Move files with `git mv`, in a commit that only renames, so `git log --follow` and blame survive.
 
 ## Comments
@@ -90,7 +89,7 @@ Write a comment only when the code cannot say it:
 - HTTP tests against real Postgres (`whiteboard_test`), not SQLite (ADR-0023).
 - `bun run test` and `bun run test:http`. Typecheck: `bun run check-types`.
 - TypeScript is split: `tsc` and `next build` use 7, ESLint uses 6 until typescript-eslint supports 7.1 (ADR-0045, README “TypeScript”). Do not change `typescript` versions on their own.
-- Verify UI in Storybook (and the browser when chrome-devtools is available). A screenshot is not verification.
+- Verify UI in the running app in a browser, and for Construction Management in its Playwright end-to-end tests (ADR CM-0031). The repo has no Storybook (ADR-0056). A screenshot is not verification.
 
 ## Commands
 

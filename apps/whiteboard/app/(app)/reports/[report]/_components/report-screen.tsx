@@ -101,7 +101,7 @@ function ReportNotAvailable() {
   );
 }
 
-/** The report screen with its filters given, for the page and Storybook. */
+/** The report screen with its filters given. */
 export function ReportContent({
   item,
   options,

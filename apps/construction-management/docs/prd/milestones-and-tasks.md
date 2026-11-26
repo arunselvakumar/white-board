@@ -19,13 +19,13 @@ Priority 1 is **M0 → M3** (project setup, SaaS login/signup and company onboar
 
 ## Legend
 
-| Status        | Meaning                                                            |
-| ------------- | ------------------------------------------------------------------ |
-| `todo`        | Not started                                                        |
-| `in_progress` | Someone is implementing it                                         |
-| `blocked`     | Cannot proceed; note why in the ticket                             |
-| `done`        | Merged and verified (tests + Storybook/UI where the ticket has UI) |
-| `moved`       | Moved to another milestone; the title names the new ticket         |
+| Status        | Meaning                                                              |
+| ------------- | -------------------------------------------------------------------- |
+| `todo`        | Not started                                                          |
+| `in_progress` | Someone is implementing it                                           |
+| `blocked`     | Cannot proceed; note why in the ticket                               |
+| `done`        | Merged and verified (tests, and the UI in a browser where it has UI) |
+| `moved`       | Moved to another milestone; the title names the new ticket           |
 
 | Area   | Meaning                                                               |
 | ------ | --------------------------------------------------------------------- |
@@ -35,7 +35,7 @@ Priority 1 is **M0 → M3** (project setup, SaaS login/signup and company onboar
 | Data   | Prisma schema files under `packages/db/construction/prisma/schema/*`  |
 | Domain | `apps/construction-management/src/<context>/{domain,application}`     |
 | HTTP   | Route Handlers + Zod models + OpenAPI under `/api/construction/<ctx>` |
-| UI     | Screens in `apps/construction-management/app` + Storybook             |
+| UI     | Screens in `apps/construction-management/app`                         |
 | Kernel | `src/shared-kernel` (LocationRef, Money, SequenceRule, Approval…)     |
 
 Ticket ids are `CM-<milestone><nn>`: `CM-105` is milestone 1, ticket 5.

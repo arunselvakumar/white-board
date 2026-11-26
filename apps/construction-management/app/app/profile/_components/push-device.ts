@@ -1,6 +1,6 @@
 /**
  * The browser's push APIs behind one small seam, so the notification
- * settings can be shown in every state in Storybook.
+ * settings do not call them directly.
  */
 import { base64UrlToBytes } from "@/lib/notification-format";
 

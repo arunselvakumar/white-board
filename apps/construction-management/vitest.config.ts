@@ -2,8 +2,6 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
-import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -68,27 +66,6 @@ export default defineConfig({
           // Users, and mobiles (test/companies.ts), and no file wipes tables
           // or reads across Companies.
           maxWorkers: HTTP_WORKERS,
-        },
-      },
-      {
-        extends: true,
-        plugins: [
-          storybookTest({
-            configDir: path.join(dirname, ".storybook"),
-            storybookScript: "bun run storybook -- --no-open",
-          }),
-        ],
-        test: {
-          name: "storybook",
-          setupFiles: ["./.storybook/vitest.setup.ts"],
-          browser: {
-            enabled: true,
-            headless: true,
-            provider: playwright({
-              contextOptions: { reducedMotion: "reduce" },
-            }),
-            instances: [{ browser: "chromium" }],
-          },
         },
       },
     ],

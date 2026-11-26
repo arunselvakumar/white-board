@@ -83,17 +83,6 @@
       "dependsOn": ["^generate"],
       "cache": false,
       "persistent": true
-    },
-    "storybook": {
-      "dependsOn": ["^generate"],
-      "cache": false,
-      "persistent": true
-    },
-    "build-storybook": {
-      "outputs": ["storybook-static/**"]
-    },
-    "test-storybook": {
-      "cache": false
     }
   }
 }

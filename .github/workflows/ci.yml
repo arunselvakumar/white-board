@@ -15,8 +15,8 @@ permissions:
   contents: read
 
 jobs:
-  # These jobs run side by side: static checks, tests for each app, build,
-  # and Storybook. Keep the steps in sync with the root `ci` script. Tests
+  # These jobs run side by side: static checks, tests for each app, and
+  # build. Keep the steps in sync with the root `ci` script. Tests
   # only need the generated Prisma clients (turbo's `^generate`), not the
   # build.
   checks:
@@ -114,30 +114,3 @@ jobs:
       - run: bun run build
         env:
           NODE_OPTIONS: --max-old-space-size=8192
-
-  # The Storybook play tests got their own job once M7's stories pushed the
-  # single job past 20 minutes.
-  storybook:
-    name: Storybook
-    runs-on: ubuntu-24.04
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
-
-      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
-        with:
-          bun-version: 1.3.13
-
-      - run: bun install --frozen-lockfile
-
-      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('bun.lock') }}
-
-      # Whiteboard and Construction Management pin the same Playwright version.
-      - name: Install Playwright Chromium
-        working-directory: apps/whiteboard
-        run: bunx playwright install --with-deps chromium
-
-      - run: bun run test-storybook

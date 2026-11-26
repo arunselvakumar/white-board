@@ -47,7 +47,7 @@ const DEVICE_HINT: Record<DeviceState, string> = {
 /**
  * Turn on push on this browser, and mute push per menu group. In-app
  * notifications are never muted; the Notification flag is the Company's
- * switch. `device` is the browser's push APIs; stories pass a fake.
+ * switch. `device` is the browser's push APIs.
  */
 export function NotificationSettings({
   device = browserPushDevice,

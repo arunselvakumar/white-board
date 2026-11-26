@@ -6,7 +6,6 @@ bun.lock
 coverage
 out
 build
-storybook-static
 .next-*
 .blob-local
 

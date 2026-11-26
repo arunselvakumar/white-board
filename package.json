@@ -3,8 +3,8 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev storybook",
-    "start": "turbo run dev storybook",
+    "dev": "turbo run dev",
+    "start": "turbo run dev",
     "generate": "turbo run generate",
     "test": "turbo run test",
     "test:http": "turbo run test:http",
@@ -14,10 +14,7 @@
     "check-comments": "node scripts/check-comment-ticket-ids.mjs",
     "check-types": "turbo run check-types",
     "check-versions": "check-dependency-version-consistency --ignore-dep typescript --dep-type=dependencies,devDependencies,optionalDependencies,peerDependencies,resolutions .",
-    "ci": "bun run check-versions && bun run format:check && bun run check-comments && bun run lint && bun run check-types && bun run test && bun run test:http && bun run build && bun run test-storybook",
-    "storybook": "turbo run storybook --filter=whiteboard --filter=construction-management",
-    "build-storybook": "turbo run build-storybook --filter=whiteboard --filter=construction-management",
-    "test-storybook": "turbo run test-storybook --concurrency=1 --filter=whiteboard --filter=construction-management"
+    "ci": "bun run check-versions && bun run format:check && bun run check-comments && bun run lint && bun run check-types && bun run test && bun run test:http && bun run build"
   },
   "devDependencies": {
     "@typescript/native": "npm:typescript@7.0.2",

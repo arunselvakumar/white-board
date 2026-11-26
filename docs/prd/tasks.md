@@ -20,21 +20,21 @@ Update **Status** in the board when you pick up or finish work. Leave **Issue** 
 
 ## Legend
 
-| Status        | Meaning                                                            |
-| ------------- | ------------------------------------------------------------------ |
-| `todo`        | Not started                                                        |
-| `in_progress` | Someone is implementing it                                         |
-| `blocked`     | Cannot proceed; note why in the ticket                             |
-| `done`        | Merged and verified (tests + Storybook/UI where the ticket has UI) |
+| Status        | Meaning                                                              |
+| ------------- | -------------------------------------------------------------------- |
+| `todo`        | Not started                                                          |
+| `in_progress` | Someone is implementing it                                           |
+| `blocked`     | Cannot proceed; note why in the ticket                               |
+| `done`        | Merged and verified (tests, and the UI in a browser where it has UI) |
 
-| Area   | Meaning                        |
-| ------ | ------------------------------ |
-| Docs   | Language and spec only         |
-| Shell  | Authenticated chrome           |
-| Data   | Prisma                         |
-| Domain | `src/training` aggregates      |
-| HTTP   | Route Handlers + OpenAPI       |
-| UI     | Whiteboard screens + Storybook |
+| Area   | Meaning                   |
+| ------ | ------------------------- |
+| Docs   | Language and spec only    |
+| Shell  | Authenticated chrome      |
+| Data   | Prisma                    |
+| Domain | `src/training` aggregates |
+| HTTP   | Route Handlers + OpenAPI  |
+| UI     | Whiteboard screens        |
 
 ## Board
 
