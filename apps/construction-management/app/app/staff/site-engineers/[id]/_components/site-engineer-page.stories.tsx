@@ -11,6 +11,10 @@ import {
 } from "@/app/app/_components/activity/person-activity-fixtures";
 import { PERSON_ACTIVITY_EMPTY } from "@/app/app/_components/activity/person-activity";
 import {
+  SITE_ENGINEER_ATTENDANCE,
+  attendancePage,
+} from "@/app/app/_components/person-attendance/person-attendance-fixtures";
+import {
   GREEN_VALLEY,
   PROJECT_OPTIONS,
   PROJECT_OPTIONS_URL,
@@ -26,6 +30,7 @@ import { pageHref } from "@/lib/page-href";
 const KARTHIK = siteEngineer();
 const ONE = `${SITE_ENGINEERS_URL}/${KARTHIK.id}`;
 const ACTIVITY = `${ONE}/activity`;
+const ATTENDANCE = `${ONE}/attendance`;
 const ENTRIES = personActivityEntries(
   { id: SRI_HEIGHTS, name: "Sri Heights" },
   { id: GREEN_VALLEY, name: "Green Valley" },
@@ -46,6 +51,13 @@ function serve(activity: (call: { path: string }) => PersonActivityPage) {
       if (call.path === ONE) return Response.json(KARTHIK);
       if (call.path === ACTIVITY || call.path.startsWith(`${ACTIVITY}?`))
         return Response.json(activity(call));
+      if (call.path === ATTENDANCE || call.path.startsWith(`${ATTENDANCE}?`))
+        return Response.json(
+          attendancePage(
+            SITE_ENGINEER_ATTENDANCE,
+            new URLSearchParams(call.path.split("?")[1] ?? "").get("to"),
+          ),
+        );
       return undefined;
     });
     return api.restore;
@@ -106,6 +118,29 @@ export const TabsKeepTheAddressAndTypedChanges: Story = {
     // The form stayed mounted: what was typed is still there to save.
     await expect(canvas.getByLabelText("Name")).toHaveValue("Karthik R");
     await expect(canvas.getByRole("button", { name: "Save" })).toBeVisible();
+  },
+};
+
+/**
+ * The Attendance tab (ADR CM-0051): days from the Check-In log, no
+ * absences, and a Check In with no Check Out said as such.
+ */
+export const Attendance: Story = {
+  parameters: { searchParams: "?tab=attendance" },
+  beforeEach: serve(() => personActivityPage([])),
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByRole("tab", { name: "Attendance", selected: true }),
+    ).toBeVisible();
+    const cards = await canvas.findByRole("list", {
+      name: "This month in figures",
+    });
+    await expect(within(cards).getByText("Hours worked")).toBeVisible();
+    await expect(within(cards).queryByText("Absent & leave")).toBeNull();
+    await expect(
+      canvas.getByRole("region", { name: "Attendance calendar" }),
+    ).toBeVisible();
+    await expect(canvas.getByText(/All time since Feb 2026:/)).toBeVisible();
   },
 };
 

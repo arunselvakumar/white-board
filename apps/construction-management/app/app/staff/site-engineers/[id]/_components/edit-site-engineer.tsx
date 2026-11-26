@@ -3,7 +3,7 @@
 import { useActiveCompany } from "@repo/auth/construction/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { History, UserRound } from "lucide-react";
+import { CalendarCheck, History, UserRound } from "lucide-react";
 import Link from "next/link";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useState } from "react";
@@ -19,11 +19,13 @@ import {
 
 import { PersonActivity } from "@/app/app/_components/activity/person-activity";
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
+import { PersonAttendance } from "@/app/app/_components/person-attendance/person-attendance";
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";
 import { SITE_ENGINEERS_PATH } from "@/lib/staff-nav";
 import { siteEngineerActivityQuery } from "@/src/queries/activity";
 import { QueryHttpError } from "@/src/queries/http";
+import { siteEngineerAttendanceQuery } from "@/src/queries/person-attendance";
 import {
   siteEngineerQueries,
   useResendSiteEngineerInvite,
@@ -77,15 +79,16 @@ function modeOf(
   };
 }
 
-const TABS = ["details", "activity"] as const;
+const TABS = ["details", "attendance", "activity"] as const;
 
 /**
  * A Site Engineer's page: Details is Edit Site Engineer (ADR CM-0037),
  * Add's cards, the sign-in status in place of the Sign-in choice once they
  * have one, and one Save; one who is Office Staff keeps their email, KYC,
- * salary and Projects there. Activity is their feed (ADR CM-0044 §7). The
- * tab is kept in the address (`?tab=activity`), and Details stays mounted
- * while Activity shows, so typed changes survive a tab switch.
+ * salary and Projects there. Attendance is their days from the Check-In
+ * log (ADR CM-0051) and Activity their feed (ADR CM-0044 §7). The tab is
+ * kept in the address (`?tab=activity`), and Details stays mounted while
+ * another tab shows, so typed changes survive a tab switch.
  */
 export function EditSiteEngineer({
   id,
@@ -134,6 +137,10 @@ export function EditSiteEngineer({
               <UserRound aria-hidden="true" />
               Details
             </TabsTrigger>
+            <TabsTrigger value="attendance">
+              <CalendarCheck aria-hidden="true" />
+              Attendance
+            </TabsTrigger>
             <TabsTrigger value="activity">
               <History aria-hidden="true" />
               Activity
@@ -147,6 +154,12 @@ export function EditSiteEngineer({
               canSeeSalary={canSeeSalary}
               saved={saved}
               onSaved={setSaved}
+            />
+          </TabsContent>
+          <TabsContent value="attendance" className="pt-4">
+            <PersonAttendance
+              query={siteEngineerAttendanceQuery(id)}
+              emptyMessage="Days they check in at a Project will show here."
             />
           </TabsContent>
           <TabsContent value="activity" className="pt-4">

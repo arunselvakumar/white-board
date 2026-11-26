@@ -307,3 +307,48 @@ export const NO_ATTENDANCE: AttendanceFixture = {
   firstMonth: "2026-11",
   dayFor: () => undefined,
 };
+
+/**
+ * A Site Engineer, from the Check-In log: no status but Present, no
+ * absences, sometimes two Projects in a day, and now and then a Check In
+ * left with no Check Out (open, no hours), as on Tue 17 Nov 2026.
+ */
+export function siteEngineerDay(date: string): PersonAttendanceDay | undefined {
+  const n = noise(date);
+  if (weekday(date) === 0 || n < 12) return undefined;
+  if (n < 18 || date === "2026-11-17")
+    return day(date, "present", [
+      place(SKY_TOWERS, {
+        checkIn: "08:45",
+        checkOut: null,
+        workedMinutes: 0,
+        open: true,
+      }),
+    ]);
+  if (n > 70)
+    return day(date, "present", [
+      place(SKY_TOWERS, {
+        checkIn: "08:30",
+        checkOut: "12:30",
+        workedMinutes: 240,
+      }),
+      place(VILLA_PHASE_2, {
+        checkIn: "13:30",
+        checkOut: "19:00",
+        workedMinutes: 330,
+      }),
+    ]);
+  return day(date, "present", [
+    place(SKY_TOWERS, {
+      checkIn: "09:00",
+      checkOut: n > 60 ? "20:00" : "18:00",
+      workedMinutes: n > 60 ? 660 : 540,
+    }),
+  ]);
+}
+
+export const SITE_ENGINEER_ATTENDANCE: AttendanceFixture = {
+  recordsAbsence: false,
+  firstMonth: "2026-02",
+  dayFor: siteEngineerDay,
+};

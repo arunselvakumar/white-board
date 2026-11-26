@@ -30,7 +30,8 @@ export function vendorCalendarDays(
 ): AttendanceDayRow[] {
   const byDay = new Map<CalendarDate, Map<string, AttendancePlaceRow>>();
   for (const day of days) {
-    const projects = byDay.get(day.date) ?? new Map();
+    const projects =
+      byDay.get(day.date) ?? new Map<string, AttendancePlaceRow>();
     const place: AttendancePlaceRow = projects.get(day.projectId) ?? {
       place: { kind: "project", projectId: day.projectId },
       status: null,

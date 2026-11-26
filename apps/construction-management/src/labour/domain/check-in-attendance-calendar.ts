@@ -78,7 +78,9 @@ export function checkInCalendarDays(
 ): AttendanceDayRow[] {
   const byDay = new Map<CalendarDate, Map<string, CalendarCheckInEntry[]>>();
   for (const entry of entries) {
-    const projects = byDay.get(entry.attendanceDate) ?? new Map();
+    const projects =
+      byDay.get(entry.attendanceDate) ??
+      new Map<string, CalendarCheckInEntry[]>();
     const list = projects.get(entry.projectId) ?? [];
     list.push(entry);
     projects.set(entry.projectId, list);
