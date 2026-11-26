@@ -101,12 +101,29 @@ function PersonAttendanceBody({
       : thisMonth;
   const loaded = months.find((month) => month.month === selected);
 
-  const { hasNextPage, isFetchingNextPage, fetchNextPage } = result;
-  // A month picked further back than loaded: load pages until it is.
+  const {
+    hasNextPage,
+    isFetchingNextPage,
+    isFetchNextPageError,
+    fetchNextPage,
+  } = result;
+  // A month picked further back than loaded: load pages until it is. After
+  // a failed page it stops; "Earlier" on the calendar tries again.
   useEffect(() => {
-    if (loaded == null && hasNextPage && !isFetchingNextPage)
+    if (
+      loaded == null &&
+      hasNextPage &&
+      !isFetchingNextPage &&
+      !isFetchNextPageError
+    )
       void fetchNextPage();
-  }, [loaded, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [
+    loaded,
+    hasNextPage,
+    isFetchingNextPage,
+    isFetchNextPageError,
+    fetchNextPage,
+  ]);
 
   if (first == null) return null;
   const allTime = first.allTime;

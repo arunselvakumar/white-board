@@ -143,13 +143,19 @@ export function AttendanceCalendar({
   }, [hasEarlier]);
 
   // A month picked off-screen (the month switcher, or loaded for it)
-  // scrolls into view; only the strip moves, never the page (the strip is the offset parent).
+  // scrolls into view once: when it is picked, or when its block arrives.
+  // Earlier months loaded while scrolling back leave the view where the
+  // viewer put it. Only the strip moves, never the page (the strip is the
+  // offset parent).
+  const revealed = useRef<string | null>(null);
   useEffect(() => {
+    if (revealed.current === selectedMonth) return;
     const el = scrollerRef.current;
     const block = el?.querySelector<HTMLElement>(
       `[data-month="${selectedMonth}"]`,
     );
     if (el == null || block == null) return;
+    revealed.current = selectedMonth;
     const left = block.offsetLeft;
     const right = left + block.offsetWidth;
     if (left < el.scrollLeft) el.scrollLeft = left - 8;

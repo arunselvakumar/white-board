@@ -11,6 +11,7 @@ import {
   OFFICE_STAFF_ATTENDANCE,
   SITE_ENGINEER_ATTENDANCE,
   VENDOR_ATTENDANCE,
+  attendancePage,
   attendanceRoute,
   type AttendanceFixture,
 } from "./person-attendance-fixtures";
@@ -157,6 +158,75 @@ export const OfficeStaff: Story = {
     });
     await expect(within(cards).getByText("Places worked at")).toBeVisible();
     await expect(within(cards).getByText("Absent & leave")).toBeVisible();
+  },
+};
+
+/** The calendar's scrolling strip. */
+function strip(canvasElement: HTMLElement): HTMLElement {
+  const calendar = within(canvasElement).getByRole("region", {
+    name: "Attendance calendar",
+  });
+  const scroller = calendar.querySelector<HTMLElement>(".overflow-x-auto");
+  if (scroller == null) throw new Error("No scrolling strip");
+  return scroller;
+}
+
+/**
+ * Scrolling back loads earlier months and leaves the view where the viewer
+ * put it: the picked month (November) is not scrolled back into view.
+ */
+export const ScrollBackKeepsTheView: Story = {
+  beforeEach: serve(LABOUR_ATTENDANCE),
+  play: async ({ canvas, canvasElement }) => {
+    await canvas.findByRole("heading", { name: "November 2026" });
+    const scroller = strip(canvasElement);
+    scroller.scrollLeft = 0;
+    scroller.dispatchEvent(new Event("scroll"));
+    await expect(
+      await canvas.findByRole("button", { name: /^Dec 2025/ }),
+    ).toBeInTheDocument();
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    const november = scroller.querySelector<HTMLElement>(
+      '[data-month="2026-11"]',
+    );
+    // November is still off to the right, not pulled back into view.
+    await expect(november?.offsetLeft ?? 0).toBeGreaterThan(
+      scroller.scrollLeft + scroller.clientWidth,
+    );
+  },
+};
+
+let earlierCalls = 0;
+
+/**
+ * A month picked further back than loaded, whose page fails: one request,
+ * a message, and no retrying on its own ("Earlier" tries again).
+ */
+export const EarlierPageFails: Story = {
+  parameters: { searchParams: "?month=2026-03" },
+  beforeEach: () => {
+    earlierCalls = 0;
+    return mockFetch([
+      {
+        path: PATH,
+        respond: ({ search }) => {
+          if (search.get("to") == null)
+            return Response.json(attendancePage(LABOUR_ATTENDANCE, null));
+          earlierCalls += 1;
+          return Response.json({ code: "X", message: "Down" }, { status: 500 });
+        },
+      },
+    ]).restore;
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByText(
+        "Couldn't load earlier months. Please try again.",
+      ),
+    ).toBeVisible();
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    await expect(earlierCalls).toBe(1);
+    await expect(canvas.getByRole("button", { name: "Earlier" })).toBeEnabled();
   },
 };
 

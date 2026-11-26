@@ -188,7 +188,11 @@ function placeKey(place: AttendancePlaceRef): string {
     : `branch:${place.branchId}`;
 }
 
-/** Adds up the days a source read, for the all-time line. */
+/**
+ * Adds up the days a source read, for the all-time line: a Half Day is
+ * half a day worked, and hours are added up on every day that has them,
+ * a holiday worked included (the share is only for the day count).
+ */
 export function allTimeOf(
   rows: readonly AttendanceDayRow[],
 ): AttendanceAllTime {
@@ -201,7 +205,12 @@ export function allTimeOf(
   let heads = 0;
   for (const row of rows) {
     const share = workedShare(dayStatus(row));
-    if (share === 0) continue;
+    // Hours count wherever they were recorded: a holiday or week off
+    // worked, or an HRMS day short of half a day, as the month's cards do.
+    const recorded = row.places.some(
+      (place) => place.workedMinutes > 0 || place.overtimeMinutes > 0,
+    );
+    if (share === 0 && !recorded) continue;
     daysWorked += share;
     if (firstDay == null || row.date < firstDay) firstDay = row.date;
     if (lastDay == null || row.date > lastDay) lastDay = row.date;

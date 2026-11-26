@@ -71,6 +71,36 @@ describe("dayStatus", () => {
 });
 
 describe("allTimeOf", () => {
+  it("adds up hours on a holiday worked and an HRMS day short of half a day, without counting them as days worked", () => {
+    const rows: AttendanceDayRow[] = [
+      {
+        date: "2026-10-01",
+        status: "present",
+        places: [at("a", { workedMinutes: 480 })],
+      },
+      {
+        date: "2026-10-02",
+        status: "holiday",
+        places: [at("a", { workedMinutes: 180, overtimeMinutes: 180 })],
+      },
+      {
+        date: "2026-10-03",
+        status: "absent",
+        places: [at("b", { workedMinutes: 90 })],
+      },
+      { date: "2026-10-04", status: "absent", places: [] },
+    ];
+    expect(allTimeOf(rows)).toEqual({
+      firstDay: "2026-10-01",
+      lastDay: "2026-10-03",
+      daysWorked: 1,
+      workedMinutes: 750,
+      overtimeMinutes: 180,
+      headDays: 0,
+      places: 2,
+    });
+  });
+
   it("adds up days worked, hours, head-days and places, leaving out absences", () => {
     const rows: AttendanceDayRow[] = [
       {
