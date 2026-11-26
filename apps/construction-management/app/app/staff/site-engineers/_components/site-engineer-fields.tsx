@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Controller, useWatch, type UseFormReturn } from "react-hook-form";
+import { Controller, type UseFormReturn } from "react-hook-form";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import {
@@ -219,14 +219,16 @@ export function SiteEngineerFields({
   form: UseFormReturn<SiteEngineerFormValues>;
   mode: SiteEngineerFormMode;
   masked?: MaskedSecrets;
-  /** They sign in by code with this mobile, so it cannot change here. */
+  /**
+   * They sign in with this mobile and also work with another Company, so
+   * it cannot change here.
+   */
   mobileLocked?: boolean;
   /** The Sign-in card, or Edit's sign-in status. */
   signIn?: ReactNode;
 }) {
-  const email = useWatch({ control: form.control, name: "email" });
-  // A mobile or an email is needed: Mobile is marked while Email is blank.
-  const mobileRequired = mode.membership && email.trim() === "";
+  // Their own sign-in is their mobile (ADR CM-0053).
+  const mobileRequired = mode.membership;
 
   return (
     <div className="space-y-6">
@@ -247,9 +249,9 @@ export function SiteEngineerFields({
             locked={mobileLocked}
             hint={
               mobileLocked
-                ? "They sign in with this number; they change it in My Profile."
+                ? "They sign in with this number and also work with another Company, so only they can change it."
                 : mode.membership
-                  ? "They can sign in with it and a password."
+                  ? "They sign in with this number and their password."
                   : "Shown on attendance and reports."
             }
           />
@@ -261,7 +263,7 @@ export function SiteEngineerFields({
               name="email"
               type="email"
               placeholder="karthik@example.com"
-              hint="Where the invitation goes. They can sign in with it too."
+              hint="Optional. A contact only: they sign in with their mobile."
             />
           )}
           {mode.membership && (

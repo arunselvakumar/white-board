@@ -42,7 +42,7 @@ export async function GET(request: Request): Promise<Response> {
 
 /**
  * Add Site Engineer (ADR CM-0037): the record and their sign-in on the
- * Site Engineer Role, invited or with a first password.
+ * Site Engineer Role, by their mobile and a first password (ADR CM-0053).
  */
 export async function POST(request: Request): Promise<Response> {
   try {
@@ -63,10 +63,7 @@ export async function POST(request: Request): Promise<Response> {
       by: session.userId,
       grantor: session.access,
       details: siteEngineerInput(model, session.access),
-      signIn: {
-        invite: model.signIn.invite,
-        password: model.signIn.password ?? null,
-      },
+      signIn: { password: model.signIn.password ?? null },
     });
     return Response.json(
       toSiteEngineerCreatedResponse(created, session.access),

@@ -67,6 +67,14 @@ function assertPassword(password: string): void {
     );
 }
 
+/** 400 `MOBILE_REQUIRED`: a Site Engineer signs in with it (ADR CM-0053). */
+export function mobileRequired(): DomainError {
+  return new DomainError(
+    "MOBILE_REQUIRED",
+    "A Site Engineer signs in with their mobile number: enter it.",
+  );
+}
+
 /** One line of a Project's Resources (CM-406). */
 export type ProjectTeamMemberReadModel = {
   id: string;
@@ -307,6 +315,10 @@ export class TeamMemberHandlers {
    * already has their mobile or email, the password is ignored and the
    * member stays (or is again) a Join Request, invited when there is an
    * email.
+   *
+   * A Site Engineer signs in with their mobile only (ADR CM-0053): the
+   * account is made from the mobile, their email stays a contact, and no
+   * invitation is sent.
    */
   private async giveAccount(
     member: TeamMember,
@@ -315,9 +327,11 @@ export class TeamMemberHandlers {
   ): Promise<TeamMemberWithPassword> {
     const { accounts, memberships } = this.passwordAccounts();
     const { details } = member;
+    const mobileOnly = member.siteEngineer;
+    if (mobileOnly && details.mobile == null) throw mobileRequired();
     const account = await accounts.createPasswordAccount({
       name: details.name,
-      email: details.email,
+      email: mobileOnly ? null : details.email,
       phoneNumber: details.mobile,
       password,
     });
@@ -329,7 +343,7 @@ export class TeamMemberHandlers {
           this.audit(member, by, "team_member.invite_resent"),
         );
       }
-      if (details.email != null) await this.invited(member);
+      if (details.email != null && !mobileOnly) await this.invited(member);
       return {
         ...(await this.view(member)),
         passwordIgnored: "existing_account",
@@ -385,9 +399,17 @@ export class TeamMemberHandlers {
           ? member.details.pan
           : input.details.pan,
     });
+    // A Site Engineer's mobile is the one they sign in with whatever the
+    // SMS switch (ADR CM-0053): a change moves their sign-in with it.
+    const moveSignIn =
+      member.siteEngineer &&
+      member.userId != null &&
+      details.mobile !== member.details.mobile;
     member.updateDetails(details, input.by, now, {
-      mobileIsSignIn: this.mobileSignIn(),
+      mobileIsSignIn: this.mobileSignIn() && !member.siteEngineer,
     });
+    if (moveSignIn)
+      await this.moveSignInMobile(input.workspaceId, member, details.mobile);
     if (input.salary !== undefined)
       member.setSalary(
         staffSalary(keepLeftOut(input.salary, member.salary)),
@@ -405,6 +427,35 @@ export class TeamMemberHandlers {
       this.audit(member, input.by, "team_member.updated", before),
     );
     return this.view(member);
+  }
+
+  /**
+   * Points a Site Engineer's sign-in at their new mobile (ADR CM-0053). 400
+   * `MOBILE_REQUIRED` to clear it; 409 `MOBILE_LOCKED` when their User also
+   * works with another Company; 409 `MOBILE_IN_USE` when someone else signs
+   * in with it.
+   */
+  private async moveSignInMobile(
+    workspaceId: string,
+    member: TeamMember,
+    mobile: string | null,
+  ): Promise<void> {
+    const userId = member.userId;
+    if (userId == null) return;
+    if (mobile == null) throw mobileRequired();
+    const { accounts } = this.passwordAccounts();
+    const others = await accounts.inOtherCompanies(workspaceId, [userId]);
+    if (others.has(userId))
+      throw new DomainError(
+        "MOBILE_LOCKED",
+        "They also work with another Company and sign in with this mobile, so only they can change it.",
+        { kind: "conflict" },
+      );
+    if ((await accounts.changeSignInMobile(userId, mobile)) === "in_use")
+      throw conflict(
+        "MOBILE_IN_USE",
+        "Someone else already signs in with this mobile number.",
+      );
   }
 
   /**
@@ -439,7 +490,8 @@ export class TeamMemberHandlers {
    * with a password. With one: only when that User belongs to no other
    * Company (409 `USER_IN_OTHER_COMPANY`), never the Owner's (409
    * `OWNER_PASSWORD`); they must change it at their next sign-in and every
-   * session of theirs ends.
+   * session of theirs ends. A Site Engineer's needs a mobile (400
+   * `MOBILE_REQUIRED`), which their sign-in then uses (ADR CM-0053).
    */
   async setPassword(input: {
     workspaceId: string;
@@ -464,6 +516,8 @@ export class TeamMemberHandlers {
         );
     }
     assertPassword(input.password);
+    if (member.siteEngineer && member.details.mobile == null)
+      throw mobileRequired();
     const { accounts } = this.passwordAccounts();
     if (member.userId == null)
       return this.giveAccount(member, input.password, input.by);
@@ -474,6 +528,14 @@ export class TeamMemberHandlers {
       throw conflict(
         "USER_IN_OTHER_COMPANY",
         "This User also works with another Company, so only they can change their password.",
+      );
+    // A Site Engineer who joined by email before ADR CM-0053 may have no
+    // sign-in mobile yet: the password they get works with their mobile.
+    if (member.siteEngineer)
+      await this.moveSignInMobile(
+        input.workspaceId,
+        member,
+        member.details.mobile,
       );
     await accounts.setTemporaryPassword(member.userId, input.password);
     await this.members.save(member, {

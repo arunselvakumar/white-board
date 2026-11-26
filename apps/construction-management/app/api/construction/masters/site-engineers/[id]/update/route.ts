@@ -20,7 +20,9 @@ export const dynamic = "force-dynamic";
 /**
  * Edit Site Engineer with the `updatedAt` you loaded (409
  * SUPERVISOR_CHANGED when stale). An older one without a sign-in gets one
- * now (`signIn`, else 400 SIGN_IN_REQUIRED).
+ * now (`signIn`, else 400 SIGN_IN_REQUIRED). A Site Engineer who signs
+ * in needs a mobile (400 MOBILE_REQUIRED); changing it moves their sign-in
+ * (409 MOBILE_IN_USE, MOBILE_LOCKED).
  */
 export async function POST(
   request: Request,
@@ -51,12 +53,7 @@ export async function POST(
       details: siteEngineerInput(model, session.access),
       ...(model.signIn == null
         ? {}
-        : {
-            signIn: {
-              invite: model.signIn.invite,
-              password: model.signIn.password ?? null,
-            },
-          }),
+        : { signIn: { password: model.signIn.password ?? null } }),
     });
     return Response.json(toSiteEngineerResponse(item, session.access));
   } catch (error) {

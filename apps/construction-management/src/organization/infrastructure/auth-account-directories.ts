@@ -26,6 +26,8 @@ export const authSignInAccounts: SignInAccounts = {
   createPasswordAccount: (input) => accounts.createPasswordAccount(input),
   setTemporaryPassword: (userId, password) =>
     accounts.setTemporaryPassword(userId, password),
+  changeSignInMobile: (userId, phoneNumber) =>
+    accounts.changeSignInMobile(userId, phoneNumber),
   inOtherCompanies: (workspaceId, userIds) =>
     accounts.inOtherCompanies(workspaceId, userIds),
 };

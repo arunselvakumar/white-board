@@ -41,6 +41,8 @@ projectTest.describe("Masters", () => {
         .click();
       const addSiteEngineerPage = new AddSiteEngineerPage(page);
       await expect(addSiteEngineerPage.pageHeading).toBeVisible();
+      // They sign in with their mobile; nobody is invited (ADR CM-0053).
+      await expect(addSiteEngineerPage.mobileLoginCheckbox).toBeChecked();
       await addSiteEngineerPage.fillDetails({
         name: supervisor,
         mobile: newMobile().slice(3),

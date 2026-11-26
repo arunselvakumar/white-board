@@ -131,7 +131,7 @@ describe("Project staffing in the Activity feeds", () => {
           email: newEmail(),
           projectIds: [],
           profile: {},
-          signIn: { invite: false, password: "first-pass-1234" },
+          signIn: { password: "first-pass-1234" },
         }),
       ),
       StatusCodes.CREATED,

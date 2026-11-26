@@ -46,9 +46,13 @@ export type TeamMemberReadModel = {
   permissions: PermissionGrants;
   /**
    * Edit User may set a new password (ADR CM-0030 §7): not the Owner, and
-   * either no User yet or a User who belongs to no other Company.
+   * either no User yet or a User who belongs to no other Company. A Site
+   * Engineer's sign-in also needs a mobile, the only way they sign in (ADR
+   * CM-0053).
    */
   canSetPassword: boolean;
+  /** Their User also belongs to another Company. */
+  inOtherCompany: boolean;
   /** `/join/<token>` while Joining Pending; null otherwise. */
   invitePath: string | null;
   invitedAt: Date | null;
@@ -70,6 +74,8 @@ export function toTeamMemberReadModel(
   lookups: TeamMemberLookups,
 ): TeamMemberReadModel {
   const { details } = member;
+  const inOtherCompany =
+    member.userId != null && lookups.usersInOtherCompanies.has(member.userId);
   const role =
     member.roleId == null ? null : (lookups.roles.get(member.roleId) ?? null);
   const permissions = member.isOwner
@@ -101,9 +107,11 @@ export function toTeamMemberReadModel(
     permissions: permissions.toGrants(),
     canSetPassword:
       !member.isOwner &&
-      (details.mobile != null || details.email != null) &&
-      (member.userId == null ||
-        !lookups.usersInOtherCompanies.has(member.userId)),
+      (member.siteEngineer
+        ? details.mobile != null
+        : details.mobile != null || details.email != null) &&
+      !inOtherCompany,
+    inOtherCompany,
     invitePath:
       member.status === "joining_pending" && member.inviteToken != null
         ? pageHref("/join/[token]", { token: member.inviteToken })

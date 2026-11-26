@@ -25,10 +25,7 @@ import {
   type SiteEngineerPasswordOutcome,
 } from "@/src/queries/site-engineers";
 
-import {
-  signInWays,
-  temporaryPassword,
-} from "@/app/app/staff/office-staff/_components/sign-in-options";
+import { temporaryPassword } from "@/app/app/staff/office-staff/_components/sign-in-options";
 
 const schema = z.object({ password: temporaryPassword });
 type Values = z.infer<typeof schema>;
@@ -91,7 +88,7 @@ export function SetPasswordDialog({
           <DialogHeader>
             <DialogTitle>Set password</DialogTitle>
             <DialogDescription>
-              {engineer.name} signs in with {signInWays(engineer)} and this
+              {engineer.name} signs in with their mobile number and this
               password, and must change it the next time they sign in.
             </DialogDescription>
           </DialogHeader>

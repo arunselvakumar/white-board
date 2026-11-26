@@ -137,7 +137,7 @@ async function siteEngineer(
       email: newEmail(),
       projectIds,
       profile: {},
-      signIn: { invite: false, password: "first-pass-1234" },
+      signIn: { password: "first-pass-1234" },
     }),
   );
   if (response.status !== 201)
