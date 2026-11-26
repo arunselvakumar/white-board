@@ -8,12 +8,14 @@ import {
   useSuspenseQueries,
 } from "@tanstack/react-query";
 import {
+  CalendarCheck,
   FolderKanban,
   KeyRound,
   Send,
   ShieldCheck,
   UserRound,
 } from "lucide-react";
+import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@repo/ui/components/button";
@@ -25,6 +27,7 @@ import {
 } from "@repo/ui/components/tabs";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
+import { PersonAttendance } from "@/app/app/_components/person-attendance/person-attendance";
 import {
   STAFF_SALARY,
   wageDefaults,
@@ -32,6 +35,7 @@ import {
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";
 import { STAFF_PATH } from "@/lib/staff-nav";
+import { teamMemberAttendanceQuery } from "@/src/queries/person-attendance";
 import { ROLES_KEY, rolesQuery } from "@/src/queries/roles";
 import {
   TEAM_MEMBERS_KEY,
@@ -72,6 +76,9 @@ function valuesOf(member: TeamMember): TeamMemberDetailsValues {
   };
 }
 
+const TABS = ["details", "attendance", "projects", "role"] as const;
+type Tab = (typeof TABS)[number];
+
 /** What the last sign-in action did, for the line under the header. */
 type Notice = { tone: "status" | "alert"; text: string };
 
@@ -89,21 +96,33 @@ function passwordNotice(outcome: TeamMember & PasswordOutcome): Notice {
 
 /**
  * Edit Staff (ADR CM-0030): Details (the Details, Salary and
- * Sign-in cards, in Add Staff's order, ADR CM-0033 §1), Projects and Role
- * tabs, and from the header Set a new password and the invitation.
+ * Sign-in cards, in Add Staff's order, ADR CM-0033 §1), Attendance (ADR
+ * CM-0051), Projects and Role tabs, the tab kept in the address
+ * (`?tab=attendance`), and from the header Set a new password and the
+ * invitation.
  */
 export function EditTeamMember({
   id,
   canSeeSalary,
+  canSeeAttendance,
 }: {
   id: string;
   /** Financial on Staff (ADR CM-0032). */
   canSeeSalary: boolean;
+  /** HRMS Attendance Read (ADR CM-0051 §5): without it the tab says so. */
+  canSeeAttendance: boolean;
 }) {
   const [{ data: member }, { data: roles }] = useSuspenseQueries({
     queries: [teamMemberQuery(id), rolesQuery],
   });
   const { company } = useActiveCompany();
+  const [tab, setTab] = useQueryState(
+    "tab",
+    parseAsStringLiteral(TABS).withDefault("details"),
+  );
+  // An HRMS Team Member has no Projects tab.
+  const shown: Tab =
+    tab === "projects" && member.memberType !== "normal" ? "details" : tab;
   const queryClient = useQueryClient();
   const saved = async (updated: TeamMember) => {
     queryClient.setQueryData(teamMemberQuery(id).queryKey, updated);
@@ -223,11 +242,21 @@ export function EditTeamMember({
               : fieldForCode(invite.error, {}).message
           }
         />
-        <Tabs defaultValue="details" className="gap-6">
+        <Tabs
+          value={shown}
+          onValueChange={(next: Tab) => {
+            void setTab(next === "details" ? null : next);
+          }}
+          className="gap-6"
+        >
           <TabsList>
             <TabsTrigger value="details">
               <UserRound aria-hidden="true" />
               Details
+            </TabsTrigger>
+            <TabsTrigger value="attendance">
+              <CalendarCheck aria-hidden="true" />
+              Attendance
             </TabsTrigger>
             {member.memberType === "normal" && (
               <TabsTrigger value="projects">
@@ -282,6 +311,20 @@ export function EditTeamMember({
                 </Button>
               </div>
             </form>
+          </TabsContent>
+
+          <TabsContent value="attendance">
+            {canSeeAttendance ? (
+              <PersonAttendance
+                query={teamMemberAttendanceQuery(id)}
+                emptyMessage="Check-ins and back-dated days from HRMS Attendance will show here."
+              />
+            ) : (
+              <p className="text-muted-foreground text-sm">
+                Attendance comes from HRMS Attendance. You need HRMS Attendance
+                Read to see it; ask the Owner to change your Permission Matrix.
+              </p>
+            )}
           </TabsContent>
 
           {member.memberType === "normal" && (

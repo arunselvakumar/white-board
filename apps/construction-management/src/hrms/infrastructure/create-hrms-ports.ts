@@ -163,6 +163,26 @@ export function createShiftAssignmentHandlers(deps?: {
 }
 
 /**
+ * Members' days by the HRMS day rule over any dates (CM-308, ADR CM-0012
+ * §2): the same day source as `ports.attendanceDays`, typed for date
+ * ranges. Read by the monthly summary, Team Today and a member's
+ * Attendance tab (ADR CM-0051).
+ */
+export function createAttendanceDays(deps?: {
+  prisma?: PrismaClient;
+}): RecordedAttendanceDaySource {
+  const db = deps?.prisma ?? prisma;
+  const settings = new PrismaHrmsSettingsStore(db);
+  return new RecordedAttendanceDaySource({
+    books: new PrismaShiftBookSource(db, settings),
+    holidays: new PrismaHolidayStore(db),
+    entries: new PrismaAttendanceStore(db),
+    leave: new PrismaLeaveDaySource(db),
+    timeZone: (workspaceId) => companyTimeZone(db, workspaceId),
+  });
+}
+
+/**
  * Attendance (CM-308, CM-309): check in and out, missed checkout,
  * back-dated days, approvals, Team Today and the monthly summary.
  */
@@ -175,14 +195,6 @@ export function createAttendanceHandlers(deps?: {
   const ports = createHrmsPorts({ prisma: db });
   const store = new PrismaAttendanceStore(db);
   const timeZone = (workspaceId: string) => companyTimeZone(db, workspaceId);
-  // The same day source as `ports.attendanceDays`, typed for date ranges.
-  const days = new RecordedAttendanceDaySource({
-    books: new PrismaShiftBookSource(db, ports.settings),
-    holidays: new PrismaHolidayStore(db),
-    entries: store,
-    leave: ports.leaveDays,
-    timeZone,
-  });
   return new AttendanceHandlers({
     store,
     employees: ports.employees,
@@ -190,7 +202,7 @@ export function createAttendanceHandlers(deps?: {
     fences: createMemberFences({ prisma: db }),
     shifts: ports.shifts,
     calendar: ports.calendar,
-    days,
+    days: createAttendanceDays({ prisma: db }),
     monthLock: ports.monthLock,
     guard: new PrismaAttendanceBackdatedGuard(db),
     timeZone,

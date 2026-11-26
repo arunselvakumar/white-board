@@ -7,6 +7,10 @@ import {
   ROLES,
   ROLES_URL,
 } from "@/app/app/staff/_components/role-fixtures";
+import {
+  OFFICE_STAFF_ATTENDANCE,
+  attendanceRoute,
+} from "@/app/app/_components/person-attendance/person-attendance-fixtures";
 import type { TeamMember } from "@/src/queries/team-members";
 
 import { mockFetch, type MockRoute } from "@/.storybook/mock-fetch";
@@ -44,7 +48,7 @@ function serve(member: TeamMember, extra: MockRoute[] = []) {
 const meta = {
   title: "Human Resources/Staff/EditStaff",
   component: EditTeamMember,
-  args: { id: MEMBER.id, canSeeSalary: true },
+  args: { id: MEMBER.id, canSeeSalary: true, canSeeAttendance: true },
   beforeEach() {
     signInAs("owner", { name: "Anugraha Engineers" });
   },
@@ -393,6 +397,77 @@ export const SendInvitation: Story = {
     await waitFor(() =>
       expect(dialog.getByLabelText("Invite link")).toBeVisible(),
     );
+  },
+};
+
+/**
+ * The Attendance tab (ADR CM-0051): the HRMS day status, hours by branch
+ * and Project site, a back-dated day awaiting approval, and today's open
+ * Check In.
+ */
+export const Attendance: Story = {
+  parameters: { searchParams: "?tab=attendance" },
+  beforeEach: serve(MEMBER, [
+    attendanceRoute(`${ONE}/attendance`, OFFICE_STAFF_ATTENDANCE),
+  ]),
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByRole("tab", { name: "Attendance", selected: true }),
+    ).toBeVisible();
+    await expect(
+      await canvas.findByRole("list", { name: "This month in figures" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("region", { name: "Attendance calendar" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("button", {
+        name: /^Thu, 12 Nov 2026: Absent, .*No fence matched, .*Awaiting approval/,
+      }),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByRole("button", {
+        name: /^Wed, 18 Nov 2026: Absent, .*Head Office, .*No check-out/,
+      }),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByRole("button", {
+        name: /^Sun, 15 Nov 2026: Week Off/,
+      }),
+    ).toBeInTheDocument();
+  },
+};
+
+/** Without HRMS Attendance Read the tab says so and asks nothing of the API. */
+export const AttendanceWithoutHrmsAccess: Story = {
+  args: { canSeeAttendance: false },
+  parameters: { searchParams: "?tab=attendance" },
+  beforeEach: serve(MEMBER),
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByText(/You need HRMS Attendance Read to see it/),
+    ).toBeVisible();
+    await expect(
+      fetchMock?.spy.mock.calls.some(
+        ([input]) => typeof input === "string" && input.endsWith("/attendance"),
+      ),
+    ).toBe(false);
+  },
+};
+
+/** The tab is kept in the address: Projects opens from `?tab=projects`. */
+export const ProjectsTabFromAddress: Story = {
+  parameters: { searchParams: "?tab=projects" },
+  beforeEach: serve(MEMBER, [
+    {
+      path: "/api/construction/projects/projects/options",
+      respond: () => Response.json({ items: [] }),
+    },
+  ]),
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByRole("tab", { name: "Projects", selected: true }),
+    ).toBeVisible();
   },
 };
 
