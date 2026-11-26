@@ -101,6 +101,14 @@ describe("dayMark and the label", () => {
   it("marks absence and leave, and reads a two-Project day out loud", () => {
     expect(dayMark(day("2026-11-04", "absent", []))).toBe("absent");
     expect(dayMark(day("2026-11-04", "on_leave", []))).toBe("leave");
+    // Absent by the HRMS rule only because the entry awaits approval.
+    expect(
+      dayMark(
+        day("2026-11-04", "absent", [
+          place(SKY_TOWERS, { workedMinutes: 0, pending: true }),
+        ]),
+      ),
+    ).toBeNull();
     const twoProjects = day("2026-11-02", "present", [
       place(SKY_TOWERS, {
         checkIn: "08:30",

@@ -59,10 +59,11 @@ No amounts are returned: no wages, rates or pay.
 
 For the picked month:
 
-- **Labours, Site Engineers, Office Staff:** Days worked (a Half Day counts as half, with the full and half days under it), Hours worked, Overtime, Average hours a day worked, Absent and leave (Labours and Office Staff only: the other two have no absences) and Projects worked at.
+- **Labours and Office Staff:** Days worked (a Half Day counts as half, with the full and half days under it), Hours worked (with the average a day worked), Overtime, Absent and leave, and the Projects worked at ("Places worked at" when an HRMS office branch is among them).
+- **Site Engineers:** Days worked (days with a Check In), Hours worked and Projects worked at. The Check-In log has no absences, half days or overtime, so those are left out rather than shown as zeros.
 - **Vendors:** Days supplied, Head-days, Most heads in a day, Overtime hours and Projects supplied.
 
-All time: the first and last day worked, days worked, hours (head-days for a Vendor) and the number of Projects.
+All time: the first and last day worked (supplied, for a Vendor), days worked, hours (head-days for a Vendor) and the number of Projects.
 
 ### 5. Who sees what
 

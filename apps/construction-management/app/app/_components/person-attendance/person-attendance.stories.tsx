@@ -8,6 +8,7 @@ import { mockFetch } from "@/.storybook/mock-fetch";
 import {
   LABOUR_ATTENDANCE,
   NO_ATTENDANCE,
+  OFFICE_STAFF_ATTENDANCE,
   SITE_ENGINEER_ATTENDANCE,
   VENDOR_ATTENDANCE,
   attendanceRoute,
@@ -136,11 +137,26 @@ export const SiteEngineer: Story = {
     });
     await expect(within(cards).getByText("Hours worked")).toBeVisible();
     await expect(within(cards).queryByText("Absent & leave")).toBeNull();
+    // The log has no overtime and no half days, so neither is shown as a zero.
+    await expect(within(cards).queryByText("Overtime")).toBeNull();
+    await expect(within(cards).getByText("Days with a Check In")).toBeVisible();
     await expect(
       canvas.getByRole("button", {
         name: /^Tue, 17 Nov 2026: Present, 0 h\. Sky Towers, 0 h, 8:45 am – …, No check-out$/,
       }),
     ).toBeInTheDocument();
+  },
+};
+
+/** Office Staff: HRMS days by branch, so the places card says Places. */
+export const OfficeStaff: Story = {
+  beforeEach: serve(OFFICE_STAFF_ATTENDANCE),
+  play: async ({ canvas }) => {
+    const cards = await canvas.findByRole("list", {
+      name: "This month in figures",
+    });
+    await expect(within(cards).getByText("Places worked at")).toBeVisible();
+    await expect(within(cards).getByText("Absent & leave")).toBeVisible();
   },
 };
 

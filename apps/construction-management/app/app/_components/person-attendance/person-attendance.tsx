@@ -236,7 +236,7 @@ function AllTimeLine({
       {parts.join(" · ")}
       {allTime.lastDay == null
         ? null
-        : ` · last worked ${formatLongDate(allTime.lastDay)}`}
+        : ` · last ${measure === "head_days" ? "supplied" : "worked"} ${formatLongDate(allTime.lastDay)}`}
     </p>
   );
 }
@@ -298,7 +298,11 @@ function MonthCards({
             label="Days worked"
             icon={CalendarCheck}
             value={countFigure(figures.daysWorked)}
-            caption={`${String(figures.fullDays)} full · ${String(figures.halfDays)} half`}
+            caption={
+              recordsAbsence
+                ? `${String(figures.fullDays)} full · ${String(figures.halfDays)} half`
+                : "Days with a Check In"
+            }
           />,
           <MetricCard
             key="hours"
@@ -312,16 +316,16 @@ function MonthCards({
                 : `${hoursFigure(figures.averageMinutes)} h a day on average`
             }
           />,
-          <MetricCard
-            key="overtime"
-            label="Overtime"
-            icon={Timer}
-            value={hoursFigure(figures.overtimeMinutes)}
-            unit=" h"
-            caption="Beyond working hours"
-          />,
           ...(recordsAbsence
             ? [
+                <MetricCard
+                  key="overtime"
+                  label="Overtime"
+                  icon={Timer}
+                  value={hoursFigure(figures.overtimeMinutes)}
+                  unit=" h"
+                  caption="Beyond working hours"
+                />,
                 <MetricCard
                   key="absent"
                   label="Absent & leave"
@@ -333,7 +337,11 @@ function MonthCards({
             : []),
           <MetricCard
             key="places"
-            label="Projects worked at"
+            label={
+              figures.places.some((place) => place.kind === "branch")
+                ? "Places worked at"
+                : "Projects worked at"
+            }
             icon={Building2}
             value={figures.places.length}
             caption={placeCaption(figures)}

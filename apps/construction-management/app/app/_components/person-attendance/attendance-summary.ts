@@ -74,7 +74,12 @@ export type MonthFigures = {
   /** Most heads (full + half) on one day. */
   peakHeads: number;
   /** Places worked at, by name, most days first. */
-  places: { id: string; name: string; days: number }[];
+  places: {
+    id: string;
+    kind: "project" | "branch";
+    name: string;
+    days: number;
+  }[];
 };
 
 function heads(place: PersonAttendancePlace): number {
@@ -85,7 +90,7 @@ function heads(place: PersonAttendancePlace): number {
 export function monthFigures(
   days: readonly PersonAttendanceDay[],
 ): MonthFigures {
-  const places = new Map<string, { id: string; name: string; days: number }>();
+  const places = new Map<string, MonthFigures["places"][number]>();
   const figures: MonthFigures = {
     daysWorked: 0,
     fullDays: 0,
@@ -126,6 +131,7 @@ export function monthFigures(
         continue;
       const seen = places.get(place.place.id) ?? {
         id: place.place.id,
+        kind: place.place.kind,
         name: place.place.name,
         days: 0,
       };
@@ -181,6 +187,8 @@ export function dayMark(
   day: PersonAttendanceDay | undefined,
 ): "absent" | "leave" | "off" | null {
   if (day == null || isWorked(day)) return null;
+  // Waiting on a Check Out or an approval: shown as worked, not absent.
+  if (day.places.some((place) => place.open || place.pending)) return null;
   if (day.status === "absent") return "absent";
   if (day.status === "on_leave" || day.status === "paid_leave") return "leave";
   if (day.status === "holiday" || day.status === "week_off") return "off";
