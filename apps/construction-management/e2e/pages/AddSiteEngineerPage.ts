@@ -1,6 +1,9 @@
 import { AppShellPage } from "./AppShellPage";
 
-/** Add Site Engineer: one page of cards; every new one signs in (ADR CM-0037). */
+/**
+ * Add Site Engineer: one page of cards; every new one signs in with their
+ * mobile and a password (ADR CM-0037, CM-0053).
+ */
 export class AddSiteEngineerPage extends AppShellPage {
   public get url() {
     return "/app/staff/site-engineers/new";
@@ -23,11 +26,13 @@ export class AddSiteEngineerPage extends AppShellPage {
   }
 
   public get passwordField() {
-    return this.page.getByRole("textbox", { name: "Set a password" });
+    return this.page.getByLabel("Password", { exact: true });
   }
 
-  public get inviteCheckbox() {
-    return this.page.getByRole("checkbox", { name: /Invite them/ });
+  public get mobileLoginCheckbox() {
+    return this.page.getByRole("checkbox", {
+      name: /Use mobile number as login/,
+    });
   }
 
   public async fillDetails(input: {

@@ -57,7 +57,7 @@ export const siteEngineerOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: PATH,
     summary:
-      "Add a Site Engineer and their sign-in on the default Site Engineer Role (400 SIGN_IN_REQUIRED; 403 CANNOT_GRANT; 409 SUPERVISOR_NAME_IN_USE, SUPERVISOR_EMPLOYEE_CODE_IN_USE, SITE_ENGINEER_ROLE_MISSING)",
+      "Add a Site Engineer who signs in with their mobile and a first password, on the default Site Engineer Role (400 MOBILE_REQUIRED, SIGN_IN_REQUIRED; 403 CANNOT_GRANT; 409 SUPERVISOR_NAME_IN_USE, SUPERVISOR_EMPLOYEE_CODE_IN_USE, SITE_ENGINEER_ROLE_MISSING)",
     tags: TAGS,
     body: CreateConstructionMastersSiteEngineerRequestModel,
     successStatus: StatusCodes.CREATED,
@@ -91,21 +91,9 @@ export const siteEngineerOpenApiOperations: OpenApiOperation[] = [
   },
   {
     method: "post",
-    path: `${PATH}/{id}/resend-invite`,
-    summary:
-      "Send their invitation again with a fresh link (409 SITE_ENGINEER_NO_SIGN_IN, MEMBER_EMAIL_REQUIRED)",
-    tags: TAGS,
-    params,
-    successStatus: StatusCodes.OK,
-    successDescription: "The Site Engineer",
-    successSchema: ConstructionMastersSiteEngineerResponseModel,
-    errors: [...WRITE, StatusCodes.NOT_FOUND, StatusCodes.CONFLICT],
-  },
-  {
-    method: "post",
     path: `${PATH}/{id}/password`,
     summary:
-      "Set a temporary password for their sign-in (403 CANNOT_GRANT, OWN_ROLE; 409 SITE_ENGINEER_NO_SIGN_IN, USER_IN_OTHER_COMPANY)",
+      "Set a temporary password for their sign-in by mobile (400 MOBILE_REQUIRED; 403 CANNOT_GRANT, OWN_ROLE; 409 SITE_ENGINEER_NO_SIGN_IN, USER_IN_OTHER_COMPANY, MOBILE_IN_USE)",
     tags: TAGS,
     params,
     body: SetConstructionMastersSiteEngineerPasswordRequestModel,

@@ -20,6 +20,14 @@ export type SignInAccounts = {
    * every session they have.
    */
   setTemporaryPassword(userId: string, password: string): Promise<void>;
+  /**
+   * The mobile (E.164) the User signs in with, for a User only this Company
+   * relies on (ADR CM-0053). `in_use` when another User has it.
+   */
+  changeSignInMobile(
+    userId: string,
+    phoneNumber: string,
+  ): Promise<"changed" | "in_use">;
   /** The Users among `userIds` who also belong to another Company. */
   inOtherCompanies(
     workspaceId: string,

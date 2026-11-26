@@ -1,5 +1,4 @@
 import { normalizeMobile } from "@repo/auth/construction/mobile";
-import { isConstructionSmsEnabled } from "@repo/auth/construction/server";
 import { z } from "zod";
 
 import {
@@ -65,20 +64,17 @@ const BankModel = z.object({
 
 const SignInModel = z
   .object({
-    invite: z
-      .boolean()
-      .describe("Send the invitation (an email, or a mobile while SMS is on)"),
     password: z
       .string()
       .min(PASSWORD_MIN)
       .max(PASSWORD_MAX)
       .nullish()
       .describe(
-        "A first password: they can sign in at once and must change it",
+        "A first password: they sign in with their mobile and it at once, and must change it (400 SIGN_IN_REQUIRED without one)",
       ),
   })
   .describe(
-    "How the Site Engineer signs in; one of an invitation or a password is required (400 SIGN_IN_REQUIRED)",
+    "How the Site Engineer signs in: their mobile and this password. Nobody is invited (ADR CM-0053)",
   );
 
 const details = {
@@ -88,7 +84,9 @@ const details = {
     .trim()
     .max(40)
     .nullish()
-    .describe("Any common Indian format or E.164; stored as E.164"),
+    .describe(
+      "Any common Indian format or E.164; stored as E.164. Required with their own sign-in, which it is (400 MOBILE_REQUIRED)",
+    ),
   email: z.string().trim().max(254).nullish(),
   address: z.string().trim().max(500).nullish(),
   aadhaar: z
@@ -208,10 +206,11 @@ const SignInResponseModel = z
       memberId: z.uuid(),
       status: z.enum(["joining_pending", "active", "rejected", "left"]),
       canSetPassword: z.boolean(),
-      invitePath: z
-        .string()
-        .nullable()
-        .describe("`/join/<token>` while Joining Pending"),
+      mobileLocked: z
+        .boolean()
+        .describe(
+          "Their User also works with another Company, so the mobile they sign in with cannot change here",
+        ),
       invitedAt: z.iso.datetime().nullable(),
       joinedAt: z.iso.datetime().nullable(),
     }),
@@ -234,7 +233,7 @@ export const ConstructionMastersSiteEngineerResponseModel = z.object({
   mobileLocked: z
     .boolean()
     .describe(
-      "The mobile is how they sign in by code and cannot change once they joined (SMS on)",
+      "The mobile is their sign-in and their User also works with another Company, so it cannot change here (409 MOBILE_LOCKED)",
     ),
   profile: ProfileModel.extend({
     employeeCode: z.string().nullable(),
@@ -297,10 +296,9 @@ export const ConstructionMastersSiteEngineerCreatedResponseModel =
       .enum(["existing_account"])
       .nullable()
       .describe(
-        "`existing_account`: someone already signs in with this mobile or email, so the password was not set and they got a Join Request instead",
+        "`existing_account`: someone already signs in with this mobile, so the password was not set and they got a Join Request instead",
       ),
     passwordSet: z.boolean(),
-    invited: z.boolean(),
   });
 
 export const ConstructionMastersSiteEngineerPasswordResponseModel =
@@ -320,10 +318,7 @@ export function toSiteEngineerResponse(
     id: item.id,
     name: item.name,
     mobile: item.mobile,
-    mobileLocked:
-      isConstructionSmsEnabled() &&
-      signIn.kind === "site_engineer" &&
-      signIn.status !== "joining_pending",
+    mobileLocked: signIn.kind === "site_engineer" && signIn.mobileLocked,
     profile: item.profile,
     bank: financial ? item.bank : null,
     signIn:
@@ -361,6 +356,5 @@ export function toSiteEngineerCreatedResponse(
     ...toSiteEngineerResponse(item, access),
     passwordIgnored: item.passwordIgnored,
     passwordSet: item.passwordSet,
-    invited: item.invited,
   };
 }

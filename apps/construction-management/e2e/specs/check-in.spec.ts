@@ -173,7 +173,7 @@ checkInPageTest.describe("Check-In", () => {
           email: newEmail(),
           projectIds: [project.id],
           profile: {},
-          signIn: { invite: false, password: "first-pass-1234" },
+          signIn: { password: "first-pass-1234" },
         },
       );
       await checkInPage.goto();

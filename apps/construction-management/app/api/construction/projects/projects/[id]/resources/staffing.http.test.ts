@@ -267,7 +267,7 @@ async function engineerWithSignIn(
       email: newEmail(),
       projectIds,
       profile: { employeeCode: `SE-${name.slice(0, 3)}` },
-      signIn: { invite: false, password: "first-pass-1234" },
+      signIn: { password: "first-pass-1234" },
     }),
   );
   expect(response.status).toBe(StatusCodes.CREATED);

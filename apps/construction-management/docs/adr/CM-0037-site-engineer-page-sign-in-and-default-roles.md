@@ -1,6 +1,7 @@
 # CM-0037 — A Site Engineer page with a full profile and a sign-in, and default Roles that stay
 
 - Status: accepted (2026-11-11, the owner's request)
+- Amended by: [CM-0053](CM-0053-site-engineers-sign-in-with-mobile.md) (Site Engineers sign in with their mobile and a password; no invitations)
 - Date: 2026-11-11
 - Amends: [CM-0036](CM-0036-one-staff-group-and-site-engineers.md) §2 (a Site Engineer now signs in), [CM-0030](CM-0030-users-and-roles.md) (seeded Roles could be renamed and deleted like any other)
 - Relates to: [CM-0032](CM-0032-staff-and-salary.md) and [CM-0033](CM-0033-one-page-staff-no-designations-labours-on-many-projects.md) §3 (the salary set-up), [CM-0009](CM-0009-email-sign-in-while-sms-is-off.md) (invitations by mobile only while SMS is on), ADR-0030 (one migration per schema), `modules/02`, `modules/08`

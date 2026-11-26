@@ -11,9 +11,10 @@ import type {
 } from "@/src/masters/domain/site-engineer-profile";
 import { createSupervisorHandlers } from "@/src/masters/infrastructure/create-masters-handlers";
 import type { CompanyMemberships } from "@/src/organization/application/company-memberships";
-import type {
-  PasswordIgnored,
-  TeamMemberHandlers,
+import {
+  mobileRequired,
+  type PasswordIgnored,
+  type TeamMemberHandlers,
 } from "@/src/organization/application/team-member-handlers";
 import type { TeamMemberReadModel } from "@/src/organization/application/team-member-read-model";
 import type { RoleRepository } from "@/src/organization/domain/role-repository";
@@ -30,7 +31,8 @@ import { DomainError, conflict } from "@/src/shared-kernel/domain-error";
  * How a Site Engineer signs in (ADR CM-0037):
  *
  * - `site_engineer`: their own sign-in, made and managed on their page, on
- *   the Site Engineer Role, left off Office Staff.
+ *   the Site Engineer Role, left off Office Staff. They sign in with their
+ *   mobile and a password set here; nobody is invited (ADR CM-0053).
  * - `office_staff`: they are an Office Staff member (linked before ADR
  *   CM-0037); that record is managed on Office Staff.
  * - `none`: an older Site Engineer without a sign-in; Edit adds one.
@@ -41,7 +43,8 @@ export type SiteEngineerSignIn =
       memberId: string;
       status: TeamMemberStatus;
       canSetPassword: boolean;
-      invitePath: string | null;
+      /** Their User also works with another Company: the mobile stays. */
+      mobileLocked: boolean;
       invitedAt: Date | null;
       joinedAt: Date | null;
     }
@@ -89,16 +92,17 @@ export type SiteEngineerInput = {
   bank?: SiteEngineerBankInput;
 };
 
-/** An invitation, a first password, or both. */
+/**
+ * Their first password: they sign in with their mobile and it, and change
+ * it the first time (ADR CM-0053). There is no invitation.
+ */
 export type SiteEngineerSignInInput = {
-  invite: boolean;
   password: string | null;
 };
 
 export type SiteEngineerCreated = SiteEngineerReadModel & {
   passwordIgnored: PasswordIgnored;
   passwordSet: boolean;
-  invited: boolean;
 };
 
 /** A Site Engineer on a Project's Resources (ADR CM-0038 §3). */
@@ -145,7 +149,7 @@ function signInOf(
     memberId: member.id,
     status: member.status,
     canSetPassword: member.canSetPassword,
-    invitePath: member.invitePath,
+    mobileLocked: member.userId != null && member.inOtherCompany,
     invitedAt: member.invitedAt,
     joinedAt: member.joinedAt,
   };
@@ -183,16 +187,24 @@ function toReadModel(
   };
 }
 
-/** 400 `SIGN_IN_REQUIRED` unless the sign-in invites or sets a password. */
-function assertSignIn(
-  signIn: SiteEngineerSignInInput | undefined,
-): SiteEngineerSignInInput {
-  if (signIn == null || (!signIn.invite && signIn.password == null))
+/**
+ * A new sign-in needs a password (400 `SIGN_IN_REQUIRED`): a Site Engineer
+ * signs in with their mobile and the password set for them (ADR CM-0053).
+ */
+function assertSignIn(signIn: SiteEngineerSignInInput | undefined): {
+  password: string;
+} {
+  if (signIn?.password == null)
     throw new DomainError(
       "SIGN_IN_REQUIRED",
-      "A Site Engineer signs in: invite them, or set a password for them.",
+      "A Site Engineer signs in with their mobile number and a password: set one for them.",
     );
-  return signIn;
+  return { password: signIn.password };
+}
+
+/** Their own sign-in is their mobile (ADR CM-0053): 400 `MOBILE_REQUIRED`. */
+function assertMobile(details: SiteEngineerInput): void {
+  if (details.mobile == null) throw mobileRequired();
 }
 
 /**
@@ -439,7 +451,7 @@ export class SiteEngineerHandlers {
     by: string;
     grantor: MemberAccess;
     details: SiteEngineerInput;
-    signIn: SiteEngineerSignInInput;
+    signIn: { password: string };
   }) {
     const { details } = input;
     return this.members.invite({
@@ -460,7 +472,7 @@ export class SiteEngineerHandlers {
       siteEngineer: true,
       projectIds: details.projectIds ?? [],
       roleId: await this.roleId(input.workspaceId),
-      invite: input.signIn.invite,
+      invite: false,
       password: input.signIn.password,
     });
   }
@@ -481,8 +493,8 @@ export class SiteEngineerHandlers {
   }
 
   /**
-   * Add Site Engineer: the row and its sign-in. 400 `SIGN_IN_REQUIRED`
-   * without an invitation or a password.
+   * Add Site Engineer: the row and its sign-in. 400 `MOBILE_REQUIRED`
+   * without a mobile and `SIGN_IN_REQUIRED` without a password.
    */
   async create(input: {
     workspaceId: string;
@@ -491,6 +503,7 @@ export class SiteEngineerHandlers {
     details: SiteEngineerInput;
     signIn?: SiteEngineerSignInInput;
   }): Promise<SiteEngineerCreated> {
+    assertMobile(input.details);
     const signIn = assertSignIn(input.signIn);
     const row = {
       workspaceId: input.workspaceId,
@@ -515,17 +528,17 @@ export class SiteEngineerHandlers {
     return {
       ...toReadModel(supervisor, member),
       passwordIgnored: member.passwordIgnored,
-      passwordSet: signIn.password != null && member.passwordIgnored == null,
-      invited: signIn.invite,
+      passwordSet: member.passwordIgnored == null,
     };
   }
 
   /**
    * Edit Site Engineer. With their own sign-in, its details and Projects
-   * change too. An older one without a sign-in must get one now (400
-   * `SIGN_IN_REQUIRED`). One who is Office Staff keeps that record as it
-   * is: only the Site Engineer row changes. 409 `SUPERVISOR_CHANGED` when
-   * the row is stale.
+   * change too, and a new mobile moves their sign-in (ADR CM-0053). An
+   * older one without a sign-in must get one now (400 `SIGN_IN_REQUIRED`).
+   * Both need a mobile (400 `MOBILE_REQUIRED`). One who is Office Staff
+   * keeps that record as it is: only the Site Engineer row changes. 409
+   * `SUPERVISOR_CHANGED` when the row is stale.
    */
   async update(input: {
     workspaceId: string;
@@ -538,6 +551,7 @@ export class SiteEngineerHandlers {
   }): Promise<SiteEngineerReadModel> {
     const current = await this.get(input.workspaceId, input.id);
     const { details } = input;
+    if (current.signIn.kind !== "office_staff") assertMobile(details);
     const row = {
       workspaceId: input.workspaceId,
       id: input.id,
@@ -613,21 +627,6 @@ export class SiteEngineerHandlers {
           : "This Site Engineer has no sign-in yet. Add one on Edit.",
       );
     return current.signIn.memberId;
-  }
-
-  /** A fresh invite link, sent again. */
-  async resendInvite(input: {
-    workspaceId: string;
-    id: string;
-    by: string;
-  }): Promise<SiteEngineerReadModel> {
-    const memberId = await this.ownSignIn(input.workspaceId, input.id);
-    await this.members.resendInvite({
-      workspaceId: input.workspaceId,
-      id: memberId,
-      by: input.by,
-    });
-    return this.get(input.workspaceId, input.id);
   }
 
   /** A new temporary password (ADR CM-0030 §7). */

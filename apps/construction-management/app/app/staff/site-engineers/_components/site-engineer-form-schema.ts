@@ -65,7 +65,6 @@ const siteEngineerObject = z.object({
     }),
   address: upto(500, "Address is too long"),
   emergencyContact: upto(120, "Too long"),
-  invite: z.boolean(),
   // Blank means no password; otherwise a Temporary Password.
   password: z.union([z.literal(""), temporaryPassword]),
 
@@ -129,9 +128,11 @@ export type SiteEngineerFormValues = z.infer<typeof siteEngineerObject>;
  *
  * - `financial`: Financial on Labours; the Salary and Bank cards.
  * - `signIn`: the Sign-in card (Add, and Edit of one without a sign-in);
- *   one of Invite them or a password is required (ADR CM-0037).
- * - `membership`: the details their sign-in holds (email, address, KYC,
- *   salary). Off for a Site Engineer who is Office Staff.
+ *   a password is required: they sign in with their mobile and it, and
+ *   nobody is invited (ADR CM-0053).
+ * - `membership`: their own sign-in, so the mobile it uses is required,
+ *   and the details it holds (email, address, KYC, salary). Off for a Site
+ *   Engineer who is Office Staff.
  */
 export type SiteEngineerFormMode = {
   financial: boolean;
@@ -140,15 +141,10 @@ export type SiteEngineerFormMode = {
 };
 
 export const SIGN_IN_REQUIRED_MESSAGE =
-  "A Site Engineer signs in: invite them, or set a password for them";
+  "Set a password: they sign in with their mobile number and it";
 
-/** Whether Invite them can be ticked: it needs an email and no password. */
-export function inviteAvailable(values: {
-  email: string;
-  password: string;
-}): boolean {
-  return values.email.trim() !== "" && values.password === "";
-}
+export const MOBILE_REQUIRED_MESSAGE =
+  "Enter the mobile number: they sign in with it";
 
 function todayIso(): string {
   const now = new Date();
@@ -161,14 +157,10 @@ export function siteEngineerSchema(mode: SiteEngineerFormMode) {
     const issue = (path: (string | number)[], message: string) => {
       ctx.addIssue({ code: "custom", path, message });
     };
-    // Their sign-in needs one of the two (ADR CM-0030 §6).
-    if (mode.membership && values.mobile === "" && values.email === "")
-      issue(["mobile"], "Enter a mobile number or an email");
-    if (
-      mode.signIn &&
-      values.password === "" &&
-      !(inviteAvailable(values) && values.invite)
-    )
+    // Their sign-in is their mobile and a password (ADR CM-0053).
+    if (mode.membership && values.mobile === "")
+      issue(["mobile"], MOBILE_REQUIRED_MESSAGE);
+    if (mode.signIn && values.password === "")
       issue(["password"], SIGN_IN_REQUIRED_MESSAGE);
     if (values.dateOfBirth !== "" && values.dateOfBirth >= todayIso())
       issue(["dateOfBirth"], "The date of birth must be before today");
@@ -205,7 +197,6 @@ export function siteEngineerDefaults(
     email: text(engineer?.email),
     address: text(engineer?.address),
     emergencyContact: text(engineer?.emergencyContact),
-    invite: true,
     password: "",
     fatherName: text(profile?.fatherName),
     dateOfBirth: text(profile?.dateOfBirth),
@@ -315,12 +306,9 @@ function detailsInput(
   return details;
 }
 
-/** Invite them goes out only when it can: an email, no password. */
+/** Their first password; they sign in with their mobile and it. */
 export function signInInput(values: SiteEngineerFormValues) {
-  return {
-    invite: inviteAvailable(values) && values.invite,
-    password: values.password === "" ? null : values.password,
-  };
+  return { password: values.password === "" ? null : values.password };
 }
 
 export function createSiteEngineerPayload(
@@ -363,7 +351,9 @@ export function siteEngineerErrorFields(
     MEMBER_NAME_REQUIRED: "name",
     MEMBER_NAME_TOO_LONG: "name",
     MOBILE_INVALID: "mobile",
+    MOBILE_REQUIRED: "mobile",
     MEMBER_MOBILE_IN_USE: "mobile",
+    MOBILE_IN_USE: "mobile",
     MOBILE_LOCKED: "mobile",
     FATHER_NAME_TOO_LONG: "fatherName",
     DATE_OF_BIRTH_INVALID: "dateOfBirth",
@@ -388,7 +378,6 @@ export function siteEngineerErrorFields(
       MOBILE_OR_EMAIL_REQUIRED: "mobile",
       EMAIL_INVALID: "email",
       MEMBER_EMAIL_IN_USE: "email",
-      MEMBER_EMAIL_REQUIRED: "email",
       ADDRESS_TOO_LONG: "address",
       EMERGENCY_CONTACT_TOO_LONG: "emergencyContact",
       AADHAAR_INVALID: "aadhaar",

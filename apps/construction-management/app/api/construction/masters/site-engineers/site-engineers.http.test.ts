@@ -1,9 +1,11 @@
+import { outbox } from "@repo/auth/construction/testing";
 import { prisma } from "@repo/construction-db";
 import { StatusCodes } from "http-status-codes";
 import { describe, expect, it } from "vitest";
 
 import { GET as listOfficeStaff } from "@/app/api/construction/organization/team-members/route";
 import { POST as createSupervisor } from "@/app/api/construction/masters/supervisors/route";
+import { createTeamMemberHandlers } from "@/src/organization/infrastructure/create-team-member-handlers";
 import {
   addProject,
   jsonRequest,
@@ -14,7 +16,6 @@ import { TEST_ORIGIN, newEmail, newMobile, postAuth } from "@/test/sessions";
 
 import { POST as remove } from "./[id]/delete/route";
 import { POST as setPassword } from "./[id]/password/route";
-import { POST as resendInvite } from "./[id]/resend-invite/route";
 import { GET as getOne } from "./[id]/route";
 import { POST as update } from "./[id]/update/route";
 import { GET as list, POST as create } from "./route";
@@ -78,7 +79,7 @@ function add(owner: { cookie: string }, fields: Record<string, unknown> = {}) {
         ifsc: "hdfc0001234",
         bankName: "HDFC Bank",
       },
-      signIn: { invite: false, password: FIRST_PASSWORD },
+      signIn: { password: FIRST_PASSWORD },
       ...fields,
     }),
   );
@@ -90,12 +91,18 @@ async function teamMemberCount(owner: Owner): Promise<number> {
   });
 }
 
-describe("Site Engineers HTTP (ADR CM-0037)", () => {
+describe("Site Engineers HTTP (ADR CM-0037, CM-0053)", () => {
   it("adds a Site Engineer who signs in on the Site Engineer Role, off Office Staff", async () => {
     const owner = await ownerWithCompany();
     const projectId = await addProject(owner.workspaceId, owner.userId);
     const mobile = newMobile();
-    const created = await add(owner, { mobile, projectIds: [projectId] });
+    const email = newEmail();
+    outbox.length = 0;
+    const created = await add(owner, {
+      mobile,
+      email,
+      projectIds: [projectId],
+    });
     expect(created.status).toBe(StatusCodes.CREATED);
     const engineer = await json<SiteEngineer>(created);
     expect(engineer).toMatchObject({
@@ -126,12 +133,20 @@ describe("Site Engineers HTTP (ADR CM-0037)", () => {
       roleId: owner.roleId("Site Engineer"),
     });
 
-    // They sign in with the first password.
+    // They sign in with their mobile and the first password (ADR CM-0053).
     const signedIn = await postAuth("/sign-in/phone-number", {
       phoneNumber: mobile,
       password: FIRST_PASSWORD,
     });
     expect(signedIn.status).toBe(StatusCodes.OK);
+    // The email is a contact only: not their login, and nothing is mailed.
+    const byEmail = await postAuth("/sign-in/email", {
+      email,
+      password: FIRST_PASSWORD,
+    });
+    expect(byEmail.status).not.toBe(StatusCodes.OK);
+    expect(outbox.filter((mail) => mail.to === email)).toEqual([]);
+    expect(engineer).toMatchObject({ email });
 
     // Listed as a Site Engineer, not on Office Staff.
     const engineers = await json<{ items: SiteEngineer[] }>(
@@ -160,12 +175,19 @@ describe("Site Engineers HTTP (ADR CM-0037)", () => {
     expect(JSON.stringify(audits)).not.toContain("50100123456789");
   });
 
-  it("needs a sign-in, and refuses before making one", async () => {
+  it("needs a mobile and a password, and refuses before making a sign-in", async () => {
     const owner = await ownerWithCompany();
     const before = await teamMemberCount(owner);
-    const none = await add(owner, { signIn: { invite: false } });
+    const none = await add(owner, { signIn: {} });
     expect(none.status).toBe(StatusCodes.BAD_REQUEST);
     expect(await json(none)).toMatchObject({ code: "SIGN_IN_REQUIRED" });
+    // An invitation is no longer a way in (ADR CM-0053).
+    const invite = await add(owner, { signIn: { invite: true } });
+    expect(await json(invite)).toMatchObject({ code: "SIGN_IN_REQUIRED" });
+    const noMobile = await add(owner, { mobile: null });
+    expect(noMobile.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await json(noMobile)).toMatchObject({ code: "MOBILE_REQUIRED" });
+    expect(await teamMemberCount(owner)).toBe(before);
 
     expect((await add(owner)).status).toBe(StatusCodes.CREATED);
     const after = await teamMemberCount(owner);
@@ -277,6 +299,7 @@ describe("Site Engineers HTTP (ADR CM-0037)", () => {
     const stale = await update(
       jsonRequest(`${BASE}/${engineer.id}/update`, owner.cookie, {
         name: "Someone else",
+        mobile: engineer.mobile,
         profile: {},
         expectedUpdatedAt: engineer.updatedAt,
       }),
@@ -305,6 +328,7 @@ describe("Site Engineers HTTP (ADR CM-0037)", () => {
     );
     expect(shown.signIn).toEqual({ kind: "none" });
 
+    const mobile = newMobile();
     const body = {
       name: "Sundar",
       email: newEmail(),
@@ -312,39 +336,38 @@ describe("Site Engineers HTTP (ADR CM-0037)", () => {
       expectedUpdatedAt: older.updatedAt,
     };
     const without = await update(
-      jsonRequest(`${BASE}/${older.id}/update`, owner.cookie, body),
+      jsonRequest(`${BASE}/${older.id}/update`, owner.cookie, {
+        ...body,
+        mobile,
+      }),
       params(older.id),
     );
     expect(await json(without)).toMatchObject({ code: "SIGN_IN_REQUIRED" });
-    const invited = await update(
+    const noMobile = await update(
       jsonRequest(`${BASE}/${older.id}/update`, owner.cookie, {
         ...body,
-        signIn: { invite: true },
+        signIn: { password: FIRST_PASSWORD },
       }),
       params(older.id),
     );
-    expect(invited.status).toBe(StatusCodes.OK);
-    const engineer = await json<SiteEngineer>(invited);
-    expect(engineer.signIn).toMatchObject({
-      kind: "site_engineer",
-      status: "joining_pending",
-    });
-    const resent = await resendInvite(
-      jsonRequest(`${BASE}/${older.id}/resend-invite`, owner.cookie, {}),
-      params(older.id),
-    );
-    expect(resent.status).toBe(StatusCodes.OK);
-    const password = await setPassword(
-      jsonRequest(`${BASE}/${older.id}/password`, owner.cookie, {
-        password: FIRST_PASSWORD,
+    expect(await json(noMobile)).toMatchObject({ code: "MOBILE_REQUIRED" });
+    const given = await update(
+      jsonRequest(`${BASE}/${older.id}/update`, owner.cookie, {
+        ...body,
+        mobile,
+        signIn: { password: FIRST_PASSWORD },
       }),
       params(older.id),
     );
-    expect(password.status).toBe(StatusCodes.OK);
-    expect(await json(password)).toMatchObject({
-      signIn: { status: "active" },
-      passwordIgnored: null,
+    expect(given.status).toBe(StatusCodes.OK);
+    expect(await json<SiteEngineer>(given)).toMatchObject({
+      signIn: { kind: "site_engineer", status: "active" },
     });
+    const signedIn = await postAuth("/sign-in/phone-number", {
+      phoneNumber: mobile,
+      password: FIRST_PASSWORD,
+    });
+    expect(signedIn.status).toBe(StatusCodes.OK);
 
     // One linked to an Office Staff member before ADR CM-0037.
     const staff = await memberWith(owner, {});
@@ -367,13 +390,140 @@ describe("Site Engineers HTTP (ADR CM-0037)", () => {
       kind: "office_staff",
       memberId: staff.memberId,
     });
-    const noResend = await resendInvite(
-      jsonRequest(`${BASE}/${linked.id}/resend-invite`, owner.cookie, {}),
+    const noPassword = await setPassword(
+      jsonRequest(`${BASE}/${linked.id}/password`, owner.cookie, {
+        password: FIRST_PASSWORD,
+      }),
       params(linked.id),
     );
-    expect(await json(noResend)).toMatchObject({
+    expect(await json(noPassword)).toMatchObject({
       code: "SITE_ENGINEER_NO_SIGN_IN",
     });
+  });
+
+  it("lets one invited by email before ADR CM-0053 in with a mobile and a password", async () => {
+    const owner = await ownerWithCompany();
+    const invited = await createTeamMemberHandlers().invite({
+      workspaceId: owner.workspaceId,
+      by: owner.userId,
+      memberType: "normal",
+      siteEngineer: true,
+      roleId: owner.roleId("Site Engineer"),
+      details: { name: "Ganesh", email: newEmail() },
+      invite: true,
+    });
+    const row = await json<{ id: string; updatedAt: string }>(
+      await createSupervisor(
+        jsonRequest(
+          `${TEST_ORIGIN}/api/construction/masters/supervisors`,
+          owner.cookie,
+          { name: "Ganesh", teamMemberId: invited.id },
+        ),
+      ),
+    );
+    const pending = await json<SiteEngineer>(
+      await getOne(
+        jsonRequest(`${BASE}/${row.id}`, owner.cookie),
+        params(row.id),
+      ),
+    );
+    expect(pending.signIn).toMatchObject({
+      kind: "site_engineer",
+      status: "joining_pending",
+      canSetPassword: false,
+    });
+    const noMobile = await setPassword(
+      jsonRequest(`${BASE}/${row.id}/password`, owner.cookie, {
+        password: FIRST_PASSWORD,
+      }),
+      params(row.id),
+    );
+    expect(noMobile.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await json(noMobile)).toMatchObject({ code: "MOBILE_REQUIRED" });
+
+    const mobile = newMobile();
+    const saved = await update(
+      jsonRequest(`${BASE}/${row.id}/update`, owner.cookie, {
+        name: "Ganesh",
+        mobile,
+        email: pending.email,
+        profile: {},
+        expectedUpdatedAt: pending.updatedAt,
+      }),
+      params(row.id),
+    );
+    expect(saved.status).toBe(StatusCodes.OK);
+    expect(await json(saved)).toMatchObject({
+      signIn: { status: "joining_pending", canSetPassword: true },
+    });
+    const password = await setPassword(
+      jsonRequest(`${BASE}/${row.id}/password`, owner.cookie, {
+        password: FIRST_PASSWORD,
+      }),
+      params(row.id),
+    );
+    expect(await json(password)).toMatchObject({
+      signIn: { status: "active" },
+      passwordIgnored: null,
+    });
+    const signedIn = await postAuth("/sign-in/phone-number", {
+      phoneNumber: mobile,
+      password: FIRST_PASSWORD,
+    });
+    expect(signedIn.status).toBe(StatusCodes.OK);
+  });
+
+  it("moves their sign-in when the mobile is corrected", async () => {
+    const owner = await ownerWithCompany();
+    const engineer = await json<SiteEngineer>(await add(owner));
+    const corrected = newMobile();
+    const body = {
+      name: engineer.name,
+      email: engineer.email,
+      profile: PROFILE,
+      expectedUpdatedAt: engineer.updatedAt,
+    };
+    const cleared = await update(
+      jsonRequest(`${BASE}/${engineer.id}/update`, owner.cookie, {
+        ...body,
+        mobile: null,
+      }),
+      params(engineer.id),
+    );
+    expect(await json(cleared)).toMatchObject({ code: "MOBILE_REQUIRED" });
+
+    const saved = await update(
+      jsonRequest(`${BASE}/${engineer.id}/update`, owner.cookie, {
+        ...body,
+        mobile: corrected,
+      }),
+      params(engineer.id),
+    );
+    expect(saved.status).toBe(StatusCodes.OK);
+    const savedBody = await json<SiteEngineer>(saved);
+    expect(savedBody).toMatchObject({ mobile: corrected, mobileLocked: false });
+    const signIn = (phoneNumber: string | null) =>
+      postAuth("/sign-in/phone-number", {
+        phoneNumber,
+        password: FIRST_PASSWORD,
+      });
+    expect((await signIn(corrected)).status).toBe(StatusCodes.OK);
+    expect((await signIn(engineer.mobile)).status).not.toBe(StatusCodes.OK);
+
+    // Someone in another Company already signs in with this number.
+    const other = await ownerWithCompany();
+    const theirs = await json<SiteEngineer>(await add(other));
+    const taken = await update(
+      jsonRequest(`${BASE}/${engineer.id}/update`, owner.cookie, {
+        ...body,
+        mobile: theirs.mobile,
+        expectedUpdatedAt: savedBody.updatedAt,
+      }),
+      params(engineer.id),
+    );
+    expect(taken.status).toBe(StatusCodes.CONFLICT);
+    expect(await json(taken)).toMatchObject({ code: "MOBILE_IN_USE" });
+    expect((await signIn(corrected)).status).toBe(StatusCodes.OK);
   });
 
   it("deletes the Site Engineer and takes back their sign-in", async () => {

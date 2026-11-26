@@ -107,19 +107,6 @@ export function useUpdateSiteEngineer(id: string) {
   });
 }
 
-/** Sends their invitation again, with a fresh link. */
-export function useResendSiteEngineerInvite(id: string) {
-  const queryClient = useQueryClient();
-  const invalidate = useInvalidateSiteEngineers();
-  return useMutation({
-    mutationFn: () => post<SiteEngineer>(itemUrl(id, "resend-invite")),
-    onSuccess: async (updated) => {
-      queryClient.setQueryData(siteEngineerQueries.key.detail(id), updated);
-      await invalidate();
-    },
-  });
-}
-
 /** A Temporary Password they replace at their next sign-in (ADR CM-0030 §7). */
 export function useSetSiteEngineerPassword(id: string) {
   const queryClient = useQueryClient();

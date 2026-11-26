@@ -1,6 +1,5 @@
 "use client";
 
-import { useActiveCompany } from "@repo/auth/construction/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { CalendarCheck, History, UserRound } from "lucide-react";
@@ -28,14 +27,11 @@ import { QueryHttpError } from "@/src/queries/http";
 import { siteEngineerAttendanceQuery } from "@/src/queries/person-attendance";
 import {
   siteEngineerQueries,
-  useResendSiteEngineerInvite,
   useUpdateSiteEngineer,
   type SiteEngineer,
   type SiteEngineerPasswordOutcome,
 } from "@/src/queries/site-engineers";
 
-import { ShareInviteDialog } from "@/app/app/staff/office-staff/_components/share-invite-dialog";
-import { signInWays } from "@/app/app/staff/office-staff/_components/sign-in-options";
 import {
   siteEngineerDefaults,
   siteEngineerErrorFields,
@@ -60,11 +56,11 @@ function passwordNotice(outcome: SiteEngineerPasswordOutcome): Notice {
   if (outcome.passwordIgnored === "existing_account")
     return {
       tone: "alert",
-      text: `${outcome.name} already has an account, so we did not set the password. They got a Join Request instead.`,
+      text: `Someone already signs in with this mobile number, so we did not set the password. ${outcome.name} got a Join Request instead.`,
     };
   return {
     tone: "status",
-    text: `Password set. ${outcome.name} signs in with ${signInWays(outcome)} and that password, and must change it the next time they sign in.`,
+    text: `Password set. ${outcome.name} signs in with their mobile number and that password, and must change it the next time they sign in.`,
   };
 }
 
@@ -201,8 +197,6 @@ function EditSiteEngineerForm({
   saved: boolean;
   onSaved: (saved: boolean) => void;
 }) {
-  const { company } = useActiveCompany();
-  const companyName = company?.name ?? "your Company";
   const queryClient = useQueryClient();
   const mode = modeOf(engineer, canSeeSalary);
   const form = useForm<SiteEngineerFormValues>({
@@ -210,11 +204,9 @@ function EditSiteEngineerForm({
     defaultValues: siteEngineerDefaults(engineer),
   });
   const update = useUpdateSiteEngineer(engineer.id);
-  const resend = useResendSiteEngineerInvite(engineer.id);
   const [stale, setStale] = useState<string | null>(null);
   const [reloading, setReloading] = useState(false);
   const [settingPassword, setSettingPassword] = useState(false);
-  const [sharing, setSharing] = useState(false);
   const [notice, setNotice] = useState<Notice | null>(null);
 
   const submit = form.handleSubmit(async (values) => {
@@ -258,8 +250,6 @@ function EditSiteEngineerForm({
   };
 
   const signIn = engineer.signIn;
-  const invitePath = signIn.kind === "site_engineer" ? signIn.invitePath : null;
-  const canShare = invitePath != null && engineer.email != null;
 
   return (
     <>
@@ -281,46 +271,20 @@ function EditSiteEngineerForm({
           }}
           signIn={
             signIn.kind === "none" ? (
-              <SignInChoice form={form} companyName={companyName} />
+              <SignInChoice form={form} />
             ) : signIn.kind === "office_staff" ? (
               <OfficeStaffSignIn signIn={signIn} />
             ) : (
               <div className="space-y-3">
                 <SignInStatus
                   signIn={signIn}
-                  contact={engineer}
-                  canShare={canShare}
-                  resending={resend.isPending}
-                  onResend={() => {
-                    setNotice(null);
-                    resend.mutate(undefined, {
-                      onSuccess: (updated) => {
-                        setNotice({
-                          tone: "status",
-                          text:
-                            updated.email == null
-                              ? `We sent ${updated.name} the invitation again.`
-                              : `We sent the invitation to ${updated.email} again.`,
-                        });
-                      },
-                    });
-                  }}
+                  mobile={engineer.mobile}
                   onSetPassword={() => {
                     setNotice(null);
                     setSettingPassword(true);
                   }}
-                  onShare={() => {
-                    setSharing(true);
-                  }}
                 />
                 {notice != null && <NoticeLine notice={notice} />}
-                <FormAlert
-                  message={
-                    resend.error == null
-                      ? undefined
-                      : fieldForCode(resend.error, {}).message
-                  }
-                />
               </div>
             )
           }
@@ -372,16 +336,6 @@ function EditSiteEngineerForm({
             setSettingPassword(false);
             setNotice(passwordNotice(outcome));
           }}
-        />
-      )}
-      {invitePath != null && engineer.email != null && (
-        <ShareInviteDialog
-          open={sharing}
-          onOpenChange={setSharing}
-          memberName={engineer.name}
-          companyName={companyName}
-          email={engineer.email}
-          invitePath={invitePath}
         />
       )}
     </>

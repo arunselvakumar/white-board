@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { Prisma, prisma } from "@repo/construction-db";
 import { hashPassword } from "better-auth/crypto";
 
-import { placeholderEmailFor } from "../mobile";
+import { isPlaceholderEmail, placeholderEmailFor } from "../mobile";
 import { COMPANY_WORKSPACE_KIND } from "../roles";
 
 /** What screens show for a User who deleted their account (CM-907). */
@@ -203,6 +203,50 @@ export const accounts = {
       });
       await tx.identitySession.deleteMany({ where: { userId } });
     });
+  },
+
+  /**
+   * A new sign-in mobile for a User only their Company relies on (ADR
+   * CM-0053): an admin corrected the mobile a Site Engineer signs in with.
+   * Stored verified, as `createPasswordAccount` does; a placeholder email
+   * follows the number. `in_use` when another User has the number already.
+   */
+  async changeSignInMobile(
+    userId: string,
+    phoneNumber: string,
+  ): Promise<"changed" | "in_use"> {
+    const other = await findUserByContact(prisma, {
+      email: null,
+      phoneNumber,
+    });
+    if (other != null && other !== userId) return "in_use";
+    const user = await prisma.identityUser.findUnique({
+      where: { id: userId },
+      select: { email: true },
+    });
+    if (user == null) throw new Error("The User was not found.");
+    try {
+      await prisma.identityUser.update({
+        where: { id: userId },
+        data: {
+          phoneNumber,
+          phoneNumberVerified: true,
+          ...(isPlaceholderEmail(user.email)
+            ? { email: placeholderEmailFor(phoneNumber) }
+            : {}),
+          updatedAt: new Date(),
+        },
+      });
+    } catch (error) {
+      // Someone took the number meanwhile.
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      )
+        return "in_use";
+      throw error;
+    }
+    return "changed";
   },
 
   /** The Users among `userIds` who belong to a Company other than this one. */
