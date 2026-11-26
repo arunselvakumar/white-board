@@ -352,3 +352,72 @@ export const SITE_ENGINEER_ATTENDANCE: AttendanceFixture = {
   firstMonth: "2026-02",
   dayFor: siteEngineerDay,
 };
+
+/** HRMS's place for an entry that matched no fence (ADR CM-0051 §3). */
+export const NO_FENCE_MATCHED = {
+  kind: "branch" as const,
+  id: "00000000-0000-0000-0000-000000000000",
+  name: "No fence matched",
+  canOpen: false,
+};
+
+/**
+ * An Office Staff member (HRMS): Sundays off, Head Office most days, Sky
+ * Towers' site on Thursdays, a back-dated day awaiting approval, an
+ * absence, paid and unpaid leave, and today checked in with no check-out.
+ */
+export function officeStaffDay(date: string): PersonAttendanceDay {
+  const dow = weekday(date);
+  const n = noise(date);
+  if (dow === 0) return day(date, "week_off", []);
+  if (date === "2026-11-14") return day(date, "holiday", []);
+  if (date === ATTENDANCE_TODAY)
+    return day(date, "absent", [
+      place(HEAD_OFFICE, {
+        checkIn: "09:20",
+        checkOut: null,
+        workedMinutes: 0,
+        open: true,
+      }),
+    ]);
+  if (date === "2026-11-12")
+    return day(date, "absent", [
+      place(NO_FENCE_MATCHED, { workedMinutes: 0, pending: true }),
+    ]);
+  if (n < 5) return day(date, "absent", []);
+  if (n < 8) return day(date, n < 7 ? "paid_leave" : "on_leave", []);
+  if (dow === 4)
+    return day(date, "present", [
+      place(HEAD_OFFICE, {
+        checkIn: "09:05",
+        checkOut: "12:30",
+        workedMinutes: 205,
+      }),
+      place(SKY_TOWERS, {
+        checkIn: "13:15",
+        checkOut: "19:10",
+        workedMinutes: 355,
+        overtimeMinutes: n > 60 ? 60 : 0,
+      }),
+    ]);
+  if (dow === 6)
+    return day(date, "half_day", [
+      place(HEAD_OFFICE, {
+        checkIn: "09:30",
+        checkOut: "14:00",
+        workedMinutes: 270,
+      }),
+    ]);
+  return day(date, "present", [
+    place(HEAD_OFFICE, {
+      checkIn: n < 20 ? "09:40" : "09:00",
+      checkOut: "18:15",
+      workedMinutes: n < 20 ? 515 : 555,
+    }),
+  ]);
+}
+
+export const OFFICE_STAFF_ATTENDANCE: AttendanceFixture = {
+  firstMonth: "2026-06",
+  dayFor: officeStaffDay,
+};

@@ -37,7 +37,21 @@ Until now attendance shows on a person's page only as Activity entries, one per 
 | Labour        | `labour_attendance` (and its overtime)                          | In and Out: Out − In − break (CM-0011). Present without times: the working hours stored on the day; Half Day: half of them. Overtime is the day's overtime hours. Absent, leave and holiday: none. | As marked; On Leave that is paid shows as Paid Leave. Two Projects in one day: the better of the two |
 | Site Engineer | `check_in_events` of kind `site_engineer`, voided ones left out | Each Check In to the next Check Out at that Project, added up. A Check In with no Check Out is shown ("No check-out") and adds no hours.                                                           | Present on any day with a Check In. The log has no absences                                          |
 | Vendor        | `vendor_attendance` and its lines                               | No hours: the headcount, full days and half days, and head-days (full + half ÷ 2). Overtime is the lines' overtime hours.                                                                          | Present on any day with a headcount. No absences                                                     |
-| Office Staff  | HRMS `attendance_entries`                                       | Closed entries that need no approval or are approved, by the branch (or Project site) checked in at. Pending entries show as "Awaiting approval" and add no hours; rejected ones are left out.     | The HRMS day status (CM-0012 §2): Present, Half Day, Absent, On Leave, Holiday or Week Off           |
+| Office Staff  | HRMS `attendance_entries`                                       | Closed entries that need no approval or are approved, by the branch checked in at (a Project site as its Project; none matched: "No fence matched"). Pending: no hours. Rejected: left out         | The HRMS day status (CM-0012 §2), first day to today. Paid On Leave shows as Paid Leave              |
+
+Site Engineers and Vendors in detail (decided while building them):
+
+- **A Site Engineer's pairs.** Entries are grouped by their stored attendance day, so a night shift's Check Out after midnight stays on the day it began. A second Check In while already in is skipped (the first stands) and a Check Out with no Check In before it is ignored, as in a Labour's day from check-in entries (CM-0043 §3). After In, Out, In the place is open, Out is the last Check Out and only the closed pair adds minutes. Their first day is their earliest live Check In.
+- **A Site Engineer's Projects.** A viewer with Labours Read but no Attendance Read on a Project gets the tab with no days there, not a 403, as on the Activity tab.
+- **A Vendor's empty saves.** A save may hold only overtime (no full or half heads). A Project-day whose lines add up to no heads supplied nobody, so it is left out with its overtime, and does not count as a day supplied. Two saves at one Project on one day are added together.
+
+Office Staff in detail (decided while building it):
+
+- **Which days.** As in the monthly summary, a joined (active) member has the HRMS status of every day from their first day (joining or added, the earlier) to today, Absent and Week Off included; a member who has not joined or has left has only the days they have entries on. Days after today are never read.
+- **Places.** An entry counts at the branch it checked in at: an office branch by its name; a Project site as its Project (two sites of one Project are one place); no fence matched (GPS off, accepted out of fence, a back-dated day or a missed checkout carry no location) as one place named "No fence matched", with the nil id `00000000-0000-0000-0000-000000000000`. A removed branch keeps its name.
+- **In and Out** are the first check-in and the last check-out at that place, in Company time; while an entry there is open, Out is empty and the place shows "No check-out". Pending entries show their times, "Awaiting approval" and no hours.
+- **Overtime** is the day's HRMS overtime (hours past the shift, every hour on a holiday or week off), put on the place with the most hours that day.
+- **Access.** The route needs Office Staff Read (403 `PERMISSION_DENIED`) and HRMS Attendance Read (403 `HRMS_ATTENDANCE_READ_REQUIRED`); the page asks for the second before showing the tab's data.
 
 No amounts are returned: no wages, rates or pay.
 
