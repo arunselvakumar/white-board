@@ -3,6 +3,12 @@ import { StatusCodes } from "http-status-codes";
 import { describe, expect, it } from "vitest";
 
 import { GET as listCategories } from "@/app/api/construction/masters/labour-categories/route";
+import { POST as deleteDepartment } from "@/app/api/construction/organization/departments/[id]/delete/route";
+import { POST as renameDepartment } from "@/app/api/construction/organization/departments/[id]/update/route";
+import {
+  GET as listDepartments,
+  POST as createDepartment,
+} from "@/app/api/construction/organization/departments/route";
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import { jsonRequest, memberWith, ownerWithCompany } from "@/test/companies";
 import { TEST_ORIGIN } from "@/test/sessions";
@@ -20,6 +26,7 @@ type Role = {
   name: string;
   description: string | null;
   isSeed: boolean;
+  department: { id: string; name: string } | null;
   permissions: Record<string, string[]>;
   userCount: number;
   createdAt: string;
@@ -40,7 +47,11 @@ async function list(cookie: string): Promise<Role[]> {
   return (await json<{ items: Role[] }>(response)).items;
 }
 
-function update(cookie: string, role: Role, changes: Partial<Role>) {
+function update(
+  cookie: string,
+  role: Role,
+  changes: Partial<Role> & { departmentId?: string | null },
+) {
   return updateRole(
     jsonRequest(`${BASE}/${role.id}/update`, cookie, {
       name: role.name,
@@ -51,6 +62,21 @@ function update(cookie: string, role: Role, changes: Partial<Role>) {
     }),
     params(role.id),
   );
+}
+
+const DEPARTMENTS = `${TEST_ORIGIN}/api/construction/organization/departments`;
+
+type Department = { id: string; name: string; updatedAt: string };
+
+async function addDepartment(
+  cookie: string,
+  name: string,
+): Promise<Department> {
+  const response = await createDepartment(
+    jsonRequest(DEPARTMENTS, cookie, { name }),
+  );
+  expect(response.status).toBe(StatusCodes.CREATED);
+  return json<Department>(response);
 }
 
 describe("Role Management HTTP (ADR CM-0030)", () => {
@@ -405,5 +431,147 @@ describe("Role Management HTTP (ADR CM-0030)", () => {
         "/api/construction/organization/roles/{id}/delete",
       ]),
     );
+  });
+});
+
+describe("A Role under a Department (ADR CM-0050)", () => {
+  it("adds a Role under a Department or none, moves it, and copies it with Duplicate", async () => {
+    const owner = await ownerWithCompany();
+    const accounts = await addDepartment(owner.cookie, "Accounts");
+    const purchase = await addDepartment(owner.cookie, "Purchase");
+
+    const none = await createRole(
+      jsonRequest(BASE, owner.cookie, { name: "Driver", permissions: {} }),
+    );
+    expect(await json(none)).toMatchObject({ department: null });
+
+    const created = await createRole(
+      jsonRequest(BASE, owner.cookie, {
+        name: "Cashier",
+        departmentId: accounts.id,
+        permissions: {},
+      }),
+    );
+    expect(created.status).toBe(StatusCodes.CREATED);
+    const role = await json<Role>(created);
+    expect(role.department).toEqual({ id: accounts.id, name: "Accounts" });
+
+    // Leaving departmentId out keeps it.
+    const kept = await updateRole(
+      jsonRequest(`${BASE}/${role.id}/update`, owner.cookie, {
+        name: "Cashier",
+        permissions: {},
+        updatedAt: role.updatedAt,
+      }),
+      params(role.id),
+    );
+    const keptRole = await json<Role>(kept);
+    expect(keptRole.department).toEqual({ id: accounts.id, name: "Accounts" });
+
+    const moved = await json<Role>(
+      await update(owner.cookie, keptRole, { departmentId: purchase.id }),
+    );
+    expect(moved.department).toEqual({ id: purchase.id, name: "Purchase" });
+
+    const copy = await json<Role>(
+      await duplicateRole(
+        jsonRequest(`${BASE}/${role.id}/duplicate`, owner.cookie, {}),
+        params(role.id),
+      ),
+    );
+    expect(copy.department).toEqual({ id: purchase.id, name: "Purchase" });
+
+    // A rename of the Department shows on its Roles at once.
+    await renameDepartment(
+      jsonRequest(`${DEPARTMENTS}/${purchase.id}/update`, owner.cookie, {
+        name: "Stores",
+        expectedUpdatedAt: purchase.updatedAt,
+      }),
+      params(purchase.id),
+    );
+    const listed = await list(owner.cookie);
+    expect(listed.find((item) => item.id === role.id)?.department).toEqual({
+      id: purchase.id,
+      name: "Stores",
+    });
+
+    const cleared = await json<Role>(
+      await update(owner.cookie, moved, { departmentId: null }),
+    );
+    expect(cleared.department).toBeNull();
+
+    const audit = await prisma.constructionOrganizationAuditEvent.findMany({
+      where: { workspaceId: owner.workspaceId, entityId: role.id },
+      select: { after: true },
+    });
+    expect(
+      audit
+        .map((event) =>
+          String((event.after as { departmentId: string | null }).departmentId),
+        )
+        .sort(),
+    ).toEqual([accounts.id, accounts.id, purchase.id, "null"].sort());
+  });
+
+  it("refuses a Department that is unknown, deleted or another Company's", async () => {
+    const owner = await ownerWithCompany();
+    const other = await ownerWithCompany("Sri Infra");
+    const theirs = await addDepartment(other.cookie, "Accounts");
+    const gone = await addDepartment(owner.cookie, "Old");
+    await deleteDepartment(
+      jsonRequest(`${DEPARTMENTS}/${gone.id}/delete`, owner.cookie, {}),
+      params(gone.id),
+    );
+    for (const departmentId of [
+      theirs.id,
+      gone.id,
+      "0199c3a0-0000-7000-8000-00000000dead",
+    ]) {
+      const response = await createRole(
+        jsonRequest(BASE, owner.cookie, {
+          name: "Clerk",
+          departmentId,
+          permissions: {},
+        }),
+      );
+      expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+      expect(await json(response)).toMatchObject({
+        code: "ROLE_DEPARTMENT_NOT_FOUND",
+      });
+    }
+    const notUuid = await createRole(
+      jsonRequest(BASE, owner.cookie, {
+        name: "Clerk",
+        departmentId: "accounts",
+        permissions: {},
+      }),
+    );
+    expect(notUuid.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(
+      (await list(owner.cookie)).some((role) => role.name === "Clerk"),
+    ).toBe(false);
+  });
+
+  it("lets whoever adds Roles read the Departments to choose from", async () => {
+    const owner = await ownerWithCompany();
+    const roleAdmin = await memberWith(owner, {
+      "organization.roles": ["read", "create"],
+    });
+    const response = await listDepartments(
+      jsonRequest(DEPARTMENTS, roleAdmin.cookie),
+    );
+    expect(response.status).toBe(StatusCodes.OK);
+    expect(
+      (await json<{ items: Department[] }>(response)).items.map(
+        (item) => item.name,
+      ),
+    ).toEqual(["Human Resources", "Marketing"]);
+    expect(
+      (
+        await createDepartment(
+          jsonRequest(DEPARTMENTS, roleAdmin.cookie, { name: "Accounts" }),
+        )
+      ).status,
+    ).toBe(StatusCodes.FORBIDDEN);
   });
 });

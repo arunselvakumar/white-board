@@ -109,6 +109,47 @@ describe("Role", () => {
     expect(copy.permissions.equals(seeded.permissions)).toBe(true);
   });
 
+  it("is under a Department or none, kept on an update that leaves it out (ADR CM-0050)", () => {
+    expect(role().departmentId).toBeNull();
+    const cashier = Role.create({
+      id: "r2",
+      workspaceId: "company-1",
+      name: "Cashier",
+      departmentId: "accounts",
+      permissions: attendance,
+      by: "user-1",
+      now: NOW,
+    });
+    expect(cashier.departmentId).toBe("accounts");
+    cashier.update({
+      name: "Cashier",
+      permissions: attendance,
+      by: "u",
+      now: NOW,
+    });
+    expect(cashier.departmentId).toBe("accounts");
+    expect(
+      cashier.duplicate({ id: "r3", name: "Cashier (copy)", by: "u", now: NOW })
+        .departmentId,
+    ).toBe("accounts");
+    cashier.update({
+      name: "Cashier",
+      departmentId: "purchase",
+      permissions: attendance,
+      by: "u",
+      now: NOW,
+    });
+    expect(cashier.departmentId).toBe("purchase");
+    cashier.update({
+      name: "Cashier",
+      departmentId: null,
+      permissions: attendance,
+      by: "u",
+      now: NOW,
+    });
+    expect(cashier.departmentId).toBeNull();
+  });
+
   it("cannot be deleted twice", () => {
     const item = role();
     item.delete("user-1", NOW);

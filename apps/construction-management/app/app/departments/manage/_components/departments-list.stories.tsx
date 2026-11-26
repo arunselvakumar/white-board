@@ -32,8 +32,15 @@ const STORY_DEPARTMENTS = [
 
 let api: ReturnType<typeof fakeApi>;
 
-/** An in-memory departments API: names unique ignoring case. */
-function serveDepartments(initial = STORY_DEPARTMENTS) {
+/**
+ * An in-memory departments API: names unique ignoring case. `withRoles`
+ * names departments that Roles are under, so their delete answers
+ * DEPARTMENT_IN_USE (ADR CM-0050).
+ */
+function serveDepartments(
+  initial = STORY_DEPARTMENTS,
+  withRoles: readonly string[] = [],
+) {
   return () => {
     let items = [...initial];
     let next = 100;
@@ -68,6 +75,16 @@ function serveDepartments(initial = STORY_DEPARTMENTS) {
       const item = items.find((row) => row.id === match?.[1]);
       if (item == null) return undefined;
       if (match?.[2] === "delete") {
+        if (withRoles.includes(item.name))
+          return Response.json(
+            {
+              code: "DEPARTMENT_IN_USE",
+              message:
+                "2 Roles are under this Department. Move them to another Department, or to none, first.",
+              details: { roleCount: 2 },
+            },
+            { status: 409 },
+          );
         items = items.filter((row) => row.id !== item.id);
         return new Response(null, { status: 204 });
       }
@@ -239,6 +256,29 @@ export const DeleteAsksFirst: Story = {
       expect(canvas.queryByText("Accounts")).not.toBeInTheDocument(),
     );
     await expect(calledPath(api.spy, "/delete")).toBe(true);
+  },
+};
+
+/** Roles are under it: the dialog says so and the department stays (ADR CM-0050). */
+export const DeleteRefusedWhileRolesUnder: Story = {
+  beforeEach: serveDepartments(STORY_DEPARTMENTS, ["Accounts"]),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await canvas.findByRole("list", { name: "Departments" });
+    await chooseFromMenu(canvasElement, userEvent, "Accounts", "Delete");
+    const dialog = await body.findByRole("alertdialog");
+    await expect(
+      await within(dialog).findByText(/Move any Roles under it/),
+    ).toBeVisible();
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: "Delete" }),
+    );
+    await expect(
+      await within(dialog).findByText(
+        /2 Roles are under this Department\. Move them/,
+      ),
+    ).toBeVisible();
+    await expect(canvas.getByText("Accounts")).toBeInTheDocument();
   },
 };
 

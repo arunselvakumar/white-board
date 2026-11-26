@@ -47,6 +47,8 @@ export type RoleProps = {
   description: string | null;
   /** Copied from `seeds/roles.json` when the Company was created. */
   isSeed: boolean;
+  /** The Department the Role is under, or none (ADR CM-0050). */
+  departmentId: string | null;
   permissions: PermissionSet;
   createdAt: Date;
   updatedAt: Date;
@@ -61,7 +63,8 @@ export type RoleProps = {
  * it on every request, so editing a Role changes access for everyone on
  * it. A default (seeded) Role keeps its name and cannot be deleted: the
  * app finds Site Engineer and HRMS Staff by name. Its description and
- * matrix are edited like any other (ADR CM-0037).
+ * matrix are edited like any other (ADR CM-0037). A Role may be under one
+ * of the Company's Departments, or none (ADR CM-0050).
  */
 export class Role {
   private constructor(private props: RoleProps) {}
@@ -71,6 +74,7 @@ export class Role {
     workspaceId: string;
     name: string;
     description?: string | null;
+    departmentId?: string | null;
     permissions: PermissionSet;
     isSeed?: boolean;
     by: string;
@@ -82,6 +86,7 @@ export class Role {
       name: cleanName(input.name),
       description: cleanDescription(input.description),
       isSeed: input.isSeed ?? false,
+      departmentId: input.departmentId ?? null,
       permissions: input.permissions,
       createdAt: input.now,
       updatedAt: input.now,
@@ -110,6 +115,9 @@ export class Role {
   get isSeed(): boolean {
     return this.props.isSeed;
   }
+  get departmentId(): string | null {
+    return this.props.departmentId;
+  }
   get permissions(): PermissionSet {
     return this.props.permissions;
   }
@@ -130,12 +138,14 @@ export class Role {
   }
 
   /**
-   * Replaces the name, description and the whole matrix. 400
+   * Replaces the name, description, Department (kept when `departmentId`
+   * is left out; `null` takes the Role out of it) and the whole matrix. 400
    * `ROLE_DEFAULT_NAME_LOCKED` when the name of a default Role changes.
    */
   update(input: {
     name: string;
     description?: string | null;
+    departmentId?: string | null;
     permissions: PermissionSet;
     by: string;
     now: Date;
@@ -150,19 +160,24 @@ export class Role {
       ...this.props,
       name,
       description: cleanDescription(input.description),
+      departmentId:
+        input.departmentId === undefined
+          ? this.props.departmentId
+          : input.departmentId,
       permissions: input.permissions,
       updatedAt: input.now,
       updatedBy: input.by,
     };
   }
 
-  /** A Company-made copy with the same matrix (`Role/Duplicate`). */
+  /** A Company-made copy with the same Department and matrix (`Role/Duplicate`). */
   duplicate(input: { id: string; name: string; by: string; now: Date }): Role {
     return Role.create({
       id: input.id,
       workspaceId: this.props.workspaceId,
       name: input.name,
       description: this.props.description,
+      departmentId: this.props.departmentId,
       permissions: this.props.permissions,
       by: input.by,
       now: input.now,

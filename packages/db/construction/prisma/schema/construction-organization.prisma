@@ -82,30 +82,35 @@ model ConstructionOrganizationSubscription {
 /// (partial index, hand-written in the migration). Each Company gets its own
 /// copy of the seed set (`seeds/roles.json`).
 model ConstructionOrganizationRole {
-  id          String    @id @db.Uuid
-  workspaceId String    @map("workspace_id")
-  name        String
-  description String?
-  isSeed      Boolean   @default(false) @map("is_seed")
-  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
-  createdBy   String    @map("created_by")
-  updatedBy   String    @map("updated_by")
-  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  id           String    @id @db.Uuid
+  workspaceId  String    @map("workspace_id")
+  name         String
+  description  String?
+  isSeed       Boolean   @default(false) @map("is_seed")
+  /// The Department the Role is under, or none (ADR CM-0050). A Department
+  /// with live Roles in it cannot be deleted.
+  departmentId String?   @map("department_id") @db.Uuid
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime  @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy    String    @map("created_by")
+  updatedBy    String    @map("updated_by")
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(3)
 
+  department  ConstructionOrganizationDepartment?          @relation(fields: [departmentId], references: [id], onDelete: Restrict)
   permissions ConstructionOrganizationRoleMenuPermission[]
   members     ConstructionOrganizationTeamMember[]
 
   @@index([workspaceId])
+  @@index([departmentId])
   @@map("roles")
   @@schema("construction_organization")
 }
 
-/// A department of the Company (Manage Departments, ADR CM-0049): a name
-/// only, linked to nothing else for now. Human Resources and Marketing are
-/// system departments in every Company: their name is fixed and they are
-/// never deleted. Names are unique among live rows, ignoring case (partial
-/// index in the migration).
+/// A department of the Company (Manage Departments, ADR CM-0049): a name.
+/// A Role may be under one (ADR CM-0050); nothing else refers to it.
+/// Human Resources and Marketing are system departments in every Company:
+/// their name is fixed and they are never deleted. Names are unique among
+/// live rows, ignoring case (partial index in the migration).
 model ConstructionOrganizationDepartment {
   id          String    @id @db.Uuid
   workspaceId String    @map("workspace_id")
@@ -117,6 +122,8 @@ model ConstructionOrganizationDepartment {
   updatedBy   String    @map("updated_by")
   deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
   deletedBy   String?   @map("deleted_by")
+
+  roles ConstructionOrganizationRole[]
 
   @@index([workspaceId])
   @@map("departments")

@@ -9,7 +9,11 @@ import { departmentHandlers as handlers } from "../../handlers";
 
 export const dynamic = "force-dynamic";
 
-/** Deletes a Company-made department (ADR CM-0049 §4). 409 `DEPARTMENT_IS_SYSTEM`. */
+/**
+ * Deletes a Company-made department (ADR CM-0049 §4). 409
+ * `DEPARTMENT_IS_SYSTEM`; 409 `DEPARTMENT_IN_USE` while Roles are under it
+ * (ADR CM-0050).
+ */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },

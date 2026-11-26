@@ -40,7 +40,7 @@ _Avoid_: invite request
 ### Access
 
 **Role**:
-A named Permission Matrix in a Company (Admin, Site Engineer, HRMS Staff…), given to Team Members on Human Resources → Role Management. Every Team Member but the Owner has exactly one. Editing a Role changes access for everyone on it (ADR CM-0030).
+A named Permission Matrix in a Company (Admin, Site Engineer, HRMS Staff…), given to Team Members on Human Resources → Role Management. Every Team Member but the Owner has exactly one. Editing a Role changes access for everyone on it (ADR CM-0030). A Role may be under one **Department**, optionally (ADR CM-0050).
 _Avoid_: designation, job title, permission template, group
 
 **Permission Matrix**:
@@ -65,7 +65,7 @@ _Avoid_: settings (for these lists), catalog
 
 There is no trade **Department** (RCC, Plumbing…) since ADR CM-0048. Nothing is filed under a trade; **Departments** in the main menu are Human Resources and Marketing (ADR CM-0046).
 
-A **Department** is an office unit of the Company (Accounts, Purchase), kept in **Manage Departments** under Departments (ADR CM-0049). Human Resources and Marketing are **system Departments**: every Company has them, and they keep their names and are never deleted. A Company adds its own; for now a Department is a name only, linked to no other record.
+A **Department** is an office unit of the Company (Accounts, Purchase), kept in **Manage Departments** under Departments (ADR CM-0049). Human Resources and Marketing are **system Departments**: every Company has them, and they keep their names and are never deleted. A Company adds its own. A **Role** may be under one Department, or none (ADR CM-0050); a Department with Roles under it cannot be deleted. Nothing else is linked to a Department.
 
 **Contractor**:
 A party that executes work, labour-and-material or labour-only. Has invoices with TDS. Not a User. Inactive Contractors leave the pickers but stay on their Projects.

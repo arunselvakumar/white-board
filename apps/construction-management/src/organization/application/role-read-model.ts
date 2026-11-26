@@ -7,6 +7,8 @@ export type RoleReadModel = {
   name: string;
   description: string | null;
   isSeed: boolean;
+  /** The Department the Role is under, or none (ADR CM-0050). */
+  department: { id: string; name: string } | null;
   permissions: PermissionGrants;
   /** Live non-Owner Team Members on the Role. */
   userCount: number;
@@ -14,12 +16,25 @@ export type RoleReadModel = {
   updatedAt: Date;
 };
 
-export function toRoleReadModel(role: Role, userCount: number): RoleReadModel {
+/** `departmentNames` holds the Company's live Departments by id. */
+export function toRoleReadModel(
+  role: Role,
+  userCount: number,
+  departmentNames: ReadonlyMap<string, string>,
+): RoleReadModel {
+  const departmentName =
+    role.departmentId == null
+      ? undefined
+      : departmentNames.get(role.departmentId);
   return {
     id: role.id,
     name: role.name,
     description: role.description,
     isSeed: role.isSeed,
+    department:
+      role.departmentId == null || departmentName == null
+        ? null
+        : { id: role.departmentId, name: departmentName },
     permissions: role.permissions.toGrants(),
     userCount,
     createdAt: role.createdAt,

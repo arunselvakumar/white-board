@@ -44,7 +44,7 @@ export const roleOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: ROLES_PATH,
     summary:
-      "Add a Role (409 ROLE_NAME_TAKEN; 403 CANNOT_GRANT for a cell the caller lacks)",
+      "Add a Role, under a Department or none (409 ROLE_NAME_TAKEN; 400 ROLE_DEPARTMENT_NOT_FOUND; 403 CANNOT_GRANT for a cell the caller lacks)",
     tags: ORGANIZATION,
     body: CreateConstructionOrganizationRoleRequestModel,
     successStatus: StatusCodes.CREATED,
@@ -67,7 +67,7 @@ export const roleOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: `${ITEM}/update`,
     summary:
-      "Replace a Role's name, description and matrix; everyone on it has the new access from their next request (400 ROLE_DEFAULT_NAME_LOCKED when a default Role's name changes; 409 STALE_ROLE; 403 OWN_ROLE, CANNOT_GRANT)",
+      "Replace a Role's name, description, Department and matrix; everyone on it has the new access from their next request (400 ROLE_DEFAULT_NAME_LOCKED when a default Role's name changes, ROLE_DEPARTMENT_NOT_FOUND; 409 STALE_ROLE; 403 OWN_ROLE, CANNOT_GRANT)",
     tags: ORGANIZATION,
     params: ConstructionOrganizationRoleParamsModel,
     body: UpdateConstructionOrganizationRoleRequestModel,
@@ -84,7 +84,8 @@ export const roleOpenApiOperations: OpenApiOperation[] = [
   {
     method: "post",
     path: `${ITEM}/duplicate`,
-    summary: 'Copy a Role as "<name> (copy)", with nobody on it',
+    summary:
+      'Copy a Role as "<name> (copy)", under the same Department, with nobody on it',
     tags: ORGANIZATION,
     params: ConstructionOrganizationRoleParamsModel,
     successStatus: StatusCodes.CREATED,
