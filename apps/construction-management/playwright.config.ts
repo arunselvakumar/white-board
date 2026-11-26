@@ -50,7 +50,7 @@ export default defineConfig({
     screenshot: "only-on-failure",
     timezoneId: "Asia/Kolkata",
     locale: "en-IN",
-    /* GSAP and popup animations raced Storybook tests; the app honours this. */
+    /* GSAP and popup animations race tests; the app honours this. */
     contextOptions: { reducedMotion: "reduce" },
   },
 

@@ -1,8 +1,6 @@
 "use client";
 
 import {
-  createContext,
-  use,
   useCallback,
   useEffect,
   useRef,
@@ -363,15 +361,4 @@ export function useCamera(): Camera {
     switchCamera,
     capture,
   };
-}
-
-/**
- * The camera a screen uses (check-in capture, Take photo): the real one,
- * or a stand-in a story provides (Storybook cannot open a camera).
- */
-export const CameraContext = createContext<() => Camera>(useCamera);
-
-export function useProvidedCamera(): Camera {
-  const useProvidedCamera = use(CameraContext);
-  return useProvidedCamera();
 }

@@ -1,8 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
-import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -41,27 +39,6 @@ export default defineConfig({
             EMAIL_TRANSPORT: "outbox",
           },
           globalSetup: ["./vitest.http-global-setup.ts"],
-        },
-      },
-      {
-        extends: true,
-        plugins: [
-          storybookTest({
-            configDir: path.join(dirname, ".storybook"),
-            storybookScript: "bun run storybook -- --no-open",
-          }),
-        ],
-        test: {
-          name: "storybook",
-          setupFiles: ["./.storybook/vitest.setup.ts"],
-          browser: {
-            enabled: true,
-            headless: true,
-            provider: playwright({
-              contextOptions: { reducedMotion: "reduce" },
-            }),
-            instances: [{ browser: "chromium" }],
-          },
         },
       },
     ],

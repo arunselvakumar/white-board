@@ -1,5 +1,3 @@
-import storybook from "eslint-plugin-storybook";
-
 import { nextJsConfig } from "@repo/eslint-config/next-js";
 
 // Bounded contexts under `src/` (root ADR-0009, ADR CM-0001). A context
@@ -168,7 +166,6 @@ export default [
   skeletonGuard,
   prismaErrorGuard,
   pageHrefGuard,
-  ...storybook.configs["flat/recommended"],
   {
     // Playwright fixtures hand their value to `use`, which is not React's.
     // Page objects expose every URL as a getter, literal or not, so a
@@ -182,7 +179,6 @@ export default [
   {
     // public/ holds static files served as-is (sw.js is plain browser JS).
     ignores: [
-      "storybook-static/**",
       ".next-verify/**",
       ".next-e2e/**",
       "playwright-report/**",

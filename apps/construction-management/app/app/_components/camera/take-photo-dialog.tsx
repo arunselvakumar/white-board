@@ -17,7 +17,7 @@ import { fieldForCode } from "@/lib/server-errors";
 
 import { CameraCaptureError } from "./camera-frame";
 import { CaptureCameraPanel } from "./capture-camera-panel";
-import { useProvidedCamera, type CapturedPhoto } from "./use-camera";
+import { useCamera, type CapturedPhoto } from "./use-camera";
 
 function messageOf(error: unknown): string {
   return error instanceof CameraCaptureError
@@ -38,7 +38,7 @@ function TakePhoto({
   onTaken: (file: File) => Promise<unknown>;
   onDone: () => void;
 }) {
-  const camera = useProvidedCamera();
+  const camera = useCamera();
   const [taken, setTaken] = useState<CapturedPhoto | null>(null);
   const [busy, setBusy] = useState<"capture" | "save" | null>(null);
   const [error, setError] = useState<string | undefined>();

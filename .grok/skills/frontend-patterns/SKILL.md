@@ -1,6 +1,6 @@
 ---
 name: frontend-patterns
-description: Whiteboard UI conventions — use @repo/ui (shadcn/Base UI) components instead of native HTML controls, wire Select with Controller, keep forms on react-hook-form and zod. Use when adding or changing screens, forms, inputs, selects, dropdowns, buttons, dialogs, checkboxes, or Storybook play functions in apps/whiteboard or packages/ui.
+description: Whiteboard UI conventions — use @repo/ui (shadcn/Base UI) components instead of native HTML controls, wire Select with Controller, keep forms on react-hook-form and zod. Use when adding or changing screens, forms, inputs, selects, dropdowns, buttons, dialogs, or checkboxes in apps/whiteboard or packages/ui.
 ---
 
 # Frontend patterns
@@ -111,18 +111,3 @@ A compact trigger (`w-32`, a filter) still gets the 176 px menu; Base UI shifts 
 - A field the Zod schema requires gets `<Label required>` (red asterisk) and `aria-required` on its control; a conditional one gets `required={…}` from the watched value. Groups put `<RequiredIndicator />` (or `FieldLegend required`) after the legend. The asterisk is CSS on an empty `aria-hidden` span, so `getByLabelText("Name")` still matches. For an either/or pair, mark only the primary field, while the other is blank. Leave existing "(optional)" labels as they are.
 - `noValidate` on `<form>`; Zod owns messages
 - Submit is `Button type="submit"`
-
-## Storybook
-
-Select options portal to `document.body`, so `canvas.getByRole("option")` misses them.
-
-```ts
-await userEvent.click(
-  canvas.getByLabelText("What kind of institution is this?"),
-);
-await userEvent.click(
-  await within(canvasElement.ownerDocument.body).findByRole("option", {
-    name: "School",
-  }),
-);
-```

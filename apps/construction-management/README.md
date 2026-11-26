@@ -20,8 +20,6 @@ An existing Postgres volume predates the `construction` database; create it once
 ```sh
 bun run --cwd apps/construction-management test           # domain unit tests
 bun run --cwd apps/construction-management test:http      # HTTP tests on construction_test
-bun run --cwd apps/construction-management test-storybook # Storybook play functions
-bun run --cwd apps/construction-management storybook      # http://localhost:6007
 bun run --cwd apps/construction-management test:e2e:build  # production build for end-to-end tests
 bun run --cwd apps/construction-management test:e2e:pr     # Playwright: the @pr journeys
 bun run --cwd apps/construction-management test:e2e        # Playwright: every journey

@@ -22,7 +22,7 @@ You are implementing milestone <MILESTONE> of the Construction Management app in
 - Identity (users, sessions, workspaces=companies, memberships, invitations) stays in @repo/auth. Company = Workspace. Never join to the identity schema.
 - Every command checks the permission matrix via can(member, menu, flag, { projectId? }) once CM-107 exists; before that, owner-only.
 - Money is integer paise; quantities are decimal + UoM; balances are derived from append-only ledger entries (ADR CM-0004).
-- UI: @repo/ui components, react-hook-form + zod, AppShell, useSuspenseQuery + queryOptions, Storybook play functions for every form and empty state. Form widths and avatar rules follow AGENTS.md.
+- UI: @repo/ui components, react-hook-form + zod, AppShell, useSuspenseQuery + queryOptions. Form widths and avatar rules follow AGENTS.md.
 - Verify as you go: `bun run check-types`, `bun run lint`, `bun run test --filter=construction-management`, `bun run test:http --filter=construction-management`, `bun run format:check` (CI fails on an unformatted file). Run the dev server and check screens in the browser; a screenshot is not verification.
 - Mark anything you had to assume with a short note in the PR description. Do not pad; do not add features outside the tickets.
 

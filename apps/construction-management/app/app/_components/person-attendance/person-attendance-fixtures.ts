@@ -1,4 +1,3 @@
-import type { MockRoute } from "@/.storybook/mock-fetch";
 import type {
   PersonAttendanceDay,
   PersonAttendancePage,
@@ -276,18 +275,6 @@ export function attendancePage(
             headDays: worked.reduce((sum, d) => sum + (d.headDays ?? 0), 0),
             places: placeIds.size,
           },
-  };
-}
-
-/** A mock route for `{base}/attendance` that pages like the server. */
-export function attendanceRoute(
-  path: string,
-  fixture: AttendanceFixture,
-): MockRoute {
-  return {
-    path,
-    respond: ({ search }) =>
-      Response.json(attendancePage(fixture, search.get("to"))),
   };
 }
 

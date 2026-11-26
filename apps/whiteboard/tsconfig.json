@@ -17,8 +17,6 @@
     "**/*.ts",
     "**/*.tsx",
     "**/*.mts",
-    ".storybook/**/*.ts",
-    ".storybook/**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],

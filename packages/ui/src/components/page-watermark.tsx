@@ -6,8 +6,8 @@ import { useLayoutEffect, useRef } from "react";
 /**
  * What a page's `<main>` needs for the PageWatermark inside it: a stacking
  * context, so the name paints above the shell's background, and a horizontal
- * clip, so a long name is cut at the page's edge. Every shell layout uses it,
- * and so do the Storybook previews. Import it from Client Components only,
+ * clip, so a long name is cut at the page's edge. Every shell layout uses it.
+ * Import it from Client Components only,
  * as this file is one: a Server Component would get a reference, not the
  * string.
  */
