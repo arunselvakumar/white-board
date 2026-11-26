@@ -1,0 +1,68 @@
+# CM-0051 — An Attendance tab on the Labour, Site Engineer, Vendor and Office Staff pages
+
+- Status: accepted (2026-11-26, the owner's request)
+- Date: 2026-11-26
+- Relates to: [CM-0038](CM-0038-project-staffing-and-activity-feeds.md) (the people pages' tabs and who sees which Project), [CM-0043](CM-0043-site-check-in.md) (the Check-In log), [CM-0044](CM-0044-check-ins-in-the-activity-feeds-and-teams-rows-open-profiles.md) (§4: check-in entries need Attendance Read), [CM-0011](CM-0011-attendance-check-in-out-and-working-hours.md) (a Labour day's hours), [CM-0012](CM-0012-hrms-product-decisions.md) (§2: an HRMS day's status)
+
+The owner asked (2026-11-26) for an **Attendance** tab on a Labour's page, a Site Engineer's page and "anyone who deals with attendance": the figures that matter as cards, and a calendar of the days they worked in the style of a contribution graph, where hovering a day shows the Projects they worked at that day and the hours at each.
+
+Until now attendance shows on a person's page only as Activity entries, one per day, newest first. That answers "what happened on the 12th?" but not "how regular is this person?" or "how many hours did they give us this month?".
+
+## Decisions taken with the owner
+
+| Question                                                   | Answer                                                                                                                                   |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Which pages get the tab?                                   | All four: Labours, Site Engineers, Vendors and Office Staff.                                                                             |
+| A Labour day marked Present or Half Day with no In and Out | Counts the Labour's working hours as marked that day (Half Day: half of them), plus its overtime. The hover says no times were recorded. |
+| What period do the cards cover?                            | A month the viewer picks (this month at first), with all-time figures beside them.                                                       |
+
+## Decision
+
+### 1. The tab
+
+- Each of the four pages gains an **Attendance** tab between Details and Activity, kept in the address as `?tab=attendance`, with the picked month as `?month=YYYY-MM`.
+- The tab has three parts, top to bottom: the **month's cards**, a one-line **all-time** summary, and the **calendar**.
+
+### 2. The calendar
+
+- One block per month laid out like a wall calendar (Monday first), the blocks side by side, newest on the right. It opens on this month and loads earlier months as the viewer scrolls back (six at a time), stopping at the person's first month: the earliest of their first attendance day, their joining date and the day they were added.
+- A day's shade says how much was worked: hours for Labours, Site Engineers and Office Staff (none, under 4, under 8, under 10, 10 or more), and head-days for a Vendor (in quarters of the most in the months shown). Absent, leave and holiday or week-off days get their own marks; days after today are blank; today is ringed.
+- Clicking a month's name picks it for the cards.
+- **Hovering or focusing a day** shows its date and status, then one line per Project (or HRMS branch) worked at that day: its name and the hours there, with In – Out when recorded, overtime when any, and for a Vendor the headcount (full and half days) and head-days. Each day is also a button with the same text as its label, so the calendar can be read without a mouse.
+
+### 3. How a day is counted
+
+| Who           | Read from                                                       | A day's hours at a Project                                                                                                                                                                         | Day status                                                                                           |
+| ------------- | --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Labour        | `labour_attendance` (and its overtime)                          | In and Out: Out − In − break (CM-0011). Present without times: the working hours stored on the day; Half Day: half of them. Overtime is the day's overtime hours. Absent, leave and holiday: none. | As marked; On Leave that is paid shows as Paid Leave. Two Projects in one day: the better of the two |
+| Site Engineer | `check_in_events` of kind `site_engineer`, voided ones left out | Each Check In to the next Check Out at that Project, added up. A Check In with no Check Out is shown ("No check-out") and adds no hours.                                                           | Present on any day with a Check In. The log has no absences                                          |
+| Vendor        | `vendor_attendance` and its lines                               | No hours: the headcount, full days and half days, and head-days (full + half ÷ 2). Overtime is the lines' overtime hours.                                                                          | Present on any day with a headcount. No absences                                                     |
+| Office Staff  | HRMS `attendance_entries`                                       | Closed entries that need no approval or are approved, by the branch (or Project site) checked in at. Pending entries show as "Awaiting approval" and add no hours; rejected ones are left out.     | The HRMS day status (CM-0012 §2): Present, Half Day, Absent, On Leave, Holiday or Week Off           |
+
+No amounts are returned: no wages, rates or pay.
+
+### 4. The cards
+
+For the picked month:
+
+- **Labours, Site Engineers, Office Staff:** Days worked (a Half Day counts as half, with the full and half days under it), Hours worked, Overtime, Average hours a day worked, Absent and leave (Labours and Office Staff only: the other two have no absences) and Projects worked at.
+- **Vendors:** Days supplied, Head-days, Most heads in a day, Overtime hours and Projects supplied.
+
+All time: the first and last day worked, days worked, hours (head-days for a Vendor) and the number of Projects.
+
+### 5. Who sees what
+
+- The tab follows the page: `masters.labours` Read for Labours and Site Engineers, `masters.vendors` for Vendors, `organization.team_members` for Office Staff. Office Staff attendance also needs HRMS Attendance Read (`hrms.attendance`); without it the tab says so.
+- As in the Activity feed (CM-0038), a Project the viewer may not open is left out: its hours are not on the calendar or in the cards, and a day worked only there shows as not worked. The Owner sees every Project.
+- A Site Engineer's days come from the Check-In log, so they need Attendance Read on the Project as well (CM-0044 §4).
+- Office Staff days are not filtered by Project: HRMS Attendance Read already shows the whole Company's register (the monthly summary), so the tab shows the member's every entry, a Project site's included.
+
+### 6. The API
+
+`GET …/{id}/attendance?to=YYYY-MM&months=6` on each person's route (`/api/construction/labour/labours`, `/api/construction/masters/site-engineers`, `/api/construction/labour/vendors`, and the Office Staff route). `to` is the newest month (this month when left out) and `months` 1 to 12. Every route answers with the same model, `ConstructionPersonAttendanceResponseModel`: the months' days with their places, the person's first month, whether there are earlier months, and the all-time figures on the first page.
+
+## Consequences
+
+- The cards for a month are worked out in the browser from that month's days, so picking a month already loaded costs no request.
+- All-time figures read every day of the person once, when the tab opens. A person has at most a few hundred days a year, so this is cheap; if it is not, it can become a stored summary later without changing the model.
+- Vendor and Site Engineer days have no absences, so their cards leave those out rather than show zeros that would read as perfect attendance.

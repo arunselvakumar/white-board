@@ -2,6 +2,10 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor, within } from "storybook/test";
 
 import { StoryQueryClient } from "@/app/app/_components/masters/masters-story-support";
+import {
+  LABOUR_ATTENDANCE,
+  attendanceRoute,
+} from "@/app/app/_components/person-attendance/person-attendance-fixtures";
 
 import { mockFetch, type MockRoute } from "@/.storybook/mock-fetch";
 import {
@@ -45,6 +49,7 @@ const PAGE: MockRoute[] = [
     path: `${LABOURS}/${DHURESH.id}/documents`,
     respond: () => Response.json({ items: [] }),
   },
+  attendanceRoute(`${LABOURS}/${DHURESH.id}/attendance`, LABOUR_ATTENDANCE),
 ];
 
 function withActivity(respond: MockRoute["respond"]) {
@@ -99,6 +104,23 @@ export const DetailsKeepsTypedChangesAcrossTabs: Story = {
     // The form stayed mounted: what was typed is still there to save.
     await expect(canvas.getByLabelText("Labour name")).toHaveValue("Dhuresh N");
     await expect(canvas.getByRole("button", { name: "Save" })).toBeVisible();
+  },
+};
+
+/** The Attendance tab (ADR CM-0051): cards, all-time line and the calendar. */
+export const Attendance: Story = {
+  parameters: { searchParams: "?tab=attendance" },
+  beforeEach: withActivity(() => Response.json(activityPage([]))),
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByRole("tab", { name: "Attendance", selected: true }),
+    ).toBeVisible();
+    await expect(
+      await canvas.findByRole("list", { name: "This month in figures" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("region", { name: "Attendance calendar" }),
+    ).toBeVisible();
   },
 };
 

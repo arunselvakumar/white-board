@@ -8,23 +8,26 @@ import {
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components/tabs";
-import { History, UserRound } from "lucide-react";
+import { CalendarCheck, History, UserRound } from "lucide-react";
 
 import {
   EditLabourDetails,
   FormPage,
   editLabourMeta,
 } from "@/app/app/staff/labours/_components/labour-form";
+import { PersonAttendance } from "@/app/app/_components/person-attendance/person-attendance";
 import { labourQuery } from "@/src/queries/labours";
+import { labourAttendanceQuery } from "@/src/queries/person-attendance";
 
 import { LabourActivity } from "./labour-activity";
 
-const TABS = ["details", "activity"] as const;
+const TABS = ["details", "attendance", "activity"] as const;
 
 /**
- * A Labour's page (ADR CM-0038 §5): Details (Edit Labour's form) and
- * Activity, the tab kept in the address (`?tab=activity`). Details stays
- * mounted while Activity shows, so typed changes survive a tab switch.
+ * A Labour's page (ADR CM-0038 §5, CM-0051): Details (Edit Labour's
+ * form), Attendance and Activity, the tab kept in the address
+ * (`?tab=activity`). Details stays mounted while another tab shows, so
+ * typed changes survive a tab switch.
  */
 export function LabourPage({
   id,
@@ -56,6 +59,10 @@ export function LabourPage({
             <UserRound aria-hidden="true" />
             Details
           </TabsTrigger>
+          <TabsTrigger value="attendance">
+            <CalendarCheck aria-hidden="true" />
+            Attendance
+          </TabsTrigger>
           <TabsTrigger value="activity">
             <History aria-hidden="true" />
             Activity
@@ -63,6 +70,12 @@ export function LabourPage({
         </TabsList>
         <TabsContent value="details" keepMounted className="pt-4">
           <EditLabourDetails labour={data} />
+        </TabsContent>
+        <TabsContent value="attendance" className="pt-4">
+          <PersonAttendance
+            query={labourAttendanceQuery(id)}
+            emptyMessage="Days marked on the attendance sheet, or by Check-In, will show here."
+          />
         </TabsContent>
         <TabsContent value="activity" className="pt-4">
           <LabourActivity labourId={id} now={now} />

@@ -244,6 +244,10 @@ import {
   type OpenApiComponents,
   type OpenApiOperation,
 } from "./openapi";
+import {
+  personAttendanceOpenApiComponents,
+  personAttendanceOpenApiOperations,
+} from "./person-attendance-openapi";
 
 const ORGANIZATION = ["Construction · Organization"];
 
@@ -911,6 +915,10 @@ Object.assign(openApiComponents, siteEngineerActivityOpenApiComponents);
 openApiOperations.push(...siteEngineerActivityOpenApiOperations);
 Object.assign(openApiComponents, vendorActivityOpenApiComponents);
 openApiOperations.push(...vendorActivityOpenApiOperations);
+
+// Every person's Attendance tab (ADR CM-0051): one model, four routes.
+Object.assign(openApiComponents, personAttendanceOpenApiComponents);
+openApiOperations.push(...personAttendanceOpenApiOperations);
 
 // The project labour summary lists its own model and route.
 Object.assign(openApiComponents, labourSummaryOpenApiComponents);

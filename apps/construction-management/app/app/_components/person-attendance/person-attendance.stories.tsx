@@ -1,0 +1,153 @@
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { expect, waitFor, within } from "storybook/test";
+
+import { StoryQueryClient } from "@/app/app/_components/masters/masters-story-support";
+import { labourAttendanceQuery } from "@/src/queries/person-attendance";
+
+import { mockFetch } from "@/.storybook/mock-fetch";
+import {
+  LABOUR_ATTENDANCE,
+  NO_ATTENDANCE,
+  VENDOR_ATTENDANCE,
+  attendanceRoute,
+  type AttendanceFixture,
+} from "./person-attendance-fixtures";
+import { PersonAttendance } from "./person-attendance";
+
+const ID = "0195f0a0-0000-7000-8000-00000000c0de";
+const PATH = `/api/construction/labour/labours/${ID}/attendance`;
+const EMPTY = "Days marked on the attendance sheet will show here.";
+
+function serve(fixture: AttendanceFixture) {
+  return () => mockFetch([attendanceRoute(PATH, fixture)]).restore;
+}
+
+const meta = {
+  title: "People/Attendance tab",
+  component: PersonAttendance,
+  args: { query: labourAttendanceQuery(ID), emptyMessage: EMPTY },
+  render: (args) => (
+    <StoryQueryClient>
+      <PersonAttendance {...args} />
+    </StoryQueryClient>
+  ),
+} satisfies Meta<typeof PersonAttendance>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+/** A Labour: this month's cards, the all-time line and six months of calendar. */
+export const Labour: Story = {
+  beforeEach: serve(LABOUR_ATTENDANCE),
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByRole("heading", { name: "November 2026" }),
+    ).toBeVisible();
+    const cards = canvas.getByRole("list", { name: "This month in figures" });
+    for (const label of [
+      "Days worked",
+      "Hours worked",
+      "Overtime",
+      "Absent & leave",
+      "Projects worked at",
+    ])
+      await expect(within(cards).getByText(label)).toBeVisible();
+    await expect(canvas.getByText(/All time since Dec 2025:/)).toBeVisible();
+    // Six months open: Jun to Nov 2026, with "Earlier" before them.
+    await expect(
+      canvas.getByRole("button", { name: /^Jun 2026/ }),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByRole("button", { name: "Earlier" }),
+    ).toBeInTheDocument();
+  },
+};
+
+/** Hovering a day shows each Project and the hours there. */
+export const HoverShowsProjectsAndHours: Story = {
+  beforeEach: serve(LABOUR_ATTENDANCE),
+  play: async ({ canvas, userEvent }) => {
+    // 2026-11-02 is a Monday on two Projects in the fixture.
+    const day = await canvas.findByRole("button", {
+      name: /^Mon, 2 Nov 2026: Present, 10 h/,
+    });
+    await userEvent.hover(day);
+    const tooltip = await waitFor(() => {
+      const popup = document.querySelector<HTMLElement>(
+        '[data-slot="tooltip-content"]',
+      );
+      if (popup == null) throw new Error("No tooltip yet");
+      return popup;
+    });
+    await expect(tooltip).toHaveTextContent("Sky Towers");
+    await expect(tooltip).toHaveTextContent("4 h 30 m");
+    await expect(tooltip).toHaveTextContent("Villa Phase 2");
+    await expect(tooltip).toHaveTextContent("5 h 30 m");
+    await expect(tooltip).toHaveTextContent("Overtime 2 h");
+    await expect(tooltip).toHaveTextContent("Total");
+  },
+};
+
+/** Picking an earlier month loads the pages it needs and fills the cards. */
+export const PickAnEarlierMonth: Story = {
+  beforeEach: serve(LABOUR_ATTENDANCE),
+  play: async ({ canvas, userEvent }) => {
+    await canvas.findByRole("heading", { name: "November 2026" });
+    const previous = canvas.getByRole("button", { name: "Previous month" });
+    for (let i = 0; i < 7; i += 1) await userEvent.click(previous);
+    await expect(
+      await canvas.findByRole("heading", { name: "April 2026" }),
+    ).toBeVisible();
+    await waitFor(() =>
+      expect(
+        canvas.getByRole("button", { name: /^Apr 2026/, pressed: true }),
+      ).toBeInTheDocument(),
+    );
+    await expect(
+      canvas.getByRole("button", { name: "This month" }),
+    ).toBeVisible();
+  },
+};
+
+/** A Vendor: head-days instead of hours, and no absences. */
+export const Vendor: Story = {
+  beforeEach: serve(VENDOR_ATTENDANCE),
+  play: async ({ canvas }) => {
+    const cards = await canvas.findByRole("list", {
+      name: "This month in figures",
+    });
+    await expect(within(cards).getByText("Head-days")).toBeVisible();
+    await expect(within(cards).getByText("Days supplied")).toBeVisible();
+    await expect(within(cards).queryByText("Absent & leave")).toBeNull();
+    await expect(canvas.queryByText("Absent")).toBeNull();
+  },
+};
+
+export const Empty: Story = {
+  beforeEach: serve(NO_ATTENDANCE),
+  play: async ({ canvas }) => {
+    await expect(await canvas.findByText("No attendance yet")).toBeVisible();
+    await expect(canvas.getByText(EMPTY)).toBeVisible();
+  },
+};
+
+export const Failed: Story = {
+  beforeEach: () =>
+    mockFetch([
+      {
+        path: PATH,
+        respond: () =>
+          Response.json({ code: "X", message: "Down" }, { status: 500 }),
+      },
+    ]).restore,
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByText("Couldn't load the attendance"),
+    ).toBeVisible();
+  },
+};
+
+export const Dark: Story = {
+  ...Labour,
+  globals: { theme: "dark" },
+};
