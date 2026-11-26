@@ -110,7 +110,13 @@ const details = {
   overtimeWagePerHour: paise,
   workingHoursPerDay: z.union([z.string().max(12), z.number()]).nullish(),
   weeklyHolidays: z.array(z.int()).max(7).optional(),
-  projectIds: z.array(z.string().min(1).max(64)).max(500).default([]),
+  projectIds: z
+    .array(z.string().min(1).max(64))
+    .max(500)
+    .optional()
+    .describe(
+      "Left out: none on Add, and kept on edit. Site Engineers are put on a Project from the Project's Resources",
+    ),
   profile: ProfileModel.default({}),
   bank: BankModel.optional().describe(
     "Ignored without Financial on Labours; left out keeps the stored details",

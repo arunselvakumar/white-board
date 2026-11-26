@@ -47,6 +47,7 @@ function withActivity(respond: MockRoute["respond"]) {
         respond: () => Response.json(CATEGORY_LIST),
       },
       { path: ONE, respond: () => Response.json(MUTHU_GANG) },
+      { path: `${ONE}/documents`, respond: () => Response.json({ items: [] }) },
       { path: ACTIVITY, respond },
       attendanceRoute(`${ONE}/attendance`, VENDOR_ATTENDANCE),
     ]);

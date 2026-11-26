@@ -82,7 +82,8 @@ export type SiteEngineerInput = {
   emergencyContact: string | null;
   /** Left out without Financial; each field left out keeps the stored one. */
   salary?: StaffSalaryInput;
-  projectIds: readonly string[];
+  /** Left out: none on Add, kept on edit (set from the Project instead). */
+  projectIds?: readonly string[];
   profile: SiteEngineerProfileInput;
   /** Left out without Financial, which keeps the stored details. */
   bank?: SiteEngineerBankInput;
@@ -457,7 +458,7 @@ export class SiteEngineerHandlers {
       ...(details.salary === undefined ? {} : { salary: details.salary }),
       memberType: "normal",
       siteEngineer: true,
-      projectIds: details.projectIds,
+      projectIds: details.projectIds ?? [],
       roleId: await this.roleId(input.workspaceId),
       invite: input.signIn.invite,
       password: input.signIn.password,
@@ -578,7 +579,7 @@ export class SiteEngineerHandlers {
         memberType: "normal",
       });
       const before = new Set(current.member?.projectIds ?? []);
-      const after = new Set(details.projectIds);
+      const after = new Set(details.projectIds ?? before);
       if (
         before.size !== after.size ||
         [...after].some((projectId) => !before.has(projectId))

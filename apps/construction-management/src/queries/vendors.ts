@@ -4,6 +4,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
+import type { ConstructionLabourPartyDocumentResponseModel } from "@/app/api/construction/labour/_party-files/party-file-models";
 import type { UpdateConstructionLabourVendorRequestModel } from "@/app/api/construction/labour/vendors/[id]/update/update-vendor-request-model";
 import type { CreateConstructionLabourVendorRequestModel } from "@/app/api/construction/labour/vendors/create-vendor-request-model";
 import type { ListConstructionLabourVendorsResponseModel } from "@/app/api/construction/labour/vendors/list-vendors-response-model";
@@ -20,6 +21,7 @@ export type VendorSummary = ConstructionLabourVendorSummaryResponseModel;
 export type VendorList = ListConstructionLabourVendorsResponseModel;
 export type VendorInput = CreateConstructionLabourVendorRequestModel;
 export type VendorUpdateInput = UpdateConstructionLabourVendorRequestModel;
+export type VendorDocument = ConstructionLabourPartyDocumentResponseModel;
 export type VendorOption =
   ListConstructionLabourVendorOptionsResponseModel["items"][number];
 
@@ -80,6 +82,43 @@ function postJson<T>(url: string, body?: unknown): Promise<T> {
 
 function itemUrl(id: string, verb: string): string {
   return `${VENDORS_API}/${encodeURIComponent(id)}/${verb}`;
+}
+
+function postFile<T>(url: string, file: Blob): Promise<T> {
+  return apiJson<T>(url, {
+    method: "POST",
+    headers: { "content-type": file.type || "application/octet-stream" },
+    body: file,
+  });
+}
+
+export function vendorDocumentsQuery(id: string) {
+  return queryOptions({
+    queryKey: [...VENDORS_KEY, "documents", id],
+    queryFn: () =>
+      apiJson<{ items: VendorDocument[] }>(itemUrl(id, "documents")),
+  });
+}
+
+export function uploadVendorPhoto(id: string, file: File) {
+  return postFile<{ photoUrl: string | null }>(itemUrl(id, "photo"), file);
+}
+
+export function removeVendorPhoto(id: string) {
+  return postJson<{ photoUrl: null }>(itemUrl(id, "photo/remove"));
+}
+
+export function addVendorDocument(id: string, file: File) {
+  return postFile<VendorDocument>(
+    itemUrl(id, `documents?fileName=${encodeURIComponent(file.name)}`),
+    file,
+  );
+}
+
+export function deleteVendorDocument(id: string, documentId: string) {
+  return postJson<undefined>(
+    itemUrl(id, `documents/${encodeURIComponent(documentId)}/delete`),
+  );
 }
 
 export function createVendor(input: VendorInput): Promise<VendorResponse> {

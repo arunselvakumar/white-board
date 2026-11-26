@@ -108,17 +108,15 @@ export const InviteByEmail: Story = {
     const { canvas, canvasElement, userEvent } = context;
     const body = within(canvasElement.ownerDocument.body);
     // One page: every card is there at once, in order, with one button.
-    await canvas.findByRole("heading", { name: /^Projects/ });
+    await canvas.findByRole("heading", { name: /^Salary/ });
     const cards = canvas
       .getAllByRole("heading", { level: 2 })
       .map((heading) => heading.textContent.replace(/\W+$/, ""));
-    await expect(cards).toEqual([
-      "Details",
-      "Role",
-      "Sign-in",
-      "Salary",
-      "Projects",
-    ]);
+    await expect(cards).toEqual(["Details", "Role", "Sign-in", "Salary"]);
+    // Projects are set from the Project's Resources, not here.
+    await expect(
+      canvas.queryByRole("heading", { name: "Projects" }),
+    ).not.toBeInTheDocument();
     await expect(canvas.queryByText(/Step \d of/)).not.toBeInTheDocument();
     await expect(canvas.getByRole("link", { name: "Cancel" })).toHaveAttribute(
       "href",
@@ -170,9 +168,9 @@ export const InviteByEmail: Story = {
     await userEvent.type(canvas.getByLabelText("Working hours per day"), "9");
     await userEvent.click(canvas.getByRole("button", { name: "Sat" }));
 
-    await userEvent.click(
-      canvas.getByRole("checkbox", { name: /Sri Heights/ }),
-    );
+    await expect(
+      canvas.queryByRole("checkbox", { name: /Sri Heights/ }),
+    ).not.toBeInTheDocument();
 
     // No Role yet: the Role card says so.
     await userEvent.click(
@@ -212,7 +210,6 @@ export const InviteByEmail: Story = {
       email: "prabhu@sakthi.in",
       mobile: "+917708165767",
       memberType: "normal",
-      projectIds: [SRI_HEIGHTS],
       roleId: SITE_ENGINEER_ROLE.id,
       invite: true,
       password: null,
@@ -465,18 +462,12 @@ export const EmailWithoutInvite: Story = {
   },
 };
 
-/** HRMS staff: no Projects card, and HRMS Staff is chosen for them. */
+/** HRMS staff: HRMS Staff is chosen for them. */
 export const HrmsMemberStartsOnHrmsStaff: Story = {
   beforeEach: serve(createdAs({ name: "Anitha", memberType: "hrms" })),
   play: async (context) => {
     const { canvas, userEvent } = context;
-    await expect(
-      await canvas.findByRole("heading", { name: "Projects" }),
-    ).toBeVisible();
-    await userEvent.click(canvas.getByText("HRMS only"));
-    await expect(
-      canvas.queryByRole("heading", { name: "Projects" }),
-    ).not.toBeInTheDocument();
+    await userEvent.click(await canvas.findByText("HRMS only"));
     await userEvent.type(canvas.getByLabelText("Name"), "Anitha");
     await userEvent.type(canvas.getByLabelText("Email"), "anitha@anugraha.in");
     await expect(
@@ -489,7 +480,6 @@ export const HrmsMemberStartsOnHrmsStaff: Story = {
       expect(sentBody()).toMatchObject({
         memberType: "hrms",
         mobile: null,
-        projectIds: [],
         roleId: HRMS_STAFF_ROLE.id,
         invite: true,
       }),

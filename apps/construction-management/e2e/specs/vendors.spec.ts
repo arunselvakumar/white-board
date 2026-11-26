@@ -3,6 +3,7 @@ import { expect } from "@playwright/test";
 import { unique } from "../api/session";
 import { projectTest } from "../helpers/projectTest";
 import { AddVendorPage } from "../pages/AddVendorPage";
+import { ResourcesPage } from "../pages/ResourcesPage";
 import { VendorAttendancePage } from "../pages/VendorAttendancePage";
 import { WagesPage } from "../pages/WagesPage";
 
@@ -15,12 +16,17 @@ projectTest.describe("Vendors", () => {
       await addVendorPage.goto();
       await addVendorPage.fill({
         name: vendor,
-        project: project.name,
         category: "Mason",
         ratePerDay: "900",
       });
       await addVendorPage.saveButton.click();
       await expect(page).toHaveURL(/\/app\/staff\/vendors$/);
+
+      // Projects are set from the Project, not on Add Vendor.
+      const resourcesPage = new ResourcesPage(page, project.id);
+      await resourcesPage.goto();
+      await resourcesPage.assign("Vendors", vendor);
+      await expect(resourcesPage.section("Vendors")).toContainText(vendor);
 
       const attendancePage = new VendorAttendancePage(page, project.id);
       await attendancePage.goto();

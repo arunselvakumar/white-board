@@ -1,4 +1,3 @@
-import { Skeleton } from "@repo/ui/components/skeleton";
 import {
   FormSkeleton,
   SkeletonGroup,
@@ -11,6 +10,7 @@ import {
   FormPageSkeleton,
   FormSectionSkeleton,
 } from "@/app/app/_components/masters/masters-skeletons";
+import { StaffPhotoSkeleton } from "@/app/app/staff/_components/staff-skeletons";
 
 /** The Labours screens while they load (ADR-0047). */
 
@@ -60,24 +60,6 @@ export function TransferHistorySkeleton() {
   );
 }
 
-/** A Labour's documents: icon, file name, size, remove. */
-export function LabourFilesSkeleton() {
-  return (
-    <SkeletonGroup label="Loading documents" className="block">
-      <ul className="bg-card divide-border divide-y rounded-lg border">
-        {["54%", "38%"].map((width) => (
-          <li key={width} className="flex items-center gap-3 px-4 py-2.5">
-            <Skeleton className="size-4 shrink-0 rounded-sm" />
-            <SkeletonText width={width} className="flex-1" />
-            <SkeletonText size="xs" width="3rem" />
-            <Skeleton className="size-8 shrink-0 rounded-lg" />
-          </li>
-        ))}
-      </ul>
-    </SkeletonGroup>
-  );
-}
-
 /** Edit Labour while the Labour loads. */
 export function LabourFormSkeleton() {
   return (
@@ -86,6 +68,9 @@ export function LabourFormSkeleton() {
       meta
     >
       <div className="space-y-6">
+        <FormSectionSkeleton title="Photo & documents">
+          <StaffPhotoSkeleton />
+        </FormSectionSkeleton>
         <FormSectionSkeleton title="Basic">
           <FormSkeleton
             columns={2}

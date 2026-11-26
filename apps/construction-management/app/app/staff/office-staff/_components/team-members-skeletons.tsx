@@ -1,4 +1,4 @@
-import { FolderKanban, ShieldCheck, UserRound } from "lucide-react";
+import { CalendarCheck, ShieldCheck, UserRound } from "lucide-react";
 import type { ReactNode } from "react";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import {
@@ -49,23 +49,6 @@ export function TeamMemberRowsSkeleton() {
           ))}
         </ul>
       </div>
-    </SkeletonGroup>
-  );
-}
-
-/** The Projects checklist: a checkbox, the name and its status badge. */
-export function ProjectChecklistSkeleton() {
-  return (
-    <SkeletonGroup label="Loading Projects" className="block space-y-3">
-      <ul className="bg-card divide-y rounded-xl border">
-        {["46%", "32%", "54%"].map((width) => (
-          <li key={width} className="flex items-center gap-3 px-4 py-3">
-            <Skeleton className="size-4 shrink-0 rounded-[4px]" />
-            <SkeletonText width={width} className="flex-1" />
-            <Skeleton className="h-5 w-16 rounded-full" />
-          </li>
-        ))}
-      </ul>
     </SkeletonGroup>
   );
 }
@@ -161,18 +144,13 @@ export function AddTeamMemberSkeleton() {
         <DetailCardsSkeleton
           label="Loading Roles"
           between={
-            <>
-              <CardSkeleton title="Projects">
-                <ProjectChecklistSkeleton />
-              </CardSkeleton>
-              <CardSkeleton title="Role">
-                <FormSkeleton
-                  columns={1}
-                  actions={0}
-                  fields={[{ label: "Role" }]}
-                />
-              </CardSkeleton>
-            </>
+            <CardSkeleton title="Role">
+              <FormSkeleton
+                columns={1}
+                actions={0}
+                fields={[{ label: "Role" }]}
+              />
+            </CardSkeleton>
           }
         />
       </div>
@@ -193,9 +171,9 @@ export function EditTeamMemberSkeleton() {
               <UserRound aria-hidden="true" />
               Details
             </TabsTrigger>
-            <TabsTrigger value="projects" disabled>
-              <FolderKanban aria-hidden="true" />
-              Projects
+            <TabsTrigger value="attendance" disabled>
+              <CalendarCheck aria-hidden="true" />
+              Attendance
             </TabsTrigger>
             <TabsTrigger value="role" disabled>
               <ShieldCheck aria-hidden="true" />

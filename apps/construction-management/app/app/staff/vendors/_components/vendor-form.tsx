@@ -4,28 +4,36 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Suspense, useMemo, type ReactNode } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { FolderSimpleIcon } from "@phosphor-icons/react/ssr";
+import { useMemo, useState, type ReactNode } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { Button, buttonVariants } from "@repo/ui/components/button";
-import { Checkbox } from "@repo/ui/components/checkbox";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import { Textarea } from "@repo/ui/components/textarea";
-import { EmptyState } from "@repo/ui/components/empty-state";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
-import { ChecklistSkeleton } from "@/app/app/_components/masters/masters-skeletons";
+import {
+  PendingPhoto,
+  StaffFiles,
+  type PendingPhotoValue,
+  type StaffFilesApi,
+} from "@/app/app/staff/_components/staff-files";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MobileField } from "@/components/auth/mobile-field";
 import { MoneyInput } from "@/components/money/money-input";
+import type { AppHref } from "@/lib/page-href";
 import { fieldForCode } from "@/lib/server-errors";
-import { VENDORS_PATH } from "@/lib/staff-nav";
+import { VENDORS_PATH, vendorPagePath } from "@/lib/staff-nav";
 import { lookupListQuery } from "@/src/queries/masters";
-import { projectOptionsQuery } from "@/src/queries/projects";
 import {
+  VENDORS_KEY,
+  addVendorDocument,
+  deleteVendorDocument,
+  removeVendorPhoto,
+  uploadVendorPhoto,
   useCreateVendor,
+  vendorDocumentsQuery,
   useUpdateVendor,
   vendorQuery,
   type VendorResponse,
@@ -74,59 +82,36 @@ function useCategoryChoices(vendor: VendorResponse | null): {
   }, [query.data, query.error, vendor]);
 }
 
-function ProjectsChecklist({
-  value,
-  onChange,
-}: {
-  value: string[];
-  onChange: (ids: string[]) => void;
-}) {
-  const { data } = useSuspenseQuery(projectOptionsQuery);
-  if (data.items.length === 0)
-    return (
-      <EmptyState
-        icon={FolderSimpleIcon}
-        tone="blue"
-        size="sm"
-        title="No Projects yet."
-        description="Add a Project first, then assign the Vendor to it."
-        className="bg-card text-muted-foreground rounded-lg border border-dashed p-4 text-sm"
-      />
-    );
-  return (
-    <ul className="grid gap-2 sm:grid-cols-2">
-      {data.items.map((project) => {
-        const checked = value.includes(project.id);
-        return (
-          <li key={project.id}>
-            <Label className="bg-card hover:bg-muted/50 flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 font-normal">
-              <Checkbox
-                checked={checked}
-                onCheckedChange={(next) => {
-                  onChange(
-                    next
-                      ? [...value, project.id]
-                      : value.filter((id) => id !== project.id),
-                  );
-                }}
-              />
-              {project.name}
-            </Label>
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
+const VENDOR_FILES: StaffFilesApi = {
+  queryKey: VENDORS_KEY,
+  documentsQuery: vendorDocumentsQuery,
+  uploadPhoto: uploadVendorPhoto,
+  removePhoto: removeVendorPhoto,
+  addDocument: addVendorDocument,
+  deleteDocument: deleteVendorDocument,
+};
 
+/**
+ * Add and Edit Vendor: Details and the rate card. Projects are not set
+ * here: a Vendor is put on a Project from the Project's Resources. Add
+ * Vendor starts with the photo (`photo`); Edit Vendor shows Photo &
+ * documents above the form.
+ */
 function VendorForm({
   vendor,
   onSave,
   saving,
+  photo,
 }: {
   vendor: VendorResponse | null;
-  onSave: (payload: Payload) => Promise<unknown>;
+  /** Resolves to where to go next, or the Vendors list when null. */
+  onSave: (payload: Payload) => Promise<AppHref | null>;
   saving: boolean;
+  /** Add Vendor's photo, taken or chosen before Save. */
+  photo?: {
+    value: PendingPhotoValue | null;
+    onChange: (photo: PendingPhotoValue | null) => void;
+  };
 }) {
   const router = useRouter();
   // Amounts come back null without the Financial flag; a new Vendor assumes it.
@@ -137,11 +122,12 @@ function VendorForm({
     defaultValues: vendorFormDefaults(vendor),
   });
   const errors = form.formState.errors;
+  const name = useWatch({ control: form.control, name: "name" });
 
   const submit = form.handleSubmit(async (values) => {
     try {
-      await onSave(vendorPayload(values, showAmounts));
-      router.push(VENDORS_PATH);
+      const next = await onSave(vendorPayload(values, showAmounts));
+      router.push(next ?? VENDORS_PATH);
     } catch (error) {
       const field = vendorErrorField(error, values);
       const { message } = fieldForCode(error, {});
@@ -159,6 +145,13 @@ function VendorForm({
         void submit(event);
       }}
     >
+      {photo != null && (
+        <PendingPhoto
+          name={name}
+          value={photo.value}
+          onChange={photo.onChange}
+        />
+      )}
       <section
         aria-labelledby="vendor-details"
         className="bg-card space-y-4 rounded-xl border p-4 sm:p-5"
@@ -238,33 +231,6 @@ function VendorForm({
         </div>
       </section>
 
-      <section
-        aria-labelledby="vendor-projects"
-        className="bg-card space-y-3 rounded-xl border p-4 sm:p-5"
-      >
-        <div className="space-y-1">
-          <h2 id="vendor-projects" className="font-semibold">
-            Projects
-          </h2>
-          <p className="text-muted-foreground text-sm">
-            The Vendor appears on the attendance screen of these Projects.
-          </p>
-        </div>
-        <Suspense fallback={<ChecklistSkeleton />}>
-          <Controller
-            name="projectIds"
-            control={form.control}
-            render={({ field }) => (
-              <ProjectsChecklist
-                value={field.value}
-                onChange={field.onChange}
-              />
-            )}
-          />
-        </Suspense>
-        <FieldError message={errors.projectIds?.message} />
-      </section>
-
       <FormAlert message={categories.error} />
       <RateCardEditor
         control={form.control}
@@ -315,29 +281,48 @@ export function FormPage({
 
 export function NewVendorScreen() {
   const create = useCreateVendor();
+  const [photo, setPhoto] = useState<PendingPhotoValue | null>(null);
   return (
     <FormPage title="Add Vendor">
       <VendorForm
         vendor={null}
         saving={create.isPending}
-        onSave={(payload) => create.mutateAsync(payload)}
+        photo={{ value: photo, onChange: setPhoto }}
+        onSave={async (payload) => {
+          const created = await create.mutateAsync(payload);
+          if (photo == null) return null;
+          try {
+            await uploadVendorPhoto(created.id, photo.file);
+            return null;
+          } catch {
+            // The Vendor is saved; their page shows no photo, to try again.
+            return vendorPagePath(created.id);
+          }
+        }}
       />
     </FormPage>
   );
 }
 
-/** Edit Vendor's form: the Vendor page's Details tab. */
+/** Photo & documents, then Edit Vendor's form: the Vendor page's Details tab. */
 export function EditVendorDetails({ vendor }: { vendor: VendorResponse }) {
   const update = useUpdateVendor(vendor.id);
   return (
-    <VendorForm
-      key={vendor.updatedAt}
-      vendor={vendor}
-      saving={update.isPending}
-      onSave={(payload) =>
-        update.mutateAsync({ ...payload, expectedUpdatedAt: vendor.updatedAt })
-      }
-    />
+    <div className="space-y-6">
+      <StaffFiles owner={vendor} api={VENDOR_FILES} />
+      <VendorForm
+        key={vendor.updatedAt}
+        vendor={vendor}
+        saving={update.isPending}
+        onSave={async (payload) => {
+          await update.mutateAsync({
+            ...payload,
+            expectedUpdatedAt: vendor.updatedAt,
+          });
+          return null;
+        }}
+      />
+    </div>
   );
 }
 

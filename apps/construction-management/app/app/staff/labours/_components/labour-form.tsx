@@ -8,6 +8,7 @@ import { useState, type ReactNode } from "react";
 import {
   Controller,
   useForm,
+  useWatch,
   type Control,
   type FieldPath,
 } from "react-hook-form";
@@ -28,22 +29,23 @@ import { FormSection } from "@/components/forms/form-section";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MobileField } from "@/components/auth/mobile-field";
 import { MoneyInput } from "@/components/money/money-input";
-import {
-  MultiSelect,
-  type MultiSelectOption,
-} from "@/components/ui/multi-select";
 import { WageFields } from "@/app/app/staff/_components/wage-fields";
 import { LABOUR_WAGE } from "@/app/app/staff/_components/wage-schema";
+import type { AppHref } from "@/lib/page-href";
 import { fieldForCode } from "@/lib/server-errors";
-import { LABOURS_PAGE_PATH } from "@/lib/staff-nav";
+import {
+  PendingPhoto,
+  type PendingPhotoValue,
+} from "@/app/app/staff/_components/staff-files";
+import { LABOURS_PAGE_PATH, labourPagePath } from "@/lib/staff-nav";
 import {
   labourQuery,
+  uploadLabourPhoto,
   useCreateLabour,
   useUpdateLabour,
   type LabourResponse,
 } from "@/src/queries/labours";
 import { lookupListQuery } from "@/src/queries/masters";
-import { projectOptionsQuery } from "@/src/queries/projects";
 
 import { LabourCategorySheet } from "./labour-category-sheet";
 import { LabourFiles } from "./labour-files";
@@ -153,18 +155,30 @@ function ChoiceField({
 }
 
 /**
- * Add and Edit Labour: Basic, Wage, Statutory, Category & contact, and
- * Projects (none, one or many, ADR CM-0033). Amounts are typed in rupees
- * and sent as paise.
+ * Add and Edit Labour: Basic, Wage, Statutory, and Category & contact.
+ * Amounts are typed in rupees and sent as paise. Projects are not set
+ * here: a Labour is put on a Project from the Project's Resources, and
+ * moved between Projects with Transfer. Add Labour starts with the photo
+ * (`photo`); Edit Labour shows Photo & documents above the form.
  */
 export function LabourForm({
   labour,
   onSave,
   saving,
+  photo,
 }: {
   labour: LabourResponse | null;
-  onSave: (values: LabourFormValues, showAmounts: boolean) => Promise<unknown>;
+  /** Resolves to where to go next, or the Labours list when null. */
+  onSave: (
+    values: LabourFormValues,
+    showAmounts: boolean,
+  ) => Promise<AppHref | null>;
   saving: boolean;
+  /** Add Labour's photo, taken or chosen before Save. */
+  photo?: {
+    value: PendingPhotoValue | null;
+    onChange: (photo: PendingPhotoValue | null) => void;
+  };
 }) {
   const router = useRouter();
   const isNew = labour == null;
@@ -183,7 +197,6 @@ export function LabourForm({
   } | null>(null);
 
   const categories = useQuery(lookupListQuery("labour-categories"));
-  const projects = useQuery(projectOptionsQuery);
   const categoryChoices = useChoices(
     categories.data?.items,
     labour?.labourCategory,
@@ -196,18 +209,12 @@ export function LabourForm({
       value: addedCategory.id,
       label: addedCategory.name,
     });
-  // Live Projects, plus any saved one no longer live, so it stays ticked.
-  const projectChoices: MultiSelectOption[] = [
-    ...(projects.data?.items ?? []).map(({ id, name }) => ({ id, name })),
-    ...(labour?.projects ?? []).filter(
-      (saved) => !projects.data?.items.some((item) => item.id === saved.id),
-    ),
-  ];
+  const name = useWatch({ control: form.control, name: "name" });
 
   const submit = form.handleSubmit(async (values) => {
     try {
-      await onSave(values, showAmounts);
-      router.push(LABOURS_PAGE_PATH);
+      const next = await onSave(values, showAmounts);
+      router.push(next ?? LABOURS_PAGE_PATH);
     } catch (error) {
       const { field, message } = fieldForCode(error, labourErrorFields(values));
       form.setError(field ?? "root", { message });
@@ -222,6 +229,13 @@ export function LabourForm({
         void submit(event);
       }}
     >
+      {photo != null && (
+        <PendingPhoto
+          name={name}
+          value={photo.value}
+          onChange={photo.onChange}
+        />
+      )}
       <FormSection title="Basic">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
@@ -448,53 +462,6 @@ export function LabourForm({
         </div>
       </FormSection>
 
-      <FormSection
-        title="Projects"
-        hint={
-          isNew
-            ? "Where they work from the joining date. Leave empty to choose later."
-            : "A Project ticked or removed here counts from today. To move them from one Project to another on a date, use Transfer."
-        }
-      >
-        <div className="space-y-1.5">
-          <Label htmlFor="labour-projects-select">Projects</Label>
-          <Controller
-            name="projectIds"
-            control={form.control}
-            render={({ field }) => (
-              <MultiSelect
-                id="labour-projects-select"
-                options={projectChoices}
-                value={field.value}
-                onChange={field.onChange}
-                placeholder={
-                  projects.isPending ? "Loading Projects…" : "Search Projects"
-                }
-                empty="No Projects found."
-                listLabel="Projects"
-                invalid={errors.projectIds != null}
-              />
-            )}
-          />
-          <FieldError message={errors.projectIds?.message} />
-          <p className="text-muted-foreground text-xs">
-            {siteEngineersLine(labour)}
-          </p>
-        </div>
-        {projects.data?.items.length === 0 && (
-          <p className="text-muted-foreground text-sm">
-            No Projects yet.{" "}
-            <Link
-              href="/app/projects"
-              className="text-primary underline underline-offset-4"
-            >
-              Add a Project
-            </Link>{" "}
-            to choose it here.
-          </p>
-        )}
-      </FormSection>
-
       <FormAlert message={errors.root?.message} />
       <div className="flex flex-wrap gap-2">
         <Button type="submit" disabled={saving}>
@@ -550,12 +517,24 @@ export function FormPage({
 
 export function NewLabourScreen() {
   const create = useCreateLabour();
+  const [photo, setPhoto] = useState<PendingPhotoValue | null>(null);
   return (
     <FormPage title="Add Labour">
       <LabourForm
         labour={null}
         saving={create.isPending}
-        onSave={(values) => create.mutateAsync(createLabourPayload(values))}
+        photo={{ value: photo, onChange: setPhoto }}
+        onSave={async (values) => {
+          const created = await create.mutateAsync(createLabourPayload(values));
+          if (photo == null) return null;
+          try {
+            await uploadLabourPhoto(created.id, photo.file);
+            return null;
+          } catch {
+            // The Labour is saved; their page shows no photo, to try again.
+            return labourPagePath(created.id);
+          }
+        }}
       />
     </FormPage>
   );
@@ -574,21 +553,6 @@ export function EditLabourScreen({ id }: { id: string }) {
   );
 }
 
-/**
- * Who the Labour answers to (ADR CM-0041): the Site Engineers on their saved
- * Projects. There is no Site Engineer field; Site Engineers are put on a
- * Project from the Project.
- */
-export function siteEngineersLine(labour: LabourResponse | null): string {
-  if (labour == null || labour.projects.length === 0)
-    return "They answer to the Site Engineers on their Projects.";
-  if (labour.siteEngineers.length === 0)
-    return "None of their Projects has a Site Engineer yet. Add one on the Project.";
-  return `Site Engineers on their Projects: ${labour.siteEngineers
-    .map((engineer) => engineer.name)
-    .join(", ")}.`;
-}
-
 /** Under Edit Labour's title: the Projects and an Inactive mark. */
 export function editLabourMeta(labour: LabourResponse): string {
   return `${projectsLabel(labour.projects)}${labour.isActive ? "" : " · Inactive"}`;
@@ -598,21 +562,22 @@ export function editLabourMeta(labour: LabourResponse): string {
 export function EditLabourDetails({ labour }: { labour: LabourResponse }) {
   const update = useUpdateLabour(labour.id);
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
+      <LabourFiles labour={labour} />
       <LabourForm
         key={labour.updatedAt}
         labour={labour}
         saving={update.isPending}
-        onSave={(values, showAmounts) =>
-          update.mutateAsync(
+        onSave={async (values, showAmounts) => {
+          await update.mutateAsync(
             updateLabourPayload(values, {
               showAmounts,
               expectedUpdatedAt: labour.updatedAt,
             }),
-          )
-        }
+          );
+          return null;
+        }}
       />
-      <LabourFiles labour={labour} />
     </div>
   );
 }

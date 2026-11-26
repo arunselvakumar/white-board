@@ -67,8 +67,6 @@ const baseSchema = z.object({
       message: "Enter a valid 10-digit mobile number",
     }),
   gender: z.enum(["", "male", "female", "other"]),
-  /** None, one or many; not required (ADR CM-0033). */
-  projectIds: z.array(z.string()),
 });
 
 export type LabourFormValues = z.infer<typeof baseSchema>;
@@ -116,7 +114,6 @@ export function labourFormDefaults(
       reportsToId: "",
       contactNumber: "",
       gender: "",
-      projectIds: [],
     };
   return {
     name: labour.name,
@@ -142,7 +139,6 @@ export function labourFormDefaults(
     reportsToId: labour.reportsTo?.id ?? "",
     contactNumber: labour.contactNumber?.replace(/^\+91/, "") ?? "",
     gender: labour.gender ?? "",
-    projectIds: labour.projects.map((project) => project.id),
   };
 }
 
@@ -167,7 +163,6 @@ function details(values: LabourFormValues) {
         ? null
         : normalizeMobile(values.contactNumber),
     gender: values.gender === "" ? null : values.gender,
-    projectIds: values.projectIds,
   };
 }
 
@@ -192,8 +187,8 @@ export function createLabourPayload(values: LabourFormValues): LabourInput {
 
 /**
  * The Edit request body. A blank Aadhaar keeps the stored one; without
- * Financial the amounts are left out and kept. The Projects are sent in
- * full: those ticked or unticked are on or off from today.
+ * Financial the amounts are left out and kept. Projects are left out, so
+ * they are kept: they change from the Project's Resources and Transfer.
  */
 export function updateLabourPayload(
   values: LabourFormValues,
@@ -230,7 +225,6 @@ export const LABOUR_ERROR_FIELDS: Record<string, LabourField> = {
   REPORTS_TO_NOT_FOUND: "reportsToId",
   REPORTS_TO_SELF: "reportsToId",
   REPORTS_TO_LOOP: "reportsToId",
-  PROJECT_NOT_FOUND: "projectIds",
 };
 
 /** The field for a wage error depends on the wage type being saved. */

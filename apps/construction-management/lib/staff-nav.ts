@@ -103,6 +103,14 @@ export function staffPath(id: string): AppHref {
   return pageHref("/app/staff/office-staff/[id]", { id });
 }
 
+export function labourPagePath(id: string): AppHref {
+  return pageHref("/app/staff/labours/[id]", { id });
+}
+
+export function vendorPagePath(id: string): AppHref {
+  return pageHref("/app/staff/vendors/[id]", { id });
+}
+
 export function rolePath(id: string): AppHref {
   return pageHref("/app/staff/roles/[id]", { id });
 }

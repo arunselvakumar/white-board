@@ -18,7 +18,6 @@ import { FormSection } from "@/components/forms/form-section";
 import { WageFields } from "@/app/app/staff/_components/wage-fields";
 import { STAFF_SALARY } from "@/app/app/staff/_components/wage-schema";
 
-import { ProjectsField } from "@/app/app/staff/office-staff/_components/projects-field";
 import {
   BLOOD_GROUP_OPTIONS,
   GENDER_OPTIONS,
@@ -457,18 +456,6 @@ export function SiteEngineerFields({
               placeholder="HDFC Bank"
             />
           </div>
-        </FormSection>
-      )}
-
-      {mode.membership && (
-        <FormSection title="Projects">
-          <Controller
-            name="projectIds"
-            control={form.control}
-            render={({ field }) => (
-              <ProjectsField value={field.value} onChange={field.onChange} />
-            )}
-          />
         </FormSection>
       )}
     </div>

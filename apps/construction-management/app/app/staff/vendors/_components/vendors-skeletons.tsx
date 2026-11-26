@@ -7,10 +7,10 @@ import {
 } from "@repo/ui/components/skeleton-kit";
 
 import {
-  ChecklistSkeleton,
   FormPageSkeleton,
   FormSectionSkeleton,
 } from "@/app/app/_components/masters/masters-skeletons";
+import { StaffPhotoSkeleton } from "@/app/app/staff/_components/staff-skeletons";
 
 /** The Vendors screens while they load (ADR-0047). */
 
@@ -43,11 +43,14 @@ export function ProjectFilterSkeleton() {
   );
 }
 
-/** Edit Vendor while the Vendor loads: details, Projects, rate card. */
+/** Edit Vendor while the Vendor loads: photo, details, rate card. */
 export function VendorFormSkeleton() {
   return (
     <FormPageSkeleton back={{ label: "Vendors", href: "/app/staff/vendors" }}>
       <div className="space-y-6">
+        <FormSectionSkeleton title="Photo & documents">
+          <StaffPhotoSkeleton />
+        </FormSectionSkeleton>
         <FormSectionSkeleton title="Details">
           <FormSkeleton
             columns={2}
@@ -61,12 +64,6 @@ export function VendorFormSkeleton() {
               { label: "Address", control: "textarea", wide: true },
             ]}
           />
-        </FormSectionSkeleton>
-        <FormSectionSkeleton
-          title="Projects"
-          description="The Vendor appears on the attendance screen of these Projects."
-        >
-          <ChecklistSkeleton />
         </FormSectionSkeleton>
         <FormSectionSkeleton title="Rate card">
           <FormSkeleton

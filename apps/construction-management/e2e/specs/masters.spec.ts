@@ -60,13 +60,14 @@ projectTest.describe("Masters", () => {
         page.getByRole("combobox", { name: "Labour Category" }),
       ).toContainText(category);
       // A Labour answers to the Site Engineers on their Projects; there is
-      // no Site Engineer to pick (ADR CM-0041).
+      // no Site Engineer to pick (ADR CM-0041), and no Projects either:
+      // both are set from the Project.
       await expect(
         page.getByRole("combobox", { name: "Site Engineer" }),
       ).toHaveCount(0);
       await expect(
-        page.getByText("They answer to the Site Engineers on their Projects."),
-      ).toBeVisible();
+        page.getByRole("combobox", { name: "Projects" }),
+      ).toHaveCount(0);
     },
   );
 

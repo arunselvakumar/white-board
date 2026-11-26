@@ -90,7 +90,8 @@ function post<T>(path: string, body?: unknown): Promise<T> {
  */
 export function createTeamMember(
   input: TeamMemberDetailsInput & {
-    projectIds: string[];
+    /** Left out: none. Team Members are put on a Project from its Resources. */
+    projectIds?: string[];
     roleId: string;
     invite: boolean;
     password: string | null;
@@ -118,12 +119,6 @@ export function setTeamMemberPassword(id: string, password: string) {
     `/${encodeURIComponent(id)}/password`,
     { password },
   );
-}
-
-export function assignTeamMemberProjects(id: string, projectIds: string[]) {
-  return post<TeamMember>(`/${encodeURIComponent(id)}/projects`, {
-    projectIds,
-  });
 }
 
 export function resendTeamMemberInvite(id: string) {

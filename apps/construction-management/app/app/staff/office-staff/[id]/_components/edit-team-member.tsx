@@ -9,7 +9,6 @@ import {
 } from "@tanstack/react-query";
 import {
   CalendarCheck,
-  FolderKanban,
   KeyRound,
   Send,
   ShieldCheck,
@@ -48,7 +47,6 @@ import {
 } from "@/src/queries/team-members";
 
 import { MemberStatusBadge } from "@/app/app/staff/office-staff/_components/member-status-badge";
-import { TeamMemberProjectsTab } from "@/app/app/staff/office-staff/_components/projects-field";
 import { RoleField } from "@/app/app/staff/office-staff/_components/role-field";
 import { SetPasswordDialog } from "./set-password-dialog";
 import { ShareInviteDialog } from "@/app/app/staff/office-staff/_components/share-invite-dialog";
@@ -76,7 +74,7 @@ function valuesOf(member: TeamMember): TeamMemberDetailsValues {
   };
 }
 
-const TABS = ["details", "attendance", "projects", "role"] as const;
+const TABS = ["details", "attendance", "role"] as const;
 type Tab = (typeof TABS)[number];
 
 /** What the last sign-in action did, for the line under the header. */
@@ -97,7 +95,8 @@ function passwordNotice(outcome: TeamMember & PasswordOutcome): Notice {
 /**
  * Edit Staff (ADR CM-0030): Details (the Details, Salary and
  * Sign-in cards, in Add Staff's order, ADR CM-0033 §1), Attendance (ADR
- * CM-0051), Projects and Role tabs, the tab kept in the address
+ * CM-0051) and Role tabs (Projects are set from the Project's
+ * Resources), the tab kept in the address
  * (`?tab=attendance`), and from the header Set a new password and the
  * invitation.
  */
@@ -120,9 +119,6 @@ export function EditTeamMember({
     "tab",
     parseAsStringLiteral(TABS).withDefault("details"),
   );
-  // An HRMS Team Member has no Projects tab.
-  const shown: Tab =
-    tab === "projects" && member.memberType !== "normal" ? "details" : tab;
   const queryClient = useQueryClient();
   const saved = async (updated: TeamMember) => {
     queryClient.setQueryData(teamMemberQuery(id).queryKey, updated);
@@ -243,7 +239,7 @@ export function EditTeamMember({
           }
         />
         <Tabs
-          value={shown}
+          value={tab}
           onValueChange={(next: Tab) => {
             void setTab(next === "details" ? null : next);
           }}
@@ -258,12 +254,6 @@ export function EditTeamMember({
               <CalendarCheck aria-hidden="true" />
               Attendance
             </TabsTrigger>
-            {member.memberType === "normal" && (
-              <TabsTrigger value="projects">
-                <FolderKanban aria-hidden="true" />
-                Projects
-              </TabsTrigger>
-            )}
             <TabsTrigger value="role">
               <ShieldCheck aria-hidden="true" />
               Role
@@ -326,12 +316,6 @@ export function EditTeamMember({
               </p>
             )}
           </TabsContent>
-
-          {member.memberType === "normal" && (
-            <TabsContent value="projects">
-              <TeamMemberProjectsTab member={member} />
-            </TabsContent>
-          )}
 
           <TabsContent value="role" className="space-y-4">
             {member.isOwner ? (

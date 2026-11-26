@@ -10,7 +10,6 @@ import {
   PROJECT_OPTIONS,
   PROJECT_OPTIONS_URL,
   SITE_ENGINEERS_URL,
-  SRI_HEIGHTS,
   siteEngineer,
 } from "@/app/app/staff/site-engineers/_components/site-engineer-fixtures";
 import { AddSiteEngineer } from "./add-site-engineer";
@@ -108,7 +107,7 @@ export const Validation: Story = {
   ),
   play: async (context) => {
     const { canvas, userEvent } = context;
-    await canvas.findByRole("heading", { name: /^Projects/ });
+    await canvas.findByRole("heading", { name: /^KYC/ });
     await expect(cardTitles(canvas)).toEqual([
       "Details",
       "Sign-in",
@@ -117,7 +116,6 @@ export const Validation: Story = {
       "KYC",
       "Salary",
       "Bank",
-      "Projects",
     ]);
     await expect(
       canvas.getByText("Signs in with the Site Engineer Role"),
@@ -241,9 +239,10 @@ export const FullSubmit: Story = {
     );
     await userEvent.type(canvas.getByLabelText("IFSC"), "hdfc0001234");
     await userEvent.type(canvas.getByLabelText("Bank name"), "HDFC Bank");
-    await userEvent.click(
-      await canvas.findByRole("checkbox", { name: /Sri Heights/ }),
-    );
+    // Projects are set from the Project's Resources, not here.
+    await expect(
+      canvas.queryByRole("checkbox", { name: /Sri Heights/ }),
+    ).not.toBeInTheDocument();
 
     await userEvent.click(
       canvas.getByRole("button", { name: "Add Site Engineer" }),
@@ -267,7 +266,6 @@ export const FullSubmit: Story = {
       overtimeWagePerHour: 0,
       workingHoursPerDay: "8",
       weeklyHolidays: [0],
-      projectIds: [SRI_HEIGHTS],
       profile: {
         employeeCode: "SE-001",
         fatherName: "Selvam",
@@ -367,14 +365,13 @@ export const WithoutFinancial: Story = {
   args: { canSeeSalary: false },
   beforeEach: serve(created()),
   play: async ({ canvas, userEvent }) => {
-    await canvas.findByRole("heading", { name: /^Projects/ });
+    await canvas.findByRole("heading", { name: /^KYC/ });
     await expect(cardTitles(canvas)).toEqual([
       "Details",
       "Sign-in",
       "Personal",
       "Employment",
       "KYC",
-      "Projects",
     ]);
     await userEvent.type(canvas.getByLabelText("Name"), "Karthik Raja");
     await userEvent.type(canvas.getByLabelText("Mobile"), "77081 65767");

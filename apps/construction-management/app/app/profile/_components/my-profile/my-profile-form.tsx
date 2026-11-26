@@ -215,6 +215,7 @@ export function MyProfileForm({ profile }: { profile: MyProfileModel }) {
           kind="member_photo"
           noun="photo"
           shape="circle"
+          camera
           imageUrl={profile.photoUrl}
           fallback={initials(profile.name) || "?"}
           hint="PNG, JPEG or WebP, up to 10 MB."

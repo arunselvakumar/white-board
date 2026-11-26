@@ -15,7 +15,6 @@ import { Button, buttonVariants } from "@repo/ui/components/button";
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
-import { FormSection } from "@/components/forms/form-section";
 import { fieldForCode } from "@/lib/server-errors";
 import { STAFF_PATH } from "@/lib/staff-nav";
 import { QueryHttpError } from "@/src/queries/http";
@@ -27,7 +26,6 @@ import {
   type TeamMember,
 } from "@/src/queries/team-members";
 
-import { ProjectsField } from "@/app/app/staff/office-staff/_components/projects-field";
 import {
   RoleField,
   hrmsStaffRoleId,
@@ -97,7 +95,6 @@ export function AddTeamMember({
   );
   const [roleError, setRoleError] = useState<string | undefined>();
   const [created, setCreated] = useState<Created | null>(null);
-  const [projectIds, setProjectIds] = useState<string[]>([]);
 
   // HRMS Team Members start on HRMS Staff until another Role is picked.
   const roleId =
@@ -137,7 +134,6 @@ export function AddTeamMember({
           keepIdentifiersWhenBlank: false,
           canSeeSalary,
         }),
-        projectIds: memberType === "hrms" ? [] : projectIds,
         roleId,
         invite: sendInvite,
         password: temporary,
@@ -200,13 +196,7 @@ export function AddTeamMember({
                 previewOpen={false}
               />
             }
-          >
-            {memberType !== "hrms" && (
-              <FormSection title="Projects">
-                <ProjectsField value={projectIds} onChange={setProjectIds} />
-              </FormSection>
-            )}
-          </TeamMemberDetailsFields>
+          />
 
           <FormAlert message={form.formState.errors.root?.message} />
 
