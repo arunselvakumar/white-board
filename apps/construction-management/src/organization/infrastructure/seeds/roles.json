@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "source": "Default Roles every new Company starts with (ADR CM-0030). The first eight are the Permission Templates the Designation seeds carried before Roles; Admin holds every supported cell (\"ALL\"); HRMS Staff is the HRMS default set. Companies edit their own copy. Marketing is the Marketing Person's Role (ADR CM-0040): Visits, Follow-ups and Companies, their own only.",
   "roles": [
     {
@@ -184,6 +184,7 @@
     {
       "name": "Site Engineer",
       "description": "Daily worksheets, labour and attendance, tasks, issues and inspections on their Projects.",
+      "department": "Human Resources",
       "permissions": {
         "projects.project": ["read"],
         "site_work.daily_worksheet": [
@@ -252,36 +253,16 @@
       }
     },
     {
-      "name": "Site Supervisor",
-      "description": "Day-to-day site entries: worksheets, labour attendance and site diary on their Projects.",
-      "permissions": {
-        "projects.project": ["read"],
-        "site_work.daily_worksheet": ["create", "read", "update"],
-        "tracking.tasks": ["create", "read", "update", "notification"],
-        "tracking.issues": ["create", "read", "update", "notification"],
-        "tracking.inspection_requests": ["create", "read", "update"],
-        "labour.attendance": ["create", "read", "update"],
-        "labour.labour": ["create", "read", "update"],
-        "labour.vendor": ["create", "read", "update"],
-        "projects.gallery": ["read"],
-        "reporting.project_dashboard": ["read"],
-        "site_work.equipment_usage": ["create", "read", "update"],
-        "site_work.site_diary": ["create", "read", "update"],
-        "site_work.hindrances": ["create", "read"],
-        "masters.master_records": ["read"],
-        "masters.issue_categories": ["read"],
-        "masters.tags": ["read"],
-        "masters.labours": ["read"],
-        "masters.labour_categories": ["read"],
-        "hrms.hrms": ["read"],
-        "hrms.holidays": ["read"],
-        "hrms.attendance": ["create", "read", "notification"],
-        "hrms.leaves": ["create", "read", "notification"],
-        "hrms.salaries": ["read"],
-        "finance.payments": ["read"],
-        "finance.petty_cash": ["create", "read", "update"],
-        "finance.other_expenses": ["create", "read"]
-      }
+      "name": "Labour",
+      "description": "Labours on site. They do not sign in, so the Role gives no access.",
+      "department": "Human Resources",
+      "permissions": {}
+    },
+    {
+      "name": "Vendor",
+      "description": "Vendors who supply labour gangs. They do not sign in, so the Role gives no access.",
+      "department": "Human Resources",
+      "permissions": {}
     },
     {
       "name": "Store Keeper",

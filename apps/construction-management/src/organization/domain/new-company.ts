@@ -1,7 +1,7 @@
 import { newId } from "@/src/shared-kernel/ids";
 
 import type { CompanyDetails } from "./company-details";
-import { Department } from "./department";
+import type { Department } from "./department";
 import type { CompanyCreated } from "./events";
 import type { Role } from "./role";
 import { TeamMember, teamMemberDetails } from "./team-member";
@@ -36,7 +36,12 @@ export class NewCompany {
     workspaceId: string;
     details: CompanyDetails;
     owner: CompanyOwner;
-    /** The Company's own copy of the seed Roles (ADR CM-0030 §5). */
+    /** The system Departments (ADR CM-0049 §3), made first. */
+    departments: readonly Department[];
+    /**
+     * The Company's own copy of the seed Roles (ADR CM-0030 §5), some
+     * under those Departments (ADR CM-0054).
+     */
     roles: readonly Role[];
     now: Date;
   }): NewCompany {
@@ -57,11 +62,7 @@ export class NewCompany {
       input.details,
       input.owner,
       input.roles,
-      Department.systemSet({
-        workspaceId: input.workspaceId,
-        by: input.owner.userId,
-        now: input.now,
-      }),
+      input.departments,
       ownerMember,
       input.now,
     );

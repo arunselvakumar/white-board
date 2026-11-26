@@ -25,6 +25,7 @@ import {
 
 import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FieldError } from "@/components/auth/field-error";
+import { RoleAssignment } from "@/app/app/staff/_components/role-assignment";
 import { FormSection } from "@/components/forms/form-section";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MobileField } from "@/components/auth/mobile-field";
@@ -299,6 +300,8 @@ export function LabourForm({
           </div>
         </div>
       </FormSection>
+
+      <RoleAssignment role="Labour" />
 
       <FormSection
         title="Wage"

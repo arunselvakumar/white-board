@@ -95,13 +95,14 @@ describe("Role Management HTTP (ADR CM-0030)", () => {
         "Accountant",
         "Admin",
         "HRMS Staff",
+        "Labour",
         "Marketing",
         "Project Manager",
         "Quality Control",
         "Site Engineer",
-        "Site Supervisor",
         "Store Keeper",
         "Structural Engineer",
+        "Vendor",
       ].sort(),
     );
     expect(seeds.every((role) => role.userCount === 0)).toBe(true);

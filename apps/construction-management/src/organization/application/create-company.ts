@@ -1,6 +1,7 @@
 import type { EventDispatcher } from "@/src/shared-kernel/events";
 
 import { CompanyDetails } from "../domain/company-details";
+import { Department } from "../domain/department";
 import { NewCompany } from "../domain/new-company";
 import type { Role } from "../domain/role";
 import type { CompanyDirectory } from "./company-directory";
@@ -22,11 +23,15 @@ export type CreateCompanyCommand = {
   userEmail: string | null;
 };
 
-/** Copies the seed Roles for a new Company (ADR CM-0030 §5). */
+/**
+ * Copies the seed Roles for a new Company (ADR CM-0030 §5), under its
+ * system Departments where the seed names one (ADR CM-0054).
+ */
 export type SeedRoles = (input: {
   workspaceId: string;
   by: string;
   now: Date;
+  departments: readonly Department[];
 }) => Role[];
 
 export type CreatedCompany = {
@@ -56,10 +61,21 @@ export class CreateCompanyHandler {
       ownerUserId: command.userId,
     });
     const now = this.clock();
+    const departments = Department.systemSet({
+      workspaceId,
+      by: command.userId,
+      now,
+    });
     const company = NewCompany.start({
       workspaceId,
       details,
-      roles: this.seedRoles({ workspaceId, by: command.userId, now }),
+      departments,
+      roles: this.seedRoles({
+        workspaceId,
+        by: command.userId,
+        now,
+        departments,
+      }),
       owner: {
         userId: command.userId,
         name: command.userName,

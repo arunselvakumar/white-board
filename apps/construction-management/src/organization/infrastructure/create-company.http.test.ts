@@ -61,7 +61,7 @@ describe("createCompany on Postgres (CM-104)", () => {
     ).resolves.toBe(1);
   });
 
-  it("gives the Company its own copy of the nine seed Roles (ADR CM-0030 §5)", async () => {
+  it("gives the Company its own copy of the eleven seed Roles (ADR CM-0030 §5)", async () => {
     const userId = await newUser();
     const { workspaceId } = await createCompanyHandlers().create.execute({
       name: "Anugraha Engineers",
@@ -73,7 +73,7 @@ describe("createCompany on Postgres (CM-104)", () => {
     });
     const stored = await createRoleHandlers().list(workspaceId);
     const seeds = seedRoles({ workspaceId, by: userId, now: new Date() });
-    expect(stored).toHaveLength(10);
+    expect(stored).toHaveLength(11);
     for (const seed of seeds)
       expect(
         stored.find((role) => role.name === seed.name),
@@ -84,6 +84,19 @@ describe("createCompany on Postgres (CM-104)", () => {
         permissions: seed.permissions.toGrants(),
         userCount: 0,
       });
+    // Site Engineer, Labour and Vendor start under Human Resources (ADR
+    // CM-0054); the others under no Department.
+    const departmentOf = Object.fromEntries(
+      stored.map((role) => [role.name, role.department?.name ?? null]),
+    );
+    expect(departmentOf).toMatchObject({
+      "Site Engineer": "Human Resources",
+      Labour: "Human Resources",
+      Vendor: "Human Resources",
+      Admin: null,
+      "HRMS Staff": null,
+    });
+    expect(departmentOf).not.toHaveProperty("Site Supervisor");
     // The Owner has no Role: they can do everything.
     await expect(
       prisma.constructionOrganizationTeamMember.findFirstOrThrow({
