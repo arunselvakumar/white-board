@@ -176,7 +176,7 @@ function DepartmentsListContent({ actions }: { actions: DepartmentActions }) {
       ) : null}
       <ConfirmDeleteDialog
         name={pendingDelete?.name ?? null}
-        description="It leaves your list of departments. Nothing else uses departments yet, so nothing else changes."
+        description="It leaves your list of departments. Move any Roles under it to another Department first."
         error={deleteError}
         pending={command.isPending}
         onClose={() => {
