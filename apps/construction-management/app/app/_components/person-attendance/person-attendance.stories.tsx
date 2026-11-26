@@ -8,6 +8,7 @@ import { mockFetch } from "@/.storybook/mock-fetch";
 import {
   LABOUR_ATTENDANCE,
   NO_ATTENDANCE,
+  SITE_ENGINEER_ATTENDANCE,
   VENDOR_ATTENDANCE,
   attendanceRoute,
   type AttendanceFixture,
@@ -120,6 +121,26 @@ export const Vendor: Story = {
     await expect(within(cards).getByText("Days supplied")).toBeVisible();
     await expect(within(cards).queryByText("Absent & leave")).toBeNull();
     await expect(canvas.queryByText("Absent")).toBeNull();
+  },
+};
+
+/**
+ * A Site Engineer: days from the Check-In log, no absences, and a Check
+ * In with no Check Out shown as such, adding no hours.
+ */
+export const SiteEngineer: Story = {
+  beforeEach: serve(SITE_ENGINEER_ATTENDANCE),
+  play: async ({ canvas }) => {
+    const cards = await canvas.findByRole("list", {
+      name: "This month in figures",
+    });
+    await expect(within(cards).getByText("Hours worked")).toBeVisible();
+    await expect(within(cards).queryByText("Absent & leave")).toBeNull();
+    await expect(
+      canvas.getByRole("button", {
+        name: /^Tue, 17 Nov 2026: Present, 0 h\. Sky Towers, 0 h, 8:45 am – …, No check-out$/,
+      }),
+    ).toBeInTheDocument();
   },
 };
 

@@ -11,6 +11,10 @@ import {
 import { PERSON_ACTIVITY_EMPTY } from "@/app/app/_components/activity/person-activity";
 import { StoryQueryClient } from "@/app/app/_components/masters/masters-story-support";
 import {
+  VENDOR_ATTENDANCE,
+  attendanceRoute,
+} from "@/app/app/_components/person-attendance/person-attendance-fixtures";
+import {
   CATEGORY_LIST,
   MUTHU_GANG,
   PROJECT_OPTIONS,
@@ -44,6 +48,7 @@ function withActivity(respond: MockRoute["respond"]) {
       },
       { path: ONE, respond: () => Response.json(MUTHU_GANG) },
       { path: ACTIVITY, respond },
+      attendanceRoute(`${ONE}/attendance`, VENDOR_ATTENDANCE),
     ]);
     return api.restore;
   };
@@ -111,6 +116,26 @@ export const TabsKeepTheAddressAndTypedChanges: Story = {
       "Muthu Gang (Nagercoil)",
     );
     await expect(canvas.getByRole("button", { name: "Save" })).toBeVisible();
+  },
+};
+
+/** The Attendance tab (ADR CM-0051): head-days supplied, no absences. */
+export const Attendance: Story = {
+  parameters: { searchParams: "?tab=attendance" },
+  beforeEach: withActivity(() => Response.json(personActivityPage([]))),
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByRole("tab", { name: "Attendance", selected: true }),
+    ).toBeVisible();
+    const cards = await canvas.findByRole("list", {
+      name: "This month in figures",
+    });
+    await expect(within(cards).getByText("Days supplied")).toBeVisible();
+    await expect(within(cards).getByText("Head-days")).toBeVisible();
+    await expect(within(cards).queryByText("Absent & leave")).toBeNull();
+    await expect(
+      canvas.getByRole("region", { name: "Attendance calendar" }),
+    ).toBeVisible();
   },
 };
 
