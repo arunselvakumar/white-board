@@ -9,10 +9,10 @@ import { Money } from "@/src/shared-kernel/money";
 
 import {
   Employee,
-  MAX_PAISE,
   checkEmployeeDetails,
   type EmployeeDetails,
 } from "../domain/employee";
+import { MAX_PAISE } from "../domain/ledger";
 import {
   DEFAULT_IMPORT_ROLE,
   MAX_IMPORT_ROWS,

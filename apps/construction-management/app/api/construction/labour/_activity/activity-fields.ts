@@ -3,21 +3,21 @@ import { z } from "zod";
 import type { ActivityPage } from "@/src/composition/labour-activity";
 import type { PersonActivityEntry } from "@/src/composition/person-activity";
 
-/**
- * What every person's Activity feed shares (ADR CM-0038, CM-0044): the
- * query fields, Project changes and check-in entries. The Employee's feed
- * adds its own entries; a Vendor's has only these.
- */
+// The parts of the Activity feeds' models (ADR CM-0038, CM-0044) shared by
+// the Project feed and a Vendor's feed, so neither reads the Employee
+// record's own models (ADR CM-0055).
 
-const calendarDate = z.iso.date().describe("Calendar date, YYYY-MM-DD.");
+export const activityCalendarDate = z.iso
+  .date()
+  .describe("Calendar date, YYYY-MM-DD.");
 
-/** A person's feed's query besides `type`: an Employee's or a Vendor's. */
+/** A person's feed's query besides `type`. */
 export const personActivityQueryFields = {
   /** Only entries about this Project. */
   projectId: z.uuid().optional(),
   /** Effective dates, inclusive. */
-  from: calendarDate.optional(),
-  to: calendarDate.optional(),
+  from: activityCalendarDate.optional(),
+  to: activityCalendarDate.optional(),
   /** `nextCursor` of the page before. */
   cursor: z.string().min(1).max(200).optional(),
 };
@@ -42,17 +42,15 @@ export const activityProject = z.object({
   canOpen: z.boolean(),
 });
 
-export const activityEntryBase = {
+const base = {
   /** Unique within the feed. */
   id: z.string(),
-  /** The day it applies to: a removal's last day, a transfer's first day on the new Project. */
-  date: calendarDate,
+  /** The day it applies to: a removal's last day. */
+  date: activityCalendarDate,
   recordedAt: z.iso.datetime(),
   /** Who recorded it; a removed Team Member keeps their name. */
   by: z.string().nullable(),
 };
-
-export const activityRemark = z.string().nullable();
 
 /** A check-in entry's own fields (ADR CM-0044 §2); no amounts. */
 export const checkInActivityFields = {
@@ -79,48 +77,46 @@ export const checkInActivityFields = {
   voided: z.object({ reason: z.string() }).nullable(),
 };
 
-/** Added to or removed from a Project; in every person's feed. */
-export const projectChangeActivityEntry = z.object({
-  ...activityEntryBase,
+/** Added to or removed from a Project. */
+const projectChangeActivityEntry = z.object({
+  ...base,
   kind: z.enum(["project_added", "project_removed"]),
   project: activityProject,
-  /** Null in a Vendor's feed. */
-  remark: activityRemark,
+  /** Always null in a Vendor's feed. */
+  remark: z.string().nullable(),
 });
 
-/** One Check In or Check Out; in every person's feed. */
-export const checkInActivityEntry = z.object({
-  ...activityEntryBase,
+/** One Check In or Check Out. */
+const checkInActivityEntry = z.object({
+  ...base,
   kind: z.literal("check_in"),
   project: activityProject,
   ...checkInActivityFields,
 });
 
 /** A Vendor's entry (ADR CM-0044 §7). */
-export const personActivityEntry = z.discriminatedUnion("kind", [
+const vendorActivityEntry = z.discriminatedUnion("kind", [
   projectChangeActivityEntry,
   checkInActivityEntry,
 ]);
 
 /** One page of a Vendor's feed. */
-export function personActivityPageModel() {
-  return z.object({
-    /** Newest effective date first, then the latest recorded. */
-    items: z.array(personActivityEntry),
-    /** Send back as `cursor` for the next page; null on the last. */
-    nextCursor: z.string().nullable(),
-    /** The Company's IANA time zone, for showing recorded times. */
-    timeZone: z.string(),
-  });
-}
+export const vendorActivityPageModel = z.object({
+  /** Newest effective date first, then the latest recorded. */
+  items: z.array(vendorActivityEntry),
+  /** Send back as `cursor` for the next page; null on the last. */
+  nextCursor: z.string().nullable(),
+  /** The Company's IANA time zone, for showing recorded times. */
+  timeZone: z.string(),
+});
 
-export type PersonActivityPageResponse = z.infer<
-  ReturnType<typeof personActivityPageModel>
+export type VendorActivityPageResponse = z.infer<
+  typeof vendorActivityPageModel
 >;
 
-export function toPersonActivityResponse(
+export function toVendorActivityResponse(
   page: ActivityPage<PersonActivityEntry>,
-): PersonActivityPageResponse {
+): VendorActivityPageResponse {
   return {
     items: page.items.map((entry) =>
       entry.kind === "check_in"

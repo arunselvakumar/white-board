@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { checkInActivityFields } from "@/app/api/_lib/person-activity-models";
+import { checkInActivityFields } from "@/app/api/construction/labour/_activity/activity-fields";
 import type { ActivityPage } from "@/src/composition/labour-activity";
 import {
   PROJECT_ACTIVITY_TYPES,
@@ -16,7 +16,7 @@ export const ListConstructionProjectsProjectActivityRequestModel = z
       .enum(PROJECT_ACTIVITY_TYPES)
       .default("all")
       .describe(
-        "team: Labours and Site Engineers added, removed, transferred; check_ins: each Check In and Check Out (Attendance Read on the Project).",
+        "team: Employees added, removed, transferred; check_ins: each Check In and Check Out (Attendance Read on the Project).",
       ),
     who: z
       .enum(PROJECT_ACTIVITY_WHO)
@@ -43,43 +43,44 @@ const project = z.object({
   canOpen: z.boolean(),
 });
 
-const labour = z.object({
+const employee = z.object({
   id: z.uuid(),
-  /** Kept after the Labour was deleted. */
+  /** Kept after the Employee was deleted. */
   name: z.string(),
-  /** "Labour Id". */
-  labourCode: z.string().nullable(),
-  labourCategory: z.string().nullable(),
-  /** The viewer may open the Labour's page (Labours Read) and the Labour is not deleted. */
+  /** "Employee Id". */
+  employeeCode: z.string().nullable(),
+  /** The Employee's Role name (ADR CM-0055); null once the Role was deleted. */
+  role: z.string().nullable(),
+  /** The viewer may open the Employee's page (Employees Read) and the Employee is not deleted. */
   canOpen: z.boolean(),
 });
 
 const base = {
   /** Unique within the feed. */
   id: z.string(),
-  /** The day it applies to: a removal's last day; a Site Engineer change's recorded day. */
+  /** The day it applies to: a removal's last day. */
   date: calendarDate,
   recordedAt: z.iso.datetime(),
   /** Who recorded it; a removed Team Member keeps their name. */
   by: z.string().nullable(),
 };
 
-/** One command's Labours, by name: one entry for a batch. */
-const labours = z.array(labour).min(1);
+/** One command's Employees, by name: one entry for a batch. */
+const employees = z.array(employee).min(1);
 const remark = z.string().nullable();
 
 export const ConstructionProjectsProjectActivityEntryResponseModel =
   z.discriminatedUnion("kind", [
     z.object({
       ...base,
-      kind: z.enum(["labour_added", "labour_removed"]),
-      labours,
+      kind: z.enum(["employee_added", "employee_removed"]),
+      employees,
       remark,
     }),
     z.object({
       ...base,
       kind: z.literal("transferred_in"),
-      labours,
+      employees,
       /** Where they came from. */
       fromProject: project.nullable(),
       remark,
@@ -87,34 +88,23 @@ export const ConstructionProjectsProjectActivityEntryResponseModel =
     z.object({
       ...base,
       kind: z.literal("transferred_out"),
-      labours,
+      employees,
       /** Where they went. */
       toProject: project.nullable(),
       remark,
     }),
     z.object({
       ...base,
-      kind: z.enum(["site_engineer_added", "site_engineer_removed"]),
-      siteEngineer: z.object({
-        /** The Site Engineer; null when none points at the sign-in. */
-        id: z.uuid().nullable(),
-        name: z.string(),
-        /** The viewer may open the Site Engineer's page and they are not deleted. */
-        canOpen: z.boolean(),
-      }),
-    }),
-    z.object({
-      ...base,
       kind: z.literal("check_in"),
       /** Who was checked in or out. */
       person: z.object({
-        kind: z.enum(["labour", "site_engineer", "vendor"]),
+        kind: z.enum(["employee", "vendor"]),
         id: z.uuid(),
         /** Kept after they were deleted. */
         name: z.string(),
-        /** The Labour Category, "Site Engineer" or "Vendor". */
+        /** An Employee's Role name, or "Vendor". */
         role: z.string().nullable(),
-        /** The viewer may open their page (Labours Read; Vendors Read for a Vendor) and they are not deleted. */
+        /** The viewer may open their page (Employees Read; Vendors Read for a Vendor) and they are not deleted. */
         canOpen: z.boolean(),
       }),
       ...checkInActivityFields,
