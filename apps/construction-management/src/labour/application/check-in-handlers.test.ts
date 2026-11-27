@@ -11,7 +11,7 @@ import {
   type CheckInTransaction,
 } from "./check-in-handlers";
 import { fakeDirectory } from "./labour-attendance-fakes";
-import type { AttendanceLabourer } from "./labour-attendance-handlers";
+import type { AttendanceEmployee } from "./labour-attendance-handlers";
 
 const PNG = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
 
@@ -47,10 +47,11 @@ describe("readPhoto", () => {
   });
 });
 
-const LABOURER: AttendanceLabourer = {
+const EMPLOYEE: AttendanceEmployee = {
   id: "l1",
   name: "Dhuresh Nawin",
-  labourCode: null,
+  employeeCode: null,
+  roleId: "r1",
   isActive: true,
   labourCategoryId: null,
   weeklyHolidays: [],
@@ -64,7 +65,7 @@ const LABOURER: AttendanceLabourer = {
 };
 
 /**
- * Just enough of the store for a Labour's first Check In, with a
+ * Just enough of the store for an Employee's first Check In, with a
  * transaction whose day save meets the sheet's day saved at that instant.
  */
 function setup() {
@@ -93,7 +94,7 @@ function setup() {
           attendanceDate: "2026-11-14",
         },
       ]),
-    labourer: () => Promise.resolve(LABOURER),
+    employee: () => Promise.resolve(EMPLOYEE),
     day: () => Promise.resolve(null),
     saveDay: () =>
       Promise.reject(
@@ -103,32 +104,26 @@ function setup() {
   const store: Partial<CheckInStore> = {
     timeZone: () => Promise.resolve("Asia/Kolkata"),
     standing: () => Promise.resolve({ last: null, entriesToday: 0 }),
-    labour: () =>
+    employee: () =>
       Promise.resolve({
         person: {
-          kind: "labour",
+          kind: "employee",
           id: "l1",
-          name: LABOURER.name,
-          labourCategoryId: null,
+          name: EMPLOYEE.name,
+          roleId: "r1",
           code: null,
           phone: null,
           photoKey: null,
         },
-        labourer: LABOURER,
+        employee: EMPLOYEE,
       }),
-    labourOnProject: () => Promise.resolve(true),
+    employeeOnProject: () => Promise.resolve(true),
     inPerson: (_workspaceId, _person, work) => work(tx as CheckInTransaction),
   };
   const handlers = new CheckInHandlers(
     store as CheckInStore,
     fakeDirectory({ p1: "Tower A" }),
-    fakeDirectory({}),
-    {
-      onProject: () => Promise.resolve([]),
-      find: () => Promise.resolve(new Map()),
-      names: () => Promise.resolve(new Map()),
-      idsNamed: () => Promise.resolve([]),
-    },
+    fakeDirectory({ r1: "Labour" }),
     { ofProject: () => Promise.resolve(null) },
     storage,
     { assert: () => Promise.resolve() },
@@ -146,7 +141,7 @@ describe("CheckInHandlers.record", () => {
         workspaceId: "w1",
         userId: "u1",
         projectId: "p1",
-        kind: "labour",
+        kind: "employee",
         personId: "l1",
         action: "check_in",
         photo: png(),
@@ -159,7 +154,7 @@ describe("CheckInHandlers.record", () => {
       code: "ATTENDANCE_CHANGED",
       kind: "conflict",
       message:
-        "This Labour's day was marked on the attendance sheet just now. Try again.",
+        "This Employee's day was marked on the attendance sheet just now. Try again.",
     });
     expect(put).toHaveLength(1);
     expect(deleted).toEqual(put);

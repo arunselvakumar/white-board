@@ -7,7 +7,7 @@ import {
   labourFinancial,
 } from "../handlers";
 import {
-  GetConstructionLabourLabourAttendanceMonthRequestModel,
+  GetConstructionLabourEmployeeAttendanceMonthRequestModel,
   toLabourAttendanceMonthResponse,
 } from "../labour-attendance-models";
 
@@ -21,7 +21,7 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request): Promise<Response> {
   try {
     const model = parseOrThrow(
-      GetConstructionLabourLabourAttendanceMonthRequestModel.safeParse(
+      GetConstructionLabourEmployeeAttendanceMonthRequestModel.safeParse(
         Object.fromEntries(new URL(request.url).searchParams),
       ),
     );

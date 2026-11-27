@@ -10,15 +10,15 @@ import {
 } from "../handlers";
 import {
   expectedDates,
-  MarkConstructionLabourLabourAttendanceRequestModel,
+  MarkConstructionLabourEmployeeAttendanceRequestModel,
   toLabourAttendanceDayResponse,
-  type MarkConstructionLabourLabourAttendanceResponseModel,
+  type MarkConstructionLabourEmployeeAttendanceResponseModel,
 } from "../labour-attendance-models";
 
 export const dynamic = "force-dynamic";
 
 /**
- * Marks many labourers' day on a Project in one transaction: each
+ * Marks many Employees' day on a Project in one transaction: each
  * day priced from the labourer's current wages and posted to the labour
  * ledger. A new day needs Attendance create; re-marking a day (its
  * `updatedAt` in `expected`) needs Attendance update and reverses and
@@ -27,7 +27,7 @@ export const dynamic = "force-dynamic";
 export async function POST(request: Request): Promise<Response> {
   try {
     const model = parseOrThrow(
-      MarkConstructionLabourLabourAttendanceRequestModel.safeParse(
+      MarkConstructionLabourEmployeeAttendanceRequestModel.safeParse(
         await request.json(),
       ),
     );
@@ -50,7 +50,7 @@ export async function POST(request: Request): Promise<Response> {
       canEdit: can(session.access, "labour.attendance", "update", scope),
     });
     const financial = labourFinancial(session.access, model.projectId);
-    const body: MarkConstructionLabourLabourAttendanceResponseModel = {
+    const body: MarkConstructionLabourEmployeeAttendanceResponseModel = {
       items: saved.map((day) => toLabourAttendanceDayResponse(day, financial)),
     };
     return Response.json(body);

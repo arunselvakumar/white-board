@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  assertDistinctLabourers,
+  assertDistinctEmployees,
   dayLedgerEntries,
   priceDay,
   withPaidLeave,
@@ -23,7 +23,7 @@ function price(mark: Parameters<typeof priceDay>[0]["mark"], card = daily) {
 describe("priceDay", () => {
   it("snapshots the wage and prices overtime at the Labour's rate", () => {
     const day = price({
-      labourId: "l1",
+      employeeId: "l1",
       status: "present",
       shift: " Shift 1 ",
       overtime: [{ labourCategoryId: "c1", hours: "2.5" }],
@@ -44,7 +44,7 @@ describe("priceDay", () => {
   it("keeps the overtime rate within ₹2 crore and a day's overtime within an integer", () => {
     expect(() =>
       price({
-        labourId: "l1",
+        employeeId: "l1",
         status: "present",
         overtime: [
           { labourCategoryId: null, hours: 1, ratePerHour: 2_000_000_001 },
@@ -53,7 +53,7 @@ describe("priceDay", () => {
     ).toThrow(expect.objectContaining({ code: "OVERTIME_RATE_INVALID" }));
     expect(() =>
       price({
-        labourId: "l1",
+        employeeId: "l1",
         status: "present",
         overtime: [
           { labourCategoryId: null, hours: 2, ratePerHour: 2_000_000_000 },
@@ -65,7 +65,7 @@ describe("priceDay", () => {
   it("lets a line override the overtime rate", () => {
     expect(
       price({
-        labourId: "l1",
+        employeeId: "l1",
         status: "holiday",
         overtime: [{ labourCategoryId: null, hours: 4, ratePerHour: 15_000 }],
       }),
@@ -75,14 +75,14 @@ describe("priceDay", () => {
   it("refuses overtime on an Absent day and more than 24 hours a day", () => {
     expect(() =>
       price({
-        labourId: "l1",
+        employeeId: "l1",
         status: "absent",
         overtime: [{ labourCategoryId: null, hours: 1 }],
       }),
     ).toThrow(expect.objectContaining({ code: "OVERTIME_ON_ABSENT_DAY" }));
     expect(() =>
       price({
-        labourId: "l1",
+        employeeId: "l1",
         status: "present",
         overtime: [
           { labourCategoryId: null, hours: 12 },
@@ -94,9 +94,9 @@ describe("priceDay", () => {
 
   it("allows Paid Leave only on leave, and re-prices it", () => {
     expect(() =>
-      price({ labourId: "l1", status: "present", isPaidLeave: true }),
+      price({ employeeId: "l1", status: "present", isPaidLeave: true }),
     ).toThrow(expect.objectContaining({ code: "PAID_LEAVE_NEEDS_LEAVE" }));
-    const leave = price({ labourId: "l1", status: "on_leave" });
+    const leave = price({ employeeId: "l1", status: "on_leave" });
     expect(leave.earned).toBe(0);
     expect(withPaidLeave(leave, true).earned).toBe(80_000);
   });
@@ -104,7 +104,7 @@ describe("priceDay", () => {
   it("prorates a monthly wage", () => {
     expect(
       price(
-        { labourId: "l1", status: "present" },
+        { employeeId: "l1", status: "present" },
         {
           wageType: "monthly",
           wagePerDay: null,
@@ -118,19 +118,19 @@ describe("priceDay", () => {
 
   it("marks each Labour once per command", () => {
     expect(() => {
-      assertDistinctLabourers([
-        { labourId: "l1", status: "present" },
-        { labourId: "l1", status: "absent" },
+      assertDistinctEmployees([
+        { employeeId: "l1", status: "present" },
+        { employeeId: "l1", status: "absent" },
       ]);
-    }).toThrow(expect.objectContaining({ code: "LABOUR_MARKED_TWICE" }));
+    }).toThrow(expect.objectContaining({ code: "EMPLOYEE_MARKED_TWICE" }));
     expect(() => {
-      assertDistinctLabourers([]);
+      assertDistinctEmployees([]);
     }).toThrow(expect.objectContaining({ code: "ATTENDANCE_EMPTY" }));
   });
 });
 
 describe("priceDay with check-in and check-out (ADR CM-0011)", () => {
-  const timed = { labourId: "l1", status: "present" as const };
+  const timed = { employeeId: "l1", status: "present" as const };
   const fromTimes = { labourCategoryId: "c1", fromTimes: true };
 
   it("keeps the times, a 60-minute break by default and the working hours", () => {
@@ -199,7 +199,7 @@ describe("priceDay with check-in and check-out (ADR CM-0011)", () => {
   it("measures overtime against the Labour's working hours, on a Half Day too", () => {
     const day = price(
       {
-        labourId: "l1",
+        employeeId: "l1",
         status: "half_day",
         checkIn: "08:00",
         checkOut: "19:30",
@@ -264,9 +264,9 @@ describe("priceDay with check-in and check-out (ADR CM-0011)", () => {
 
   it("refuses times that do not fit the day", () => {
     for (const status of ["absent", "on_leave", "holiday"] as const)
-      expect(() => price({ labourId: "l1", status, checkIn: "09:00" })).toThrow(
-        expect.objectContaining({ code: "TIMES_NEED_PRESENT" }),
-      );
+      expect(() =>
+        price({ employeeId: "l1", status, checkIn: "09:00" }),
+      ).toThrow(expect.objectContaining({ code: "TIMES_NEED_PRESENT" }));
     expect(() => price({ ...timed, checkOut: "18:00" })).toThrow(
       expect.objectContaining({ code: "CHECK_IN_REQUIRED" }),
     );

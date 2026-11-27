@@ -17,14 +17,14 @@ import {
 import type { PaymentMode } from "../domain/wage-payment";
 import type { ProjectDirectory } from "./directories";
 
-/** A labourer or vendor shown on a Project's balances. */
+/** An Employee or vendor shown on a Project's balances. */
 export type BalanceParty = {
   id: string;
   name: string;
-  /** The labourer's "Labour Id"; null for vendors. */
+  /** The Employee's "Employee Id"; null for vendors. */
   code: string | null;
   isActive: boolean;
-  /** Labour: the current Project is this one. Vendor: assigned to it. */
+  /** Employee: the current Project is this one. Vendor: assigned to it. */
   onProject: boolean;
 };
 
@@ -58,7 +58,7 @@ export type BalancePaymentInfo = {
 /** Reads for balances (Prisma in infrastructure). */
 export type BalanceStore = {
   /**
-   * The parties of a Project for a period: labourers whose current
+   * The parties of a Project for a period: Employees whose current
    * Project it is (joined by the period's end), vendors assigned to it
    * (joined by the period's end), and any party with an entry in this
    * Project during the period. Live parties only, by name.
@@ -198,15 +198,15 @@ export function totalOf(
 }
 
 function partyNotFound(partyType: PartyType): DomainError {
-  return partyType === "labour"
-    ? notFound("LABOUR_NOT_FOUND", "This Labour was not found.")
+  return partyType === "employee"
+    ? notFound("EMPLOYEE_NOT_FOUND", "This Employee was not found.")
     : notFound("VENDOR_NOT_FOUND", "This Vendor was not found.");
 }
 
 /**
- * Labour and vendor balances (CM-214 read side, ADR CM-0004). A balance
+ * Employee and vendor balances (CM-214 read side, ADR CM-0004). A balance
  * belongs to the party, not the Project (`modules/08`: it moves with the
- * labourer), so every figure is party-wide across Projects: Previous
+ * Employee), so every figure is party-wide across Projects: Previous
  * Balance, To Pay, Advance, Paid and Final Amount sum all of the party's
  * entries; the statement names the Project of each entry. A Project only
  * decides which parties are listed. Access is checked by the caller.

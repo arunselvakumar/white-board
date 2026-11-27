@@ -12,6 +12,7 @@ import {
   normalizeAadhaar,
 } from "@/src/shared-kernel/tax-ids";
 
+import { MAX_PAISE } from "./ledger";
 import {
   DEFAULT_WORKING_HOURS,
   workingHours,
@@ -22,6 +23,7 @@ import {
 export type Gender = "male" | "female" | "other";
 
 export const GENDERS: readonly Gender[] = ["male", "female", "other"];
+export { MAX_PAISE };
 export const WAGE_TYPES: readonly WageType[] = ["daily", "monthly"];
 
 export const BLOOD_GROUPS = [
@@ -36,9 +38,6 @@ export const BLOOD_GROUPS = [
 ] as const;
 
 export type BloodGroup = (typeof BLOOD_GROUPS)[number];
-
-/** Wages and the opening balance stay within a Postgres `integer` of paise. */
-export const MAX_PAISE = 2_000_000_000;
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

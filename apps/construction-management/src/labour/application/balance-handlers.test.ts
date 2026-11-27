@@ -25,7 +25,7 @@ function entry(
     amount,
     entryDate,
     projectId: "tower",
-    sourceType: "labour_attendance",
+    sourceType: "employee_attendance",
     sourceId: `s${String(sequence)}`,
     reversesEntryId: null,
     ...extra,
@@ -153,7 +153,7 @@ describe("BalanceHandlers", () => {
     const result = await handlers.balances({
       workspaceId: "w",
       projectId: "tower",
-      partyType: "labour",
+      partyType: "employee",
       kind: "monthly",
     });
     expect(result).toMatchObject({ from: "2026-09-01", to: "2026-09-30" });
@@ -174,16 +174,16 @@ describe("BalanceHandlers", () => {
       handlers.statement({
         workspaceId: "w",
         projectId: "tower",
-        partyType: "labour",
+        partyType: "employee",
         partyId: "meena",
         from: "2026-09-01",
         to: "2026-09-30",
       }),
-    ).rejects.toMatchObject({ code: "LABOUR_NOT_FOUND" });
+    ).rejects.toMatchObject({ code: "EMPLOYEE_NOT_FOUND" });
     const statement = await handlers.statement({
       workspaceId: "w",
       projectId: "tower",
-      partyType: "labour",
+      partyType: "employee",
       partyId: "dhuresh",
       from: "2026-09-01",
       to: "2026-09-30",
@@ -200,7 +200,7 @@ describe("BalanceHandlers", () => {
       handlers.balances({
         workspaceId: "w",
         projectId: "tower",
-        partyType: "labour",
+        partyType: "employee",
         kind: "custom",
         anchor: "2026-09-10",
         to: "2026-09-01",
@@ -210,7 +210,7 @@ describe("BalanceHandlers", () => {
       handlers.balances({
         workspaceId: "w",
         projectId: "gone",
-        partyType: "labour",
+        partyType: "employee",
         kind: "monthly",
       }),
     ).rejects.toMatchObject({ code: "PROJECT_NOT_FOUND" });

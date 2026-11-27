@@ -15,9 +15,9 @@ import {
   labourFinancial,
 } from "./handlers";
 import {
-  ListConstructionLabourLabourAttendanceRequestModel,
+  ListConstructionLabourEmployeeAttendanceRequestModel,
   toLabourAttendanceDayResponse,
-  type ListConstructionLabourLabourAttendanceResponseModel,
+  type ListConstructionLabourEmployeeAttendanceResponseModel,
 } from "./labour-attendance-models";
 
 export const dynamic = "force-dynamic";
@@ -32,13 +32,13 @@ function cursorOf(day: { date: string; id: string }): string {
 
 /**
  * Marked labour days of a Project, newest date first: filter by
- * dates, labourer and status, with bidirectional cursors and a
+ * dates, Employee and status, with bidirectional cursors and a
  * total. Needs Attendance read on the Project.
  */
 export async function GET(request: Request): Promise<Response> {
   try {
     const model = parseOrThrow(
-      ListConstructionLabourLabourAttendanceRequestModel.safeParse(
+      ListConstructionLabourEmployeeAttendanceRequestModel.safeParse(
         Object.fromEntries(new URL(request.url).searchParams),
       ),
     );
@@ -59,7 +59,7 @@ export async function GET(request: Request): Promise<Response> {
       projectId: model.projectId,
       from: model.from,
       to: model.to,
-      labourId: model.labourId,
+      employeeId: model.employeeId,
       status: model.status,
       limit: model.limit,
       after: model.after == null ? undefined : decode(model.after),
@@ -71,7 +71,7 @@ export async function GET(request: Request): Promise<Response> {
     const backwards = model.before != null;
     const moreAfter = backwards || page.hasMore;
     const moreBefore = backwards ? page.hasMore : model.after != null;
-    const body: ListConstructionLabourLabourAttendanceResponseModel = {
+    const body: ListConstructionLabourEmployeeAttendanceResponseModel = {
       items: page.items.map((item) =>
         toLabourAttendanceDayResponse(item, financial),
       ),

@@ -12,9 +12,9 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The labour tiles on a Project's Overview: labourers present
+ * The labour tiles on a Project's Overview: Employees present
  * today, vendor headcount, the last two weeks (or `from` to `date` for the
- * Project Dashboard), and labour and vendor payment status.
+ * Project Dashboard), and Employee and vendor payment status.
  */
 export async function GET(request: Request): Promise<Response> {
   try {
@@ -37,7 +37,7 @@ export async function GET(request: Request): Promise<Response> {
     const options = { projectId: model.projectId };
     return Response.json(
       toProjectSummaryResponse(summary, {
-        labour: can(session.access, "labour.labour", "financial", options),
+        employee: can(session.access, "labour.labour", "financial", options),
         vendor: can(session.access, "labour.vendor", "financial", options),
       }),
     );

@@ -14,12 +14,13 @@ import {
   calendarDateToDb,
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
+import { companyToday } from "@/src/shared-kernel/company-today";
 import { conflict, notFound } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
 import { isUniqueViolation } from "@/src/shared-kernel/prisma-errors";
 
 import type {
-  AttendanceLabourer,
+  AttendanceEmployee,
   LabourAttendanceActor,
   LabourAttendanceBackdatedGuard,
   LabourAttendanceStore,
@@ -29,9 +30,8 @@ import type {
 } from "../application/labour-attendance-handlers";
 import { dayLedgerEntries, type PricedDay } from "../domain/labour-attendance";
 import { workingHours, type Weekday } from "../domain/wages";
-import { onProjectOn } from "./labour-project-on";
+import { activeEmployeeIdsOn, onProjectOn } from "./labour-project-on";
 import { lockLiveParties } from "./party-locks";
-import { companyToday, PrismaLabourQueries } from "./prisma-labour-queries";
 import { prismaLedger } from "./prisma-ledger";
 
 const INCLUDE = {
@@ -42,19 +42,18 @@ type Row = Prisma.ConstructionLabourAttendanceGetPayload<{
   include: typeof INCLUDE;
 }>;
 
-type LabourRow = Prisma.ConstructionLabourLabourGetPayload<object>;
+type EmployeeRow = Prisma.ConstructionLabourEmployeeGetPayload<object>;
 
 function toStored(row: Row): StoredLabourDay {
   return {
     id: row.id,
     workspaceId: row.workspaceId,
     projectId: row.projectId,
-    labourId: row.labourId,
+    employeeId: row.employeeId,
     date: calendarDateFromDb(row.attendanceDate),
     status: row.status,
     isPaidLeave: row.isPaidLeave,
     shift: row.shift,
-    supervisorId: row.supervisorId,
     checkIn: row.checkIn,
     checkOut: row.checkOut,
     breakMinutes: row.breakMinutes,
@@ -78,24 +77,26 @@ function toStored(row: Row): StoredLabourDay {
   };
 }
 
-/** A labourer row as attendance prices them. */
-export function toLabourer(row: {
+/** An Employee row as attendance prices them. */
+export function toAttendanceEmployee(row: {
   id: string;
   name: string;
-  labourCode: string | null;
+  employeeCode: string | null;
+  roleId: string;
   isActive?: boolean;
   labourCategoryId: string | null;
   weeklyHolidays: number[];
-  wageType: LabourRow["wageType"];
+  wageType: EmployeeRow["wageType"];
   wagePerDay: number | null;
   wagePerMonth: number | null;
   overtimeWagePerHour: number;
   workingHoursPerDay: string | Prisma.Decimal;
-}): AttendanceLabourer {
+}): AttendanceEmployee {
   return {
     id: row.id,
     name: row.name,
-    labourCode: row.labourCode,
+    employeeCode: row.employeeCode,
+    roleId: row.roleId,
     isActive: row.isActive ?? true,
     labourCategoryId: row.labourCategoryId,
     weeklyHolidays: row.weeklyHolidays as Weekday[],
@@ -109,24 +110,23 @@ export function toLabourer(row: {
   };
 }
 
-function changed(labourId: string) {
+function changed(employeeId: string) {
   return conflict(
     "ATTENDANCE_CHANGED",
-    "Someone changed this Labour's day after you opened it. Reload to see the latest.",
-    { labourId },
+    "Someone changed this Employee's day after you opened it. Reload to see the latest.",
+    { employeeId },
   );
 }
 
 /** What the audit log keeps of a day. */
 function snapshot(day: PricedDay) {
   return {
-    labourId: day.labourId,
+    employeeId: day.employeeId,
     projectId: day.projectId,
     date: day.date,
     status: day.status,
     isPaidLeave: day.isPaidLeave,
     shift: day.shift,
-    supervisorId: day.supervisorId,
     checkIn: day.checkIn,
     checkOut: day.checkOut,
     breakMinutes: day.breakMinutes,
@@ -146,7 +146,6 @@ function rowData(day: PricedDay) {
     status: day.status,
     isPaidLeave: day.isPaidLeave,
     shift: day.shift,
-    supervisorId: day.supervisorId,
     checkIn: day.checkIn,
     checkOut: day.checkOut,
     breakMinutes: day.breakMinutes,
@@ -163,7 +162,7 @@ function rowData(day: PricedDay) {
  * Writes one day inside the caller's transaction: the row (a create, or a
  * compare-and-set on `expectedUpdatedAt`), its overtime lines, the ledger
  * reversal and reposting, and the audit event (ADR CM-0004). The caller
- * holds the labourer's share lock. Returns the next overtime id step.
+ * holds the Employee's share lock. Returns the next overtime id step.
  */
 export async function saveDayInTx(
   tx: Prisma.TransactionClient,
@@ -188,7 +187,7 @@ export async function saveDayInTx(
         data: {
           id: write.id,
           workspaceId,
-          labourId: day.labourId,
+          employeeId: day.employeeId,
           attendanceDate: calendarDateToDb(day.date),
           ...rowData(day),
           createdAt: now,
@@ -199,7 +198,7 @@ export async function saveDayInTx(
       });
     } catch (error) {
       // The live-day unique index: someone marked this day meanwhile.
-      if (isUniqueViolation(error)) throw changed(day.labourId);
+      if (isUniqueViolation(error)) throw changed(day.employeeId);
       throw error;
     }
   } else {
@@ -207,7 +206,7 @@ export async function saveDayInTx(
       where: { id: write.id, workspaceId, deletedAt: null },
       include: INCLUDE,
     });
-    if (row == null) throw changed(day.labourId);
+    if (row == null) throw changed(day.employeeId);
     before = toStored(row);
     // Compare-and-set on updatedAt: a stale save changes no row.
     const updated = await tx.constructionLabourAttendance.updateMany({
@@ -219,7 +218,7 @@ export async function saveDayInTx(
       },
       data: { ...rowData(day), updatedAt: now, updatedBy: by },
     });
-    if (updated.count === 0) throw changed(day.labourId);
+    if (updated.count === 0) throw changed(day.employeeId);
     await tx.constructionLabourOvertime.deleteMany({
       where: { attendanceId: write.id },
     });
@@ -240,7 +239,7 @@ export async function saveDayInTx(
     tx,
     workspaceId,
     by,
-    "labour_attendance",
+    "employee_attendance",
     write.id,
   );
   await prismaLedger.post(tx, workspaceId, by, dayLedgerEntries(day, write.id));
@@ -265,7 +264,7 @@ export async function saveDayInTx(
 /**
  * Clears one day inside the caller's transaction: tombstones the row
  * (compare-and-set on `expectedUpdatedAt`), reverses its ledger entries
- * and records the audit event. The caller holds the labourer's share lock.
+ * and records the audit event. The caller holds the Employee's share lock.
  */
 export async function clearDayInTx(
   tx: Prisma.TransactionClient,
@@ -298,13 +297,13 @@ export async function clearDayInTx(
     });
     if (live === 0)
       throw notFound("ATTENDANCE_NOT_FOUND", "This attendance was not found.");
-    throw changed(day.labourId);
+    throw changed(day.employeeId);
   }
   await prismaLedger.reverseSource(
     tx,
     workspaceId,
     by,
-    "labour_attendance",
+    "employee_attendance",
     day.id,
   );
   await recordAudit(tx, {
@@ -319,22 +318,22 @@ export async function clearDayInTx(
 }
 
 /**
- * The live day of a labourer on a Project and date, its row locked until
+ * The live day of an Employee on a Project and date, its row locked until
  * the transaction ends, or null.
  */
 export async function lockedDayInTx(
   tx: Prisma.TransactionClient,
   input: {
     workspaceId: string;
-    labourId: string;
+    employeeId: string;
     projectId: string;
     date: CalendarDate;
   },
 ): Promise<StoredLabourDay | null> {
   const locked = await tx.$queryRaw<{ id: string }[]>(Prisma.sql`
-    SELECT id::text AS id FROM construction_labour.labour_attendance
+    SELECT id::text AS id FROM construction_labour.employee_attendance
     WHERE workspace_id = ${input.workspaceId}
-      AND labour_id = ${input.labourId}::uuid
+      AND employee_id = ${input.employeeId}::uuid
       AND project_id = ${input.projectId}::uuid
       AND attendance_date = ${calendarDateToDb(input.date)}
       AND deleted_at IS NULL
@@ -350,33 +349,29 @@ export async function lockedDayInTx(
 
 /**
  * Labour attendance in `construction_labour` (CM-210): one live row per
- * labourer per Project per date (partial unique index, ADR CM-0033),
+ * Employee per Project per date (partial unique index, ADR CM-0033),
  * overtime lines in id order, and the labour ledger in the same
  * transaction (ADR CM-0004).
  */
 export class PrismaLabourAttendanceStore implements LabourAttendanceStore {
-  private readonly queries: PrismaLabourQueries;
-
   constructor(
     private readonly db: PrismaClient,
     private readonly clock: () => Date = () => new Date(),
-  ) {
-    this.queries = new PrismaLabourQueries(db, clock);
-  }
+  ) {}
 
   today(workspaceId: string): Promise<CalendarDate> {
     return companyToday(this.db, workspaceId, this.clock());
   }
 
-  async labourers(
+  async employees(
     workspaceId: string,
     ids: readonly string[],
-  ): Promise<Map<string, AttendanceLabourer>> {
+  ): Promise<Map<string, AttendanceEmployee>> {
     if (ids.length === 0) return new Map();
-    const rows = await this.db.constructionLabourLabour.findMany({
+    const rows = await this.db.constructionLabourEmployee.findMany({
       where: { workspaceId, id: { in: [...new Set(ids)] }, deletedAt: null },
     });
-    return new Map(rows.map((row) => [row.id, toLabourer(row)]));
+    return new Map(rows.map((row) => [row.id, toAttendanceEmployee(row)]));
   }
 
   onProject(
@@ -385,31 +380,41 @@ export class PrismaLabourAttendanceStore implements LabourAttendanceStore {
     projectId: string,
     date: CalendarDate,
   ): Promise<Set<string>> {
-    // Ids come from `labourers`, already scoped to the Company.
+    // Ids come from `employees`, already scoped to the Company.
     return onProjectOn(this.db, ids, projectId, date);
   }
 
-  async labourersOn(
+  async employeesOn(
     workspaceId: string,
     projectId: string,
     date: CalendarDate,
-  ): Promise<AttendanceLabourer[]> {
-    const options = await this.queries.options(workspaceId, projectId, date);
-    return options.map((option) => toLabourer(option));
+  ): Promise<AttendanceEmployee[]> {
+    const ids = await activeEmployeeIdsOn(
+      this.db,
+      workspaceId,
+      projectId,
+      date,
+    );
+    if (ids.length === 0) return [];
+    const rows = await this.db.constructionLabourEmployee.findMany({
+      where: { workspaceId, id: { in: ids } },
+      orderBy: [{ name: "asc" }, { id: "asc" }],
+    });
+    return rows.map(toAttendanceEmployee);
   }
 
   async daysOf(
     workspaceId: string,
-    labourIds: readonly string[],
+    employeeIds: readonly string[],
     projectId: string,
     date: CalendarDate,
   ): Promise<StoredLabourDay[]> {
-    if (labourIds.length === 0) return [];
+    if (employeeIds.length === 0) return [];
     const rows = await this.db.constructionLabourAttendance.findMany({
       where: {
         workspaceId,
         projectId,
-        labourId: { in: [...new Set(labourIds)] },
+        employeeId: { in: [...new Set(employeeIds)] },
         attendanceDate: calendarDateToDb(date),
         deletedAt: null,
       },
@@ -465,7 +470,8 @@ export class PrismaLabourAttendanceStore implements LabourAttendanceStore {
       filters.push({ attendanceDate: { gte: calendarDateToDb(params.from) } });
     if (params.to != null)
       filters.push({ attendanceDate: { lte: calendarDateToDb(params.to) } });
-    if (params.labourId != null) filters.push({ labourId: params.labourId });
+    if (params.employeeId != null)
+      filters.push({ employeeId: params.employeeId });
     if (params.status === "paid_leave")
       filters.push({ status: "on_leave", isPaidLeave: true });
     else if (params.status != null) filters.push({ status: params.status });
@@ -519,12 +525,12 @@ export class PrismaLabourAttendanceStore implements LabourAttendanceStore {
   ): Promise<void> {
     const { workspaceId } = input;
     await this.db.$transaction(async (tx) => {
-      // A labourer deleted meanwhile is refused; a delete waits for this.
+      // An Employee deleted meanwhile is refused; a delete waits for this.
       await lockLiveParties(
         tx,
         workspaceId,
-        "labour",
-        input.writes.map((write) => write.day.labourId),
+        "employee",
+        input.writes.map((write) => write.day.employeeId),
         "share",
       );
       let step = 0;
@@ -548,8 +554,8 @@ export class PrismaLabourAttendanceStore implements LabourAttendanceStore {
       await lockLiveParties(
         tx,
         workspaceId,
-        "labour",
-        input.days.map(({ day }) => day.labourId),
+        "employee",
+        input.days.map(({ day }) => day.employeeId),
         "share",
       );
       for (const { day, expectedUpdatedAt } of input.days)
@@ -563,19 +569,19 @@ export class PrismaLabourAttendanceStore implements LabourAttendanceStore {
     });
   }
 
-  async labourNames(
+  async employeeNames(
     workspaceId: string,
     ids: readonly string[],
-  ): Promise<Map<string, { name: string; labourCode: string | null }>> {
+  ): Promise<Map<string, { name: string; employeeCode: string | null }>> {
     if (ids.length === 0) return new Map();
-    const rows = await this.db.constructionLabourLabour.findMany({
+    const rows = await this.db.constructionLabourEmployee.findMany({
       where: { workspaceId, id: { in: [...new Set(ids)] } },
-      select: { id: true, name: true, labourCode: true },
+      select: { id: true, name: true, employeeCode: true },
     });
     return new Map(
       rows.map((row) => [
         row.id,
-        { name: row.name, labourCode: row.labourCode },
+        { name: row.name, employeeCode: row.employeeCode },
       ]),
     );
   }

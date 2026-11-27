@@ -80,7 +80,7 @@ describe("the report catalogue HTTP (ADR CM-0021 §2)", () => {
     );
     const month = items.find((item) => item.kind === "labour_month");
     expect(month).toMatchObject({
-      title: "Month-wise Labour",
+      title: "Employee Month",
       group: "labour",
       period: "month",
       formats: ["xlsx", "pdf"],

@@ -5,7 +5,7 @@ export const COUNTERPARTY_KINDS = [
   "contractor",
   "supplier",
   "other_party",
-  "labour",
+  "employee",
   "vendor",
   "team_member",
 ] as const;

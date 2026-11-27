@@ -20,7 +20,7 @@ export type CounterpartyKind =
   | "contractor"
   | "supplier"
   | "other_party"
-  | "labour"
+  | "employee"
   | "vendor"
   | "team_member";
 

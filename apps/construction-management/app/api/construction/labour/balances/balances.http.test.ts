@@ -2,7 +2,6 @@ import { prisma } from "@repo/construction-db";
 import { StatusCodes } from "http-status-codes";
 import { describe, expect, it } from "vitest";
 
-import { POST as createLabour } from "@/app/api/construction/labour/labours/route";
 import { POST as cancelPayment } from "@/app/api/construction/labour/payments/[id]/cancel/route";
 import { POST as recordPayment } from "@/app/api/construction/labour/payments/route";
 import { POST as createVendor } from "@/app/api/construction/labour/vendors/route";
@@ -21,6 +20,7 @@ import {
   memberWith,
   ownerWithCompany,
 } from "@/test/companies";
+import { seedEmployee } from "@/test/employees";
 import { seededAccounts } from "@/test/finance";
 import { TEST_ORIGIN } from "@/test/sessions";
 
@@ -29,7 +29,6 @@ import { GET as getStatement } from "./statement/route";
 
 const BASE = `${TEST_ORIGIN}/api/construction/labour/balances`;
 const PAYMENTS = `${TEST_ORIGIN}/api/construction/labour/payments`;
-const LABOURS = `${TEST_ORIGIN}/api/construction/labour/labours`;
 const VENDORS = `${TEST_ORIGIN}/api/construction/labour/vendors`;
 
 type Company = Awaited<ReturnType<typeof ownerWithCompany>>;
@@ -78,23 +77,18 @@ async function seed(company: Company) {
     addProject(company.workspaceId, company.userId, "Tower A"),
     addProject(company.workspaceId, company.userId, "Villa"),
   ]);
-  const labour = async (name: string, projectId: string) =>
-    (
-      await json<{ id: string }>(
-        await createLabour(
-          jsonRequest(LABOURS, company.cookie, {
-            name,
-            joiningDate: "2026-08-01",
-            wageType: "daily",
-            wagePerDay: 70_000,
-            overtimeWagePerHour: 10_000,
-            weeklyHolidays: [0],
-            projectIds: [projectId],
-            openingBalance: 100_000,
-          }),
-        ),
-      )
-    ).id;
+  const labour = (name: string, projectId: string) =>
+    seedEmployee({
+      workspaceId: company.workspaceId,
+      name,
+      joiningDate: "2026-08-01",
+      wagePerDay: 70_000,
+      overtimeWagePerHour: 10_000,
+      weeklyHolidays: [0],
+      projectIds: [projectId],
+      openingBalance: 100_000,
+      by: company.userId,
+    });
   const dhuresh = await labour("Dhuresh Nawin", tower);
   const meena = await labour("Meena Selvi", villa);
   const vendor = await json<{ id: string }>(
@@ -110,7 +104,7 @@ async function seed(company: Company) {
   );
   // Attendance as the ledger sees it (the attendance commands post these).
   const earned = (
-    partyType: "labour" | "vendor",
+    partyType: "employee" | "vendor",
     partyId: string,
     projectId: string,
     entryDate: string,
@@ -124,18 +118,18 @@ async function seed(company: Company) {
     kind,
     amount,
     sourceType:
-      partyType === "labour" ? "labour_attendance" : "vendor_attendance",
+      partyType === "employee" ? "employee_attendance" : "vendor_attendance",
     sourceId: newId(),
     reversesEntryId: null,
   });
   await prisma.$transaction((tx) =>
     prismaLedger.post(tx, company.workspaceId, company.userId, [
-      earned("labour", dhuresh, tower, "2026-08-20", "earned", 50_000),
-      earned("labour", dhuresh, tower, "2026-09-10", "earned", 70_000),
+      earned("employee", dhuresh, tower, "2026-08-20", "earned", 50_000),
+      earned("employee", dhuresh, tower, "2026-09-10", "earned", 70_000),
       // Earned in another Project: still Dhuresh's balance.
-      earned("labour", dhuresh, villa, "2026-09-11", "overtime", 20_000),
+      earned("employee", dhuresh, villa, "2026-09-11", "overtime", 20_000),
       // Meena worked a day on Tower A in September.
-      earned("labour", meena, tower, "2026-09-15", "earned", 35_000),
+      earned("employee", meena, tower, "2026-09-15", "earned", 35_000),
       earned("vendor", vendor.id, tower, "2026-09-10", "earned", 180_000),
     ]),
   );
@@ -145,7 +139,7 @@ async function seed(company: Company) {
       await recordPayment(
         jsonRequest(PAYMENTS, company.cookie, {
           accountId: cashId,
-          partyType: "labour",
+          partyType: "employee",
           partyId: dhuresh,
           projectId: tower,
           mode: "cash",
@@ -220,7 +214,7 @@ describe("labour and vendor balances HTTP", () => {
     const month = await json<Balances>(
       await balances(
         company.cookie,
-        `projectId=${s.tower}&partyType=labour&kind=monthly&anchor=2026-09-15`,
+        `projectId=${s.tower}&partyType=employee&kind=monthly&anchor=2026-09-15`,
       ),
     );
     expect(month).toMatchObject({ from: "2026-09-01", to: "2026-09-30" });
@@ -245,7 +239,7 @@ describe("labour and vendor balances HTTP", () => {
     const week = await json<Balances>(
       await balances(
         company.cookie,
-        `projectId=${s.tower}&partyType=labour&kind=weekly&anchor=2026-09-16`,
+        `projectId=${s.tower}&partyType=employee&kind=weekly&anchor=2026-09-16`,
       ),
     );
     expect(week).toMatchObject({ from: "2026-09-14", to: "2026-09-20" });
@@ -259,7 +253,7 @@ describe("labour and vendor balances HTTP", () => {
     const custom = await json<Balances>(
       await balances(
         company.cookie,
-        `projectId=${s.tower}&partyType=labour&kind=custom&anchor=2026-09-11&to=2026-09-12`,
+        `projectId=${s.tower}&partyType=employee&kind=custom&anchor=2026-09-11&to=2026-09-12`,
       ),
     );
     expect(rowOf(custom, s.dhuresh)).toMatchObject({
@@ -278,7 +272,7 @@ describe("labour and vendor balances HTTP", () => {
 
     const backwards = await balances(
       company.cookie,
-      `projectId=${s.tower}&partyType=labour&kind=custom&anchor=2026-09-12&to=2026-09-11`,
+      `projectId=${s.tower}&partyType=employee&kind=custom&anchor=2026-09-12&to=2026-09-11`,
     );
     expect(backwards.status).toBe(StatusCodes.BAD_REQUEST);
 
@@ -299,7 +293,7 @@ describe("labour and vendor balances HTTP", () => {
   it("restores the Final Amount when a payment is cancelled, and the statement shows the running balance", async () => {
     const company = await ownerWithCompany();
     const s = await seed(company);
-    const query = `projectId=${s.tower}&partyType=labour&kind=monthly&anchor=2026-09-15`;
+    const query = `projectId=${s.tower}&partyType=employee&kind=monthly&anchor=2026-09-15`;
     const cancelled = await cancelPayment(
       jsonRequest(`${PAYMENTS}/${s.payment.id}/cancel`, company.cookie, {
         expectedUpdatedAt: s.payment.updatedAt,
@@ -315,7 +309,7 @@ describe("labour and vendor balances HTTP", () => {
 
     const response = await getStatement(
       jsonRequest(
-        `${BASE}/statement?projectId=${s.tower}&partyType=labour&partyId=${s.dhuresh}&from=2026-09-01&to=2026-09-30`,
+        `${BASE}/statement?projectId=${s.tower}&partyType=employee&partyId=${s.dhuresh}&from=2026-09-01&to=2026-09-30`,
         company.cookie,
       ),
     );
@@ -352,7 +346,7 @@ describe("labour and vendor balances HTTP", () => {
     const other = await addProject(company.workspaceId, company.userId, "B");
     const off = await getStatement(
       jsonRequest(
-        `${BASE}/statement?projectId=${other}&partyType=labour&partyId=${s.meena}&from=2026-09-01&to=2026-09-30`,
+        `${BASE}/statement?projectId=${other}&partyType=employee&partyId=${s.meena}&from=2026-09-01&to=2026-09-30`,
         company.cookie,
       ),
     );
@@ -360,7 +354,7 @@ describe("labour and vendor balances HTTP", () => {
     // …but she has entries on Tower A, so it shows there.
     const onTower = await getStatement(
       jsonRequest(
-        `${BASE}/statement?projectId=${s.tower}&partyType=labour&partyId=${s.meena}&from=2026-08-01&to=2026-09-30`,
+        `${BASE}/statement?projectId=${s.tower}&partyType=employee&partyId=${s.meena}&from=2026-08-01&to=2026-09-30`,
         company.cookie,
       ),
     );
@@ -376,7 +370,7 @@ describe("labour and vendor balances HTTP", () => {
     const body = await json<Balances>(
       await balances(
         viewer.cookie,
-        `projectId=${s.tower}&partyType=labour&anchor=2026-09-15`,
+        `projectId=${s.tower}&partyType=employee&anchor=2026-09-15`,
       ),
     );
     expect(body.financial).toBe(false);
@@ -386,7 +380,7 @@ describe("labour and vendor balances HTTP", () => {
     const statement = await json<Statement>(
       await getStatement(
         jsonRequest(
-          `${BASE}/statement?projectId=${s.tower}&partyType=labour&partyId=${s.dhuresh}&from=2026-09-01&to=2026-09-30`,
+          `${BASE}/statement?projectId=${s.tower}&partyType=employee&partyId=${s.dhuresh}&from=2026-09-01&to=2026-09-30`,
           viewer.cookie,
         ),
       ),
@@ -401,14 +395,14 @@ describe("labour and vendor balances HTTP", () => {
     expect(vendors.status).toBe(StatusCodes.FORBIDDEN);
     const villa = await balances(
       viewer.cookie,
-      `projectId=${s.villa}&partyType=labour`,
+      `projectId=${s.villa}&partyType=employee`,
     );
     expect(villa.status).toBe(StatusCodes.FORBIDDEN);
 
     const other = await ownerWithCompany("Other Builders");
     const foreign = await balances(
       other.cookie,
-      `projectId=${s.tower}&partyType=labour`,
+      `projectId=${s.tower}&partyType=employee`,
     );
     expect(foreign.status).toBe(StatusCodes.NOT_FOUND);
   });

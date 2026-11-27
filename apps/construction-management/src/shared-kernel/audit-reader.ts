@@ -56,13 +56,14 @@ export async function readAuditEvents(
 }
 
 /**
- * `labour.imported` events whose `after.labourIds` lists the labourer: one
- * import writes one event for every row it added (`labour-import.ts`).
+ * `employee.imported` events whose `after.employeeIds` lists the Employee:
+ * one import writes one event for every row it added (`labour-import.ts`,
+ * ADR CM-0055).
  */
-export async function readLabourImports(
+export async function readEmployeeImports(
   db: Db,
   workspaceId: string,
-  labourId: string,
+  employeeId: string,
 ): Promise<AuditRecord[]> {
   return db.$queryRaw<AuditRecord[]>(Prisma.sql`
     SELECT id::text AS id, action, entity_id AS "entityId",
@@ -70,9 +71,9 @@ export async function readLabourImports(
       before, after
     FROM construction_organization.audit_events
     WHERE workspace_id = ${workspaceId}
-      AND entity_type = 'labour'
-      AND action = 'labour.imported'
-      AND after -> 'labourIds' @> to_jsonb(${labourId}::text)
+      AND entity_type = 'employee'
+      AND action = 'employee.imported'
+      AND after -> 'employeeIds' @> to_jsonb(${employeeId}::text)
     ORDER BY occurred_at, id
   `);
 }
@@ -86,9 +87,9 @@ export const ATTENDANCE_STATUSES = [
 ] as const;
 export type AttendanceStatus = (typeof ATTENDANCE_STATUSES)[number];
 
-/** What a labour attendance event keeps of the day (`labour-attendance-store.ts` `snapshot`). */
+/** What an Employee attendance event keeps of the day (`labour-attendance-store.ts` `snapshot`). */
 export type AttendanceAuditDay = {
-  labourId: string;
+  employeeId: string;
   projectId: string;
   date: string;
   status: AttendanceStatus;
@@ -105,9 +106,9 @@ function record(value: unknown): Record<string, unknown> | null {
 export function attendanceAuditDay(value: unknown): AttendanceAuditDay | null {
   const day = record(value);
   if (day == null) return null;
-  const { labourId, projectId, date, status, isPaidLeave } = day;
+  const { employeeId, projectId, date, status, isPaidLeave } = day;
   if (
-    typeof labourId !== "string" ||
+    typeof employeeId !== "string" ||
     typeof projectId !== "string" ||
     typeof date !== "string" ||
     typeof status !== "string" ||
@@ -115,7 +116,7 @@ export function attendanceAuditDay(value: unknown): AttendanceAuditDay | null {
   )
     return null;
   return {
-    labourId,
+    employeeId,
     projectId,
     date,
     status: status as AttendanceStatus,

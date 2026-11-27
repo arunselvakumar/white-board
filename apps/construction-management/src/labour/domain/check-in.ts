@@ -18,21 +18,16 @@ import {
  * free of storage so they can be tested as plain functions.
  */
 
-export const CHECK_IN_PERSON_KINDS = [
-  "labour",
-  "vendor",
-  "site_engineer",
-] as const;
+/** An Employee (any Role, ADR CM-0055) or a labour-supply Vendor. */
+export const CHECK_IN_PERSON_KINDS = ["employee", "vendor"] as const;
 
-/** `site_engineer` is a Site Engineer row, not their sign-in. */
 export type CheckInPersonKind = (typeof CHECK_IN_PERSON_KINDS)[number];
 
-/** The role a Site Engineer or Vendor shows with; a Labour shows their Labour Category. */
+/** The role a Vendor shows with; an Employee shows their Role's name. */
 export const ROLE_WORDS: Record<
-  Exclude<CheckInPersonKind, "labour">,
+  Exclude<CheckInPersonKind, "employee">,
   string
 > = {
-  site_engineer: "Site Engineer",
   vendor: "Vendor",
 };
 
@@ -162,19 +157,19 @@ export function clockTime(instant: Date, timeZone: string): string {
   return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
 }
 
-/** In, Out and break of a Labour's day as the entries give them. */
+/** In, Out and break of an Employee's day as the entries give them. */
 export type EntryTimes = {
   checkIn: string;
-  /** Null while the Labour is in, or when In to Out cannot be told in a day. */
+  /** Null while the Employee is in, or when In to Out cannot be told in a day. */
   checkOut: string | null;
   /** Whole minutes, 0 to 720, shorter than In to Out. */
   breakMinutes: number;
 };
 
 /**
- * A Labour's In, Out and break from the live entries of one attendance day,
+ * An Employee's In, Out and break from the live entries of one attendance day,
  * oldest first (ADR CM-0043 §3). In is the first Check In; Out is the last
- * Check Out when the Labour is out; the break is the gaps between a Check
+ * Check Out when the Employee is out; the break is the gaps between a Check
  * Out and the next Check In. With no gap it is the default break when the
  * day is longer than it, and none otherwise. Null when the day has no
  * Check In.
@@ -250,7 +245,7 @@ export function timesFromEntries(
   };
 }
 
-/** What the rules need to know about the Labour's day as it is stored. */
+/** What the rules need to know about the Employee's day as it is stored. */
 export type DayBefore = {
   status: AttendanceStatus;
   /** `HH:MM`, or null when the day has no times. */
@@ -259,7 +254,7 @@ export type DayBefore = {
   timesFromCheckIn: boolean;
 };
 
-/** Why an entry left the Labour's day as it was. */
+/** Why an entry left the Employee's day as it was. */
 export type DayKeptReason =
   /** The sheet's typed times win over the log. */
   | "sheet_times"
@@ -278,7 +273,7 @@ export type DayEffect =
   | { kind: "keep"; reason: DayKeptReason };
 
 /**
- * What a Labour's entries do to their attendance day (ADR CM-0043 §3).
+ * What an Employee's entries do to their attendance day (ADR CM-0043 §3).
  * `times` is `timesFromEntries` of the live entries left, null when none
  * are. Only a Check In may create the day: a void or a Check Out never
  * brings back a day the sheet cleared.

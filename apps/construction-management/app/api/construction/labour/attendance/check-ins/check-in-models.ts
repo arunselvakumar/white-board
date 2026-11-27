@@ -6,7 +6,7 @@ export const CHECK_INS_PATH = "/api/construction/labour/attendance/check-ins";
 /** The log's name search takes at most this many characters. */
 export const CHECK_IN_NAME_SEARCH_MAX = 100;
 
-const KINDS = ["labour", "vendor", "site_engineer"] as const;
+const KINDS = ["employee", "vendor"] as const;
 const ACTIONS = ["check_in", "check_out"] as const;
 const STATUSES = [
   "present",
@@ -59,7 +59,7 @@ export const ListConstructionLabourCheckInEntriesRequestModel = z
 export const RecordConstructionLabourCheckInRequestModel = z.object({
   projectId: z.uuid(),
   kind,
-  /** A Labour, a Vendor or a Site Engineer, by `kind`. */
+  /** An Employee (any Role, ADR CM-0055) or a Vendor, by `kind`. */
   personId: z.uuid(),
   action,
   /** The frame taken on submitting: a JPEG, PNG or WebP of at most 1 MB, base64. */
@@ -104,13 +104,13 @@ export const ConstructionLabourCheckInPersonResponseModel = z.object({
   kind,
   id: z.uuid(),
   name: z.string(),
-  /** The Labour Category, "Site Engineer" or "Vendor"; null for a Labour with no category. */
+  /** An Employee's Role name, or "Vendor"; null once an Employee's Role was deleted. */
   role: z.string().nullable(),
-  /** The Labour Id or the Site Engineer's employee code. */
+  /** The Employee Id; null for a Vendor. */
   code: z.string().nullable(),
   /** E.164. */
   phone: z.string().nullable(),
-  /** The Labour's or Vendor's record has a photo (`…/people/{kind}/{id}/photo`). */
+  /** The Employee's or Vendor's record has a photo (`…/people/{kind}/{id}/photo`). */
   hasPhoto: z.boolean(),
   state: z.object({
     /** `in` while their last entry is a Check In less than 16 hours old. */
@@ -138,16 +138,16 @@ const context = {
   siteFence: z.object({ name: z.string() }).nullable(),
   /** Attendance Create on the Project. */
   canCheckIn: z.boolean(),
-  /** Attendance Delete on the Project: a Vendor's or a Site Engineer's entry. */
+  /** Attendance Delete on the Project: a Vendor's entry. */
   canVoid: z.boolean(),
-  /** Attendance Delete and Update: a Labour's entry, whose void changes their day. */
-  canVoidLabour: z.boolean(),
+  /** Attendance Delete and Update: an Employee's entry, whose void changes their day. */
+  canVoidEmployee: z.boolean(),
 };
 
 export const ListConstructionLabourCheckInPeopleResponseModel = z.object({
   ...context,
-  siteEngineers: z.array(ConstructionLabourCheckInPersonResponseModel),
-  labours: z.array(ConstructionLabourCheckInPersonResponseModel),
+  /** Every active Employee on the Project today, whatever their Role. */
+  employees: z.array(ConstructionLabourCheckInPersonResponseModel),
   vendors: z.array(ConstructionLabourCheckInPersonResponseModel),
 });
 
@@ -215,7 +215,7 @@ export type ListConstructionLabourCheckInEntriesResponseModel = z.infer<
   typeof ListConstructionLabourCheckInEntriesResponseModel
 >;
 
-/** What an entry (or a void) did to a Labour's attendance day. */
+/** What an entry (or a void) did to an Employee's attendance day. */
 export const ConstructionLabourCheckInDayResponseModel = z.object({
   /**
    * `created`: marked Present; `updated`: its times were worked out again;
@@ -242,7 +242,7 @@ export const RecordConstructionLabourCheckInResponseModel = z.object({
   /** The same action was recorded moments ago: this is that entry, nothing was written. */
   repeated: z.boolean(),
   person: ConstructionLabourCheckInPersonResponseModel,
-  /** Null for a Vendor or a Site Engineer: their entries are a log only. */
+  /** Null for a Vendor: their entries are a log only. */
   day: ConstructionLabourCheckInDayResponseModel.nullable(),
 });
 

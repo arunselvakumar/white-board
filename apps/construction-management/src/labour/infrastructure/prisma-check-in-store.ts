@@ -21,7 +21,6 @@ import type {
   CheckInStore,
   CheckInTransaction,
   PersonStanding,
-  SiteEngineerDirectory,
   SiteFenceDirectory,
 } from "../application/check-in-handlers";
 import type {
@@ -37,12 +36,10 @@ import {
   clearDayInTx,
   lockedDayInTx,
   saveDayInTx,
-  toLabourer,
+  toAttendanceEmployee,
 } from "./labour-attendance-store";
-import { onProjectOn } from "./labour-project-on";
+import { activeEmployeeIdsOn, onProjectOn } from "./labour-project-on";
 import { lockLiveParties } from "./party-locks";
-import { PrismaLabourQueries } from "./prisma-labour-queries";
-import { siteEngineerContactsOn } from "./project-site-engineers";
 
 type Row = Prisma.ConstructionLabourCheckInEventGetPayload<object>;
 
@@ -124,28 +121,52 @@ const LIVE_SELECT = {
   attendanceDate: true,
 } as const;
 
-/** Labours and Vendors as Check-In lists them. */
-function partyPerson(
-  kind: "labour" | "vendor",
-  row: {
-    id: string;
-    name: string;
-    labourCode?: string | null;
-    labourCategoryId?: string | null;
-    contactNumber: string | null;
-    photoKey: string | null;
-  },
-): CheckInPersonRecord {
+/** An Employee as Check-In lists them. */
+function employeePerson(row: {
+  id: string;
+  name: string;
+  employeeCode: string | null;
+  roleId: string;
+  mobile: string | null;
+  photoKey: string | null;
+}): CheckInPersonRecord {
   return {
-    kind,
+    kind: "employee",
     id: row.id,
     name: row.name,
-    labourCategoryId: row.labourCategoryId ?? null,
-    code: kind === "labour" ? (row.labourCode ?? null) : null,
+    roleId: row.roleId,
+    code: row.employeeCode,
+    phone: row.mobile,
+    photoKey: row.photoKey,
+  };
+}
+
+/** A Vendor as Check-In lists them. */
+function vendorPerson(row: {
+  id: string;
+  name: string;
+  contactNumber: string | null;
+  photoKey: string | null;
+}): CheckInPersonRecord {
+  return {
+    kind: "vendor",
+    id: row.id,
+    name: row.name,
+    roleId: null,
+    code: null,
     phone: row.contactNumber,
     photoKey: row.photoKey,
   };
 }
+
+const EMPLOYEE_PERSON = {
+  id: true,
+  name: true,
+  employeeCode: true,
+  roleId: true,
+  mobile: true,
+  photoKey: true,
+} as const;
 
 /** The person's entries are serialised on this lock (ADR CM-0043 §2). */
 function lockKey(person: Person): string {
@@ -227,25 +248,33 @@ function transaction(
       });
       return rows.map(toLive);
     },
-    async labourer(labourId) {
+    async employee(employeeId) {
       try {
         // A delete waits for this day to be written, then refuses.
-        await lockLiveParties(tx, workspaceId, "labour", [labourId], "share");
+        await lockLiveParties(
+          tx,
+          workspaceId,
+          "employee",
+          [employeeId],
+          "share",
+        );
       } catch (error) {
-        if (error instanceof DomainError && error.code === "LABOUR_NOT_FOUND")
+        if (error instanceof DomainError && error.code === "EMPLOYEE_NOT_FOUND")
           return null;
         throw error;
       }
-      const row = await tx.constructionLabourLabour.findFirst({
-        where: { id: labourId, workspaceId, deletedAt: null },
+      const row = await tx.constructionLabourEmployee.findFirst({
+        where: { id: employeeId, workspaceId, deletedAt: null },
       });
-      return row == null ? null : toLabourer(row);
+      return row == null ? null : toAttendanceEmployee(row);
     },
-    async onProject(labourId, projectId, date) {
-      return (await onProjectOn(tx, [labourId], projectId, date)).has(labourId);
+    async onProject(employeeId, projectId, date) {
+      return (await onProjectOn(tx, [employeeId], projectId, date)).has(
+        employeeId,
+      );
     },
-    day(labourId, projectId, date) {
-      return lockedDayInTx(tx, { workspaceId, labourId, projectId, date });
+    day(employeeId, projectId, date) {
+      return lockedDayInTx(tx, { workspaceId, employeeId, projectId, date });
     },
     async saveDay(write, by, now) {
       await saveDayInTx(tx, { workspaceId, write, reason: "marked", by, now });
@@ -274,50 +303,44 @@ export class PrismaCheckInStore implements CheckInStore {
     return companyTimezone(this.db, workspaceId);
   }
 
-  async labour(workspaceId: string, id: string) {
-    const row = await this.db.constructionLabourLabour.findFirst({
+  async employee(workspaceId: string, id: string) {
+    const row = await this.db.constructionLabourEmployee.findFirst({
       where: { id, workspaceId, deletedAt: null },
     });
     if (row == null) return null;
-    return { person: partyPerson("labour", row), labourer: toLabourer(row) };
+    return { person: employeePerson(row), employee: toAttendanceEmployee(row) };
   }
 
-  async labourOnProject(
+  async employeeOnProject(
     _workspaceId: string,
-    labourId: string,
+    employeeId: string,
     projectId: string,
     date: CalendarDate,
   ): Promise<boolean> {
-    // The labourer was read for this Company first.
-    return (await onProjectOn(this.db, [labourId], projectId, date)).has(
-      labourId,
+    // The Employee was read for this Company first.
+    return (await onProjectOn(this.db, [employeeId], projectId, date)).has(
+      employeeId,
     );
   }
 
-  async laboursOn(
+  async employeesOn(
     workspaceId: string,
     projectId: string,
     date: CalendarDate,
   ): Promise<CheckInPersonRecord[]> {
     // The marking sheet's own read of who is on the Project that day.
-    const options = await new PrismaLabourQueries(this.db).options(
+    const ids = await activeEmployeeIdsOn(
+      this.db,
       workspaceId,
       projectId,
       date,
     );
-    if (options.length === 0) return [];
-    const rows = await this.db.constructionLabourLabour.findMany({
-      where: { workspaceId, id: { in: options.map((option) => option.id) } },
-      select: {
-        id: true,
-        name: true,
-        labourCode: true,
-        labourCategoryId: true,
-        contactNumber: true,
-        photoKey: true,
-      },
+    if (ids.length === 0) return [];
+    const rows = await this.db.constructionLabourEmployee.findMany({
+      where: { workspaceId, id: { in: ids } },
+      select: EMPLOYEE_PERSON,
     });
-    return rows.map((row) => partyPerson("labour", row));
+    return rows.map(employeePerson);
   }
 
   async vendor(workspaceId: string, id: string, projectId: string) {
@@ -329,7 +352,7 @@ export class PrismaCheckInStore implements CheckInStore {
     });
     if (row == null) return null;
     return {
-      person: partyPerson("vendor", row),
+      person: vendorPerson(row),
       isActive: row.isActive,
       assigned: row.projects.length > 0,
     };
@@ -348,7 +371,7 @@ export class PrismaCheckInStore implements CheckInStore {
       },
       select: { id: true, name: true, contactNumber: true, photoKey: true },
     });
-    return rows.map((row) => partyPerson("vendor", row));
+    return rows.map(vendorPerson);
   }
 
   async standing(
@@ -507,13 +530,13 @@ export class PrismaCheckInStore implements CheckInStore {
   async partiesNamed(
     workspaceId: string,
     q: string,
-  ): Promise<{ kind: "labour" | "vendor"; id: string }[]> {
+  ): Promise<{ kind: CheckInPersonKind; id: string }[]> {
     const where = {
       workspaceId,
       name: { contains: q, mode: "insensitive" as const },
     };
-    const [labours, vendors] = await Promise.all([
-      this.db.constructionLabourLabour.findMany({
+    const [employees, vendors] = await Promise.all([
+      this.db.constructionLabourEmployee.findMany({
         where,
         select: { id: true },
       }),
@@ -523,26 +546,26 @@ export class PrismaCheckInStore implements CheckInStore {
       }),
     ]);
     return [
-      ...labours.map((row) => ({ kind: "labour" as const, id: row.id })),
+      ...employees.map((row) => ({ kind: "employee" as const, id: row.id })),
       ...vendors.map((row) => ({ kind: "vendor" as const, id: row.id })),
     ];
   }
 
   async partyNames(
     workspaceId: string,
-    refs: readonly { kind: "labour" | "vendor"; id: string }[],
-  ): Promise<Map<string, { name: string; labourCategoryId: string | null }>> {
-    const ids = (kind: "labour" | "vendor") => [
+    refs: readonly { kind: CheckInPersonKind; id: string }[],
+  ): Promise<Map<string, { name: string; roleId: string | null }>> {
+    const ids = (kind: CheckInPersonKind) => [
       ...new Set(refs.filter((ref) => ref.kind === kind).map((ref) => ref.id)),
     ];
-    const labourIds = ids("labour");
+    const employeeIds = ids("employee");
     const vendorIds = ids("vendor");
-    const [labours, vendors] = await Promise.all([
-      labourIds.length === 0
+    const [employees, vendors] = await Promise.all([
+      employeeIds.length === 0
         ? []
-        : this.db.constructionLabourLabour.findMany({
-            where: { workspaceId, id: { in: labourIds } },
-            select: { id: true, name: true, labourCategoryId: true },
+        : this.db.constructionLabourEmployee.findMany({
+            where: { workspaceId, id: { in: employeeIds } },
+            select: { id: true, name: true, roleId: true },
           }),
       vendorIds.length === 0
         ? []
@@ -551,20 +574,17 @@ export class PrismaCheckInStore implements CheckInStore {
             select: { id: true, name: true },
           }),
     ]);
-    return new Map([
-      ...labours.map(
+    return new Map<string, { name: string; roleId: string | null }>([
+      ...employees.map(
         (row) =>
           [
-            `labour:${row.id}`,
-            { name: row.name, labourCategoryId: row.labourCategoryId },
+            `employee:${row.id}`,
+            { name: row.name, roleId: row.roleId },
           ] as const,
       ),
       ...vendors.map(
         (row) =>
-          [
-            `vendor:${row.id}`,
-            { name: row.name, labourCategoryId: null },
-          ] as const,
+          [`vendor:${row.id}`, { name: row.name, roleId: null }] as const,
       ),
     ]);
   }
@@ -588,52 +608,6 @@ export class PrismaCheckInStore implements CheckInStore {
       },
       { maxWait: 10_000, timeout: 20_000 },
     );
-  }
-}
-
-/**
- * Site Engineers (`construction_masters.supervisors`) for Check-In: plain
- * reads of the masters table by id, like the other directories.
- */
-export class PrismaSiteEngineerDirectory implements SiteEngineerDirectory {
-  constructor(private readonly db: PrismaClient) {}
-
-  onProject(workspaceId: string, projectId: string) {
-    return siteEngineerContactsOn(this.db, workspaceId, projectId);
-  }
-
-  async find(workspaceId: string, ids: readonly string[]) {
-    if (ids.length === 0) return new Map();
-    const rows = await this.db.constructionMastersSupervisor.findMany({
-      where: { workspaceId, id: { in: [...new Set(ids)] }, deletedAt: null },
-      select: { id: true, name: true, disabledAt: true },
-    });
-    return new Map(
-      rows.map((row) => [
-        row.id,
-        { id: row.id, name: row.name, disabled: row.disabledAt != null },
-      ]),
-    );
-  }
-
-  async names(
-    workspaceId: string,
-    ids: readonly string[],
-  ): Promise<Map<string, string>> {
-    if (ids.length === 0) return new Map();
-    const rows = await this.db.constructionMastersSupervisor.findMany({
-      where: { workspaceId, id: { in: [...new Set(ids)] } },
-      select: { id: true, name: true },
-    });
-    return new Map(rows.map((row) => [row.id, row.name]));
-  }
-
-  async idsNamed(workspaceId: string, q: string): Promise<string[]> {
-    const rows = await this.db.constructionMastersSupervisor.findMany({
-      where: { workspaceId, name: { contains: q, mode: "insensitive" } },
-      select: { id: true },
-    });
-    return rows.map((row) => row.id);
   }
 }
 

@@ -404,7 +404,7 @@ describe("dashboard views agree with the module lists (CM-902)", () => {
       { projectId, approvalStatus: "pending" },
     );
     const labour = await read<{
-      labourers: { present: number; halfDay: number };
+      employees: { present: number; halfDay: number };
     }>(owner, getLabourSummary, "labour/summary", { projectId });
     const row = company.projects.find((item) => item.id === projectId);
     expect(row).toMatchObject({
@@ -417,17 +417,17 @@ describe("dashboard views agree with the module lists (CM-902)", () => {
       pendingIssues: tracking.kpis.pendingIssues,
       delayedIssues: 1,
       pendingInspections: tracking.kpis.pendingInspections,
-      labourToday: labour.labourers.present + labour.labourers.halfDay,
+      employeesToday: labour.employees.present + labour.employees.halfDay,
       due: fromCentral?.due,
     });
     expect(row?.approvals).toBe(11);
-    expect(row?.labourToday).toBe(2);
+    expect(row?.employeesToday).toBe(2);
     expect(company.totals).toMatchObject({
       activeProjects: 2,
       approvals: 21,
       pendingIssues: 2,
       pendingInspections: 1,
-      labourToday: 2,
+      employeesToday: 2,
       amountDue: 8_500_00,
     });
   });

@@ -162,7 +162,7 @@ describe("Downloads HTTP (CM-901)", () => {
     expect(failedRow).toMatchObject({
       source: "report",
       kind: "labour_month",
-      title: "Month-wise Labour",
+      title: "Employee Month",
       detail: "September 2026",
       projectId: villa,
       projectName: "Villa",

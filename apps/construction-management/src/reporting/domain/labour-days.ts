@@ -9,14 +9,16 @@ export type AttendanceStatus =
 
 export type WageType = "daily" | "monthly";
 
-export type ReportLabour = {
+export type ReportEmployee = {
   id: string;
   name: string;
-  labourCode: string | null;
+  employeeCode: string | null;
   fatherName: string | null;
   category: string | null;
+  /** The Employee's Role name (ADR CM-0055); null once it was deleted. */
+  role: string | null;
   gender: "male" | "female" | "other" | null;
-  /** The Labour's current wage, for a register row with no marked day. */
+  /** The Employee's current wage, for a register row with no marked day. */
   wageType: WageType;
   /** Paise per day or per month, by `wageType`. */
   wageRate: number;
@@ -24,16 +26,11 @@ export type ReportLabour = {
 
 /** One marked day, with its wage snapshot (ADR CM-0004). */
 export type ReportLabourDay = {
-  labourId: string;
+  employeeId: string;
   date: CalendarDate;
   status: AttendanceStatus;
   isPaidLeave: boolean;
   shift: string | null;
-  /**
-   * The Site Engineer saved with the day (days marked before ADR CM-0041),
-   * else the Project's Site Engineers, comma-separated; null for none.
-   */
-  siteEngineers: string | null;
   /** `HH:MM`, Company time (ADR CM-0011); null when not recorded. */
   checkIn: string | null;
   /** `HH:MM`; at or before `checkIn` is the next day. */
@@ -193,8 +190,8 @@ export function markWithOvertime(day: ReportLabourDay): string {
   return `${mark}+${String(hours(day.overtimeHundredths))}`;
 }
 
-/** Labours by name, then Labour Id. */
-export function byName<T extends { name: string; labourCode: string | null }>(
+/** Employees by name, then Employee Id. */
+export function byName<T extends { name: string; employeeCode: string | null }>(
   a: T,
   b: T,
 ): number {
@@ -202,20 +199,20 @@ export function byName<T extends { name: string; labourCode: string | null }>(
     a.name.localeCompare(b.name, "en", {
       sensitivity: "base",
       numeric: true,
-    }) || (a.labourCode ?? "").localeCompare(b.labourCode ?? "")
+    }) || (a.employeeCode ?? "").localeCompare(b.employeeCode ?? "")
   );
 }
 
-/** The days of each Labour, keyed by Labour then date. */
-export function daysByLabour(
+/** The days of each Employee, keyed by Employee then date. */
+export function daysByEmployee(
   days: readonly ReportLabourDay[],
 ): Map<string, Map<CalendarDate, ReportLabourDay>> {
   const map = new Map<string, Map<CalendarDate, ReportLabourDay>>();
   for (const day of days) {
     const own =
-      map.get(day.labourId) ?? new Map<CalendarDate, ReportLabourDay>();
+      map.get(day.employeeId) ?? new Map<CalendarDate, ReportLabourDay>();
     own.set(day.date, day);
-    map.set(day.labourId, own);
+    map.set(day.employeeId, own);
   }
   return map;
 }

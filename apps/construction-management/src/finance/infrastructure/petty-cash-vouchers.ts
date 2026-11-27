@@ -120,7 +120,7 @@ type Deps = {
     | "projects"
     | "contractors"
     | "suppliers"
-    | "labours"
+    | "employees"
     | "vendors"
   >;
   names: FinanceAuthorNames;
@@ -581,8 +581,8 @@ export class PettyCashVouchers {
           input.id,
         )?.name;
         break;
-      case "labour":
-        name = (await directory.labours(tx, workspaceId, ids)).get(
+      case "employee":
+        name = (await directory.employees(tx, workspaceId, ids)).get(
           input.id,
         )?.name;
         break;

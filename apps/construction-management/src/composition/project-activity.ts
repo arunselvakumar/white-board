@@ -8,12 +8,6 @@ import type {
 } from "@/src/labour/application/labour-activity-ports";
 import { PrismaLabourActivity } from "@/src/labour/infrastructure/prisma-labour-activity";
 import {
-  siteEngineerSignInLinks,
-  type SiteEngineerSignInLink,
-} from "@/src/masters/infrastructure/prisma-site-engineer-sign-ins";
-import type { SignInProjectHistory } from "@/src/organization/application/sign-in-project-history";
-import { PrismaSignInProjectHistory } from "@/src/organization/infrastructure/prisma-sign-in-project-history";
-import {
   loadVisibleProject,
   type ProjectViewer,
 } from "@/src/projects/application/project-handlers";
@@ -25,10 +19,8 @@ import {
   decodeActivityCursor,
   encodeActivityCursor,
   mergeActivity,
-  pageAfter,
-  type ActivityKey,
 } from "@/src/shared-kernel/activity-key";
-import { todayIn, type CalendarDate } from "@/src/shared-kernel/calendar-date";
+import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 import { companyTimezone } from "@/src/shared-kernel/company-today";
 
 import {
@@ -43,10 +35,7 @@ import {
   type ProjectNames,
 } from "./labour-activity";
 
-/** Site Engineer entries rank above the Labour ones on the same time. */
-const SITE_ENGINEER_RANK = { added: 6, removed: 7 } as const;
-
-/** Opens the Labour and Site Engineer pages (both under the Labours menu). */
+/** Opens an Employee's page (the Employees menu, key `masters.labours`). */
 const PEOPLE_MENU = "masters.labours";
 /** Opens a Vendor's page. */
 const VENDORS_MENU = "masters.vendors";
@@ -55,8 +44,7 @@ type CheckInPersonKind = CheckInActivityRow["person"]["kind"];
 
 /** Shown for a person whose row is gone. */
 const DELETED_PERSON: Record<CheckInPersonKind, string> = {
-  labour: "Deleted Labour",
-  site_engineer: "Deleted Site Engineer",
+  employee: "Deleted Employee",
   vendor: "Deleted Vendor",
 };
 
@@ -65,25 +53,19 @@ export type ActivityCheckInPerson = {
   kind: CheckInPersonKind;
   id: string;
   name: string;
-  /** The Labour Category, "Site Engineer" or "Vendor". */
+  /** An Employee's Role name, or "Vendor". */
   role: string | null;
   /** The viewer may open their page, and they were not deleted. */
   canOpen: boolean;
 };
 
-export type ActivityLabourPerson = {
+export type ActivityEmployeePerson = {
   id: string;
   name: string;
-  labourCode: string | null;
-  labourCategory: string | null;
+  employeeCode: string | null;
+  /** The Employee's Role name (ADR CM-0055 §5). */
+  role: string | null;
   /** The viewer may open their page, and they were not deleted. */
-  canOpen: boolean;
-};
-
-export type ActivitySiteEngineer = {
-  /** The Site Engineer; null when no Site Engineer points at the sign-in. */
-  id: string | null;
-  name: string;
   canOpen: boolean;
 };
 
@@ -97,35 +79,26 @@ type EntryBase = {
 export type ProjectActivityEntry = EntryBase &
   (
     | {
-        kind: "labour_added" | "labour_removed";
-        labours: ActivityLabourPerson[];
+        kind: "employee_added" | "employee_removed";
+        employees: ActivityEmployeePerson[];
         remark: string | null;
       }
     | {
         kind: "transferred_in";
-        labours: ActivityLabourPerson[];
+        employees: ActivityEmployeePerson[];
         fromProject: ActivityProject | null;
         remark: string | null;
       }
     | {
         kind: "transferred_out";
-        labours: ActivityLabourPerson[];
+        employees: ActivityEmployeePerson[];
         toProject: ActivityProject | null;
         remark: string | null;
-      }
-    | {
-        kind: "site_engineer_added" | "site_engineer_removed";
-        siteEngineer: ActivitySiteEngineer;
       }
     | ({ kind: "check_in"; person: ActivityCheckInPerson } & ActivityCheckIn)
   );
 
-export const PROJECT_ACTIVITY_WHO = [
-  "all",
-  "site_engineers",
-  "labours",
-  "vendors",
-] as const;
+export const PROJECT_ACTIVITY_WHO = ["all", "employees", "vendors"] as const;
 export type ProjectActivityWho = (typeof PROJECT_ACTIVITY_WHO)[number];
 
 /** Team changes: added, removed, transferred (ADR CM-0044 §5). */
@@ -134,9 +107,8 @@ export type ProjectActivityType = (typeof PROJECT_ACTIVITY_TYPES)[number];
 
 /** Whose check-in entries each Who reads. */
 const CHECK_IN_KINDS: Record<ProjectActivityWho, CheckInPersonKind[]> = {
-  all: ["labour", "site_engineer", "vendor"],
-  site_engineers: ["site_engineer"],
-  labours: ["labour"],
+  all: ["employee", "vendor"],
+  employees: ["employee"],
   vendors: ["vendor"],
 };
 
@@ -148,28 +120,16 @@ export type ProjectActivityFilter = {
   cursor: string | null;
 };
 
-type SiteEngineerRow = {
-  key: ActivityKey;
-  kind: "site_engineer_added" | "site_engineer_removed";
-  memberId: string;
-  by: string;
-};
-
-type Row = ProjectLabourMoveRow | SiteEngineerRow | CheckInActivityRow;
-
-/** Where Site Engineers' sign-ins are found, and who they are (masters). */
-export type SiteEngineerLinks = (
-  workspaceId: string,
-) => Promise<SiteEngineerSignInLink[]>;
+type Row = ProjectLabourMoveRow | CheckInActivityRow;
 
 /**
- * A Project's Activity feed (ADR CM-0038 §1, §4): Labours added, removed
- * and transferred in or out (labour context, a batch as one entry), Site
- * Engineers added or removed (their sign-in's history in the organization
- * context, named by the masters context), and everyone's check-in entries,
- * one each (labour context, ADR CM-0044), only with Attendance Read on the
- * Project. The viewer must be on the Project; the day's attendance status
- * is not in this feed.
+ * A Project's Activity feed (ADR CM-0038 §1, §4, CM-0055): Employees
+ * added, removed and transferred in or out (labour context, a batch as one
+ * entry; an Employee who signs in has the same Projects, so their sign-in
+ * adds nothing), and everyone's check-in entries, one each (labour
+ * context, ADR CM-0044), only with Attendance Read on the Project. The
+ * viewer must be on the Project; the day's attendance status is not in
+ * this feed.
  */
 export class ProjectActivityService {
   constructor(
@@ -178,8 +138,6 @@ export class ProjectActivityService {
       projectId: string,
     ) => Promise<void>,
     private readonly labour: LabourActivitySource,
-    private readonly signIns: SignInProjectHistory,
-    private readonly siteEngineers: SiteEngineerLinks,
     private readonly projectNames: ProjectNames,
     private readonly actorNames: ActorNames,
     private readonly timeZoneOf: (workspaceId: string) => Promise<string>,
@@ -207,16 +165,10 @@ export class ProjectActivityService {
     const checkIns =
       filter.type !== "team" &&
       can(access, CHECK_IN_MENU, "read", { projectId });
-    const [moves, engineers, entries] = await Promise.all([
-      team && (filter.who === "all" || filter.who === "labours")
+    const [moves, entries] = await Promise.all([
+      team && (filter.who === "all" || filter.who === "employees")
         ? this.labour.projectMoves(window)
         : Promise.resolve([]),
-      team && (filter.who === "all" || filter.who === "site_engineers")
-        ? this.siteEngineerRows(window, timeZone)
-        : Promise.resolve({
-            rows: [],
-            people: new Map<string, ActivitySiteEngineerSource>(),
-          }),
       checkIns
         ? this.labour.projectCheckIns({
             ...window,
@@ -224,13 +176,13 @@ export class ProjectActivityService {
           })
         : Promise.resolve([]),
     ]);
-    const page = mergeActivity<Row>([moves, engineers.rows, entries]);
+    const page = mergeActivity<Row>([moves, entries]);
 
-    const labourIds = page.items.flatMap((row) =>
-      "labourIds" in row ? row.labourIds : [],
+    const employeeIds = page.items.flatMap((row) =>
+      "employeeIds" in row ? row.employeeIds : [],
     );
-    const [labours, checkInPeople, project, names] = await Promise.all([
-      this.labour.labours(workspaceId, labourIds),
+    const [employees, checkInPeople, project, names] = await Promise.all([
+      this.labour.employees(workspaceId, employeeIds),
       this.labour.checkInPeople(
         workspaceId,
         page.items.flatMap((row) =>
@@ -251,8 +203,7 @@ export class ProjectActivityService {
     ]);
     const mayOpenPeople = can(access, PEOPLE_MENU, "read");
     const mayOpen: Record<CheckInPersonKind, boolean> = {
-      labour: mayOpenPeople,
-      site_engineer: mayOpenPeople,
+      employee: mayOpenPeople,
       vendor: can(access, VENDORS_MENU, "read"),
     };
     const checkInPerson = (
@@ -267,17 +218,17 @@ export class ProjectActivityService {
         canOpen: mayOpen[ref.kind] && found != null && !found.deleted,
       };
     };
-    const person = (id: string): ActivityLabourPerson => {
-      const found = labours.get(id);
+    const person = (id: string): ActivityEmployeePerson => {
+      const found = employees.get(id);
       return {
         id,
-        name: found?.name ?? "Deleted Labour",
-        labourCode: found?.labourCode ?? null,
-        labourCategory: found?.labourCategory ?? null,
+        name: found?.name ?? DELETED_PERSON.employee,
+        employeeCode: found?.employeeCode ?? null,
+        role: found?.role ?? null,
         canOpen: mayOpenPeople && found != null && !found.deleted,
       };
     };
-    const byName = (a: ActivityLabourPerson, b: ActivityLabourPerson) =>
+    const byName = (a: ActivityEmployeePerson, b: ActivityEmployeePerson) =>
       a.name.localeCompare(b.name) || (a.id < b.id ? -1 : 1);
 
     return {
@@ -295,22 +246,7 @@ export class ProjectActivityService {
             person: checkInPerson(row.person),
             ...activityCheckIn(row),
           };
-        if ("memberId" in row) {
-          const found = engineers.people.get(row.memberId);
-          return {
-            ...base,
-            kind: row.kind,
-            siteEngineer: {
-              id: found?.siteEngineerId ?? null,
-              name: found?.name ?? "Site Engineer",
-              canOpen:
-                mayOpenPeople &&
-                found?.siteEngineerId != null &&
-                !found.deleted,
-            },
-          };
-        }
-        const people = row.labourIds.map(person).sort(byName);
+        const people = row.employeeIds.map(person).sort(byName);
         const other =
           row.otherProjectId == null ? null : project(row.otherProjectId);
         switch (row.kind) {
@@ -318,7 +254,7 @@ export class ProjectActivityService {
             return {
               ...base,
               kind: row.kind,
-              labours: people,
+              employees: people,
               fromProject: other,
               remark: row.remark,
             };
@@ -326,7 +262,7 @@ export class ProjectActivityService {
             return {
               ...base,
               kind: row.kind,
-              labours: people,
+              employees: people,
               toProject: other,
               remark: row.remark,
             };
@@ -334,7 +270,7 @@ export class ProjectActivityService {
             return {
               ...base,
               kind: row.kind,
-              labours: people,
+              employees: people,
               remark: row.remark,
             };
         }
@@ -343,74 +279,7 @@ export class ProjectActivityService {
       timeZone,
     };
   }
-
-  /**
-   * Site Engineers put on or taken off the Project, dated the day it was
-   * recorded in the Company's time zone. A sign-in counts when a Site
-   * Engineer (live or deleted) points at it or it is marked Site Engineer.
-   */
-  private async siteEngineerRows(
-    window: ProjectActivityWindow,
-    timeZone: string,
-  ): Promise<{
-    rows: SiteEngineerRow[];
-    people: Map<string, ActivitySiteEngineerSource>;
-  }> {
-    const [links, signIns] = await Promise.all([
-      this.siteEngineers(window.workspaceId),
-      this.signIns.siteEngineerSignIns(window.workspaceId),
-    ]);
-    const people = new Map<string, ActivitySiteEngineerSource>();
-    for (const signIn of signIns)
-      people.set(signIn.id, {
-        siteEngineerId: null,
-        name: signIn.name,
-        deleted: false,
-      });
-    // A live Site Engineer wins over a deleted one pointing at the same sign-in.
-    for (const link of links) {
-      const known = people.get(link.teamMemberId);
-      if (known?.siteEngineerId != null && !known.deleted) continue;
-      people.set(link.teamMemberId, {
-        siteEngineerId: link.id,
-        name: link.name,
-        deleted: link.deleted,
-      });
-    }
-    const changes = await this.signIns.projectChanges(
-      window.workspaceId,
-      [...people.keys()],
-      window.projectId,
-    );
-    const rows = changes
-      .map((change): SiteEngineerRow => ({
-        key: {
-          date: todayIn(timeZone, change.occurredAt),
-          recordedAt: change.occurredAt,
-          rank: SITE_ENGINEER_RANK[change.change],
-          id: change.eventId,
-        },
-        kind:
-          change.change === "added"
-            ? "site_engineer_added"
-            : "site_engineer_removed",
-        memberId: change.memberId,
-        by: change.by,
-      }))
-      .filter(
-        (row) =>
-          (window.from == null || row.key.date >= window.from) &&
-          (window.to == null || row.key.date <= window.to),
-      );
-    return { rows: pageAfter(rows, window.before, window.limit), people };
-  }
 }
-
-type ActivitySiteEngineerSource = {
-  siteEngineerId: string | null;
-  name: string;
-  deleted: boolean;
-};
 
 /** The Prisma-backed composition the route uses. */
 export function createProjectActivity(deps?: {
@@ -423,8 +292,6 @@ export function createProjectActivity(deps?: {
       await loadVisibleProject(projects, viewer, projectId);
     },
     new PrismaLabourActivity(db),
-    new PrismaSignInProjectHistory(db),
-    (workspaceId) => siteEngineerSignInLinks(workspaceId, db),
     (workspaceId, ids) => projectNames(workspaceId, ids, db),
     companyActorNames(db),
     (workspaceId) => companyTimezone(db, workspaceId),

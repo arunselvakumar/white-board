@@ -6,7 +6,7 @@ import {
 } from "@/src/shared-kernel/calendar-date";
 import { DomainError, notFound } from "@/src/shared-kernel/domain-error";
 
-import { MAX_PAISE } from "./employee";
+import { MAX_PAISE } from "./ledger";
 
 export const VENDOR_NAME_MAX = 120;
 export const VENDOR_ADDRESS_MAX = 500;

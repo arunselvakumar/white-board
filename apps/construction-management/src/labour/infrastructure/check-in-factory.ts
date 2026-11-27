@@ -9,7 +9,6 @@ import { checkInPhotoRetentionHandler } from "../application/check-in-retention"
 import {
   PrismaCheckInRetentionStore,
   PrismaCheckInStore,
-  PrismaSiteEngineerDirectory,
   PrismaSiteFenceDirectory,
 } from "./prisma-check-in-store";
 import { companyToday } from "@/src/shared-kernel/company-today";
@@ -28,8 +27,7 @@ export function createCheckInHandlers(deps?: {
   return new CheckInHandlers(
     new PrismaCheckInStore(db),
     directories.projects,
-    directories.labourCategories,
-    new PrismaSiteEngineerDirectory(db),
+    directories.roles,
     new PrismaSiteFenceDirectory(db),
     deps?.storage ?? objectStorage(),
     new PrismaLabourAttendanceBackdatedGuard(db, (workspaceId) =>

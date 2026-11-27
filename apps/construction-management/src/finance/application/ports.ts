@@ -98,8 +98,8 @@ export type FinanceDirectory = {
     workspaceId: string,
     userId: string,
   ): Promise<TeamMemberFacts | null>;
-  /** Live Labours and Vendors by id (for Paid To labels). */
-  labours(
+  /** Live Employees and Vendors by id (for Paid To labels, ADR CM-0055). */
+  employees(
     db: Db,
     workspaceId: string,
     ids: readonly string[],
@@ -111,14 +111,14 @@ export type FinanceDirectory = {
   ): Promise<Map<string, NamedFacts>>;
   /**
    * Live, active parties of a kind for a picker, by name: on the Project
-   * when given (Contractors and Suppliers assigned to it, Labours whose
+   * when given (Contractors and Suppliers assigned to it, Employees whose
    * current Project it is, Vendors assigned to it; Team Members are
    * Company-wide). Other Parties live in finance and are not read here.
    */
   listParties(
     db: Db,
     workspaceId: string,
-    kind: "contractor" | "supplier" | "labour" | "vendor" | "team_member",
+    kind: "contractor" | "supplier" | "employee" | "vendor" | "team_member",
     projectId: string | null,
   ): Promise<NamedFacts[]>;
   /** Live GRNs by id (CM-705). */

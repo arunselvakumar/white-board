@@ -4,6 +4,8 @@ import { prisma } from "@repo/construction-db";
 
 import { calendarDateToDb, todayIn } from "@/src/shared-kernel/calendar-date";
 
+import { seedEmployee } from "./employees";
+
 /**
  * Documents for the dashboard tests (CM-902), written straight to the
  * tables: the views are read-side, so these rows only need to exist with
@@ -96,7 +98,7 @@ export async function dashboardSheetStatus(
     });
 }
 
-/** One Labour's attendance on the Project for the day (a new Labour). */
+/** One Employee's attendance on the Project for the day (a new Employee). */
 export async function dashboardLabourAttendance(
   workspaceId: string,
   by: string,
@@ -106,37 +108,22 @@ export async function dashboardLabourAttendance(
     status: "present" | "half_day" | "absent" | "on_leave" | "holiday";
   },
 ): Promise<void> {
-  const labourId = randomUUID();
   const now = new Date();
-  await prisma.constructionLabourLabour.create({
-    data: {
-      id: labourId,
-      workspaceId,
-      name: `Labour ${labourId.slice(0, 6)}`,
-      wageType: "daily",
-      wagePerDay: 800_00,
-      overtimeWagePerHour: 100_00,
-      weeklyHolidays: [],
-      joiningDate: calendarDateToDb(input.date),
-      projects: {
-        create: {
-          workspaceId,
-          projectId: input.projectId,
-          since: calendarDateToDb(input.date),
-        },
-      },
-      createdAt: now,
-      updatedAt: now,
-      createdBy: by,
-      updatedBy: by,
-    },
+  const employeeId = await seedEmployee({
+    workspaceId,
+    wagePerDay: 800_00,
+    overtimeWagePerHour: 100_00,
+    weeklyHolidays: [],
+    joiningDate: input.date,
+    projectIds: [input.projectId],
+    by,
   });
   await prisma.constructionLabourAttendance.create({
     data: {
       id: randomUUID(),
       workspaceId,
       projectId: input.projectId,
-      labourId,
+      employeeId,
       attendanceDate: calendarDateToDb(input.date),
       status: input.status,
       wageType: "daily",

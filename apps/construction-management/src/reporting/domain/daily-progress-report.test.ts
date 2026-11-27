@@ -69,8 +69,8 @@ describe("buildDailyProgressReport", () => {
         hindrances: [],
         includeImages: true,
         attendance: {
-          labourPresent: { skilled: 0, unskilled: 0 },
-          labourHalfDay: { skilled: 0, unskilled: 0 },
+          employeesPresent: { skilled: 0, unskilled: 0 },
+          employeesHalfDay: { skilled: 0, unskilled: 0 },
           vendorFullDay: { skilled: 0, unskilled: 0 },
           vendorHalfDay: { skilled: 0, unskilled: 0 },
         },

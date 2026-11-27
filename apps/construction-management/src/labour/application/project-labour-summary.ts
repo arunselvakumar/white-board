@@ -5,10 +5,10 @@ import {
 } from "@/src/shared-kernel/calendar-date";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
-/** One day of the "Labours present at site" series (CM-219). */
+/** One day of the "present at site" series (CM-219). */
 export type PresentDay = {
   date: CalendarDate;
-  /** Labourers marked Present or Half Day. */
+  /** Employees marked Present or Half Day. */
   present: number;
   /** Vendor heads: full + half day counts. */
   vendorHeadcount: number;
@@ -17,8 +17,8 @@ export type PresentDay = {
 /** What the project Overview shows about labour (CM-219, `modules/08` dashboard). */
 export type ProjectLabourSummary = {
   date: CalendarDate;
-  labourers: {
-    /** Active labourers whose current Project this is. */
+  employees: {
+    /** Active Employees whose current Project this is. */
     onProject: number;
     present: number;
     halfDay: number;
@@ -35,8 +35,8 @@ export type ProjectLabourSummary = {
   };
   /** The last 14 days, or `from` to `date`; oldest first. */
   presentSeries: PresentDay[];
-  /** Paise; balances of the Project's labourers (positive owed, negative advanced). */
-  labourBalance: { toPay: number; advanced: number };
+  /** Paise; balances of the Project's Employees (positive owed, negative advanced). */
+  employeeBalance: { toPay: number; advanced: number };
   vendorBalance: { toPay: number; advanced: number };
 };
 

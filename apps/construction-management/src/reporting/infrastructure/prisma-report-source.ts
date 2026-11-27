@@ -9,7 +9,7 @@ import { notFound } from "@/src/shared-kernel/domain-error";
 import type { ProjectLookup, ReportSource } from "../application/ports";
 import {
   hundredthsOf,
-  type ReportLabour,
+  type ReportEmployee,
   type ReportLabourDay,
 } from "../domain/labour-days";
 import type { ReportProjectLabourDay } from "../domain/central-labour-attendance-report";
@@ -57,8 +57,9 @@ export function prismaReportSource(db: PrismaClient): ReportSource {
     return { gte: calendarDateToDb(from), lte: calendarDateToDb(to) };
   }
 
+  /** Names of Labour Categories or Roles (organization) by id, deleted ones too. */
   async function namesOf(
-    model: "category" | "supervisor",
+    model: "category" | "role",
     workspaceId: string,
     ids: Iterable<string | null>,
   ): Promise<Map<string, string>> {
@@ -69,53 +70,8 @@ export function prismaReportSource(db: PrismaClient): ReportSource {
     const rows =
       model === "category"
         ? await db.constructionMastersLabourCategory.findMany({ where, select })
-        : await db.constructionMastersSupervisor.findMany({ where, select });
+        : await db.constructionOrganizationRole.findMany({ where, select });
     return new Map(rows.map((row) => [row.id, row.name]));
-  }
-
-  /**
-   * The Site Engineers on each Project, comma-separated by name (ADR
-   * CM-0041): live, enabled Site Engineers whose sign-in (not the Owner's) is
-   * on the Project. Projects with none are left out.
-   */
-  async function siteEngineerNames(
-    workspaceId: string,
-    projectIds: Iterable<string>,
-  ): Promise<Map<string, string>> {
-    const wanted = [...new Set(projectIds)];
-    if (wanted.length === 0) return new Map();
-    const assignments =
-      await db.constructionOrganizationTeamMemberProject.findMany({
-        where: {
-          projectId: { in: wanted },
-          member: { workspaceId, deletedAt: null, isOwner: false },
-        },
-        select: { memberId: true, projectId: true },
-      });
-    if (assignments.length === 0) return new Map();
-    const engineers = await db.constructionMastersSupervisor.findMany({
-      where: {
-        workspaceId,
-        deletedAt: null,
-        disabledAt: null,
-        teamMemberId: { in: assignments.map((row) => row.memberId) },
-      },
-      select: { name: true, teamMemberId: true },
-    });
-    const names = new Map<string, Set<string>>();
-    for (const { memberId, projectId } of assignments)
-      for (const engineer of engineers)
-        if (engineer.teamMemberId === memberId)
-          names.set(
-            projectId,
-            (names.get(projectId) ?? new Set()).add(engineer.name),
-          );
-    return new Map(
-      [...names].map(([projectId, set]) => [
-        projectId,
-        [...set].sort((a, b) => a.localeCompare(b)).join(", "),
-      ]),
-    );
   }
 
   /**
@@ -139,29 +95,37 @@ export function prismaReportSource(db: PrismaClient): ReportSource {
     return user == null || user.name.trim() === "" ? null : user.name;
   }
 
-  async function laboursOf(
+  async function employeesOf(
     workspaceId: string,
     ids: Iterable<string>,
-  ): Promise<ReportLabour[]> {
+  ): Promise<ReportEmployee[]> {
     const wanted = [...new Set(ids)];
     if (wanted.length === 0) return [];
-    const rows = await db.constructionLabourLabour.findMany({
+    const rows = await db.constructionLabourEmployee.findMany({
       where: { workspaceId, id: { in: wanted } },
     });
-    const categories = await namesOf(
-      "category",
-      workspaceId,
-      rows.map((row) => row.labourCategoryId),
-    );
+    const [categories, roles] = await Promise.all([
+      namesOf(
+        "category",
+        workspaceId,
+        rows.map((row) => row.labourCategoryId),
+      ),
+      namesOf(
+        "role",
+        workspaceId,
+        rows.map((row) => row.roleId),
+      ),
+    ]);
     return rows.map((row) => ({
       id: row.id,
       name: row.name,
-      labourCode: row.labourCode,
+      employeeCode: row.employeeCode,
       fatherName: row.fatherName,
       category:
         row.labourCategoryId == null
           ? null
           : (categories.get(row.labourCategoryId) ?? null),
+      role: roles.get(row.roleId) ?? null,
       gender: row.gender,
       wageType: row.wageType,
       wageRate:
@@ -194,32 +158,13 @@ export function prismaReportSource(db: PrismaClient): ReportSource {
       include: { overtime: { select: { hours: true, amount: true } } },
       orderBy: [{ attendanceDate: "asc" }],
     });
-    // A day keeps the Site Engineer it was saved with; days marked since
-    // ADR CM-0041 show the Project's Site Engineers.
-    const [saved, onProjects] = await Promise.all([
-      namesOf(
-        "supervisor",
-        workspaceId,
-        rows.map((row) => row.supervisorId),
-      ),
-      siteEngineerNames(
-        workspaceId,
-        rows
-          .filter((row) => row.supervisorId == null)
-          .map((row) => row.projectId),
-      ),
-    ]);
     return rows.map((row) => ({
       projectId: row.projectId,
-      labourId: row.labourId,
+      employeeId: row.employeeId,
       date: calendarDateFromDb(row.attendanceDate),
       status: row.status,
       isPaidLeave: row.isPaidLeave,
       shift: row.shift,
-      siteEngineers:
-        row.supervisorId == null
-          ? (onProjects.get(row.projectId) ?? null)
-          : (saved.get(row.supervisorId) ?? null),
       checkIn: row.checkIn,
       checkOut: row.checkOut,
       breakMinutes: row.breakMinutes,
@@ -248,12 +193,12 @@ export function prismaReportSource(db: PrismaClient): ReportSource {
     };
   }
 
-  async function currentLabourIds(
+  async function currentEmployeeIds(
     workspaceId: string,
     projectId: string,
     joinedBy?: DateRange["to"],
   ): Promise<string[]> {
-    const rows = await db.constructionLabourLabour.findMany({
+    const rows = await db.constructionLabourEmployee.findMany({
       where: {
         workspaceId,
         projects: { some: { projectId } },
@@ -319,7 +264,7 @@ export function prismaReportSource(db: PrismaClient): ReportSource {
 
     async projectLabourDays(workspaceId, projectIds, range) {
       if (projectIds?.length === 0)
-        return { projects: [], labours: [], days: [] };
+        return { projects: [], employees: [], days: [] };
       const projects = await db.constructionProjectsProject.findMany({
         where: {
           workspaceId,
@@ -330,29 +275,29 @@ export function prismaReportSource(db: PrismaClient): ReportSource {
       });
       const live = projects.map((project) => project.id);
       const days = await markedDays(workspaceId, live, range);
-      const labours = await laboursOf(
+      const employees = await employeesOf(
         workspaceId,
-        days.map((day) => day.labourId),
+        days.map((day) => day.employeeId),
       );
-      return { projects, labours, days };
+      return { projects, employees, days };
     },
 
     async labourDays(workspaceId, projectId, range) {
       const days = await labourDays(workspaceId, projectId, range);
-      const labours = await laboursOf(
+      const employees = await employeesOf(
         workspaceId,
-        days.map((day) => day.labourId),
+        days.map((day) => day.employeeId),
       );
-      return { labours, days };
+      return { employees, days };
     },
 
     async labourLedger(workspaceId, projectId, range) {
       const [current, moved] = await Promise.all([
-        currentLabourIds(workspaceId, projectId),
+        currentEmployeeIds(workspaceId, projectId),
         db.constructionLabourLedgerEntry.findMany({
           where: {
             workspaceId,
-            partyType: "labour",
+            partyType: "employee",
             projectId,
             entryDate: between(range),
           },
@@ -363,29 +308,29 @@ export function prismaReportSource(db: PrismaClient): ReportSource {
       const ids = [
         ...new Set([...current, ...moved.map((row) => row.partyId)]),
       ];
-      const [labours, entries] = await Promise.all([
-        laboursOf(workspaceId, ids),
+      const [employees, entries] = await Promise.all([
+        employeesOf(workspaceId, ids),
         db.constructionLabourLedgerEntry.findMany({
           where: {
             workspaceId,
-            partyType: "labour",
+            partyType: "employee",
             partyId: { in: ids },
             entryDate: { lte: calendarDateToDb(range.to) },
           },
           select: { partyId: true, kind: true, amount: true, entryDate: true },
         }),
       ]);
-      return { labours, entries: entries.map(toEntry) };
+      return { employees, entries: entries.map(toEntry) };
     },
 
     async musterRoll(workspaceId, projectId, range) {
       const [days, current, money] = await Promise.all([
         labourDays(workspaceId, projectId, range),
-        currentLabourIds(workspaceId, projectId, range.to),
+        currentEmployeeIds(workspaceId, projectId, range.to),
         db.constructionLabourLedgerEntry.findMany({
           where: {
             workspaceId,
-            partyType: "labour",
+            partyType: "employee",
             projectId,
             kind: { in: ["advance", "payment"] },
             entryDate: between(range),
@@ -393,12 +338,12 @@ export function prismaReportSource(db: PrismaClient): ReportSource {
           select: { partyId: true, kind: true, amount: true, entryDate: true },
         }),
       ]);
-      const labours = await laboursOf(workspaceId, [
-        ...days.map((day) => day.labourId),
+      const employees = await employeesOf(workspaceId, [
+        ...days.map((day) => day.employeeId),
         ...current,
         ...money.map((row) => row.partyId),
       ]);
-      return { labours, days, entries: money.map(toEntry) };
+      return { employees, days, entries: money.map(toEntry) };
     },
 
     async vendorLines(workspaceId, filter) {

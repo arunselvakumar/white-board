@@ -6,7 +6,7 @@ import { isValidGstin, isValidPan } from "@/src/shared-kernel/tax-ids";
 
 /**
  * An Other Party (Masters → Other Party, ADR CM-0017 §11): a counter-party
- * that is not a Contractor, Supplier, Labour or Vendor — a landlord, a
+ * that is not a Contractor, Supplier, Employee or Vendor — a landlord, a
  * consultant, a buyer of scrap. Its purchase and sales invoices and
  * payments arrive with CM-708.
  */

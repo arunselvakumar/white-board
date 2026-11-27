@@ -1,12 +1,12 @@
 import {
   byName,
-  daysByLabour,
+  daysByEmployee,
   endsNextDay,
   hours,
   markOf,
   MARK_LEGEND,
   tally,
-  type ReportLabour,
+  type ReportEmployee,
   type ReportLabourDay,
   workedHundredths,
 } from "./labour-days";
@@ -19,29 +19,29 @@ import {
 import { dateLabel, type DateRange } from "./report-period";
 
 /**
- * All Labour Attendance (CM-217): for one Project and a date range, a
- * summary per Labour (present, half day, absent, leave, paid leave,
+ * Employee Attendance (CM-217): for one Project and a date range, a
+ * summary per Employee (present, half day, absent, leave, paid leave,
  * holiday, overtime hours) and every marked day with its status, check-in,
- * check-out, hours worked (ADR CM-0011) and overtime. Only Labours marked
+ * check-out, hours worked (ADR CM-0011) and overtime. Only Employees marked
  * in the Project in the range appear.
  */
 export function buildLabourAttendanceReport(input: {
   range: DateRange;
-  labours: readonly ReportLabour[];
+  employees: readonly ReportEmployee[];
   days: readonly ReportLabourDay[];
 }): ReportBody {
   const inRange = input.days.filter(
     (day) => day.date >= input.range.from && day.date <= input.range.to,
   );
-  const byLabour = daysByLabour(inRange);
-  const labours = input.labours
-    .filter((labour) => byLabour.has(labour.id))
+  const byEmployee = daysByEmployee(inRange);
+  const employees = input.employees
+    .filter((employee) => byEmployee.has(employee.id))
     .sort(byName);
 
   const summaryColumns = [
     column("Sl. No.", "count", 5),
-    column("Labour", "text", 22),
-    column("Labour Id", "text", 10),
+    column("Employee", "text", 22),
+    column("Employee Id", "text", 10),
     column("Category", "text", 14),
     column("Present", "count"),
     column("Half day", "count"),
@@ -51,13 +51,13 @@ export function buildLabourAttendanceReport(input: {
     column("Holiday", "count"),
     column("OT hours", "hours"),
   ];
-  const summaryRows: Cell[][] = labours.map((labour, index) => {
-    const sum = tally([...(byLabour.get(labour.id)?.values() ?? [])]);
+  const summaryRows: Cell[][] = employees.map((employee, index) => {
+    const sum = tally([...(byEmployee.get(employee.id)?.values() ?? [])]);
     return [
       index + 1,
-      labour.name,
-      labour.labourCode,
-      labour.category,
+      employee.name,
+      employee.employeeCode,
+      employee.category,
       sum.present,
       sum.halfDay,
       sum.absent,
@@ -72,36 +72,36 @@ export function buildLabourAttendanceReport(input: {
 
   const dayColumns = [
     column("Date", "text", 11),
-    column("Labour", "text", 22),
-    column("Labour Id", "text", 10),
+    column("Employee", "text", 22),
+    column("Employee Id", "text", 10),
     column("Status", "text", 10),
     column("Shift", "text", 9),
-    column("Site Engineers", "text", 20),
+    column("Role", "text", 16),
     column("In", "text", 6),
     column("Out", "text", 10),
     column("Worked", "hours"),
     column("OT hours", "hours"),
   ];
-  const names = new Map(labours.map((labour) => [labour.id, labour]));
+  const names = new Map(employees.map((employee) => [employee.id, employee]));
   const dayRows: Cell[][] = [...inRange]
-    .filter((day) => names.has(day.labourId))
+    .filter((day) => names.has(day.employeeId))
     .sort((a, b) => {
-      const left = names.get(a.labourId);
-      const right = names.get(b.labourId);
+      const left = names.get(a.employeeId);
+      const right = names.get(b.employeeId);
       return (
         a.date.localeCompare(b.date) ||
         (left != null && right != null ? byName(left, right) : 0)
       );
     })
     .map((day) => {
-      const labour = names.get(day.labourId);
+      const employee = names.get(day.employeeId);
       return [
         dateLabel(day.date),
-        labour?.name ?? "",
-        labour?.labourCode ?? null,
+        employee?.name ?? "",
+        employee?.employeeCode ?? null,
         STATUS_LABEL[markOf(day)],
         day.shift,
-        day.siteEngineers,
+        employee?.role ?? null,
         day.checkIn,
         checkOutLabel(day),
         workedOf(day),
@@ -110,9 +110,9 @@ export function buildLabourAttendanceReport(input: {
     });
 
   return {
-    title: "All Labour Attendance Report",
+    title: "Employee Attendance Report",
     notes: [
-      `${String(labours.length)} Labours marked in this Project in the period.`,
+      `${String(employees.length)} Employees marked in this Project in the period.`,
       MARK_LEGEND,
     ],
     tables: [

@@ -38,8 +38,8 @@ export type CompanyDashboardRow = {
   delayedIssues: number | null;
   /** Inspection Requests pending a decision in the duration. */
   pendingInspections: number | null;
-  /** Labours present or on half day on the Company's today. */
-  labourToday: number | null;
+  /** Employees present or on half day on the Company's today. */
+  employeesToday: number | null;
   /** Σ due on bills from parties on the Project, on the Company's today. */
   due: bigint | null;
 };
@@ -50,7 +50,7 @@ export type CompanyDashboardTotals = {
   approvals: number | null;
   pendingIssues: number | null;
   pendingInspections: number | null;
-  labourToday: number | null;
+  employeesToday: number | null;
   amountDue: bigint | null;
 };
 
@@ -79,7 +79,7 @@ export function companyDashboardTotals(
     approvals: count(rows.map((row) => row.approvals)),
     pendingIssues: count(rows.map((row) => row.pendingIssues)),
     pendingInspections: count(rows.map((row) => row.pendingInspections)),
-    labourToday: count(rows.map((row) => row.labourToday)),
+    employeesToday: count(rows.map((row) => row.employeesToday)),
     amountDue: money(rows.map((row) => row.due)),
   };
 }

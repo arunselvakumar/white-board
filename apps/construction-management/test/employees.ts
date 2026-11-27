@@ -12,8 +12,14 @@ export type SeedEmployee = {
   roleId?: string;
   employeeCode?: string | null;
   mobile?: string | null;
-  /** Paise a day; the wage type is daily. Default ₹600. */
+  /** Daily (the default) or monthly. */
+  wageType?: "daily" | "monthly";
+  /** Paise a day, on a daily wage. Default ₹600. */
   wagePerDay?: number;
+  /** Paise a month, on a monthly wage. Default ₹18,000. */
+  wagePerMonth?: number;
+  /** Decimal hours a day. Default 8. */
+  workingHoursPerDay?: string;
   /** Paise an hour. Default ₹100. */
   overtimeWagePerHour?: number;
   joiningDate?: string;
@@ -24,6 +30,9 @@ export type SeedEmployee = {
   /** Each is joined from `joiningDate`, with its history row. */
   projectIds?: readonly string[];
   teamMemberId?: string | null;
+  photoKey?: string | null;
+  /** Paise owed (positive) or advanced (negative) before the app. */
+  openingBalance?: number;
   by?: string;
 };
 
@@ -58,8 +67,15 @@ export async function seedEmployee(input: SeedEmployee): Promise<string> {
       teamMemberId: input.teamMemberId ?? null,
       mobile: input.mobile ?? null,
       joiningDate,
-      wageType: "daily",
-      wagePerDay: input.wagePerDay ?? 60_000,
+      wageType: input.wageType ?? "daily",
+      wagePerDay:
+        (input.wageType ?? "daily") === "daily"
+          ? (input.wagePerDay ?? 60_000)
+          : null,
+      wagePerMonth:
+        input.wageType === "monthly" ? (input.wagePerMonth ?? 1_800_000) : null,
+      workingHoursPerDay: input.workingHoursPerDay ?? "8",
+      photoKey: input.photoKey ?? null,
       overtimeWagePerHour: input.overtimeWagePerHour ?? 10_000,
       weeklyHolidays: input.weeklyHolidays ?? [0],
       labourCategoryId: input.labourCategoryId ?? null,
@@ -69,6 +85,22 @@ export async function seedEmployee(input: SeedEmployee): Promise<string> {
       updatedBy: by,
     },
   });
+  if (input.openingBalance != null && input.openingBalance !== 0)
+    await prisma.constructionLabourLedgerEntry.create({
+      data: {
+        id: randomUUID(),
+        workspaceId: input.workspaceId,
+        partyType: "employee",
+        partyId: id,
+        projectId: null,
+        entryDate: joiningDate,
+        kind: "opening",
+        amount: input.openingBalance,
+        sourceType: "employee",
+        sourceId: id,
+        createdBy: by,
+      },
+    });
   for (const projectId of input.projectIds ?? []) {
     await prisma.constructionLabourEmployeeProject.create({
       data: {
@@ -91,4 +123,48 @@ export async function seedEmployee(input: SeedEmployee): Promise<string> {
     });
   }
   return id;
+}
+
+/**
+ * Moves an Employee between Projects from `date`, as a transfer does
+ * (CM-206): off `fromProjectId` (when given), onto `toProjectId` (when
+ * given), with the history row.
+ */
+export async function moveEmployee(input: {
+  workspaceId: string;
+  employeeId: string;
+  fromProjectId: string | null;
+  toProjectId: string | null;
+  date: string;
+  by?: string;
+}): Promise<void> {
+  const transferDate = new Date(`${input.date}T00:00:00Z`);
+  if (input.fromProjectId != null)
+    await prisma.constructionLabourEmployeeProject.deleteMany({
+      where: { employeeId: input.employeeId, projectId: input.fromProjectId },
+    });
+  if (input.toProjectId != null)
+    await prisma.constructionLabourEmployeeProject.create({
+      data: {
+        workspaceId: input.workspaceId,
+        employeeId: input.employeeId,
+        projectId: input.toProjectId,
+        since: transferDate,
+      },
+    });
+  await prisma.constructionLabourEmployeeTransfer.create({
+    data: {
+      id: randomUUID(),
+      workspaceId: input.workspaceId,
+      employeeId: input.employeeId,
+      fromProjectId: input.fromProjectId,
+      toProjectId: input.toProjectId,
+      transferDate,
+      createdBy: input.by ?? "test",
+    },
+  });
+  await prisma.constructionLabourEmployee.update({
+    where: { id: input.employeeId },
+    data: { updatedAt: new Date() },
+  });
 }

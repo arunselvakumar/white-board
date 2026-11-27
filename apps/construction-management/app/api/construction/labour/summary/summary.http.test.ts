@@ -16,6 +16,7 @@ import {
   memberWith,
   ownerWithCompany,
 } from "@/test/companies";
+import { seedEmployee } from "@/test/employees";
 import { TEST_ORIGIN } from "@/test/sessions";
 
 import { GET as getSummary } from "./route";
@@ -27,37 +28,23 @@ const YESTERDAY = addDays(TODAY, -1);
 
 type Company = Awaited<ReturnType<typeof ownerWithCompany>>;
 
-async function labourer(company: Company, projectId: string, isActive = true) {
-  const id = newId();
-  await prisma.constructionLabourLabour.create({
-    data: {
-      id,
-      workspaceId: company.workspaceId,
-      name: `Labour ${id.slice(-4)}`,
-      joiningDate: calendarDateToDb("2026-01-01"),
-      wageType: "daily",
-      wagePerDay: 80_000,
-      overtimeWagePerHour: 10_000,
-      weeklyHolidays: [],
-      projects: {
-        create: {
-          workspaceId: company.workspaceId,
-          projectId,
-          since: calendarDateToDb("2026-01-01"),
-        },
-      },
-      isActive,
-      createdBy: company.userId,
-      updatedBy: company.userId,
-    },
+function labourer(company: Company, projectId: string, isActive = true) {
+  return seedEmployee({
+    workspaceId: company.workspaceId,
+    joiningDate: "2026-01-01",
+    wagePerDay: 80_000,
+    overtimeWagePerHour: 10_000,
+    weeklyHolidays: [],
+    projectIds: [projectId],
+    isActive,
+    by: company.userId,
   });
-  return id;
 }
 
 async function mark(
   company: Company,
   projectId: string,
-  labourId: string,
+  employeeId: string,
   date: string,
   status: "present" | "half_day" | "absent" | "holiday",
 ) {
@@ -66,7 +53,7 @@ async function mark(
       id: newId(),
       workspaceId: company.workspaceId,
       projectId,
-      labourId,
+      employeeId,
       attendanceDate: calendarDateToDb(date),
       status,
       wageType: "daily",
@@ -134,7 +121,7 @@ async function seed(company: Company) {
   });
 
   const entry = (
-    partyType: "labour" | "vendor",
+    partyType: "employee" | "vendor",
     partyId: string,
     amount: number,
   ) => ({
@@ -144,14 +131,14 @@ async function seed(company: Company) {
     entryDate: YESTERDAY,
     kind: amount > 0 ? ("earned" as const) : ("advance" as const),
     amount,
-    sourceType: "labour_attendance" as const,
+    sourceType: "employee_attendance" as const,
     sourceId: newId(),
     reversesEntryId: null,
   });
   await prisma.$transaction((tx) =>
     prismaLedger.post(tx, company.workspaceId, company.userId, [
-      entry("labour", dhuresh, 1_60_000),
-      entry("labour", kavitha, -50_000),
+      entry("employee", dhuresh, 1_60_000),
+      entry("employee", kavitha, -50_000),
       entry("vendor", vendorId, 4_00_000),
     ]),
   );
@@ -168,7 +155,7 @@ describe("project labour summary (CM-219)", () => {
     expect(response.status).toBe(StatusCodes.OK);
     const summary = (await response.json()) as Summary;
     expect(summary.date).toBe(TODAY);
-    expect(summary.labourers).toEqual({
+    expect(summary.employees).toEqual({
       onProject: 4,
       present: 1,
       halfDay: 1,
@@ -191,7 +178,7 @@ describe("project labour summary (CM-219)", () => {
       date: YESTERDAY,
       present: 1,
     });
-    expect(summary.labourBalance).toEqual({
+    expect(summary.employeeBalance).toEqual({
       toPay: 1_60_000,
       advanced: 50_000,
     });
@@ -212,8 +199,8 @@ describe("project labour summary (CM-219)", () => {
         jsonRequest(`${BASE}?projectId=${projectId}`, viewer.cookie),
       )
     ).json()) as Summary;
-    expect(seen.labourers.present).toBe(1);
-    expect(seen.labourBalance).toBeNull();
+    expect(seen.employees.present).toBe(1);
+    expect(seen.employeeBalance).toBeNull();
     expect(seen.vendorBalance).toBeNull();
 
     const outsider = await memberWith(company, { "labour.labour": ["read"] });
@@ -241,7 +228,7 @@ describe("project labour summary (CM-219)", () => {
       YESTERDAY,
       TODAY,
     ]);
-    expect(ranged.labourers.present).toBe(1);
+    expect(ranged.employees.present).toBe(1);
 
     const year = (await (
       await getSummary(

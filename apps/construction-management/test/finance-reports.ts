@@ -646,12 +646,12 @@ export async function reportOtherExpense(
   return id;
 }
 
-/** A labour or vendor wage payment (M2), with or without its account. */
+/** An Employee or vendor wage payment (M2), with or without its account. */
 export async function reportWagePayment(
   workspaceId: string,
   by: string,
   input: {
-    partyType: "labour" | "vendor";
+    partyType: "employee" | "vendor";
     projectId: string;
     date: string;
     amount: number;

@@ -1,15 +1,13 @@
 import { StatusCodes } from "http-status-codes";
 import { describe, expect, it } from "vitest";
 
-import { GET as getLabourActivity } from "@/app/api/construction/labour/labours/[id]/activity/route";
-import { POST as createLabour } from "@/app/api/construction/labour/labours/route";
-import { POST as createSiteEngineer } from "@/app/api/construction/masters/site-engineers/route";
-import { POST as removeLabour } from "@/app/api/construction/projects/projects/[id]/resources/labours/[labourId]/remove/route";
-import { POST as addLabours } from "@/app/api/construction/projects/projects/[id]/resources/labours/route";
-import { POST as setSiteEngineers } from "@/app/api/construction/projects/projects/[id]/resources/site-engineers/route";
+import { GET as getEmployeeActivity } from "@/app/api/construction/labour/employees/[id]/activity/route";
+import { POST as createEmployee } from "@/app/api/construction/labour/employees/route";
+import { POST as removeEmployee } from "@/app/api/construction/projects/projects/[id]/resources/employees/[employeeId]/remove/route";
+import { POST as addEmployees } from "@/app/api/construction/projects/projects/[id]/resources/employees/route";
 import { addDays, todayIn } from "@/src/shared-kernel/calendar-date";
 import { addProject, jsonRequest, ownerWithCompany } from "@/test/companies";
-import { TEST_ORIGIN, newEmail, newMobile } from "@/test/sessions";
+import { TEST_ORIGIN } from "@/test/sessions";
 
 import { GET as getProjectActivity } from "./route";
 
@@ -24,10 +22,9 @@ type ProjectEntry = {
   kind: string;
   date: string;
   remark?: string | null;
-  labours?: Named[];
-  siteEngineer?: Named;
+  employees?: (Named & { role: string | null })[];
 };
-type LabourEntry = {
+type EmployeeEntry = {
   kind: string;
   date: string;
   remark?: string | null;
@@ -42,11 +39,12 @@ async function ok<T>(response: Response, status: number = StatusCodes.OK) {
   return (body === "" ? undefined : JSON.parse(body)) as T;
 }
 
-async function labour(company: Company, name: string) {
+async function employee(company: Company, name: string, role: string) {
   const created = await ok<{ id: string }>(
-    await createLabour(
-      jsonRequest(`${API}/labour/labours`, company.cookie, {
+    await createEmployee(
+      jsonRequest(`${API}/labour/employees`, company.cookie, {
         name,
+        roleId: company.roleId(role),
         joiningDate: day(-40),
         wageType: "daily",
         wagePerDay: 70_000,
@@ -70,90 +68,56 @@ function projectFeed(company: Company, projectId: string) {
   );
 }
 
-function labourFeed(company: Company, labourId: string) {
-  return getLabourActivity(
+function employeeFeed(company: Company, employeeId: string) {
+  return getEmployeeActivity(
     jsonRequest(
-      `${API}/labour/labours/${labourId}/activity?type=projects`,
+      `${API}/labour/employees/${employeeId}/activity?type=projects`,
       company.cookie,
     ),
-    { params: Promise.resolve({ id: labourId }) },
+    { params: Promise.resolve({ id: employeeId }) },
   );
 }
 
 /**
- * The Resources saves (ADR CM-0038 §2, §3) and the feeds that read their
- * history (§1), end to end: one Add Labours save is one Project entry, a
- * removal sits on its Last day, and a Site Engineers save shows as added
- * and removed.
+ * The Teams saves (ADR CM-0038 §2, §3, CM-0055 §5) and the feeds that read
+ * their history (§1), end to end: one Add Employees save is one Project
+ * entry, whatever the Employees' Roles, and a removal sits on its Last day.
  */
 describe("Project staffing in the Activity feeds", () => {
-  it("shows Resources' adds and removes in the Project and Labour feeds", async () => {
+  it("shows Teams' adds and removes in the Project and Employee feeds", async () => {
     const company = await ownerWithCompany();
     const sky = await addProject(
       company.workspaceId,
       company.userId,
       "Sky Towers",
     );
-    const [ravi, selvi] = await Promise.all([
-      labour(company, "Ravi"),
-      labour(company, "Selvi"),
+    const [ravi, karthik] = await Promise.all([
+      employee(company, "Ravi", "Labour"),
+      employee(company, "Karthik", "Site Engineer"),
     ]);
     const params = { params: Promise.resolve({ id: sky }) };
 
     await ok(
-      await addLabours(
+      await addEmployees(
         jsonRequest(
-          `${API}/projects/projects/${sky}/resources/labours`,
+          `${API}/projects/projects/${sky}/resources/employees`,
           company.cookie,
-          { labourIds: [ravi, selvi], from: day(-10), remark: "Slab work" },
+          { employeeIds: [ravi, karthik], from: day(-10), remark: "Slab work" },
         ),
         params,
       ),
       StatusCodes.NO_CONTENT,
     );
     await ok(
-      await removeLabour(
+      await removeEmployee(
         jsonRequest(
-          `${API}/projects/projects/${sky}/resources/labours/${selvi}/remove`,
+          `${API}/projects/projects/${sky}/resources/employees/${karthik}/remove`,
           company.cookie,
           { lastDay: day(-2), remark: "Slab done" },
         ),
-        { params: Promise.resolve({ id: sky, labourId: selvi }) },
+        { params: Promise.resolve({ id: sky, employeeId: karthik }) },
       ),
       StatusCodes.NO_CONTENT,
-    );
-
-    const engineer = await ok<{ id: string }>(
-      await createSiteEngineer(
-        jsonRequest(`${API}/masters/site-engineers`, company.cookie, {
-          name: "Karthik",
-          mobile: newMobile(),
-          email: newEmail(),
-          projectIds: [],
-          profile: {},
-          signIn: { password: "first-pass-1234" },
-        }),
-      ),
-      StatusCodes.CREATED,
-    );
-    const resources = `${API}/projects/projects/${sky}/resources/site-engineers`;
-    await ok(
-      await setSiteEngineers(
-        jsonRequest(resources, company.cookie, {
-          ids: [engineer.id],
-          expectedIds: [],
-        }),
-        params,
-      ),
-    );
-    await ok(
-      await setSiteEngineers(
-        jsonRequest(resources, company.cookie, {
-          ids: [],
-          expectedIds: [engineer.id],
-        }),
-        params,
-      ),
     );
 
     const project = await ok<{ items: ProjectEntry[] }>(
@@ -162,28 +126,23 @@ describe("Project staffing in the Activity feeds", () => {
     const summary = project.items.map((entry) => [
       entry.kind,
       entry.date,
-      ...(entry.labours?.map((person) => person.name).sort() ?? [
-        entry.siteEngineer?.name,
-      ]),
+      ...(entry.employees
+        ?.map((person) => `${person.name} (${person.role ?? "-"})`)
+        .sort() ?? []),
     ]);
-    expect(summary).toEqual(
-      expect.arrayContaining([
-        ["labour_added", day(-10), "Ravi", "Selvi"],
-        ["labour_removed", day(-2), "Selvi"],
-        ["site_engineer_added", TODAY, "Karthik"],
-        ["site_engineer_removed", TODAY, "Karthik"],
-      ]),
-    );
-    expect(project.items).toHaveLength(4);
+    expect(summary).toEqual([
+      ["employee_removed", day(-2), "Karthik (Site Engineer)"],
+      ["employee_added", day(-10), "Karthik (Site Engineer)", "Ravi (Labour)"],
+    ]);
     expect(
-      project.items.find((entry) => entry.kind === "labour_added")?.remark,
+      project.items.find((entry) => entry.kind === "employee_added")?.remark,
     ).toBe("Slab work");
 
-    const selviFeed = await ok<{ items: LabourEntry[] }>(
-      await labourFeed(company, selvi),
+    const karthikFeed = await ok<{ items: EmployeeEntry[] }>(
+      await employeeFeed(company, karthik),
     );
     expect(
-      selviFeed.items.map((entry) => [
+      karthikFeed.items.map((entry) => [
         entry.kind,
         entry.date,
         entry.project?.name,

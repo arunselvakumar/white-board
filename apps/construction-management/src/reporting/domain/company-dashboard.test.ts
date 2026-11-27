@@ -28,7 +28,7 @@ function row(overrides: Partial<CompanyDashboardRow>): CompanyDashboardRow {
     pendingIssues: null,
     delayedIssues: null,
     pendingInspections: null,
-    labourToday: null,
+    employeesToday: null,
     due: null,
     ...overrides,
   };
@@ -107,7 +107,7 @@ describe("Company Dashboard totals (CM-902)", () => {
         status: "on_hold",
         approvals: null,
         pendingIssues: 1,
-        labourToday: 12,
+        employeesToday: 12,
         due: 250_00n,
       }),
       row({ id: "c", status: "completed" }),
@@ -117,7 +117,7 @@ describe("Company Dashboard totals (CM-902)", () => {
       approvals: 2,
       pendingIssues: 4,
       pendingInspections: null,
-      labourToday: 12,
+      employeesToday: 12,
       amountDue: 1_250_00n,
     });
     expect(companyDashboardTotals([])).toEqual({
@@ -125,7 +125,7 @@ describe("Company Dashboard totals (CM-902)", () => {
       approvals: null,
       pendingIssues: null,
       pendingInspections: null,
-      labourToday: null,
+      employeesToday: null,
       amountDue: null,
     });
   });

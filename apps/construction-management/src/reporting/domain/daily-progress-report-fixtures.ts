@@ -92,8 +92,8 @@ export function dprReadModel(
       ],
     },
     attendance: {
-      labourPresent: { skilled: 3, unskilled: 5 },
-      labourHalfDay: { skilled: 0, unskilled: 1 },
+      employeesPresent: { skilled: 3, unskilled: 5 },
+      employeesHalfDay: { skilled: 0, unskilled: 1 },
       vendorFullDay: { skilled: 2, unskilled: 2 },
       vendorHalfDay: { skilled: 0, unskilled: 0 },
     },

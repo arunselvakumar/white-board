@@ -204,7 +204,7 @@ export type WorksheetDirectory = {
  * The Project's attendance on a date, as heads by Labour Category skill
  * (CM-0016 §6): labour attendance present or half day counts one head per
  * live row; vendor attendance lines count full-day plus half-day heads.
- * `skill` is null for a labourer with no category.
+ * `skill` is null for an Employee with no category.
  */
 export type AttendanceHeadcounts = {
   onDate(

@@ -1,8 +1,6 @@
 import { prisma } from "@repo/construction-db";
 import { describe, expect, it } from "vitest";
 
-import { POST as createLabour } from "@/app/api/construction/labour/labours/route";
-import { POST as createSiteEngineer } from "@/app/api/construction/masters/site-engineers/route";
 import { createCheckInHandlers } from "@/src/labour/infrastructure/check-in-factory";
 import type { Flag } from "@/src/shared-kernel/access";
 import {
@@ -18,13 +16,13 @@ import {
   memberWith,
   ownerWithCompany,
 } from "@/test/companies";
+import { seedEmployee, seededRoleId } from "@/test/employees";
 import { pngBytes } from "@/test/files";
-import { TEST_ORIGIN, newEmail, newMobile } from "@/test/sessions";
+import { TEST_ORIGIN } from "@/test/sessions";
 
 import { GET as getActivity } from "./route";
 
 const API = `${TEST_ORIGIN}/api/construction`;
-const LABOURS = `${API}/labour/labours`;
 const TODAY = todayIn("Asia/Kolkata");
 const day = (offset: number) => addDays(TODAY, offset);
 const PHOTO = Buffer.from(pngBytes(2048)).toString("base64");
@@ -144,41 +142,34 @@ async function mason(workspaceId: string) {
 }
 
 async function labourOn(company: Company, name: string, projectId: string) {
-  const response = await createLabour(
-    jsonRequest(LABOURS, company.cookie, {
-      name,
-      joiningDate: day(-40),
-      wageType: "daily",
-      wagePerDay: 70_000,
-      overtimeWagePerHour: 10_000,
-      weeklyHolidays: [],
-      projectIds: [projectId],
-      labourCategoryId: await mason(company.workspaceId),
-    }),
-  );
-  if (response.status !== 201)
-    throw new Error(`labour: ${await response.text()}`);
-  return ((await response.json()) as { id: string }).id;
+  return seedEmployee({
+    workspaceId: company.workspaceId,
+    name,
+    joiningDate: day(-40),
+    wagePerDay: 70_000,
+    overtimeWagePerHour: 10_000,
+    weeklyHolidays: [],
+    projectIds: [projectId],
+    labourCategoryId: await mason(company.workspaceId),
+    by: company.userId,
+  });
 }
 
+/** An Employee on the Site Engineer Role (ADR CM-0055). */
 async function siteEngineerOn(
   company: Company,
   name: string,
   projectId: string,
 ) {
-  const response = await createSiteEngineer(
-    jsonRequest(`${API}/masters/site-engineers`, company.cookie, {
-      name,
-      mobile: newMobile(),
-      email: newEmail(),
-      projectIds: [projectId],
-      profile: {},
-      signIn: { password: "first-pass-1234" },
-    }),
-  );
-  if (response.status !== 201)
-    throw new Error(`site engineer: ${await response.text()}`);
-  return ((await response.json()) as { id: string }).id;
+  return seedEmployee({
+    workspaceId: company.workspaceId,
+    name,
+    roleId: await seededRoleId(company.workspaceId, "Site Engineer"),
+    joiningDate: day(-40),
+    weeklyHolidays: [],
+    projectIds: [projectId],
+    by: company.userId,
+  });
 }
 
 async function vendorOn(company: Company, name: string, projectId: string) {
@@ -199,8 +190,9 @@ async function vendorOn(company: Company, name: string, projectId: string) {
 }
 
 /**
- * Sky Towers with a Site fence, and on it Murugan (a Mason), Sundar (a
- * Site Engineer) and Selvam Gang (a Vendor). Sundar checks in outside the
+ * Sky Towers with a Site fence, and on it Murugan (an Employee on the
+ * Labour Role), Sundar (on the Site Engineer Role) and Selvam Gang (a
+ * Vendor). Sundar checks in outside the
  * fence two days ago; Selvam Gang is checked in and voided; Murugan works
  * a night shift that began yesterday.
  */
@@ -231,7 +223,7 @@ async function history(company: Company) {
   const clock = { now: new Date() };
   const handlers = createCheckInHandlers({ clock: () => clock.now });
   const record = async (
-    kind: "labour" | "site_engineer" | "vendor",
+    kind: "employee" | "vendor",
     personId: string,
     action: "check_in" | "check_out",
     time: Date,
@@ -251,7 +243,7 @@ async function history(company: Company) {
     return result.entry.id;
   };
   const sundarIn = await record(
-    "site_engineer",
+    "employee",
     sundar,
     "check_in",
     at(day(-2), "09:00"),
@@ -273,14 +265,14 @@ async function history(company: Company) {
     reason: "Wrong gang",
   });
   const muruganIn = await record(
-    "labour",
+    "employee",
     murugan,
     "check_in",
     at(day(-1), "22:00"),
     SITE,
   );
   const muruganOut = await record(
-    "labour",
+    "employee",
     murugan,
     "check_out",
     at(TODAY, "05:30"),
@@ -325,10 +317,10 @@ describe("Project Activity: check-in entries (ADR CM-0044)", () => {
       recordedAt: at(TODAY, "05:30").toISOString(),
       by: owner?.name,
       person: {
-        kind: "labour",
+        kind: "employee",
         id: h.murugan,
         name: "Murugan Ganesan",
-        role: "Mason",
+        role: "Labour",
         canOpen: true,
       },
       action: "check_out",
@@ -357,7 +349,7 @@ describe("Project Activity: check-in entries (ADR CM-0044)", () => {
     });
     expect(outside).toMatchObject({
       person: {
-        kind: "site_engineer",
+        kind: "employee",
         id: h.sundar,
         name: "Sundar",
         role: "Site Engineer",
@@ -368,7 +360,7 @@ describe("Project Activity: check-in entries (ADR CM-0044)", () => {
     expect(outside?.metresOutside).toBeGreaterThan(100);
     // The team changes are still there beside them.
     expect(all.map((entry) => entry.kind)).toEqual(
-      expect.arrayContaining(["labour_added", "site_engineer_added"]),
+      expect.arrayContaining(["employee_added"]),
     );
 
     for (const word of ["wage", "earned", "amount", "rate"])
@@ -395,17 +387,18 @@ describe("Project Activity: check-in entries (ADR CM-0044)", () => {
     expect(await kinds("?who=vendors")).toEqual(["check_in:vendor"]);
     // Vendors have no team entries in this feed.
     expect(await kinds("?type=team&who=vendors")).toEqual([]);
-    expect(await kinds("?who=labours")).toEqual([
-      "check_in:labour",
-      "check_in:labour",
-      "labour_added",
+    // Labours and Site Engineers alike are Employees (ADR CM-0055).
+    expect(await kinds("?who=employees")).toEqual([
+      "check_in:employee",
+      "check_in:employee",
+      "check_in:employee",
+      "employee_added",
+      "employee_added",
     ]);
-    expect(await kinds("?who=site_engineers")).toEqual([
-      "site_engineer_added",
-      "check_in:site_engineer",
-    ]);
-    expect(await kinds("?type=check_ins&who=site_engineers")).toEqual([
-      "check_in:site_engineer",
+    expect(await kinds("?type=check_ins&who=employees")).toEqual([
+      "check_in:employee",
+      "check_in:employee",
+      "check_in:employee",
     ]);
     expect(
       (
@@ -451,7 +444,7 @@ describe("Project Activity: check-in entries (ADR CM-0044)", () => {
     );
     const seen = checkIns(await everything(attendance.cookie, h.sky));
     expect(ids(seen)).toEqual(ids(checkIns(ownerFeed)));
-    // Named, but no page to open without Labours or Vendors Read.
+    // Named, but no page to open without Employees or Vendors Read.
     for (const entry of seen) expect(entry.person?.canOpen).toBe(false);
 
     const vendors = await memberOn(
@@ -470,8 +463,7 @@ describe("Project Activity: check-in entries (ADR CM-0044)", () => {
       ]),
     );
     expect(Object.fromEntries(open)).toEqual({
-      labour: false,
-      site_engineer: false,
+      employee: false,
       vendor: true,
     });
 
@@ -498,9 +490,10 @@ describe("Project Activity: check-in entries (ADR CM-0044)", () => {
     );
     const murugan = await labourOn(company, "Murugan Ganesan", sky);
     const selvam = await vendorOn(company, "Selvam Gang", sky);
-    const added = await prisma.constructionLabourTransfer.findFirstOrThrow({
-      where: { labourId: murugan, toProjectId: sky },
-    });
+    const added =
+      await prisma.constructionLabourEmployeeTransfer.findFirstOrThrow({
+        where: { employeeId: murugan, toProjectId: sky },
+      });
     const seed = async (date: string, instant: Date, count: number) => {
       await prisma.constructionLabourCheckInEvent.createMany({
         data: Array.from({ length: count }, (_, index) => ({
@@ -508,7 +501,7 @@ describe("Project Activity: check-in entries (ADR CM-0044)", () => {
           workspaceId: company.workspaceId,
           projectId: sky,
           personKind:
-            index % 2 === 0 ? ("labour" as const) : ("vendor" as const),
+            index % 2 === 0 ? ("employee" as const) : ("vendor" as const),
           personId: index % 2 === 0 ? murugan : selvam,
           action: "check_in" as const,
           occurredAt: instant,
@@ -521,7 +514,7 @@ describe("Project Activity: check-in entries (ADR CM-0044)", () => {
     };
     for (let offset = -27; offset <= -1; offset++)
       await seed(day(offset), at(day(offset), "10:00"), 1);
-    // Three on the very instant and day the Labour was added.
+    // Three on the very instant and day the Employee was added.
     const addedOn = calendarDateFromDb(added.transferDate);
     await seed(addedOn, added.createdAt, 3);
 
@@ -529,7 +522,7 @@ describe("Project Activity: check-in entries (ADR CM-0044)", () => {
     expect(before).toHaveLength(27 + 3 + 1);
     const first = await page(company.cookie, sky);
     expect(first.items).toHaveLength(30);
-    // The page ends on a check-in entry; the next starts on the Labour
+    // The page ends on a check-in entry; the next starts on the Employee
     // added at the same instant.
     expect(
       [first.items.at(-1), before[30]].map((entry) => [
@@ -539,7 +532,7 @@ describe("Project Activity: check-in entries (ADR CM-0044)", () => {
       ]),
     ).toEqual([
       ["check_in", addedOn, added.createdAt.toISOString()],
-      ["labour_added", addedOn, added.createdAt.toISOString()],
+      ["employee_added", addedOn, added.createdAt.toISOString()],
     ]);
 
     // One newer than the first page, one among the pages still to read.

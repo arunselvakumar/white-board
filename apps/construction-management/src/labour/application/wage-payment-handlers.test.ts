@@ -130,7 +130,7 @@ const actor = { workspaceId: "w", userId: "u", role: "owner" as const };
 
 const input = {
   actor,
-  partyType: "labour" as const,
+  partyType: "employee" as const,
   partyId: "dhuresh",
   projectId: "tower",
   paymentDate: "2026-10-05",
@@ -151,14 +151,14 @@ describe("WagePaymentHandlers", () => {
       amount: 50_000,
       receiptVersion: null,
     });
-    expect(guarded).toEqual(["create:labour:2026-10-05"]);
+    expect(guarded).toEqual(["create:employee:2026-10-05"]);
   });
 
   it.each([
     [{ amount: 0 }, "PAYMENT_AMOUNT_INVALID"],
     [{ paymentDate: "2026-10-10" }, "PAYMENT_DATE_IN_FUTURE"],
     [{ paymentDate: "05-10-2026" }, "PAYMENT_DATE_INVALID"],
-    [{ partyId: "nobody" }, "LABOUR_NOT_FOUND"],
+    [{ partyId: "nobody" }, "EMPLOYEE_NOT_FOUND"],
     [{ partyType: "vendor" as const, partyId: "nobody" }, "VENDOR_NOT_FOUND"],
     [
       { partyType: "vendor" as const, partyId: "gang" },
@@ -174,7 +174,7 @@ describe("WagePaymentHandlers", () => {
     expect(payments.size).toBe(0);
   });
 
-  it("pays a vendor on a Project it is assigned to, and a Labour on any live Project", async () => {
+  it("pays a vendor on a Project it is assigned to, and an Employee on any live Project", async () => {
     const { handlers } = fakes();
     await expect(
       handlers.record({
@@ -205,7 +205,7 @@ describe("WagePaymentHandlers", () => {
       expectedUpdatedAt: payment.updatedAt,
     });
     expect(cancelled.has(payment.id)).toBe(true);
-    expect(guarded.at(-1)).toBe("edit:labour:2026-10-05");
+    expect(guarded.at(-1)).toBe("edit:employee:2026-10-05");
     await expect(handlers.get("w", payment.id)).rejects.toMatchObject({
       code: "PAYMENT_NOT_FOUND",
     });

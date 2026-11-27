@@ -33,9 +33,9 @@ export function anyPettyCash(access: MemberAccess): boolean {
   return can(access, "finance.petty_cash", "view_all");
 }
 
-/** Labour payments are under Labour, vendor payments under Vendor (`modules/08`). */
+/** Employee payments are under Labour (`labour.labour`, labelled Employees), vendor payments under Vendor (`modules/08`). */
 export function paymentMenu(partyType: PartyType): MenuKey {
-  return partyType === "labour" ? "labour.labour" : "labour.vendor";
+  return partyType === "employee" ? "labour.labour" : "labour.vendor";
 }
 
 /** Amounts need the party's menu Financial on the Project. */

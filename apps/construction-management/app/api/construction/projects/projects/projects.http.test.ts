@@ -13,6 +13,7 @@ import {
   memberWith,
   ownerWithCompany,
 } from "@/test/companies";
+import { seedEmployee } from "@/test/employees";
 import { TEST_ORIGIN } from "@/test/sessions";
 
 import { POST as deleteProject } from "./[id]/delete/route";
@@ -335,24 +336,16 @@ describe("Projects HTTP (CM-204)", () => {
     await create(owner.cookie, { name: "Project 11" });
   });
 
-  it("refuses to delete a Project while a labour works on it", async () => {
+  it("refuses to delete a Project while an Employee works on it", async () => {
     const owner = await ownerWithCompany();
     const kumari = await create(owner.cookie, { name: "Kumari Heights" });
-    const labourId = newId();
-    await prisma.$executeRaw`
-      INSERT INTO construction_labour.labours
-        (id, workspace_id, name, joining_date, wage_type, wage_per_day,
-         overtime_wage_per_hour, created_by, updated_by)
-      VALUES
-        (${labourId}::uuid, ${owner.workspaceId}, 'Ramu', DATE '2026-10-01',
-         'daily', 70000, 10000, ${owner.userId}, ${owner.userId})
-    `;
-    await prisma.$executeRaw`
-      INSERT INTO construction_labour.labour_projects
-        (workspace_id, labour_id, project_id, since)
-      VALUES
-        (${owner.workspaceId}, ${labourId}::uuid, ${kumari.id}::uuid, DATE '2026-10-01')
-    `;
+    const employeeId = await seedEmployee({
+      workspaceId: owner.workspaceId,
+      name: "Ramu",
+      joiningDate: "2026-10-01",
+      projectIds: [kumari.id],
+      by: owner.userId,
+    });
     const refused = await deleteProject(
       jsonRequest(`${BASE}/${kumari.id}/delete`, owner.cookie, {}),
       params(kumari.id),
@@ -360,10 +353,10 @@ describe("Projects HTTP (CM-204)", () => {
     expect(refused.status).toBe(StatusCodes.CONFLICT);
     expect(await json(refused)).toMatchObject({ code: "PROJECT_IN_USE" });
 
-    await prisma.$executeRaw`
-      UPDATE construction_labour.labours SET deleted_at = now()
-      WHERE id = ${labourId}::uuid
-    `;
+    await prisma.constructionLabourEmployee.update({
+      where: { id: employeeId },
+      data: { deletedAt: new Date() },
+    });
     const allowed = await deleteProject(
       jsonRequest(`${BASE}/${kumari.id}/delete`, owner.cookie, {}),
       params(kumari.id),
