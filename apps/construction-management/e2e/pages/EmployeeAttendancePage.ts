@@ -3,9 +3,9 @@ import { ProjectPage } from "./ProjectPage";
 export type AttendanceStatus =
   "Present" | "Half Day" | "Absent" | "Leave" | "Holiday";
 
-export class LabourAttendancePage extends ProjectPage {
+export class EmployeeAttendancePage extends ProjectPage {
   public get url() {
-    return `${this.base}/attendance/labour`;
+    return `${this.base}/attendance/employees`;
   }
 
   public get dateField() {
@@ -13,12 +13,12 @@ export class LabourAttendancePage extends ProjectPage {
   }
 
   public get form() {
-    return this.page.getByRole("form", { name: "Labour attendance" });
+    return this.page.getByRole("form", { name: "Employee attendance" });
   }
 
-  public statusButton(labour: string, status: AttendanceStatus) {
+  public statusButton(employee: string, status: AttendanceStatus) {
     return this.form.getByRole("button", {
-      name: `${labour} ${status}`,
+      name: `${employee} ${status}`,
       exact: true,
     });
   }

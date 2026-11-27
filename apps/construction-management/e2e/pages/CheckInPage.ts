@@ -12,7 +12,7 @@ export class CheckInPage extends ProjectPage {
     return this.page.getByRole("searchbox", { name: "Search people" });
   }
 
-  public group(name: "Site Engineers" | "Labours" | "Vendors") {
+  public group(name: "Employees" | "Vendors") {
     return this.page.getByRole("region", { name });
   }
 

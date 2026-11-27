@@ -1,17 +1,17 @@
 import { ProjectPage } from "./ProjectPage";
 
-/** Payments → Wages: Labour and Vendor balances and payments. */
+/** Payments → Employee & Vendor: Employee and Vendor balances and payments. */
 export class WagesPage extends ProjectPage {
   public get url() {
     return `${this.base}/payments/wages`;
   }
 
-  public tab(name: "Labour" | "Vendor" | "Payments") {
+  public tab(name: "Employee" | "Vendor" | "Payments") {
     return this.page.getByRole("tab", { name });
   }
 
-  public get labourBalances() {
-    return this.page.getByRole("table", { name: "Labour balances" });
+  public get employeeBalances() {
+    return this.page.getByRole("table", { name: "Employee balances" });
   }
 
   public balanceRow(name: string) {
@@ -30,7 +30,7 @@ export class WagesPage extends ProjectPage {
     name: string,
     label: "Previous Balance" | "To Pay" | "Advance" | "Paid" | "Final Amount",
   ) {
-    const table = this.page.getByRole("table", { name: "Labour balances" });
+    const table = this.page.getByRole("table", { name: "Employee balances" });
     const column =
       ["Previous Balance", "To Pay", "Advance", "Paid", "Final Amount"].indexOf(
         label,
@@ -41,7 +41,7 @@ export class WagesPage extends ProjectPage {
       .getByRole("cell")
       .nth(column);
     const card = this.page
-      .getByRole("list", { name: "Labour balances" })
+      .getByRole("list", { name: "Employee balances" })
       .getByRole("listitem")
       .filter({ hasText: name });
     const definition =
