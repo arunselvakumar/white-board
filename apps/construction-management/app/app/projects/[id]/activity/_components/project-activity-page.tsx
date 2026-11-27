@@ -4,7 +4,6 @@ import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import {
   ArrowLeftToLine,
   ArrowRightFromLine,
-  HardHat,
   UserMinus,
   UserPlus,
 } from "lucide-react";
@@ -42,10 +41,10 @@ import { type AppHref, pageHref } from "@/lib/page-href";
 
 type Lines = { detail?: string; more?: ActivityFeedItem["more"] };
 
-type LabourPerson = Extract<
+type EmployeePerson = Extract<
   ProjectActivityEntry,
-  { labours: unknown }
->["labours"][number];
+  { employees: unknown }
+>["employees"][number];
 type Project = { id: string; name: string; canOpen: boolean };
 type CheckInPerson = Extract<
   ProjectActivityEntry,
@@ -53,7 +52,7 @@ type CheckInPerson = Extract<
 >["person"];
 
 export const PROJECT_ACTIVITY_EMPTY =
-  "Nothing yet. Adding Site Engineers or Labours to this Project will show here.";
+  "Nothing yet. Adding Employees to this Project will show here.";
 
 export const PROJECT_CHECK_INS_EMPTY =
   "No check-in entries. People checked in or out on Check-In will show here.";
@@ -66,18 +65,20 @@ const TYPE_ITEMS: { value: ProjectActivityType; label: string }[] = [
 
 const WHO_ITEMS: { value: ProjectActivityWho; label: string }[] = [
   { value: "all", label: "Everyone" },
-  { value: "site_engineers", label: "Site Engineers" },
-  { value: "labours", label: "Labours" },
+  { value: "employees", label: "Employees" },
   { value: "vendors", label: "Vendors" },
 ];
 
-/** Each kind of person's page (ADR CM-0036). */
+/** An Employee's page (ADR CM-0055 §5). */
+function employeePage(id: string): AppHref {
+  return pageHref("/app/staff/employees/[id]", { id });
+}
+
+/** Each kind of person's page. */
 function personPage(kind: CheckInPerson["kind"], id: string): AppHref {
   switch (kind) {
-    case "labour":
-      return pageHref("/app/staff/labours/[id]", { id });
-    case "site_engineer":
-      return pageHref("/app/staff/site-engineers/[id]", { id });
+    case "employee":
+      return employeePage(id);
     case "vendor":
       return pageHref("/app/staff/vendors/[id]", { id });
   }
@@ -99,10 +100,8 @@ function Named({ href, name }: { href: AppHref | null; name: string }) {
   );
 }
 
-function labourHref(labour: LabourPerson): AppHref | null {
-  return labour.canOpen
-    ? pageHref("/app/staff/labours/[id]", { id: labour.id })
-    : null;
+function employeeHref(employee: EmployeePerson): AppHref | null {
+  return employee.canOpen ? employeePage(employee.id) : null;
 }
 
 function ProjectName({ project }: { project: Project | null }) {
@@ -119,26 +118,26 @@ function ProjectName({ project }: { project: Project | null }) {
   );
 }
 
-function labourLine(labour: LabourPerson): string {
-  return [labour.labourCode, labour.labourCategory]
+function employeeLine(employee: EmployeePerson): string {
+  return [employee.employeeCode, employee.role]
     .filter((part): part is string => part != null && part !== "")
     .join(" · ");
 }
 
-/** Who moved: the Labour's name, or "12 Labours" for a batch. */
-function who(labours: readonly LabourPerson[]) {
-  const [only] = labours;
-  if (labours.length === 1 && only != null)
-    return <Named href={labourHref(only)} name={only.name} />;
+/** Who moved: the Employee's name, or "12 Employees" for a batch. */
+function who(employees: readonly EmployeePerson[]) {
+  const [only] = employees;
+  if (employees.length === 1 && only != null)
+    return <Named href={employeeHref(only)} name={only.name} />;
   return (
-    <strong className="font-medium">{`${String(labours.length)} Labours`}</strong>
+    <strong className="font-medium">{`${String(employees.length)} Employees`}</strong>
   );
 }
 
-function batch(labours: readonly LabourPerson[]): Lines {
-  const [only] = labours;
-  if (labours.length === 1 && only != null) {
-    const line = labourLine(only);
+function batch(employees: readonly EmployeePerson[]): Lines {
+  const [only] = employees;
+  if (employees.length === 1 && only != null) {
+    const line = employeeLine(only);
     return line === "" ? {} : { detail: line };
   }
   return {
@@ -146,12 +145,12 @@ function batch(labours: readonly LabourPerson[]): Lines {
       label: "Show names",
       content: (
         <ul className="space-y-1">
-          {labours.map((labour) => (
-            <li key={labour.id}>
-              <Named href={labourHref(labour)} name={labour.name} />
-              {labourLine(labour) === "" ? null : (
+          {employees.map((employee) => (
+            <li key={employee.id}>
+              <Named href={employeeHref(employee)} name={employee.name} />
+              {employeeLine(employee) === "" ? null : (
                 <span className="text-muted-foreground">
-                  {` · ${labourLine(labour)}`}
+                  {` · ${employeeLine(employee)}`}
                 </span>
               )}
             </li>
@@ -182,41 +181,21 @@ export function projectActivityItem(
     by: entry.by,
   };
   switch (entry.kind) {
-    case "site_engineer_added":
-    case "site_engineer_removed": {
-      const person = entry.siteEngineer;
-      const href =
-        person.canOpen && person.id != null
-          ? pageHref("/app/staff/site-engineers/[id]", { id: person.id })
-          : null;
-      const added = entry.kind === "site_engineer_added";
-      return {
-        ...base,
-        icon: HardHat,
-        tone: added ? "added" : "removed",
-        title: (
-          <>
-            Site Engineer <Named href={href} name={person.name} />{" "}
-            {added ? "added" : "removed"}
-          </>
-        ),
-      };
-    }
-    case "labour_added":
+    case "employee_added":
       return {
         ...base,
         icon: UserPlus,
         tone: "added",
-        title: <>{who(entry.labours)} added</>,
-        ...withRemark(batch(entry.labours), entry.remark),
+        title: <>{who(entry.employees)} added</>,
+        ...withRemark(batch(entry.employees), entry.remark),
       };
-    case "labour_removed":
+    case "employee_removed":
       return {
         ...base,
         icon: UserMinus,
         tone: "removed",
-        title: <>{who(entry.labours)} removed</>,
-        ...withRemark(batch(entry.labours), entry.remark),
+        title: <>{who(entry.employees)} removed</>,
+        ...withRemark(batch(entry.employees), entry.remark),
       };
     case "transferred_in":
       return {
@@ -225,11 +204,11 @@ export function projectActivityItem(
         tone: "added",
         title: (
           <>
-            {who(entry.labours)} transferred in from{" "}
+            {who(entry.employees)} transferred in from{" "}
             <ProjectName project={entry.fromProject} />
           </>
         ),
-        ...withRemark(batch(entry.labours), entry.remark),
+        ...withRemark(batch(entry.employees), entry.remark),
       };
     case "transferred_out":
       return {
@@ -238,11 +217,11 @@ export function projectActivityItem(
         tone: "removed",
         title: (
           <>
-            {who(entry.labours)} transferred out to{" "}
+            {who(entry.employees)} transferred out to{" "}
             <ProjectName project={entry.toProject} />
           </>
         ),
-        ...withRemark(batch(entry.labours), entry.remark),
+        ...withRemark(batch(entry.employees), entry.remark),
       };
     case "check_in": {
       const { person } = entry;
@@ -296,7 +275,7 @@ function ProjectActivityList({
 }
 
 /**
- * A Project's Activity (ADR CM-0038 §4): Site Engineers and Labours added,
+ * A Project's Activity (ADR CM-0038 §4): Employees added,
  * removed and transferred, and each Check In and Check Out (ADR CM-0044),
  * filtered by Type, Who and dates kept in the address.
  */
@@ -314,7 +293,7 @@ export function ProjectActivityPage({
     <div className="w-full max-w-4xl space-y-6 p-6">
       <PageHeader
         title="Activity"
-        meta="Site Engineers and Labours added, removed and transferred, and who checked in and out."
+        meta="Employees added, removed and transferred, and who checked in and out."
       />
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <ActivityFilterSelect

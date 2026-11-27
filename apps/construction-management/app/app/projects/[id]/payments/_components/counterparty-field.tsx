@@ -32,6 +32,11 @@ export const EMPTY_COUNTERPARTY: CounterpartyValue = {
 
 const TYPED = "__typed__";
 
+/** "a Contractor", "an Employee", "an Other Party". */
+function withArticle(label: string): string {
+  return `${/^[AEIOU]/.test(label) ? "an" : "a"} ${label}`;
+}
+
 export const COUNTERPARTY_KIND_LABELS: Record<CounterpartyKindModel, string> = {
   contractor: "Contractor",
   supplier: "Supplier",
@@ -93,7 +98,7 @@ function PartySelect({
           placeholder={
             parties.length === 0
               ? `No ${COUNTERPARTY_KIND_LABELS[kind]} here yet`
-              : `Choose a ${COUNTERPARTY_KIND_LABELS[kind]}`
+              : `Choose ${withArticle(COUNTERPARTY_KIND_LABELS[kind])}`
           }
         />
       </SelectTrigger>
