@@ -18,7 +18,7 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Marks many employees' day on a Project in one transaction: each
+ * Marks many Employees' day on a Project in one transaction: each
  * day priced from the labourer's current wages and posted to the labour
  * ledger. A new day needs Attendance create; re-marking a day (its
  * `updatedAt` in `expected`) needs Attendance update and reverses and

@@ -90,20 +90,20 @@ export type LabourDayListParams = {
  * Where labour attendance lives (Prisma in infrastructure). `save` and
  * `clear` are one transaction each: rows, overtime lines, ledger reversal
  * and reposting, and the audit events (ADR CM-0004). A stale
- * `expectedUpdatedAt`, or a second live row for a employee and date, is 409
+ * `expectedUpdatedAt`, or a second live row for an Employee and date, is 409
  * `ATTENDANCE_CHANGED` with `details.employeeId`.
  */
 export type LabourAttendanceStore = {
   /** Today in the Company's time zone. */
   today(workspaceId: string): Promise<CalendarDate>;
-  /** Live (not deleted) employees among `ids`, active or not. */
+  /** Live (not deleted) Employees among `ids`, active or not. */
   employees(
     workspaceId: string,
     ids: readonly string[],
   ): Promise<Map<string, AttendanceEmployee>>;
   /**
-   * Which employees worked on `projectId` on `date` (transfer history); a
-   * employee may be on several Projects (ADR CM-0033).
+   * Which Employees worked on `projectId` on `date` (transfer history); a
+   * Employee may be on several Projects (ADR CM-0033).
    */
   onProject(
     workspaceId: string,
@@ -111,13 +111,13 @@ export type LabourAttendanceStore = {
     projectId: string,
     date: CalendarDate,
   ): Promise<Set<string>>;
-  /** Active employees on the Project on `date`, by name. */
+  /** Active Employees on the Project on `date`, by name. */
   employeesOn(
     workspaceId: string,
     projectId: string,
     date: CalendarDate,
   ): Promise<AttendanceEmployee[]>;
-  /** Live rows of these employees on `projectId` on `date`. */
+  /** Live rows of these Employees on `projectId` on `date`. */
   daysOf(
     workspaceId: string,
     employeeIds: readonly string[],
@@ -136,7 +136,7 @@ export type LabourAttendanceStore = {
     params: LabourDayListParams,
   ): Promise<{ items: StoredLabourDay[]; total: number; hasMore: boolean }>;
   /**
-   * Writes every day in one transaction, after locking the employees' rows
+   * Writes every day in one transaction, after locking the Employees' rows
    * (404 `EMPLOYEE_NOT_FOUND` when one was deleted meanwhile).
    */
   save(input: {
@@ -153,7 +153,7 @@ export type LabourAttendanceStore = {
     by: string;
     now: Date;
   }): Promise<void>;
-  /** Names of employees by id, including inactive and deleted ones. */
+  /** Names of Employees by id, including inactive and deleted ones. */
   employeeNames(
     workspaceId: string,
     ids: readonly string[],
@@ -237,13 +237,13 @@ export type LabourSheetRowReadModel = {
   wagePerDay: number | null;
   wagePerMonth: number | null;
   overtimeWagePerHour: number | null;
-  /** Decimal hours a day; null for a employee no longer listed. */
+  /** Decimal hours a day; null for an Employee no longer listed. */
   workingHoursPerDay: string | null;
   /** Active and on this Project on the date: the row can be marked. */
   canMark: boolean;
   isActive: boolean;
   onProject: boolean;
-  /** The date is one of the employee's weekly holidays. */
+  /** The date is one of the Employee's weekly holidays. */
   isWeeklyHoliday: boolean;
   /** Pre-fill for an unmarked row: Holiday on a weekly holiday, else yesterday's status. */
   suggestedStatus: AttendanceStatus | null;
@@ -333,7 +333,7 @@ export type MarkLabourDayInput = {
   marks: readonly DayMark[];
   /**
    * The `updatedAt` of each already-marked row this save changes, by
-   * employee. A marked row without an entry (or with a stale one) is 409
+   * Employee. A marked row without an entry (or with a stale one) is 409
    * `ATTENDANCE_CHANGED`, so a stale screen never overwrites a newer mark.
    */
   expected?: Readonly<Record<string, Date>>;
@@ -479,12 +479,12 @@ function stripHundredths(
 }
 
 /**
- * Labour attendance (CM-210, CM-211): mark many employees' day on a Project
+ * Labour attendance (CM-210, CM-211): mark many Employees' day on a Project
  * in one command, clear days, "Mark Paid Leave", and the marking sheet,
  * recorded list and month grid. Menu access is checked by the route; the
  * create/update split, the back-dated guard and the concurrency check here.
  *
- * A new day is priced from the employee's current wages. A re-marked day is
+ * A new day is priced from the Employee's current wages. A re-marked day is
  * re-priced from the current wages too (the day changed, so it is a new
  * pricing); days that are not touched keep their snapshot. "Mark Paid
  * Leave" alone keeps the snapshot wage (`withPaidLeave`).
@@ -584,9 +584,9 @@ export class LabourAttendanceHandlers {
   }
 
   /**
-   * Marks many employees' day on a Project in one transaction (CM-210).
-   * Every employee must be live, active and on this Project on that date;
-   * a employee already marked that day needs their row's `updatedAt` in
+   * Marks many Employees' day on a Project in one transaction (CM-210).
+   * Every Employee must be live, active and on this Project on that date;
+   * an Employee already marked that day needs their row's `updatedAt` in
    * `expected`. Returns the saved rows.
    */
   async markDay(
@@ -900,9 +900,9 @@ export class LabourAttendanceHandlers {
   }
 
   /**
-   * The marking sheet for a Project and date: every active employee on the
+   * The marking sheet for a Project and date: every active Employee on the
    * Project that day (transfer history) with the day's row if marked, the
-   * pre-fill hint, and employees marked here who since became inactive
+   * pre-fill hint, and Employees marked here who since became inactive
    * (read-only).
    */
   async sheet(
@@ -1064,9 +1064,9 @@ export class LabourAttendanceHandlers {
   }
 
   /**
-   * The month grid: employee × day codes with overtime, and totals per
-   * employee. Lists every employee marked here that month, plus the active
-   * employees on the Project at the month's end (or today) with no marks.
+   * The month grid: Employee × day codes with overtime, and totals per
+   * Employee. Lists every Employee marked here that month, plus the active
+   * Employees on the Project at the month's end (or today) with no marks.
    */
   async month(
     workspaceId: string,
