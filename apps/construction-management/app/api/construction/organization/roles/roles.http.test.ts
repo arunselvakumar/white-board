@@ -436,6 +436,9 @@ describe("Role Management HTTP (ADR CM-0030)", () => {
       jsonRequest(BASE, adder.cookie, { name: "X", permissions: {} }),
     );
     expect(refused.status).toBe(StatusCodes.FORBIDDEN);
+    // The Employee form offers each Employee's Role (ADR CM-0055).
+    const employees = await memberWith(owner, { "masters.labours": ["read"] });
+    expect(await list(employees.cookie)).not.toHaveLength(0);
     const outsider = await memberWith(owner, {
       "projects.project": ["read"],
     });

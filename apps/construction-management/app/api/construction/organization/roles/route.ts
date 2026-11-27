@@ -18,8 +18,9 @@ export const dynamic = "force-dynamic";
 
 /**
  * Every live Role of the Active Company, by name (ADR CM-0030). Role
- * Management reads it, so does Add Staff to offer the Roles, and so does
- * Back-dated Entry to offer override Roles (ADR CM-0033).
+ * Management reads it, so does Add Staff to offer the Roles, so does
+ * Back-dated Entry to offer override Roles (ADR CM-0033), and so do the
+ * Employee form and list to offer each Employee's Role (ADR CM-0055).
  */
 export async function GET(request: Request): Promise<Response> {
   try {
@@ -27,6 +28,7 @@ export async function GET(request: Request): Promise<Response> {
       "organization.roles",
       "organization.team_members",
       "organization.settings",
+      "masters.labours",
     ]);
     if (isResponse(session)) return session;
     const items = await handlers.list(session.workspaceId);
