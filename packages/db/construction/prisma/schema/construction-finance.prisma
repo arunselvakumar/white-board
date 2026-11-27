@@ -55,7 +55,8 @@ enum ConstructionFinanceCounterpartyKind {
   contractor
   supplier
   other_party
-  labour
+  /// An Employee (`construction_labour.employees`, ADR CM-0055).
+  employee
   vendor
   team_member
 
@@ -63,7 +64,7 @@ enum ConstructionFinanceCounterpartyKind {
   @@schema("construction_finance")
 }
 
-/// The parties whose balances live in this schema. Labours and Vendors keep
+/// The parties whose balances live in this schema. Employees and Vendors keep
 /// theirs in `construction_labour.ledger_entries` (M2).
 enum ConstructionFinancePartyType {
   contractor

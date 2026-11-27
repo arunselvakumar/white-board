@@ -215,9 +215,9 @@ model ConstructionOrganizationTeamMember {
   /// Storage key of the photo set in My Profile (CM-115); a `stored_files` row.
   photoKey            String?                                  @map("photo_key")
   memberType          ConstructionOrganizationMemberType       @default(normal) @map("member_type")
-  /// The sign-in of a Site Engineer (ADR CM-0037): managed from their
-  /// Site Engineer page and left off Office Staff.
-  siteEngineer        Boolean                                  @default(false) @map("site_engineer")
+  /// The sign-in of an Employee (ADR CM-0055, was a Site Engineer's,
+  /// CM-0037): managed from their Employee page and left off Office Staff.
+  employee            Boolean                                  @default(false)
   isOwner             Boolean                                  @default(false) @map("is_owner")
   status              ConstructionOrganizationTeamMemberStatus @default(joining_pending)
   inviteToken         String?                                  @unique @map("invite_token")

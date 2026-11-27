@@ -1,8 +1,9 @@
 /// Construction Management — labour context (ADR CM-0001, `modules/08`):
-/// the Company's own labourers and labour-supply vendors, daily attendance,
-/// and what each is owed. Every amount is integer paise. Balances are never
-/// stored: they are the sum of immutable ledger entries (ADR CM-0004).
-/// Projects, Labour Categories and Supervisors are ids from other contexts.
+/// the Company's own Employees (ADR CM-0055) and labour-supply vendors,
+/// daily attendance, and what each is owed. Every amount is integer paise.
+/// Balances are never stored: they are the sum of immutable ledger entries
+/// (ADR CM-0004). Projects, Roles, Team Members and Labour Categories are
+/// ids from other contexts.
 
 enum ConstructionLabourWageType {
   daily
@@ -21,90 +22,123 @@ enum ConstructionLabourGender {
   @@schema("construction_labour")
 }
 
-/// A labourer employed directly by the Company (CM-205). Not a User; never
-/// signs in. Wages here are the current rates; attendance keeps its own
-/// snapshot so a change never reprices past days.
-model ConstructionLabourLabour {
-  id                  String                     @id @db.Uuid
-  workspaceId         String                     @map("workspace_id")
-  name                String
-  /// The Company's own "Labour Id"; unique among live labourers when set.
-  labourCode          String?                    @map("labour_code")
-  fatherName          String?                    @map("father_name")
-  joiningDate         DateTime                   @map("joining_date") @db.Date
-  wageType            ConstructionLabourWageType @map("wage_type")
+/// An Employee of the Company (ADR CM-0055): one record for everyone who
+/// used to be a Labour or a Site Engineer. What sets them apart is their
+/// Role (organization context id), and through it the Role's Department.
+/// Every Employee has a wage and is on the attendance sheet of the Projects
+/// they work on. An Employee may sign in (`team_member_id`): what they may
+/// then do comes from the Role's Permission Matrix. Wages here are the
+/// current rates; attendance keeps its own snapshot so a change never
+/// reprices past days. Aadhaar, PAN and the bank account number are
+/// AES-256-GCM ciphertext (shared-kernel `PrivateDataCipher`); the last
+/// four characters are kept for masking.
+model ConstructionLabourEmployee {
+  id                   String                     @id @db.Uuid
+  workspaceId          String                     @map("workspace_id")
+  name                 String
+  /// The Company's own "Employee Id"; unique among live Employees when set.
+  employeeCode         String?                    @map("employee_code")
+  /// `construction_organization.roles`; live, in the same Company. The
+  /// Department is the Role's (`roles.department_id`), never stored here.
+  roleId               String                     @map("role_id") @db.Uuid
+  /// The sign-in membership (`construction_organization.team_members`),
+  /// kept off Office Staff; null when the Employee does not sign in.
+  teamMemberId         String?                    @unique @map("team_member_id") @db.Uuid
+  fatherName           String?                    @map("father_name")
+  dateOfBirth          DateTime?                  @map("date_of_birth") @db.Date
+  gender               ConstructionLabourGender?
+  /// A+, A-, B+, B-, AB+, AB-, O+ or O-.
+  bloodGroup           String?                    @map("blood_group") @db.VarChar(3)
+  joiningDate          DateTime                   @map("joining_date") @db.Date
+  /// E.164. Required to sign in: it is their login (ADR CM-0053).
+  mobile               String?
+  email                String?
+  address              String?
+  emergencyContact     String?                    @map("emergency_contact")
+  qualification        String?
+  experienceYears      Int?                       @map("experience_years")
+  /// Civil, steel / PEB, MEP …; free text.
+  specialisation       String?
+  wageType             ConstructionLabourWageType @map("wage_type")
   /// Paise; set when `wage_type` is daily.
-  wagePerDay          Int?                       @map("wage_per_day")
+  wagePerDay           Int?                       @map("wage_per_day")
   /// Paise; set when `wage_type` is monthly.
-  wagePerMonth        Int?                       @map("wage_per_month")
+  wagePerMonth         Int?                       @map("wage_per_month")
   /// Paise.
-  overtimeWagePerHour Int                        @map("overtime_wage_per_hour")
+  overtimeWagePerHour  Int                        @map("overtime_wage_per_hour")
   /// Hours a day; time worked beyond it is overtime (ADR CM-0011).
-  workingHoursPerDay  Decimal                    @default(8) @map("working_hours_per_day") @db.Decimal(4, 2)
+  workingHoursPerDay   Decimal                    @default(8) @map("working_hours_per_day") @db.Decimal(4, 2)
   /// Weekdays off, 0 = Sunday … 6 = Saturday.
-  weeklyHolidays      Int[]                      @map("weekly_holidays")
-  uanNumber           String?                    @map("uan_number") @db.VarChar(12)
-  esicNumber          String?                    @map("esic_number") @db.VarChar(17)
-  /// AES-256-GCM ciphertext (shared-kernel `PrivateDataCipher`).
-  aadhaarEncrypted    String?                    @map("aadhaar_encrypted")
-  aadhaarLast4        String?                    @map("aadhaar_last4") @db.Char(4)
-  labourCategoryId    String?                    @map("labour_category_id") @db.Uuid
-  /// The Labour this labourer reports to, if any (ADR CM-0035): another
-  /// live labourer of the same Company, never themselves, never a loop.
-  reportsToId         String?                    @map("reports_to_id") @db.Uuid
-  /// E.164.
-  contactNumber       String?                    @map("contact_number")
-  gender              ConstructionLabourGender?
+  weeklyHolidays       Int[]                      @map("weekly_holidays")
+  uanNumber            String?                    @map("uan_number") @db.VarChar(12)
+  esicNumber           String?                    @map("esic_number") @db.VarChar(17)
+  aadhaarEncrypted     String?                    @map("aadhaar_encrypted")
+  aadhaarLast4         String?                    @map("aadhaar_last4") @db.Char(4)
+  panEncrypted         String?                    @map("pan_encrypted")
+  panLast4             String?                    @map("pan_last4") @db.Char(4)
+  bankAccountHolder    String?                    @map("bank_account_holder")
+  bankAccountEncrypted String?                    @map("bank_account_encrypted")
+  bankAccountLast4     String?                    @map("bank_account_last4") @db.VarChar(4)
+  bankIfsc             String?                    @map("bank_ifsc") @db.VarChar(11)
+  bankName             String?                    @map("bank_name")
+  /// `construction_masters.labour_categories`: the trade their overtime is
+  /// booked under.
+  labourCategoryId     String?                    @map("labour_category_id") @db.Uuid
+  /// The Employee this Employee reports to, if any (ADR CM-0035, CM-0055):
+  /// another live Employee of the same Company, never themselves, never a loop.
+  reportsToId          String?                    @map("reports_to_id") @db.Uuid
   /// Storage key; a `stored_files` row.
-  photoKey            String?                    @map("photo_key")
-  /// Inactive labourers leave the attendance list; their records stay.
-  isActive            Boolean                    @default(true) @map("is_active")
-  createdAt           DateTime                   @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt           DateTime                   @default(now()) @map("updated_at") @db.Timestamptz(3)
-  createdBy           String                     @map("created_by")
-  updatedBy           String                     @map("updated_by")
-  deletedAt           DateTime?                  @map("deleted_at") @db.Timestamptz(3)
-  deletedBy           String?                    @map("deleted_by")
+  photoKey             String?                    @map("photo_key")
+  /// Inactive Employees leave the attendance list; their records stay.
+  isActive             Boolean                    @default(true) @map("is_active")
+  createdAt            DateTime                   @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt            DateTime                   @default(now()) @map("updated_at") @db.Timestamptz(3)
+  createdBy            String                     @map("created_by")
+  updatedBy            String                     @map("updated_by")
+  deletedAt            DateTime?                  @map("deleted_at") @db.Timestamptz(3)
+  deletedBy            String?                    @map("deleted_by")
 
-  reportsTo  ConstructionLabourLabour?         @relation("LabourReportsTo", fields: [reportsToId], references: [id], onDelete: SetNull)
-  reports    ConstructionLabourLabour[]        @relation("LabourReportsTo")
-  projects   ConstructionLabourLabourProject[]
-  transfers  ConstructionLabourTransfer[]
+  reportsTo  ConstructionLabourEmployee?          @relation("EmployeeReportsTo", fields: [reportsToId], references: [id], onDelete: SetNull)
+  reports    ConstructionLabourEmployee[]         @relation("EmployeeReportsTo")
+  projects   ConstructionLabourEmployeeProject[]
+  transfers  ConstructionLabourEmployeeTransfer[]
   attendance ConstructionLabourAttendance[]
 
   @@index([workspaceId, name])
+  @@index([workspaceId, roleId])
   @@index([reportsToId])
-  @@map("labours")
+  @@map("employees")
   @@schema("construction_labour")
 }
 
-/// The Projects a labourer works on now (ADR CM-0033): none, one or many.
-/// Changed by Add and Edit Labour and by a transfer, each of which also
-/// writes a `labour_transfers` row.
-model ConstructionLabourLabourProject {
+/// The Projects an Employee works on now (ADR CM-0033, CM-0055): none, one
+/// or many. Changed from the Project's Teams and by a transfer, each of
+/// which also writes an `employee_transfers` row. For an Employee who signs
+/// in, the same Projects are their membership's Projects, so they see them.
+model ConstructionLabourEmployeeProject {
   workspaceId String   @map("workspace_id")
-  labourId    String   @map("labour_id") @db.Uuid
+  employeeId  String   @map("employee_id") @db.Uuid
   projectId   String   @map("project_id") @db.Uuid
   /// The first day on the Project.
   since       DateTime @db.Date
 
-  labour ConstructionLabourLabour @relation(fields: [labourId], references: [id], onDelete: Cascade)
+  employee ConstructionLabourEmployee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
-  @@id([labourId, projectId])
+  @@id([employeeId, projectId])
   @@index([workspaceId, projectId])
-  @@map("labour_projects")
+  @@map("employee_projects")
   @@schema("construction_labour")
 }
 
-/// Where a labourer works, from when (CM-206, ADR CM-0033). Rows added with
-/// the labourer, or a Project ticked on Edit, have no `from_project_id`; a
-/// Project unticked on Edit has no `to_project_id`; a transfer has both.
-/// A labourer is on a Project on a date when the latest row on or before
-/// it that names the Project moves them to it. Append-only.
-model ConstructionLabourTransfer {
+/// Where an Employee works, from when (CM-206, ADR CM-0033). A row that
+/// adds them to a Project has no `from_project_id`; one that takes them
+/// off has no `to_project_id`; a transfer has both. An Employee is on a
+/// Project on a date when the latest row on or before it that names the
+/// Project moves them to it. Append-only.
+model ConstructionLabourEmployeeTransfer {
   id            String   @id @db.Uuid
   workspaceId   String   @map("workspace_id")
-  labourId      String   @map("labour_id") @db.Uuid
+  employeeId    String   @map("employee_id") @db.Uuid
   fromProjectId String?  @map("from_project_id") @db.Uuid
   toProjectId   String?  @map("to_project_id") @db.Uuid
   /// The first day in the new project (or the first day off the old one).
@@ -113,12 +147,12 @@ model ConstructionLabourTransfer {
   createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
   createdBy     String   @map("created_by")
 
-  labour ConstructionLabourLabour @relation(fields: [labourId], references: [id], onDelete: Cascade)
+  employee ConstructionLabourEmployee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
-  @@index([labourId, transferDate])
+  @@index([employeeId, transferDate])
   @@index([workspaceId, toProjectId])
   @@index([workspaceId, fromProjectId])
-  @@map("labour_transfers")
+  @@map("employee_transfers")
   @@schema("construction_labour")
 }
 
@@ -133,31 +167,28 @@ enum ConstructionLabourAttendanceStatus {
   @@schema("construction_labour")
 }
 
-/// One labourer, one Project, one day (CM-210, ADR CM-0033): one live row
-/// per labourer per Project per date (partial unique index in the
-/// migration), on a Project they were on that day. The wage is a snapshot; `earned` is what the day pays before
-/// overtime. Re-marking a day updates the row and reverses its old ledger
-/// entries.
+/// One Employee, one Project, one day (CM-210, ADR CM-0033, CM-0055): one
+/// live row per Employee per Project per date (partial unique index in the
+/// migration), on a Project they were on that day. The wage is a snapshot;
+/// `earned` is what the day pays before overtime. Re-marking a day updates
+/// the row and reverses its old ledger entries.
 model ConstructionLabourAttendance {
   id               String                             @id @db.Uuid
   workspaceId      String                             @map("workspace_id")
   projectId        String                             @map("project_id") @db.Uuid
-  labourId         String                             @map("labour_id") @db.Uuid
+  employeeId       String                             @map("employee_id") @db.Uuid
   attendanceDate   DateTime                           @map("attendance_date") @db.Date
   status           ConstructionLabourAttendanceStatus
   /// Only on `on_leave`: the leave day is paid ("Mark Paid Leave").
   isPaidLeave      Boolean                            @default(false) @map("is_paid_leave")
   shift            String?
-  /// The Labour's Site Engineer, saved on days marked before ADR CM-0041;
-  /// null on days marked since (a Labour's Site Engineers come from the Project).
-  supervisorId     String?                            @map("supervisor_id") @db.Uuid
   /// `HH:MM`, Company time; only on Present or Half Day (ADR CM-0011).
   checkIn          String?                            @map("check_in") @db.Char(5)
   /// `HH:MM`; at or before `check_in` means the next day.
   checkOut         String?                            @map("check_out") @db.Char(5)
   /// Unpaid break in minutes; set when there is a check-in.
   breakMinutes     Int?                               @map("break_minutes")
-  /// The Labour's working hours a day, as on the day it was marked.
+  /// The Employee's working hours a day, as on the day it was marked.
   workingHours     Decimal                            @default(8) @map("working_hours") @db.Decimal(4, 2)
   wageType         ConstructionLabourWageType         @map("wage_type")
   /// Paise: wage per day, or wage per month, as on the day it was marked.
@@ -176,12 +207,12 @@ model ConstructionLabourAttendance {
   deletedAt        DateTime?                          @map("deleted_at") @db.Timestamptz(3)
   deletedBy        String?                            @map("deleted_by")
 
-  labour   ConstructionLabourLabour     @relation(fields: [labourId], references: [id])
+  employee ConstructionLabourEmployee   @relation(fields: [employeeId], references: [id])
   overtime ConstructionLabourOvertime[]
 
   @@index([workspaceId, projectId, attendanceDate])
-  @@index([labourId, attendanceDate])
-  @@map("labour_attendance")
+  @@index([employeeId, attendanceDate])
+  @@map("employee_attendance")
   @@schema("construction_labour")
 }
 
@@ -202,15 +233,13 @@ model ConstructionLabourOvertime {
   attendance ConstructionLabourAttendance @relation(fields: [attendanceId], references: [id], onDelete: Cascade)
 
   @@index([attendanceId])
-  @@map("labour_overtime")
+  @@map("employee_overtime")
   @@schema("construction_labour")
 }
 
 enum ConstructionLabourCheckInPersonKind {
-  labour
+  employee
   vendor
-  /// A Site Engineer row (`construction_masters.supervisors`).
-  site_engineer
 
   @@map("check_in_person_kind")
   @@schema("construction_labour")
@@ -226,15 +255,14 @@ enum ConstructionLabourCheckInAction {
 
 /// One Check In or Check Out of a person at a Project's site (ADR CM-0043):
 /// a photo, the server's time and the device's location. Append-only: a
-/// wrong one is voided, and only the retention job removes the photo. A
-/// Labour's entries write their attendance day; a Vendor's and a Site
-/// Engineer's are a log.
+/// wrong one is voided, and only the retention job removes the photo. An
+/// Employee's entries write their attendance day; a Vendor's are a log.
 model ConstructionLabourCheckInEvent {
   id             String                              @id @db.Uuid
   workspaceId    String                              @map("workspace_id")
   projectId      String                              @map("project_id") @db.Uuid
   personKind     ConstructionLabourCheckInPersonKind @map("person_kind")
-  /// A Labour, a Vendor or a Site Engineer row, by `person_kind`.
+  /// An Employee or a Vendor row, by `person_kind`.
   personId       String                              @map("person_id") @db.Uuid
   action         ConstructionLabourCheckInAction
   /// The server's clock when the entry arrived.
@@ -395,7 +423,7 @@ model ConstructionLabourVendorAttendanceLine {
 }
 
 enum ConstructionLabourPartyType {
-  labour
+  employee
   vendor
 
   @@map("party_type")
@@ -417,7 +445,7 @@ enum ConstructionLabourLedgerEntryKind {
   @@schema("construction_labour")
 }
 
-/// The money trail for a labourer or a vendor (ADR CM-0004). Append-only:
+/// The money trail for an Employee or a vendor (ADR CM-0004). Append-only:
 /// a change writes an entry that reverses the old one (`reverses_entry_id`)
 /// and a new one. Positive amounts are owed to the party; payments and
 /// advances are negative. A balance is the sum of the entries.
@@ -432,7 +460,7 @@ model ConstructionLabourLedgerEntry {
   kind            ConstructionLabourLedgerEntryKind
   /// Paise, signed.
   amount          Int
-  /// What wrote it: `labour`, `vendor`, `labour_attendance`, `vendor_attendance`, `wage_payment`.
+  /// What wrote it: `employee`, `vendor`, `employee_attendance`, `vendor_attendance`, `wage_payment`.
   sourceType      String                            @map("source_type")
   sourceId        String                            @map("source_id") @db.Uuid
   reversesEntryId String?                           @unique @map("reverses_entry_id") @db.Uuid
@@ -462,7 +490,7 @@ enum ConstructionLabourPaymentMode {
   @@schema("construction_labour")
 }
 
-/// Money paid to a labourer or a vendor (CM-215). Posts one ledger entry;
+/// Money paid to an Employee or a vendor (CM-215). Posts one ledger entry;
 /// cancelling posts its reversal. From M7 a payment names the finance account
 /// it was paid from and posts there too (CM-0017 §12).
 model ConstructionLabourWagePayment {
@@ -498,14 +526,14 @@ model ConstructionLabourWagePayment {
 }
 
 enum ConstructionLabourDocumentOwner {
-  labour
+  employee
   vendor
 
   @@map("document_owner")
   @@schema("construction_labour")
 }
 
-/// "Other Documents" on a labourer or a vendor: files in private storage.
+/// "Other Documents" on an Employee or a vendor: files in private storage.
 model ConstructionLabourDocument {
   id          String                          @id @db.Uuid
   workspaceId String                          @map("workspace_id")
