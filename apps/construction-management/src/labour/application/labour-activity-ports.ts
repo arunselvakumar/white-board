@@ -5,7 +5,7 @@ import type { CheckInAction, CheckInPersonKind } from "../domain/check-in";
 
 /**
  * What the labour context gives the Activity feeds (ADR CM-0038 §1): rows
- * read from its own history (transfers, attendance and the labourer's audit
+ * read from its own history (transfers, attendance and the Employee's audit
  * events), each with its place in the feed. Ids only; the composition
  * names Projects and people and decides what the viewer may open.
  *
@@ -27,15 +27,12 @@ export const LABOUR_ACTIVITY_RANK = {
   check_in: 8,
 } as const;
 
-/**
- * The Project feed's Labour entries rank below its Site Engineer ones
- * (6 and 7, in the composition), and check-in entries above both.
- */
+/** The Project feed's Employee entries; check-in entries rank above them. */
 export const PROJECT_LABOUR_ACTIVITY_RANK = {
-  labour_added: 2,
+  employee_added: 2,
   transferred_in: 3,
   transferred_out: 4,
-  labour_removed: 5,
+  employee_removed: 5,
 } as const;
 
 export const PROJECT_CHECK_IN_ACTIVITY_RANK = 8;
@@ -44,7 +41,7 @@ export const PROJECT_CHECK_IN_ACTIVITY_RANK = 8;
 export type AttendanceLabel =
   "present" | "half_day" | "absent" | "on_leave" | "paid_leave" | "holiday";
 
-/** One person's feed: a Labour's, a Site Engineer's or a Vendor's. */
+/** One person's feed: an Employee's or a Vendor's. */
 export type PersonActivityWindow = {
   workspaceId: string;
   before: ActivityKey | null;
@@ -58,7 +55,9 @@ export type PersonActivityWindow = {
   to: CalendarDate | null;
 };
 
-export type LabourActivityWindow = PersonActivityWindow & { labourId: string };
+export type LabourActivityWindow = PersonActivityWindow & {
+  employeeId: string;
+};
 
 /** Whose check-in entries one person's feed reads. */
 export type PersonCheckInWindow = PersonActivityWindow & {
@@ -155,7 +154,7 @@ export type LabourActivityRow =
 export type ProjectLabourMoveKind = keyof typeof PROJECT_LABOUR_ACTIVITY_RANK;
 
 /**
- * Labours moving on or off one Project. Rows of one command that share
+ * Employees moving on or off one Project. Rows of one command that share
  * the recorded time, the actor, the date, the remark and the direction are
  * one entry (a batch, ADR CM-0038 §1).
  */
@@ -164,7 +163,7 @@ export type ProjectLabourMoveRow = {
   kind: ProjectLabourMoveKind;
   /** Where they came from (transferred in) or went (transferred out). */
   otherProjectId: string | null;
-  labourIds: string[];
+  employeeIds: string[];
   remark: string | null;
   by: string;
 };
@@ -186,22 +185,23 @@ export type ProjectCheckInWindow = ProjectActivityWindow & {
 /** A person a check-in entry names, as the Project feed shows them. */
 export type ActivityCheckInPerson = {
   name: string;
-  /** The Labour Category, "Site Engineer" or "Vendor". */
+  /** An Employee's Role name, or "Vendor". */
   role: string | null;
   deleted: boolean;
 };
 
-export type ActivityLabour = {
+export type ActivityEmployee = {
   id: string;
   name: string;
-  labourCode: string | null;
-  labourCategory: string | null;
+  employeeCode: string | null;
+  /** The Role's name; null once the Role was deleted. */
+  role: string | null;
   deleted: boolean;
 };
 
 export type LabourActivitySource = {
-  /** The live labourer, or null. */
-  find(workspaceId: string, labourId: string): Promise<{ id: string } | null>;
+  /** The live Employee, or null. */
+  find(workspaceId: string, employeeId: string): Promise<{ id: string } | null>;
   moves(window: LabourActivityWindow): Promise<LabourMoveRow[]>;
   attendance(window: LabourActivityWindow): Promise<LabourAttendanceRow[]>;
   /**
@@ -240,9 +240,9 @@ export type LabourActivitySource = {
     workspaceId: string,
     people: readonly { kind: CheckInPersonKind; id: string }[],
   ): Promise<Map<string, ActivityCheckInPerson>>;
-  /** Labourers by id, deleted ones included, with their Labour Category's name. */
-  labours(
+  /** Employees by id, deleted ones included, with their Role's name. */
+  employees(
     workspaceId: string,
     ids: readonly string[],
-  ): Promise<Map<string, ActivityLabour>>;
+  ): Promise<Map<string, ActivityEmployee>>;
 };

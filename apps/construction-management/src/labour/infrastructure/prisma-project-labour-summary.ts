@@ -3,6 +3,7 @@ import {
   type PrismaClient,
 } from "@repo/construction-db";
 
+import { companyToday } from "@/src/shared-kernel/company-today";
 import {
   calendarDateFromDb,
   calendarDateToDb,
@@ -15,7 +16,6 @@ import {
   type ProjectLabourSummary,
 } from "../application/project-labour-summary";
 import { prismaLedger } from "./prisma-ledger";
-import { companyToday } from "./prisma-labour-queries";
 
 /**
  * The labour numbers on a Project's Overview (CM-219): who is on site
@@ -38,8 +38,8 @@ export async function projectLabourSummary(
   const from = calendarDateToDb(dates[0] ?? date);
   const to = calendarDateToDb(date);
 
-  const [labourers, vendors, attendance, vendorLines] = await Promise.all([
-    db.constructionLabourLabour.findMany({
+  const [employees, vendors, attendance, vendorLines] = await Promise.all([
+    db.constructionLabourEmployee.findMany({
       where: {
         workspaceId,
         projects: { some: { projectId } },
@@ -64,7 +64,7 @@ export async function projectLabourSummary(
         deletedAt: null,
         attendanceDate: { gte: from, lte: to },
       },
-      select: { attendanceDate: true, status: true, labourId: true },
+      select: { attendanceDate: true, status: true, employeeId: true },
     }),
     db.constructionLabourVendorAttendanceLine.findMany({
       where: {
@@ -107,12 +107,12 @@ export async function projectLabourSummary(
   }
   const markedToday = today.present + today.halfDay + today.absent + today.off;
 
-  const [labourBalances, vendorBalances] = await Promise.all([
+  const [employeeBalances, vendorBalances] = await Promise.all([
     prismaLedger.balances(
       db,
       workspaceId,
-      "labour",
-      labourers.map((row) => row.id),
+      "employee",
+      employees.map((row) => row.id),
       date,
     ),
     prismaLedger.balances(
@@ -126,10 +126,10 @@ export async function projectLabourSummary(
 
   return {
     date,
-    labourers: {
-      onProject: labourers.length,
+    employees: {
+      onProject: employees.length,
       ...today,
-      unmarked: Math.max(0, labourers.length - markedToday),
+      unmarked: Math.max(0, employees.length - markedToday),
     },
     vendors: {
       assigned: vendors.length,
@@ -141,7 +141,7 @@ export async function projectLabourSummary(
       present: present.get(day) ?? 0,
       vendorHeadcount: heads.get(day) ?? 0,
     })),
-    labourBalance: splitBalances(labourBalances.values()),
+    employeeBalance: splitBalances(employeeBalances.values()),
     vendorBalance: splitBalances(vendorBalances.values()),
   };
 }
