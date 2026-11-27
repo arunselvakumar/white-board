@@ -128,7 +128,7 @@ export async function resolveCounterparty(
   db: Tx,
   directory: Pick<
     FinanceDirectory,
-    "contractors" | "suppliers" | "labours" | "vendors" | "teamMembers"
+    "contractors" | "suppliers" | "employees" | "vendors" | "teamMembers"
   >,
   lookups: Pick<TransactionLookups, "otherParties">,
   workspaceId: string,
@@ -167,8 +167,8 @@ export async function resolveCounterparty(
     case "supplier":
       found = (await directory.suppliers(db, workspaceId, [id])).get(id);
       break;
-    case "labour":
-      found = (await directory.labours(db, workspaceId, [id])).get(id);
+    case "employee":
+      found = (await directory.employees(db, workspaceId, [id])).get(id);
       break;
     case "vendor":
       found = (await directory.vendors(db, workspaceId, [id])).get(id);

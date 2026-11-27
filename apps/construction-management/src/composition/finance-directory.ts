@@ -177,10 +177,10 @@ export const financeDirectory: FinanceDirectory = {
     return row == null ? null : toMember(row);
   },
 
-  async labours(db, workspaceId, ids) {
+  async employees(db, workspaceId, ids) {
     if (ids.length === 0) return new Map();
     return named(
-      await db.constructionLabourLabour.findMany({
+      await db.constructionLabourEmployee.findMany({
         where: live(workspaceId, ids),
         select: { id: true, name: true },
       }),
@@ -222,8 +222,8 @@ export const financeDirectory: FinanceDirectory = {
           select,
           orderBy,
         });
-      case "labour":
-        return db.constructionLabourLabour.findMany({
+      case "employee":
+        return db.constructionLabourEmployee.findMany({
           where: {
             ...base,
             isActive: true,
@@ -315,8 +315,9 @@ export const financeDirectory: FinanceDirectory = {
       },
       _sum: { amount: true },
     });
-    const paid = (type: "labour" | "vendor") =>
+    const paid = (type: "employee" | "vendor") =>
       BigInt(rows.find((row) => row.partyType === type)?._sum.amount ?? 0);
-    return { labour: paid("labour"), vendor: paid("vendor") };
+    // Employees' wages are the Project's labour payments (ADR CM-0055).
+    return { labour: paid("employee"), vendor: paid("vendor") };
   },
 };

@@ -182,7 +182,7 @@ describe("finance dashboard HTTP (CM-709)", () => {
       amount: 99_000_00n,
     });
     await reportWagePayment(s.ws, s.by, {
-      partyType: "labour",
+      partyType: "employee",
       projectId: s.tower,
       date: "2026-09-05",
       amount: 2_500_00,
@@ -194,7 +194,7 @@ describe("finance dashboard HTTP (CM-709)", () => {
       amount: 1_500_00,
     });
     await reportWagePayment(s.ws, s.by, {
-      partyType: "labour",
+      partyType: "employee",
       projectId: s.tower,
       date: "2026-09-07",
       amount: 9_999_00,

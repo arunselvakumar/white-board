@@ -97,7 +97,7 @@ export type LedgerFilters = {
     | "contractor"
     | "supplier"
     | "other_party"
-    | "labour"
+    | "employee"
     | "vendor"
     | "team_member"
     | null;
