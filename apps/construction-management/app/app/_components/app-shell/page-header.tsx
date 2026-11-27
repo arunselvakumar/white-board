@@ -6,6 +6,8 @@ import { Button, buttonVariants } from "@repo/ui/components/button";
 import { PageWatermark } from "@repo/ui/components/page-watermark";
 import type { AppHref } from "@/lib/page-href";
 
+import { PageHeaderArt } from "./page-header-art";
+
 export type PageHeaderBack =
   { label: string; href: AppHref } | { label: string; onClick: () => void };
 
@@ -66,7 +68,7 @@ export function PageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <header className="space-y-4">
+    <header className="@container relative space-y-4">
       {back == null ? null : <PageHeaderBackLink back={back} />}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="relative flex min-w-0 items-center gap-4">
@@ -83,8 +85,13 @@ export function PageHeader({
             )}
           </div>
         </div>
-        {actions == null ? null : (
-          <div className="flex flex-wrap items-center gap-2">{actions}</div>
+        {actions == null ? (
+          <PageHeaderArt className="-top-3 right-0" />
+        ) : (
+          <div className="relative flex flex-wrap items-center gap-2">
+            <PageHeaderArt className="-top-3 right-full mr-8" />
+            {actions}
+          </div>
         )}
       </div>
     </header>
