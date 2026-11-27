@@ -4,7 +4,6 @@ import { describe, expect, it } from "vitest";
 
 import { POST as markDays } from "@/app/api/construction/labour/attendance/labour/mark/route";
 import { GET as getSheet } from "@/app/api/construction/labour/attendance/labour/sheet/route";
-import { POST as createLabour } from "@/app/api/construction/labour/labours/route";
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import { createCheckInHandlers } from "@/src/labour/infrastructure/check-in-factory";
 import type { Flag } from "@/src/shared-kernel/access";
@@ -17,6 +16,7 @@ import {
   memberWith,
   ownerWithCompany,
 } from "@/test/companies";
+import { seedEmployee, seededRoleId } from "@/test/employees";
 import { bytesOf, gifBytes, pngBytes } from "@/test/files";
 import { TEST_ORIGIN } from "@/test/sessions";
 
@@ -36,7 +36,6 @@ import { GET as getPerson } from "./person/route";
 import { GET as listEntries, POST as recordCheckIn } from "./route";
 
 const BASE = `${TEST_ORIGIN}/api/construction/labour/attendance/check-ins`;
-const LABOURS = `${TEST_ORIGIN}/api/construction/labour/labours`;
 const ATTENDANCE = `${TEST_ORIGIN}/api/construction/labour/attendance/labour`;
 
 type Company = Awaited<ReturnType<typeof ownerWithCompany>>;
@@ -81,40 +80,28 @@ async function seedCategory(workspaceId: string, name: string) {
   return id;
 }
 
-/** A Site Engineer whose sign-in is on `projectIds` (ADR CM-0038 §3). */
+/**
+ * An Employee on the Site Engineer Role, on `projectIds` (ADR CM-0055): a
+ * person like any other Employee, whose check-ins write attendance.
+ */
 async function seedSiteEngineer(
   workspaceId: string,
   name: string,
   projectIds: readonly string[],
-  extra: { disabled?: boolean } = {},
+  extra: { inactive?: boolean } = {},
 ) {
-  const id = newId();
-  const memberId = newId();
-  await prisma.constructionOrganizationTeamMember.create({
-    data: {
-      id: memberId,
-      workspaceId,
-      name,
-      email: `${memberId}@site.test`,
-      siteEngineer: true,
-      status: "active",
-      createdBy: "test",
-      updatedBy: "test",
-      projects: { create: projectIds.map((projectId) => ({ projectId })) },
-    },
-  });
-  await prisma.constructionMastersSupervisor.create({
-    data: {
-      id,
-      workspaceId,
-      name,
-      mobile: "+919876500011",
-      employeeCode: `SE-${id.slice(-4)}`,
-      teamMemberId: memberId,
-      disabledAt: extra.disabled === true ? new Date() : null,
-      createdBy: "test",
-      updatedBy: "test",
-    },
+  const id = await seedEmployee({
+    workspaceId,
+    name,
+    roleId: await seededRoleId(workspaceId, "Site Engineer"),
+    mobile: "+919876500011",
+    employeeCode: `SE-${newId().slice(-4)}`,
+    joiningDate: "2026-09-01",
+    wagePerDay: DAILY,
+    overtimeWagePerHour: OT,
+    weeklyHolidays: [],
+    projectIds,
+    isActive: extra.inactive !== true,
   });
   return id;
 }
@@ -165,24 +152,18 @@ async function fixtures(company: Company) {
     addProject(company.workspaceId, company.userId, "Villa"),
     seedCategory(company.workspaceId, "Mason"),
   ]);
-  const labour = async (name: string, projectIds = [tower]) => {
-    const response = await createLabour(
-      jsonRequest(LABOURS, company.cookie, {
-        name,
-        joiningDate: "2026-09-01",
-        wageType: "daily",
-        wagePerDay: DAILY,
-        overtimeWagePerHour: OT,
-        weeklyHolidays: [],
-        projectIds,
-        labourCategoryId: mason,
-        contactNumber: "9876500033",
-      }),
-    );
-    if (response.status !== 201)
-      throw new Error(`labour: ${await response.text()}`);
-    return (await json<{ id: string }>(response)).id;
-  };
+  const labour = (name: string, projectIds = [tower]) =>
+    seedEmployee({
+      workspaceId: company.workspaceId,
+      name,
+      joiningDate: "2026-09-01",
+      wagePerDay: DAILY,
+      overtimeWagePerHour: OT,
+      weeklyHolidays: [],
+      projectIds,
+      labourCategoryId: mason,
+      mobile: "+919876500033",
+    });
   const dhuresh = await labour("Dhuresh Nawin");
   return {
     tower,
@@ -207,7 +188,7 @@ function entryBody(
 ): Record<string, unknown> {
   return {
     projectId: f.tower,
-    kind: "labour",
+    kind: "employee",
     personId: f.dhuresh,
     action: "check_in",
     photo: PHOTO,
@@ -238,17 +219,17 @@ function handlersAt(clock: { now: Date }) {
   return createCheckInHandlers({ clock: () => clock.now });
 }
 
-async function ledgerSum(labourId: string): Promise<number> {
+async function ledgerSum(employeeId: string): Promise<number> {
   const sum = await prisma.constructionLabourLedgerEntry.aggregate({
-    where: { partyId: labourId, sourceType: "labour_attendance" },
+    where: { partyId: employeeId, sourceType: "employee_attendance" },
     _sum: { amount: true },
   });
   return sum._sum.amount ?? 0;
 }
 
-async function liveDays(labourId: string) {
+async function liveDays(employeeId: string) {
   return prisma.constructionLabourAttendance.findMany({
-    where: { labourId, deletedAt: null },
+    where: { employeeId, deletedAt: null },
     include: { overtime: true },
   });
 }
@@ -309,10 +290,11 @@ async function sheetDay(
     ),
   );
   const body = await json<{
-    labourers: { labourId: string; attendance: SheetDay | null }[];
+    employees: { employeeId: string; attendance: SheetDay | null }[];
   }>(response);
   return (
-    body.labourers.find((row) => row.labourId === f.dhuresh)?.attendance ?? null
+    body.employees.find((row) => row.employeeId === f.dhuresh)?.attendance ??
+    null
   );
 }
 
@@ -326,7 +308,7 @@ async function markOnSheet(
     jsonRequest(`${ATTENDANCE}/mark`, company.cookie, {
       projectId: f.tower,
       date: TODAY,
-      marks: [{ labourId: f.dhuresh, ...mark }],
+      marks: [{ employeeId: f.dhuresh, ...mark }],
       ...(expected == null ? {} : { expected: { [f.dhuresh]: expected } }),
     }),
   );
@@ -343,7 +325,7 @@ describe("recording a check-in entry (ADR CM-0043)", () => {
     expect(labour.repeated).toBe(false);
     expect(labour.entry).toMatchObject({
       projectId: f.tower,
-      kind: "labour",
+      kind: "employee",
       personId: f.dhuresh,
       personName: "Dhuresh Nawin",
       action: "check_in",
@@ -355,9 +337,10 @@ describe("recording a check-in entry (ADR CM-0043)", () => {
       recordedBy: { id: company.userId },
       voided: null,
     });
-    expect(labour.entry.role).toMatch(/^Mason /);
+    // An Employee shows their Role (ADR CM-0055).
+    expect(labour.entry.role).toBe("Labour");
     expect(labour.person).toMatchObject({
-      kind: "labour",
+      kind: "employee",
       name: "Dhuresh Nawin",
       hasPhoto: false,
       state: { status: "in", since: labour.entry.at },
@@ -404,17 +387,22 @@ describe("recording a check-in entry (ADR CM-0043)", () => {
     });
     expect(vendor.day).toBeNull();
 
+    // A Site Engineer is an Employee: their Check In marks their day too.
     const engineer = await recorded(
       company.cookie,
-      entryBody(f, { kind: "site_engineer", personId: f.engineer }),
+      entryBody(f, { personId: f.engineer }),
     );
     expect(engineer.entry).toMatchObject({
-      kind: "site_engineer",
+      kind: "employee",
       personName: "Sundar",
       role: "Site Engineer",
     });
     expect(engineer.person.code).toMatch(/^SE-/);
-    expect(engineer.day).toBeNull();
+    expect(engineer.day).toMatchObject({
+      effect: "created",
+      status: "present",
+    });
+    expect(await ledgerSum(f.engineer)).toBe(DAILY);
 
     // Every entry's photo is private, counted, and recorded with it.
     const files = await photoFiles(company.workspaceId);
@@ -437,7 +425,7 @@ describe("recording a check-in entry (ADR CM-0043)", () => {
       "check_in.recorded",
       "check_in.recorded",
     ]);
-    // A Vendor's or Site Engineer's entry changes no attendance.
+    // A Vendor's entry changes no attendance.
     expect(
       await prisma.constructionLabourVendorAttendance.count({
         where: { workspaceId: company.workspaceId },
@@ -450,28 +438,23 @@ describe("recording a check-in entry (ADR CM-0043)", () => {
     const f = await fixtures(company);
     const elsewhere = await f.labour("Murugan", [f.villa]);
     const resting = await f.labour("Anbu");
-    await prisma.constructionLabourLabour.update({
+    await prisma.constructionLabourEmployee.update({
       where: { id: resting },
       data: { isActive: false },
     });
-    const [idleVendor, villaVendor, offEngineer, idleEngineer] =
-      await Promise.all([
-        seedVendor(company.workspaceId, "Idle Gang", [f.tower], {
-          inactive: true,
-        }),
-        seedVendor(company.workspaceId, "Villa Gang", [f.villa]),
-        seedSiteEngineer(company.workspaceId, "Ravi", [f.villa]),
-        seedSiteEngineer(company.workspaceId, "Kumar", [f.tower], {
-          disabled: true,
-        }),
-      ]);
+    const [idleVendor, villaVendor] = await Promise.all([
+      seedVendor(company.workspaceId, "Idle Gang", [f.tower], {
+        inactive: true,
+      }),
+      seedVendor(company.workspaceId, "Villa Gang", [f.villa]),
+    ]);
     const cases: [Record<string, unknown>, number, string][] = [
-      [{ personId: newId() }, StatusCodes.NOT_FOUND, "LABOUR_NOT_FOUND"],
-      [{ personId: resting }, StatusCodes.BAD_REQUEST, "LABOUR_INACTIVE"],
+      [{ personId: newId() }, StatusCodes.NOT_FOUND, "EMPLOYEE_NOT_FOUND"],
+      [{ personId: resting }, StatusCodes.BAD_REQUEST, "EMPLOYEE_INACTIVE"],
       [
         { personId: elsewhere },
         StatusCodes.BAD_REQUEST,
-        "LABOUR_NOT_ON_PROJECT",
+        "EMPLOYEE_NOT_ON_PROJECT",
       ],
       [
         { kind: "vendor", personId: newId() },
@@ -488,23 +471,19 @@ describe("recording a check-in entry (ADR CM-0043)", () => {
         StatusCodes.BAD_REQUEST,
         "VENDOR_NOT_ON_PROJECT",
       ],
+      // The old kinds are gone (ADR CM-0055).
       [
-        { kind: "site_engineer", personId: newId() },
-        StatusCodes.NOT_FOUND,
-        "SITE_ENGINEER_NOT_FOUND",
+        { kind: "site_engineer", personId: f.engineer },
+        StatusCodes.BAD_REQUEST,
+        "VALIDATION_ERROR",
       ],
       [
-        { kind: "site_engineer", personId: idleEngineer },
+        { kind: "labour", personId: f.dhuresh },
         StatusCodes.BAD_REQUEST,
-        "SITE_ENGINEER_DISABLED",
-      ],
-      [
-        { kind: "site_engineer", personId: offEngineer },
-        StatusCodes.BAD_REQUEST,
-        "SITE_ENGINEER_NOT_ON_PROJECT",
+        "VALIDATION_ERROR",
       ],
       [{ projectId: newId() }, StatusCodes.NOT_FOUND, "PROJECT_NOT_FOUND"],
-      // A Labour with a Check Out and no open Check In.
+      // An Employee with a Check Out and no open Check In.
       [{ action: "check_out" }, StatusCodes.CONFLICT, "NOT_CHECKED_IN"],
     ];
     for (const [overrides, status, code] of cases)
@@ -619,12 +598,12 @@ describe("recording a check-in entry (ADR CM-0043)", () => {
     // Through the route: a repeat answers 200.
     const viaRoute = await post(
       company.cookie,
-      entryBody(f, { kind: "site_engineer", personId: f.engineer }),
+      entryBody(f, { personId: f.engineer }),
     );
     expect(viaRoute.status).toBe(StatusCodes.CREATED);
     const repeat = await post(
       company.cookie,
-      entryBody(f, { kind: "site_engineer", personId: f.engineer }),
+      entryBody(f, { personId: f.engineer }),
     );
     expect(repeat.status).toBe(StatusCodes.OK);
     expect((await json<Recorded>(repeat)).repeated).toBe(true);
@@ -641,7 +620,7 @@ describe("recording a check-in entry (ADR CM-0043)", () => {
         workspaceId: company.workspaceId,
         userId: company.userId,
         projectId: f.tower,
-        kind: "labour",
+        kind: "employee",
         personId: f.dhuresh,
         action,
         photo: PHOTO,
@@ -738,7 +717,7 @@ describe("recording a check-in entry (ADR CM-0043)", () => {
       workspaceId: company.workspaceId,
       userId: company.userId,
       projectId: f.tower,
-      kind: "labour",
+      kind: "employee",
       personId: f.dhuresh,
       action: "check_in",
       photo: PHOTO,
@@ -764,7 +743,7 @@ describe("recording a check-in entry (ADR CM-0043)", () => {
         workspaceId: company.workspaceId,
         userId: company.userId,
         projectId: f.tower,
-        kind: "labour",
+        kind: "employee",
         personId: f.dhuresh,
         action,
         photo: PHOTO,
@@ -855,7 +834,7 @@ describe("recording a check-in entry (ADR CM-0043)", () => {
         workspaceId: company.workspaceId,
         userId: company.userId,
         projectId: f.tower,
-        kind: "labour",
+        kind: "employee",
         personId: f.dhuresh,
         action,
         photo: PHOTO,
@@ -981,7 +960,7 @@ describe("recording a check-in entry (ADR CM-0043)", () => {
     expect(outside.entry.location?.accuracyMetres).toBeNull();
     const none = await recorded(
       company.cookie,
-      entryBody(f, { kind: "site_engineer", personId: f.engineer }),
+      entryBody(f, { personId: f.engineer }),
     );
     expect(none.entry).toMatchObject({
       location: null,
@@ -1121,7 +1100,7 @@ describe("voiding a check-in entry (ADR CM-0043)", () => {
           workspaceId: company.workspaceId,
           userId: company.userId,
           projectId: f.tower,
-          kind: "labour",
+          kind: "employee",
           personId: f.dhuresh,
           action,
           photo: PHOTO,
@@ -1259,7 +1238,7 @@ describe("voiding a check-in entry (ADR CM-0043)", () => {
       workspaceId: company.workspaceId,
       userId: company.userId,
       projectId: f.tower,
-      kind: "labour",
+      kind: "employee",
       personId: f.dhuresh,
       action: "check_in",
       photo: PHOTO,
@@ -1297,7 +1276,7 @@ describe("voiding a check-in entry (ADR CM-0043)", () => {
     const today = (
       await recorded(
         clerk.cookie,
-        entryBody(f, { kind: "labour", personId: anbu }),
+        entryBody(f, { kind: "employee", personId: anbu }),
       )
     ).entry;
     expect(
@@ -1392,7 +1371,7 @@ describe("Check-In reads (ADR CM-0043)", () => {
   function recorder(company: Company, f: Fixtures, clock: { now: Date }) {
     const handlers = handlersAt(clock);
     return async (
-      kind: "labour" | "vendor" | "site_engineer",
+      kind: "employee" | "vendor",
       personId: string,
       action: "check_in" | "check_out",
       when: Date,
@@ -1418,7 +1397,7 @@ describe("Check-In reads (ADR CM-0043)", () => {
     await seedFence(company.workspaceId, f.tower);
     const anbu = await f.labour("Anbu Selvan");
     const resting = await f.labour("Arul");
-    await prisma.constructionLabourLabour.update({
+    await prisma.constructionLabourEmployee.update({
       where: { id: resting },
       data: { isActive: false },
     });
@@ -1428,13 +1407,13 @@ describe("Check-In reads (ADR CM-0043)", () => {
     });
     await seedVendor(company.workspaceId, "Villa Gang", [f.villa]);
     await seedSiteEngineer(company.workspaceId, "Kumar", [f.tower], {
-      disabled: true,
+      inactive: true,
     });
     await seedSiteEngineer(company.workspaceId, "Ravi", [f.villa]);
     const arjun = await seedSiteEngineer(company.workspaceId, "Arjun", [
       f.tower,
     ]);
-    await prisma.constructionLabourLabour.update({
+    await prisma.constructionLabourEmployee.update({
       where: { id: f.dhuresh },
       data: {
         photoKey: `companies/${company.workspaceId}/labour-photos/x.png`,
@@ -1443,25 +1422,25 @@ describe("Check-In reads (ADR CM-0043)", () => {
 
     const clock = { now: at(TODAY, "08:00") };
     const record = recorder(company, f, clock);
-    await record("labour", f.dhuresh, "check_in", at(TODAY, "09:00"));
+    await record("employee", f.dhuresh, "check_in", at(TODAY, "09:00"));
     await record("vendor", f.vendor, "check_in", at(TODAY, "08:00"));
     await record("vendor", f.vendor, "check_out", at(TODAY, "09:30"));
     const voided = await record(
-      "site_engineer",
+      "employee",
       f.engineer,
       "check_in",
       at(TODAY, "08:30"),
     );
     await voidEntry(company.cookie, voided.id, "Wrong person");
     // Yesterday's Check Out reads as nothing today.
-    await record("site_engineer", arjun, "check_in", at(YESTERDAY, "09:00"));
-    await record("site_engineer", arjun, "check_out", at(YESTERDAY, "17:00"));
+    await record("employee", arjun, "check_in", at(YESTERDAY, "09:00"));
+    await record("employee", arjun, "check_out", at(YESTERDAY, "17:00"));
 
     clock.now = at(TODAY, "10:00");
     const people = await handlersAt(clock).people(
       company.workspaceId,
       f.tower,
-      { canCheckIn: true, canVoid: false, canVoidLabour: false },
+      { canCheckIn: true, canVoid: false, canVoidEmployee: false },
     );
     expect(people).toMatchObject({
       now: at(TODAY, "10:00"),
@@ -1471,19 +1450,23 @@ describe("Check-In reads (ADR CM-0043)", () => {
       canCheckIn: true,
       canVoid: false,
     });
-    expect(people.labours.map((person) => person.name)).toEqual([
+    // Every active Employee on the Project, whatever their Role.
+    expect(people.employees.map((person) => person.name)).toEqual([
       "Anbu Selvan",
+      "Arjun",
       "Dhuresh Nawin",
+      "Sundar",
     ]);
-    expect(people.labours[1]).toMatchObject({
-      kind: "labour",
+    expect(people).not.toHaveProperty("siteEngineers");
+    expect(people.employees[2]).toMatchObject({
+      kind: "employee",
       id: f.dhuresh,
+      role: "Labour",
       hasPhoto: true,
       state: { status: "in", since: at(TODAY, "09:00") },
       entriesToday: 1,
     });
-    expect(people.labours[1]?.role).toMatch(/^Mason /);
-    expect(people.labours[0]).toMatchObject({
+    expect(people.employees[0]).toMatchObject({
       id: anbu,
       hasPhoto: false,
       state: { status: "none", since: null },
@@ -1502,19 +1485,15 @@ describe("Check-In reads (ADR CM-0043)", () => {
         entriesToday: 2,
       },
     ]);
-    expect(people.siteEngineers.map((person) => person.name)).toEqual([
-      "Arjun",
-      "Sundar",
-    ]);
-    expect(people.siteEngineers[0]).toMatchObject({
+    expect(people.employees[1]).toMatchObject({
       role: "Site Engineer",
       phone: "+919876500011",
       state: { status: "none" },
       entriesToday: 0,
     });
-    expect(people.siteEngineers[0]?.code).toMatch(/^SE-/);
+    expect(people.employees[1]?.code).toMatch(/^SE-/);
     // A voided entry does not count.
-    expect(people.siteEngineers[1]).toMatchObject({
+    expect(people.employees[3]).toMatchObject({
       state: { status: "none", since: null },
       entriesToday: 0,
     });
@@ -1535,8 +1514,10 @@ describe("Check-In reads (ADR CM-0043)", () => {
       canCheckIn: false,
       canVoid: false,
     });
-    expect(body.labours).toHaveLength(2);
-    expect(body.labours[1]?.state.since).toBe(at(TODAY, "09:00").toISOString());
+    expect(body.employees).toHaveLength(4);
+    expect(body.employees[2]?.state.since).toBe(
+      at(TODAY, "09:00").toISOString(),
+    );
     const owner = await json<PeoplePage>(
       await listPeople(
         jsonRequest(`${BASE}/people?projectId=${f.tower}`, company.cookie),
@@ -1545,7 +1526,7 @@ describe("Check-In reads (ADR CM-0043)", () => {
     expect(owner).toMatchObject({
       canCheckIn: true,
       canVoid: true,
-      canVoidLabour: true,
+      canVoidEmployee: true,
     });
     const offProject = await member(
       company,
@@ -1567,7 +1548,7 @@ describe("Check-In reads (ADR CM-0043)", () => {
     const clock = { now: at(YESTERDAY, "22:00") };
     const record = recorder(company, f, clock);
     const night = await record(
-      "labour",
+      "employee",
       f.dhuresh,
       "check_in",
       at(YESTERDAY, "22:00"),
@@ -1576,9 +1557,9 @@ describe("Check-In reads (ADR CM-0043)", () => {
     const page = await handlersAt(clock).capture(
       company.workspaceId,
       f.tower,
-      "labour",
+      "employee",
       f.dhuresh,
-      { canCheckIn: true, canVoid: true, canVoidLabour: true },
+      { canCheckIn: true, canVoid: true, canVoidEmployee: true },
     );
     expect(page.person).toMatchObject({
       name: "Dhuresh Nawin",
@@ -1625,16 +1606,15 @@ describe("Check-In reads (ADR CM-0043)", () => {
 
     // The same refusals as recording.
     const resting = await f.labour("Anbu");
-    await prisma.constructionLabourLabour.update({
+    await prisma.constructionLabourEmployee.update({
       where: { id: resting },
       data: { isActive: false },
     });
     const elsewhere = await f.labour("Murugan", [f.villa]);
     for (const [kind, personId, code] of [
-      ["labour", resting, "LABOUR_INACTIVE"],
-      ["labour", elsewhere, "LABOUR_NOT_ON_PROJECT"],
-      ["labour", newId(), "LABOUR_NOT_FOUND"],
-      ["site_engineer", newId(), "SITE_ENGINEER_NOT_FOUND"],
+      ["employee", resting, "EMPLOYEE_INACTIVE"],
+      ["employee", elsewhere, "EMPLOYEE_NOT_ON_PROJECT"],
+      ["employee", newId(), "EMPLOYEE_NOT_FOUND"],
     ] as const)
       expect(
         (
@@ -1662,16 +1642,21 @@ describe("Check-In reads (ADR CM-0043)", () => {
       at(YESTERDAY, "08:00"),
     );
     await record("vendor", f.vendor, "check_out", at(YESTERDAY, "18:00"));
-    const a = await record("labour", f.dhuresh, "check_in", at(TODAY, "08:00"));
+    const a = await record(
+      "employee",
+      f.dhuresh,
+      "check_in",
+      at(TODAY, "08:00"),
+    );
     const b = await record("vendor", f.vendor, "check_in", at(TODAY, "08:10"));
     const c = await record(
-      "site_engineer",
+      "employee",
       f.engineer,
       "check_in",
       at(TODAY, "08:20"),
     );
     const d = await record(
-      "labour",
+      "employee",
       f.dhuresh,
       "check_out",
       at(TODAY, "12:00"),
@@ -1775,15 +1760,15 @@ describe("Check-In reads (ADR CM-0043)", () => {
       code: "PHOTO_NOT_FOUND",
     });
 
-    // A record photo, as the Labours page stores it.
+    // A record photo, as the Employees page stores it.
     const key = `companies/${company.workspaceId}/labour-photos/${newId()}.png`;
     await objectStorage().put(key, photo, "image/png");
-    await prisma.constructionLabourLabour.update({
+    await prisma.constructionLabourEmployee.update({
       where: { id: f.dhuresh },
       data: { photoKey: key },
     });
     const elsewhere = await f.labour("Murugan", [f.villa]);
-    await prisma.constructionLabourLabour.update({
+    await prisma.constructionLabourEmployee.update({
       where: { id: elsewhere },
       data: { photoKey: key },
     });
@@ -1799,21 +1784,22 @@ describe("Check-In reads (ADR CM-0043)", () => {
         ),
         { params: Promise.resolve({ kind, personId }) },
       );
-    const labour = await recordPhoto("labour", f.dhuresh);
+    const labour = await recordPhoto("employee", f.dhuresh);
     expect(labour.status).toBe(StatusCodes.OK);
     expect(labour.headers.get("cache-control")).toMatch(/^private/);
     expect(await bytesOf(labour)).toEqual(photo);
     for (const [kind, personId] of [
       ["vendor", f.vendor],
-      ["site_engineer", f.engineer],
-      ["labour", elsewhere],
+      // On the Project, but no record photo.
+      ["employee", f.engineer],
+      ["employee", elsewhere],
     ] as const)
       expect(await failure(await recordPhoto(kind, personId))).toMatchObject({
         status: StatusCodes.NOT_FOUND,
         code: "PHOTO_NOT_FOUND",
       });
     expect(
-      (await recordPhoto("labour", f.dhuresh, offProject.cookie)).status,
+      (await recordPhoto("employee", f.dhuresh, offProject.cookie)).status,
     ).toBe(StatusCodes.FORBIDDEN);
   });
 });

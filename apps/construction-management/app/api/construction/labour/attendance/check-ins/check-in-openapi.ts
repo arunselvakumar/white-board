@@ -62,7 +62,7 @@ export const checkInOpenApiOperations: OpenApiOperation[] = [
     method: "get",
     path: `${BASE}/people`,
     summary:
-      "Check-In's find screen: the Project's Site Engineers, Labours on it today and Vendors assigned to it, by name, each with where they stand today; the server's time, the time zone and the Site fence",
+      "Check-In's find screen: every active Employee on the Project today (any Role) and the Vendors assigned to it, by name, each with where they stand today; the server's time, the time zone and the Site fence",
     tags: LABOUR,
     query: ListConstructionLabourCheckInPeopleRequestModel,
     successStatus: StatusCodes.OK,
@@ -98,12 +98,12 @@ export const checkInOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: BASE,
     summary:
-      "Record a Check In or Check Out with its photo (base64, ≤ 1 MB) and the location when there is one; 200 with `repeated` for the same action within two minutes (nothing written). A Labour's entry marks, re-times or keeps their attendance day in the same transaction (ALREADY_CHECKED_IN, NOT_CHECKED_IN, ATTENDANCE_CHANGED 409; PHOTO_INVALID, PHOTO_TOO_LARGE, LOCATION_INVALID and the person's refusals 400)",
+      "Record a Check In or Check Out with its photo (base64, ≤ 1 MB) and the location when there is one; 200 with `repeated` for the same action within two minutes (nothing written). An Employee's entry marks, re-times or keeps their attendance day in the same transaction (ALREADY_CHECKED_IN, NOT_CHECKED_IN, ATTENDANCE_CHANGED 409; PHOTO_INVALID, PHOTO_TOO_LARGE, LOCATION_INVALID and the person's refusals 400)",
     tags: LABOUR,
     body: RecordConstructionLabourCheckInRequestModel,
     successStatus: StatusCodes.CREATED,
     successDescription:
-      "The entry, the person and what it did to a Labour's day",
+      "The entry, the person and what it did to an Employee's day",
     successSchema: RecordConstructionLabourCheckInResponseModel,
     errors: WRITE_ERRORS,
   },
@@ -111,7 +111,7 @@ export const checkInOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: `${BASE}/{id}/void`,
     summary:
-      "Void an entry with a reason; a Labour's day is worked out again, and cleared with its wage reversed when Check-In made it and this was its last entry (VOID_REASON_REQUIRED 400; CHECK_IN_ALREADY_VOIDED 409; needs Attendance delete)",
+      "Void an entry with a reason; an Employee's day is worked out again, and cleared with its wage reversed when Check-In made it and this was its last entry (VOID_REASON_REQUIRED 400; CHECK_IN_ALREADY_VOIDED 409; needs Attendance delete)",
     tags: LABOUR,
     params: ConstructionLabourCheckInParamsModel,
     body: VoidConstructionLabourCheckInRequestModel,
@@ -136,7 +136,7 @@ export const checkInOpenApiOperations: OpenApiOperation[] = [
     method: "get",
     path: `${BASE}/people/{kind}/{personId}/photo`,
     summary:
-      "The photo on a Labour's or Vendor's record, for someone on the Project (PHOTO_NOT_FOUND 404 when none, and for a Site Engineer)",
+      "The photo on an Employee's or Vendor's record, for someone on the Project (PHOTO_NOT_FOUND 404 when none)",
     tags: LABOUR,
     params: ConstructionLabourCheckInPersonPhotoParamsModel,
     query: ListConstructionLabourCheckInPeopleRequestModel,

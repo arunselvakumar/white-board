@@ -24,7 +24,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * Voids a check-in entry with a reason. The entry stays in the log,
- * struck out; a Labour's day is worked out again from the entries left,
+ * struck out; an Employee's day is worked out again from the entries left,
  * and cleared (its wage reversed) when Check-In made it and this was its
  * last entry. 404 for another Company's entry; needs Attendance delete on
  * the entry's Project.
@@ -57,14 +57,14 @@ export async function POST(
     );
     if (isResponse(session)) return session;
     if (
-      entry.kind === "labour" &&
+      entry.kind === "employee" &&
       !can(session.access, "labour.attendance", "update", {
         projectId: entry.projectId,
       })
     )
       throw forbidden(
         "PERMISSION_DENIED",
-        "Voiding a Labour's entry changes their attendance day, so it needs permission to change marked attendance.",
+        "Voiding an Employee's entry changes their attendance day, so it needs permission to change marked attendance.",
       );
     const voided = await handlers.void({
       workspaceId: session.workspaceId,

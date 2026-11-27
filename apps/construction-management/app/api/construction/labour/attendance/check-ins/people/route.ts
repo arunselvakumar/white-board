@@ -39,8 +39,7 @@ export async function GET(request: Request): Promise<Response> {
     );
     const body: ListConstructionLabourCheckInPeopleResponseModel = {
       ...toContextResponse(people),
-      siteEngineers: people.siteEngineers.map(toPersonResponse),
-      labours: people.labours.map(toPersonResponse),
+      employees: people.employees.map(toPersonResponse),
       vendors: people.vendors.map(toPersonResponse),
     };
     return Response.json(body);

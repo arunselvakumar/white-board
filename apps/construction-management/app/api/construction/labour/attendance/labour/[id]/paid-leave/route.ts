@@ -12,8 +12,8 @@ import {
   labourFinancial,
 } from "../../handlers";
 import {
-  ConstructionLabourLabourAttendanceParamsModel,
-  SetConstructionLabourLabourAttendancePaidLeaveRequestModel,
+  ConstructionLabourEmployeeAttendanceParamsModel,
+  SetConstructionLabourEmployeeAttendancePaidLeaveRequestModel,
   toLabourAttendanceDayResponse,
 } from "../../labour-attendance-models";
 
@@ -30,12 +30,12 @@ export async function POST(
 ): Promise<Response> {
   try {
     const { id } = parseOrThrow(
-      ConstructionLabourLabourAttendanceParamsModel.safeParse(
+      ConstructionLabourEmployeeAttendanceParamsModel.safeParse(
         await context.params,
       ),
     );
     const model = parseOrThrow(
-      SetConstructionLabourLabourAttendancePaidLeaveRequestModel.safeParse(
+      SetConstructionLabourEmployeeAttendancePaidLeaveRequestModel.safeParse(
         await request.json(),
       ),
     );

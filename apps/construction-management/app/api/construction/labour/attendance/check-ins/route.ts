@@ -84,7 +84,7 @@ export async function GET(request: Request): Promise<Response> {
  * Records a Check In or Check Out on a Project with its photo (base64,
  * checked by content, at most 1 MB) and the device's location when there
  * is one. 201 with the entry; 200 with `repeated` when the same action
- * was recorded in the last two minutes (nothing is written). A Labour's
+ * was recorded in the last two minutes (nothing is written). An Employee's
  * entry writes their attendance day in the same transaction. Needs
  * Attendance create on the Project.
  */

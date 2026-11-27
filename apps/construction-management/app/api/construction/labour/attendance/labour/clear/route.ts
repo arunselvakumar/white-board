@@ -6,21 +6,21 @@ import { isResponse } from "@/app/api/_lib/require-session";
 
 import { actorOf, labourAttendanceHandlers as handlers } from "../handlers";
 import {
-  ClearConstructionLabourLabourAttendanceRequestModel,
+  ClearConstructionLabourEmployeeAttendanceRequestModel,
   expectedDates,
 } from "../labour-attendance-models";
 
 export const dynamic = "force-dynamic";
 
 /**
- * Clears labourers' marked day on a Project: rows tombstoned and
+ * Clears employees' marked day on a Project: rows tombstoned and
  * ledger entries reversed, all or none. Needs Attendance delete; the
  * back-dated edit limit applies.
  */
 export async function POST(request: Request): Promise<Response> {
   try {
     const model = parseOrThrow(
-      ClearConstructionLabourLabourAttendanceRequestModel.safeParse(
+      ClearConstructionLabourEmployeeAttendanceRequestModel.safeParse(
         await request.json(),
       ),
     );
@@ -37,7 +37,7 @@ export async function POST(request: Request): Promise<Response> {
       actor: actorOf(session),
       projectId: model.projectId,
       date: model.date,
-      labourIds: model.labourIds,
+      employeeIds: model.employeeIds,
       expected: expectedDates(model.expected),
     });
     return new Response(null, { status: StatusCodes.NO_CONTENT });

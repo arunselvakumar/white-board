@@ -5,30 +5,30 @@ import {
 } from "@tanstack/react-query";
 
 import type {
-  ClearConstructionLabourLabourAttendanceRequestModel,
-  ConstructionLabourLabourAttendanceDayResponseModel,
-  GetConstructionLabourLabourAttendanceMonthResponseModel,
-  GetConstructionLabourLabourAttendanceSheetResponseModel,
-  ListConstructionLabourLabourAttendanceResponseModel,
-  MarkConstructionLabourLabourAttendanceRequestModel,
-  MarkConstructionLabourLabourAttendanceResponseModel,
+  ClearConstructionLabourEmployeeAttendanceRequestModel,
+  ConstructionLabourEmployeeAttendanceDayResponseModel,
+  GetConstructionLabourEmployeeAttendanceMonthResponseModel,
+  GetConstructionLabourEmployeeAttendanceSheetResponseModel,
+  ListConstructionLabourEmployeeAttendanceResponseModel,
+  MarkConstructionLabourEmployeeAttendanceRequestModel,
+  MarkConstructionLabourEmployeeAttendanceResponseModel,
 } from "@/app/api/construction/labour/attendance/labour/labour-attendance-models";
 
 import { apiJson } from "./http";
 
 export type LabourAttendanceDay =
-  ConstructionLabourLabourAttendanceDayResponseModel;
+  ConstructionLabourEmployeeAttendanceDayResponseModel;
 export type LabourSheet =
-  GetConstructionLabourLabourAttendanceSheetResponseModel;
-export type LabourSheetRow = LabourSheet["labourers"][number];
+  GetConstructionLabourEmployeeAttendanceSheetResponseModel;
+export type LabourSheetRow = LabourSheet["employees"][number];
 export type LabourAttendanceMonth =
-  GetConstructionLabourLabourAttendanceMonthResponseModel;
+  GetConstructionLabourEmployeeAttendanceMonthResponseModel;
 export type LabourAttendanceList =
-  ListConstructionLabourLabourAttendanceResponseModel;
+  ListConstructionLabourEmployeeAttendanceResponseModel;
 export type MarkLabourDayInput =
-  MarkConstructionLabourLabourAttendanceRequestModel;
+  MarkConstructionLabourEmployeeAttendanceRequestModel;
 export type ClearLabourDayInput =
-  ClearConstructionLabourLabourAttendanceRequestModel;
+  ClearConstructionLabourEmployeeAttendanceRequestModel;
 export type AttendanceStatus = LabourAttendanceDay["status"];
 
 export const LABOUR_ATTENDANCE_API =
@@ -77,7 +77,7 @@ export type LabourAttendanceListFilter = {
   projectId: string;
   from?: string;
   to?: string;
-  labourId?: string;
+  employeeId?: string;
   status?: string;
   cursor?: { after: string } | { before: string } | null;
 };
@@ -87,7 +87,7 @@ export function labourAttendanceListQuery(filter: LabourAttendanceListFilter) {
     projectId: filter.projectId,
     from: filter.from,
     to: filter.to,
-    labourId: filter.labourId,
+    employeeId: filter.employeeId,
     status: filter.status,
     limit: "25",
     after:
@@ -108,7 +108,7 @@ export function labourAttendanceListQuery(filter: LabourAttendanceListFilter) {
 
 export function markLabourDay(
   input: MarkLabourDayInput,
-): Promise<MarkConstructionLabourLabourAttendanceResponseModel> {
+): Promise<MarkConstructionLabourEmployeeAttendanceResponseModel> {
   return postJson(`${LABOUR_ATTENDANCE_API}/mark`, input);
 }
 
