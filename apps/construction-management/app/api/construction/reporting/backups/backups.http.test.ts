@@ -37,6 +37,7 @@ import {
   memberWith,
   ownerWithCompany,
 } from "@/test/companies";
+import { seedEmployee, seededRoleId } from "@/test/employees";
 import { pngBytes } from "@/test/files";
 import { TEST_ORIGIN } from "@/test/sessions";
 import {
@@ -499,6 +500,28 @@ describe("backups: Project scope (CM-906)", () => {
         updatedBy: owner.userId,
       },
     });
+    // An Employee on the Site Engineer Role, checked in and marked (ADR CM-0055).
+    const employeeId = await seedEmployee({
+      workspaceId: owner.workspaceId,
+      name: "Murugan Selvam",
+      roleId: await seededRoleId(owner.workspaceId, "Site Engineer"),
+      projectIds: [projectId],
+    });
+    await prisma.constructionLabourAttendance.create({
+      data: {
+        id: randomUUID(),
+        workspaceId: owner.workspaceId,
+        projectId,
+        employeeId,
+        attendanceDate: new Date("2026-09-12T00:00:00Z"),
+        status: "present",
+        wageType: "daily",
+        wageRate: 60_000,
+        earned: 60_000,
+        createdBy: owner.userId,
+        updatedBy: owner.userId,
+      },
+    });
     const photoKey = `companies/${owner.workspaceId}/check-in-photos/${randomUUID()}.jpg`;
     const entry = {
       workspaceId: owner.workspaceId,
@@ -532,6 +555,16 @@ describe("backups: Project scope (CM-906)", () => {
           voidedBy: owner.userId,
           voidReason: "Pressed by mistake",
         },
+        {
+          ...entry,
+          id: randomUUID(),
+          personKind: "employee",
+          personId: employeeId,
+          action: "check_in",
+          occurredAt: new Date("2026-09-12T03:00:00Z"),
+          // As after retention removed the photo.
+          photoRemovedAt: new Date("2026-12-11T00:00:00Z"),
+        },
       ],
     });
     const backup = await done(owner.cookie, {
@@ -546,15 +579,20 @@ describe("backups: Project scope (CM-906)", () => {
       modules: { entities: { entity: string; rows: number }[] }[];
     };
     expect(manifest.modules[0]?.entities).toEqual([
-      { entity: "labour_attendance", rows: 0 },
-      { entity: "check_in_log", rows: 2 },
+      { entity: "labour_attendance", rows: 1 },
+      { entity: "check_in_log", rows: 3 },
     ]);
+    const days = csvLines(files, "labour-attendance/labour_attendance.csv");
+    expect(days[0]).toContain("Employee,Role,");
+    expect(days[0]).not.toContain("Site Engineer");
+    expect(days[1]).toContain("Murugan Selvam,Site Engineer,");
     const lines = csvLines(files, "labour-attendance/check_in_log.csv");
     expect(lines[0]).toContain(
       "Date,Person type,Person,Check In / Check Out,Time",
     );
-    expect(lines).toHaveLength(3);
+    expect(lines).toHaveLength(4);
     expect(lines.join("\n")).toContain("Selvam Gang");
+    expect(lines.join("\n")).toContain("Murugan Selvam");
     expect(lines.join("\n")).toContain("Pressed by mistake");
     const all = `${lines.join("\n")}${text(files, "labour-attendance/check_in_log.json")}`;
     expect(all).not.toContain(photoKey);

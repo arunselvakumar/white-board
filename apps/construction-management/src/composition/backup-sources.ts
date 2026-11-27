@@ -220,6 +220,10 @@ const OG = "construction_organization";
 const HR = "construction_hrms";
 const SL = "construction_sales";
 
+/** An Employee's Role name, by the Employee's id (ADR CM-0055). */
+const EMPLOYEE_ROLE = (employeeSql: string) =>
+  `(SELECT r.name FROM ${OG}.roles r JOIN ${LB}.employees e ON e.role_id = r.id WHERE e.id = (${employeeSql})::uuid)`;
+
 const AADHAAR = (alias = "t") =>
   `CASE WHEN ${alias}.aadhaar_last4 IS NULL THEN NULL ELSE 'XXXX XXXX ' || ${alias}.aadhaar_last4 END`;
 const PAN = (alias = "t") =>
@@ -761,7 +765,7 @@ const SPECS: Record<string, EntitySpec> = {
 
   // Labour ------------------------------------------------------------------
   labour_attendance: {
-    from: `${LB}.labour_attendance t`,
+    from: `${LB}.employee_attendance t`,
     workspace: "t.workspace_id",
     project: "t.project_id",
     date: "t.attendance_date",
@@ -772,15 +776,11 @@ const SPECS: Record<string, EntitySpec> = {
       id(),
       projectName(),
       col("attendanceDate", "Date", "t.attendance_date", "date"),
-      col("labour", "Labour", nameIn(`${LB}.labours`, "t.labour_id")),
+      col("employee", "Employee", nameIn(`${LB}.employees`, "t.employee_id")),
+      col("role", "Role", EMPLOYEE_ROLE("t.employee_id")),
       col("status", "Attendance", "t.status::text", "enum"),
       col("isPaidLeave", "Paid Leave", "t.is_paid_leave", "bool"),
       col("shift", "Shift", "t.shift"),
-      col(
-        "supervisor",
-        "Site Engineer",
-        nameIn(`${MS}.supervisors`, "t.supervisor_id"),
-      ),
       col("checkIn", "Check In", "t.check_in"),
       col("checkOut", "Check Out", "t.check_out"),
       col("breakMinutes", "Break (min)", "t.break_minutes", "number"),
@@ -788,7 +788,7 @@ const SPECS: Record<string, EntitySpec> = {
       col(
         "overtimeHours",
         "OT Hours",
-        `(SELECT COALESCE(SUM(o.hours), 0) FROM ${LB}.labour_overtime o WHERE o.attendance_id = t.id)`,
+        `(SELECT COALESCE(SUM(o.hours), 0) FROM ${LB}.employee_overtime o WHERE o.attendance_id = t.id)`,
         "number",
       ),
       col("wageType", "Wage Type", "t.wage_type::text", "enum"),
@@ -797,7 +797,7 @@ const SPECS: Record<string, EntitySpec> = {
       money(
         "overtimeAmount",
         "OT Amount (₹)",
-        `(SELECT COALESCE(SUM(o.amount), 0) FROM ${LB}.labour_overtime o WHERE o.attendance_id = t.id)`,
+        `(SELECT COALESCE(SUM(o.amount), 0) FROM ${LB}.employee_overtime o WHERE o.attendance_id = t.id)`,
       ),
       ...stamps(),
     ],
@@ -821,9 +821,8 @@ const SPECS: Record<string, EntitySpec> = {
         "person",
         "Person",
         `CASE t.person_kind
-          WHEN 'labour' THEN ${nameIn(`${LB}.labours`, "t.person_id")}
-          WHEN 'vendor' THEN ${nameIn(`${LB}.vendors`, "t.person_id")}
-          ELSE ${nameIn(`${MS}.supervisors`, "t.person_id")}
+          WHEN 'employee' THEN ${nameIn(`${LB}.employees`, "t.person_id")}
+          ELSE ${nameIn(`${LB}.vendors`, "t.person_id")}
         END`,
       ),
       col("action", "Check In / Check Out", "t.action::text", "enum"),
@@ -860,8 +859,8 @@ const SPECS: Record<string, EntitySpec> = {
       col("partyType", "Paid To", "t.party_type::text", "enum"),
       col(
         "party",
-        "Labour / Vendor",
-        `COALESCE(${nameIn(`${LB}.labours`, "t.party_id")}, ${nameIn(`${LB}.vendors`, "t.party_id")})`,
+        "Employee / Vendor",
+        `COALESCE(${nameIn(`${LB}.employees`, "t.party_id")}, ${nameIn(`${LB}.vendors`, "t.party_id")})`,
       ),
       col("kind", "Payment", "t.kind::text", "enum"),
       col("mode", "Mode", "t.mode::text", "enum"),
@@ -1658,10 +1657,16 @@ const SPECS: Record<string, EntitySpec> = {
     col("isActive", "Active", "t.is_active", "bool"),
     ...stamps(),
   ]),
-  labours: master(`${LB}.labours t`, [
+  employees: master(`${LB}.employees t`, [
     id(),
-    col("name", "Labour Name", "t.name"),
-    col("labourCode", "Labour Code", "t.labour_code"),
+    col("name", "Employee Name", "t.name"),
+    col("employeeCode", "Employee Id", "t.employee_code"),
+    col(
+      "department",
+      "Department",
+      `(SELECT d.name FROM ${OG}.roles r JOIN ${OG}.departments d ON d.id = r.department_id WHERE r.id = t.role_id)`,
+    ),
+    col("role", "Role", nameIn(`${OG}.roles`, "t.role_id")),
     col("fatherName", "Father's Name", "t.father_name"),
     col("gender", "Gender", "t.gender::text", "enum"),
     col("joiningDate", "Joining Date", "t.joining_date", "date"),
@@ -1673,7 +1678,7 @@ const SPECS: Record<string, EntitySpec> = {
     col(
       "projects",
       "Projects",
-      `(SELECT string_agg(x.name, '; ' ORDER BY x.name) FROM ${LB}.labour_projects a JOIN ${PJ}.projects x ON x.id = a.project_id WHERE a.labour_id = t.id AND x.deleted_at IS NULL)`,
+      `(SELECT string_agg(x.name, '; ' ORDER BY x.name) FROM ${LB}.employee_projects a JOIN ${PJ}.projects x ON x.id = a.project_id WHERE a.employee_id = t.id AND x.deleted_at IS NULL)`,
     ),
     col("wageType", "Wage Type", "t.wage_type::text", "enum"),
     money("wagePerDay", "Wage / Day (₹)", "t.wage_per_day"),
@@ -1692,7 +1697,8 @@ const SPECS: Record<string, EntitySpec> = {
     ),
     col("uanNumber", "UAN", "t.uan_number"),
     col("esicNumber", "ESIC", "t.esic_number"),
-    col("contactNumber", "Contact Number", "t.contact_number"),
+    col("mobile", "Mobile", "t.mobile"),
+    col("email", "Email", "t.email"),
     col("isActive", "Active", "t.is_active", "bool"),
     ...stamps(),
   ]),
