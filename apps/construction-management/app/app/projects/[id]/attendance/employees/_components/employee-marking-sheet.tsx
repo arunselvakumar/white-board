@@ -49,19 +49,19 @@ import { FormAlert } from "@/components/auth/form-alert";
 import { formatPaise, MoneyInput } from "@/components/money/money-input";
 import { QueryHttpError } from "@/src/queries/http";
 import {
-  useClearLabourDay,
-  useMarkLabourDay,
+  useClearEmployeeDay,
+  useMarkEmployeeDay,
   type AttendanceStatus,
-  type LabourSheet,
-  type LabourSheetRow,
+  type EmployeeSheet,
+  type EmployeeSheetRow,
 } from "@/src/queries/labour-attendance";
 
 import {
   isRowDirty,
   isTimedStatus,
-  labourMarkPayload,
-  labourSheetDefaults,
-  labourSheetFormSchema,
+  employeeMarkPayload,
+  employeeSheetDefaults,
+  employeeSheetFormSchema,
   newOvertimeLine,
   NO_SHIFT,
   previewEarned,
@@ -72,12 +72,12 @@ import {
   withStatus,
   withTimes,
   withYesterday,
-  type LabourRowDraft,
-  type LabourSheetFormValues,
+  type EmployeeRowDraft,
+  type EmployeeSheetFormValues,
   type TimesField,
   type TimesPatch,
-} from "./labour-sheet-form";
-import { RowTimes, SetTimesDialog, workingDayLabel } from "./labour-times";
+} from "./employee-sheet-form";
+import { RowTimes, SetTimesDialog, workingDayLabel } from "./employee-times";
 
 const NO_CATEGORY = "none";
 
@@ -86,16 +86,16 @@ function categoryValue(id: string | undefined): string {
 }
 
 type Form = {
-  control: Control<LabourSheetFormValues>;
-  setValue: UseFormSetValue<LabourSheetFormValues>;
+  control: Control<EmployeeSheetFormValues>;
+  setValue: UseFormSetValue<EmployeeSheetFormValues>;
   /** Replace a row's draft through a pure change (status, times, yesterday). */
   apply: (
     index: number,
-    change: (draft: LabourRowDraft) => LabourRowDraft,
+    change: (draft: EmployeeRowDraft) => EmployeeRowDraft,
   ) => void;
 };
 
-/** A row's error: from the server (`details.labourId`) or the form check. */
+/** A row's error: from the server (`details.employeeId`) or the form check. */
 type RowError = { message: string; field?: TimesField };
 
 function isTimesField(value: unknown): value is TimesField {
@@ -103,7 +103,7 @@ function isTimesField(value: unknown): value is TimesField {
 }
 
 /** Decimal hours of the row's overtime lines, for the OT button. */
-function overtimeTotal(draft: LabourRowDraft): string | null {
+function overtimeTotal(draft: EmployeeRowDraft): string | null {
   let hundredths = 0;
   for (const line of draft.overtime) {
     const hours = Number(line.hours);
@@ -166,8 +166,8 @@ function OvertimeLines({
   financial,
 }: {
   index: number;
-  row: LabourSheetRow;
-  sheet: LabourSheet;
+  row: EmployeeSheetRow;
+  sheet: EmployeeSheet;
   form: Form;
   financial: boolean;
 }) {
@@ -215,13 +215,13 @@ function OvertimeLines({
           ) : null}
           <div className="col-span-2 space-y-1 sm:col-span-1">
             <Label
-              htmlFor={`ot-${row.labourId}-${String(line)}-category`}
+              htmlFor={`ot-${row.employeeId}-${String(line)}-category`}
               className="text-xs"
             >
               Labour Category
             </Label>
             <SimpleSelect
-              id={`ot-${row.labourId}-${String(line)}-category`}
+              id={`ot-${row.employeeId}-${String(line)}-category`}
               label={`${row.name} overtime ${String(line + 1)} category`}
               value={categoryValue(lines[line]?.labourCategoryId)}
               items={categories}
@@ -236,14 +236,14 @@ function OvertimeLines({
           </div>
           <div className="space-y-1">
             <Label
-              htmlFor={`ot-${row.labourId}-${String(line)}-hours`}
+              htmlFor={`ot-${row.employeeId}-${String(line)}-hours`}
               className="text-xs"
               required={lines[line]?.fromTimes !== true}
             >
               Hours
             </Label>
             <Input
-              id={`ot-${row.labourId}-${String(line)}-hours`}
+              id={`ot-${row.employeeId}-${String(line)}-hours`}
               aria-label={`${row.name} overtime ${String(line + 1)} hours`}
               aria-required={lines[line]?.fromTimes !== true}
               inputMode="decimal"
@@ -269,7 +269,7 @@ function OvertimeLines({
             <Label
               htmlFor={
                 financial
-                  ? `ot-${row.labourId}-${String(line)}-rate`
+                  ? `ot-${row.employeeId}-${String(line)}-rate`
                   : undefined
               }
               className="text-xs"
@@ -278,7 +278,7 @@ function OvertimeLines({
             </Label>
             {financial ? (
               <MoneyInput
-                id={`ot-${row.labourId}-${String(line)}-rate`}
+                id={`ot-${row.employeeId}-${String(line)}-rate`}
                 aria-label={`${row.name} overtime ${String(line + 1)} rate`}
                 className="h-11"
                 value={lines[line]?.rate ?? ""}
@@ -292,7 +292,7 @@ function OvertimeLines({
               />
             ) : (
               <p className="text-muted-foreground flex h-11 items-center text-sm">
-                Labourer&apos;s OT wage
+                Employee&apos;s OT wage
               </p>
             )}
           </div>
@@ -324,7 +324,7 @@ function OvertimeLines({
   );
 }
 
-function ReadOnlyRow({ row }: { row: LabourSheetRow }) {
+function ReadOnlyRow({ row }: { row: EmployeeSheetRow }) {
   const day = row.attendance;
   return (
     <li
@@ -334,7 +334,13 @@ function ReadOnlyRow({ row }: { row: LabourSheetRow }) {
       <div>
         <p className="font-medium">{row.name}</p>
         <p className="text-muted-foreground text-xs">
-          {row.isActive ? "No longer on this Project" : "Inactive"} · read-only
+          {[
+            row.role?.name,
+            row.isActive ? "No longer on this Project" : "Inactive",
+            "read-only",
+          ]
+            .filter(Boolean)
+            .join(" · ")}
         </p>
       </div>
       {day == null ? null : (
@@ -364,8 +370,8 @@ function SheetRow({
   error,
 }: {
   index: number;
-  row: LabourSheetRow;
-  sheet: LabourSheet;
+  row: EmployeeSheetRow;
+  sheet: EmployeeSheet;
   date: string;
   form: Form;
   financial: boolean;
@@ -422,9 +428,9 @@ function SheetRow({
           <div className="min-w-0 flex-1">
             <p className="flex flex-wrap items-center gap-2 font-medium">
               {row.name}
-              {row.labourCode == null ? null : (
+              {row.employeeCode == null ? null : (
                 <span className="text-muted-foreground text-xs">
-                  {row.labourCode}
+                  {row.employeeCode}
                 </span>
               )}
               {dirty ? (
@@ -438,6 +444,7 @@ function SheetRow({
             </p>
             <p className="text-muted-foreground text-xs">
               {[
+                row.role?.name,
                 row.labourCategory?.name,
                 row.wageType === "monthly" ? "Monthly" : "Daily",
                 workingDayLabel(row),
@@ -585,17 +592,17 @@ function ClearDayDialog({
   onOpenChange: (open: boolean) => void;
   projectId: string;
   date: string;
-  rows: LabourSheetRow[];
+  rows: EmployeeSheetRow[];
   onCleared: (count: number) => void;
 }) {
-  const clear = useClearLabourDay();
+  const clear = useClearEmployeeDay();
   const [error, setError] = useState<string>();
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            Clear {rows.length} labourer{rows.length === 1 ? "" : "s"}&apos;
+            Clear {rows.length} Employee{rows.length === 1 ? "" : "s"}&apos;
             day?
           </AlertDialogTitle>
           <AlertDialogDescription>
@@ -614,12 +621,12 @@ function ClearDayDialog({
               const expected: Record<string, string> = {};
               for (const row of rows)
                 if (row.attendance != null)
-                  expected[row.labourId] = row.attendance.updatedAt;
+                  expected[row.employeeId] = row.attendance.updatedAt;
               clear.mutate(
                 {
                   projectId,
                   date,
-                  labourIds: rows.map((row) => row.labourId),
+                  employeeIds: rows.map((row) => row.employeeId),
                   expected,
                 },
                 {
@@ -646,9 +653,13 @@ function ClearDayDialog({
   );
 }
 
-function labourIdOf(details: unknown): string | null {
-  if (details != null && typeof details === "object" && "labourId" in details) {
-    const value = details.labourId;
+function employeeIdOf(details: unknown): string | null {
+  if (
+    details != null &&
+    typeof details === "object" &&
+    "employeeId" in details
+  ) {
+    const value = details.employeeId;
     return typeof value === "string" ? value : null;
   }
   return null;
@@ -662,14 +673,14 @@ function timesFieldOf(details: unknown): TimesField | undefined {
 }
 
 /**
- * The marking sheet for one date: a row per labourer with status buttons,
+ * The marking sheet for one date: a row per Employee with status buttons,
  * Paid Leave on Leave, shift and overtime lines; check-in, check-out and
  * break on Present / Half Day with overtime from the times (ADR CM-0011);
  * multi-select bulk marks and "Set times", "Mark all present" and "Copy
  * yesterday". Save sends only the rows that changed, each with its loaded
  * `updatedAt`.
  */
-export function LabourMarkingSheet({
+export function EmployeeMarkingSheet({
   projectId,
   date,
   sheet,
@@ -677,14 +688,14 @@ export function LabourMarkingSheet({
 }: {
   projectId: string;
   date: string;
-  sheet: LabourSheet;
+  sheet: EmployeeSheet;
   onSaved: (message: string) => void;
 }) {
   const financial = sheet.totals.earned != null;
   const { control, setValue, handleSubmit, getValues } =
-    useForm<LabourSheetFormValues>({
-      resolver: zodResolver(labourSheetFormSchema),
-      defaultValues: labourSheetDefaults(sheet),
+    useForm<EmployeeSheetFormValues>({
+      resolver: zodResolver(employeeSheetFormSchema),
+      defaultValues: employeeSheetDefaults(sheet),
     });
   const apply: Form["apply"] = (index, change) => {
     const before = getValues(`rows.${index}`);
@@ -707,7 +718,7 @@ export function LabourMarkingSheet({
   };
   const form: Form = { control, setValue, apply };
   const rows = useWatch({ control, name: "rows" });
-  const mark = useMarkLabourDay();
+  const mark = useMarkEmployeeDay();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [rowErrors, setRowErrors] = useState<Record<string, RowError>>({});
@@ -718,45 +729,46 @@ export function LabourMarkingSheet({
 
   const visible = useMemo(() => {
     const term = search.trim().toLowerCase();
-    return sheet.labourers
+    return sheet.employees
       .map((row, index) => ({ row, index }))
       .filter(
         ({ row }) =>
           term === "" ||
           row.name.toLowerCase().includes(term) ||
-          (row.labourCode ?? "").toLowerCase().includes(term),
+          (row.employeeCode ?? "").toLowerCase().includes(term),
       );
-  }, [sheet.labourers, search]);
+  }, [sheet.employees, search]);
   const markable = visible.filter(({ row }) => row.canMark);
-  const dirtyCount = sheet.labourers.filter((row, index) => {
+  const dirtyCount = sheet.employees.filter((row, index) => {
     const draft = rows[index];
     return draft != null && isRowDirty(row, draft);
   }).length;
-  const selectedRows = sheet.labourers.filter((row) =>
-    selected.has(row.labourId),
+  const selectedRows = sheet.employees.filter((row) =>
+    selected.has(row.employeeId),
   );
   const selectedSaved = selectedRows.filter((row) => row.attendance != null);
-  const selectedIndexes = sheet.labourers.flatMap((row, index) =>
-    row.canMark && selected.has(row.labourId) ? [index] : [],
+  const selectedIndexes = sheet.employees.flatMap((row, index) =>
+    row.canMark && selected.has(row.employeeId) ? [index] : [],
   );
   const timedIndexes = selectedIndexes.filter((index) =>
     isTimedStatus(rows[index]?.status ?? ""),
   );
   const allSelected =
     markable.length > 0 &&
-    markable.every(({ row }) => selected.has(row.labourId));
+    markable.every(({ row }) => selected.has(row.employeeId));
   const hasYesterday = markable.some(
     ({ row }) => row.yesterday != null && row.attendance == null,
   );
 
   const setStatusAt = (index: number, status: AttendanceStatus) => {
-    const row = sheet.labourers[index];
+    const row = sheet.employees[index];
     if (row != null) apply(index, (draft) => withStatus(row, draft, status));
   };
 
   const bulk = (status: AttendanceStatus) => {
-    sheet.labourers.forEach((row, index) => {
-      if (row.canMark && selected.has(row.labourId)) setStatusAt(index, status);
+    sheet.employees.forEach((row, index) => {
+      if (row.canMark && selected.has(row.employeeId))
+        setStatusAt(index, status);
     });
   };
 
@@ -764,7 +776,7 @@ export function LabourMarkingSheet({
     (values) => {
       setRowErrors({});
       setFormError(undefined);
-      const payload = labourMarkPayload(projectId, date, sheet, values);
+      const payload = employeeMarkPayload(projectId, date, sheet, values);
       if (payload == null) {
         setFormError("Nothing to save: mark a status first.");
         return;
@@ -772,22 +784,22 @@ export function LabourMarkingSheet({
       mark.mutate(payload, {
         onSuccess: (saved) => {
           onSaved(
-            `Saved ${String(saved.items.length)} Labour${saved.items.length === 1 ? "" : "s"}.`,
+            `Saved ${String(saved.items.length)} Employee${saved.items.length === 1 ? "" : "s"}.`,
           );
         },
         onError: (failure) => {
           if (failure instanceof QueryHttpError) {
-            const labourId = labourIdOf(failure.details);
-            if (labourId != null) {
+            const employeeId = employeeIdOf(failure.details);
+            if (employeeId != null) {
               setRowErrors({
-                [labourId]: {
+                [employeeId]: {
                   message: failure.message,
                   field: timesFieldOf(failure.details),
                 },
               });
               const name =
-                sheet.labourers.find((row) => row.labourId === labourId)
-                  ?.name ?? "a Labour";
+                sheet.employees.find((row) => row.employeeId === employeeId)
+                  ?.name ?? "an Employee";
               setFormError(`Not saved: see ${name}.`);
               return;
             }
@@ -818,7 +830,7 @@ export function LabourMarkingSheet({
           (name) => rowError[name]?.message != null,
         );
         if (field != null) {
-          found[draft.labourId] = {
+          found[draft.employeeId] = {
             message: rowError[field]?.message ?? "Check the times.",
             field,
           };
@@ -826,7 +838,7 @@ export function LabourMarkingSheet({
         }
         const lines = draft.overtime.map((_, at) => rowError.overtime?.[at]);
         const line = lines.find((item) => item != null);
-        found[draft.labourId] = {
+        found[draft.employeeId] = {
           message:
             rowError.overtime?.message ??
             line?.hours?.message ??
@@ -841,7 +853,7 @@ export function LabourMarkingSheet({
 
   return (
     <form
-      aria-label="Labour attendance"
+      aria-label="Employee attendance"
       className="space-y-4 pb-20 lg:pb-0"
       onSubmit={(event) => {
         void submit(event);
@@ -851,8 +863,8 @@ export function LabourMarkingSheet({
         <div className="relative w-full sm:w-64">
           <Search className="text-muted-foreground pointer-events-none absolute top-3 left-3 size-4" />
           <Input
-            aria-label="Search Labours"
-            placeholder="Search name or Labour Id"
+            aria-label="Search Employees"
+            placeholder="Search name or Employee Id"
             className="h-10 pl-9"
             value={search}
             onChange={(event) => {
@@ -865,7 +877,7 @@ export function LabourMarkingSheet({
             type="button"
             variant="outline"
             className="h-10"
-            title="Every visible Labour Present, except weekly holidays"
+            title="Every visible Employee Present, except weekly holidays"
             disabled={markable.length === 0}
             onClick={() => {
               for (const { row, index } of markable)
@@ -907,8 +919,8 @@ export function LabourMarkingSheet({
               setSelected((current) => {
                 const next = new Set(current);
                 for (const { row } of markable)
-                  if (on) next.add(row.labourId);
-                  else next.delete(row.labourId);
+                  if (on) next.add(row.employeeId);
+                  else next.delete(row.employeeId);
                 return next;
               });
             }}
@@ -997,33 +1009,33 @@ export function LabourMarkingSheet({
           className="bg-card border"
           icon={MagnifyingGlassIcon}
           tone="neutral"
-          title="No Labour matches the filter."
+          title="No Employee matches the filter."
         />
       ) : (
         <ul className="space-y-2">
           {visible.map(({ row, index }) =>
             row.canMark ? (
               <SheetRow
-                key={row.labourId}
+                key={row.employeeId}
                 index={index}
                 row={row}
                 sheet={sheet}
                 date={date}
                 form={form}
                 financial={financial}
-                selected={selected.has(row.labourId)}
+                selected={selected.has(row.employeeId)}
                 onSelect={(on) => {
                   setSelected((current) => {
                     const next = new Set(current);
-                    if (on) next.add(row.labourId);
-                    else next.delete(row.labourId);
+                    if (on) next.add(row.employeeId);
+                    else next.delete(row.employeeId);
                     return next;
                   });
                 }}
-                error={rowErrors[row.labourId]}
+                error={rowErrors[row.employeeId]}
               />
             ) : (
-              <ReadOnlyRow key={row.labourId} row={row} />
+              <ReadOnlyRow key={row.employeeId} row={row} />
             ),
           )}
         </ul>
@@ -1051,13 +1063,13 @@ export function LabourMarkingSheet({
         skipped={selectedIndexes.length - timedIndexes.length}
         onApply={(patch) => {
           for (const index of timedIndexes) {
-            const row = sheet.labourers[index];
+            const row = sheet.employees[index];
             if (row != null)
               apply(index, (draft) => withTimes(row, draft, patch));
           }
           const skipped = selectedIndexes.length - timedIndexes.length;
           setNotice(
-            `Times set for ${String(timedIndexes.length)} Labour${timedIndexes.length === 1 ? "" : "s"}${skipped > 0 ? `, ${String(skipped)} skipped` : ""}`,
+            `Times set for ${String(timedIndexes.length)} Employee${timedIndexes.length === 1 ? "" : "s"}${skipped > 0 ? `, ${String(skipped)} skipped` : ""}`,
           );
           setSettingTimes(false);
         }}
@@ -1071,7 +1083,9 @@ export function LabourMarkingSheet({
         rows={selectedSaved}
         onCleared={(count) => {
           setSelected(new Set());
-          onSaved(`Cleared ${String(count)} Labour${count === 1 ? "" : "s"}.`);
+          onSaved(
+            `Cleared ${String(count)} Employee${count === 1 ? "" : "s"}.`,
+          );
         }}
       />
     </form>

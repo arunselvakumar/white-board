@@ -47,13 +47,12 @@ import {
 import { CheckInLogSkeleton } from "./check-in-log-skeletons";
 import { VoidEntryDialog } from "./void-entry-dialog";
 
-const LOG_KINDS = ["all", "site-engineer", "labour", "vendor"] as const;
+const LOG_KINDS = ["all", "employee", "vendor"] as const;
 type LogKind = (typeof LOG_KINDS)[number];
 
 const KIND_TABS: { value: LogKind; label: string }[] = [
   { value: "all", label: "All" },
-  { value: "site-engineer", label: "Site Engineers" },
-  { value: "labour", label: "Labours" },
+  { value: "employee", label: "Employees" },
   { value: "vendor", label: "Vendors" },
 ];
 
@@ -298,7 +297,7 @@ function LogBody({
   const items = data.pages.flatMap((page) => page.items);
   const timeZone = first?.timeZone ?? "Asia/Kolkata";
   const canVoid = first?.canVoid ?? false;
-  const canVoidLabour = first?.canVoidLabour ?? false;
+  const canVoidEmployee = first?.canVoidEmployee ?? false;
   const today = first?.today ?? deviceToday();
   const total = first?.total ?? 0;
   const [photo, setPhoto] = useState<CheckInEntry | null>(null);
@@ -358,7 +357,7 @@ function LogBody({
                 key={entry.id}
                 entry={entry}
                 timeZone={timeZone}
-                canVoid={entry.kind === "labour" ? canVoidLabour : canVoid}
+                canVoid={entry.kind === "employee" ? canVoidEmployee : canVoid}
                 onOpenPhoto={() => {
                   setPhoto(entry);
                 }}

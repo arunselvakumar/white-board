@@ -22,8 +22,8 @@ export function CentralReportsWorkspaceTile() {
       <ItemContent>
         <ItemTitle>Central Reports</ItemTitle>
         <ItemDescription>
-          Labour attendance, Purchase Requests and Orders, material received and
-          transferred, and the Stock Register across your Projects and the
+          Employee attendance, Purchase Requests and Orders, material received
+          and transferred, and the Stock Register across your Projects and the
           Central Stores, as Excel and PDF.
         </ItemDescription>
       </ItemContent>

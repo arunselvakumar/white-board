@@ -15,7 +15,7 @@ import { Label } from "@repo/ui/components/label";
 import { cn } from "@repo/ui/lib/utils";
 
 import { DEFAULT_BREAK_MINUTES, endsNextDay } from "@/src/labour/domain/wages";
-import type { LabourSheetRow } from "@/src/queries/labour-attendance";
+import type { EmployeeSheetRow } from "@/src/queries/labour-attendance";
 
 import {
   breakOf,
@@ -23,11 +23,11 @@ import {
   timesIssues,
   timesSummary,
   workingHoursOf,
-  type LabourRowDraft,
+  type EmployeeRowDraft,
   type TimesField,
   type TimesIssues,
   type TimesPatch,
-} from "./labour-sheet-form";
+} from "./employee-sheet-form";
 
 /**
  * A phone opens its own time picker on tap, so below desktop the picker
@@ -52,15 +52,15 @@ function NextDay() {
 
 /**
  * The live preview of a row's times (ADR CM-0011): hours worked against the
- * Labour's working hours. A short day is only information; pay follows the
+ * Employee's working hours. A short day is only information; pay follows the
  * status.
  */
 function WorkedPreview({
   row,
   draft,
 }: {
-  row: LabourSheetRow;
-  draft: LabourRowDraft;
+  row: EmployeeSheetRow;
+  draft: EmployeeRowDraft;
 }) {
   const summary = timesSummary(row, draft);
   if (summary == null) {
@@ -94,7 +94,10 @@ function WorkedPreview({
  * them yet (ADR CM-0043). Typing other times and saving stops the log from
  * changing that day's times.
  */
-function followsCheckIn(row: LabourSheetRow, draft: LabourRowDraft): boolean {
+function followsCheckIn(
+  row: EmployeeSheetRow,
+  draft: EmployeeRowDraft,
+): boolean {
   const saved = row.attendance;
   return (
     saved?.timesFromCheckIn === true &&
@@ -116,8 +119,8 @@ export function RowTimes({
   serverError,
   onChange,
 }: {
-  row: LabourSheetRow;
-  draft: LabourRowDraft;
+  row: EmployeeSheetRow;
+  draft: EmployeeRowDraft;
   /** A server error on one of these fields (`details.field`). */
   serverError: { field: TimesField; message: string } | undefined;
   onChange: (patch: TimesPatch) => void;
@@ -125,7 +128,7 @@ export function RowTimes({
   const issues: TimesIssues = timesIssues(draft);
   if (serverError != null && issues[serverError.field] == null)
     issues[serverError.field] = serverError.message;
-  const id = (field: TimesField) => `times-${row.labourId}-${field}`;
+  const id = (field: TimesField) => `times-${row.employeeId}-${field}`;
   const nextDay =
     draft.checkIn !== "" &&
     draft.checkOut !== "" &&
@@ -239,15 +242,15 @@ export function RowTimes({
   );
 }
 
-/** The Labour's working hours, for the row's subtitle. */
-export function workingDayLabel(row: LabourSheetRow): string {
+/** The Employee's working hours, for the row's subtitle. */
+export function workingDayLabel(row: EmployeeSheetRow): string {
   return `${workingHoursOf(row)} h day`;
 }
 
 /**
  * "Set times" for the selected rows: In, Out and Break applied to those
  * marked Present or Half Day. A blank time leaves each row's own, so a
- * supervisor can set everyone's check-in in the morning and their
+ * site lead can set everyone's check-in in the morning and their
  * check-out in the evening.
  */
 export function SetTimesDialog({
@@ -287,8 +290,8 @@ export function SetTimesDialog({
     checkIn === "" &&
     checkOut === "" &&
     ["", String(DEFAULT_BREAK_MINUTES)].includes(breakMinutes.trim());
-  const labours = (count: number) =>
-    `${String(count)} Labour${count === 1 ? "" : "s"}`;
+  const employees = (count: number) =>
+    `${String(count)} Employee${count === 1 ? "" : "s"}`;
 
   return (
     <Dialog
@@ -307,8 +310,8 @@ export function SetTimesDialog({
           <DialogTitle>Set times</DialogTitle>
           <DialogDescription>
             {eligible === 0
-              ? "None of the selected Labours is marked Present or Half Day. Mark them first."
-              : `For ${labours(eligible)} marked Present or Half Day. A blank time keeps what each row has.`}
+              ? "None of the selected Employees is marked Present or Half Day. Mark them first."
+              : `For ${employees(eligible)} marked Present or Half Day. A blank time keeps what each row has.`}
           </DialogDescription>
         </DialogHeader>
         <form
@@ -389,7 +392,7 @@ export function SetTimesDialog({
           )}
           {skipped > 0 ? (
             <p className="text-muted-foreground col-span-3 text-sm">
-              {labours(skipped)} selected {skipped === 1 ? "is" : "are"} not
+              {employees(skipped)} selected {skipped === 1 ? "is" : "are"} not
               Present or Half Day and will be skipped.
             </p>
           ) : null}
@@ -411,7 +414,7 @@ export function SetTimesDialog({
               eligible === 0 || nothing || Object.keys(issues).length > 0
             }
           >
-            Set times for {labours(eligible)}
+            Set times for {employees(eligible)}
           </Button>
         </DialogFooter>
       </DialogContent>

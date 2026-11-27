@@ -40,12 +40,12 @@ const schema = z.object({
 type Values = z.infer<typeof schema>;
 
 export const VOID_EXPLAINED = "The entry stays in the log, struck out.";
-export const VOID_LABOUR_DAY =
-  "A Labour's day is worked out again from the entries left.";
+export const VOID_EMPLOYEE_DAY =
+  "An Employee's day is worked out again from the entries left.";
 
 /**
  * Void a wrong check-in entry with a reason (ADR CM-0043 §2, §8). Entries
- * are never edited; a Labour's day follows the entries left.
+ * are never edited; an Employee's day follows the entries left.
  */
 export function VoidEntryDialog({
   projectId,
@@ -116,7 +116,7 @@ export function VoidEntryDialog({
                 ? null
                 : `${entry.personName} · ${ACTION_LABELS[entry.action]} ${formatTime(entry.at, timeZone)}. `}
               {VOID_EXPLAINED}
-              {entry?.kind === "labour" ? ` ${VOID_LABOUR_DAY}` : null}
+              {entry?.kind === "employee" ? ` ${VOID_EMPLOYEE_DAY}` : null}
             </DialogDescription>
           </DialogHeader>
           <div className="min-w-0 space-y-1.5">

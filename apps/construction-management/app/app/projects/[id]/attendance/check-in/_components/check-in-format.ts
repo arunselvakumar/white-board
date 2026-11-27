@@ -11,27 +11,21 @@ import { type AppHref, type HrefSuffix, pageHref } from "@/lib/page-href";
 
 export { formatTime };
 
-/** `site_engineer` in the API is `site-engineer` in the address. */
+/** A kind is its own segment in the address. */
 export const KIND_SEGMENTS: Record<CheckInKind, string> = {
-  labour: "labour",
-  site_engineer: "site-engineer",
+  employee: "employee",
   vendor: "vendor",
 };
 
-/** The three groups, in the order the find screen lists them. */
-export const KIND_ORDER: readonly CheckInKind[] = [
-  "site_engineer",
-  "labour",
-  "vendor",
-];
+/** The groups, in the order the find screen lists them. */
+export const KIND_ORDER: readonly CheckInKind[] = ["employee", "vendor"];
 
 export function kindFromSegment(segment: string): CheckInKind | null {
   return KIND_ORDER.find((kind) => KIND_SEGMENTS[kind] === segment) ?? null;
 }
 
 export const KIND_PLURALS: Record<CheckInKind, string> = {
-  site_engineer: "Site Engineers",
-  labour: "Labours",
+  employee: "Employees",
   vendor: "Vendors",
 };
 

@@ -51,9 +51,9 @@ import {
 } from "@/app/app/_components/payments/payment-format";
 import { PAYMENT_COLUMNS, PaymentRowsSkeleton } from "./payments-skeletons";
 
-const TYPES: FilterTab<"all" | "labour" | "vendor">[] = [
+const TYPES: FilterTab<"all" | "employee" | "vendor">[] = [
   { value: "all", label: "All", icon: LayoutGrid },
-  { value: "labour", label: "Labour", icon: Shovel },
+  { value: "employee", label: "Employee", icon: Shovel },
   { value: "vendor", label: "Vendor", icon: Handshake },
 ];
 
@@ -194,7 +194,7 @@ function PaymentRows({
         description={
           filtered
             ? "Try another type, kind or date range."
-            : "Pay a Labour or a Vendor from the Labour or Vendor tab; their payments list here."
+            : "Pay an Employee or a Vendor from the Employee or Vendor tab; their payments list here."
         }
       />
     );
@@ -232,7 +232,7 @@ function PaymentRows({
                 <TableCell>
                   <p className="font-medium">{payment.partyName}</p>
                   <p className="text-muted-foreground text-xs">
-                    {payment.partyType === "labour" ? "Labour" : "Vendor"}
+                    {payment.partyType === "employee" ? "Employee" : "Vendor"}
                     {payment.remarks != null && ` · ${payment.remarks}`}
                   </p>
                 </TableCell>

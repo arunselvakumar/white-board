@@ -26,7 +26,7 @@ export const COMPANY_DASHBOARD_COLUMNS: readonly {
   { header: "Progress", className: "w-[16%]" },
   { header: "Approvals", className: "text-right" },
   { header: "Pending issues", className: "text-right" },
-  { header: "Labour today", className: "text-right" },
+  { header: "Employees today", className: "text-right" },
 ];
 
 const TOTAL_LABELS = [
@@ -34,12 +34,12 @@ const TOTAL_LABELS = [
   "Approvals waiting",
   "Pending Issues & Snags",
   "Pending Inspections",
-  "Labours present today",
+  "Employees present today",
   // Amount due shows only with Payments Read, so its label waits for data.
   undefined,
 ];
 
-const CARD_FIGURES = ["Approvals", "Pending issues", "Labour today", "Due"];
+const CARD_FIGURES = ["Approvals", "Pending issues", "Employees today", "Due"];
 const NAME_WIDTHS = ["62%", "48%", "70%"];
 
 function ProgressBarSkeleton() {

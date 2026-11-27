@@ -108,12 +108,12 @@ function totalsOf(data: Dashboard): Total[] {
           : "Waiting for a decision",
     },
     {
-      key: "labour",
-      label: "Labours present today",
+      key: "employees",
+      label: "Employees present today",
       icon: HardHat,
-      value: totals.labourToday,
+      value: totals.employeesToday,
       caption:
-        totals.labourToday == null
+        totals.employeesToday == null
           ? without("Attendance read")
           : `On ${formatCalendarDate(data.today)}`,
     },
@@ -228,7 +228,7 @@ function ProjectsTable({ data }: { data: Dashboard }) {
             <td className={NUMBER}>
               <Issues row={row} />
             </td>
-            <td className={NUMBER}>{figure(row.labourToday)}</td>
+            <td className={NUMBER}>{figure(row.employeesToday)}</td>
             {data.financial ? (
               <td className={cn(NUMBER, "font-medium")}>
                 <Due paise={row.due} />
@@ -277,8 +277,8 @@ function ProjectCards({ data }: { data: Dashboard }) {
               <CardFigure label="Pending issues">
                 <Issues row={row} />
               </CardFigure>
-              <CardFigure label="Labour today">
-                {figure(row.labourToday)}
+              <CardFigure label="Employees today">
+                {figure(row.employeesToday)}
               </CardFigure>
               {data.financial ? (
                 <CardFigure label="Due">
@@ -299,7 +299,7 @@ function NoProjects() {
       icon={FolderSimpleIcon}
       tone="blue"
       title="No Projects to show"
-      description="The Projects you are on show here with their approvals, issues, labour on site and amounts due."
+      description="The Projects you are on show here with their approvals, issues, Employees on site and amounts due."
       className="bg-card border"
       actions={
         <Link

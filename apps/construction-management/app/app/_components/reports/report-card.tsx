@@ -107,7 +107,7 @@ const LEDGER_EXTRAS: {
       { value: "contractor", label: "Contractor" },
       { value: "supplier", label: "Supplier" },
       { value: "other_party", label: "Other Party" },
-      { value: "labour", label: "Labour" },
+      { value: "employee", label: "Employee" },
       { value: "vendor", label: "Vendor" },
       { value: "team_member", label: "Team Member" },
     ],

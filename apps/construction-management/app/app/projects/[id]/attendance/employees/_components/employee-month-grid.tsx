@@ -19,15 +19,15 @@ import { cn } from "@repo/ui/lib/utils";
 
 import { formatPaise } from "@/components/money/money-input";
 import {
-  labourAttendanceMonthQuery,
-  type LabourAttendanceMonth,
+  employeeAttendanceMonthQuery,
+  type EmployeeAttendanceMonth,
 } from "@/src/queries/labour-attendance";
 import {
-  LABOUR_MONTH_TOTALS,
+  EMPLOYEE_MONTH_TOTALS,
   MonthGridSkeleton,
 } from "@/app/app/projects/[id]/attendance/_components/attendance-skeletons";
 
-type Totals = LabourAttendanceMonth["totals"];
+type Totals = EmployeeAttendanceMonth["totals"];
 
 const MONTH_LEGEND =
   "P Present · H Half Day · A Absent · L Leave · PL Paid Leave · HO Holiday · a number under the code is overtime hours.";
@@ -76,15 +76,15 @@ function TotalsCells({ totals }: { totals: Totals }) {
 
 function Grid({ projectId, month }: { projectId: string; month: string }) {
   const { data } = useSuspenseQuery(
-    labourAttendanceMonthQuery(projectId, month),
+    employeeAttendanceMonthQuery(projectId, month),
   );
-  if (data.labourers.length === 0)
+  if (data.employees.length === 0)
     return (
       <EmptyState
         className="bg-card border"
         icon={UsersThreeIcon}
         tone="violet"
-        title="No Labours on this Project in this month."
+        title="No Employees on this Project in this month."
       />
     );
   const counts = new Map(data.dayCounts.map((row) => [row.date, row]));
@@ -93,22 +93,22 @@ function Grid({ projectId, month }: { projectId: string; month: string }) {
       <p className="text-muted-foreground text-xs">{MONTH_LEGEND}</p>
       <div
         role="region"
-        aria-label="Labour attendance by day, scrolls sideways"
+        aria-label="Employee attendance by day, scrolls sideways"
         tabIndex={0}
         className={SCROLL}
       >
-        <Table aria-label="Labour attendance by day">
+        <Table aria-label="Employee attendance by day">
           <TableHeader>
             <TableRow>
               <TableHead className="bg-card sticky left-0 min-w-36">
-                Labour
+                Employee
               </TableHead>
               {data.dates.map((date) => (
                 <TableHead key={date} className="px-1 text-center tabular-nums">
                   {Number(date.slice(8))}
                 </TableHead>
               ))}
-              {LABOUR_MONTH_TOTALS.map((total) => (
+              {EMPLOYEE_MONTH_TOTALS.map((total) => (
                 <TableHead key={total} className="text-right">
                   {total}
                 </TableHead>
@@ -116,10 +116,10 @@ function Grid({ projectId, month }: { projectId: string; month: string }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.labourers.map((row) => {
+            {data.employees.map((row) => {
               const byDate = new Map(row.days.map((day) => [day.date, day]));
               return (
-                <TableRow key={row.labourId} aria-label={row.name}>
+                <TableRow key={row.employeeId} aria-label={row.name}>
                   <TableHead
                     scope="row"
                     className="bg-card sticky left-0 font-medium"
@@ -189,8 +189,8 @@ function Grid({ projectId, month }: { projectId: string; month: string }) {
   );
 }
 
-/** Labourer × day codes with totals per labourer. */
-export function LabourMonthGrid({
+/** Employee × day codes with totals per Employee. */
+export function EmployeeMonthGrid({
   projectId,
   initialMonth,
 }: {
@@ -202,9 +202,9 @@ export function LabourMonthGrid({
   return (
     <div className="space-y-4">
       <div className="space-y-1.5">
-        <Label htmlFor="labour-attendance-month">Month</Label>
+        <Label htmlFor="employee-attendance-month">Month</Label>
         <Input
-          id="labour-attendance-month"
+          id="employee-attendance-month"
           type="month"
           className="h-10 w-44"
           value={month}
@@ -221,8 +221,8 @@ export function LabourMonthGrid({
             <MonthGridSkeleton
               label="Loading the month"
               month={shownMonth}
-              nameHeader="Labour"
-              totals={LABOUR_MONTH_TOTALS}
+              nameHeader="Employee"
+              totals={EMPLOYEE_MONTH_TOTALS}
               legend={MONTH_LEGEND}
             />
           }

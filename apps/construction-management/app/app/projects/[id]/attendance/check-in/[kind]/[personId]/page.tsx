@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "Check-In" };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-/** `[kind]` is `labour`, `site-engineer` or `vendor`; anything else is not found. */
+/** `[kind]` is `employee` or `vendor`; anything else is not found. */
 export default async function ProjectCheckInCapturePage({
   params,
 }: {

@@ -51,10 +51,9 @@ export const READ_ONLY_LINE =
 
 const GROUPS: Record<
   CheckInKind,
-  keyof Pick<CheckInPeople, "siteEngineers" | "labours" | "vendors">
+  keyof Pick<CheckInPeople, "employees" | "vendors">
 > = {
-  site_engineer: "siteEngineers",
-  labour: "labours",
+  employee: "employees",
   vendor: "vendors",
 };
 
@@ -371,7 +370,7 @@ function People({
 
 /**
  * Check-In, find a person (ADR CM-0043 §7): one large search box, then the
- * Project's Site Engineers, Labours and Vendors with where each stands
+ * Project's Employees and Vendors with where each stands
  * today. The typed text is kept in the address (`?q=`), so Back from the
  * capture screen finds it again.
  */

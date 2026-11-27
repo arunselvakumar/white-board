@@ -30,17 +30,17 @@ import { formatPaise } from "@/components/money/money-input";
 import { endsNextDay } from "@/src/labour/domain/wages";
 import { QueryHttpError } from "@/src/queries/http";
 import {
-  labourAttendanceListQuery,
-  labourSheetQuery,
-  useSetLabourPaidLeave,
-  type LabourAttendanceDay,
-  type LabourAttendanceListFilter,
+  employeeAttendanceListQuery,
+  employeeSheetQuery,
+  useSetEmployeePaidLeave,
+  type EmployeeAttendanceDay,
+  type EmployeeAttendanceListFilter,
 } from "@/src/queries/labour-attendance";
 
-import { STATUS_LABELS } from "./labour-sheet-form";
+import { STATUS_LABELS } from "./employee-sheet-form";
 import {
-  LABOUR_RECORDED_COLUMNS,
-  LabourRecordedSkeleton,
+  EMPLOYEE_RECORDED_COLUMNS,
+  EmployeeRecordedSkeleton,
 } from "@/app/app/projects/[id]/attendance/_components/attendance-skeletons";
 
 const ALL = "all";
@@ -92,8 +92,8 @@ function FilterSelect({
   );
 }
 
-function PaidLeaveButton({ day }: { day: LabourAttendanceDay }) {
-  const change = useSetLabourPaidLeave();
+function PaidLeaveButton({ day }: { day: EmployeeAttendanceDay }) {
+  const change = useSetEmployeePaidLeave();
   const [error, setError] = useState<string>();
   return (
     <div className="space-y-1">
@@ -129,14 +129,14 @@ function PaidLeaveButton({ day }: { day: LabourAttendanceDay }) {
   );
 }
 
-function statusText(day: LabourAttendanceDay): string {
+function statusText(day: EmployeeAttendanceDay): string {
   return day.status === "on_leave" && day.isPaidLeave
     ? "Paid Leave"
     : STATUS_LABELS[day.status];
 }
 
 /** A check-out on the next day (a night shift) carries "+1". */
-function CheckOut({ day }: { day: LabourAttendanceDay }) {
+function CheckOut({ day }: { day: EmployeeAttendanceDay }) {
   if (day.checkOut == null) return <>—</>;
   const nextDay = day.checkIn != null && endsNextDay(day.checkIn, day.checkOut);
   return (
@@ -159,7 +159,7 @@ function CheckOut({ day }: { day: LabourAttendanceDay }) {
 }
 
 /** "In 08:00 · Out 19:00 · Worked 10 h" for a phone card; null without times. */
-function TimesLine({ day }: { day: LabourAttendanceDay }) {
+function TimesLine({ day }: { day: EmployeeAttendanceDay }) {
   if (day.checkIn == null) return null;
   return (
     <p className="text-muted-foreground text-sm tabular-nums">
@@ -181,10 +181,10 @@ function Results({
   filter,
   onCursor,
 }: {
-  filter: LabourAttendanceListFilter;
-  onCursor: (cursor: LabourAttendanceListFilter["cursor"]) => void;
+  filter: EmployeeAttendanceListFilter;
+  onCursor: (cursor: EmployeeAttendanceListFilter["cursor"]) => void;
 }) {
-  const { data } = useSuspenseQuery(labourAttendanceListQuery(filter));
+  const { data } = useSuspenseQuery(employeeAttendanceListQuery(filter));
   if (data.items.length === 0)
     return (
       <EmptyState
@@ -201,7 +201,7 @@ function Results({
         {data.items.map((day) => (
           <li key={day.id} className="bg-card space-y-2 rounded-xl border p-3">
             <div className="flex justify-between gap-2">
-              <span className="font-medium">{day.labourName}</span>
+              <span className="font-medium">{day.employeeName}</span>
               <span className="text-muted-foreground text-sm">{day.date}</span>
             </div>
             <div className="flex flex-wrap items-center gap-2 text-sm">
@@ -222,10 +222,10 @@ function Results({
         ))}
       </ul>
       <div className="bg-card hidden rounded-lg border lg:block">
-        <Table aria-label="Recorded labour attendance">
+        <Table aria-label="Recorded Employee attendance">
           <TableHeader>
             <TableRow>
-              {LABOUR_RECORDED_COLUMNS.map((column, index) => (
+              {EMPLOYEE_RECORDED_COLUMNS.map((column, index) => (
                 <TableHead key={index} className={column.className}>
                   {column.header}
                 </TableHead>
@@ -236,14 +236,11 @@ function Results({
             {data.items.map((day) => (
               <TableRow key={day.id}>
                 <TableCell className="tabular-nums">{day.date}</TableCell>
-                <TableCell className="font-medium">{day.labourName}</TableCell>
+                <TableCell className="font-medium">
+                  {day.employeeName}
+                </TableCell>
                 <TableCell>{statusText(day)}</TableCell>
                 <TableCell>{day.shift ?? "—"}</TableCell>
-                <TableCell>
-                  {day.siteEngineers.length === 0
-                    ? "—"
-                    : day.siteEngineers.map((item) => item.name).join(", ")}
-                </TableCell>
                 <TableCell className="tabular-nums">
                   {day.checkIn ?? "—"}
                 </TableCell>
@@ -296,10 +293,10 @@ function Results({
 }
 
 /**
- * Recorded labour days of a Project with filters, with check-in, check-out
+ * Recorded Employee days of a Project with filters, with check-in, check-out
  * and hours worked.
  */
-export function LabourRecordedList({
+export function EmployeeRecordedList({
   projectId,
   initialFrom,
   initialTo,
@@ -310,22 +307,22 @@ export function LabourRecordedList({
 }) {
   const [from, setFrom] = useState(initialFrom);
   const [to, setTo] = useState(initialTo);
-  const [labourId, setLabourId] = useState(ALL);
+  const [employeeId, setEmployeeId] = useState(ALL);
   const [status, setStatus] = useState(ALL);
   const [cursor, setCursor] =
-    useState<LabourAttendanceListFilter["cursor"]>(null);
+    useState<EmployeeAttendanceListFilter["cursor"]>(null);
   const [paging, startTransition] = useTransition();
   // Typed dates and picked filters keep the old rows, dimmed, until the new
   // ones arrive.
   const shownFrom = useDeferredValue(from);
   const shownTo = useDeferredValue(to);
-  // Labourers on the Project, for the picker.
-  const options = useQuery(labourSheetQuery(projectId, initialTo));
-  const filter: LabourAttendanceListFilter = {
+  // Employees on the Project, for the picker.
+  const options = useQuery(employeeSheetQuery(projectId, initialTo));
+  const filter: EmployeeAttendanceListFilter = {
     projectId,
     from: shownFrom || undefined,
     to: shownTo || undefined,
-    labourId: labourId === ALL ? undefined : labourId,
+    employeeId: employeeId === ALL ? undefined : employeeId,
     status: status === ALL ? undefined : status,
     cursor,
   };
@@ -341,9 +338,9 @@ export function LabourRecordedList({
     <div className="space-y-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-end">
         <div className="space-y-1.5">
-          <Label htmlFor="labour-recorded-from">From</Label>
+          <Label htmlFor="employee-recorded-from">From</Label>
           <Input
-            id="labour-recorded-from"
+            id="employee-recorded-from"
             type="date"
             className="h-10 sm:w-44"
             value={from}
@@ -356,9 +353,9 @@ export function LabourRecordedList({
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="labour-recorded-to">To</Label>
+          <Label htmlFor="employee-recorded-to">To</Label>
           <Input
-            id="labour-recorded-to"
+            id="employee-recorded-to"
             type="date"
             className="h-10 sm:w-44"
             value={to}
@@ -369,16 +366,16 @@ export function LabourRecordedList({
           />
         </div>
         <FilterSelect
-          label="Labour"
-          value={labourId}
+          label="Employee"
+          value={employeeId}
           items={[
-            { value: ALL, label: "Every Labour" },
-            ...(options.data?.labourers ?? []).map((row) => ({
-              value: row.labourId,
+            { value: ALL, label: "Every Employee" },
+            ...(options.data?.employees ?? []).map((row) => ({
+              value: row.employeeId,
               label: row.name,
             })),
           ]}
-          onChange={reset(setLabourId)}
+          onChange={reset(setEmployeeId)}
         />
         <FilterSelect
           label="Status"
@@ -393,7 +390,7 @@ export function LabourRecordedList({
             "opacity-60 transition-opacity",
         )}
       >
-        <Suspense fallback={<LabourRecordedSkeleton />}>
+        <Suspense fallback={<EmployeeRecordedSkeleton />}>
           <Results
             filter={filter}
             onCursor={(next) => {

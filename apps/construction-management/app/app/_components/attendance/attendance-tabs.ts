@@ -6,7 +6,7 @@ import { type AppHref, pageHref } from "@/lib/page-href";
  */
 export const ATTENDANCE_TABS = [
   { segment: "check-in", label: "Check-In" },
-  { segment: "labour", label: "Labour" },
+  { segment: "employees", label: "Employees" },
   { segment: "vendors", label: "Vendor" },
 ] as const;
 
@@ -22,7 +22,8 @@ const ATTENDANCE_TAB_PAGES: Record<
 > = {
   "check-in": (id) =>
     pageHref("/app/projects/[id]/attendance/check-in", { id }),
-  labour: (id) => pageHref("/app/projects/[id]/attendance/labour", { id }),
+  employees: (id) =>
+    pageHref("/app/projects/[id]/attendance/employees", { id }),
   vendors: (id) => pageHref("/app/projects/[id]/attendance/vendors", { id }),
 };
 

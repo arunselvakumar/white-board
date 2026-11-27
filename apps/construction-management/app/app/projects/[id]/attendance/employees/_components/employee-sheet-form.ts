@@ -15,9 +15,9 @@ import {
 } from "@/src/labour/domain/wages";
 import type {
   AttendanceStatus,
-  LabourSheet,
-  LabourSheetRow,
-  MarkLabourDayInput,
+  EmployeeSheet,
+  EmployeeSheetRow,
+  MarkEmployeeDayInput,
 } from "@/src/queries/labour-attendance";
 
 /** The status buttons, in tap order. */
@@ -64,7 +64,7 @@ const overtimeLineSchema = z
   .object({
     labourCategoryId: z.string(),
     hours: z.string(),
-    /** Rupees; empty means the labourer's overtime wage. */
+    /** Rupees; empty means the Employee's overtime wage. */
     rate: z
       .string()
       .trim()
@@ -161,7 +161,7 @@ export function timesIssues(draft: TimesDraft): TimesIssues {
 
 const rowSchema = z
   .object({
-    labourId: z.string(),
+    employeeId: z.string(),
     status: z.enum(STATUS_VALUES),
     isPaidLeave: z.boolean(),
     shift: z.string(),
@@ -174,21 +174,21 @@ const rowSchema = z
     if (row.status === "absent" && row.overtime.length > 0)
       ctx.addIssue({
         code: "custom",
-        message: "An Absent Labour cannot have overtime.",
+        message: "An Absent Employee cannot have overtime.",
         path: ["overtime"],
       });
     for (const [field, message] of Object.entries(timesIssues(row)))
       ctx.addIssue({ code: "custom", message, path: [field] });
   });
 
-export const labourSheetFormSchema = z.object({ rows: z.array(rowSchema) });
+export const employeeSheetFormSchema = z.object({ rows: z.array(rowSchema) });
 
 export type OvertimeLineDraft = z.infer<typeof overtimeLineSchema>;
-export type LabourRowDraft = z.infer<typeof rowSchema>;
-export type LabourSheetFormValues = z.infer<typeof labourSheetFormSchema>;
+export type EmployeeRowDraft = z.infer<typeof rowSchema>;
+export type EmployeeSheetFormValues = z.infer<typeof employeeSheetFormSchema>;
 
-/** The Labour's working hours a day, decimal hours. */
-export function workingHoursOf(row: LabourSheetRow): string {
+/** The Employee's working hours a day, decimal hours. */
+export function workingHoursOf(row: EmployeeSheetRow): string {
   return row.workingHoursPerDay ?? DEFAULT_WORKING_HOURS;
 }
 
@@ -210,7 +210,7 @@ export type TimesSummary = {
  * wrong.
  */
 export function timesSummary(
-  row: LabourSheetRow,
+  row: EmployeeSheetRow,
   draft: TimesDraft,
 ): TimesSummary | null {
   if (!isTimedStatus(draft.status)) return null;
@@ -244,21 +244,21 @@ export function timesSummary(
  * Kept simple and predictable:
  *
  * - With extra time, the line marked `fromTimes` takes the new hours and
- *   keeps the category and rate the supervisor chose.
+ *   keeps the category and rate whoever marks chose.
  * - Without extra time (no check-out, a short day, wrong times), that line
  *   drops out.
- * - A new `fromTimes` line (the Labour's category and overtime wage) is only
+ * - A new `fromTimes` line (the Employee's category and overtime wage) is only
  *   added when the row has no overtime lines at all, so hours typed by hand
  *   are never counted twice. Editing the line's hours turns it into an
  *   ordinary line (see `OvertimeLines`), and removing it keeps it away until
  *   the times change again.
  *
  * This runs only when the times or status change, never on render, so a
- * removed line stays removed while the supervisor works on other fields.
+ * removed line stays removed while whoever marks works on other fields.
  */
 export function withTimesOvertime(
-  row: LabourSheetRow,
-  draft: LabourRowDraft,
+  row: EmployeeSheetRow,
+  draft: EmployeeRowDraft,
 ): OvertimeLineDraft[] {
   const extra = timesSummary(row, draft)?.extra ?? null;
   if (extra == null) return draft.overtime.filter((line) => !line.fromTimes);
@@ -271,7 +271,7 @@ export function withTimesOvertime(
 }
 
 export type TimesPatch = Partial<
-  Pick<LabourRowDraft, "checkIn" | "checkOut" | "breakMinutes">
+  Pick<EmployeeRowDraft, "checkIn" | "checkOut" | "breakMinutes">
 >;
 
 /**
@@ -279,10 +279,10 @@ export type TimesPatch = Partial<
  * break, and the `fromTimes` overtime line follows.
  */
 export function withTimes(
-  row: LabourSheetRow,
-  draft: LabourRowDraft,
+  row: EmployeeSheetRow,
+  draft: EmployeeRowDraft,
   patch: TimesPatch,
-): LabourRowDraft {
+): EmployeeRowDraft {
   const next = { ...draft, ...patch };
   if (
     next.checkIn.trim() !== "" &&
@@ -299,12 +299,12 @@ export function withTimes(
  * Holiday.
  */
 export function withStatus(
-  row: LabourSheetRow,
-  draft: LabourRowDraft,
+  row: EmployeeSheetRow,
+  draft: EmployeeRowDraft,
   status: AttendanceStatus,
-): LabourRowDraft {
+): EmployeeRowDraft {
   const timed = isTimedStatus(status);
-  const next: LabourRowDraft = {
+  const next: EmployeeRowDraft = {
     ...draft,
     status,
     isPaidLeave: status === "on_leave" ? draft.isPaidLeave : false,
@@ -318,9 +318,9 @@ export function withStatus(
 
 /** "Copy yesterday" for one row: status, Paid Leave, shift and times. */
 export function withYesterday(
-  row: LabourSheetRow,
-  draft: LabourRowDraft,
-): LabourRowDraft {
+  row: EmployeeSheetRow,
+  draft: EmployeeRowDraft,
+): EmployeeRowDraft {
   const yesterday = row.yesterday;
   if (yesterday == null) return draft;
   const next = {
@@ -338,11 +338,11 @@ export function withYesterday(
 }
 
 /** A row as the server has it (or unmarked), before any pre-fill. */
-export function savedDraft(row: LabourSheetRow): LabourRowDraft {
+export function savedDraft(row: EmployeeSheetRow): EmployeeRowDraft {
   const day = row.attendance;
   if (day == null)
     return {
-      labourId: row.labourId,
+      employeeId: row.employeeId,
       status: "",
       isPaidLeave: false,
       shift: "",
@@ -352,7 +352,7 @@ export function savedDraft(row: LabourSheetRow): LabourRowDraft {
       overtime: [],
     };
   return {
-    labourId: row.labourId,
+    employeeId: row.employeeId,
     status: day.status,
     isPaidLeave: day.isPaidLeave,
     shift: day.shift ?? "",
@@ -369,9 +369,11 @@ export function savedDraft(row: LabourSheetRow): LabourRowDraft {
 }
 
 /** The form's starting values: saved rows, and weekly holidays pre-filled Holiday. */
-export function labourSheetDefaults(sheet: LabourSheet): LabourSheetFormValues {
+export function employeeSheetDefaults(
+  sheet: EmployeeSheet,
+): EmployeeSheetFormValues {
   return {
-    rows: sheet.labourers.map((row) => {
+    rows: sheet.employees.map((row) => {
       const saved = savedDraft(row);
       if (row.attendance == null && row.canMark && row.isWeeklyHoliday)
         return { ...saved, status: "holiday" };
@@ -380,7 +382,7 @@ export function labourSheetDefaults(sheet: LabourSheet): LabourSheetFormValues {
   };
 }
 
-function normalised(row: LabourRowDraft) {
+function normalised(row: EmployeeRowDraft) {
   const timed = isTimedStatus(row.status);
   const checkIn = timed ? row.checkIn.trim() : "";
   return {
@@ -406,8 +408,8 @@ function normalised(row: LabourRowDraft) {
 
 /** Whether the row differs from what the server has (a marked status is needed to save). */
 export function isRowDirty(
-  row: LabourSheetRow,
-  draft: LabourRowDraft,
+  row: EmployeeSheetRow,
+  draft: EmployeeRowDraft,
 ): boolean {
   if (!row.canMark || draft.status === "") return false;
   return (
@@ -416,8 +418,8 @@ export function isRowDirty(
   );
 }
 
-/** A new overtime line: the Labour's category, empty hours, their OT wage. */
-export function newOvertimeLine(row: LabourSheetRow): OvertimeLineDraft {
+/** A new overtime line: the Employee's category, empty hours, their OT wage. */
+export function newOvertimeLine(row: EmployeeSheetRow): OvertimeLineDraft {
   return {
     labourCategoryId: row.labourCategory?.id ?? "",
     hours: "",
@@ -433,22 +435,22 @@ export function newOvertimeLine(row: LabourSheetRow): OvertimeLineDraft {
  * The save body: only dirty rows, each with its loaded `updatedAt` in
  * `expected` when it was already marked (the review rule for multi-row saves).
  */
-export function labourMarkPayload(
+export function employeeMarkPayload(
   projectId: string,
   date: string,
-  sheet: LabourSheet,
-  values: LabourSheetFormValues,
-): MarkLabourDayInput | null {
-  const marks: MarkLabourDayInput["marks"] = [];
+  sheet: EmployeeSheet,
+  values: EmployeeSheetFormValues,
+): MarkEmployeeDayInput | null {
+  const marks: MarkEmployeeDayInput["marks"] = [];
   const expected: Record<string, string> = {};
-  sheet.labourers.forEach((row, index) => {
+  sheet.employees.forEach((row, index) => {
     const draft = values.rows[index];
     if (draft == null || draft.status === "" || !isRowDirty(row, draft)) return;
     const timed = isTimedStatus(draft.status);
     const checkIn = timed ? draft.checkIn.trim() : "";
     const checkOut = timed ? draft.checkOut.trim() : "";
     marks.push({
-      labourId: row.labourId,
+      employeeId: row.employeeId,
       status: draft.status,
       ...(draft.status === "on_leave"
         ? { isPaidLeave: draft.isPaidLeave }
@@ -470,7 +472,7 @@ export function labourMarkPayload(
       })),
     });
     if (row.attendance != null)
-      expected[row.labourId] = row.attendance.updatedAt;
+      expected[row.employeeId] = row.attendance.updatedAt;
   });
   if (marks.length === 0) return null;
   return {
@@ -483,8 +485,8 @@ export function labourMarkPayload(
 
 /** Paise a draft day would earn, for the preview (null without wages). */
 export function previewEarned(
-  row: LabourSheetRow,
-  draft: LabourRowDraft,
+  row: EmployeeSheetRow,
+  draft: EmployeeRowDraft,
   date: string,
 ): number | null {
   if (draft.status === "") return null;

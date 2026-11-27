@@ -36,7 +36,7 @@ export const COUNTERPARTY_KIND_LABELS: Record<CounterpartyKindModel, string> = {
   contractor: "Contractor",
   supplier: "Supplier",
   other_party: "Other Party",
-  labour: "Labour",
+  employee: "Employee",
   vendor: "Vendor",
   team_member: "Team Member",
 };

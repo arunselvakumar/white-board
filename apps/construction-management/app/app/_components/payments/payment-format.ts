@@ -83,7 +83,7 @@ export function sourceLabel(line: StatementLine): string {
     return "Attendance changed";
   }
   switch (line.sourceType) {
-    case "labour_attendance":
+    case "employee_attendance":
     case "vendor_attendance":
       return line.kind === "overtime" ? "Overtime" : "Attendance";
     case "wage_payment":
@@ -94,6 +94,6 @@ export function sourceLabel(line: StatementLine): string {
 }
 
 export const PARTY_NOUNS = {
-  labour: { one: "Labour", many: "Labours", title: "Labour" },
+  employee: { one: "Employee", many: "Employees", title: "Employee" },
   vendor: { one: "Vendor", many: "Vendors", title: "Vendor" },
 } as const;

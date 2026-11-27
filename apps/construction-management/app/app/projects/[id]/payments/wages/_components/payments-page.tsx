@@ -27,15 +27,15 @@ import { PeriodSwitcher } from "./period-switcher";
 import { StatementSheet, type StatementTarget } from "./statement-sheet";
 import { BalancesSkeleton } from "./payments-skeletons";
 
-export type PaymentsTab = "labour" | "vendor" | "payments";
+export type PaymentsTab = "employee" | "vendor" | "payments";
 
 /**
- * A Project's Payments: Labour and Vendor balances for a period with Pay
+ * A Project's Payments: Employee and Vendor balances for a period with Pay
  * and the statement, and the list of recorded payments.
  */
 export function PaymentsPage({
   projectId,
-  initialTab = "labour",
+  initialTab = "employee",
   today,
 }: {
   projectId: string;
@@ -52,9 +52,9 @@ export function PaymentsPage({
   return (
     <Tabs defaultValue={initialTab} className="gap-4">
       <TabsList>
-        <TabsTrigger value="labour">
+        <TabsTrigger value="employee">
           <Shovel aria-hidden="true" />
-          Labour
+          Employee
         </TabsTrigger>
         <TabsTrigger value="vendor">
           <Handshake aria-hidden="true" />
@@ -65,7 +65,7 @@ export function PaymentsPage({
           Payments
         </TabsTrigger>
       </TabsList>
-      {(["labour", "vendor"] as const).map((partyType) => (
+      {(["employee", "vendor"] as const).map((partyType) => (
         <TabsContent key={partyType} value={partyType} className="space-y-4">
           <BalancesPanel
             projectId={projectId}
@@ -117,7 +117,7 @@ function BalancesPanel({
         <Suspense
           fallback={
             <BalancesSkeleton
-              noun={partyType === "labour" ? "Labours" : "Vendors"}
+              noun={partyType === "employee" ? "Employees" : "Vendors"}
             />
           }
         >
