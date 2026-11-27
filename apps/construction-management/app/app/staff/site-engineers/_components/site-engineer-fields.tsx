@@ -14,6 +14,7 @@ import {
 
 import { FieldError } from "@/components/auth/field-error";
 import { MobileField } from "@/components/auth/mobile-field";
+import { RoleAssignment } from "@/app/app/staff/_components/role-assignment";
 import { FormSection } from "@/components/forms/form-section";
 import { WageFields } from "@/app/app/staff/_components/wage-fields";
 import { STAFF_SALARY } from "@/app/app/staff/_components/wage-schema";
@@ -288,6 +289,8 @@ export function SiteEngineerFields({
           )}
         </div>
       </FormSection>
+
+      <RoleAssignment role="Site Engineer" />
 
       {signIn}
 

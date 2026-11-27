@@ -2,6 +2,7 @@
 
 - Status: accepted (2026-11-26, the owner asked for it)
 - Date: 2026-11-26
+- Amended by: [CM-0054](CM-0054-hr-default-roles.md) (default Roles under Human Resources)
 - Amends: [CM-0049](CM-0049-manage-departments.md) §6 (a department was linked to nothing)
 - Relates to: [CM-0030](CM-0030-users-and-roles.md) (Roles and the Permission Matrix)
 
@@ -13,7 +14,7 @@ Manage Departments (CM-0049) gave each Company a list of departments, Human Reso
 
 ### 1. A Role is under one Department, or none
 
-- `construction_organization.roles.department_id`, nullable, a foreign key to `departments`. Every existing Role starts under none; the default (seeded) Roles too.
+- `construction_organization.roles.department_id`, nullable, a foreign key to `departments`. Every existing Role starts under none; the default (seeded) Roles too (until [CM-0054](CM-0054-hr-default-roles.md) put Site Engineer, Labour and Vendor under Human Resources).
 - A Role has at most one Department. A Department has any number of Roles.
 - The Department does not change what a Role may do: access still comes only from its Permission Matrix.
 

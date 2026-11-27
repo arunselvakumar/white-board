@@ -296,7 +296,12 @@ describe("Manage Departments HTTP (ADR CM-0049)", () => {
 describe("the Manage Departments migration (ADR CM-0049)", () => {
   it("adds the system departments to a Company and the Departments cells to its Admin", async () => {
     const owner = await ownerWithCompany();
-    // As the Company stood before the release.
+    // As the Company stood before the release: no Role under a Department
+    // yet (the seeds since ADR CM-0054 are).
+    await prisma.constructionOrganizationRole.updateMany({
+      where: { workspaceId: owner.workspaceId },
+      data: { departmentId: null },
+    });
     await prisma.constructionOrganizationDepartment.deleteMany({
       where: { workspaceId: owner.workspaceId },
     });

@@ -38,8 +38,9 @@ export class PrismaNewCompanyStore implements NewCompanyStore {
           updatedBy: ownerId,
         },
       });
-      await insertRoles(tx, company.roles);
+      // Departments first: seed Roles may be under one (ADR CM-0054).
       await insertDepartments(tx, company.departments);
+      await insertRoles(tx, company.roles);
       await this.members.write(tx, company.ownerMember);
       await recordAudit(tx, {
         workspaceId: company.workspaceId,

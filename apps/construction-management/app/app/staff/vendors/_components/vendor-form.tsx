@@ -18,6 +18,7 @@ import {
   type PendingPhotoValue,
   type StaffFilesApi,
 } from "@/app/app/staff/_components/staff-files";
+import { RoleAssignment } from "@/app/app/staff/_components/role-assignment";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MobileField } from "@/components/auth/mobile-field";
@@ -230,6 +231,8 @@ function VendorForm({
           </div>
         </div>
       </section>
+
+      <RoleAssignment role="Vendor" />
 
       <FormAlert message={categories.error} />
       <RateCardEditor

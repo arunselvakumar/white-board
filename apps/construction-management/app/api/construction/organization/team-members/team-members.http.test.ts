@@ -181,7 +181,7 @@ describe("Team Members HTTP (CM-110)", () => {
           name,
           email: newEmail(),
           memberType: "normal",
-          roleId: owner.roleId("Site Supervisor"),
+          roleId: owner.roleId("Store Keeper"),
         }),
       );
     const first = await json<Page>(
@@ -568,7 +568,7 @@ describe("Team Members HTTP (CM-110)", () => {
       name: "Mobile Only",
       mobile: newMobile(),
       memberType: "normal",
-      roleId: owner.roleId("Site Supervisor"),
+      roleId: owner.roleId("Store Keeper"),
     };
     const invited = await create(jsonRequest(BASE, owner.cookie, body));
     expect(invited.status).toBe(StatusCodes.BAD_REQUEST);
@@ -638,7 +638,7 @@ describe("Team Members HTTP, SMS on (ADR CM-0009)", () => {
           name: "Mobile Only",
           mobile: newMobile(),
           memberType: "normal",
-          roleId: owner.roleId("Site Supervisor"),
+          roleId: owner.roleId("Store Keeper"),
         }),
       ),
     );

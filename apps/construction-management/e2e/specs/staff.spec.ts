@@ -79,7 +79,7 @@ staffPageTest.describe("Staff", () => {
       });
       // One page: Details, Salary, Role and Sign-in together.
       await addStaffPage.workingHoursField.fill("9");
-      await addStaffPage.chooseRole("Site Supervisor");
+      await addStaffPage.chooseRole("Store Keeper");
       await addStaffPage.button("Add Staff").click();
       await expect(
         addStaffPage.heading(`${name} can sign in now`),
@@ -88,7 +88,7 @@ staffPageTest.describe("Staff", () => {
       await staffPage.goto();
       const row = staffPage.user(name);
       await expect(row).toContainText("Active");
-      await expect(row).toContainText("Site Supervisor");
+      await expect(row).toContainText("Store Keeper");
 
       await row.getByRole("link", { name }).click();
       const editStaffPage = new EditStaffPage(page);

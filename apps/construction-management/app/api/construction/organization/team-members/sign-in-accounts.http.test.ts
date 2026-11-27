@@ -57,7 +57,7 @@ function addUser(
     jsonRequest(BASE, owner.cookie, {
       name: "Murugan Pillai",
       memberType: "normal",
-      roleId: owner.roleId("Site Supervisor"),
+      roleId: owner.roleId("Store Keeper"),
       ...fields,
     }),
   );
@@ -86,7 +86,7 @@ describe("Add User: invite, set a password, or a record (ADR CM-0030 §6)", () =
     expect(member).toMatchObject({
       status: "active",
       passwordIgnored: null,
-      role: { name: "Site Supervisor" },
+      role: { name: "Store Keeper" },
       canSetPassword: true,
     });
     const user = await prisma.identityUser.findUniqueOrThrow({

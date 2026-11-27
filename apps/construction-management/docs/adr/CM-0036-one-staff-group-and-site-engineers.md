@@ -37,7 +37,7 @@ Labels, headings, filters, placeholders, empty states, error messages, report an
 
 The code, the API paths (`/api/construction/masters/supervisors`), the Prisma model `ConstructionMastersSupervisor`, the `supervisors` table and `supervisor_id` columns, and audit actions (`supervisor.created`, …) keep **supervisor**. Renaming them needs a migration and touches about 550 references for no change a user sees. A later ADR can do it on its own.
 
-The seeded **Site Supervisor** Role is a different thing (a Role, not this list) and keeps its name. A **Site Engineer** Role already exists among the seeds, so renaming it would make two Roles with one name.
+The seeded **Site Supervisor** Role is a different thing (a Role, not this list) and keeps its name (removed later by [CM-0054](CM-0054-hr-default-roles.md)). A **Site Engineer** Role already exists among the seeds, so renaming it would make two Roles with one name.
 
 ## Consequences
 
