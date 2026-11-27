@@ -296,7 +296,7 @@ const FULL = [
   ["added", day(-40)],
 ];
 
-describe("Labour Activity (ADR CM-0038)", () => {
+describe("Employee Activity (ADR CM-0038, CM-0055)", () => {
   it("shows every entry kind on its effective date, newest first, with no amounts", async () => {
     const company = await ownerWithCompany();
     const { sky, green, employeeId } = await history(company);
@@ -520,7 +520,7 @@ describe("Labour Activity (ADR CM-0038)", () => {
     const hidden = await read(other.cookie, employeeId);
     expect(hidden.status).toBe(StatusCodes.NOT_FOUND);
     expect((await json<{ code: string }>(hidden)).code).toBe(
-      "LABOUR_NOT_FOUND",
+      "EMPLOYEE_NOT_FOUND",
     );
     expect((await read(company.cookie, newId())).status).toBe(
       StatusCodes.NOT_FOUND,
@@ -598,7 +598,7 @@ describe("Labour Activity (ADR CM-0038)", () => {
       doc.paths["/api/construction/labour/employees/{id}/activity"]?.["get"],
     ).toBeDefined();
     expect(
-      doc.components.schemas["ListConstructionLabourLabourActivityResponse"],
+      doc.components.schemas["ListConstructionLabourEmployeeActivityResponse"],
     ).toBeDefined();
   });
 });

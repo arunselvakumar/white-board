@@ -7,7 +7,8 @@ import { POST as removeEmployee } from "@/app/api/construction/projects/projects
 import { POST as addEmployees } from "@/app/api/construction/projects/projects/[id]/resources/employees/route";
 import { addDays, todayIn } from "@/src/shared-kernel/calendar-date";
 import { addProject, jsonRequest, ownerWithCompany } from "@/test/companies";
-import { TEST_ORIGIN } from "@/test/sessions";
+import { seededRoleId } from "@/test/employees";
+import { TEST_ORIGIN, newMobile } from "@/test/sessions";
 
 import { GET as getProjectActivity } from "./route";
 
@@ -17,12 +18,12 @@ const day = (offset: number) => addDays(TODAY, offset);
 
 type Company = Awaited<ReturnType<typeof ownerWithCompany>>;
 
-type Named = { id: string | null; name: string };
+type Named = { id: string; name: string; role: string | null };
 type ProjectEntry = {
   kind: string;
   date: string;
   remark?: string | null;
-  employees?: (Named & { role: string | null })[];
+  employees?: Named[];
 };
 type EmployeeEntry = {
   kind: string;
@@ -39,18 +40,23 @@ async function ok<T>(response: Response, status: number = StatusCodes.OK) {
   return (body === "" ? undefined : JSON.parse(body)) as T;
 }
 
-async function employee(company: Company, name: string, role: string) {
+async function employee(
+  company: Company,
+  name: string,
+  extra: Record<string, unknown> = {},
+) {
   const created = await ok<{ id: string }>(
     await createEmployee(
       jsonRequest(`${API}/labour/employees`, company.cookie, {
         name,
-        roleId: company.roleId(role),
+        roleId: await seededRoleId(company.workspaceId),
         joiningDate: day(-40),
         wageType: "daily",
         wagePerDay: 70_000,
         overtimeWagePerHour: 10_000,
         weeklyHolidays: [],
         projectIds: [],
+        ...extra,
       }),
     ),
     StatusCodes.CREATED,
@@ -79,9 +85,10 @@ function employeeFeed(company: Company, employeeId: string) {
 }
 
 /**
- * The Teams saves (ADR CM-0038 §2, §3, CM-0055 §5) and the feeds that read
+ * The Teams saves (ADR CM-0038 §2, CM-0055 §5) and the feeds that read
  * their history (§1), end to end: one Add Employees save is one Project
- * entry, whatever the Employees' Roles, and a removal sits on its Last day.
+ * entry, a removal sits on its Last day, and an Employee who signs in shows
+ * once, as an Employee.
  */
 describe("Project staffing in the Activity feeds", () => {
   it("shows Teams' adds and removes in the Project and Employee feeds", async () => {
@@ -91,9 +98,18 @@ describe("Project staffing in the Activity feeds", () => {
       company.userId,
       "Sky Towers",
     );
-    const [ravi, karthik] = await Promise.all([
-      employee(company, "Ravi", "Labour"),
-      employee(company, "Karthik", "Site Engineer"),
+    const engineerRole = await seededRoleId(
+      company.workspaceId,
+      "Site Engineer",
+    );
+    const [ravi, selvi, karthik] = await Promise.all([
+      employee(company, "Ravi"),
+      employee(company, "Selvi"),
+      employee(company, "Karthik", {
+        roleId: engineerRole,
+        mobile: newMobile(),
+        signIn: { canSignIn: true, password: "first-pass-1234" },
+      }),
     ]);
     const params = { params: Promise.resolve({ id: sky }) };
 
@@ -102,7 +118,11 @@ describe("Project staffing in the Activity feeds", () => {
         jsonRequest(
           `${API}/projects/projects/${sky}/resources/employees`,
           company.cookie,
-          { employeeIds: [ravi, karthik], from: day(-10), remark: "Slab work" },
+          {
+            employeeIds: [ravi, selvi, karthik],
+            from: day(-10),
+            remark: "Slab work",
+          },
         ),
         params,
       ),
@@ -111,11 +131,11 @@ describe("Project staffing in the Activity feeds", () => {
     await ok(
       await removeEmployee(
         jsonRequest(
-          `${API}/projects/projects/${sky}/resources/employees/${karthik}/remove`,
+          `${API}/projects/projects/${sky}/resources/employees/${selvi}/remove`,
           company.cookie,
           { lastDay: day(-2), remark: "Slab done" },
         ),
-        { params: Promise.resolve({ id: sky, employeeId: karthik }) },
+        { params: Promise.resolve({ id: sky, employeeId: selvi }) },
       ),
       StatusCodes.NO_CONTENT,
     );
@@ -126,23 +146,25 @@ describe("Project staffing in the Activity feeds", () => {
     const summary = project.items.map((entry) => [
       entry.kind,
       entry.date,
-      ...(entry.employees
-        ?.map((person) => `${person.name} (${person.role ?? "-"})`)
-        .sort() ?? []),
+      ...(entry.employees?.map((person) => person.name).sort() ?? []),
     ]);
     expect(summary).toEqual([
-      ["employee_removed", day(-2), "Karthik (Site Engineer)"],
-      ["employee_added", day(-10), "Karthik (Site Engineer)", "Ravi (Labour)"],
+      ["employee_removed", day(-2), "Selvi"],
+      ["employee_added", day(-10), "Karthik", "Ravi", "Selvi"],
     ]);
+    const added = project.items.find(
+      (entry) => entry.kind === "employee_added",
+    );
+    expect(added?.remark).toBe("Slab work");
     expect(
-      project.items.find((entry) => entry.kind === "employee_added")?.remark,
-    ).toBe("Slab work");
+      added?.employees?.find((person) => person.id === karthik)?.role,
+    ).toBe("Site Engineer");
 
-    const karthikFeed = await ok<{ items: EmployeeEntry[] }>(
-      await employeeFeed(company, karthik),
+    const selviFeed = await ok<{ items: EmployeeEntry[] }>(
+      await employeeFeed(company, selvi),
     );
     expect(
-      karthikFeed.items.map((entry) => [
+      selviFeed.items.map((entry) => [
         entry.kind,
         entry.date,
         entry.project?.name,

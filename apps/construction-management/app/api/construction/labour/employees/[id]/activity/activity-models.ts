@@ -2,14 +2,12 @@ import { z } from "zod";
 
 import {
   DATES_IN_ORDER,
-  activityEntryBase as base,
+  activityCalendarDate as calendarDate,
   activityProject as project,
-  activityRemark as remark,
-  checkInActivityEntry,
+  checkInActivityFields,
   datesInOrder,
   personActivityQueryFields,
-  projectChangeActivityEntry,
-} from "@/app/api/_lib/person-activity-models";
+} from "@/app/api/construction/labour/_activity/activity-fields";
 import {
   LABOUR_ACTIVITY_TYPES,
   type ActivityPage,
@@ -30,6 +28,34 @@ const status = z
   .describe(
     "As on the attendance sheet: Present, Half Day, Absent, On Leave, Paid Leave (On Leave that is paid), Holiday.",
   );
+
+const base = {
+  /** Unique within the feed. */
+  id: z.string(),
+  /** The day it applies to: a removal's last day, a transfer's first day on the new Project. */
+  date: calendarDate,
+  recordedAt: z.iso.datetime(),
+  /** Who recorded it; a removed Team Member keeps their name. */
+  by: z.string().nullable(),
+};
+
+const remark = z.string().nullable();
+
+/** Added to or removed from a Project. */
+const projectChangeActivityEntry = z.object({
+  ...base,
+  kind: z.enum(["project_added", "project_removed"]),
+  project,
+  remark,
+});
+
+/** One Check In or Check Out. */
+const checkInActivityEntry = z.object({
+  ...base,
+  kind: z.literal("check_in"),
+  project,
+  ...checkInActivityFields,
+});
 
 export const ListConstructionLabourEmployeeActivityRequestModel = z
   .object({
