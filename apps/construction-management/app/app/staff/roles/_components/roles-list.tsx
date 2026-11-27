@@ -38,7 +38,7 @@ import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
 import { MasterListPageSkeleton } from "@/app/app/_components/masters/masters-skeletons";
 import { fieldForCode } from "@/lib/server-errors";
-import { ROLES_PATH, rolePath, staffCount } from "@/lib/staff-nav";
+import { ROLES_PATH, roleMembersLabel, rolePath } from "@/lib/staff-nav";
 import { QueryHttpError } from "@/src/queries/http";
 import {
   rolesQuery,
@@ -57,23 +57,27 @@ const byName = new Intl.Collator("en", { sensitivity: "base", numeric: true });
 /** Why a Role cannot be deleted yet, or null when it can. */
 function deleteBlockedReason(role: Role): string | null {
   if (role.isSeed) return "Default Roles cannot be deleted.";
-  if (role.userCount === 0) return null;
-  return `${staffCount(role.userCount)} on it. Move them to another Role first.`;
+  if (role.userCount === 0 && role.employeeCount === 0) return null;
+  return `${roleMembersLabel(role, " and ")} on it. Move them to another Role first.`;
 }
 
-/** The user count a ROLE_IN_USE refusal carries, when it does. */
-function userCountOf(error: unknown): number | null {
+/** Who a ROLE_IN_USE refusal says is on the Role, when it says. */
+function inUseOf(
+  error: unknown,
+): { userCount: number; employeeCount: number } | null {
   if (!(error instanceof QueryHttpError) || error.code !== "ROLE_IN_USE")
     return null;
   const details = error.details;
-  if (
-    typeof details === "object" &&
-    details != null &&
-    "userCount" in details &&
-    typeof details.userCount === "number"
-  )
-    return details.userCount;
-  return null;
+  if (typeof details !== "object" || details == null) return null;
+  const record = details as Record<string, unknown>;
+  const count = (key: string) => {
+    const value = record[key];
+    return typeof value === "number" ? value : 0;
+  };
+  return {
+    userCount: count("userCount"),
+    employeeCount: count("employeeCount"),
+  };
 }
 
 function AddRoleLink() {
@@ -126,11 +130,11 @@ function RoleRow({
         ) : null}
         {/* On a phone the count sits under the name. */}
         <p className="text-muted-foreground text-xs sm:hidden">
-          {staffCount(role.userCount)}
+          {roleMembersLabel(role)}
         </p>
       </div>
-      <p className="text-muted-foreground hidden w-24 shrink-0 text-right text-sm tabular-nums sm:block">
-        {staffCount(role.userCount)}
+      <p className="text-muted-foreground hidden w-40 shrink-0 text-right text-sm tabular-nums sm:block">
+        {roleMembersLabel(role)}
       </p>
       <DropdownMenu>
         <DropdownMenuTrigger
@@ -326,11 +330,11 @@ function RolesListContent({ actions }: { actions: RoleActions }) {
                   },
                   onError: (error) => {
                     // Someone was put on it after the list loaded.
-                    const count = userCountOf(error);
+                    const inUse = inUseOf(error);
                     setDeleteError(
-                      count == null
+                      inUse == null
                         ? fieldForCode(error, {}).message
-                        : `${staffCount(count)} on this Role now. Move them to another Role first.`,
+                        : `${roleMembersLabel(inUse, " and ")} on this Role now. Move them to another Role first.`,
                     );
                   },
                 });

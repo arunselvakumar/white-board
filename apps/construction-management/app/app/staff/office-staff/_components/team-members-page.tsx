@@ -207,7 +207,7 @@ function TeamMemberRows({
         description={
           filtered
             ? "Try another name or status."
-            : "Add your site engineers, store keepers and accountants. Invite them by email, or set a password so they sign in with their mobile."
+            : "Add your office staff, store keepers and accountants. Invite them by email, or set a password so they sign in with their mobile."
         }
         className="bg-card border"
         actions={

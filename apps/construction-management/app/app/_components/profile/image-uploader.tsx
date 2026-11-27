@@ -33,7 +33,7 @@ export function imageFileProblem(file: File, kind: ImageKind): string | null {
 
 /**
  * Preview, upload, replace and remove for one image (Company logo, My
- * Profile photo, a Labour's or Vendor's photo). With `camera`, Take photo
+ * Profile photo, an Employee's or Vendor's photo). With `camera`, Take photo
  * opens the device camera (a phone's, or a laptop's webcam) as another
  * way to set it. The file goes to our own route, never straight to
  * storage.

@@ -111,3 +111,22 @@ export function rolePath(id: string): AppHref {
 export function staffCount(count: number): string {
   return count === 1 ? "1 Staff member" : `${String(count)} Staff`;
 }
+
+/** "1 Employee", "3 Employees". */
+export function employeeCount(count: number): string {
+  return count === 1 ? "1 Employee" : `${String(count)} Employees`;
+}
+
+/**
+ * Who is on a Role (ADR CM-0055 §2): "3 Staff", "3 Staff · 12 Employees",
+ * "12 Employees"; "0 Staff" for nobody. `joiner` puts " and " in a
+ * sentence.
+ */
+export function roleMembersLabel(
+  counts: { userCount: number; employeeCount: number },
+  joiner = " · ",
+): string {
+  if (counts.employeeCount === 0) return staffCount(counts.userCount);
+  if (counts.userCount === 0) return employeeCount(counts.employeeCount);
+  return `${staffCount(counts.userCount)}${joiner}${employeeCount(counts.employeeCount)}`;
+}

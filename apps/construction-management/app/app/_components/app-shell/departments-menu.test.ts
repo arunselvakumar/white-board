@@ -45,8 +45,8 @@ describe("the Departments search (ADR CM-0046)", () => {
   });
 
   it("finds a screen under its department's name", () => {
-    expect(shown("lab")).toEqual([
-      { label: "Human Resources", rows: ["Labour"] },
+    expect(shown("employ")).toEqual([
+      { label: "Human Resources", rows: ["Employees"] },
     ]);
     expect(shown("dashboard")).toEqual([
       { label: "Human Resources", rows: ["Dashboard"] },

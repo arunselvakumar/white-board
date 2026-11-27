@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   activeStaffSection,
   employeePagePath,
+  roleMembersLabel,
   rolePath,
   staffPath,
   staffSections,
@@ -56,5 +57,22 @@ describe("staffSections", () => {
       activeStaffSection("/app/masters/labour-categories"),
     ).toBeUndefined();
     expect(activeStaffSection("/app/masters")).toBeUndefined();
+  });
+});
+
+describe("roleMembersLabel", () => {
+  it("counts Staff and Employees on a Role (ADR CM-0055 §2)", () => {
+    expect(roleMembersLabel({ userCount: 0, employeeCount: 0 })).toBe(
+      "0 Staff",
+    );
+    expect(roleMembersLabel({ userCount: 1, employeeCount: 0 })).toBe(
+      "1 Staff member",
+    );
+    expect(roleMembersLabel({ userCount: 0, employeeCount: 1 })).toBe(
+      "1 Employee",
+    );
+    expect(roleMembersLabel({ userCount: 2, employeeCount: 12 }, " and ")).toBe(
+      "2 Staff and 12 Employees",
+    );
   });
 });
