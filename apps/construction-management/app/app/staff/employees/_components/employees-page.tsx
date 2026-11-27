@@ -68,35 +68,33 @@ import { PageHeader } from "@/app/app/_components/app-shell/page-header";
 import { FormAlert } from "@/components/auth/form-alert";
 import { formatPaise } from "@/components/money/money-input";
 import { fieldForCode } from "@/lib/server-errors";
-import { LABOURS_PAGE_PATH } from "@/lib/staff-nav";
+import { EMPLOYEES_PATH, employeePagePath } from "@/lib/staff-nav";
+import { departmentsQuery } from "@/src/queries/departments";
 import {
-  labourExportUrl,
-  laboursQuery,
-  useLabourCommand,
-  type LabourListFilter,
-  type LabourResponse,
-} from "@/src/queries/labours";
+  employeeExportUrl,
+  employeesQuery,
+  useEmployeeCommand,
+  type EmployeeListFilter,
+  type EmployeeResponse,
+} from "@/src/queries/employees";
 import { lookupListQuery } from "@/src/queries/masters";
 import { projectOptionsQuery } from "@/src/queries/projects";
+import { rolesQuery } from "@/src/queries/roles";
 
 import { ImportDialog } from "./import-dialog";
-import { ProjectChips } from "./labour-projects";
+import { ProjectChips } from "./employee-projects";
 import { TransferDialog, type TransferTarget } from "./transfer-dialog";
 import { TransferHistorySheet } from "./transfer-history-sheet";
-import { LabourRowsSkeleton } from "./labours-skeletons";
-import type { AppHref } from "@/lib/page-href";
+import { EmployeeRowsSkeleton } from "./employees-skeletons";
+import { rolesUnder } from "./role-choices";
 
-const STATUS_FILTERS: FilterTab<LabourListFilter["status"]>[] = [
+const STATUS_FILTERS: FilterTab<EmployeeListFilter["status"]>[] = [
   { value: "all", label: "All", icon: LayoutGrid },
   { value: "active", label: "Active", icon: CircleDot },
   { value: "inactive", label: "Inactive", icon: CircleOff },
 ];
 
 const ALL = "all";
-
-function editPath(id: string): AppHref {
-  return `${LABOURS_PAGE_PATH}/${encodeURIComponent(id)}`;
-}
 
 function FilterSelect({
   label,
@@ -141,23 +139,34 @@ function FilterSelect({
   );
 }
 
-/** The Labours register by Project, with transfer and import. */
-export function LaboursPage() {
+/** The Employees register by Project, Department and Role, with transfer and import. */
+export function EmployeesPage() {
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<LabourListFilter["status"]>("all");
+  const [status, setStatus] = useState<EmployeeListFilter["status"]>("all");
   const [projectId, setProjectId] = useState<string | null>(null);
   const [categoryId, setCategoryId] = useState<string | null>(null);
-  const [cursor, setCursor] = useState<LabourListFilter["cursor"]>(null);
+  const [departmentId, setDepartmentId] = useState<string | null>(null);
+  const [roleId, setRoleId] = useState<string | null>(null);
+  const [cursor, setCursor] = useState<EmployeeListFilter["cursor"]>(null);
   const [importing, setImporting] = useState(false);
   const deferredSearch = useDeferredValue(search);
   const projects = useQuery(projectOptionsQuery);
   const categories = useQuery(lookupListQuery("labour-categories"));
+  const departments = useQuery(departmentsQuery);
+  const roles = useQuery(rolesQuery);
+  // With a Department chosen, Role offers only the Roles under it.
+  const roleItems =
+    departmentId == null
+      ? [...(roles.data ?? [])].sort((a, b) => a.name.localeCompare(b.name))
+      : rolesUnder(roles.data ?? [], departmentId);
 
   const filter = {
     search: deferredSearch,
     status,
     projectId,
     categoryId,
+    roleId,
+    departmentId,
   };
   // Filter and page changes keep the old rows on screen, dimmed (ADR-0047).
   const [isPending, startTransition] = useTransition();
@@ -171,9 +180,9 @@ export function LaboursPage() {
     };
 
   const addLink = (
-    <Link href={`${LABOURS_PAGE_PATH}/new`} className={buttonVariants()}>
+    <Link href={`${EMPLOYEES_PATH}/new`} className={buttonVariants()}>
       <Plus aria-hidden="true" />
-      Add Labour
+      Add Employee
     </Link>
   );
 
@@ -181,8 +190,8 @@ export function LaboursPage() {
     <div className="w-full p-6">
       <div className="w-full max-w-5xl space-y-6">
         <PageHeader
-          title="Labours"
-          meta="Your own Labours: wages, Projects and transfers."
+          title="Employees"
+          meta="Your own people on site: Role, wages, Projects and transfers."
           actions={
             <div className="flex flex-wrap gap-2">
               <Button
@@ -196,7 +205,7 @@ export function LaboursPage() {
                 Import
               </Button>
               <a
-                href={labourExportUrl(filter)}
+                href={employeeExportUrl(filter)}
                 download
                 className={buttonVariants({ variant: "outline" })}
               >
@@ -214,8 +223,8 @@ export function LaboursPage() {
             </InputGroupAddon>
             <InputGroupInput
               type="search"
-              aria-label="Search Labours"
-              placeholder="Search name, Labour Id or contact"
+              aria-label="Search Employees"
+              placeholder="Search name, Employee Id or mobile"
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value);
@@ -247,9 +256,37 @@ export function LaboursPage() {
             items={categories.data?.items ?? []}
             onChange={set(setCategoryId)}
           />
+          <FilterSelect
+            label="Department"
+            allLabel="All Departments"
+            value={departmentId}
+            items={departments.data?.items ?? []}
+            onChange={(next) => {
+              startTransition(() => {
+                setDepartmentId(next);
+                // A Role under another Department would match no one.
+                if (
+                  next != null &&
+                  roleId != null &&
+                  !rolesUnder(roles.data ?? [], next).some(
+                    (role) => role.id === roleId,
+                  )
+                )
+                  setRoleId(null);
+                setCursor(null);
+              });
+            }}
+          />
+          <FilterSelect
+            label="Role"
+            allLabel="All Roles"
+            value={roleId}
+            items={roleItems}
+            onChange={set(setRoleId)}
+          />
         </div>
-        <Suspense fallback={<LabourRowsSkeleton />}>
-          <LabourRows
+        <Suspense fallback={<EmployeeRowsSkeleton />}>
+          <EmployeeRows
             filter={{ ...filter, cursor }}
             onPage={(next) => {
               startTransition(() => {
@@ -287,47 +324,47 @@ const CONFIRM: Record<
   },
   delete: {
     title: (name) => `Delete ${name}?`,
-    body: "Only a Labour with no attendance and no payments can be deleted. Deactivate someone who has worked for you instead.",
+    body: "Only an Employee with no attendance and no payments can be deleted. Deactivate someone who has worked for you instead. Their sign-in, if any, goes too.",
     action: "Delete",
   },
 };
 
-function wageText(labour: LabourResponse): string {
-  if (labour.wageType === "daily")
-    return labour.wagePerDay == null
+function wageText(employee: EmployeeResponse): string {
+  if (employee.wageType === "daily")
+    return employee.wagePerDay == null
       ? "Daily"
-      : `${formatPaise(labour.wagePerDay)} / day`;
-  return labour.wagePerMonth == null
+      : `${formatPaise(employee.wagePerDay)} / day`;
+  return employee.wagePerMonth == null
     ? "Monthly"
-    : `${formatPaise(labour.wagePerMonth)} / month`;
+    : `${formatPaise(employee.wagePerMonth)} / month`;
 }
 
-function LabourRows({
+function EmployeeRows({
   filter,
   onPage,
   addLink,
   onImport,
   className,
 }: {
-  filter: LabourListFilter;
-  onPage: (cursor: LabourListFilter["cursor"]) => void;
+  filter: EmployeeListFilter;
+  onPage: (cursor: EmployeeListFilter["cursor"]) => void;
   addLink: ReactNode;
   onImport: () => void;
   className?: string;
 }) {
-  const { data } = useSuspenseQuery(laboursQuery(filter));
-  const command = useLabourCommand();
+  const { data } = useSuspenseQuery(employeesQuery(filter));
+  const command = useEmployeeCommand();
   const [selected, setSelected] = useState<Map<string, TransferTarget>>(
     new Map(),
   );
   const [transferring, setTransferring] = useState<TransferTarget[] | null>(
     null,
   );
-  const [history, setHistory] = useState<LabourResponse | null>(null);
+  const [history, setHistory] = useState<EmployeeResponse | null>(null);
   // Kept after the dialog closes so its text stays while it animates out.
   const [pending, setPending] = useState<{
     kind: ConfirmKind;
-    labour: LabourResponse;
+    employee: EmployeeResponse;
   } | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [error, setError] = useState<string | undefined>();
@@ -336,17 +373,19 @@ function LabourRows({
     filter.search.trim().length > 0 ||
     filter.status !== "all" ||
     filter.projectId != null ||
-    filter.categoryId != null;
+    filter.categoryId != null ||
+    filter.departmentId != null ||
+    filter.roleId != null;
   if (data.items.length === 0)
     return (
       <EmptyState
         icon={filtered ? MagnifyingGlassIcon : UsersThreeIcon}
         tone={filtered ? "neutral" : "violet"}
-        title={filtered ? "No Labours match" : "No Labours yet"}
+        title={filtered ? "No Employees match" : "No Employees yet"}
         description={
           filtered
-            ? "Try another name, status, Project, category or Site Engineer."
-            : "Add the Labours on your own roll with their wage and Projects, or import them from Excel."
+            ? "Try another name, status, Project, category, Department or Role."
+            : "Add the people on your own roll with their Role and wage, or import them from Excel."
         }
         className="bg-card border"
         actions={
@@ -366,11 +405,11 @@ function LabourRows({
   const showBalance = data.items.some((item) => item.balance != null);
   const pageIds = data.items.map((item) => item.id);
   const allSelected = pageIds.every((id) => selected.has(id));
-  const toggle = (labour: LabourResponse, on: boolean) => {
+  const toggle = (employee: EmployeeResponse, on: boolean) => {
     setSelected((current) => {
       const next = new Map(current);
-      if (on) next.set(labour.id, labour);
-      else next.delete(labour.id);
+      if (on) next.set(employee.id, employee);
+      else next.delete(employee.id);
       return next;
     });
   };
@@ -380,7 +419,7 @@ function LabourRows({
     <div className={cn("space-y-3", className)}>
       <div className="flex min-h-9 flex-wrap items-center justify-between gap-2">
         <p className="text-muted-foreground text-sm">
-          {data.total} {data.total === 1 ? "Labour" : "Labours"}
+          {data.total} {data.total === 1 ? "Employee" : "Employees"}
           {selected.size > 0 && ` · ${String(selected.size)} selected`}
         </p>
         {selected.size > 0 && (
@@ -409,7 +448,7 @@ function LabourRows({
         )}
       </div>
       <div className="bg-card rounded-lg border">
-        <Table aria-label="Labours">
+        <Table aria-label="Employees">
           <TableHeader>
             <TableRow>
               <TableHead className="w-10">
@@ -422,8 +461,8 @@ function LabourRows({
                 />
               </TableHead>
               <TableHead>Name</TableHead>
-              <TableHead>Labour Id</TableHead>
-              <TableHead>Category</TableHead>
+              <TableHead>Employee Id</TableHead>
+              <TableHead>Role</TableHead>
               <TableHead>Projects</TableHead>
               <TableHead>Wage</TableHead>
               {showBalance && (
@@ -436,44 +475,54 @@ function LabourRows({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.items.map((labour) => (
+            {data.items.map((employee) => (
               <TableRow
-                key={labour.id}
-                data-state={selected.has(labour.id) ? "selected" : undefined}
+                key={employee.id}
+                data-state={selected.has(employee.id) ? "selected" : undefined}
               >
                 <TableCell>
                   <Checkbox
-                    aria-label={`Select ${labour.name}`}
-                    checked={selected.has(labour.id)}
+                    aria-label={`Select ${employee.name}`}
+                    checked={selected.has(employee.id)}
                     onCheckedChange={(on) => {
-                      toggle(labour, on);
+                      toggle(employee, on);
                     }}
                   />
                 </TableCell>
                 <TableCell className="font-medium">
-                  <Link href={editPath(labour.id)} className="hover:underline">
-                    {labour.name}
+                  <Link
+                    href={employeePagePath(employee.id)}
+                    className="hover:underline"
+                  >
+                    {employee.name}
                   </Link>
                 </TableCell>
                 <TableCell className="text-muted-foreground">
-                  {labour.labourCode ?? "—"}
-                </TableCell>
-                <TableCell className="text-muted-foreground">
-                  {labour.labourCategory?.name ?? "—"}
+                  {employee.employeeCode ?? "—"}
                 </TableCell>
                 <TableCell>
-                  <ProjectChips projects={labour.projects} />
+                  <span className="block">{employee.role.name}</span>
+                  {employee.department == null ? null : (
+                    <span className="text-muted-foreground block text-xs">
+                      {employee.department.name}
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <ProjectChips projects={employee.projects} />
                 </TableCell>
                 <TableCell className="tabular-nums">
-                  {wageText(labour)}
+                  {wageText(employee)}
                 </TableCell>
                 {showBalance && (
                   <TableCell className="text-right tabular-nums">
-                    {labour.balance == null ? "—" : formatPaise(labour.balance)}
+                    {employee.balance == null
+                      ? "—"
+                      : formatPaise(employee.balance)}
                   </TableCell>
                 )}
                 <TableCell>
-                  {labour.isActive ? (
+                  {employee.isActive ? (
                     <Badge variant="secondary">Active</Badge>
                   ) : (
                     <Badge variant="outline">Inactive</Badge>
@@ -487,7 +536,7 @@ function LabourRows({
                           type="button"
                           variant="ghost"
                           size="icon"
-                          aria-label={`Actions for ${labour.name}`}
+                          aria-label={`Actions for ${employee.name}`}
                         />
                       }
                     >
@@ -495,20 +544,20 @@ function LabourRows({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-44">
                       <DropdownMenuItem
-                        render={<Link href={editPath(labour.id)} />}
+                        render={<Link href={employeePagePath(employee.id)} />}
                       >
                         Edit
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => {
-                          setTransferring([labour]);
+                          setTransferring([employee]);
                         }}
                       >
                         Transfer
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => {
-                          setHistory(labour);
+                          setHistory(employee);
                         }}
                       >
                         Transfer history
@@ -517,20 +566,20 @@ function LabourRows({
                         onClick={() => {
                           setError(undefined);
                           setPending({
-                            kind: labour.isActive ? "deactivate" : "activate",
-                            labour,
+                            kind: employee.isActive ? "deactivate" : "activate",
+                            employee,
                           });
                           setConfirming(true);
                         }}
                       >
-                        {labour.isActive ? "Deactivate" : "Activate"}
+                        {employee.isActive ? "Deactivate" : "Activate"}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                         variant="destructive"
                         onClick={() => {
                           setError(undefined);
-                          setPending({ kind: "delete", labour });
+                          setPending({ kind: "delete", employee });
                           setConfirming(true);
                         }}
                       >
@@ -569,7 +618,7 @@ function LabourRows({
         </div>
       )}
       <TransferDialog
-        labours={transferring ?? []}
+        employees={transferring ?? []}
         fromProjectId={filter.projectId}
         open={transferring != null}
         onOpenChange={(open) => {
@@ -580,7 +629,7 @@ function LabourRows({
         }}
       />
       <TransferHistorySheet
-        labour={history}
+        employee={history}
         onOpenChange={(open) => {
           if (!open) setHistory(null);
         }}
@@ -589,7 +638,7 @@ function LabourRows({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {pending != null && confirm?.title(pending.labour.name)}
+              {pending != null && confirm?.title(pending.employee.name)}
             </AlertDialogTitle>
             <AlertDialogDescription>{confirm?.body}</AlertDialogDescription>
           </AlertDialogHeader>
@@ -603,7 +652,7 @@ function LabourRows({
               onClick={() => {
                 if (pending == null) return;
                 command.mutate(
-                  { kind: pending.kind, id: pending.labour.id },
+                  { kind: pending.kind, id: pending.employee.id },
                   {
                     onSuccess: () => {
                       setConfirming(false);

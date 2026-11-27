@@ -3,7 +3,7 @@ import { infiniteQueryOptions } from "@tanstack/react-query";
 import type { ConstructionPersonAttendanceResponseModel } from "@/app/api/_lib/person-attendance-models";
 
 import { apiJson } from "./http";
-import { LABOURS_API, LABOURS_KEY } from "./labours";
+import { EMPLOYEES_API, EMPLOYEES_KEY } from "./employees";
 import { VENDORS_API, VENDORS_KEY } from "./vendors";
 
 /** One page of a person's Attendance tab (ADR CM-0051). */
@@ -40,8 +40,8 @@ function personAttendanceQuery(
 }
 
 /** An Employee's Attendance tab (ADR CM-0055): their marked days. */
-export function labourAttendanceQuery(id: string) {
-  return personAttendanceQuery(LABOURS_KEY, LABOURS_API, id);
+export function employeeAttendanceQuery(id: string) {
+  return personAttendanceQuery(EMPLOYEES_KEY, EMPLOYEES_API, id);
 }
 
 export function vendorAttendanceQuery(id: string) {
@@ -57,4 +57,4 @@ export function teamMemberAttendanceQuery(id: string) {
 }
 
 /** Any of the three: what the tab's component takes. */
-export type PersonAttendanceQuery = ReturnType<typeof labourAttendanceQuery>;
+export type PersonAttendanceQuery = ReturnType<typeof employeeAttendanceQuery>;

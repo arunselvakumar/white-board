@@ -11,7 +11,7 @@ export function projectsLabel(projects: readonly ProjectRef[]): string {
 }
 
 /**
- * A labourer's Projects in a list cell: a chip each for one or two, "3
+ * An Employee's Projects in a list cell: a chip each for one or two, "3
  * Projects" with every name in its title beyond that, a dash for none.
  */
 export function ProjectChips({

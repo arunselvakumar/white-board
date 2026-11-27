@@ -1,7 +1,7 @@
 import { Skeleton } from "@repo/ui/components/skeleton";
 import { SkeletonGroup, SkeletonText } from "@repo/ui/components/skeleton-kit";
 
-/** Photo & documents on Edit Labour and Edit Vendor while they load (ADR-0047). */
+/** Photo & documents on Edit Employee and Edit Vendor while they load (ADR-0047). */
 
 /** The documents list while it loads. */
 export function StaffDocumentsSkeleton() {

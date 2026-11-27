@@ -5,25 +5,25 @@ import {
   type StaffFilesApi,
 } from "@/app/app/staff/_components/staff-files";
 import {
-  LABOURS_KEY,
-  addLabourDocument,
-  deleteLabourDocument,
-  labourDocumentsQuery,
-  removeLabourPhoto,
-  uploadLabourPhoto,
-  type LabourResponse,
-} from "@/src/queries/labours";
+  EMPLOYEES_KEY,
+  addEmployeeDocument,
+  deleteEmployeeDocument,
+  employeeDocumentsQuery,
+  removeEmployeePhoto,
+  uploadEmployeePhoto,
+  type EmployeeResponse,
+} from "@/src/queries/employees";
 
-const LABOUR_FILES: StaffFilesApi = {
-  queryKey: LABOURS_KEY,
-  documentsQuery: labourDocumentsQuery,
-  uploadPhoto: uploadLabourPhoto,
-  removePhoto: removeLabourPhoto,
-  addDocument: addLabourDocument,
-  deleteDocument: deleteLabourDocument,
+const EMPLOYEE_FILES: StaffFilesApi = {
+  queryKey: EMPLOYEES_KEY,
+  documentsQuery: employeeDocumentsQuery,
+  uploadPhoto: uploadEmployeePhoto,
+  removePhoto: removeEmployeePhoto,
+  addDocument: addEmployeeDocument,
+  deleteDocument: deleteEmployeeDocument,
 };
 
-/** Photo and Other Documents, first on Edit Labour; each change saves at once. */
-export function LabourFiles({ labour }: { labour: LabourResponse }) {
-  return <StaffFiles owner={labour} api={LABOUR_FILES} />;
+/** Photo and Other Documents on Edit Employee; each change saves at once. */
+export function EmployeeFiles({ employee }: { employee: EmployeeResponse }) {
+  return <StaffFiles owner={employee} api={EMPLOYEE_FILES} />;
 }

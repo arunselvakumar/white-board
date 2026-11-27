@@ -12,9 +12,9 @@ import {
 
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";
-import { labourTransfersQuery } from "@/src/queries/labours";
+import { employeeTransfersQuery } from "@/src/queries/employees";
 
-import { TransferHistorySkeleton } from "./labours-skeletons";
+import { TransferHistorySkeleton } from "./employees-skeletons";
 
 /** `2026-10-04` → `4 Oct 2026`. */
 export function formatDate(date: string): string {
@@ -26,25 +26,25 @@ export function formatDate(date: string): string {
   }).format(new Date(`${date}T00:00:00Z`));
 }
 
-/** A labourer's Project history, newest first. */
+/** An Employee's Project history, newest first. */
 export function TransferHistorySheet({
-  labour,
+  employee,
   onOpenChange,
 }: {
-  labour: { id: string; name: string } | null;
+  employee: { id: string; name: string } | null;
   onOpenChange: (open: boolean) => void;
 }) {
   const history = useQuery({
-    ...labourTransfersQuery(labour?.id ?? ""),
-    enabled: labour != null,
+    ...employeeTransfersQuery(employee?.id ?? ""),
+    enabled: employee != null,
   });
   const items = [...(history.data?.items ?? [])].reverse();
   return (
-    <Sheet open={labour != null} onOpenChange={onOpenChange}>
+    <Sheet open={employee != null} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-md">
         <SheetHeader>
           <SheetTitle>Transfer history</SheetTitle>
-          <SheetDescription>{labour?.name}</SheetDescription>
+          <SheetDescription>{employee?.name}</SheetDescription>
         </SheetHeader>
         <div className="space-y-3 px-4 pb-6">
           {history.isPending && <TransferHistorySkeleton />}

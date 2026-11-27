@@ -49,7 +49,7 @@ function AddCategoryForm({
       className="flex min-h-0 flex-1 flex-col"
       onSubmit={(event) => {
         // The sheet is portalled, but React still bubbles submit to the
-        // Labour form around the trigger.
+        // Employee form around the trigger.
         event.stopPropagation();
         void lookup.submit(event);
       }}
@@ -58,7 +58,7 @@ function AddCategoryForm({
         <SheetTitle>Add Labour Category</SheetTitle>
         <SheetDescription>
           {LABOUR_CATEGORIES_SCREEN.dialogDescription} It is added to Masters
-          and chosen for this Labour.
+          and chosen for this Employee.
         </SheetDescription>
       </SheetHeader>
       <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-4 pb-4">
@@ -77,7 +77,7 @@ function AddCategoryForm({
 }
 
 /**
- * Add Labour Category without leaving the Labour form: a slide-over from
+ * Add Labour Category without leaving the Employee form: a slide-over from
  * the right. Saving adds it to Masters, refreshes the Labour Category
  * choices and hands the new row back to be chosen.
  */

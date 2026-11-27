@@ -27,13 +27,13 @@ import {
   PERSON_ACTIVITY_TYPES,
   type PersonActivityEntry,
   type PersonActivityFilter,
-  type siteEngineerActivityQuery,
+  type vendorActivityQuery,
 } from "@/src/queries/activity";
 import { projectOptionsQuery } from "@/src/queries/projects";
 import { pageHref } from "@/lib/page-href";
 
 /**
- * What a Labour's, a Site Engineer's and a Vendor's Activity tabs share
+ * What an Employee's and a Vendor's Activity tabs share
  * (ADR CM-0038 §5, CM-0044 §7): the Projects added and removed and the
  * check-in entries in words, the filters kept in the address, and the
  * pages of entries.
@@ -41,7 +41,7 @@ import { pageHref } from "@/lib/page-href";
 
 type ActivityProject = { id: string; name: string; canOpen: boolean };
 
-/** Shown on a Site Engineer's and a Vendor's empty feed. */
+/** Shown on a Vendor's empty feed. */
 export const PERSON_ACTIVITY_EMPTY =
   "Nothing yet. Projects they are added to, and their check-in entries, will show here.";
 
@@ -254,10 +254,10 @@ const PERSON_TYPE_ITEMS = [
   { value: "check_ins", label: "Check-In" },
 ] as const;
 
-/** A Site Engineer's or a Vendor's feed for one filter. */
+/** A Vendor's feed for one filter. */
 type PersonActivityQuery = (
   filter: PersonActivityFilter,
-) => ReturnType<typeof siteEngineerActivityQuery>;
+) => ReturnType<typeof vendorActivityQuery>;
 
 function PersonActivityList({
   query: activityQuery,
@@ -281,7 +281,7 @@ function PersonActivityList({
 }
 
 /**
- * A Site Engineer's or a Vendor's Activity tab (ADR CM-0044 §7): the
+ * A Vendor's Activity tab (ADR CM-0044 §7): the
  * Projects they were added to and removed from, and their check-in
  * entries, filtered by Type (All, Projects, Check-In), Project and dates.
  */

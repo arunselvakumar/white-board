@@ -32,22 +32,22 @@ import { FormAlert } from "@/components/auth/form-alert";
 import { formatPaise } from "@/components/money/money-input";
 import { fieldForCode } from "@/lib/server-errors";
 import {
-  LABOURS_KEY,
-  LABOUR_TEMPLATE_URL,
-  importLabours,
-  type LabourImportPreview,
-} from "@/src/queries/labours";
+  EMPLOYEES_KEY,
+  EMPLOYEE_TEMPLATE_URL,
+  importEmployees,
+  type EmployeeImportPreview,
+} from "@/src/queries/employees";
 
 const MAX_BYTES = 5 * 1024 * 1024;
 
-function wageText(values: LabourImportPreview["rows"][number]["values"]) {
+function wageText(values: EmployeeImportPreview["rows"][number]["values"]) {
   const wage = values.wagePerDay ?? values.wagePerMonth;
   if (wage == null) return "—";
   return `${formatPaise(wage)}${values.wagePerMonth != null ? " / month" : " / day"}`;
 }
 
 /**
- * Import labourers from the sample sheet: download the sample, upload it,
+ * Import Employees from the sample sheet: download the sample, upload it,
  * check every row, then import all rows at once.
  */
 export function ImportDialog({
@@ -60,21 +60,21 @@ export function ImportDialog({
   const queryClient = useQueryClient();
   const input = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<LabourImportPreview | null>(null);
+  const [preview, setPreview] = useState<EmployeeImportPreview | null>(null);
   const [error, setError] = useState<string | undefined>();
   const check = useMutation({
-    mutationFn: (chosen: File) => importLabours(chosen, true),
+    mutationFn: (chosen: File) => importEmployees(chosen, true),
     onSuccess: setPreview,
     onError: (caught) => {
       setError(fieldForCode(caught, {}).message);
     },
   });
   const commit = useMutation({
-    mutationFn: (chosen: File) => importLabours(chosen, false),
+    mutationFn: (chosen: File) => importEmployees(chosen, false),
     onSuccess: async (result) => {
       setPreview(result);
       if (result.imported > 0)
-        await queryClient.invalidateQueries({ queryKey: LABOURS_KEY });
+        await queryClient.invalidateQueries({ queryKey: EMPLOYEES_KEY });
     },
     onError: (caught) => {
       setError(fieldForCode(caught, {}).message);
@@ -117,15 +117,16 @@ export function ImportDialog({
     >
       <DialogContent className="sm:max-w-3xl">
         <DialogHeader>
-          <DialogTitle>Import Labours</DialogTitle>
+          <DialogTitle>Import Employees</DialogTitle>
           <DialogDescription>
-            Fill in the sample sheet, one Labour per row, and upload it. Every
-            row is checked first; nothing is added until every row is right.
+            Fill in the sample sheet, one Employee per row, with their
+            Department and Role, and upload it. Every row is checked first;
+            nothing is added until every row is right.
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-wrap items-center gap-2">
           <a
-            href={LABOUR_TEMPLATE_URL}
+            href={EMPLOYEE_TEMPLATE_URL}
             download
             className={buttonVariants({ variant: "outline", size: "sm" })}
           >
@@ -170,7 +171,7 @@ export function ImportDialog({
           <div className="space-y-3">
             <p role="status" className="text-sm">
               {imported
-                ? `Imported ${String(preview.imported)} ${preview.imported === 1 ? "Labour" : "Labours"}.`
+                ? `Imported ${String(preview.imported)} ${preview.imported === 1 ? "Employee" : "Employees"}.`
                 : `${String(preview.valid)} ready · ${String(preview.invalid)} with errors`}
             </p>
             <div className="bg-card max-h-80 overflow-auto rounded-lg border">
@@ -179,6 +180,7 @@ export function ImportDialog({
                   <TableRow>
                     <TableHead className="w-14">Row</TableHead>
                     <TableHead>Name</TableHead>
+                    <TableHead>Role</TableHead>
                     <TableHead>Projects</TableHead>
                     <TableHead>Wage</TableHead>
                     <TableHead>Check</TableHead>
@@ -190,6 +192,14 @@ export function ImportDialog({
                       <TableCell className="tabular-nums">{row.row}</TableCell>
                       <TableCell className="font-medium">
                         {row.values.name || "—"}
+                      </TableCell>
+                      <TableCell>
+                        {row.values.role ?? "—"}
+                        {row.values.department == null ? null : (
+                          <span className="text-muted-foreground block text-xs">
+                            {row.values.department}
+                          </span>
+                        )}
                       </TableCell>
                       <TableCell>{row.values.projects ?? "—"}</TableCell>
                       <TableCell className="tabular-nums">
@@ -249,7 +259,7 @@ export function ImportDialog({
             >
               {commit.isPending
                 ? "Importing…"
-                : `Import ${String(preview?.valid ?? 0)} ${preview?.valid === 1 ? "Labour" : "Labours"}`}
+                : `Import ${String(preview?.valid ?? 0)} ${preview?.valid === 1 ? "Employee" : "Employees"}`}
             </Button>
           )}
         </DialogFooter>

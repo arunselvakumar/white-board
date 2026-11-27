@@ -25,10 +25,10 @@ import { Textarea } from "@repo/ui/components/textarea";
 import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";
-import { useLabourCommand } from "@/src/queries/labours";
+import { useEmployeeCommand } from "@/src/queries/employees";
 import { projectOptionsQuery } from "@/src/queries/projects";
 
-import { projectsLabel } from "./labour-projects";
+import { projectsLabel } from "./employee-projects";
 
 type ProjectRef = { id: string; name: string };
 
@@ -44,11 +44,13 @@ export function localToday(now: Date = new Date()): string {
   return new Date(now.getTime() - offset).toISOString().slice(0, 10);
 }
 
-/** The Projects every one of `labours` is on: where they can all move from. */
-function sharedProjects(labours: readonly TransferTarget[]): ProjectRef[] {
-  const [first, ...rest] = labours;
+/** The Projects every one of `employees` is on: where they can all move from. */
+function sharedProjects(employees: readonly TransferTarget[]): ProjectRef[] {
+  const [first, ...rest] = employees;
   return (first?.projects ?? []).filter((project) =>
-    rest.every((labour) => labour.projects.some((p) => p.id === project.id)),
+    rest.every((employee) =>
+      employee.projects.some((p) => p.id === project.id),
+    ),
   );
 }
 
@@ -101,26 +103,26 @@ function SelectField({
 }
 
 /**
- * Transfer one or many labourers from one Project to another from a
+ * Transfer one or many Employees from one Project to another from a
  * date. The date is their first day on the new Project; their other
  * Projects stay (ADR CM-0033). `fromProjectId` picks the Project they
  * leave when they share it, e.g. the list's Project filter.
  */
 export function TransferDialog({
-  labours,
+  employees,
   fromProjectId = null,
   open,
   onOpenChange,
   onTransferred,
 }: {
-  labours: TransferTarget[];
+  employees: TransferTarget[];
   fromProjectId?: string | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onTransferred?: () => void;
 }) {
   const projects = useQuery({ ...projectOptionsQuery, enabled: open });
-  const command = useLabourCommand();
+  const command = useEmployeeCommand();
   const [chosenFrom, setChosenFrom] = useState<string | null>(null);
   const [projectId, setProjectId] = useState<string | null>(null);
   const [date, setDate] = useState(localToday);
@@ -130,8 +132,8 @@ export function TransferDialog({
     message: string;
   } | null>(null);
 
-  const single = labours.length === 1 ? labours[0] : undefined;
-  const shared = sharedProjects(labours);
+  const single = employees.length === 1 ? employees[0] : undefined;
+  const shared = sharedProjects(employees);
   const fromChoices = shared.map((project) => ({
     value: project.id,
     label: project.name,
@@ -144,9 +146,11 @@ export function TransferDialog({
       : shared.length === 1
         ? (shared[0]?.id ?? null)
         : null);
-  // A labourer cannot move to a Project they are already on.
+  // An Employee cannot move to a Project they are already on.
   const taken = new Set(
-    labours.flatMap((labour) => labour.projects.map((project) => project.id)),
+    employees.flatMap((employee) =>
+      employee.projects.map((project) => project.id),
+    ),
   );
   const choices = (projects.data?.items ?? [])
     .filter((project) => !taken.has(project.id))
@@ -166,7 +170,7 @@ export function TransferDialog({
         field: "from",
         message:
           shared.length === 0
-            ? "These Labours share no Project. Transfer them from one Project at a time."
+            ? "These Employees share no Project. Transfer them from one Project at a time."
             : "Choose the Project they move from",
       });
       return;
@@ -183,7 +187,7 @@ export function TransferDialog({
     try {
       await command.mutateAsync({
         kind: "transfer",
-        labourIds: labours.map((labour) => labour.id),
+        employeeIds: employees.map((employee) => employee.id),
         fromProjectId: from,
         toProjectId: projectId,
         transferDate: date,
@@ -199,7 +203,7 @@ export function TransferDialog({
         TRANSFER_BEFORE_LAST_TRANSFER: "date",
         TRANSFER_SAME_PROJECT: "project",
         PROJECT_NOT_FOUND: "project",
-        LABOUR_NOT_ON_PROJECT: "from",
+        EMPLOYEE_NOT_ON_PROJECT: "from",
         TRANSFER_FROM_PROJECT_REQUIRED: "from",
       } as const);
       setProblem({ field, message });
@@ -219,7 +223,7 @@ export function TransferDialog({
           <DialogTitle>
             {single != null
               ? `Transfer ${single.name}`
-              : `Transfer ${String(labours.length)} Labours`}
+              : `Transfer ${String(employees.length)} Employees`}
           </DialogTitle>
           <DialogDescription>
             {single != null

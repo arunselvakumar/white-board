@@ -20,38 +20,43 @@ import { FormAlert } from "@/components/auth/form-alert";
 import { PasswordField } from "@/components/auth/password-field";
 import { fieldForCode } from "@/lib/server-errors";
 import {
-  useSetSiteEngineerPassword,
-  type SiteEngineer,
-  type SiteEngineerPasswordOutcome,
-} from "@/src/queries/site-engineers";
+  useSetEmployeePassword,
+  type EmployeeResponse,
+} from "@/src/queries/employees";
 
 import { temporaryPassword } from "@/app/app/staff/office-staff/_components/sign-in-options";
 
 const schema = z.object({ password: temporaryPassword });
+
+/** What Set password did: set, or a Join Request for an existing account. */
+export type PasswordOutcome = {
+  name: string;
+  passwordIgnored: "existing_account" | null;
+};
 type Values = z.infer<typeof schema>;
 
 /**
- * Set password on Edit Site Engineer (ADR CM-0030 §7): a Temporary Password
+ * Set password on Edit Employee (ADR CM-0030 §7, CM-0055 §4): a Temporary Password
  * they replace the next time they sign in. Offered only while their account
  * belongs to this Company alone (`canSetPassword`).
  */
 export function SetPasswordDialog({
-  engineer,
+  employee,
   open,
   onOpenChange,
   onDone,
 }: {
-  engineer: SiteEngineer;
+  employee: EmployeeResponse;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** After the save, with what happened. */
-  onDone: (outcome: SiteEngineerPasswordOutcome) => void;
+  onDone: (outcome: PasswordOutcome) => void;
 }) {
   const form = useForm<Values>({
     resolver: zodResolver(schema),
     defaultValues: { password: "" },
   });
-  const save = useSetSiteEngineerPassword(engineer.id);
+  const save = useSetEmployeePassword(employee.id);
 
   return (
     <Dialog
@@ -88,16 +93,16 @@ export function SetPasswordDialog({
           <DialogHeader>
             <DialogTitle>Set password</DialogTitle>
             <DialogDescription>
-              {engineer.name} signs in with their mobile number and this
+              {employee.name} signs in with their mobile number and this
               password, and must change it the next time they sign in.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-1.5">
-            <Label htmlFor="engineer-new-password" required>
+            <Label htmlFor="employee-new-password" required>
               New password
             </Label>
             <PasswordField
-              id="engineer-new-password"
+              id="employee-new-password"
               autoComplete="new-password"
               placeholder="At least 8 characters"
               aria-required

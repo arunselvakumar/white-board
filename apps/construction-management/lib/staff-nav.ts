@@ -2,7 +2,6 @@ import {
   Handshake,
   HardHat,
   ShieldCheck,
-  Shovel,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -20,29 +19,22 @@ export type StaffSection = {
 /** The Staff area of Human Resources; every page in the group lives under it. */
 export const STAFF_AREA_PATH = "/app/staff";
 
-export const LABOURS_PAGE_PATH = `${STAFF_AREA_PATH}/labours`;
-export const SITE_ENGINEERS_PATH = `${STAFF_AREA_PATH}/site-engineers`;
+export const EMPLOYEES_PATH = `${STAFF_AREA_PATH}/employees`;
 export const VENDORS_PATH = `${STAFF_AREA_PATH}/vendors`;
 export const STAFF_PATH = `${STAFF_AREA_PATH}/office-staff`;
 export const ROLES_PATH = `${STAFF_AREA_PATH}/roles`;
 
 /**
- * Your own Labours, the Site Engineers who look after them, and the Vendors
- * you hire gangs from. Every Company member with Human Resources sees these.
+ * Your own Employees (ADR CM-0055) and the Vendors you hire gangs from.
+ * Every Company member with Human Resources sees these.
  */
-export const LABOUR_SECTIONS: readonly StaffSection[] = [
+export const PEOPLE_SECTIONS: readonly StaffSection[] = [
   {
-    href: LABOURS_PAGE_PATH,
-    label: "Labour",
-    title: "Labours",
-    description: "Your own Labours: wage, Project, transfers and Excel import.",
-    icon: Shovel,
-  },
-  {
-    href: SITE_ENGINEERS_PATH,
-    label: "Site Engineer",
-    title: "Site Engineers",
-    description: "The people on site who look after a group of Labours.",
+    href: EMPLOYEES_PATH,
+    label: "Employees",
+    title: "Employees",
+    description:
+      "Your own people on site, by Department and Role: wage, Projects, transfers, sign-in and Excel import.",
     icon: HardHat,
   },
   {
@@ -80,15 +72,15 @@ export const STAFF_ROLES_SECTIONS: readonly StaffSection[] = [
 ];
 
 /**
- * The Staff group of Human Resources (ADR CM-0034): Labour, Site Engineer,
+ * The Staff group of Human Resources (ADR CM-0034, CM-0055): Employees,
  * Vendor, then Office Staff and Role Management when the viewer may open them.
  */
 export function staffSections(
   canOpenStaffRoles: boolean,
 ): readonly StaffSection[] {
   return canOpenStaffRoles
-    ? [...LABOUR_SECTIONS, ...STAFF_ROLES_SECTIONS]
-    : LABOUR_SECTIONS;
+    ? [...PEOPLE_SECTIONS, ...STAFF_ROLES_SECTIONS]
+    : PEOPLE_SECTIONS;
 }
 
 /** The Staff section a path belongs to (its page or anything under it). */
@@ -103,8 +95,8 @@ export function staffPath(id: string): AppHref {
   return pageHref("/app/staff/office-staff/[id]", { id });
 }
 
-export function labourPagePath(id: string): AppHref {
-  return pageHref("/app/staff/labours/[id]", { id });
+export function employeePagePath(id: string): AppHref {
+  return pageHref("/app/staff/employees/[id]", { id });
 }
 
 export function vendorPagePath(id: string): AppHref {

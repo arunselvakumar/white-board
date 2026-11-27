@@ -63,7 +63,7 @@ import {
 } from "./other-parties-skeletons";
 
 /**
- * Parties that are not Contractors, Suppliers, Labours or Vendors — landlords,
+ * Parties that are not Contractors, Suppliers, Employees or Vendors — landlords,
  * consultants, buyers of scrap (ADR CM-0017 §11). Search, newest first in
  * pages, edit and delete.
  */
@@ -86,7 +86,7 @@ export function OtherPartiesPage() {
         <PageHeader
           back={{ label: "Masters", href: "/app/masters" }}
           title="Other Parties"
-          meta="Parties you bill or pay that are not Contractors, Suppliers, Labours or Vendors."
+          meta="Parties you bill or pay that are not Contractors, Suppliers, Employees or Vendors."
           actions={addLink}
         />
         <InputGroup className="sm:max-w-xs">

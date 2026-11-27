@@ -160,7 +160,7 @@ export const MASTERS_GROUPS: readonly MastersGroup[] = [
         label: "Categories",
         title: "Labour Categories",
         description:
-          "Trades Labours and a Vendor's headcount are booked under.",
+          "Trades Employees and a Vendor's headcount are booked under.",
         icon: HardHat,
       },
     ],

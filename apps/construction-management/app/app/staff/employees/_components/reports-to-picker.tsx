@@ -16,17 +16,18 @@ import {
   InputGroupButton,
 } from "@repo/ui/components/input-group";
 
-import { laboursQuery } from "@/src/queries/labours";
+import { employeesQuery } from "@/src/queries/employees";
 
 /** Typing waits this long before it asks the server. */
 const SEARCH_DELAY_MS = 250;
-/** The Labours list page; more matches need a narrower search. */
+/** The Employees list page; more matches need a narrower search. */
 const PAGE = 25;
 
-export type LabourRef = {
+export type EmployeeRef = {
   id: string;
   name: string;
-  labourCode?: string | null;
+  employeeCode?: string | null;
+  roleName?: string;
 };
 
 function useDebounced<T>(value: T, delay: number): T {
@@ -43,10 +44,10 @@ function useDebounced<T>(value: T, delay: number): T {
 }
 
 /**
- * Reports To (ADR CM-0035): a searchable combobox of the Company's active
- * Labours, by name, Labour Id or phone. The Labour being edited is left
- * out. The chosen Labour always shows by name, from the saved one or the
- * row picked.
+ * Reports To (ADR CM-0035, CM-0055 §1): a searchable combobox of the
+ * Company's active Employees, by name, Employee Id or mobile. The Employee
+ * being edited is left out. The chosen Employee always shows by name, from
+ * the saved one or the row picked.
  */
 export function ReportsToPicker({
   id,
@@ -58,78 +59,81 @@ export function ReportsToPicker({
   "aria-describedby": describedBy,
 }: {
   id: string;
-  /** The chosen Labour's id, or "" for none. */
+  /** The chosen Employee's id, or "" for none. */
   value: string;
   onChange: (id: string) => void;
-  /** The Labour saved on the record, so it shows before any search. */
-  saved: LabourRef | null;
-  /** The Labour being edited: they cannot report to themselves. */
+  /** The Employee saved on the record, so it shows before any search. */
+  saved: EmployeeRef | null;
+  /** The Employee being edited: they cannot report to themselves. */
   excludeId?: string;
   invalid?: boolean;
   "aria-describedby"?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [picked, setPicked] = useState<LabourRef | null>(null);
+  const [picked, setPicked] = useState<EmployeeRef | null>(null);
   const typed = query.trim();
   const search = useDebounced(typed, SEARCH_DELAY_MS);
 
   const results = useQuery({
-    ...laboursQuery({
+    ...employeesQuery({
       search,
       status: "active",
       projectId: null,
       categoryId: null,
+      roleId: null,
+      departmentId: null,
       cursor: null,
     }),
     enabled: open,
     placeholderData: keepPreviousData,
   });
 
-  const options = useMemo<LabourRef[]>(
+  const options = useMemo<EmployeeRef[]>(
     () =>
       (results.data?.items ?? [])
-        .filter((labour) => labour.id !== excludeId)
-        .map(({ id: labourId, name, labourCode }) => ({
-          id: labourId,
+        .filter((employee) => employee.id !== excludeId)
+        .map(({ id: employeeId, name, employeeCode, role }) => ({
+          id: employeeId,
           name,
-          labourCode,
+          employeeCode,
+          roleName: role.name,
         })),
     [results.data, excludeId],
   );
-  const selected = useMemo<LabourRef | null>(() => {
+  const selected = useMemo<EmployeeRef | null>(() => {
     if (value === "") return null;
     if (picked?.id === value) return picked;
     if (saved?.id === value) return saved;
     return (
       options.find((option) => option.id === value) ?? {
         id: value,
-        name: "Labour not available",
+        name: "Employee not available",
       }
     );
   }, [value, picked, saved, options]);
 
   const status = results.isError
-    ? "Labours could not be loaded. Close and try again."
+    ? "Employees could not be loaded. Close and try again."
     : results.isPending
-      ? "Loading Labours…"
+      ? "Loading Employees…"
       : options.length > 0
         ? null
         : typed !== ""
-          ? `No active Labour matches “${typed}”`
-          : "No other active Labours yet";
+          ? `No active Employee matches “${typed}”`
+          : "No other active Employees yet";
   const more =
     status == null && (results.data?.total ?? 0) > PAGE
       ? `Showing the first ${String(PAGE)}. Type to find others.`
       : null;
 
   return (
-    <Combobox<LabourRef>
+    <Combobox<EmployeeRef>
       items={options}
       filter={null}
       value={selected}
-      itemToStringLabel={(row: LabourRef) => row.name}
-      isItemEqualToValue={(row: LabourRef, other: LabourRef) =>
+      itemToStringLabel={(row: EmployeeRef) => row.name}
+      isItemEqualToValue={(row: EmployeeRef, other: EmployeeRef) =>
         row.id === other.id
       }
       onOpenChange={(next) => {
@@ -139,7 +143,7 @@ export function ReportsToPicker({
       onInputValueChange={(text, details) => {
         if (details.reason === "input-change") setQuery(text);
       }}
-      onValueChange={(next: LabourRef | null) => {
+      onValueChange={(next: EmployeeRef | null) => {
         setPicked(next);
         onChange(next?.id ?? "");
       }}
@@ -149,7 +153,7 @@ export function ReportsToPicker({
         aria-label="Reports To"
         aria-invalid={invalid || undefined}
         aria-describedby={describedBy}
-        placeholder="Search Labours"
+        placeholder="Search Employees"
         autoComplete="off"
         showTrigger={false}
         className="h-10 w-full min-w-0"
@@ -173,7 +177,7 @@ export function ReportsToPicker({
               size="icon-xs"
               variant="ghost"
               render={<ComboboxTrigger />}
-              aria-label="Show Labours"
+              aria-label="Show Employees"
               className="data-pressed:bg-transparent"
             />
           )}
@@ -188,14 +192,16 @@ export function ReportsToPicker({
             {status}
           </p>
         )}
-        <ComboboxList aria-label="Labours">
-          {(row: LabourRef) => (
+        <ComboboxList aria-label="Employees">
+          {(row: EmployeeRef) => (
             <ComboboxItem key={row.id} value={row} className="py-1.5">
               <span className="flex min-w-0 flex-col">
                 <span className="break-words">{row.name}</span>
-                {row.labourCode == null ? null : (
+                {row.employeeCode == null && row.roleName == null ? null : (
                   <span className="text-muted-foreground text-xs">
-                    {row.labourCode}
+                    {[row.roleName, row.employeeCode]
+                      .filter((part) => part != null)
+                      .join(" · ")}
                   </span>
                 )}
               </span>

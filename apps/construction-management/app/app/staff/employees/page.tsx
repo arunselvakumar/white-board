@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
-import { LaboursPage } from "@/app/app/staff/labours/_components/labours-page";
+import { EmployeesPage } from "@/app/app/staff/employees/_components/employees-page";
 
-export const metadata: Metadata = { title: "Labours" };
+export const metadata: Metadata = { title: "Employees" };
 
 export default function Page() {
-  return <LaboursPage />;
+  return <EmployeesPage />;
 }

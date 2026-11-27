@@ -11,20 +11,21 @@ import {
   FormSectionSkeleton,
 } from "@/app/app/_components/masters/masters-skeletons";
 import { StaffPhotoSkeleton } from "@/app/app/staff/_components/staff-skeletons";
+import { EMPLOYEES_PATH } from "@/lib/staff-nav";
 
-/** The Labours screens while they load (ADR-0047). */
+/** The Employees screens while they load (ADR-0047). */
 
-/** The Labours table; Balance shows only with the Financial flag. */
-const LABOUR_COLUMNS: SkeletonColumn[] = [
+/** The Employees table; Balance shows only with the Financial flag. */
+const EMPLOYEE_COLUMNS: SkeletonColumn[] = [
   {
     header: <span className="sr-only">Select</span>,
     kind: "checkbox",
     className: "w-10",
   },
   { header: "Name" },
-  { header: "Labour Id", kind: "muted" },
-  { header: "Category", kind: "muted" },
-  { header: "Project", kind: "muted" },
+  { header: "Employee Id", kind: "muted" },
+  { header: "Role", kind: "muted" },
+  { header: "Projects", kind: "muted" },
   { header: "Wage", kind: "muted" },
   { header: "Status", kind: "badge" },
   {
@@ -34,14 +35,14 @@ const LABOUR_COLUMNS: SkeletonColumn[] = [
   },
 ];
 
-export function LabourRowsSkeleton() {
+export function EmployeeRowsSkeleton() {
   return (
     <div className="space-y-3">
-      {/* The "N Labours" line sits in a min-h-9 bar beside the selection actions. */}
+      {/* The "N Employees" line sits in a min-h-9 bar beside the selection actions. */}
       <div aria-hidden="true" className="flex min-h-9 items-center">
         <SkeletonText width="5rem" />
       </div>
-      <TableSkeleton columns={LABOUR_COLUMNS} label="Loading Labours" />
+      <TableSkeleton columns={EMPLOYEE_COLUMNS} label="Loading Employees" />
     </div>
   );
 }
@@ -60,13 +61,10 @@ export function TransferHistorySkeleton() {
   );
 }
 
-/** Edit Labour while the Labour loads. */
-export function LabourFormSkeleton() {
+/** Add and Edit Employee while the Employee, Roles and Departments load. */
+export function EmployeeFormSkeleton() {
   return (
-    <FormPageSkeleton
-      back={{ label: "Labours", href: "/app/staff/labours" }}
-      meta
-    >
+    <FormPageSkeleton back={{ label: "Employees", href: EMPLOYEES_PATH }} meta>
       <div className="space-y-6">
         <FormSectionSkeleton title="Photo & documents">
           <StaffPhotoSkeleton />
@@ -75,12 +73,53 @@ export function LabourFormSkeleton() {
           <FormSkeleton
             columns={2}
             actions={0}
-            label="Loading Labour"
+            label="Loading Employee"
             fields={[
-              { label: "Labour name" },
-              { label: "Labour Id" },
+              { label: "Employee name" },
+              { label: "Mobile" },
+              { label: "Email" },
+              { label: "Gender", control: "select" },
+              { label: "Date of birth" },
               { label: "Father's name" },
+              { label: "Blood group", control: "select" },
+              { label: "Employee Id" },
               { label: "Joining date" },
+            ]}
+          />
+        </FormSectionSkeleton>
+        <FormSectionSkeleton title="Role assignment">
+          <FormSkeleton
+            columns={2}
+            actions={0}
+            fields={[
+              { label: "Department", control: "select" },
+              { label: "Role", control: "select" },
+            ]}
+          />
+        </FormSectionSkeleton>
+        <FormSectionSkeleton title="Details">
+          <FormSkeleton
+            columns={2}
+            actions={0}
+            fields={[
+              { label: "Address" },
+              { label: "Emergency contact" },
+              { label: "Aadhaar" },
+              { label: "PAN" },
+              { label: "UAN" },
+              { label: "ESIC number" },
+            ]}
+          />
+        </FormSectionSkeleton>
+        <FormSectionSkeleton title="Work">
+          <FormSkeleton
+            columns={2}
+            actions={0}
+            fields={[
+              { label: "Qualification" },
+              { label: "Experience (years)" },
+              { label: "Labour Category", control: "select" },
+              { label: "Reports To", control: "select" },
             ]}
           />
         </FormSectionSkeleton>
@@ -90,31 +129,9 @@ export function LabourFormSkeleton() {
             actions={0}
             fields={[
               { label: "Wage per day" },
-              { label: "Wage per month" },
               { label: "Overtime wage per hour" },
               { label: "Working hours per day" },
-            ]}
-          />
-        </FormSectionSkeleton>
-        <FormSectionSkeleton title="Statutory">
-          <FormSkeleton
-            columns={2}
-            actions={0}
-            fields={[
-              { label: "UAN" },
-              { label: "ESIC number" },
-              { label: "Aadhaar" },
-            ]}
-          />
-        </FormSectionSkeleton>
-        <FormSectionSkeleton title="Category & contact">
-          <FormSkeleton
-            columns={2}
-            actions={0}
-            fields={[
-              { label: "Labour Category", control: "select" },
-              { label: "Site Engineer", control: "select" },
-              { label: "Gender", control: "select" },
+              { label: "Opening balance" },
             ]}
           />
         </FormSectionSkeleton>

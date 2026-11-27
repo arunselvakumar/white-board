@@ -22,14 +22,14 @@ import {
   personActivityItem,
 } from "@/app/app/_components/activity/person-activity";
 import {
-  LABOUR_ACTIVITY_TYPES,
-  labourActivityQuery,
-  type LabourActivityEntry,
-  type LabourActivityFilter,
-  type LabourActivityType,
+  EMPLOYEE_ACTIVITY_TYPES,
+  employeeActivityQuery,
+  type EmployeeActivityEntry,
+  type EmployeeActivityFilter,
+  type EmployeeActivityType,
 } from "@/src/queries/activity";
 
-type Status = Extract<LabourActivityEntry, { kind: "attendance" }>["status"];
+type Status = Extract<EmployeeActivityEntry, { kind: "attendance" }>["status"];
 
 /** As on the attendance sheet. */
 const STATUS_LABELS: Record<Status, string> = {
@@ -41,7 +41,7 @@ const STATUS_LABELS: Record<Status, string> = {
   holiday: "Holiday",
 };
 
-const TYPE_ITEMS: { value: LabourActivityType; label: string }[] = [
+const TYPE_ITEMS: { value: EmployeeActivityType; label: string }[] = [
   { value: "all", label: "All" },
   { value: "projects", label: "Projects" },
   { value: "attendance", label: "Attendance" },
@@ -49,11 +49,11 @@ const TYPE_ITEMS: { value: LabourActivityType; label: string }[] = [
   { value: "profile", label: "Profile" },
 ];
 
-export const LABOUR_ACTIVITY_EMPTY =
-  "Nothing yet. Adding this Labour to a Project or marking attendance will show here.";
+export const EMPLOYEE_ACTIVITY_EMPTY =
+  "Nothing yet. Adding this Employee to a Project or marking attendance will show here.";
 
 function attendanceDetail(
-  entry: Extract<LabourActivityEntry, { kind: "attendance" }>,
+  entry: Extract<EmployeeActivityEntry, { kind: "attendance" }>,
 ): string | undefined {
   const parts = [
     entry.checkIn == null
@@ -65,9 +65,9 @@ function attendanceDetail(
   return parts.length === 0 ? undefined : parts.join(" · ");
 }
 
-/** One Labour Activity entry in words; times in the Company's time zone. */
-export function labourActivityItem(
-  entry: LabourActivityEntry,
+/** One Employee Activity entry in words; times in the Company's time zone. */
+export function employeeActivityItem(
+  entry: EmployeeActivityEntry,
   timeZone: string,
 ): ActivityFeedItem {
   const base = {
@@ -82,7 +82,7 @@ export function labourActivityItem(
         ...base,
         icon: UserPlus,
         tone: "added",
-        title: "Added to Labours",
+        title: "Added to Employees",
         detail: entry.imported ? "Imported from Excel" : undefined,
       };
     case "activated":
@@ -150,44 +150,50 @@ export function labourActivityItem(
   }
 }
 
-function LabourActivityList({
-  labourId,
+function EmployeeActivityList({
+  employeeId,
   filter,
   now,
 }: {
-  labourId: string;
-  filter: LabourActivityFilter;
+  employeeId: string;
+  filter: EmployeeActivityFilter;
   now?: Date;
 }) {
-  const query = useSuspenseInfiniteQuery(labourActivityQuery(labourId, filter));
+  const query = useSuspenseInfiniteQuery(
+    employeeActivityQuery(employeeId, filter),
+  );
   return (
     <ActivityPages
       pages={query.data.pages}
-      item={labourActivityItem}
+      item={employeeActivityItem}
       paging={feedPaging(query)}
-      emptyMessage={LABOUR_ACTIVITY_EMPTY}
+      emptyMessage={EMPLOYEE_ACTIVITY_EMPTY}
       now={now}
     />
   );
 }
 
 /**
- * The Labour page's Activity tab (ADR CM-0038 §5): Project moves,
+ * The Employee page's Activity tab (ADR CM-0038 §5): Project moves,
  * attendance, check-in entries (ADR CM-0044) and profile entries,
  * filtered by Type, Project and dates kept in the address.
  */
-export function LabourActivity({
-  labourId,
+export function EmployeeActivity({
+  employeeId,
   now,
 }: {
-  labourId: string;
+  employeeId: string;
   /** For stories: what "Today" is. */
   now?: Date;
 }) {
   return (
-    <PersonActivityTab types={LABOUR_ACTIVITY_TYPES} typeItems={TYPE_ITEMS}>
+    <PersonActivityTab types={EMPLOYEE_ACTIVITY_TYPES} typeItems={TYPE_ITEMS}>
       {(filter) => (
-        <LabourActivityList labourId={labourId} filter={filter} now={now} />
+        <EmployeeActivityList
+          employeeId={employeeId}
+          filter={filter}
+          now={now}
+        />
       )}
     </PersonActivityTab>
   );
