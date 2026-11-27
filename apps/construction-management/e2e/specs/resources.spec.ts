@@ -1,9 +1,9 @@
 import { expect } from "@playwright/test";
 
-import { createLabour } from "../api/labour";
+import { createEmployee } from "../api/labour";
 import { resourcesPageTest } from "../helpers/resourcesPageTest";
 import { AmenitiesPage } from "../pages/AmenitiesPage";
-import { LabourPage } from "../pages/LabourPage";
+import { EmployeePage } from "../pages/EmployeePage";
 import { ProjectActivityPage } from "../pages/ProjectActivityPage";
 import { ProjectsPage } from "../pages/ProjectsPage";
 
@@ -50,26 +50,31 @@ resourcesPageTest.describe("Project Teams", () => {
   );
 
   resourcesPageTest(
-    "should show a Labour in both Activity feeds, when the Owner adds them on the Project's Teams",
+    "should show an Employee with their Role in both Activity feeds, when the Owner adds them on the Project's Teams",
     { tag: ["@pr"] },
     async ({ resourcesPage, project, owner, page }) => {
-      const labour = await createLabour(owner.api, { projectId: null });
+      const employee = await createEmployee(owner.api, {
+        projectId: null,
+        role: "Site Engineer",
+      });
 
       await resourcesPage.goto();
-      await resourcesPage.addLabours([labour.name], "Slab work");
-      await expect(resourcesPage.section("Labours")).toContainText(labour.name);
+      await resourcesPage.addEmployees([employee.name], "Slab work");
+      const employees = resourcesPage.section("Employees");
+      await expect(employees).toContainText(employee.name);
+      await expect(employees).toContainText("Site Engineer");
 
       const projectActivity = new ProjectActivityPage(page, project.id);
       await projectActivity.goto();
       const today = projectActivity.day("Today");
-      await expect(today).toContainText(`${labour.name} added`);
+      await expect(today).toContainText(`${employee.name} added`);
       await expect(today).toContainText("Slab work");
 
-      const labourPage = new LabourPage(page, labour.id);
-      await labourPage.goto();
-      await labourPage.tab("Activity").click();
+      const employeePage = new EmployeePage(page, employee.id);
+      await employeePage.goto();
+      await employeePage.tab("Activity").click();
       await expect(page).toHaveURL(/[?&]tab=activity/);
-      await expect(labourPage.day("Today")).toContainText(
+      await expect(employeePage.day("Today")).toContainText(
         `Added to ${project.name}`,
       );
     },

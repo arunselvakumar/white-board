@@ -1,19 +1,19 @@
 import { AppShellPage } from "./AppShellPage";
 
-/** One Labour's page: the Details and Activity tabs. */
-export class LabourPage extends AppShellPage {
+/** One Employee's page: the Details, Attendance and Activity tabs. */
+export class EmployeePage extends AppShellPage {
   constructor(
     page: ConstructorParameters<typeof AppShellPage>[0],
-    private readonly labourId: string,
+    private readonly employeeId: string,
   ) {
     super(page);
   }
 
   public get url() {
-    return `/app/staff/labours/${this.labourId}`;
+    return `/app/staff/employees/${this.employeeId}`;
   }
 
-  public tab(name: "Details" | "Activity") {
+  public tab(name: "Details" | "Attendance" | "Activity") {
     return this.page.getByRole("tab", { name });
   }
 

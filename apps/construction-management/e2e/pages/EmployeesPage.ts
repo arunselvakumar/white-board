@@ -1,20 +1,20 @@
 import { AppShellPage } from "./AppShellPage";
 
-export class LaboursPage extends AppShellPage {
+export class EmployeesPage extends AppShellPage {
   public get url() {
-    return "/app/staff/labours";
+    return "/app/staff/employees";
   }
 
   public get table() {
-    return this.page.getByRole("table", { name: "Labours" });
+    return this.page.getByRole("table", { name: "Employees" });
   }
 
   public row(name: string) {
     return this.table.getByRole("row").filter({ hasText: name });
   }
 
-  public get addLabourLink() {
-    return this.link("Add Labour");
+  public get addEmployeeLink() {
+    return this.link("Add Employee");
   }
 
   public get importButton() {
