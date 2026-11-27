@@ -22,6 +22,7 @@ import { loadMemberAccess } from "@/src/shared-kernel/access/prisma-access-reade
 import { addDays, todayIn } from "@/src/shared-kernel/calendar-date";
 import { objectStorage } from "@/src/shared-kernel/files/storage-from-env";
 import { actAs, addMember, addProject, newCompany } from "@/test/companies";
+import { seedEmployee } from "@/test/employees";
 import { bytesOf } from "@/test/files";
 import { addContractor, addMaterial, addUnit } from "@/test/procurement";
 import {
@@ -412,33 +413,19 @@ describe("Progress Reports: the Daily Progress Report", () => {
     const audit = { createdBy: by, updatedBy: by };
     const skilled = await progressAddLabourCategory(ws, by, "skilled");
     const unskilled = await progressAddLabourCategory(ws, by, "unskilled");
-    const labour = async (categoryId: string | null) => {
-      const id = randomUUID();
-      await prisma.constructionLabourLabour.create({
-        data: {
-          id,
-          workspaceId: ws,
-          name: `Labour ${id.slice(0, 4)}`,
-          joiningDate: new Date("2026-01-01T00:00:00Z"),
-          wageType: "daily",
-          wagePerDay: 80_000,
-          overtimeWagePerHour: 0,
-          weeklyHolidays: [0],
-          labourCategoryId: categoryId,
-          projects: {
-            create: {
-              workspaceId: ws,
-              projectId: ctx.projectId,
-              since: new Date("2026-01-01T00:00:00Z"),
-            },
-          },
-          ...audit,
-        },
+    const labour = (categoryId: string | null) =>
+      seedEmployee({
+        workspaceId: ws,
+        joiningDate: "2026-01-01",
+        wagePerDay: 80_000,
+        overtimeWagePerHour: 0,
+        weeklyHolidays: [0],
+        labourCategoryId: categoryId,
+        projectIds: [ctx.projectId],
+        by,
       });
-      return id;
-    };
     const mark = async (
-      labourId: string,
+      employeeId: string,
       status: "present" | "half_day" | "absent",
     ) =>
       prisma.constructionLabourAttendance.create({
@@ -446,7 +433,7 @@ describe("Progress Reports: the Daily Progress Report", () => {
           id: randomUUID(),
           workspaceId: ws,
           projectId: ctx.projectId,
-          labourId,
+          employeeId,
           attendanceDate: new Date(`${DAY}T00:00:00Z`),
           status,
           wageType: "daily",
@@ -626,8 +613,8 @@ describe("Progress Reports: the Daily Progress Report", () => {
     });
     expect(model.project.name).toBe("Tower A");
     expect(model.attendance).toEqual({
-      labourPresent: { skilled: 1, unskilled: 2 },
-      labourHalfDay: { skilled: 1, unskilled: 0 },
+      employeesPresent: { skilled: 1, unskilled: 2 },
+      employeesHalfDay: { skilled: 1, unskilled: 0 },
       vendorFullDay: { skilled: 3, unskilled: 4 },
       vendorHalfDay: { skilled: 1, unskilled: 1 },
     });
@@ -638,8 +625,8 @@ describe("Progress Reports: the Daily Progress Report", () => {
     });
     const total = (skill: "skilled" | "unskilled") =>
       [
-        model.attendance.labourPresent,
-        model.attendance.labourHalfDay,
+        model.attendance.employeesPresent,
+        model.attendance.employeesHalfDay,
         model.attendance.vendorFullDay,
         model.attendance.vendorHalfDay,
       ].reduce((sum, heads) => sum + heads[skill], 0);

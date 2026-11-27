@@ -80,7 +80,7 @@ export type DashboardSource = {
     workspaceId: string,
     projectIds: readonly string[],
   ): Promise<Map<string, bigint>>;
-  /** Labours present or on half day on `date`, per Project. */
+  /** Employees present or on half day on `date`, per Project. */
   labourPresent(
     workspaceId: string,
     projectIds: readonly string[],

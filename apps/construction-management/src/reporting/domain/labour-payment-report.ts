@@ -1,4 +1,4 @@
-import { byName, type ReportLabour } from "./labour-days";
+import { byName, type ReportEmployee } from "./labour-days";
 import { paymentFigures, type ReportLedgerEntry } from "./ledger-summary";
 import {
   column,
@@ -9,15 +9,15 @@ import {
 import type { DateRange } from "./report-period";
 
 /**
- * All Labour Payment (CM-217): per Labour Previous Balance, Earned,
+ * Employee Payments (CM-217): per Employee Previous Balance, Earned,
  * Overtime, To Pay, Advance, Paid and Final Amount for a period, from the
- * ledger (ADR CM-0004). A balance belongs to the Labour and moves with
- * them on transfer, so the figures are the Labour's whole ledger.
+ * ledger (ADR CM-0004). A balance belongs to the Employee and moves with
+ * them on transfer, so the figures are the Employee's whole ledger.
  * Always carries amounts: the route refuses it without Financial.
  */
 export function buildLabourPaymentReport(input: {
   range: DateRange;
-  labours: readonly ReportLabour[];
+  employees: readonly ReportEmployee[];
   entries: readonly ReportLedgerEntry[];
 }): ReportBody {
   const byParty = new Map<string, ReportLedgerEntry[]>();
@@ -28,8 +28,8 @@ export function buildLabourPaymentReport(input: {
   }
   const columns = [
     column("Sl. No.", "count", 5),
-    column("Labour", "text", 22),
-    column("Labour Id", "text", 10),
+    column("Employee", "text", 22),
+    column("Employee Id", "text", 10),
     column("Category", "text", 14),
     column("Previous Balance", "money", 13),
     column("Earned", "money"),
@@ -39,15 +39,18 @@ export function buildLabourPaymentReport(input: {
     column("Paid", "money"),
     column("Final Amount", "money", 13),
   ];
-  const rows: Cell[][] = [...input.labours]
+  const rows: Cell[][] = [...input.employees]
     .sort(byName)
-    .map((labour, index) => {
-      const figures = paymentFigures(byParty.get(labour.id) ?? [], input.range);
+    .map((employee, index) => {
+      const figures = paymentFigures(
+        byParty.get(employee.id) ?? [],
+        input.range,
+      );
       return [
         index + 1,
-        labour.name,
-        labour.labourCode,
-        labour.category,
+        employee.name,
+        employee.employeeCode,
+        employee.category,
         figures.previousBalance,
         figures.earned,
         figures.overtime,
@@ -60,11 +63,11 @@ export function buildLabourPaymentReport(input: {
   const totals = totalsOf(columns, rows, { 1: "Total" });
   totals[0] = null;
   return {
-    title: "All Labour Payment Report",
+    title: "Employee Payments Report",
     notes: [
-      "Labours on this Project now, or with money for it in the period.",
-      "Each Labour's figures are their whole ledger: a balance moves with the Labour on transfer.",
-      "Previous Balance includes opening balances; Final Amount = Previous Balance + To Pay - Advance - Paid. A negative amount is owed by the Labour.",
+      "Employees on this Project now, or with money for it in the period.",
+      "Each Employee's figures are their whole ledger: a balance moves with the Employee on transfer.",
+      "Previous Balance includes opening balances; Final Amount = Previous Balance + To Pay - Advance - Paid. A negative amount is owed by the Employee.",
     ],
     tables: [{ name: "Payments", columns, rows, totals }],
   };

@@ -3,7 +3,7 @@ import {
   hours,
   MARK_LEGEND,
   tally,
-  type ReportLabour,
+  type ReportEmployee,
   type ReportLabourDay,
 } from "./labour-days";
 import {
@@ -26,17 +26,17 @@ export type ReportProjectLabourDay = ReportLabourDay & { projectId: string };
 export type ReportProject = { id: string; name: string };
 
 /**
- * Central Labour Attendance (CM-903, ADR CM-0021 §5): every Project's
- * labour days in the range, one row per Project and Labour like the
- * Project's All Labour Attendance summary (present, half day, absent,
+ * Central Employee Attendance (CM-903, ADR CM-0021 §5): every Project's
+ * labour days in the range, one row per Project and Employee like the
+ * Project's Employee Attendance summary (present, half day, absent,
  * leave, paid leave, holiday, overtime hours), and each Project's totals.
- * Only Labours marked in a Project in the range appear under it; a Labour
+ * Only Employees marked in a Project in the range appear under it; an Employee
  * who worked at two Projects has a row at each.
  */
 export function buildCentralLabourAttendanceReport(input: {
   range: DateRange;
   projects: readonly ReportProject[];
-  labours: readonly ReportLabour[];
+  employees: readonly ReportEmployee[];
   days: readonly ReportProjectLabourDay[];
   /**
    * Every Project of the Company (the Owner), the Projects the member is
@@ -47,27 +47,27 @@ export function buildCentralLabourAttendanceReport(input: {
   const inRange = input.days.filter(
     (day) => day.date >= input.range.from && day.date <= input.range.to,
   );
-  const laboursById = new Map(
-    input.labours.map((labour) => [labour.id, labour]),
+  const employeesById = new Map(
+    input.employees.map((employee) => [employee.id, employee]),
   );
   const projects = [...input.projects].sort((a, b) =>
     a.name.localeCompare(b.name, "en", { sensitivity: "base", numeric: true }),
   );
   const daysOf = new Map<string, Map<string, ReportLabourDay[]>>();
   for (const day of inRange) {
-    if (!laboursById.has(day.labourId)) continue;
+    if (!employeesById.has(day.employeeId)) continue;
     const project =
       daysOf.get(day.projectId) ?? new Map<string, ReportLabourDay[]>();
-    const list = project.get(day.labourId) ?? [];
+    const list = project.get(day.employeeId) ?? [];
     list.push(day);
-    project.set(day.labourId, list);
+    project.set(day.employeeId, list);
     daysOf.set(day.projectId, project);
   }
 
   const columns = [
     column("Project", "text", 18),
-    column("Labour", "text", 22),
-    column("Labour Id", "text", 10),
+    column("Employee", "text", 22),
+    column("Employee Id", "text", 10),
     column("Category", "text", 14),
     column("Present", "count"),
     column("Half day", "count"),
@@ -79,24 +79,24 @@ export function buildCentralLabourAttendanceReport(input: {
   ];
   const projectColumns = [
     column("Project", "text", 18),
-    column("Labours", "count"),
+    column("Employees", "count"),
     ...columns.slice(4),
   ];
   const rows: Cell[][] = [];
   const projectRows: Cell[][] = [];
   for (const project of projects) {
-    const byLabour = daysOf.get(project.id);
-    if (byLabour == null) continue;
-    const labours = [...byLabour.keys()]
-      .flatMap((id) => laboursById.get(id) ?? [])
+    const byEmployee = daysOf.get(project.id);
+    if (byEmployee == null) continue;
+    const employees = [...byEmployee.keys()]
+      .flatMap((id) => employeesById.get(id) ?? [])
       .sort(byName);
-    for (const labour of labours) {
-      const sum = tally(byLabour.get(labour.id) ?? []);
+    for (const employee of employees) {
+      const sum = tally(byEmployee.get(employee.id) ?? []);
       rows.push([
         project.name,
-        labour.name,
-        labour.labourCode,
-        labour.category,
+        employee.name,
+        employee.employeeCode,
+        employee.category,
         sum.present,
         sum.halfDay,
         sum.absent,
@@ -106,10 +106,10 @@ export function buildCentralLabourAttendanceReport(input: {
         hours(sum.overtimeHundredths),
       ]);
     }
-    const all = tally([...byLabour.values()].flat());
+    const all = tally([...byEmployee.values()].flat());
     projectRows.push([
       project.name,
-      labours.length,
+      employees.length,
       all.present,
       all.halfDay,
       all.absent,
@@ -120,15 +120,15 @@ export function buildCentralLabourAttendanceReport(input: {
     ]);
   }
   return {
-    title: "Central Labour Attendance Report",
+    title: "Central Employee Attendance Report",
     notes: [
       COVERS[input.covers],
-      `${String(projectRows.length)} ${projectRows.length === 1 ? "Project" : "Projects"} with labour marked in the period. A Labour marked at two Projects has a row at each.`,
+      `${String(projectRows.length)} ${projectRows.length === 1 ? "Project" : "Projects"} with Employees marked in the period. An Employee marked at two Projects has a row at each.`,
       MARK_LEGEND,
     ],
     tables: [
       {
-        name: "By Labour",
+        name: "By Employee",
         columns,
         rows,
         totals: totalsOf(columns, rows, {

@@ -579,7 +579,7 @@ export function printsAmounts(kind: ReportKind): boolean {
   return catalogueEntry(kind).money !== "never";
 }
 
-/** The download name: `all-labour-attendance-2026-09-01-to-2026-09-30`. */
+/** The download name: `employee-attendance-2026-09-01-to-2026-09-30`. */
 export function reportFileName(params: ReportParams): string {
   const slug = REPORT_TITLES[params.kind]
     .toLowerCase()

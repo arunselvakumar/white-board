@@ -238,7 +238,7 @@ export class CompanyDashboardReader {
         pendingInspections: may(INSPECTIONS, id)
           ? (pending?.pendingInspections ?? 0)
           : null,
-        labourToday: labourIds.includes(id) ? (labour.get(id) ?? 0) : null,
+        employeesToday: labourIds.includes(id) ? (labour.get(id) ?? 0) : null,
         due: dueIds.includes(id) ? (dues.get(id) ?? 0n) : null,
       };
     });

@@ -4,7 +4,7 @@ import type {
   DprDocument,
   DprReadModel,
 } from "../domain/daily-progress-report";
-import type { ReportLabour, ReportLabourDay } from "../domain/labour-days";
+import type { ReportEmployee, ReportLabourDay } from "../domain/labour-days";
 import type { ReportLedgerEntry } from "../domain/ledger-summary";
 import type { ReportDocument, ReportImageRef } from "../domain/report-document";
 import type { DateRange } from "../domain/report-period";
@@ -165,23 +165,23 @@ export type ReportSource = SiteWorkReportSource & {
     projectId: string | null,
     requestedBy?: string,
   ): Promise<HeaderFacts>;
-  /** Labours marked in the Project in the range, with their days. */
+  /** Employees marked in the Project in the range, with their days. */
   labourDays(
     workspaceId: string,
     projectId: string,
     range: DateRange,
-  ): Promise<{ labours: ReportLabour[]; days: ReportLabourDay[] }>;
+  ): Promise<{ employees: ReportEmployee[]; days: ReportLabourDay[] }>;
   /**
-   * Labours on the Project now or with ledger entries for it in the
+   * Employees on the Project now or with ledger entries for it in the
    * range, and every one of their entries up to the range's end.
    */
   labourLedger(
     workspaceId: string,
     projectId: string,
     range: DateRange,
-  ): Promise<{ labours: ReportLabour[]; entries: ReportLedgerEntry[] }>;
+  ): Promise<{ employees: ReportEmployee[]; entries: ReportLedgerEntry[] }>;
   /**
-   * The muster roll's Labours: marked in the Project in the month, or on
+   * The muster roll's Employees: marked in the Project in the month, or on
    * it now and joined by the month's end; their days in the month, and
    * their advance and payment entries for the Project in the month.
    */
@@ -190,14 +190,14 @@ export type ReportSource = SiteWorkReportSource & {
     projectId: string,
     range: DateRange,
   ): Promise<{
-    labours: ReportLabour[];
+    employees: ReportEmployee[];
     days: ReportLabourDay[];
     entries: ReportLedgerEntry[];
   }>;
   /**
-   * Central Labour Attendance (CM-903): the days marked in `projectIds`
+   * Central Employee Attendance (CM-903): the days marked in `projectIds`
    * (null: every Project of the Company) in the range, with their
-   * Projects and Labours.
+   * Projects and Employees.
    */
   projectLabourDays(
     workspaceId: string,
@@ -205,7 +205,7 @@ export type ReportSource = SiteWorkReportSource & {
     range: DateRange,
   ): Promise<{
     projects: ReportProject[];
-    labours: ReportLabour[];
+    employees: ReportEmployee[];
     days: ReportProjectLabourDay[];
   }>;
   vendorLines(

@@ -169,11 +169,11 @@ export function prismaDashboardSource(db: PrismaClient): DashboardSource {
     async labourPresent(workspaceId, projectIds, date) {
       const out = new Map<string, number>();
       if (projectIds.length === 0) return out;
-      // "Labours present today" on the Project Dashboard: Present + Half Day.
+      // "Employees present today" on the Project Dashboard: Present + Half Day.
       const rows = await db.$queryRaw<{ projectId: string; present: number }[]>(
         Prisma.sql`
           SELECT project_id::text AS "projectId", count(*)::int AS present
-          FROM construction_labour.labour_attendance
+          FROM construction_labour.employee_attendance
           WHERE workspace_id = ${workspaceId}
             AND project_id = ANY(${[...new Set(projectIds)]}::uuid[])
             AND attendance_date = ${day(date)}::date

@@ -770,7 +770,7 @@ describe("procurement reports HTTP (CM-903)", () => {
     expect(projectRows.lines.map((line) => line[0])).toEqual(["Tower A"]);
   });
 
-  it("Central Labour Attendance: a row per Project and Labour, the member's Projects only, central only", async () => {
+  it("Central Employee Attendance: a row per Project and Employee, the member's Projects only, central only", async () => {
     const ctx = await setup();
     const today = TODAY;
     for (const [projectId, status] of [
@@ -794,13 +794,13 @@ describe("procurement reports HTTP (CM-903)", () => {
       projectId: null,
       params: range,
     });
-    expect(job.title).toBe("Central Labour Attendance");
+    expect(job.title).toBe("Central Employee Attendance");
     const book = await workbook(supervisor.actor, job);
-    const byLabour = tableOf(book.worksheets[0], "Project", "Labour");
+    const byLabour = tableOf(book.worksheets[0], "Project", "Employee");
     expect(byLabour.header.slice(0, 5)).toEqual([
       "Project",
-      "Labour",
-      "Labour Id",
+      "Employee",
+      "Employee Id",
       "Category",
       "Present",
     ]);
@@ -808,7 +808,7 @@ describe("procurement reports HTTP (CM-903)", () => {
       "Tower A",
       "Tower A",
     ]);
-    const byProject = tableOf(book.worksheets[1], "Project", "Labours");
+    const byProject = tableOf(book.worksheets[1], "Project", "Employees");
     expect(byProject.lines).toEqual([
       expect.arrayContaining(["Tower A", 2, 1, 1]),
     ]);
@@ -823,7 +823,7 @@ describe("procurement reports HTTP (CM-903)", () => {
     const ownerRows = tableOf(
       (await workbook(ctx.owner, owner)).worksheets[0],
       "Project",
-      "Labour",
+      "Employee",
     );
     expect(ownerRows.lines.map((line) => line[0])).toEqual(["Villa Phase 2"]);
 

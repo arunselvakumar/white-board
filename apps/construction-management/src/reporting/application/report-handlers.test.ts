@@ -173,11 +173,11 @@ function source(overrides: Partial<ReportSource> = {}): ReportSource {
         logo: null,
         requesterName: "Asha Rao",
       }),
-    labourDays: () => Promise.resolve({ labours: [], days: [] }),
-    labourLedger: () => Promise.resolve({ labours: [], entries: [] }),
-    musterRoll: () => Promise.resolve({ labours: [], days: [], entries: [] }),
+    labourDays: () => Promise.resolve({ employees: [], days: [] }),
+    labourLedger: () => Promise.resolve({ employees: [], entries: [] }),
+    musterRoll: () => Promise.resolve({ employees: [], days: [], entries: [] }),
     projectLabourDays: () =>
-      Promise.resolve({ projects: [], labours: [], days: [] }),
+      Promise.resolve({ projects: [], employees: [], days: [] }),
     vendorLines: () =>
       Promise.resolve({ lines: [], vendorName: null, categoryName: null }),
     // Site work reports (CM-605, CM-608).
@@ -253,7 +253,7 @@ describe("report jobs (inline runner)", () => {
     const job = await handlers.request(ATTENDANCE);
     expect(statuses).toEqual(["queued", "running", "done"]);
     expect(job.status).toBe("done");
-    expect(job.fileName).toBe("all-labour-attendance-2026-08-01-to-2026-08-31");
+    expect(job.fileName).toBe("employee-attendance-2026-08-01-to-2026-08-31");
     expect(job.xlsxKey).toMatch(/^companies\/ws-1\/reports\/.+\.xlsx$/);
     expect(job.pdfKey).toMatch(/^companies\/ws-1\/reports\/.+\.pdf$/);
     expect(files.map((file) => file.contentType)).toEqual([

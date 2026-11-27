@@ -20,7 +20,7 @@ export type AttendanceHeadsRow = {
 
 /**
  * A Project's attendance heads per date and Labour Category skill (CM-0016
- * §6), read from the labour context's tables: labourers present or on a
+ * §6), read from the labour context's tables: Employees present or on a
  * half day (one head each, live rows) and vendor gangs (full-day plus
  * half-day heads on live sheets). The worksheet attendance panel reads one
  * date; the Project Dashboard reads a range (CM-608).
@@ -39,8 +39,8 @@ export async function attendanceHeadsBetween(
     SELECT day AS date, skill, SUM(heads)::int AS heads FROM (
       SELECT a.attendance_date AS day, lc.skill::text AS skill,
              COUNT(*)::int AS heads
-      FROM construction_labour.labour_attendance a
-      JOIN construction_labour.labours l ON l.id = a.labour_id
+      FROM construction_labour.employee_attendance a
+      JOIN construction_labour.employees l ON l.id = a.employee_id
       LEFT JOIN construction_masters.labour_categories lc
         ON lc.id = l.labour_category_id
       WHERE a.workspace_id = ${workspaceId}

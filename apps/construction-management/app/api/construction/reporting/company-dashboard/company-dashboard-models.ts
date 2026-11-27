@@ -57,10 +57,10 @@ const ProjectRowModel = z.object({
     .describe(
       "Inspection Requests pending a decision in the duration; null without Read.",
     ),
-  labourToday: count
+  employeesToday: count
     .nullable()
     .describe(
-      "Labours present or on half day on the Company's today; null without Attendance Read.",
+      "Employees present or on half day on the Company's today; null without Attendance Read.",
     ),
   due: paise
     .nullable()
@@ -84,7 +84,7 @@ export const GetConstructionReportingCompanyDashboardResponseModel = z
       approvals: count.nullable(),
       pendingIssues: count.nullable(),
       pendingInspections: count.nullable(),
-      labourToday: count.nullable(),
+      employeesToday: count.nullable(),
       amountDue: paise.nullable(),
     }),
     projects: z

@@ -4,17 +4,18 @@ import {
   buildCentralLabourAttendanceReport,
   type ReportProjectLabourDay,
 } from "./central-labour-attendance-report";
-import type { ReportLabour } from "./labour-days";
+import type { ReportEmployee } from "./labour-days";
 
 const RANGE = { from: "2026-10-01", to: "2026-10-31" };
 
-function labour(id: string, name: string): ReportLabour {
+function labour(id: string, name: string): ReportEmployee {
   return {
     id,
     name,
-    labourCode: `L-${id}`,
+    employeeCode: `L-${id}`,
     fatherName: null,
     category: "Mason",
+    role: "Labour",
     gender: "male",
     wageType: "daily",
     wageRate: 80_000,
@@ -23,19 +24,18 @@ function labour(id: string, name: string): ReportLabour {
 
 function day(
   projectId: string,
-  labourId: string,
+  employeeId: string,
   date: string,
   status: ReportProjectLabourDay["status"] = "present",
   overtimeHundredths = 0,
 ): ReportProjectLabourDay {
   return {
     projectId,
-    labourId,
+    employeeId,
     date,
     status,
     isPaidLeave: false,
     shift: null,
-    siteEngineers: null,
     checkIn: null,
     checkOut: null,
     breakMinutes: null,
@@ -47,7 +47,7 @@ function day(
   };
 }
 
-describe("Central Labour Attendance (CM-903)", () => {
+describe("Central Employee Attendance (CM-903)", () => {
   it("gives a row per Project and Labour and each Project's totals", () => {
     const body = buildCentralLabourAttendanceReport({
       range: RANGE,
@@ -56,7 +56,7 @@ describe("Central Labour Attendance (CM-903)", () => {
         { id: "p1", name: "Tower A" },
         { id: "p3", name: "Villa" },
       ],
-      labours: [labour("a", "Murugan"), labour("b", "Anand")],
+      employees: [labour("a", "Murugan"), labour("b", "Anand")],
       days: [
         day("p1", "a", "2026-10-01"),
         day("p1", "a", "2026-10-02", "half_day", 150),
@@ -88,7 +88,7 @@ describe("Central Labour Attendance (CM-903)", () => {
     const all = buildCentralLabourAttendanceReport({
       range: RANGE,
       projects: [],
-      labours: [],
+      employees: [],
       days: [],
       covers: "all",
     });
@@ -97,7 +97,7 @@ describe("Central Labour Attendance (CM-903)", () => {
     const chosen = buildCentralLabourAttendanceReport({
       range: RANGE,
       projects: [],
-      labours: [],
+      employees: [],
       days: [],
       covers: "chosen",
     });

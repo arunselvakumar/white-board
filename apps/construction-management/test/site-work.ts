@@ -13,6 +13,7 @@ import {
 import type { SiteWorkDocumentType } from "@/src/site-work/domain/site-work-documents";
 
 import { actAs } from "./companies";
+import { seedEmployee } from "./employees";
 
 /**
  * HTTP-test helpers for site work (M6). Each area prefixes its own helpers
@@ -338,7 +339,7 @@ export async function worksheetLabourCategory(
 }
 
 /**
- * A labourer on the Project and their attendance on `date` (one live
+ * An Employee on the Project and their attendance on `date` (one live
  * row), optionally deleted.
  */
 export async function worksheetLabourAttendance(
@@ -352,30 +353,23 @@ export async function worksheetLabourAttendance(
     deleted?: boolean;
   },
 ): Promise<void> {
-  const labourId = randomUUID();
-  await prisma.constructionLabourLabour.create({
-    data: {
-      id: labourId,
-      workspaceId,
-      name: `Murugan ${randomUUID().slice(0, 6)}`,
-      joiningDate: day("2026-04-01"),
-      wageType: "daily",
-      wagePerDay: 80_000,
-      overtimeWagePerHour: 10_000,
-      weeklyHolidays: [0],
-      labourCategoryId: options.categoryId,
-      projects: {
-        create: { workspaceId, projectId, since: day("2026-04-01") },
-      },
-      ...audit(by),
-    },
+  const employeeId = await seedEmployee({
+    workspaceId,
+    name: `Murugan ${randomUUID().slice(0, 6)}`,
+    joiningDate: "2026-04-01",
+    wagePerDay: 80_000,
+    overtimeWagePerHour: 10_000,
+    weeklyHolidays: [0],
+    labourCategoryId: options.categoryId,
+    projectIds: [projectId],
+    by,
   });
   await prisma.constructionLabourAttendance.create({
     data: {
       id: randomUUID(),
       workspaceId,
       projectId,
-      labourId,
+      employeeId,
       attendanceDate: day(date),
       status: options.status,
       wageType: "daily",

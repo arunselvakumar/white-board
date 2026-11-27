@@ -71,13 +71,13 @@ export type DprEquipmentUsage = {
 };
 
 /**
- * The Project's attendance that day (CM-0016 §6): Labours present or on a
+ * The Project's attendance that day (CM-0016 §6): Employees present or on a
  * half day count one head each; vendor gangs their full-day and half-day
  * heads. Split by the Labour Category's skill; no category is unskilled.
  */
 export type DprAttendance = {
-  labourPresent: DprHeadcount;
-  labourHalfDay: DprHeadcount;
+  employeesPresent: DprHeadcount;
+  employeesHalfDay: DprHeadcount;
   vendorFullDay: DprHeadcount;
   vendorHalfDay: DprHeadcount;
 };
@@ -346,8 +346,8 @@ function labourSection(model: DprReadModel): DprSection {
   );
   const a = model.attendance;
   const attended = [
-    a.labourPresent,
-    a.labourHalfDay,
+    a.employeesPresent,
+    a.employeesHalfDay,
     a.vendorFullDay,
     a.vendorHalfDay,
   ].reduce(sum, ZERO);
@@ -390,8 +390,8 @@ function labourSection(model: DprReadModel): DprSection {
       title: "Attendance and worksheets",
       columns: headColumns,
       rows: [
-        headcountRow("Labour present", a.labourPresent),
-        headcountRow("Labour half day", a.labourHalfDay),
+        headcountRow("Employees present", a.employeesPresent),
+        headcountRow("Employees half day", a.employeesHalfDay),
         headcountRow("Vendor full day", a.vendorFullDay),
         headcountRow("Vendor half day", a.vendorHalfDay),
         headcountRow("Attendance", attended),

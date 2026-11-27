@@ -161,13 +161,13 @@ describe("Company Dashboard HTTP (CM-902)", () => {
       pendingIssues: 0,
       delayedIssues: 0,
       pendingInspections: 1,
-      labourToday: 1,
+      employeesToday: 1,
       due: 5_000_00,
     });
     expect(view.projects[2]).toMatchObject({
       status: "on_hold",
       approvals: 0,
-      labourToday: 0,
+      employeesToday: 0,
       due: 0,
     });
     expect(view.totals).toEqual({
@@ -175,7 +175,7 @@ describe("Company Dashboard HTTP (CM-902)", () => {
       approvals: 6,
       pendingIssues: 0,
       pendingInspections: 2,
-      labourToday: 2,
+      employeesToday: 2,
       amountDue: 7_000_00,
     });
   });
@@ -201,7 +201,7 @@ describe("Company Dashboard HTTP (CM-902)", () => {
         pendingIssues: null,
         delayedIssues: null,
         pendingInspections: 1,
-        labourToday: null,
+        employeesToday: null,
         due: null,
       },
     ]);
@@ -210,7 +210,7 @@ describe("Company Dashboard HTTP (CM-902)", () => {
       approvals: 1,
       pendingIssues: null,
       pendingInspections: 1,
-      labourToday: null,
+      employeesToday: null,
       amountDue: null,
     });
     // Without Payments Read, no amounts anywhere.
@@ -236,14 +236,14 @@ describe("Company Dashboard HTTP (CM-902)", () => {
     const view = await dashboard(actor);
     expect(view.financial).toBe(true);
     expect(
-      view.projects.map((row) => [row.name, row.due, row.labourToday]),
+      view.projects.map((row) => [row.name, row.due, row.employeesToday]),
     ).toEqual([
       ["Tower A", 5_000_00, 1],
       ["Villa B", 2_000_00, 1],
     ]);
     expect(view.totals).toMatchObject({
       amountDue: 7_000_00,
-      labourToday: 2,
+      employeesToday: 2,
       // No Approve flag on any module.
       approvals: null,
     });
