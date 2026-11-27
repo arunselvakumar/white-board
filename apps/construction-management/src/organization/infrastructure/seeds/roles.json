@@ -254,7 +254,7 @@
     },
     {
       "name": "Labour",
-      "description": "Labours on site. They do not sign in, so the Role gives no access.",
+      "description": "Employees who work on site. It gives no access: tick what it may do before one of them signs in.",
       "department": "Human Resources",
       "permissions": {}
     },
