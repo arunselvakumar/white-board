@@ -175,7 +175,7 @@ const PROJECT_MODULES: readonly BackupModule[] = [
   },
   {
     key: "labour.labour",
-    label: "Employee Payments",
+    label: "Labour Payments",
     group: "Labour",
     scope: "project",
     menu: "labour.labour",

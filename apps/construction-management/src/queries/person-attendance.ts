@@ -4,7 +4,6 @@ import type { ConstructionPersonAttendanceResponseModel } from "@/app/api/_lib/p
 
 import { apiJson } from "./http";
 import { LABOURS_API, LABOURS_KEY } from "./labours";
-import { SITE_ENGINEERS_KEY } from "./site-engineers";
 import { VENDORS_API, VENDORS_KEY } from "./vendors";
 
 /** One page of a person's Attendance tab (ADR CM-0051). */
@@ -40,16 +39,9 @@ function personAttendanceQuery(
   });
 }
 
+/** An Employee's Attendance tab (ADR CM-0055): their marked days. */
 export function labourAttendanceQuery(id: string) {
   return personAttendanceQuery(LABOURS_KEY, LABOURS_API, id);
-}
-
-export function siteEngineerAttendanceQuery(id: string) {
-  return personAttendanceQuery(
-    SITE_ENGINEERS_KEY,
-    "/api/construction/masters/site-engineers",
-    id,
-  );
 }
 
 export function vendorAttendanceQuery(id: string) {
@@ -64,5 +56,5 @@ export function teamMemberAttendanceQuery(id: string) {
   );
 }
 
-/** Any of the four: what the tab's component takes. */
+/** Any of the three: what the tab's component takes. */
 export type PersonAttendanceQuery = ReturnType<typeof labourAttendanceQuery>;
