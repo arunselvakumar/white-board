@@ -1,36 +1,41 @@
 import { z } from "zod";
 
 import type {
-  ProjectLabourChoice,
-  ProjectLabourLine,
-} from "@/src/labour/application/labour-ports";
+  ProjectEmployeeChoice,
+  ProjectEmployeeLine,
+} from "@/src/labour/application/employee-ports";
 
 const date = z.iso.date();
 
-export const ConstructionProjectsProjectLabourParamsModel = z.object({
+export const ConstructionProjectsProjectEmployeeParamsModel = z.object({
   id: z.uuid(),
-  labourId: z.uuid(),
+  employeeId: z.uuid(),
 });
+
+const roleModel = z
+  .object({ id: z.uuid(), name: z.string() })
+  .describe("Their Role (ADR CM-0055 §2).");
 
 const categoryModel = z
   .object({ id: z.uuid(), name: z.string() })
   .nullable()
   .describe("Their Labour Category, when they have one.");
 
-/** A Labour on the Project (ADR CM-0038 §2). */
-export const ConstructionProjectsProjectLabourResponseModel = z.object({
+/** An Employee on the Project (ADR CM-0038 §2, CM-0055 §5). */
+export const ConstructionProjectsProjectEmployeeResponseModel = z.object({
   id: z.uuid(),
   name: z.string(),
-  labourCode: z.string().nullable().describe("The Company's Labour Id."),
+  employeeCode: z.string().nullable().describe("The Company's Employee Id."),
+  role: roleModel,
   labourCategory: categoryModel,
   since: date.describe("Their first day on this Project."),
   isActive: z.boolean(),
 });
-export type ConstructionProjectsProjectLabourResponseModel = z.infer<
-  typeof ConstructionProjectsProjectLabourResponseModel
+export type ConstructionProjectsProjectEmployeeResponseModel = z.infer<
+  typeof ConstructionProjectsProjectEmployeeResponseModel
 >;
 
-export const ListConstructionProjectsProjectLaboursRequestModel = z
+export const ListConstructionProjectsProjectEmployeesRequestModel = z
   .object({
     limit: z.coerce.number().int().min(1).max(100).optional().default(50),
     after: z.string().min(1).optional(),
@@ -40,54 +45,54 @@ export const ListConstructionProjectsProjectLaboursRequestModel = z
       .trim()
       .max(100)
       .optional()
-      .describe("Name, Labour Id, father's name or phone."),
+      .describe("Name, Employee Id, father's name or mobile."),
   })
   .refine((value) => value.after == null || value.before == null, {
     message: "after and before are mutually exclusive.",
     path: ["after"],
   });
 
-/** The Project's Labours by name, with cursors both ways and the total (ADR-0020). */
-export const ListConstructionProjectsProjectLaboursResponseModel = z.object({
-  items: z.array(ConstructionProjectsProjectLabourResponseModel),
+/** The Project's Employees by name, with cursors both ways and the total (ADR-0020). */
+export const ListConstructionProjectsProjectEmployeesResponseModel = z.object({
+  items: z.array(ConstructionProjectsProjectEmployeeResponseModel),
   nextCursor: z.string().nullable(),
   prevCursor: z.string().nullable(),
   total: z.int(),
 });
-export type ListConstructionProjectsProjectLaboursResponseModel = z.infer<
-  typeof ListConstructionProjectsProjectLaboursResponseModel
+export type ListConstructionProjectsProjectEmployeesResponseModel = z.infer<
+  typeof ListConstructionProjectsProjectEmployeesResponseModel
 >;
 
-export const ListConstructionProjectsProjectLabourOptionsRequestModel =
+export const ListConstructionProjectsProjectEmployeeOptionsRequestModel =
   z.object({
     search: z
       .string()
       .trim()
       .max(100)
       .optional()
-      .describe("Name, Labour Id, father's name or phone."),
+      .describe("Name, Employee Id, father's name or mobile."),
     limit: z.coerce.number().int().min(1).max(500).optional().default(100),
   });
 
-export const ConstructionProjectsProjectLabourOptionResponseModel = z.object({
+export const ConstructionProjectsProjectEmployeeOptionResponseModel = z.object({
   id: z.uuid(),
   name: z.string(),
-  labourCode: z.string().nullable(),
+  employeeCode: z.string().nullable(),
+  role: roleModel,
   labourCategory: categoryModel,
   joiningDate: date.describe("The earliest From date they can be added on."),
 });
 
-/** Active Labours not on the Project, by name, for Add Labours. */
-export const ListConstructionProjectsProjectLabourOptionsResponseModel =
+/** Active Employees not on the Project, by name, for Add Employees. */
+export const ListConstructionProjectsProjectEmployeeOptionsResponseModel =
   z.object({
-    items: z.array(ConstructionProjectsProjectLabourOptionResponseModel),
+    items: z.array(ConstructionProjectsProjectEmployeeOptionResponseModel),
     hasMore: z
       .boolean()
       .describe("More match than `limit`: search to narrow the list."),
   });
-export type ListConstructionProjectsProjectLabourOptionsResponseModel = z.infer<
-  typeof ListConstructionProjectsProjectLabourOptionsResponseModel
->;
+export type ListConstructionProjectsProjectEmployeeOptionsResponseModel =
+  z.infer<typeof ListConstructionProjectsProjectEmployeeOptionsResponseModel>;
 
 const remark = z
   .string()
@@ -101,51 +106,53 @@ const remark = z
 /** Checked by the labour context, so a bad date is a field error. */
 const requestDate = z.string().max(20).nullable().optional();
 
-/** Adds Labours to the Project from a date; all or none. */
-export const AddConstructionProjectsProjectLaboursRequestModel = z.object({
-  labourIds: z.array(z.uuid()).min(1).max(500),
+/** Adds Employees to the Project from a date; all or none. */
+export const AddConstructionProjectsProjectEmployeesRequestModel = z.object({
+  employeeIds: z.array(z.uuid()).min(1).max(500),
   from: requestDate.describe(
     "YYYY-MM-DD, their first day on the Project; today in the Company's time zone when left out.",
   ),
   remark,
 });
-export type AddConstructionProjectsProjectLaboursRequestModel = z.infer<
-  typeof AddConstructionProjectsProjectLaboursRequestModel
+export type AddConstructionProjectsProjectEmployeesRequestModel = z.infer<
+  typeof AddConstructionProjectsProjectEmployeesRequestModel
 >;
 
-/** Takes a Labour off the Project after their Last day. */
-export const RemoveConstructionProjectsProjectLabourRequestModel = z.object({
+/** Takes an Employee off the Project after their Last day. */
+export const RemoveConstructionProjectsProjectEmployeeRequestModel = z.object({
   lastDay: requestDate.describe(
     "YYYY-MM-DD, their last day on the Project; today in the Company's time zone when left out. The history row is dated the day after.",
   ),
   remark,
 });
-export type RemoveConstructionProjectsProjectLabourRequestModel = z.infer<
-  typeof RemoveConstructionProjectsProjectLabourRequestModel
+export type RemoveConstructionProjectsProjectEmployeeRequestModel = z.infer<
+  typeof RemoveConstructionProjectsProjectEmployeeRequestModel
 >;
 
-export function toProjectLabourResponse(
-  item: ProjectLabourLine,
-): ConstructionProjectsProjectLabourResponseModel {
+export function toProjectEmployeeResponse(
+  item: ProjectEmployeeLine,
+): ConstructionProjectsProjectEmployeeResponseModel {
   return {
     id: item.id,
     name: item.name,
-    labourCode: item.labourCode,
+    employeeCode: item.employeeCode,
+    role: item.role,
     labourCategory: item.labourCategory,
     since: item.since,
     isActive: item.isActive,
   };
 }
 
-export function toProjectLabourOptionsResponse(page: {
-  items: readonly ProjectLabourChoice[];
+export function toProjectEmployeeOptionsResponse(page: {
+  items: readonly ProjectEmployeeChoice[];
   hasMore: boolean;
-}): ListConstructionProjectsProjectLabourOptionsResponseModel {
+}): ListConstructionProjectsProjectEmployeeOptionsResponseModel {
   return {
     items: page.items.map((item) => ({
       id: item.id,
       name: item.name,
-      labourCode: item.labourCode,
+      employeeCode: item.employeeCode,
+      role: item.role,
       labourCategory: item.labourCategory,
       joiningDate: item.joiningDate,
     })),

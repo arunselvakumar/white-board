@@ -7,14 +7,14 @@ import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
 import { createLabourAttendanceCalendar } from "@/src/composition/labour-attendance-calendar";
 
-import { LabourIdParamsModel } from "../../labour-models";
+import { EMPLOYEES_MENU, EmployeeIdParamsModel } from "../../employee-models";
 
 export const dynamic = "force-dynamic";
 
 const calendar = createLabourAttendanceCalendar();
 
 /**
- * A Labour's Attendance tab (ADR CM-0051): a page of months of marked days
+ * An Employee's Attendance tab (ADR CM-0051, CM-0055): a page of months of marked days
  * with the Projects and hours, all-time figures on the first page. Days at
  * Projects the viewer may not open are left out. No amounts.
  */
@@ -23,10 +23,10 @@ export async function GET(
   context: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   try {
-    const session = await requireAccess(request, "masters.labours", "read");
+    const session = await requireAccess(request, EMPLOYEES_MENU, "read");
     if (isResponse(session)) return session;
     const { id } = parseOrThrow(
-      LabourIdParamsModel.safeParse(await context.params),
+      EmployeeIdParamsModel.safeParse(await context.params),
     );
     const query = parseOrThrow(
       ConstructionPersonAttendanceRequestModel.safeParse(

@@ -3,10 +3,10 @@ import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
 import { createLabourActivity } from "@/src/composition/labour-activity";
 
-import { LabourIdParamsModel } from "../../labour-models";
+import { EMPLOYEES_MENU, EmployeeIdParamsModel } from "../../employee-models";
 import {
-  ListConstructionLabourLabourActivityRequestModel,
-  toLabourActivityResponse,
+  ListConstructionLabourEmployeeActivityRequestModel,
+  toEmployeeActivityResponse,
 } from "./activity-models";
 
 export const dynamic = "force-dynamic";
@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 const activity = createLabourActivity();
 
 /**
- * The Labour's Activity (ADR CM-0038 §1, §5): Project moves, attendance
+ * The Employee's Activity (ADR CM-0038 §1, §5, CM-0055): Project moves, attendance
  * and its changes, check-in entries (ADR CM-0044) and profile entries, 30
  * a page, newest effective date first. Entries for Projects the viewer is
  * not on are left out, and check-in entries of Projects without Attendance
@@ -25,13 +25,13 @@ export async function GET(
   context: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   try {
-    const session = await requireAccess(request, "masters.labours", "read");
+    const session = await requireAccess(request, EMPLOYEES_MENU, "read");
     if (isResponse(session)) return session;
     const { id } = parseOrThrow(
-      LabourIdParamsModel.safeParse(await context.params),
+      EmployeeIdParamsModel.safeParse(await context.params),
     );
     const query = parseOrThrow(
-      ListConstructionLabourLabourActivityRequestModel.safeParse(
+      ListConstructionLabourEmployeeActivityRequestModel.safeParse(
         Object.fromEntries(new URL(request.url).searchParams),
       ),
     );
@@ -42,7 +42,7 @@ export async function GET(
       to: query.to ?? null,
       cursor: query.cursor ?? null,
     });
-    return Response.json(toLabourActivityResponse(page));
+    return Response.json(toEmployeeActivityResponse(page));
   } catch (error) {
     return mapError(error);
   }

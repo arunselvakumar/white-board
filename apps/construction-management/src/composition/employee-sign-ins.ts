@@ -1,133 +1,71 @@
 import { prisma, type PrismaClient } from "@repo/construction-db";
 
 import type {
-  SupervisorReadModel,
-  SupervisorHandlers,
-} from "@/src/masters/application/supervisor-handlers";
-import type { LookupStatusFilter } from "@/src/masters/application/lookup-handlers";
-import type {
-  SiteEngineerBankInput,
-  SiteEngineerProfileInput,
-} from "@/src/masters/domain/site-engineer-profile";
-import { createSupervisorHandlers } from "@/src/masters/infrastructure/create-masters-handlers";
+  CreateEmployeeInput,
+  EmployeeHandlers,
+  UpdateEmployeeInput,
+} from "@/src/labour/application/employee-handlers";
+import type { EmployeeReadModel } from "@/src/labour/application/employee-ports";
+import type { Employee } from "@/src/labour/domain/employee";
+import { createEmployeeHandlers } from "@/src/labour/infrastructure/create-employee-handlers";
 import type { CompanyMemberships } from "@/src/organization/application/company-memberships";
 import {
   mobileRequired,
   type PasswordIgnored,
   type TeamMemberHandlers,
+  type TeamMemberWithPassword,
 } from "@/src/organization/application/team-member-handlers";
 import type { TeamMemberReadModel } from "@/src/organization/application/team-member-read-model";
-import type { RoleRepository } from "@/src/organization/domain/role-repository";
-import type { StaffSalaryInput } from "@/src/organization/domain/staff-salary";
 import type { TeamMemberStatus } from "@/src/organization/domain/team-member";
 import { authCompanyMemberships } from "@/src/organization/infrastructure/auth-company-memberships";
 import { createTeamMemberHandlers } from "@/src/organization/infrastructure/create-team-member-handlers";
-import { PrismaRoleRepository } from "@/src/organization/infrastructure/prisma-role-repository";
-import { SITE_ENGINEER_ROLE } from "@/src/organization/infrastructure/role-seeds";
 import type { MemberAccess } from "@/src/shared-kernel/access";
 import { DomainError, conflict } from "@/src/shared-kernel/domain-error";
 
 /**
- * How a Site Engineer signs in (ADR CM-0037):
- *
- * - `site_engineer`: their own sign-in, made and managed on their page, on
- *   the Site Engineer Role, left off Office Staff. They sign in with their
- *   mobile and a password set here; nobody is invited (ADR CM-0053).
- * - `office_staff`: they are an Office Staff member (linked before ADR
- *   CM-0037); that record is managed on Office Staff.
- * - `none`: an older Site Engineer without a sign-in; Edit adds one.
+ * An Employee's sign-in (ADR CM-0055 §4): a membership on their Role,
+ * marked `employee` and left off Office Staff. They sign in with their
+ * mobile and the password set for them (ADR CM-0053).
  */
-export type SiteEngineerSignIn =
-  | {
-      kind: "site_engineer";
-      memberId: string;
-      status: TeamMemberStatus;
-      canSetPassword: boolean;
-      /** Their User also works with another Company: the mobile stays. */
-      mobileLocked: boolean;
-      invitedAt: Date | null;
-      joinedAt: Date | null;
-    }
-  | { kind: "office_staff"; memberId: string; name: string }
-  | { kind: "none" };
-
-/** What the sign-in membership holds for a Site Engineer of their own. */
-export type SiteEngineerMemberDetails = {
-  email: string | null;
-  address: string | null;
-  aadhaarMasked: string | null;
-  panMasked: string | null;
-  emergencyContact: string | null;
-  salaryType: TeamMemberReadModel["salaryType"];
-  /** Paise; the route nulls them without Financial. */
-  salaryPerDay: number | null;
-  salaryPerMonth: number | null;
-  overtimeWagePerHour: number;
-  workingHoursPerDay: string;
-  weeklyHolidays: number[];
-  projectIds: string[];
+export type EmployeeSignIn = {
+  memberId: string;
+  status: TeamMemberStatus;
+  /** Set password may be used (ADR CM-0030 §7). */
+  canSetPassword: boolean;
+  /** Their User also works with another Company: the mobile stays. */
+  mobileLocked: boolean;
+  invitedAt: Date | null;
+  joinedAt: Date | null;
 };
 
-export type SiteEngineerReadModel = SupervisorReadModel & {
-  signIn: SiteEngineerSignIn;
-  /** Null unless `signIn.kind` is `site_engineer`. */
-  member: SiteEngineerMemberDetails | null;
-};
-
-export type SiteEngineerInput = {
-  name: string;
-  mobile: string | null;
-  email: string | null;
-  address: string | null;
-  /** Left out on update keeps the stored one (screens hold the mask). */
-  aadhaar?: string | null;
-  pan?: string | null;
-  emergencyContact: string | null;
-  /** Left out without Financial; each field left out keeps the stored one. */
-  salary?: StaffSalaryInput;
-  /** Left out: none on Add, kept on edit (set from the Project instead). */
-  projectIds?: readonly string[];
-  profile: SiteEngineerProfileInput;
-  /** Left out without Financial, which keeps the stored details. */
-  bank?: SiteEngineerBankInput;
+export type EmployeeWithSignIn = EmployeeReadModel & {
+  /** Null when they do not sign in. */
+  signIn: EmployeeSignIn | null;
 };
 
 /**
- * Their first password: they sign in with their mobile and it, and change
- * it the first time (ADR CM-0053). There is no invitation.
+ * "Can sign in" and, to turn it on, a first password. Left out on Edit
+ * keeps the sign-in as it is; the password is only read when a sign-in is
+ * made (Set password changes it later).
  */
-export type SiteEngineerSignInInput = {
-  password: string | null;
+export type EmployeeSignInInput = {
+  canSignIn: boolean;
+  password?: string | null;
 };
 
-export type SiteEngineerCreated = SiteEngineerReadModel & {
+export type EmployeeCreated = EmployeeWithSignIn & {
+  /** `existing_account`: they got a Join Request; the password was not set. */
   passwordIgnored: PasswordIgnored;
   passwordSet: boolean;
 };
 
-/** A Site Engineer on a Project's Resources (ADR CM-0038 §3). */
-export type ProjectSiteEngineer = {
-  /** The Site Engineer (`supervisors`) row, not their sign-in. */
-  id: string;
-  name: string;
-  mobile: string | null;
-  employeeCode: string | null;
-  disabled: boolean;
-};
-
-/** One the Add Site Engineers picker lists; without a sign-in it is shown, not offered. */
-export type ProjectSiteEngineerChoice = ProjectSiteEngineer & {
-  hasSignIn: boolean;
-};
-
-function projectLine(item: SupervisorReadModel): ProjectSiteEngineer {
-  return {
-    id: item.id,
-    name: item.name,
-    mobile: item.mobile,
-    employeeCode: item.profile.employeeCode,
-    disabled: item.disabled,
-  };
+/** 400 `PASSWORD_REQUIRED` on the Password field. */
+function passwordRequired(): DomainError {
+  return new DomainError(
+    "PASSWORD_REQUIRED",
+    "An Employee who can sign in needs a first password: set one for them.",
+    { details: { field: "password" } },
+  );
 }
 
 function sameSet(a: readonly string[], b: readonly string[]): boolean {
@@ -136,16 +74,8 @@ function sameSet(a: readonly string[], b: readonly string[]): boolean {
   return left.size === right.size && [...left].every((id) => right.has(id));
 }
 
-function signInOf(
-  supervisor: SupervisorReadModel,
-  member: TeamMemberReadModel | null,
-): SiteEngineerSignIn {
-  if (supervisor.teamMemberId == null || member == null)
-    return { kind: "none" };
-  if (!member.siteEngineer)
-    return { kind: "office_staff", memberId: member.id, name: member.name };
+function signInOf(member: TeamMemberReadModel): EmployeeSignIn {
   return {
-    kind: "site_engineer",
     memberId: member.id,
     status: member.status,
     canSetPassword: member.canSetPassword,
@@ -155,91 +85,29 @@ function signInOf(
   };
 }
 
-function memberDetails(member: TeamMemberReadModel): SiteEngineerMemberDetails {
-  return {
-    email: member.email,
-    address: member.address,
-    aadhaarMasked: member.aadhaarMasked,
-    panMasked: member.panMasked,
-    emergencyContact: member.emergencyContact,
-    salaryType: member.salaryType,
-    salaryPerDay: member.salaryPerDay,
-    salaryPerMonth: member.salaryPerMonth,
-    overtimeWagePerHour: member.overtimeWagePerHour,
-    workingHoursPerDay: member.workingHoursPerDay,
-    weeklyHolidays: member.weeklyHolidays,
-    projectIds: member.projectIds,
-  };
-}
-
-function toReadModel(
-  supervisor: SupervisorReadModel,
-  member: TeamMemberReadModel | null,
-): SiteEngineerReadModel {
-  const signIn = signInOf(supervisor, member);
-  return {
-    ...supervisor,
-    signIn,
-    member:
-      signIn.kind === "site_engineer" && member != null
-        ? memberDetails(member)
-        : null,
-  };
-}
+/** What a command made, kept outside the hook so a failure can undo it. */
+type Made = { member: TeamMemberWithPassword | null };
 
 /**
- * A new sign-in needs a password (400 `SIGN_IN_REQUIRED`): a Site Engineer
- * signs in with their mobile and the password set for them (ADR CM-0053).
- */
-function assertSignIn(signIn: SiteEngineerSignInInput | undefined): {
-  password: string;
-} {
-  if (signIn?.password == null)
-    throw new DomainError(
-      "SIGN_IN_REQUIRED",
-      "A Site Engineer signs in with their mobile number and a password: set one for them.",
-    );
-  return { password: signIn.password };
-}
-
-/** Their own sign-in is their mobile (ADR CM-0053): 400 `MOBILE_REQUIRED`. */
-function assertMobile(details: SiteEngineerInput): void {
-  if (details.mobile == null) throw mobileRequired();
-}
-
-/**
- * Site Engineers with a page of their own and a sign-in (ADR CM-0037). The
- * Site Engineer row (masters) holds the name, mobile, profile and bank
- * details; the sign-in membership (organization) holds the email, address,
- * Aadhaar, PAN, emergency contact, salary and Projects, and the Role,
- * always the default Site Engineer Role. Routes check the Labours menu
- * (`masters.labours`) first; giving a sign-in also needs every cell of the
- * Site Engineer Role (403 `CANNOT_GRANT`).
+ * Employees and their optional sign-in (ADR CM-0055 §4). The labour
+ * context holds the Employee; the organization context the membership,
+ * which follows the Employee: their Role, name, mobile and email, and
+ * their Projects (`employee_projects`), so they see what they work on.
+ * Turning "Can sign in" off, or deleting the Employee, removes it.
  *
- * The two contexts write in their own transactions. Every check that could
- * refuse the Site Engineer row runs before the sign-in is made, and a
- * failed row write removes the sign-in it just made.
+ * The two contexts write in their own transactions. The membership is made
+ * or changed after every check of the Employee has passed and before the
+ * Employee is written; a failed Employee write removes a membership it had
+ * just made. Routes check the Employees menu (`masters.labours`) first;
+ * making a sign-in or changing its Role also needs every cell of the Role
+ * (403 `CANNOT_GRANT`).
  */
-export class SiteEngineerHandlers {
+export class EmployeeSignInHandlers {
   constructor(
-    private readonly supervisors: SupervisorHandlers,
+    readonly employees: EmployeeHandlers,
     private readonly members: TeamMemberHandlers,
-    private readonly roles: RoleRepository,
     private readonly memberships: CompanyMemberships,
   ) {}
-
-  /** The default Site Engineer Role; 409 when a Company has none. */
-  private async roleId(workspaceId: string): Promise<string> {
-    const role = (await this.roles.listAll(workspaceId)).find(
-      (item) => item.isSeed && item.name === SITE_ENGINEER_ROLE,
-    );
-    if (role == null)
-      throw conflict(
-        "SITE_ENGINEER_ROLE_MISSING",
-        "This Company has no default Site Engineer Role to sign in with.",
-      );
-    return role.id;
-  }
 
   private async member(
     workspaceId: string,
@@ -255,206 +123,68 @@ export class SiteEngineerHandlers {
     }
   }
 
-  async list(
+  /** The Employee with how they sign in. */
+  async withSignIn(
     workspaceId: string,
-    status: LookupStatusFilter = "all",
-  ): Promise<SiteEngineerReadModel[]> {
-    const supervisors = await this.supervisors.list(workspaceId, status);
+    item: EmployeeReadModel,
+  ): Promise<EmployeeWithSignIn> {
+    const member = await this.member(workspaceId, item.teamMemberId);
+    return { ...item, signIn: member == null ? null : signInOf(member) };
+  }
+
+  /** Many Employees with how each signs in, in one read of the members. */
+  async withSignIns(
+    workspaceId: string,
+    items: readonly EmployeeReadModel[],
+  ): Promise<EmployeeWithSignIn[]> {
     const ids = new Set(
-      supervisors
-        .map((item) => item.teamMemberId)
-        .filter((id): id is string => id != null),
+      items.flatMap((item) =>
+        item.teamMemberId == null ? [] : [item.teamMemberId],
+      ),
     );
-    if (ids.size === 0)
-      return supervisors.map((item) => toReadModel(item, null));
+    if (ids.size === 0) return items.map((item) => ({ ...item, signIn: null }));
     const page = await this.members.list({
       workspaceId,
       limit: 10_000,
-      includeSiteEngineers: true,
+      includeEmployees: true,
     });
     const byId = new Map(
       page.items
         .filter((member) => ids.has(member.id))
-        .map((member) => [member.id, member]),
+        .map((member) => [member.id, signInOf(member)]),
     );
-    return supervisors.map((item) =>
-      toReadModel(
-        item,
+    return items.map((item) => ({
+      ...item,
+      signIn:
         item.teamMemberId == null
           ? null
           : (byId.get(item.teamMemberId) ?? null),
-      ),
+    }));
+  }
+
+  async get(workspaceId: string, id: string): Promise<EmployeeWithSignIn> {
+    return this.withSignIn(
+      workspaceId,
+      await this.employees.get(workspaceId, id),
     );
   }
 
-  async get(workspaceId: string, id: string): Promise<SiteEngineerReadModel> {
-    const supervisor = await this.supervisors.get(workspaceId, id);
-    return toReadModel(
-      supervisor,
-      await this.member(workspaceId, supervisor.teamMemberId),
-    );
-  }
-
   /**
-   * Every sign-in a Site Engineer row points at: their own, or an Office
-   * Staff one linked before ADR CM-0037. A Project's Team Members leave
-   * these out, so each person appears once (ADR CM-0038 §3).
+   * A new membership on the Employee's Role and Projects; recorded on the
+   * Employee and in `made`.
    */
-  async signInIds(workspaceId: string): Promise<Set<string>> {
-    const supervisors = await this.supervisors.list(workspaceId);
-    return new Set(
-      supervisors
-        .map((item) => item.teamMemberId)
-        .filter((id): id is string => id != null),
-    );
-  }
-
-  /** The sign-ins assigned to the Project, the Owner (on every one) left out. */
-  private async assignedSignIns(
-    workspaceId: string,
-    projectId: string,
-  ): Promise<{ assigned: Set<string>; ownerIds: Set<string> }> {
-    const team = await this.members.projectTeam(workspaceId, projectId);
-    return {
-      assigned: new Set(
-        team.filter((member) => !member.isOwner).map((member) => member.id),
-      ),
-      ownerIds: new Set(
-        team.filter((member) => member.isOwner).map((member) => member.id),
-      ),
-    };
-  }
-
-  /**
-   * The Site Engineers on a Project: those whose sign-in is assigned to it
-   * (ADR CM-0038 §3), by name. The caller has checked the Project is
-   * visible.
-   */
-  async onProject(
-    workspaceId: string,
-    projectId: string,
-  ): Promise<ProjectSiteEngineer[]> {
-    const [supervisors, { assigned }] = await Promise.all([
-      this.supervisors.list(workspaceId),
-      this.assignedSignIns(workspaceId, projectId),
-    ]);
-    return supervisors
-      .filter(
-        (item) => item.teamMemberId != null && assigned.has(item.teamMemberId),
-      )
-      .map(projectLine);
-  }
-
-  /**
-   * Enabled Site Engineers not on the Project. Those without a sign-in come
-   * back with `hasSignIn: false`: they cannot be put on a Project until
-   * they get one (ADR CM-0038, question 1).
-   */
-  async assignableToProject(
-    workspaceId: string,
-    projectId: string,
-  ): Promise<ProjectSiteEngineerChoice[]> {
-    const [engineers, { assigned, ownerIds }] = await Promise.all([
-      this.list(workspaceId, "enabled"),
-      this.assignedSignIns(workspaceId, projectId),
-    ]);
-    return engineers.flatMap<ProjectSiteEngineerChoice>((item) => {
-      if (item.signIn.kind === "none")
-        return [{ ...projectLine(item), hasSignIn: false }];
-      const memberId = item.signIn.memberId;
-      if (assigned.has(memberId) || ownerIds.has(memberId)) return [];
-      return [{ ...projectLine(item), hasSignIn: true }];
-    });
-  }
-
-  /**
-   * Makes `ids` (Site Engineer rows) the Site Engineers on the Project by
-   * assigning their sign-ins through the Team Member handlers, so each
-   * change is audited `team_member.projects_changed` and they see the
-   * Project at their next request. `expectedIds` is the set the screen
-   * loaded (409 `PROJECT_RESOURCES_CHANGED` when it moved). A Site Engineer
-   * newly added must exist (400 `SUPERVISOR_NOT_FOUND`), be enabled (400
-   * `SUPERVISOR_DISABLED`) and have a sign-in (409
-   * `SITE_ENGINEER_NO_SIGN_IN`). No other sign-in is touched.
-   */
-  async setOnProject(input: {
-    workspaceId: string;
-    projectId: string;
-    ids: readonly string[];
-    expectedIds: readonly string[];
-    by: string;
-  }): Promise<void> {
-    const [engineers, { assigned }] = await Promise.all([
-      this.list(input.workspaceId),
-      this.assignedSignIns(input.workspaceId, input.projectId),
-    ]);
-    const signInOfRow = (item: SiteEngineerReadModel) =>
-      item.signIn.kind === "none" ? null : item.signIn.memberId;
-    const byId = new Map(engineers.map((item) => [item.id, item]));
-    const current = engineers.filter((item) => {
-      const memberId = signInOfRow(item);
-      return memberId != null && assigned.has(memberId);
-    });
-    const currentIds = current.map((item) => item.id);
-    if (!sameSet(input.expectedIds, currentIds))
-      throw conflict(
-        "PROJECT_RESOURCES_CHANGED",
-        "Someone else changed this Project's Teams after you opened them. Reload to see their changes.",
-      );
-    const wanted: string[] = [];
-    for (const id of new Set(input.ids)) {
-      const item = byId.get(id);
-      if (item == null)
-        throw new DomainError(
-          "SUPERVISOR_NOT_FOUND",
-          "Choose Site Engineers from the list. One of them was not found.",
-          { details: { ids: [id] } },
-        );
-      const memberId = signInOfRow(item);
-      if (currentIds.includes(id) && memberId != null) {
-        wanted.push(memberId);
-        continue;
-      }
-      if (item.disabled)
-        throw new DomainError(
-          "SUPERVISOR_DISABLED",
-          `${item.name} is disabled, so they cannot be added to a Project.`,
-          { details: { ids: [id] } },
-        );
-      if (memberId == null)
-        throw conflict(
-          "SITE_ENGINEER_NO_SIGN_IN",
-          `${item.name} has no sign-in yet. Give them one on their page first.`,
-          { ids: [id] },
-        );
-      wanted.push(memberId);
-    }
-    await this.members.setProjectTeam({
-      workspaceId: input.workspaceId,
-      projectId: input.projectId,
-      ids: wanted,
-      expectedIds: current
-        .map(signInOfRow)
-        .filter((id): id is string => id != null),
-      by: input.by,
-      scope: {
-        only: new Set(
-          engineers.map(signInOfRow).filter((id): id is string => id != null),
-        ),
-      },
-    });
-  }
-
-  /** A new sign-in on the Site Engineer Role, left off Office Staff. */
   private async newSignIn(input: {
     workspaceId: string;
     by: string;
     grantor: MemberAccess;
-    details: SiteEngineerInput;
-    signIn: { password: string };
-  }) {
-    const { details } = input;
-    return this.members.invite({
+    employee: Employee;
+    password: string;
+    made: Made;
+  }): Promise<void> {
+    const { employee } = input;
+    const { details } = employee;
+    if (details.mobile == null) throw mobileRequired();
+    input.made.member = await this.members.invite({
       workspaceId: input.workspaceId,
       by: input.by,
       grantor: input.grantor,
@@ -462,19 +192,15 @@ export class SiteEngineerHandlers {
         name: details.name,
         mobile: details.mobile,
         email: details.email,
-        address: details.address,
-        aadhaar: details.aadhaar ?? null,
-        pan: details.pan ?? null,
-        emergencyContact: details.emergencyContact,
       },
-      ...(details.salary === undefined ? {} : { salary: details.salary }),
       memberType: "normal",
-      siteEngineer: true,
-      projectIds: details.projectIds ?? [],
-      roleId: await this.roleId(input.workspaceId),
+      employee: true,
+      projectIds: [...employee.projectIds],
+      roleId: details.roleId,
       invite: false,
-      password: input.signIn.password,
+      password: input.password,
     });
+    employee.setSignIn(input.made.member.id, input.by, employee.updatedAt);
   }
 
   /** Takes a sign-in back: the record is tombstoned, the membership ends. */
@@ -483,164 +209,215 @@ export class SiteEngineerHandlers {
     memberId: string,
     by: string,
   ): Promise<void> {
-    const { userId } = await this.members.remove({
-      workspaceId,
-      id: memberId,
-      by,
-    });
+    let userId: string | null;
+    try {
+      ({ userId } = await this.members.remove({
+        workspaceId,
+        id: memberId,
+        by,
+      }));
+    } catch (error) {
+      if (error instanceof DomainError && error.kind === "not_found") return;
+      throw error;
+    }
     if (userId != null)
       await this.memberships.removeMember({ workspaceId, userId });
   }
 
   /**
-   * Add Site Engineer: the row and its sign-in. 400 `MOBILE_REQUIRED`
-   * without a mobile and `SIGN_IN_REQUIRED` without a password.
+   * Add Employee. With "Can sign in", 400 `MOBILE_REQUIRED` without a
+   * mobile and `PASSWORD_REQUIRED` without a password; someone who already
+   * signs in with that mobile gets a Join Request instead
+   * (`passwordIgnored`).
    */
   async create(input: {
     workspaceId: string;
     by: string;
     grantor: MemberAccess;
-    details: SiteEngineerInput;
-    signIn?: SiteEngineerSignInInput;
-  }): Promise<SiteEngineerCreated> {
-    assertMobile(input.details);
-    const signIn = assertSignIn(input.signIn);
-    const row = {
-      workspaceId: input.workspaceId,
-      by: input.by,
-      name: input.details.name,
-      mobile: input.details.mobile,
-      profile: input.details.profile,
-      ...(input.details.bank === undefined ? {} : { bank: input.details.bank }),
-    };
-    await this.supervisors.assertCanCreate(row);
-    const member = await this.newSignIn({ ...input, signIn });
-    let supervisor: SupervisorReadModel;
+    employee: CreateEmployeeInput;
+    signIn?: EmployeeSignInInput;
+  }): Promise<EmployeeCreated> {
+    const password = input.signIn?.password ?? null;
+    if (input.signIn?.canSignIn === true && password == null)
+      throw passwordRequired();
+    const made: Made = { member: null };
+    let created: EmployeeReadModel;
     try {
-      supervisor = await this.supervisors.create({
-        ...row,
-        teamMemberId: member.id,
+      created = await this.employees.create({
+        workspaceId: input.workspaceId,
+        employee: input.employee,
+        by: input.by,
+        beforeWrite:
+          input.signIn?.canSignIn !== true || password == null
+            ? undefined
+            : (employee) =>
+                this.newSignIn({ ...input, employee, password, made }),
       });
     } catch (error) {
-      await this.removeSignIn(input.workspaceId, member.id, input.by);
+      if (made.member != null)
+        await this.removeSignIn(input.workspaceId, made.member.id, input.by);
       throw error;
     }
+    const { member } = made;
     return {
-      ...toReadModel(supervisor, member),
-      passwordIgnored: member.passwordIgnored,
-      passwordSet: member.passwordIgnored == null,
+      ...created,
+      signIn: member == null ? null : signInOf(member),
+      passwordIgnored: member?.passwordIgnored ?? null,
+      passwordSet: member != null && member.passwordIgnored == null,
     };
   }
 
   /**
-   * Edit Site Engineer. With their own sign-in, its details and Projects
-   * change too, and a new mobile moves their sign-in (ADR CM-0053). An
-   * older one without a sign-in must get one now (400 `SIGN_IN_REQUIRED`).
-   * Both need a mobile (400 `MOBILE_REQUIRED`). One who is Office Staff
-   * keeps that record as it is: only the Site Engineer row changes. 409
-   * `SUPERVISOR_CHANGED` when the row is stale.
+   * Edit Employee. "Can sign in" turned on makes a sign-in (as on Add);
+   * left on, the sign-in takes the new Role, name, mobile and email (a new
+   * mobile moves it, 409 `MOBILE_IN_USE` / `MOBILE_LOCKED`, ADR CM-0053
+   * §3) and the Employee's Projects; turned off, it is removed. 409
+   * `EMPLOYEE_CHANGED` when the Employee is stale.
    */
   async update(input: {
     workspaceId: string;
     id: string;
     by: string;
     grantor: MemberAccess;
-    expectedUpdatedAt: Date;
-    details: SiteEngineerInput;
-    signIn?: SiteEngineerSignInInput;
-  }): Promise<SiteEngineerReadModel> {
-    const current = await this.get(input.workspaceId, input.id);
-    const { details } = input;
-    if (current.signIn.kind !== "office_staff") assertMobile(details);
-    const row = {
-      workspaceId: input.workspaceId,
-      id: input.id,
-      by: input.by,
-      expectedUpdatedAt: input.expectedUpdatedAt,
-      name: details.name,
-      mobile: details.mobile,
-      teamMemberId: current.teamMemberId,
-      profile: details.profile,
-      ...(details.bank === undefined ? {} : { bank: details.bank }),
+    employee: UpdateEmployeeInput;
+    signIn?: EmployeeSignInInput;
+  }): Promise<EmployeeWithSignIn & { passwordIgnored: PasswordIgnored }> {
+    const current = await this.employees.get(input.workspaceId, input.id);
+    const had =
+      (await this.member(input.workspaceId, current.teamMemberId))?.id ?? null;
+    const wants = input.signIn?.canSignIn ?? current.teamMemberId != null;
+    const password = input.signIn?.password ?? null;
+    if (wants && had == null && password == null) throw passwordRequired();
+    const made: Made = { member: null };
+    let updated: EmployeeReadModel;
+    try {
+      updated = await this.employees.update({
+        workspaceId: input.workspaceId,
+        id: input.id,
+        employee: input.employee,
+        by: input.by,
+        beforeWrite: async (employee) => {
+          if (wants && had == null && password != null)
+            await this.newSignIn({ ...input, employee, password, made });
+          else if (wants && had != null)
+            await this.follow(input, had, current.details.roleId, employee);
+          // Turned off, or a membership already gone: cleared.
+          else if (employee.teamMemberId != null)
+            employee.setSignIn(null, input.by, employee.updatedAt);
+        },
+      });
+    } catch (error) {
+      if (made.member != null)
+        await this.removeSignIn(input.workspaceId, made.member.id, input.by);
+      throw error;
+    }
+    if (!wants && had != null)
+      await this.removeSignIn(input.workspaceId, had, input.by);
+    if (wants && had != null)
+      await this.syncProjects(input.workspaceId, [updated], input.by);
+    return {
+      ...(await this.withSignIn(input.workspaceId, updated)),
+      passwordIgnored: made.member?.passwordIgnored ?? null,
     };
-    await this.supervisors.assertCanUpdate(row);
+  }
 
-    let teamMemberId = current.teamMemberId;
-    let made: string | null = null;
-    if (current.signIn.kind === "none") {
-      const signIn = assertSignIn(input.signIn);
-      const member = await this.newSignIn({ ...input, signIn });
-      teamMemberId = member.id;
-      made = member.id;
-    } else if (current.signIn.kind === "site_engineer") {
-      const memberId = current.signIn.memberId;
-      await this.members.update({
+  /** The sign-in takes the Employee's Role, name, mobile and email. */
+  private async follow(
+    input: { workspaceId: string; by: string; grantor: MemberAccess },
+    memberId: string,
+    roleBefore: string,
+    employee: Employee,
+  ): Promise<void> {
+    const { details } = employee;
+    if (details.mobile == null) throw mobileRequired();
+    if (details.roleId !== roleBefore)
+      await this.members.setRole({
         workspaceId: input.workspaceId,
         id: memberId,
         by: input.by,
-        details: {
-          name: details.name,
-          mobile: details.mobile,
-          email: details.email,
-          address: details.address,
-          ...(details.aadhaar === undefined
-            ? {}
-            : { aadhaar: details.aadhaar }),
-          ...(details.pan === undefined ? {} : { pan: details.pan }),
-          emergencyContact: details.emergencyContact,
-        },
-        ...(details.salary === undefined ? {} : { salary: details.salary }),
-        memberType: "normal",
+        grantor: input.grantor,
+        roleId: details.roleId,
       });
-      const before = new Set(current.member?.projectIds ?? []);
-      const after = new Set(details.projectIds ?? before);
-      if (
-        before.size !== after.size ||
-        [...after].some((projectId) => !before.has(projectId))
-      )
-        await this.members.assignProjects({
-          workspaceId: input.workspaceId,
-          id: memberId,
-          by: input.by,
-          projectIds: [...after],
-        });
-    }
-
-    try {
-      await this.supervisors.update({ ...row, teamMemberId });
-    } catch (error) {
-      if (made != null)
-        await this.removeSignIn(input.workspaceId, made, input.by);
-      throw error;
-    }
-    return this.get(input.workspaceId, input.id);
+    await this.members.update({
+      workspaceId: input.workspaceId,
+      id: memberId,
+      by: input.by,
+      details: {
+        name: details.name,
+        mobile: details.mobile,
+        email: details.email,
+      },
+      memberType: "normal",
+    });
   }
 
-  /** Their own sign-in, or 409 `SITE_ENGINEER_NO_SIGN_IN`. */
-  private async ownSignIn(workspaceId: string, id: string): Promise<string> {
-    const current = await this.get(workspaceId, id);
-    if (current.signIn.kind !== "site_engineer")
-      throw conflict(
-        "SITE_ENGINEER_NO_SIGN_IN",
-        current.signIn.kind === "office_staff"
-          ? "This Site Engineer signs in as Office Staff. Manage it there."
-          : "This Site Engineer has no sign-in yet. Add one on Edit.",
-      );
-    return current.signIn.memberId;
+  /**
+   * Gives the sign-ins of these Employees their Projects (ADR CM-0055 §4),
+   * after Edit, a transfer or a change on a Project's Teams. Each change
+   * is audited `team_member.projects_changed`.
+   */
+  async syncProjects(
+    workspaceId: string,
+    employees: readonly Pick<EmployeeReadModel, "teamMemberId" | "projects">[],
+    by: string,
+  ): Promise<void> {
+    for (const employee of employees) {
+      const member = await this.member(workspaceId, employee.teamMemberId);
+      if (member == null) continue;
+      const projectIds = employee.projects.map((project) => project.id);
+      if (sameSet(member.projectIds, projectIds)) continue;
+      await this.members.assignProjects({
+        workspaceId,
+        id: member.id,
+        by,
+        projectIds,
+      });
+    }
   }
 
-  /** A new temporary password (ADR CM-0030 §7). */
+  /** The same, by Employee id, with their Projects as they are now. */
+  async syncProjectsOf(
+    workspaceId: string,
+    employeeIds: readonly string[],
+    by: string,
+  ): Promise<void> {
+    const employees = await Promise.all(
+      [...new Set(employeeIds)].map((id) =>
+        this.employees.get(workspaceId, id),
+      ),
+    );
+    await this.syncProjects(workspaceId, employees, by);
+  }
+
+  /** Transfer (CM-206); the sign-ins then follow the new Projects. */
+  async transfer(
+    input: Parameters<EmployeeHandlers["transfer"]>[0],
+  ): Promise<EmployeeWithSignIn[]> {
+    const moved = await this.employees.transfer(input);
+    await this.syncProjects(input.workspaceId, moved, input.by);
+    return this.withSignIns(input.workspaceId, moved);
+  }
+
+  /**
+   * A new temporary password (ADR CM-0030 §7); 409 `EMPLOYEE_NO_SIGN_IN`
+   * for an Employee who does not sign in.
+   */
   async setPassword(input: {
     workspaceId: string;
     id: string;
     by: string;
     grantor: MemberAccess;
     password: string;
-  }): Promise<SiteEngineerReadModel & { passwordIgnored: PasswordIgnored }> {
-    const memberId = await this.ownSignIn(input.workspaceId, input.id);
+  }): Promise<EmployeeWithSignIn & { passwordIgnored: PasswordIgnored }> {
+    const current = await this.get(input.workspaceId, input.id);
+    if (current.signIn == null)
+      throw conflict(
+        "EMPLOYEE_NO_SIGN_IN",
+        "This Employee does not sign in. Turn on Can sign in on Edit first.",
+      );
     const result = await this.members.setPassword({
       workspaceId: input.workspaceId,
-      id: memberId,
+      id: current.signIn.memberId,
       by: input.by,
       grantor: input.grantor,
       password: input.password,
@@ -652,36 +429,30 @@ export class SiteEngineerHandlers {
   }
 
   /**
-   * Deletes the Site Engineer (409 `SUPERVISOR_IN_USE` while Labours or
-   * attendance name them) and then takes back their own sign-in. An Office
-   * Staff member they were linked to stays.
+   * Deletes the Employee (409 `EMPLOYEE_HAS_RECORDS` while they have
+   * attendance or payments) and then takes back their sign-in.
    */
   async delete(input: {
     workspaceId: string;
     id: string;
     by: string;
   }): Promise<void> {
-    const current = await this.get(input.workspaceId, input.id);
-    await this.supervisors.delete(input);
-    if (current.signIn.kind === "site_engineer")
-      await this.removeSignIn(
-        input.workspaceId,
-        current.signIn.memberId,
-        input.by,
-      );
+    const { teamMemberId } = await this.employees.delete(input);
+    if (teamMemberId != null)
+      await this.removeSignIn(input.workspaceId, teamMemberId, input.by);
   }
 }
 
-export function createSiteEngineerHandlers(deps?: {
+export function createEmployeeSignInHandlers(deps?: {
   prisma?: PrismaClient;
+  employees?: EmployeeHandlers;
   members?: TeamMemberHandlers;
   memberships?: CompanyMemberships;
-}): SiteEngineerHandlers {
+}): EmployeeSignInHandlers {
   const db = deps?.prisma ?? prisma;
-  return new SiteEngineerHandlers(
-    createSupervisorHandlers({ prisma: db }),
+  return new EmployeeSignInHandlers(
+    deps?.employees ?? createEmployeeHandlers({ prisma: db }).employees,
     deps?.members ?? createTeamMemberHandlers({ prisma: db }),
-    new PrismaRoleRepository(db),
     deps?.memberships ?? authCompanyMemberships,
   );
 }

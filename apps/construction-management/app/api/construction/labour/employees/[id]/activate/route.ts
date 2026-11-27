@@ -2,29 +2,38 @@ import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
 
-import { labour } from "../../handlers";
-import { LabourIdParamsModel, toLabourResponse } from "../../labour-models";
+import {
+  EMPLOYEES_MENU,
+  EmployeeIdParamsModel,
+  toEmployeeResponse,
+} from "../../employee-models";
+import { employee, employeeSignIns } from "../../handlers";
 
 export const dynamic = "force-dynamic";
 
-/** Marks a labourer Active again: they return to attendance pickers. */
+/** Marks an Employee Active again: they return to attendance pickers. */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   try {
-    const session = await requireAccess(request, "masters.labours", "update");
+    const session = await requireAccess(request, EMPLOYEES_MENU, "update");
     if (isResponse(session)) return session;
     const { id } = parseOrThrow(
-      LabourIdParamsModel.safeParse(await context.params),
+      EmployeeIdParamsModel.safeParse(await context.params),
     );
-    const updated = await labour.labours.setActive({
+    const updated = await employee.employees.setActive({
       workspaceId: session.workspaceId,
       id,
       active: true,
       by: session.userId,
     });
-    return Response.json(toLabourResponse(updated, session.access));
+    return Response.json(
+      toEmployeeResponse(
+        await employeeSignIns.withSignIn(session.workspaceId, updated),
+        session.access,
+      ),
+    );
   } catch (error) {
     return mapError(error);
   }

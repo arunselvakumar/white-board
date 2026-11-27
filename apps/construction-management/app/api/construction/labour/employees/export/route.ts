@@ -3,47 +3,50 @@ import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
 import {
   XLSX_CONTENT_TYPE,
-  labourExport,
-} from "@/src/labour/infrastructure/labour-workbook";
+  employeeExport,
+} from "@/src/labour/infrastructure/employee-workbook";
 import { can } from "@/src/shared-kernel/access";
 
-import { labour } from "../handlers";
 import {
-  ExportConstructionLabourLaboursRequestModel,
+  EMPLOYEES_MENU,
+  ExportConstructionLabourEmployeesRequestModel,
   queryBoolean,
-} from "../labour-models";
+} from "../employee-models";
+import { employee } from "../handlers";
 
 export const dynamic = "force-dynamic";
 
 /**
- * The filtered register as an Excel sheet, with the import's
- * columns plus Status and Balance. Amounts only with `financial`; Aadhaar
- * masked.
+ * The filtered Employees as an Excel sheet, with the import's columns plus
+ * Status and Balance. Amounts and bank details only with `financial`;
+ * Aadhaar, PAN and the account number masked.
  */
 export async function GET(request: Request): Promise<Response> {
   try {
-    const session = await requireAccess(request, "masters.labours", "read");
+    const session = await requireAccess(request, EMPLOYEES_MENU, "read");
     if (isResponse(session)) return session;
     const model = parseOrThrow(
-      ExportConstructionLabourLaboursRequestModel.safeParse(
+      ExportConstructionLabourEmployeesRequestModel.safeParse(
         Object.fromEntries(new URL(request.url).searchParams),
       ),
     );
-    const items = await labour.labours.all({
+    const items = await employee.employees.all({
       workspaceId: session.workspaceId,
       projectId: model.projectId,
       active: queryBoolean(model.active),
       search: model.q,
       labourCategoryId: model.categoryId,
+      roleId: model.roleId,
+      departmentId: model.departmentId,
     });
-    const bytes = await labourExport(
+    const bytes = await employeeExport(
       items,
-      can(session.access, "masters.labours", "financial"),
+      can(session.access, EMPLOYEES_MENU, "financial"),
     );
     return new Response(bytes, {
       headers: {
         "content-type": XLSX_CONTENT_TYPE,
-        "content-disposition": 'attachment; filename="labours.xlsx"',
+        "content-disposition": 'attachment; filename="employees.xlsx"',
         "cache-control": "no-store",
       },
     });

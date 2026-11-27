@@ -8,31 +8,35 @@ import {
   encodeListCursor,
 } from "@/src/shared-kernel/list-cursor";
 
-import { labour } from "./handlers";
 import {
-  CreateConstructionLabourLabourRequestModel,
-  ListConstructionLabourLaboursRequestModel,
+  CreateConstructionLabourEmployeeRequestModel,
+  EMPLOYEES_MENU,
+  ListConstructionLabourEmployeesRequestModel,
+  employeeBankInput,
   queryBoolean,
-  toLabourResponse,
-  type ListConstructionLabourLaboursResponseModel,
-} from "./labour-models";
+  toEmployeeCreatedResponse,
+  toEmployeeResponse,
+  type ListConstructionLabourEmployeesResponseModel,
+} from "./employee-models";
+import { employee, employeeSignIns } from "./handlers";
 
 export const dynamic = "force-dynamic";
 
 /**
- * The Labour register, newest first: filter by Project, Active and Labour
- * Category, and search name, Labour Id or contact.
+ * Employees, newest first (ADR CM-0055): filter by Project, Active, Labour
+ * Category, Role and Department, and search name, Employee Id, father's
+ * name or mobile.
  */
 export async function GET(request: Request): Promise<Response> {
   try {
-    const session = await requireAccess(request, "masters.labours", "read");
+    const session = await requireAccess(request, EMPLOYEES_MENU, "read");
     if (isResponse(session)) return session;
     const model = parseOrThrow(
-      ListConstructionLabourLaboursRequestModel.safeParse(
+      ListConstructionLabourEmployeesRequestModel.safeParse(
         Object.fromEntries(new URL(request.url).searchParams),
       ),
     );
-    const page = await labour.labours.list({
+    const page = await employee.employees.list({
       workspaceId: session.workspaceId,
       limit: model.limit,
       after: model.after == null ? undefined : decodeListCursor(model.after),
@@ -41,14 +45,20 @@ export async function GET(request: Request): Promise<Response> {
       active: queryBoolean(model.active),
       search: model.q,
       labourCategoryId: model.categoryId,
+      roleId: model.roleId,
+      departmentId: model.departmentId,
     });
+    const items = await employeeSignIns.withSignIns(
+      session.workspaceId,
+      page.items,
+    );
     const first = page.items[0];
     const last = page.items.at(-1);
     const backwards = model.before != null;
     const moreAfter = backwards || page.hasMore;
     const moreBefore = backwards ? page.hasMore : model.after != null;
-    const body: ListConstructionLabourLaboursResponseModel = {
-      items: page.items.map((item) => toLabourResponse(item, session.access)),
+    const body: ListConstructionLabourEmployeesResponseModel = {
+      items: items.map((item) => toEmployeeResponse(item, session.access)),
       nextCursor: moreAfter && last != null ? encodeListCursor(last) : null,
       prevCursor: moreBefore && first != null ? encodeListCursor(first) : null,
       total: page.total,
@@ -60,25 +70,28 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 /**
- * Adds a labourer on none, one or many Projects (ADR CM-0033). The
+ * Add Employee (ADR CM-0055): on none, one or many Projects (ADR
+ * CM-0033), with a Role, and a sign-in when "Can sign in" is on. The
  * opening balance becomes the first ledger entry, dated the joining date
  * (ADR CM-0004).
  */
 export async function POST(request: Request): Promise<Response> {
   try {
-    const session = await requireAccess(request, "masters.labours", "create");
+    const session = await requireAccess(request, EMPLOYEES_MENU, "create");
     if (isResponse(session)) return session;
-    const model = parseOrThrow(
-      CreateConstructionLabourLabourRequestModel.safeParse(
+    const { signIn, ...model } = parseOrThrow(
+      CreateConstructionLabourEmployeeRequestModel.safeParse(
         await request.json(),
       ),
     );
-    const created = await labour.labours.create({
+    const created = await employeeSignIns.create({
       workspaceId: session.workspaceId,
-      labour: model,
       by: session.userId,
+      grantor: session.access,
+      employee: { ...model, ...employeeBankInput(model, session.access) },
+      signIn,
     });
-    return Response.json(toLabourResponse(created, session.access), {
+    return Response.json(toEmployeeCreatedResponse(created, session.access), {
       status: StatusCodes.CREATED,
     });
   } catch (error) {

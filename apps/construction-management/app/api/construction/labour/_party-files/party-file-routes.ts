@@ -13,7 +13,7 @@ import {
   PARTY_PHOTO_MAX_BYTES,
   type PartyOwnerType,
 } from "@/src/labour/application/party-files";
-import { createPartyFiles } from "@/src/labour/infrastructure/create-labour-handlers";
+import { createPartyFiles } from "@/src/labour/infrastructure/create-employee-handlers";
 import type { MenuKey } from "@/src/shared-kernel/access";
 import type { StoredObject } from "@/src/shared-kernel/files";
 

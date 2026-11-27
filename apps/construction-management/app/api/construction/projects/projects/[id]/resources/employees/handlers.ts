@@ -1,4 +1,4 @@
-import { createProjectLabours } from "@/src/composition/project-labours";
+import { createProjectEmployees } from "@/src/composition/project-employees";
 
-/** One composition for every Project Labours route. */
-export const projectLabours = createProjectLabours();
+/** One composition for every Project Employees route. */
+export const projectEmployees = createProjectEmployees();

@@ -2,27 +2,28 @@ import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
 
-import { labour } from "../../handlers";
 import {
-  LabourIdParamsModel,
-  type ListConstructionLabourLabourTransfersResponseModel,
-} from "../../labour-models";
+  EMPLOYEES_MENU,
+  EmployeeIdParamsModel,
+  type ListConstructionLabourEmployeeTransfersResponseModel,
+} from "../../employee-models";
+import { employee } from "../../handlers";
 
 export const dynamic = "force-dynamic";
 
-/** The labourer's Project history, oldest first. */
+/** The Employee's Project history, oldest first. */
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   try {
-    const session = await requireAccess(request, "masters.labours", "read");
+    const session = await requireAccess(request, EMPLOYEES_MENU, "read");
     if (isResponse(session)) return session;
     const { id } = parseOrThrow(
-      LabourIdParamsModel.safeParse(await context.params),
+      EmployeeIdParamsModel.safeParse(await context.params),
     );
-    const rows = await labour.labours.transfers(session.workspaceId, id);
-    const body: ListConstructionLabourLabourTransfersResponseModel = {
+    const rows = await employee.employees.transfers(session.workspaceId, id);
+    const body: ListConstructionLabourEmployeeTransfersResponseModel = {
       items: rows.map((row) => ({
         id: row.id,
         fromProject: row.fromProject,

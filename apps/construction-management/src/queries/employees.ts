@@ -6,42 +6,45 @@ import {
 
 import type { ConstructionLabourPartyDocumentResponseModel } from "@/app/api/construction/labour/_party-files/party-file-models";
 import type {
-  ConstructionLabourLabourResponseModel,
-  CreateConstructionLabourLabourRequestModel,
-  ImportConstructionLabourLaboursResponseModel,
-  ListConstructionLabourLabourTransfersResponseModel,
-  ListConstructionLabourLaboursResponseModel,
-  UpdateConstructionLabourLabourRequestModel,
-} from "@/app/api/construction/labour/labours/labour-models";
+  ConstructionLabourEmployeeResponseModel,
+  CreateConstructionLabourEmployeeRequestModel,
+  ImportConstructionLabourEmployeesResponseModel,
+  ListConstructionLabourEmployeeTransfersResponseModel,
+  ListConstructionLabourEmployeesResponseModel,
+  UpdateConstructionLabourEmployeeRequestModel,
+} from "@/app/api/construction/labour/employees/employee-models";
 
 import { QueryHttpError, apiJson } from "./http";
 import { PROJECT_ACTIVITY_KEY } from "./projects";
 
-export type LabourResponse = ConstructionLabourLabourResponseModel;
-export type LabourList = ListConstructionLabourLaboursResponseModel;
-export type LabourInput = CreateConstructionLabourLabourRequestModel;
-export type LabourUpdateInput = UpdateConstructionLabourLabourRequestModel;
-export type LabourTransfer =
-  ListConstructionLabourLabourTransfersResponseModel["items"][number];
-export type LabourImportPreview = ImportConstructionLabourLaboursResponseModel;
-export type LabourDocument = ConstructionLabourPartyDocumentResponseModel;
+export type EmployeeResponse = ConstructionLabourEmployeeResponseModel;
+export type EmployeeList = ListConstructionLabourEmployeesResponseModel;
+export type EmployeeInput = CreateConstructionLabourEmployeeRequestModel;
+export type EmployeeUpdateInput = UpdateConstructionLabourEmployeeRequestModel;
+export type EmployeeTransfer =
+  ListConstructionLabourEmployeeTransfersResponseModel["items"][number];
+export type EmployeeImportPreview =
+  ImportConstructionLabourEmployeesResponseModel;
+export type EmployeeDocument = ConstructionLabourPartyDocumentResponseModel;
 
-export const LABOURS_API = "/api/construction/labour/labours";
+export const EMPLOYEES_API = "/api/construction/labour/employees";
 
-/** Every Labour query key starts here, so one invalidation covers them. */
-export const LABOURS_KEY = ["labour", "labours"] as const;
+/** Every Employee query key starts here, so one invalidation covers them. */
+export const EMPLOYEES_KEY = ["labour", "employees"] as const;
 
-export type LabourListFilter = {
+export type EmployeeListFilter = {
   search: string;
   status: "all" | "active" | "inactive";
   projectId: string | null;
   categoryId: string | null;
+  roleId: string | null;
+  departmentId: string | null;
   cursor: { after: string } | { before: string } | null;
 };
 
 /** The list filter as query parameters (also used by Export). */
-export function labourFilterParams(
-  filter: Omit<LabourListFilter, "cursor">,
+export function employeeFilterParams(
+  filter: Omit<EmployeeListFilter, "cursor">,
 ): URLSearchParams {
   const params = new URLSearchParams();
   if (filter.search.trim().length > 0) params.set("q", filter.search.trim());
@@ -49,48 +52,52 @@ export function labourFilterParams(
     params.set("active", filter.status === "active" ? "true" : "false");
   if (filter.projectId != null) params.set("projectId", filter.projectId);
   if (filter.categoryId != null) params.set("categoryId", filter.categoryId);
+  if (filter.roleId != null) params.set("roleId", filter.roleId);
+  if (filter.departmentId != null)
+    params.set("departmentId", filter.departmentId);
   return params;
 }
 
-export function laboursQuery(filter: LabourListFilter) {
-  const params = labourFilterParams(filter);
+export function employeesQuery(filter: EmployeeListFilter) {
+  const params = employeeFilterParams(filter);
   params.set("limit", "25");
   if (filter.cursor != null) {
     if ("after" in filter.cursor) params.set("after", filter.cursor.after);
     else params.set("before", filter.cursor.before);
   }
   return queryOptions({
-    queryKey: [...LABOURS_KEY, "list", params.toString()],
-    queryFn: () => apiJson<LabourList>(`${LABOURS_API}?${params.toString()}`),
+    queryKey: [...EMPLOYEES_KEY, "list", params.toString()],
+    queryFn: () =>
+      apiJson<EmployeeList>(`${EMPLOYEES_API}?${params.toString()}`),
   });
 }
 
 function itemUrl(id: string, path = ""): string {
-  return `${LABOURS_API}/${encodeURIComponent(id)}${path}`;
+  return `${EMPLOYEES_API}/${encodeURIComponent(id)}${path}`;
 }
 
-export function labourQuery(id: string) {
+export function employeeQuery(id: string) {
   return queryOptions({
-    queryKey: [...LABOURS_KEY, "detail", id],
-    queryFn: () => apiJson<LabourResponse>(itemUrl(id)),
+    queryKey: [...EMPLOYEES_KEY, "detail", id],
+    queryFn: () => apiJson<EmployeeResponse>(itemUrl(id)),
   });
 }
 
-export function labourTransfersQuery(id: string) {
+export function employeeTransfersQuery(id: string) {
   return queryOptions({
-    queryKey: [...LABOURS_KEY, "transfers", id],
+    queryKey: [...EMPLOYEES_KEY, "transfers", id],
     queryFn: () =>
-      apiJson<ListConstructionLabourLabourTransfersResponseModel>(
+      apiJson<ListConstructionLabourEmployeeTransfersResponseModel>(
         itemUrl(id, "/transfers"),
       ),
   });
 }
 
-export function labourDocumentsQuery(id: string) {
+export function employeeDocumentsQuery(id: string) {
   return queryOptions({
-    queryKey: [...LABOURS_KEY, "documents", id],
+    queryKey: [...EMPLOYEES_KEY, "documents", id],
     queryFn: () =>
-      apiJson<{ items: LabourDocument[] }>(itemUrl(id, "/documents")),
+      apiJson<{ items: EmployeeDocument[] }>(itemUrl(id, "/documents")),
   });
 }
 
@@ -112,32 +119,34 @@ function postFile<T>(url: string, file: Blob, type?: string): Promise<T> {
   });
 }
 
-export function createLabour(input: LabourInput): Promise<LabourResponse> {
-  return postJson(LABOURS_API, input);
+export function createEmployee(
+  input: EmployeeInput,
+): Promise<EmployeeResponse> {
+  return postJson(EMPLOYEES_API, input);
 }
 
-export function updateLabour(
+export function updateEmployee(
   id: string,
-  input: LabourUpdateInput,
-): Promise<LabourResponse> {
+  input: EmployeeUpdateInput,
+): Promise<EmployeeResponse> {
   return postJson(itemUrl(id, "/update"), input);
 }
 
-export type LabourCommand =
+export type EmployeeCommand =
   | { kind: "activate" | "deactivate" | "delete"; id: string }
   | {
       kind: "transfer";
-      labourIds: string[];
+      employeeIds: string[];
       fromProjectId: string | null;
       toProjectId: string;
       transferDate: string;
       remark: string | null;
     };
 
-export function runLabourCommand(command: LabourCommand): Promise<unknown> {
+export function runEmployeeCommand(command: EmployeeCommand): Promise<unknown> {
   if (command.kind === "transfer")
-    return postJson(`${LABOURS_API}/transfer`, {
-      labourIds: command.labourIds,
+    return postJson(`${EMPLOYEES_API}/transfer`, {
+      employeeIds: command.employeeIds,
       fromProjectId: command.fromProjectId,
       toProjectId: command.toProjectId,
       transferDate: command.transferDate,
@@ -147,35 +156,35 @@ export function runLabourCommand(command: LabourCommand): Promise<unknown> {
 }
 
 /** Activate, deactivate, delete and transfer from the list. */
-export function useLabourCommand() {
+export function useEmployeeCommand() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: runLabourCommand,
+    mutationFn: runEmployeeCommand,
     onSettled: () =>
       Promise.all(
-        [LABOURS_KEY, PROJECT_ACTIVITY_KEY].map((queryKey) =>
+        [EMPLOYEES_KEY, PROJECT_ACTIVITY_KEY].map((queryKey) =>
           queryClient.invalidateQueries({ queryKey }),
         ),
       ),
   });
 }
 
-export function useCreateLabour() {
+export function useCreateEmployee() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: createLabour,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: LABOURS_KEY }),
+    mutationFn: createEmployee,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: EMPLOYEES_KEY }),
   });
 }
 
-export function useUpdateLabour(id: string) {
+export function useUpdateEmployee(id: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (input: LabourUpdateInput) => updateLabour(id, input),
+    mutationFn: (input: EmployeeUpdateInput) => updateEmployee(id, input),
     onSuccess: async (updated) => {
-      queryClient.setQueryData(labourQuery(id).queryKey, updated);
+      queryClient.setQueryData(employeeQuery(id).queryKey, updated);
       await Promise.all(
-        [LABOURS_KEY, PROJECT_ACTIVITY_KEY].map((queryKey) =>
+        [EMPLOYEES_KEY, PROJECT_ACTIVITY_KEY].map((queryKey) =>
           queryClient.invalidateQueries({ queryKey }),
         ),
       );
@@ -183,22 +192,22 @@ export function useUpdateLabour(id: string) {
   });
 }
 
-export function uploadLabourPhoto(id: string, file: File) {
+export function uploadEmployeePhoto(id: string, file: File) {
   return postFile<{ photoUrl: string | null }>(itemUrl(id, "/photo"), file);
 }
 
-export function removeLabourPhoto(id: string) {
+export function removeEmployeePhoto(id: string) {
   return postJson<{ photoUrl: null }>(itemUrl(id, "/photo/remove"));
 }
 
-export function addLabourDocument(id: string, file: File) {
-  return postFile<LabourDocument>(
+export function addEmployeeDocument(id: string, file: File) {
+  return postFile<EmployeeDocument>(
     itemUrl(id, `/documents?fileName=${encodeURIComponent(file.name)}`),
     file,
   );
 }
 
-export function deleteLabourDocument(id: string, documentId: string) {
+export function deleteEmployeeDocument(id: string, documentId: string) {
   return postJson<undefined>(
     itemUrl(id, `/documents/${encodeURIComponent(documentId)}/delete`),
   );
@@ -212,13 +221,13 @@ const XLSX =
  * preview with `imported`, or the preview of a refused import (400
  * `IMPORT_HAS_ERRORS`) as if it were a dry run.
  */
-export async function importLabours(
+export async function importEmployees(
   file: File,
   dryRun: boolean,
-): Promise<LabourImportPreview> {
+): Promise<EmployeeImportPreview> {
   try {
-    return await postFile<LabourImportPreview>(
-      `${LABOURS_API}/import?dryRun=${String(dryRun)}`,
+    return await postFile<EmployeeImportPreview>(
+      `${EMPLOYEES_API}/import?dryRun=${String(dryRun)}`,
       file,
       XLSX,
     );
@@ -229,16 +238,30 @@ export async function importLabours(
       error.details != null &&
       typeof error.details === "object"
     )
-      return { ...(error.details as LabourImportPreview), imported: 0 };
+      return { ...(error.details as EmployeeImportPreview), imported: 0 };
     throw error;
   }
 }
 
-export const LABOUR_TEMPLATE_URL = `${LABOURS_API}/import-template`;
+export const EMPLOYEE_TEMPLATE_URL = `${EMPLOYEES_API}/import-template`;
 
-export function labourExportUrl(
-  filter: Omit<LabourListFilter, "cursor">,
+export function employeeExportUrl(
+  filter: Omit<EmployeeListFilter, "cursor">,
 ): string {
-  const params = labourFilterParams(filter).toString();
-  return `${LABOURS_API}/export${params.length > 0 ? `?${params}` : ""}`;
+  const params = employeeFilterParams(filter).toString();
+  return `${EMPLOYEES_API}/export${params.length > 0 ? `?${params}` : ""}`;
+}
+
+/** A new temporary password for the Employee's sign-in (ADR CM-0055 §4). */
+export function useSetEmployeePassword(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (password: string) =>
+      postJson<
+        EmployeeResponse & { passwordIgnored: "existing_account" | null }
+      >(itemUrl(id, "/password"), { password }),
+    onSuccess: (updated) => {
+      queryClient.setQueryData(employeeQuery(id).queryKey, updated);
+    },
+  });
 }

@@ -1,27 +1,28 @@
+import { prisma } from "@repo/construction-db";
+
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
 import { companyToday } from "@/src/labour/infrastructure/prisma-labour-queries";
 import { can } from "@/src/shared-kernel/access";
-import { prisma } from "@repo/construction-db";
 
-import { labour } from "../handlers";
 import {
-  ListConstructionLabourLabourOptionsRequestModel,
-  type ListConstructionLabourLabourOptionsResponseModel,
-} from "../labour-models";
+  ListConstructionLabourEmployeeOptionsRequestModel,
+  type ListConstructionLabourEmployeeOptionsResponseModel,
+} from "../employee-models";
+import { employee } from "../handlers";
 
 export const dynamic = "force-dynamic";
 
 /**
- * Active labourers on a Project on a date, for attendance pickers. Needs
- * `read` on Attendance for that Project; rates need
- * `financial` on Labour.
+ * Active Employees on a Project on a date, for attendance pickers. Needs
+ * `read` on Attendance for that Project; rates need `financial` on
+ * Employees (`labour.labour`).
  */
 export async function GET(request: Request): Promise<Response> {
   try {
     const model = parseOrThrow(
-      ListConstructionLabourLabourOptionsRequestModel.safeParse(
+      ListConstructionLabourEmployeeOptionsRequestModel.safeParse(
         Object.fromEntries(new URL(request.url).searchParams),
       ),
     );
@@ -31,7 +32,7 @@ export async function GET(request: Request): Promise<Response> {
     if (isResponse(session)) return session;
     const date =
       model.date ?? (await companyToday(prisma, session.workspaceId));
-    const items = await labour.labours.options(
+    const items = await employee.employees.options(
       session.workspaceId,
       model.projectId,
       date,
@@ -40,7 +41,7 @@ export async function GET(request: Request): Promise<Response> {
       projectId: model.projectId,
     });
     const money = (value: number | null) => (financial ? value : null);
-    const body: ListConstructionLabourLabourOptionsResponseModel = {
+    const body: ListConstructionLabourEmployeeOptionsResponseModel = {
       items: items.map((item) => ({
         ...item,
         wagePerDay: money(item.wagePerDay),

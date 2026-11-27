@@ -7,17 +7,17 @@ import { isResponse } from "@/app/api/_lib/require-session";
 import { can } from "@/src/shared-kernel/access";
 
 import { ConstructionProjectsProjectParamsModel } from "../../../../project-models";
-import { projectLabours } from "../handlers";
+import { projectEmployees } from "../handlers";
 import {
-  ListConstructionProjectsProjectLabourOptionsRequestModel,
-  toProjectLabourOptionsResponse,
-} from "../project-labours-models";
+  ListConstructionProjectsProjectEmployeeOptionsRequestModel,
+  toProjectEmployeeOptionsResponse,
+} from "../project-employees-models";
 
 export const dynamic = "force-dynamic";
 
 /**
- * Active Labours not on the Project, by name, for Add Labours. Project
- * menu Update and Labours Read (the register's names and Labour Ids).
+ * Active Employees not on the Project, by name, for Add Employees.
+ * Project menu Update and Employees Read (their names and Employee Ids).
  */
 export async function GET(
   request: Request,
@@ -36,13 +36,13 @@ export async function GET(
       ConstructionProjectsProjectParamsModel.safeParse(await context.params),
     );
     const model = parseOrThrow(
-      ListConstructionProjectsProjectLabourOptionsRequestModel.safeParse(
+      ListConstructionProjectsProjectEmployeeOptionsRequestModel.safeParse(
         Object.fromEntries(new URL(request.url).searchParams),
       ),
     );
     return Response.json(
-      toProjectLabourOptionsResponse(
-        await projectLabours.options(session.access, id, {
+      toProjectEmployeeOptionsResponse(
+        await projectEmployees.options(session.access, id, {
           limit: model.limit,
           ...(model.search == null || model.search === ""
             ? {}

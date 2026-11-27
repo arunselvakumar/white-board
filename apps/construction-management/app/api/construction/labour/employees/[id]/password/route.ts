@@ -2,37 +2,38 @@ import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
 
-import { ConstructionMastersIdParamsModel } from "../../../_lib/master-models";
-import { siteEngineerHandlers as handlers } from "../../handlers";
 import {
-  SITE_ENGINEER_MENU,
-  SetConstructionMastersSiteEngineerPasswordRequestModel,
-  toSiteEngineerResponse,
-} from "../../site-engineer-models";
+  EMPLOYEES_MENU,
+  EmployeeIdParamsModel,
+  SetConstructionLabourEmployeePasswordRequestModel,
+  toEmployeeResponse,
+} from "../../employee-models";
+import { employeeSignIns } from "../../handlers";
 
 export const dynamic = "force-dynamic";
 
 /**
- * A new temporary password for their sign-in (ADR CM-0030 §7): they must
- * change it at their next sign-in. 403 `CANNOT_GRANT` unless the caller
- * holds every cell of the Site Engineer Role, `OWN_ROLE` for their own.
+ * A new temporary password for the Employee's sign-in (ADR CM-0030 §7):
+ * they must change it at their next sign-in. 409 `EMPLOYEE_NO_SIGN_IN`
+ * when they do not sign in; 403 `CANNOT_GRANT` unless the caller holds
+ * every cell of their Role, `OWN_ROLE` for their own.
  */
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   try {
-    const session = await requireAccess(request, SITE_ENGINEER_MENU, "update");
+    const session = await requireAccess(request, EMPLOYEES_MENU, "update");
     if (isResponse(session)) return session;
     const { id } = parseOrThrow(
-      ConstructionMastersIdParamsModel.safeParse(await context.params),
+      EmployeeIdParamsModel.safeParse(await context.params),
     );
     const { password } = parseOrThrow(
-      SetConstructionMastersSiteEngineerPasswordRequestModel.safeParse(
+      SetConstructionLabourEmployeePasswordRequestModel.safeParse(
         await request.json(),
       ),
     );
-    const item = await handlers.setPassword({
+    const item = await employeeSignIns.setPassword({
       workspaceId: session.workspaceId,
       id,
       by: session.userId,
@@ -40,7 +41,7 @@ export async function POST(
       password,
     });
     return Response.json({
-      ...toSiteEngineerResponse(item, session.access),
+      ...toEmployeeResponse(item, session.access),
       passwordIgnored: item.passwordIgnored,
     });
   } catch (error) {

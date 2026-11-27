@@ -8,27 +8,30 @@ import {
   partyFileOpenApiComponents,
   partyFileOpenApiOperations,
 } from "@/app/api/construction/labour/_party-files/party-file-openapi";
-import { XLSX_CONTENT_TYPE } from "@/src/labour/infrastructure/labour-workbook";
+import { XLSX_CONTENT_TYPE } from "@/src/labour/infrastructure/employee-workbook";
 
 import {
-  ConstructionLabourLabourOptionResponseModel,
-  ConstructionLabourLabourResponseModel,
-  ConstructionLabourLabourTransferResponseModel,
-  CreateConstructionLabourLabourRequestModel,
-  ExportConstructionLabourLaboursRequestModel,
-  ImportConstructionLabourLaboursRequestModel,
-  ImportConstructionLabourLaboursResponseModel,
-  LABOURS_PATH,
-  LabourIdParamsModel,
-  ListConstructionLabourLabourOptionsRequestModel,
-  ListConstructionLabourLabourOptionsResponseModel,
-  ListConstructionLabourLabourTransfersResponseModel,
-  ListConstructionLabourLaboursRequestModel,
-  ListConstructionLabourLaboursResponseModel,
-  TransferConstructionLabourLaboursRequestModel,
-  TransferConstructionLabourLaboursResponseModel,
-  UpdateConstructionLabourLabourRequestModel,
-} from "./labour-models";
+  ConstructionLabourEmployeeCreatedResponseModel,
+  ConstructionLabourEmployeeOptionResponseModel,
+  ConstructionLabourEmployeePasswordResponseModel,
+  ConstructionLabourEmployeeResponseModel,
+  ConstructionLabourEmployeeTransferResponseModel,
+  CreateConstructionLabourEmployeeRequestModel,
+  ExportConstructionLabourEmployeesRequestModel,
+  ImportConstructionLabourEmployeesRequestModel,
+  ImportConstructionLabourEmployeesResponseModel,
+  EMPLOYEES_PATH,
+  EmployeeIdParamsModel,
+  ListConstructionLabourEmployeeOptionsRequestModel,
+  ListConstructionLabourEmployeeOptionsResponseModel,
+  ListConstructionLabourEmployeeTransfersResponseModel,
+  ListConstructionLabourEmployeesRequestModel,
+  ListConstructionLabourEmployeesResponseModel,
+  TransferConstructionLabourEmployeesRequestModel,
+  TransferConstructionLabourEmployeesResponseModel,
+  SetConstructionLabourEmployeePasswordRequestModel,
+  UpdateConstructionLabourEmployeeRequestModel,
+} from "./employee-models";
 
 const LABOUR = ["Construction · Labour"];
 
@@ -43,48 +46,51 @@ const ITEM_ERRORS = [
   StatusCodes.NOT_FOUND,
 ] as const;
 
-const ITEM = `${LABOURS_PATH}/{id}`;
+const ITEM = `${EMPLOYEES_PATH}/{id}`;
 
-/** The Labour register's models. */
-export const labourOpenApiComponents: OpenApiComponents = {
-  ConstructionLabourLabourResponseModel,
-  ListConstructionLabourLaboursResponseModel,
-  CreateConstructionLabourLabourRequestModel,
-  UpdateConstructionLabourLabourRequestModel,
-  TransferConstructionLabourLaboursRequestModel,
-  TransferConstructionLabourLaboursResponseModel,
-  ConstructionLabourLabourTransferResponseModel,
-  ListConstructionLabourLabourTransfersResponseModel,
-  ConstructionLabourLabourOptionResponseModel,
-  ListConstructionLabourLabourOptionsResponseModel,
-  ImportConstructionLabourLaboursResponseModel,
+/** The Employee record's models (ADR CM-0055). */
+export const employeeOpenApiComponents: OpenApiComponents = {
+  ConstructionLabourEmployeeResponseModel,
+  ConstructionLabourEmployeeCreatedResponseModel,
+  ConstructionLabourEmployeePasswordResponseModel,
+  SetConstructionLabourEmployeePasswordRequestModel,
+  ListConstructionLabourEmployeesResponseModel,
+  CreateConstructionLabourEmployeeRequestModel,
+  UpdateConstructionLabourEmployeeRequestModel,
+  TransferConstructionLabourEmployeesRequestModel,
+  TransferConstructionLabourEmployeesResponseModel,
+  ConstructionLabourEmployeeTransferResponseModel,
+  ListConstructionLabourEmployeeTransfersResponseModel,
+  ConstructionLabourEmployeeOptionResponseModel,
+  ListConstructionLabourEmployeeOptionsResponseModel,
+  ImportConstructionLabourEmployeesResponseModel,
   ...partyFileOpenApiComponents,
 };
 
-/** The Labour register's routes. */
-export const labourOpenApiOperations: OpenApiOperation[] = [
+/** The Employee record's routes. */
+export const employeeOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",
-    path: LABOURS_PATH,
+    path: EMPLOYEES_PATH,
     summary:
-      "Labours, newest first, by Project, Active, Site Engineer, Labour Category and search (amounts null without Financial)",
+      "Employees, newest first, by Project, Active, Labour Category, Role, Department and search (amounts null without Financial)",
     tags: LABOUR,
-    query: ListConstructionLabourLaboursRequestModel,
+    query: ListConstructionLabourEmployeesRequestModel,
     successStatus: StatusCodes.OK,
-    successDescription: "A page of Labours",
-    successSchema: ListConstructionLabourLaboursResponseModel,
+    successDescription: "A page of Employees",
+    successSchema: ListConstructionLabourEmployeesResponseModel,
     errors: [StatusCodes.BAD_REQUEST, ...SESSION_ERRORS],
   },
   {
     method: "post",
-    path: LABOURS_PATH,
+    path: EMPLOYEES_PATH,
     summary:
-      "Add a Labour on a Project; the opening balance is posted to the ledger",
+      "Add an Employee with a Role, on none, one or many Projects, and a sign-in when Can sign in is on; the opening balance is posted to the ledger. 400 EMPLOYEE_ROLE_NOT_FOUND, MOBILE_REQUIRED, PASSWORD_REQUIRED; 403 CANNOT_GRANT",
     tags: LABOUR,
-    body: CreateConstructionLabourLabourRequestModel,
+    body: CreateConstructionLabourEmployeeRequestModel,
     successStatus: StatusCodes.CREATED,
-    successDescription: "The Labour",
-    successSchema: ConstructionLabourLabourResponseModel,
+    successDescription: "The Employee",
+    successSchema: ConstructionLabourEmployeeCreatedResponseModel,
     errors: [
       ...ITEM_ERRORS,
       StatusCodes.CONFLICT,
@@ -93,26 +99,26 @@ export const labourOpenApiOperations: OpenApiOperation[] = [
   },
   {
     method: "get",
-    path: `${LABOURS_PATH}/options`,
+    path: `${EMPLOYEES_PATH}/options`,
     summary:
-      "Active Labours on a Project on a date, for attendance pickers (rates need Financial on Labour)",
+      "Active Employees on a Project on a date, for attendance pickers (rates need Financial on Employees)",
     tags: LABOUR,
-    query: ListConstructionLabourLabourOptionsRequestModel,
+    query: ListConstructionLabourEmployeeOptionsRequestModel,
     successStatus: StatusCodes.OK,
-    successDescription: "Labours by name",
-    successSchema: ListConstructionLabourLabourOptionsResponseModel,
+    successDescription: "Employees by name",
+    successSchema: ListConstructionLabourEmployeeOptionsResponseModel,
     errors: [StatusCodes.BAD_REQUEST, ...SESSION_ERRORS],
   },
   {
     method: "post",
-    path: `${LABOURS_PATH}/transfer`,
+    path: `${EMPLOYEES_PATH}/transfer`,
     summary:
-      "Transfer one or many Labours to a Project from a date (Labour transfer on every Project involved)",
+      "Transfer one or many Employees to a Project from a date (Employees transfer on every Project involved); their sign-ins follow",
     tags: LABOUR,
-    body: TransferConstructionLabourLaboursRequestModel,
+    body: TransferConstructionLabourEmployeesRequestModel,
     successStatus: StatusCodes.OK,
-    successDescription: "The Labours, moved",
-    successSchema: TransferConstructionLabourLaboursResponseModel,
+    successDescription: "The Employees, moved",
+    successSchema: TransferConstructionLabourEmployeesResponseModel,
     errors: [
       ...ITEM_ERRORS,
       StatusCodes.CONFLICT,
@@ -121,9 +127,9 @@ export const labourOpenApiOperations: OpenApiOperation[] = [
   },
   {
     method: "get",
-    path: `${LABOURS_PATH}/import-template`,
+    path: `${EMPLOYEES_PATH}/import-template`,
     summary:
-      "The sample Excel sheet for the labour import, with the Company's Projects and categories",
+      "The sample Excel sheet for the Employee import, with the Company's Departments, Roles, Projects and categories",
     tags: LABOUR,
     successStatus: StatusCodes.OK,
     successDescription: "An .xlsx file",
@@ -132,16 +138,16 @@ export const labourOpenApiOperations: OpenApiOperation[] = [
   },
   {
     method: "post",
-    path: `${LABOURS_PATH}/import`,
+    path: `${EMPLOYEES_PATH}/import`,
     summary:
-      "Import Labours from the sample sheet (the .xlsx as the body): preview with ?dryRun=true, import all or nothing with false",
+      "Import Employees from the sample sheet (the .xlsx as the body; a blank Role is Labour): preview with ?dryRun=true, import all or nothing with false",
     tags: LABOUR,
-    query: ImportConstructionLabourLaboursRequestModel,
+    query: ImportConstructionLabourEmployeesRequestModel,
     bodyBinaryContentTypes: [XLSX_CONTENT_TYPE],
     successStatus: StatusCodes.OK,
     successDescription:
       "The row-by-row preview (201 with `imported` when not a dry run)",
-    successSchema: ImportConstructionLabourLaboursResponseModel,
+    successSchema: ImportConstructionLabourEmployeesResponseModel,
     errors: [
       StatusCodes.BAD_REQUEST,
       ...SESSION_ERRORS,
@@ -151,11 +157,11 @@ export const labourOpenApiOperations: OpenApiOperation[] = [
   },
   {
     method: "get",
-    path: `${LABOURS_PATH}/export`,
+    path: `${EMPLOYEES_PATH}/export`,
     summary:
-      "The filtered register as an Excel sheet (amounts only with Financial)",
+      "The filtered Employees as an Excel sheet (amounts and bank details only with Financial)",
     tags: LABOUR,
-    query: ExportConstructionLabourLaboursRequestModel,
+    query: ExportConstructionLabourEmployeesRequestModel,
     successStatus: StatusCodes.OK,
     successDescription: "An .xlsx file",
     successBinaryContentTypes: [XLSX_CONTENT_TYPE],
@@ -164,25 +170,25 @@ export const labourOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",
     path: ITEM,
-    summary: "One Labour",
+    summary: "One Employee, with how they sign in",
     tags: LABOUR,
-    params: LabourIdParamsModel,
+    params: EmployeeIdParamsModel,
     successStatus: StatusCodes.OK,
-    successDescription: "The Labour",
-    successSchema: ConstructionLabourLabourResponseModel,
+    successDescription: "The Employee",
+    successSchema: ConstructionLabourEmployeeResponseModel,
     errors: [...ITEM_ERRORS],
   },
   {
     method: "post",
     path: `${ITEM}/update`,
     summary:
-      "Edit a Labour; a changed opening balance reverses the old entry and posts the new one",
+      "Edit an Employee; a changed opening balance reverses the old entry and posts the new one. Their sign-in follows the Role, name, mobile, email and Projects; Can sign in turns it on or off (409 EMPLOYEE_CHANGED, MOBILE_IN_USE, MOBILE_LOCKED)",
     tags: LABOUR,
-    params: LabourIdParamsModel,
-    body: UpdateConstructionLabourLabourRequestModel,
+    params: EmployeeIdParamsModel,
+    body: UpdateConstructionLabourEmployeeRequestModel,
     successStatus: StatusCodes.OK,
-    successDescription: "The Labour",
-    successSchema: ConstructionLabourLabourResponseModel,
+    successDescription: "The Employee",
+    successSchema: ConstructionLabourEmployeeResponseModel,
     errors: [
       ...ITEM_ERRORS,
       StatusCodes.CONFLICT,
@@ -192,32 +198,33 @@ export const labourOpenApiOperations: OpenApiOperation[] = [
   {
     method: "post",
     path: `${ITEM}/activate`,
-    summary: "Mark a Labour Active",
+    summary: "Mark an Employee Active",
     tags: LABOUR,
-    params: LabourIdParamsModel,
+    params: EmployeeIdParamsModel,
     successStatus: StatusCodes.OK,
-    successDescription: "The Labour",
-    successSchema: ConstructionLabourLabourResponseModel,
+    successDescription: "The Employee",
+    successSchema: ConstructionLabourEmployeeResponseModel,
     errors: [...ITEM_ERRORS, StatusCodes.PAYMENT_REQUIRED],
   },
   {
     method: "post",
     path: `${ITEM}/deactivate`,
-    summary: "Mark a Labour Inactive (they leave attendance pickers)",
+    summary:
+      "Mark an Employee Inactive (they leave attendance pickers; their sign-in stays)",
     tags: LABOUR,
-    params: LabourIdParamsModel,
+    params: EmployeeIdParamsModel,
     successStatus: StatusCodes.OK,
-    successDescription: "The Labour",
-    successSchema: ConstructionLabourLabourResponseModel,
+    successDescription: "The Employee",
+    successSchema: ConstructionLabourEmployeeResponseModel,
     errors: [...ITEM_ERRORS, StatusCodes.PAYMENT_REQUIRED],
   },
   {
     method: "post",
     path: `${ITEM}/delete`,
     summary:
-      "Delete (hide) a Labour; 409 LABOUR_HAS_RECORDS once they have attendance or payments",
+      "Delete (hide) an Employee and remove their sign-in; 409 EMPLOYEE_HAS_RECORDS once they have attendance or payments",
     tags: LABOUR,
-    params: LabourIdParamsModel,
+    params: EmployeeIdParamsModel,
     successStatus: StatusCodes.NO_CONTENT,
     successDescription: "Deleted",
     errors: [
@@ -229,13 +236,30 @@ export const labourOpenApiOperations: OpenApiOperation[] = [
   {
     method: "get",
     path: `${ITEM}/transfers`,
-    summary: "The Labour's Project history, oldest first",
+    summary: "The Employee's Project history, oldest first",
     tags: LABOUR,
-    params: LabourIdParamsModel,
+    params: EmployeeIdParamsModel,
     successStatus: StatusCodes.OK,
     successDescription: "Transfers",
-    successSchema: ListConstructionLabourLabourTransfersResponseModel,
+    successSchema: ListConstructionLabourEmployeeTransfersResponseModel,
     errors: [...ITEM_ERRORS],
   },
-  ...partyFileOpenApiOperations(LABOURS_PATH, "Labour", LABOUR),
+  {
+    method: "post",
+    path: `${ITEM}/password`,
+    summary:
+      "Set a new temporary password for the Employee's sign-in (409 EMPLOYEE_NO_SIGN_IN; 403 CANNOT_GRANT, OWN_ROLE)",
+    tags: LABOUR,
+    params: EmployeeIdParamsModel,
+    body: SetConstructionLabourEmployeePasswordRequestModel,
+    successStatus: StatusCodes.OK,
+    successDescription: "The Employee",
+    successSchema: ConstructionLabourEmployeePasswordResponseModel,
+    errors: [
+      ...ITEM_ERRORS,
+      StatusCodes.CONFLICT,
+      StatusCodes.PAYMENT_REQUIRED,
+    ],
+  },
+  ...partyFileOpenApiOperations(EMPLOYEES_PATH, "Employee", LABOUR),
 ];

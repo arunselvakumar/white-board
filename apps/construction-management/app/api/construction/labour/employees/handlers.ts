@@ -1,14 +1,20 @@
 import type { PartyFileRouteConfig } from "@/app/api/construction/labour/_party-files/party-file-routes";
-import { createLabourHandlers } from "@/src/labour/infrastructure/create-labour-handlers";
+import { createEmployeeSignInHandlers } from "@/src/composition/employee-sign-ins";
+import { createEmployeeHandlers } from "@/src/labour/infrastructure/create-employee-handlers";
 
-import { LABOURS_PATH } from "./labour-models";
+import { EMPLOYEES_MENU, EMPLOYEES_PATH } from "./employee-models";
 
-/** One composition for every Labour route. */
-export const labour = createLabourHandlers();
+/** One composition for every Employee route. */
+export const employee = createEmployeeHandlers();
 
-/** Photo and documents of a labourer: the register's Menu, `labour` owner. */
-export const LABOUR_FILES: PartyFileRouteConfig = {
-  ownerType: "labour",
-  menu: "masters.labours",
-  basePath: LABOURS_PATH,
+/** The Employee and their sign-in (ADR CM-0055 §4), over the same handlers. */
+export const employeeSignIns = createEmployeeSignInHandlers({
+  employees: employee.employees,
+});
+
+/** Photo and documents of an Employee: the Employees menu, `employee` owner. */
+export const EMPLOYEE_FILES: PartyFileRouteConfig = {
+  ownerType: "employee",
+  menu: EMPLOYEES_MENU,
+  basePath: EMPLOYEES_PATH,
 };

@@ -9,21 +9,21 @@ import {
 } from "@/src/shared-kernel/list-cursor";
 
 import { ConstructionProjectsProjectParamsModel } from "../../../project-models";
-import { projectLabours } from "./handlers";
+import { projectEmployees } from "./handlers";
 import {
-  AddConstructionProjectsProjectLaboursRequestModel,
-  ListConstructionProjectsProjectLaboursRequestModel,
-  toProjectLabourResponse,
-  type ListConstructionProjectsProjectLaboursResponseModel,
-} from "./project-labours-models";
+  AddConstructionProjectsProjectEmployeesRequestModel,
+  ListConstructionProjectsProjectEmployeesRequestModel,
+  toProjectEmployeeResponse,
+  type ListConstructionProjectsProjectEmployeesResponseModel,
+} from "./project-employees-models";
 
 export const dynamic = "force-dynamic";
 
 type IdContext = { params: Promise<{ id: string }> };
 
 /**
- * The Labours on a Project, by name, searchable and paged both ways
- * (ADR CM-0038 §2). Project menu Read; 404 for a Project the caller is
+ * The Employees on a Project, by name, each with their Role, searchable
+ * and paged both ways (ADR CM-0038 §2, CM-0055 §5). Project menu Read; 404 for a Project the caller is
  * not on.
  */
 export async function GET(
@@ -37,11 +37,11 @@ export async function GET(
       ConstructionProjectsProjectParamsModel.safeParse(await context.params),
     );
     const model = parseOrThrow(
-      ListConstructionProjectsProjectLaboursRequestModel.safeParse(
+      ListConstructionProjectsProjectEmployeesRequestModel.safeParse(
         Object.fromEntries(new URL(request.url).searchParams),
       ),
     );
-    const page = await projectLabours.list(session.access, id, {
+    const page = await projectEmployees.list(session.access, id, {
       limit: model.limit,
       ...(model.search == null || model.search === ""
         ? {}
@@ -56,8 +56,8 @@ export async function GET(
     const backwards = model.before != null;
     const moreAfter = backwards || page.hasMore;
     const moreBefore = backwards ? page.hasMore : model.after != null;
-    const body: ListConstructionProjectsProjectLaboursResponseModel = {
-      items: page.items.map(toProjectLabourResponse),
+    const body: ListConstructionProjectsProjectEmployeesResponseModel = {
+      items: page.items.map(toProjectEmployeeResponse),
       nextCursor: moreAfter && last != null ? encodeNameCursor(last) : null,
       prevCursor: moreBefore && first != null ? encodeNameCursor(first) : null,
       total: page.total,
@@ -69,9 +69,9 @@ export async function GET(
 }
 
 /**
- * Adds Labours to the Project from a date, written by the labour context
- * as Edit Labour writes them; all or none (ADR CM-0038 §2). Project menu
- * Update.
+ * Adds Employees to the Project from a date, written by the labour context
+ * as Edit Employee writes them, and their sign-ins follow; all or none
+ * (ADR CM-0038 §2, CM-0055 §5). Project menu Update.
  */
 export async function POST(
   request: Request,
@@ -84,11 +84,11 @@ export async function POST(
       ConstructionProjectsProjectParamsModel.safeParse(await context.params),
     );
     const body = parseOrThrow(
-      AddConstructionProjectsProjectLaboursRequestModel.safeParse(
+      AddConstructionProjectsProjectEmployeesRequestModel.safeParse(
         await request.json(),
       ),
     );
-    await projectLabours.add(session.access, id, body);
+    await projectEmployees.add(session.access, id, body);
     return new Response(null, { status: StatusCodes.NO_CONTENT });
   } catch (error) {
     return mapError(error);
