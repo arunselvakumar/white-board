@@ -10,6 +10,7 @@ import { newId } from "@/src/shared-kernel/ids";
 import { Role, changedCells, copyName } from "../domain/role";
 import type { RoleRepository } from "../domain/role-repository";
 import { assertCanGrant, assertNotOwnRole } from "./grant-rules";
+import { NO_ROLE_EMPLOYEES, type RoleEmployees } from "./role-employees";
 import { toRoleReadModel, type RoleReadModel } from "./role-read-model";
 
 type Grants = Readonly<Partial<Record<string, readonly Flag[]>>>;
@@ -33,6 +34,7 @@ export class RoleHandlers {
   constructor(
     private readonly roles: RoleRepository,
     private readonly clock: () => Date = () => new Date(),
+    private readonly employees: RoleEmployees = NO_ROLE_EMPLOYEES,
   ) {}
 
   private async load(workspaceId: string, id: string): Promise<Role> {
@@ -53,15 +55,23 @@ export class RoleHandlers {
         ? new Map<string, string>()
         : await this.roles.departmentNames(role.workspaceId);
     await this.roles.save(role, { audit });
-    return toRoleReadModel(role, 0, departments);
+    return toRoleReadModel(role, { users: 0, employees: 0 }, departments);
   }
 
   private async view(role: Role): Promise<RoleReadModel> {
-    const [counts, departments] = await Promise.all([
+    const [counts, employees, departments] = await Promise.all([
       this.roles.userCounts(role.workspaceId),
+      this.employees.counts(role.workspaceId),
       this.roles.departmentNames(role.workspaceId),
     ]);
-    return toRoleReadModel(role, counts.get(role.id) ?? 0, departments);
+    return toRoleReadModel(
+      role,
+      {
+        users: counts.get(role.id) ?? 0,
+        employees: employees.get(role.id) ?? 0,
+      },
+      departments,
+    );
   }
 
   private audit(
@@ -81,15 +91,23 @@ export class RoleHandlers {
     };
   }
 
-  /** Every live Role, by name, with how many Users are on each. */
+  /** Every live Role, by name, with how many Users and Employees are on each. */
   async list(workspaceId: string): Promise<RoleReadModel[]> {
-    const [roles, counts, departments] = await Promise.all([
+    const [roles, counts, employees, departments] = await Promise.all([
       this.roles.listAll(workspaceId),
       this.roles.userCounts(workspaceId),
+      this.employees.counts(workspaceId),
       this.roles.departmentNames(workspaceId),
     ]);
     return roles.map((role) =>
-      toRoleReadModel(role, counts.get(role.id) ?? 0, departments),
+      toRoleReadModel(
+        role,
+        {
+          users: counts.get(role.id) ?? 0,
+          employees: employees.get(role.id) ?? 0,
+        },
+        departments,
+      ),
     );
   }
 
@@ -211,7 +229,8 @@ export class RoleHandlers {
 
   /**
    * 409 `ROLE_IS_DEFAULT` for a default Role; 409 `ROLE_IN_USE` (details
-   * `{ userCount }`) while anyone is on it.
+   * `{ userCount, employeeCount }`) while Team Members or live Employees
+   * are on it (ADR CM-0055 §2).
    */
   async delete(input: {
     workspaceId: string;
@@ -220,13 +239,19 @@ export class RoleHandlers {
   }): Promise<void> {
     const role = await this.load(input.workspaceId, input.id);
     role.assertDeletable();
-    const userCount =
-      (await this.roles.userCounts(input.workspaceId)).get(role.id) ?? 0;
-    if (userCount > 0)
+    const [users, employees] = await Promise.all([
+      this.roles.userCounts(input.workspaceId),
+      this.employees.counts(input.workspaceId),
+    ]);
+    const userCount = users.get(role.id) ?? 0;
+    const employeeCount = employees.get(role.id) ?? 0;
+    if (userCount > 0 || employeeCount > 0)
       throw conflict(
         "ROLE_IN_USE",
-        "Staff are on this Role. Give them another Role first.",
-        { userCount },
+        employeeCount > 0
+          ? "Employees are on this Role. Give them another Role first."
+          : "Staff are on this Role. Give them another Role first.",
+        { userCount, employeeCount },
       );
     const before = snapshot(role);
     role.delete(input.by, this.clock());

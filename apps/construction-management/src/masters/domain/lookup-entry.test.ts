@@ -38,9 +38,9 @@ describe("cleanMasterName", () => {
     expect(codeOf(() => cleanMasterName("work_type", "   "))).toBe(
       "WORK_TYPE_NAME_REQUIRED",
     );
-    expect(codeOf(() => cleanMasterName("supervisor", "x".repeat(101)))).toBe(
-      "SUPERVISOR_NAME_TOO_LONG",
-    );
+    expect(
+      codeOf(() => cleanMasterName("labour_category", "x".repeat(101))),
+    ).toBe("LABOUR_CATEGORY_NAME_TOO_LONG");
     expect(cleanMasterName("labour_category", "x".repeat(100))).toHaveLength(
       100,
     );

@@ -10,8 +10,10 @@ export type RoleReadModel = {
   /** The Department the Role is under, or none (ADR CM-0050). */
   department: { id: string; name: string } | null;
   permissions: PermissionGrants;
-  /** Live non-Owner Team Members on the Role. */
+  /** Live non-Owner Team Members on the Role, Employees' sign-ins left out. */
   userCount: number;
+  /** Live Employees on the Role (ADR CM-0055 §2). */
+  employeeCount: number;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -19,7 +21,7 @@ export type RoleReadModel = {
 /** `departmentNames` holds the Company's live Departments by id. */
 export function toRoleReadModel(
   role: Role,
-  userCount: number,
+  counts: { users: number; employees: number },
   departmentNames: ReadonlyMap<string, string>,
 ): RoleReadModel {
   const departmentName =
@@ -36,7 +38,8 @@ export function toRoleReadModel(
         ? null
         : { id: role.departmentId, name: departmentName },
     permissions: role.permissions.toGrants(),
-    userCount,
+    userCount: counts.users,
+    employeeCount: counts.employees,
     createdAt: role.createdAt,
     updatedAt: role.updatedAt,
   };

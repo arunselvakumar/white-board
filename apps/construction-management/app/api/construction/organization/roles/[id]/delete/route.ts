@@ -10,8 +10,9 @@ import { ConstructionOrganizationRoleParamsModel } from "../../role-models";
 export const dynamic = "force-dynamic";
 
 /**
- * Deletes a Role (ADR CM-0030). 409 `ROLE_IN_USE` with `{ userCount }`
- * while Team Members are on it.
+ * Deletes a Role (ADR CM-0030). 409 `ROLE_IN_USE` with `{ userCount,
+ * employeeCount }` while Team Members or live Employees are on it (ADR
+ * CM-0055 §2).
  */
 export async function POST(
   request: Request,

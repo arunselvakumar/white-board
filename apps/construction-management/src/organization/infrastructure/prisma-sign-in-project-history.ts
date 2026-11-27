@@ -12,9 +12,9 @@ import {
 export class PrismaSignInProjectHistory implements SignInProjectHistory {
   constructor(private readonly db: PrismaClient = prisma) {}
 
-  async siteEngineerSignIns(workspaceId: string) {
+  async employeeSignIns(workspaceId: string) {
     return this.db.constructionOrganizationTeamMember.findMany({
-      where: { workspaceId, siteEngineer: true },
+      where: { workspaceId, employee: true },
       select: { id: true, name: true },
     });
   }

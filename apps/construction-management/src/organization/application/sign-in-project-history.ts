@@ -42,12 +42,10 @@ export function projectChangesOf(
 
 export type SignInProjectHistory = {
   /**
-   * Sign-ins marked Site Engineer (`team_members.site_engineer`), removed
+   * Sign-ins of Employees (`team_members.employee`, ADR CM-0055 §4), removed
    * ones included, with their names.
    */
-  siteEngineerSignIns(
-    workspaceId: string,
-  ): Promise<{ id: string; name: string }[]>;
+  employeeSignIns(workspaceId: string): Promise<{ id: string; name: string }[]>;
   /**
    * Every Project change of these sign-ins, oldest first: on one Project,
    * or on every Project when `projectId` is null.

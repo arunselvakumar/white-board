@@ -211,6 +211,8 @@ export class PrismaRoleRepository implements RoleRepository {
         workspaceId,
         deletedAt: null,
         isOwner: false,
+        // An Employee's sign-in counts as the Employee (ADR CM-0055 §2).
+        employee: false,
         roleId: { not: null },
       },
       _count: { _all: true },
