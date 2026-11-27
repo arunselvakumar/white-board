@@ -207,8 +207,8 @@ export const accounts = {
 
   /**
    * A new sign-in mobile for a User only their Company relies on (ADR
-   * CM-0053): an admin corrected the mobile a Site Engineer signs in with.
-   * Stored verified, as `createPasswordAccount` does; a placeholder email
+   * CM-0053, CM-0055): an admin corrected the mobile an Employee signs in
+   * with. Stored verified, as `createPasswordAccount` does; a placeholder email
    * follows the number. `in_use` when another User has the number already.
    */
   async changeSignInMobile(

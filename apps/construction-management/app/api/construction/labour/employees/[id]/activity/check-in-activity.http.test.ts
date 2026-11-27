@@ -1,7 +1,7 @@
 import { prisma } from "@repo/construction-db";
 import { describe, expect, it } from "vitest";
 
-import { POST as createLabour } from "@/app/api/construction/labour/labours/route";
+import { POST as createLabour } from "@/app/api/construction/labour/employees/route";
 import { createCheckInHandlers } from "@/src/labour/infrastructure/check-in-factory";
 import type { Flag } from "@/src/shared-kernel/access";
 import {
@@ -17,11 +17,12 @@ import {
   ownerWithCompany,
 } from "@/test/companies";
 import { pngBytes } from "@/test/files";
+import { seededRoleId } from "@/test/employees";
 import { TEST_ORIGIN } from "@/test/sessions";
 
 import { GET as getActivity } from "./route";
 
-const LABOURS = `${TEST_ORIGIN}/api/construction/labour/labours`;
+const LABOURS = `${TEST_ORIGIN}/api/construction/labour/employees`;
 const TODAY = todayIn("Asia/Kolkata");
 const day = (offset: number) => addDays(TODAY, offset);
 const PHOTO = Buffer.from(pngBytes(2048)).toString("base64");
@@ -62,10 +63,10 @@ function params(id: string) {
   return { params: Promise.resolve({ id }) };
 }
 
-async function page(cookie: string, labourId: string, query = "") {
+async function page(cookie: string, employeeId: string, query = "") {
   const response = await getActivity(
-    jsonRequest(`${LABOURS}/${labourId}/activity${query}`, cookie),
-    params(labourId),
+    jsonRequest(`${LABOURS}/${employeeId}/activity${query}`, cookie),
+    params(employeeId),
   );
   if (response.status !== 200)
     throw new Error(`activity: ${await response.text()}`);
@@ -74,7 +75,7 @@ async function page(cookie: string, labourId: string, query = "") {
 
 async function everything(
   cookie: string,
-  labourId: string,
+  employeeId: string,
   query = "",
 ): Promise<Entry[]> {
   const entries: Entry[] = [];
@@ -83,7 +84,7 @@ async function everything(
     const separator = query === "" ? "?" : "&";
     const next: Page = await page(
       cookie,
-      labourId,
+      employeeId,
       cursor == null
         ? query
         : `${query}${separator}cursor=${encodeURIComponent(cursor)}`,
@@ -97,6 +98,7 @@ async function everything(
 async function labourOn(company: Company, projectIds: string[]) {
   const response = await createLabour(
     jsonRequest(LABOURS, company.cookie, {
+      roleId: await seededRoleId(company.workspaceId),
       name: "Dhuresh Nawin",
       joiningDate: day(-40),
       wageType: "daily",
@@ -155,7 +157,7 @@ async function history(company: Company) {
     addProject(company.workspaceId, company.userId, "Green Park"),
   ]);
   await seedFence(company.workspaceId, green);
-  const labourId = await labourOn(company, [sky, green]);
+  const employeeId = await labourOn(company, [sky, green]);
   const clock = { now: at(day(-4), "09:00") };
   const handlers = createCheckInHandlers({ clock: () => clock.now });
   const record = async (
@@ -170,7 +172,7 @@ async function history(company: Company) {
       userId: company.userId,
       projectId,
       kind: "labour",
-      personId: labourId,
+      personId: employeeId,
       action,
       photo: PHOTO,
       location: location == null ? null : { ...location, accuracyMetres: 12 },
@@ -196,7 +198,7 @@ async function history(company: Company) {
   return {
     sky,
     green,
-    labourId,
+    employeeId,
     mistaken,
     greenIn,
     greenOut,
@@ -218,7 +220,7 @@ describe("Labour Activity: check-in entries (ADR CM-0044)", () => {
       select: { name: true },
     });
 
-    const all = await everything(company.cookie, h.labourId);
+    const all = await everything(company.cookie, h.employeeId);
     const entries = checkIns(all);
     expect(entries.map((entry) => [entry.entryId, entry.date])).toEqual([
       // The night shift's Check Out sits on the day it began.
@@ -275,27 +277,27 @@ describe("Labour Activity: check-in entries (ADR CM-0044)", () => {
     // Type: Check-In is its own; Attendance keeps meaning the day.
     const typed = await everything(
       company.cookie,
-      h.labourId,
+      h.employeeId,
       "?type=check_ins",
     );
     expect(typed).toEqual(entries);
     const attendance = await everything(
       company.cookie,
-      h.labourId,
+      h.employeeId,
       "?type=attendance",
     );
     expect(checkIns(attendance)).toEqual([]);
     expect(attendance.length).toBeGreaterThan(0);
     expect(
       checkIns(
-        await everything(company.cookie, h.labourId, `?projectId=${h.green}`),
+        await everything(company.cookie, h.employeeId, `?projectId=${h.green}`),
       ).map((entry) => entry.entryId),
     ).toEqual([h.greenOut, h.greenIn]);
     expect(
       checkIns(
         await everything(
           company.cookie,
-          h.labourId,
+          h.employeeId,
           `?from=${day(-4)}&to=${day(-3)}`,
         ),
       ).map((entry) => entry.entryId),
@@ -307,7 +309,7 @@ describe("Labour Activity: check-in entries (ADR CM-0044)", () => {
       data: { photoKey: null, photoRemovedAt: new Date() },
     });
     const removed = checkIns(
-      await everything(company.cookie, h.labourId, "?type=check_ins"),
+      await everything(company.cookie, h.employeeId, "?type=check_ins"),
     ).find((entry) => entry.entryId === h.greenIn);
     expect(removed?.hasPhoto).toBe(false);
 
@@ -318,20 +320,24 @@ describe("Labour Activity: check-in entries (ADR CM-0044)", () => {
   it("shows check-in entries only of Projects where the viewer has Attendance Read", async () => {
     const company = await ownerWithCompany();
     const h = await history(company);
-    const ownerFeed = await everything(company.cookie, h.labourId);
+    const ownerFeed = await everything(company.cookie, h.employeeId);
 
     const withoutAttendance = await memberOn(
       company,
       { "masters.labours": ["read"] },
       [h.sky, h.green],
     );
-    const plain = await everything(withoutAttendance.cookie, h.labourId);
+    const plain = await everything(withoutAttendance.cookie, h.employeeId);
     // Exactly the feed as before: everything but the check-in entries.
     expect(plain).toEqual(
       ownerFeed.filter((entry) => entry.kind !== "check_in"),
     );
     expect(
-      await everything(withoutAttendance.cookie, h.labourId, "?type=check_ins"),
+      await everything(
+        withoutAttendance.cookie,
+        h.employeeId,
+        "?type=check_ins",
+      ),
     ).toEqual([]);
 
     const onSky = await memberOn(
@@ -340,14 +346,14 @@ describe("Labour Activity: check-in entries (ADR CM-0044)", () => {
       [h.sky],
     );
     expect(
-      checkIns(await everything(onSky.cookie, h.labourId)).map(
+      checkIns(await everything(onSky.cookie, h.employeeId)).map(
         (entry) => entry.entryId,
       ),
     ).toEqual([h.nightOut, h.nightIn, h.mistaken]);
     expect(
       await everything(
         onSky.cookie,
-        h.labourId,
+        h.employeeId,
         `?type=check_ins&projectId=${h.green}`,
       ),
     ).toEqual([]);
@@ -360,7 +366,7 @@ describe("Labour Activity: check-in entries (ADR CM-0044)", () => {
       company.userId,
       "Sky Towers",
     );
-    const labourId = await labourOn(company, [sky]);
+    const employeeId = await labourOn(company, [sky]);
     let seeded = 0;
     const seedDay = async (date: string, checkInsThatDay: number) => {
       seeded += checkInsThatDay;
@@ -372,7 +378,7 @@ describe("Labour Activity: check-in entries (ADR CM-0044)", () => {
           id: newId(),
           workspaceId: company.workspaceId,
           projectId: sky,
-          labourId,
+          employeeId,
           attendanceDate: calendarDateToDb(date),
           status: "present",
           wageType: "daily",
@@ -388,8 +394,8 @@ describe("Labour Activity: check-in entries (ADR CM-0044)", () => {
           id: newId(),
           workspaceId: company.workspaceId,
           projectId: sky,
-          personKind: "labour" as const,
-          personId: labourId,
+          personKind: "employee" as const,
+          personId: employeeId,
           action:
             index % 2 === 0 ? ("check_in" as const) : ("check_out" as const),
           occurredAt: instant,
@@ -403,12 +409,12 @@ describe("Labour Activity: check-in entries (ADR CM-0044)", () => {
     for (let offset = -35; offset <= -1; offset++)
       await seedDay(day(offset), (-offset % 4) + 1);
 
-    const before = await everything(company.cookie, labourId);
+    const before = await everything(company.cookie, employeeId);
     // 35 days, their check-in entries, the Project added, Added to Labours.
     expect(before).toHaveLength(35 + seeded + 2);
     expect(new Set(before.map((entry) => entry.id)).size).toBe(before.length);
 
-    const first = await page(company.cookie, labourId);
+    const first = await page(company.cookie, employeeId);
     expect(first.items).toHaveLength(30);
     // The boundary falls inside a day, between a check-in entry and the
     // day's attendance entry of the same instant.
@@ -432,7 +438,7 @@ describe("Labour Activity: check-in entries (ADR CM-0044)", () => {
     while (cursor != null) {
       const next = await page(
         company.cookie,
-        labourId,
+        employeeId,
         `?cursor=${encodeURIComponent(cursor)}`,
       );
       expect(next.items.length).toBeLessThanOrEqual(30);
@@ -454,12 +460,12 @@ describe("Labour Activity: check-in entries (ADR CM-0044)", () => {
     // Read with type=check_ins, the pages hold only those, all of them.
     const onlyCheckIns = await everything(
       company.cookie,
-      labourId,
+      employeeId,
       "?type=check_ins",
     );
     expect(onlyCheckIns).toHaveLength(seeded);
     expect(onlyCheckIns).toEqual(
-      checkIns(await everything(company.cookie, labourId)),
+      checkIns(await everything(company.cookie, employeeId)),
     );
   });
 });

@@ -5,7 +5,7 @@ import {
   datesInOrder,
   personActivityPageModel,
   personActivityQueryFields,
-} from "@/app/api/construction/labour/labours/[id]/activity/activity-models";
+} from "@/app/api/_lib/person-activity-models";
 import { PERSON_ACTIVITY_TYPES } from "@/src/composition/person-activity";
 
 export const ListConstructionLabourVendorActivityRequestModel = z

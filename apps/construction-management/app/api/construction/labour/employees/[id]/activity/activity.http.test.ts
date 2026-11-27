@@ -5,13 +5,13 @@ import { describe, expect, it } from "vitest";
 import { POST as setPaidLeave } from "@/app/api/construction/labour/attendance/labour/[id]/paid-leave/route";
 import { POST as clearDays } from "@/app/api/construction/labour/attendance/labour/clear/route";
 import { POST as markDays } from "@/app/api/construction/labour/attendance/labour/mark/route";
-import { POST as activateLabour } from "@/app/api/construction/labour/labours/[id]/activate/route";
-import { POST as deactivateLabour } from "@/app/api/construction/labour/labours/[id]/deactivate/route";
-import { POST as updateLabour } from "@/app/api/construction/labour/labours/[id]/update/route";
-import { POST as createLabour } from "@/app/api/construction/labour/labours/route";
-import { POST as transferLabours } from "@/app/api/construction/labour/labours/transfer/route";
+import { POST as activateLabour } from "@/app/api/construction/labour/employees/[id]/activate/route";
+import { POST as deactivateLabour } from "@/app/api/construction/labour/employees/[id]/deactivate/route";
+import { POST as updateLabour } from "@/app/api/construction/labour/employees/[id]/update/route";
+import { POST as createLabour } from "@/app/api/construction/labour/employees/route";
+import { POST as transferLabours } from "@/app/api/construction/labour/employees/transfer/route";
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
-import { createLabourHandlers } from "@/src/labour/infrastructure/create-labour-handlers";
+import { createEmployeeHandlers } from "@/src/labour/infrastructure/create-employee-handlers";
 import type { Flag } from "@/src/shared-kernel/access";
 import {
   addDays,
@@ -25,11 +25,12 @@ import {
   memberWith,
   ownerWithCompany,
 } from "@/test/companies";
+import { seededRoleId } from "@/test/employees";
 import { TEST_ORIGIN } from "@/test/sessions";
 
 import { GET as getActivity } from "./route";
 
-const LABOURS = `${TEST_ORIGIN}/api/construction/labour/labours`;
+const LABOURS = `${TEST_ORIGIN}/api/construction/labour/employees`;
 const ATTENDANCE = `${TEST_ORIGIN}/api/construction/labour/attendance/labour`;
 const TODAY = todayIn("Asia/Kolkata");
 const day = (offset: number) => addDays(TODAY, offset);
@@ -68,15 +69,15 @@ async function json<T>(response: Response): Promise<T> {
   return (await response.json()) as T;
 }
 
-function read(cookie: string, labourId: string, query = "") {
+function read(cookie: string, employeeId: string, query = "") {
   return getActivity(
-    jsonRequest(`${LABOURS}/${labourId}/activity${query}`, cookie),
-    params(labourId),
+    jsonRequest(`${LABOURS}/${employeeId}/activity${query}`, cookie),
+    params(employeeId),
   );
 }
 
-async function page(cookie: string, labourId: string, query = "") {
-  const response = await read(cookie, labourId, query);
+async function page(cookie: string, employeeId: string, query = "") {
+  const response = await read(cookie, employeeId, query);
   if (response.status !== 200)
     throw new Error(`activity: ${await response.text()}`);
   return json<Page>(response);
@@ -85,7 +86,7 @@ async function page(cookie: string, labourId: string, query = "") {
 /** Every page, following the cursor. */
 async function everything(
   cookie: string,
-  labourId: string,
+  employeeId: string,
   query = "",
 ): Promise<Entry[]> {
   const entries: Entry[] = [];
@@ -94,7 +95,7 @@ async function everything(
     const separator = query === "" ? "?" : "&";
     const next: Page = await page(
       cookie,
-      labourId,
+      employeeId,
       cursor == null
         ? query
         : `${query}${separator}cursor=${encodeURIComponent(cursor)}`,
@@ -115,6 +116,7 @@ async function created(
 ): Promise<{ id: string; updatedAt: string; name: string }> {
   const response = await createLabour(
     jsonRequest(LABOURS, company.cookie, {
+      roleId: await seededRoleId(company.workspaceId),
       wageType: "daily",
       wagePerDay: 70_000,
       overtimeWagePerHour: 10_000,
@@ -127,7 +129,7 @@ async function created(
   return json(response);
 }
 
-type Day = { id: string; labourId: string; updatedAt: string };
+type Day = { id: string; employeeId: string; updatedAt: string };
 
 async function mark(
   company: Company,
@@ -182,32 +184,32 @@ async function history(company: Company) {
     joiningDate: day(-40),
     projectIds: [sky],
   });
-  const labourId = dhuresh.id;
+  const employeeId = dhuresh.id;
 
   const [a] = await mark(company, sky, day(-30), [
-    { labourId, status: "present" },
+    { employeeId, status: "present" },
   ]);
   const [a2] = await mark(
     company,
     sky,
     day(-30),
-    [{ labourId, status: "half_day" }],
-    { [labourId]: a?.updatedAt ?? "" },
+    [{ employeeId, status: "half_day" }],
+    { [employeeId]: a?.updatedAt ?? "" },
   );
   // A re-mark that keeps the status (a new shift) is not a change.
   const [a3] = await mark(
     company,
     sky,
     day(-30),
-    [{ labourId, status: "half_day", shift: "Shift 2" }],
-    { [labourId]: a2?.updatedAt ?? "" },
+    [{ employeeId, status: "half_day", shift: "Shift 2" }],
+    { [employeeId]: a2?.updatedAt ?? "" },
   );
-  await mark(company, sky, day(-30), [{ labourId, status: "absent" }], {
-    [labourId]: a3?.updatedAt ?? "",
+  await mark(company, sky, day(-30), [{ employeeId, status: "absent" }], {
+    [employeeId]: a3?.updatedAt ?? "",
   });
   await mark(company, sky, day(-29), [
     {
-      labourId,
+      employeeId,
       status: "present",
       shift: "Shift 1",
       checkIn: "09:00",
@@ -216,7 +218,7 @@ async function history(company: Company) {
     },
   ]);
   const [leave] = await mark(company, sky, day(-28), [
-    { labourId, status: "on_leave" },
+    { employeeId, status: "on_leave" },
   ]);
   const paid = await setPaidLeave(
     jsonRequest(`${ATTENDANCE}/${leave?.id ?? ""}/paid-leave`, company.cookie, {
@@ -227,29 +229,29 @@ async function history(company: Company) {
   );
   expect(paid.status).toBe(StatusCodes.OK);
   const [cleared] = await mark(company, sky, day(-27), [
-    { labourId, status: "present" },
+    { employeeId, status: "present" },
   ]);
   const clear = await clearDays(
     jsonRequest(`${ATTENDANCE}/clear`, company.cookie, {
       projectId: sky,
       date: day(-27),
-      labourIds: [labourId],
-      expected: { [labourId]: cleared?.updatedAt },
+      employeeIds: [employeeId],
+      expected: { [employeeId]: cleared?.updatedAt },
     }),
   );
   expect(clear.status).toBe(StatusCodes.NO_CONTENT);
 
   for (const route of [deactivateLabour, activateLabour]) {
     const response = await route(
-      jsonRequest(`${LABOURS}/${labourId}/x`, company.cookie, {}),
-      params(labourId),
+      jsonRequest(`${LABOURS}/${employeeId}/x`, company.cookie, {}),
+      params(employeeId),
     );
     expect(response.status).toBe(StatusCodes.OK);
   }
   // Recorded after the status changes, dated 20 days ago.
   const transferred = await transferLabours(
     jsonRequest(`${LABOURS}/transfer`, company.cookie, {
-      labourIds: [labourId],
+      employeeIds: [employeeId],
       fromProjectId: sky,
       toProjectId: green,
       transferDate: day(-20),
@@ -257,23 +259,24 @@ async function history(company: Company) {
     }),
   );
   expect(transferred.status).toBe(StatusCodes.OK);
-  await mark(company, green, day(-10), [{ labourId, status: "present" }]);
+  await mark(company, green, day(-10), [{ employeeId, status: "present" }]);
 
-  const current = await prisma.constructionLabourLabour.findUniqueOrThrow({
-    where: { id: labourId },
+  const current = await prisma.constructionLabourEmployee.findUniqueOrThrow({
+    where: { id: employeeId },
   });
   const untick = await updateLabour(
-    jsonRequest(`${LABOURS}/${labourId}/update`, company.cookie, {
+    jsonRequest(`${LABOURS}/${employeeId}/update`, company.cookie, {
       name: "Dhuresh Nawin",
+      roleId: current.roleId,
       joiningDate: day(-40),
       wageType: "daily",
       projectIds: [],
       expectedUpdatedAt: current.updatedAt.toISOString(),
     }),
-    params(labourId),
+    params(employeeId),
   );
   expect(untick.status).toBe(StatusCodes.OK);
-  return { sky, green, labourId };
+  return { sky, green, employeeId };
 }
 
 const FULL = [
@@ -296,13 +299,13 @@ const FULL = [
 describe("Labour Activity (ADR CM-0038)", () => {
   it("shows every entry kind on its effective date, newest first, with no amounts", async () => {
     const company = await ownerWithCompany();
-    const { sky, green, labourId } = await history(company);
+    const { sky, green, employeeId } = await history(company);
     const owner = await prisma.constructionOrganizationTeamMember.findFirst({
       where: { workspaceId: company.workspaceId, userId: company.userId },
       select: { name: true },
     });
 
-    const first = await page(company.cookie, labourId);
+    const first = await page(company.cookie, employeeId);
     expect(first.timeZone).toBe("Asia/Kolkata");
     expect(first.nextCursor).toBeNull();
     const entries = first.items;
@@ -375,9 +378,9 @@ describe("Labour Activity (ADR CM-0038)", () => {
 
   it("filters by type, Project and date range", async () => {
     const company = await ownerWithCompany();
-    const { green, labourId } = await history(company);
+    const { green, employeeId } = await history(company);
     const kinds = async (query: string) =>
-      summary(await everything(company.cookie, labourId, query));
+      summary(await everything(company.cookie, employeeId, query));
 
     expect(await kinds("?type=projects")).toEqual(
       FULL.filter(([kind]) =>
@@ -408,11 +411,11 @@ describe("Labour Activity (ADR CM-0038)", () => {
 
     const backwards = await read(
       company.cookie,
-      labourId,
+      employeeId,
       `?from=${day(-1)}&to=${day(-5)}`,
     );
     expect(backwards.status).toBe(StatusCodes.BAD_REQUEST);
-    const badCursor = await read(company.cookie, labourId, "?cursor=nope");
+    const badCursor = await read(company.cookie, employeeId, "?cursor=nope");
     expect(badCursor.status).toBe(StatusCodes.BAD_REQUEST);
     expect((await json<{ code: string }>(badCursor)).code).toBe(
       "INVALID_CURSOR",
@@ -421,12 +424,12 @@ describe("Labour Activity (ADR CM-0038)", () => {
 
   it("keeps a deleted Project's name without a link, and marks an imported Labour", async () => {
     const company = await ownerWithCompany();
-    const { sky, labourId } = await history(company);
+    const { sky, employeeId } = await history(company);
     await prisma.constructionProjectsProject.update({
       where: { id: sky },
       data: { deletedAt: new Date(), deletedBy: company.userId },
     });
-    const entries = await everything(company.cookie, labourId);
+    const entries = await everything(company.cookie, employeeId);
     const skyEntries = entries.filter(
       (entry) => entry.project?.id === sky || entry.fromProject?.id === sky,
     );
@@ -438,7 +441,7 @@ describe("Labour Activity (ADR CM-0038)", () => {
         canOpen: false,
       });
 
-    await createLabourHandlers().importer.commit({
+    await createEmployeeHandlers().importer.commit({
       workspaceId: company.workspaceId,
       by: company.userId,
       sheet: [
@@ -454,7 +457,7 @@ describe("Labour Activity (ADR CM-0038)", () => {
         },
       ],
     });
-    const ganesh = await prisma.constructionLabourLabour.findFirstOrThrow({
+    const ganesh = await prisma.constructionLabourEmployee.findFirstOrThrow({
       where: { workspaceId: company.workspaceId, name: "Ganesh" },
     });
     expect(summary(await everything(company.cookie, ganesh.id))).toEqual([
@@ -467,12 +470,12 @@ describe("Labour Activity (ADR CM-0038)", () => {
 
   it("leaves out Projects the viewer is not on; entries with no Project always show", async () => {
     const company = await ownerWithCompany();
-    const { sky, green, labourId } = await history(company);
+    const { sky, green, employeeId } = await history(company);
 
     const onSky = await memberOn(company, { "masters.labours": ["read"] }, [
       sky,
     ]);
-    const seen = await everything(onSky.cookie, labourId);
+    const seen = await everything(onSky.cookie, employeeId);
     expect(summary(seen)).toEqual(
       FULL.filter(
         ([kind, date]) =>
@@ -490,7 +493,9 @@ describe("Labour Activity (ADR CM-0038)", () => {
     });
     // Filtering on a Project the viewer is not on leaves only the transfer.
     expect(
-      summary(await everything(onSky.cookie, labourId, `?projectId=${green}`)),
+      summary(
+        await everything(onSky.cookie, employeeId, `?projectId=${green}`),
+      ),
     ).toEqual([["transferred", day(-20)]]);
 
     const onNeither = await memberOn(
@@ -498,7 +503,7 @@ describe("Labour Activity (ADR CM-0038)", () => {
       { "masters.labours": ["read"] },
       [],
     );
-    expect(summary(await everything(onNeither.cookie, labourId))).toEqual([
+    expect(summary(await everything(onNeither.cookie, employeeId))).toEqual([
       ["activated", TODAY],
       ["deactivated", TODAY],
       ["added", day(-40)],
@@ -508,11 +513,11 @@ describe("Labour Activity (ADR CM-0038)", () => {
       sky,
       green,
     ]);
-    const refused = await read(noRead.cookie, labourId);
+    const refused = await read(noRead.cookie, employeeId);
     expect(refused.status).toBe(StatusCodes.FORBIDDEN);
 
     const other = await ownerWithCompany("Kaveri Builders");
-    const hidden = await read(other.cookie, labourId);
+    const hidden = await read(other.cookie, employeeId);
     expect(hidden.status).toBe(StatusCodes.NOT_FOUND);
     expect((await json<{ code: string }>(hidden)).code).toBe(
       "LABOUR_NOT_FOUND",
@@ -529,7 +534,7 @@ describe("Labour Activity (ADR CM-0038)", () => {
       company.userId,
       "Sky Towers",
     );
-    const { id: labourId } = await created(company, {
+    const { id: employeeId } = await created(company, {
       name: "Murugan",
       joiningDate: day(-100),
       projectIds: [sky],
@@ -540,7 +545,7 @@ describe("Labour Activity (ADR CM-0038)", () => {
           id: newId(),
           workspaceId: company.workspaceId,
           projectId: sky,
-          labourId,
+          employeeId,
           attendanceDate: calendarDateToDb(date),
           status: "present",
           wageType: "daily",
@@ -553,9 +558,9 @@ describe("Labour Activity (ADR CM-0038)", () => {
     };
     for (let offset = -70; offset <= -1; offset++) await seed(day(offset));
 
-    const before = await everything(company.cookie, labourId);
+    const before = await everything(company.cookie, employeeId);
     expect(before).toHaveLength(72);
-    const first = await page(company.cookie, labourId);
+    const first = await page(company.cookie, employeeId);
     expect(first.items).toHaveLength(30);
     expect(first.nextCursor).not.toBeNull();
 
@@ -568,7 +573,7 @@ describe("Labour Activity (ADR CM-0038)", () => {
     while (cursor != null) {
       const next = await page(
         company.cookie,
-        labourId,
+        employeeId,
         `?cursor=${encodeURIComponent(cursor)}`,
       );
       expect(next.items.length).toBeLessThanOrEqual(30);
@@ -590,7 +595,7 @@ describe("Labour Activity (ADR CM-0038)", () => {
       components: { schemas: Record<string, unknown> };
     }>(getOpenApi());
     expect(
-      doc.paths["/api/construction/labour/labours/{id}/activity"]?.["get"],
+      doc.paths["/api/construction/labour/employees/{id}/activity"]?.["get"],
     ).toBeDefined();
     expect(
       doc.components.schemas["ListConstructionLabourLabourActivityResponse"],

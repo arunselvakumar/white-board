@@ -9,11 +9,12 @@ import { lockLiveParties } from "@/src/labour/infrastructure/party-locks";
 import { calendarDateToDb } from "@/src/shared-kernel/calendar-date";
 import { newId } from "@/src/shared-kernel/ids";
 import { addProject, jsonRequest, ownerWithCompany } from "@/test/companies";
+import { seededRoleId } from "@/test/employees";
 import { seededAccounts } from "@/test/finance";
 import { TEST_ORIGIN } from "@/test/sessions";
 
-import { POST as deleteLabour } from "./[id]/delete/route";
-import { POST as createLabour } from "./route";
+import { POST as deleteEmployee } from "./[id]/delete/route";
+import { POST as createEmployee } from "./route";
 
 const API = `${TEST_ORIGIN}/api/construction/labour`;
 
@@ -31,10 +32,11 @@ function params(id: string) {
   return { params: Promise.resolve({ id }) };
 }
 
-async function addLabour(company: Company, projectId: string) {
-  const response = await createLabour(
-    jsonRequest(`${API}/labours`, company.cookie, {
+async function addEmployee(company: Company, projectId: string) {
+  const response = await createEmployee(
+    jsonRequest(`${API}/employees`, company.cookie, {
       name: `Dhuresh ${newId().slice(-6)}`,
+      roleId: await seededRoleId(company.workspaceId),
       joiningDate: "2026-08-01",
       wageType: "daily",
       wagePerDay: 70_000,
@@ -50,7 +52,7 @@ async function addLabour(company: Company, projectId: string) {
 
 async function pay(
   company: Company,
-  partyType: "labour" | "vendor",
+  partyType: "employee" | "vendor",
   partyId: string,
   projectId: string,
 ) {
@@ -69,9 +71,9 @@ async function pay(
   );
 }
 
-function removeLabour(company: Company, id: string) {
-  return deleteLabour(
-    jsonRequest(`${API}/labours/${id}/delete`, company.cookie, {}),
+function removeEmployee(company: Company, id: string) {
+  return deleteEmployee(
+    jsonRequest(`${API}/employees/${id}/delete`, company.cookie, {}),
     params(id),
   );
 }
@@ -93,41 +95,41 @@ async function livePayments(partyId: string) {
   });
 }
 
-describe("deleting a Labour or Vendor against concurrent payments", () => {
-  it("refuses to delete a Labour with a payment", async () => {
+describe("deleting an Employee or Vendor against concurrent payments", () => {
+  it("refuses to delete an Employee with a payment", async () => {
     const company = await ownerWithCompany();
     const tower = await addProject(company.workspaceId, company.userId);
-    const labourId = await addLabour(company, tower);
-    expect((await pay(company, "labour", labourId, tower)).status).toBe(
+    const employeeId = await addEmployee(company, tower);
+    expect((await pay(company, "employee", employeeId, tower)).status).toBe(
       StatusCodes.CREATED,
     );
-    const refused = await removeLabour(company, labourId);
+    const refused = await removeEmployee(company, employeeId);
     expect(refused.status).toBe(StatusCodes.CONFLICT);
-    expect(await codeOf(refused)).toBe("LABOUR_HAS_RECORDS");
+    expect(await codeOf(refused)).toBe("EMPLOYEE_HAS_RECORDS");
   });
 
   it("makes a delete wait for a payment being written, then refuse", async () => {
     const company = await ownerWithCompany();
     const tower = await addProject(company.workspaceId, company.userId);
-    const labourId = await addLabour(company, tower);
+    const employeeId = await addEmployee(company, tower);
     let deleting: Promise<Response> | undefined;
-    // What the payment path does: lock the labourer FOR SHARE, insert.
+    // What the payment path does: lock the Employee FOR SHARE, insert.
     await prisma.$transaction(async (tx) => {
       await lockLiveParties(
         tx,
         company.workspaceId,
-        "labour",
-        [labourId],
+        "employee",
+        [employeeId],
         "share",
       );
-      deleting = removeLabour(company, labourId);
+      deleting = removeEmployee(company, employeeId);
       expect(await stillPending(deleting, 300)).toBe(true);
       await tx.constructionLabourWagePayment.create({
         data: {
           id: newId(),
           workspaceId: company.workspaceId,
-          partyType: "labour",
-          partyId: labourId,
+          partyType: "employee",
+          partyId: employeeId,
           projectId: tower,
           paymentDate: calendarDateToDb("2026-09-12"),
           kind: "advance",
@@ -141,55 +143,55 @@ describe("deleting a Labour or Vendor against concurrent payments", () => {
     if (deleting == null) throw new Error("The delete never started.");
     const refused = await deleting;
     expect(refused.status).toBe(StatusCodes.CONFLICT);
-    expect(await codeOf(refused)).toBe("LABOUR_HAS_RECORDS");
+    expect(await codeOf(refused)).toBe("EMPLOYEE_HAS_RECORDS");
   });
 
   it("makes a payment wait for a delete in progress, then refuse with 404", async () => {
     const company = await ownerWithCompany();
     const tower = await addProject(company.workspaceId, company.userId);
-    const labourId = await addLabour(company, tower);
+    const employeeId = await addEmployee(company, tower);
     let paying: Promise<Response> | undefined;
-    // What the delete path does: lock the labourer FOR UPDATE, tombstone.
+    // What the delete path does: lock the Employee FOR UPDATE, tombstone.
     await prisma.$transaction(async (tx) => {
       await lockLiveParties(
         tx,
         company.workspaceId,
-        "labour",
-        [labourId],
+        "employee",
+        [employeeId],
         "update",
       );
-      paying = pay(company, "labour", labourId, tower);
+      paying = pay(company, "employee", employeeId, tower);
       expect(await stillPending(paying, 300)).toBe(true);
-      await tx.constructionLabourLabour.update({
-        where: { id: labourId },
+      await tx.constructionLabourEmployee.update({
+        where: { id: employeeId },
         data: { deletedAt: new Date(), deletedBy: company.userId },
       });
     });
     if (paying == null) throw new Error("The payment never started.");
     const refused = await paying;
     expect(refused.status).toBe(StatusCodes.NOT_FOUND);
-    expect(await codeOf(refused)).toBe("LABOUR_NOT_FOUND");
-    expect(await livePayments(labourId)).toBe(0);
+    expect(await codeOf(refused)).toBe("EMPLOYEE_NOT_FOUND");
+    expect(await livePayments(employeeId)).toBe(0);
   });
 
   it("never lets a payment and a delete both succeed (10 races each)", async () => {
     const company = await ownerWithCompany();
     const tower = await addProject(company.workspaceId, company.userId);
     for (let round = 0; round < 10; round += 1) {
-      const labourId = await addLabour(company, tower);
+      const employeeId = await addEmployee(company, tower);
       const [paid, deleted] = await Promise.all([
-        pay(company, "labour", labourId, tower),
-        removeLabour(company, labourId),
+        pay(company, "employee", employeeId, tower),
+        removeEmployee(company, employeeId),
       ]);
       const outcome = [paid.status, deleted.status];
       expect([
         [StatusCodes.CREATED, StatusCodes.CONFLICT],
         [StatusCodes.NOT_FOUND, StatusCodes.NO_CONTENT],
       ]).toContainEqual(outcome);
-      const tombstoned = await prisma.constructionLabourLabour.count({
-        where: { id: labourId, deletedAt: { not: null } },
+      const tombstoned = await prisma.constructionLabourEmployee.count({
+        where: { id: employeeId, deletedAt: { not: null } },
       });
-      expect(tombstoned === 1 && (await livePayments(labourId)) > 0).toBe(
+      expect(tombstoned === 1 && (await livePayments(employeeId)) > 0).toBe(
         false,
       );
     }

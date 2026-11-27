@@ -4,11 +4,13 @@ import { StatusCodes } from "http-status-codes";
 import { describe, expect, it } from "vitest";
 
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
+import { GET as listStaff } from "@/app/api/construction/organization/team-members/route";
 import { calendarDateToDb } from "@/src/shared-kernel/calendar-date";
 import type { Flag } from "@/src/shared-kernel/access";
 import { newId } from "@/src/shared-kernel/ids";
 import { jsonRequest, memberWith, ownerWithCompany } from "@/test/companies";
 import { bytesOf, gifBytes, pngBytes } from "@/test/files";
+import { seededRoleId } from "@/test/employees";
 import { TEST_ORIGIN } from "@/test/sessions";
 
 import { POST as activateLabour } from "./[id]/activate/route";
@@ -24,6 +26,7 @@ import { POST as removePhoto } from "./[id]/photo/remove/route";
 import { GET as getPhoto, POST as setPhoto } from "./[id]/photo/route";
 import { GET as getLabour } from "./[id]/route";
 import { GET as listTransfers } from "./[id]/transfers/route";
+import { POST as setPassword } from "./[id]/password/route";
 import { POST as updateLabour } from "./[id]/update/route";
 import { GET as exportLabours } from "./export/route";
 import { GET as importTemplate } from "./import-template/route";
@@ -32,15 +35,17 @@ import { GET as labourOptions } from "./options/route";
 import { GET as listLabours, POST as createLabour } from "./route";
 import { POST as transferLabours } from "./transfer/route";
 
-const BASE = `${TEST_ORIGIN}/api/construction/labour/labours`;
+const BASE = `${TEST_ORIGIN}/api/construction/labour/employees`;
 const XLSX =
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 const VALID_AADHAAR = "234123412346";
 
-type Labour = {
+type Employee = {
   id: string;
   name: string;
-  labourCode: string | null;
+  employeeCode: string | null;
+  role: { id: string; name: string };
+  department: { id: string; name: string } | null;
   joiningDate: string;
   wageType: "daily" | "monthly";
   wagePerDay: number | null;
@@ -51,10 +56,11 @@ type Labour = {
   openingBalance: number | null;
   balance: number | null;
   aadhaarMasked: string | null;
-  contactNumber: string | null;
+  mobile: string | null;
   projects: { id: string; name: string }[];
   labourCategory: { id: string; name: string } | null;
-  siteEngineers: { id: string; name: string }[];
+  canSignIn: boolean;
+  signIn: { memberId: string; status: string } | null;
   reportsTo: { id: string; name: string } | null;
   isActive: boolean;
   photoUrl: string | null;
@@ -106,44 +112,14 @@ async function seedCategory(
   return id;
 }
 
-/**
- * A Site Engineer whose sign-in is on `projectIds` (ADR CM-0038 §3): the
- * Site Engineer row, and the Team Member it points at with those Projects.
- */
-async function seedSiteEngineer(
-  workspaceId: string,
-  name: string,
-  projectIds: readonly string[] = [],
-  options: { disabled?: boolean } = {},
-) {
-  const id = newId();
-  const memberId = newId();
-  await prisma.constructionOrganizationTeamMember.create({
-    data: {
-      id: memberId,
-      workspaceId,
-      name,
-      email: `${memberId}@site.test`,
-      siteEngineer: true,
-      status: "active",
-      createdBy: "test",
-      updatedBy: "test",
-      projects: { create: projectIds.map((projectId) => ({ projectId })) },
-    },
-  });
-  await prisma.constructionMastersSupervisor.create({
-    data: {
-      id,
-      workspaceId,
-      name,
-      teamMemberId: memberId,
-      disabledAt: options.disabled === true ? new Date() : null,
-      createdBy: "test",
-      updatedBy: "test",
-    },
-  });
-  return id;
+/** A mobile nobody signs in with yet: sign-ins outlive a test run. */
+function freshMobile(): { typed: string; e164: string } {
+  const digits = `9${String(Math.floor(Math.random() * 1e9)).padStart(9, "0")}`;
+  return { typed: digits, e164: `+91${digits}` };
 }
+
+/** The seeded Labour Role of each Company a test signs in to, by cookie. */
+const ROLES = new Map<string, string>();
 
 async function fixtures(company: Company) {
   const suffix = newId().slice(-6);
@@ -153,13 +129,9 @@ async function fixtures(company: Company) {
     seedCategory(company.workspaceId, `Mason ${suffix}`),
     seedCategory(company.workspaceId, `Welder ${suffix}`, true),
   ]);
-  // On Tower A, so every Labour there answers to them (ADR CM-0041).
-  const supervisor = await seedSiteEngineer(
-    company.workspaceId,
-    `Sundar ${suffix}`,
-    [tower],
-  );
-  return { tower, villa, mason, welder, supervisor, suffix };
+  const labourRole = await seededRoleId(company.workspaceId);
+  ROLES.set(company.cookie, labourRole);
+  return { tower, villa, mason, welder, labourRole, suffix };
 }
 
 function labourBody(projectId: string, extra: Record<string, unknown> = {}) {
@@ -175,29 +147,40 @@ function labourBody(projectId: string, extra: Record<string, unknown> = {}) {
   };
 }
 
-async function create(cookie: string, body: unknown) {
-  return createLabour(jsonRequest(BASE, cookie, body));
+/** Add Employee; the Company's Labour Role unless the body names one. */
+async function create(cookie: string, body: Record<string, unknown>) {
+  return createLabour(
+    jsonRequest(BASE, cookie, { roleId: ROLES.get(cookie), ...body }),
+  );
 }
 
-async function created(cookie: string, body: unknown): Promise<Labour> {
+async function created(
+  cookie: string,
+  body: Record<string, unknown>,
+): Promise<Employee> {
   const response = await create(cookie, body);
   expect(response.status).toBe(StatusCodes.CREATED);
-  return json<Labour>(response);
+  return json<Employee>(response);
 }
 
-async function get(cookie: string, id: string): Promise<Labour> {
+async function get(cookie: string, id: string): Promise<Employee> {
   const response = await getLabour(
     jsonRequest(`${BASE}/${id}`, cookie),
     params(id),
   );
   expect(response.status).toBe(StatusCodes.OK);
-  return json<Labour>(response);
+  return json<Employee>(response);
 }
 
-function update(cookie: string, labour: Labour, body: Record<string, unknown>) {
+function update(
+  cookie: string,
+  labour: Employee,
+  body: Record<string, unknown>,
+) {
   return updateLabour(
     jsonRequest(`${BASE}/${labour.id}/update`, cookie, {
       name: labour.name,
+      roleId: labour.role.id,
       joiningDate: labour.joiningDate,
       wageType: labour.wageType,
       expectedUpdatedAt: labour.updatedAt,
@@ -209,7 +192,7 @@ function update(cookie: string, labour: Labour, body: Record<string, unknown>) {
 
 function openingEntries(labourId: string) {
   return prisma.constructionLabourLedgerEntry.findMany({
-    where: { partyType: "labour", partyId: labourId },
+    where: { partyType: "employee", partyId: labourId },
     // A reversal and its repost share one transaction's timestamp; the
     // reversal (it names the entry it reverses) comes first.
     orderBy: [
@@ -230,7 +213,7 @@ async function markAttendance(
       id: newId(),
       workspaceId,
       projectId,
-      labourId,
+      employeeId: labourId,
       attendanceDate: calendarDateToDb(date),
       status: "present",
       wageType: "daily",
@@ -248,6 +231,8 @@ async function memberOn(
   projectIds: string[] = [],
 ) {
   const member = await memberWith(company, permissions);
+  const role = ROLES.get(company.cookie);
+  if (role != null) ROLES.set(member.cookie, role);
   if (projectIds.length > 0)
     await prisma.constructionOrganizationTeamMemberProject.createMany({
       data: projectIds.map((projectId) => ({
@@ -284,26 +269,38 @@ function upload(
   });
 }
 
-describe("Labour register (CM-205 – CM-207)", () => {
-  it("adds a Labour with an opening balance posted to the ledger", async () => {
+describe("Employees (CM-205 – CM-207, ADR CM-0055)", () => {
+  it("adds an Employee with an opening balance posted to the ledger", async () => {
     const company = await ownerWithCompany();
-    const { tower, mason, supervisor } = await fixtures(company);
+    const { tower, mason, labourRole } = await fixtures(company);
     const labour = await created(
       company.cookie,
       labourBody(tower, {
-        labourCode: "L-001",
+        employeeCode: "L-001",
         openingBalance: 150_000,
         aadhaar: "2341 2341 2346",
-        contactNumber: "77081 65767",
+        mobile: "77081 65767",
         labourCategoryId: mason,
-        // Before ADR CM-0041 the form sent one; it is ignored now.
-        supervisorId: newId(),
         uanNumber: "100123456789",
+        // What a Site Engineer had (ADR CM-0055 §1).
+        email: "Dhuresh@Site.Test",
+        dateOfBirth: "1990-04-01",
+        bloodGroup: "O+",
+        pan: "ABCPE1234F",
+        qualification: "Diploma in Civil Engineering",
+        experienceYears: 6,
+        specialisation: "Steel / PEB",
+        address: "12 Gandhi Road, Madurai",
+        emergencyContact: "Wife, 98400 12345",
+        bankAccountHolder: "Dhuresh Nawin",
+        bankAccountNumber: "1234 5678 9012",
+        bankIfsc: "hdfc0001234",
+        bankName: "HDFC Bank",
       }),
     );
     expect(labour).toMatchObject({
       name: "Dhuresh Nawin",
-      labourCode: "L-001",
+      employeeCode: "L-001",
       wageType: "daily",
       wagePerDay: 70_000,
       wagePerMonth: null,
@@ -311,10 +308,24 @@ describe("Labour register (CM-205 – CM-207)", () => {
       openingBalance: 150_000,
       balance: 150_000,
       aadhaarMasked: "XXXXXXXX2346",
-      contactNumber: "+917708165767",
+      mobile: "+917708165767",
       projects: [{ id: tower }],
       labourCategory: { id: mason },
-      siteEngineers: [{ id: supervisor }],
+      role: { id: labourRole, name: "Labour" },
+      department: { name: "Human Resources" },
+      email: "dhuresh@site.test",
+      dateOfBirth: "1990-04-01",
+      bloodGroup: "O+",
+      panMasked: "XXXXXX234F",
+      experienceYears: 6,
+      bank: {
+        accountHolder: "Dhuresh Nawin",
+        accountLast4: "9012",
+        ifsc: "HDFC0001234",
+        bankName: "HDFC Bank",
+      },
+      canSignIn: false,
+      signIn: null,
       isActive: true,
     });
     const entries = await openingEntries(labour.id);
@@ -322,16 +333,19 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect(entries[0]).toMatchObject({
       kind: "opening",
       amount: 150_000,
-      sourceType: "labour",
+      sourceType: "employee",
       sourceId: labour.id,
       projectId: null,
     });
     expect(entries[0]?.entryDate.toISOString().slice(0, 10)).toBe("2026-09-01");
-    const row = await prisma.constructionLabourLabour.findUniqueOrThrow({
+    const row = await prisma.constructionLabourEmployee.findUniqueOrThrow({
       where: { id: labour.id },
     });
     expect(row.aadhaarEncrypted).not.toContain(VALID_AADHAAR);
     expect(row.aadhaarLast4).toBe("2346");
+    expect(row.panEncrypted).not.toContain("ABCPE1234F");
+    expect(row.bankAccountEncrypted).not.toContain("123456789012");
+    expect(row.bankAccountLast4).toBe("9012");
 
     const history = await json<{
       items: {
@@ -366,7 +380,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
       openingBalance: -20_000,
     });
     expect(changed.status).toBe(StatusCodes.OK);
-    const after = await json<Labour>(changed);
+    const after = await json<Employee>(changed);
     expect(after.openingBalance).toBe(-20_000);
     expect(after.balance).toBe(-20_000);
     expect(after.wagePerDay).toBe(70_000);
@@ -386,15 +400,16 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect(entries.at(-1)?.entryDate.toISOString().slice(0, 10)).toBe(
       "2026-08-15",
     );
-    expect((await json<Labour>(moved)).openingBalance).toBe(-20_000);
-    const first = await prisma.constructionLabourTransfer.findFirstOrThrow({
-      where: { labourId: labour.id },
-    });
+    expect((await json<Employee>(moved)).openingBalance).toBe(-20_000);
+    const first =
+      await prisma.constructionLabourEmployeeTransfer.findFirstOrThrow({
+        where: { employeeId: labour.id },
+      });
     expect(first.transferDate.toISOString().slice(0, 10)).toBe("2026-08-15");
 
     const stale = await update(company.cookie, labour, { name: "Old copy" });
     expect(stale.status).toBe(StatusCodes.CONFLICT);
-    expect(await codeOf(stale)).toBe("LABOUR_CHANGED");
+    expect(await codeOf(stale)).toBe("EMPLOYEE_CHANGED");
   });
 
   it("switches wage type and clears the other wage", async () => {
@@ -406,7 +421,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
     });
     expect(missing.status).toBe(StatusCodes.BAD_REQUEST);
     expect(await codeOf(missing)).toBe("WAGE_REQUIRED");
-    const monthly = await json<Labour>(
+    const monthly = await json<Employee>(
       await update(company.cookie, labour, {
         wageType: "monthly",
         wagePerMonth: 18_00_000,
@@ -427,20 +442,20 @@ describe("Labour register (CM-205 – CM-207)", () => {
       labourBody(tower, { workingHoursPerDay: "9.50" }),
     );
     expect(labour.workingHoursPerDay).toBe("9.5");
-    const row = await prisma.constructionLabourLabour.findUniqueOrThrow({
+    const row = await prisma.constructionLabourEmployee.findUniqueOrThrow({
       where: { id: labour.id },
     });
     expect(row.workingHoursPerDay.toString()).toBe("9.5");
 
-    const renamed = await json<Labour>(
+    const renamed = await json<Employee>(
       await update(company.cookie, labour, { name: "Dhuresh P" }),
     );
     expect(renamed.workingHoursPerDay).toBe("9.5");
-    const cleared = await json<Labour>(
+    const cleared = await json<Employee>(
       await update(company.cookie, renamed, { workingHoursPerDay: null }),
     );
     expect(cleared.workingHoursPerDay).toBe("9.5");
-    const changed = await json<Labour>(
+    const changed = await json<Employee>(
       await update(company.cookie, cleared, { workingHoursPerDay: 12 }),
     );
     expect(changed.workingHoursPerDay).toBe("12");
@@ -475,16 +490,16 @@ describe("Labour register (CM-205 – CM-207)", () => {
     ]);
   });
 
-  it("validates fields, references and the Labour Id", async () => {
+  it("validates fields, references and the Employee Id", async () => {
     const company = await ownerWithCompany();
     const { tower, welder } = await fixtures(company);
     const cases: [Record<string, unknown>, string][] = [
-      [{ name: " " }, "LABOUR_NAME_REQUIRED"],
+      [{ name: " " }, "EMPLOYEE_NAME_REQUIRED"],
       [{ wagePerDay: 0 }, "WAGE_REQUIRED"],
       [{ uanNumber: "123" }, "UAN_INVALID"],
       [{ esicNumber: "12345" }, "ESIC_INVALID"],
       [{ aadhaar: "234123412345" }, "AADHAAR_INVALID"],
-      [{ contactNumber: "12345" }, "MOBILE_INVALID"],
+      [{ mobile: "12345" }, "MOBILE_INVALID"],
       [{ weeklyHolidays: [1, 1] }, "WEEKLY_HOLIDAYS_INVALID"],
       [{ joiningDate: "2026-13-01" }, "JOINING_DATE_INVALID"],
       [{ projectIds: [newId()] }, "PROJECT_NOT_FOUND"],
@@ -498,13 +513,13 @@ describe("Labour register (CM-205 – CM-207)", () => {
       expect(await codeOf(response)).toBe(code);
     }
 
-    await created(company.cookie, labourBody(tower, { labourCode: "M-7" }));
+    await created(company.cookie, labourBody(tower, { employeeCode: "M-7" }));
     const clash = await create(
       company.cookie,
-      labourBody(tower, { labourCode: "m-7" }),
+      labourBody(tower, { employeeCode: "m-7" }),
     );
     expect(clash.status).toBe(StatusCodes.CONFLICT);
-    expect(await codeOf(clash)).toBe("LABOUR_CODE_TAKEN");
+    expect(await codeOf(clash)).toBe("EMPLOYEE_CODE_TAKEN");
   });
 
   it("nulls amounts for a Team Member without Financial and refuses one without the menu", async () => {
@@ -544,41 +559,280 @@ describe("Labour register (CM-205 – CM-207)", () => {
     );
   });
 
-  it("reads a Labour's Site Engineers from their Projects, never stores one (ADR CM-0041)", async () => {
+  it("needs a live Role of the Company and reads the Department from it (ADR CM-0055 §2)", async () => {
     const company = await ownerWithCompany();
-    const { tower, villa, supervisor, suffix } = await fixtures(company);
-    const [anand, off] = await Promise.all([
-      seedSiteEngineer(company.workspaceId, `Anand ${suffix}`, [villa]),
-      // Disabled: no one's Site Engineer, though still on the Project.
-      seedSiteEngineer(company.workspaceId, `Off ${suffix}`, [villa], {
-        disabled: true,
-      }),
-      // Not on any Project.
-      seedSiteEngineer(company.workspaceId, `Benched ${suffix}`),
-    ]);
+    const other = await ownerWithCompany("Sakthi Constructions");
+    const { tower, labourRole } = await fixtures(company);
+    const engineerRole = await seededRoleId(
+      company.workspaceId,
+      "Site Engineer",
+    );
+    const foreignRole = await seededRoleId(other.workspaceId);
+    const refused = await create(
+      company.cookie,
+      labourBody(tower, { roleId: foreignRole }),
+    );
+    expect(refused.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await json(refused)).toMatchObject({
+      code: "EMPLOYEE_ROLE_NOT_FOUND",
+      details: { field: "roleId" },
+    });
+
     const labour = await created(
       company.cookie,
-      labourBody(tower, { projectIds: [tower, villa] }),
+      labourBody(tower, { name: "Anbu" }),
     );
-    expect(labour.siteEngineers.map((item) => item.id)).toEqual([
-      anand,
-      supervisor,
-    ]);
-    expect(labour.siteEngineers.map((item) => item.id)).not.toContain(off);
-
-    // Off Tower A: only Villa's Site Engineer is left.
-    const moved = await json<Labour>(
-      await update(company.cookie, labour, { projectIds: [villa] }),
+    const engineer = await created(
+      company.cookie,
+      labourBody(tower, { name: "Meena", roleId: engineerRole }),
     );
-    expect(moved.siteEngineers).toEqual([
-      { id: anand, name: `Anand ${suffix}` },
-    ]);
+    expect(engineer.role).toEqual({ id: engineerRole, name: "Site Engineer" });
+    const department = engineer.department?.id ?? "";
+    expect(engineer.department?.name).toBe("Human Resources");
 
-    // Nothing on the row: the column is gone.
-    const row = await prisma.constructionLabourLabour.findUniqueOrThrow({
-      where: { id: labour.id },
+    // A Role moved to another Department moves its Employees with it.
+    const site = newId();
+    await prisma.constructionOrganizationDepartment.create({
+      data: {
+        id: site,
+        workspaceId: company.workspaceId,
+        name: "Site",
+        createdBy: "test",
+        updatedBy: "test",
+      },
     });
-    expect(row).not.toHaveProperty("supervisorId");
+    await prisma.constructionOrganizationRole.update({
+      where: { id: engineerRole },
+      data: { departmentId: site },
+    });
+    expect((await get(company.cookie, engineer.id)).department).toEqual({
+      id: site,
+      name: "Site",
+    });
+
+    const ids = async (query: string) =>
+      (
+        await json<{ items: Employee[] }>(
+          await listLabours(jsonRequest(`${BASE}?${query}`, company.cookie)),
+        )
+      ).items.map((item) => item.id);
+    expect(await ids(`roleId=${labourRole}`)).toEqual([labour.id]);
+    expect(await ids(`departmentId=${site}`)).toEqual([engineer.id]);
+    expect(await ids(`departmentId=${department}`)).toEqual([labour.id]);
+
+    // A new Role on Edit.
+    const moved = await update(company.cookie, labour, {
+      roleId: engineerRole,
+    });
+    expect(moved.status).toBe(StatusCodes.OK);
+    expect((await json<Employee>(moved)).role.id).toBe(engineerRole);
+  });
+
+  it("signs in with the mobile and a password when Can sign in is on (ADR CM-0055 §4)", async () => {
+    const company = await ownerWithCompany();
+    const { tower, villa } = await fixtures(company);
+    const engineerRole = await seededRoleId(
+      company.workspaceId,
+      "Site Engineer",
+    );
+    const signIn = { canSignIn: true, password: "first-pass-1" };
+    const first = freshMobile();
+    const second = freshMobile();
+
+    const noMobile = await create(
+      company.cookie,
+      labourBody(tower, { signIn }),
+    );
+    expect(noMobile.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await codeOf(noMobile)).toBe("MOBILE_REQUIRED");
+    const noPassword = await create(
+      company.cookie,
+      labourBody(tower, {
+        mobile: first.typed,
+        signIn: { canSignIn: true },
+      }),
+    );
+    expect(await codeOf(noPassword)).toBe("PASSWORD_REQUIRED");
+    // Nothing was written by the refusals.
+    expect(
+      await prisma.constructionOrganizationTeamMember.count({
+        where: { workspaceId: company.workspaceId, employee: true },
+      }),
+    ).toBe(0);
+
+    const response = await create(
+      company.cookie,
+      labourBody(tower, {
+        name: "Meena Kumari",
+        mobile: first.typed,
+        email: "meena@site.test",
+        roleId: engineerRole,
+        signIn,
+      }),
+    );
+    expect(response.status).toBe(StatusCodes.CREATED);
+    const meena = await json<
+      Employee & { passwordIgnored: unknown; passwordSet: boolean }
+    >(response);
+    expect(meena).toMatchObject({
+      canSignIn: true,
+      signIn: { status: "active" },
+      passwordIgnored: null,
+      passwordSet: true,
+    });
+    const memberId = meena.signIn?.memberId ?? "";
+    const member = () =>
+      prisma.constructionOrganizationTeamMember.findUniqueOrThrow({
+        where: { id: memberId },
+        include: { projects: true },
+      });
+    expect(await member()).toMatchObject({
+      name: "Meena Kumari",
+      mobile: first.e164,
+      email: "meena@site.test",
+      roleId: engineerRole,
+      employee: true,
+      deletedAt: null,
+    });
+    expect((await member()).projects.map((row) => row.projectId)).toEqual([
+      tower,
+    ]);
+    const row = await prisma.constructionLabourEmployee.findUniqueOrThrow({
+      where: { id: meena.id },
+    });
+    expect(row.teamMemberId).toBe(memberId);
+
+    // Not on Office Staff.
+    const staff = await json<{ items: { id: string }[] }>(
+      await listStaff(
+        jsonRequest(
+          `${TEST_ORIGIN}/api/construction/organization/team-members`,
+          company.cookie,
+        ),
+      ),
+    );
+    expect(staff.items.map((item) => item.id)).not.toContain(memberId);
+
+    // Name, mobile, email, Role and Projects follow the Employee.
+    const labourRole = ROLES.get(company.cookie) ?? "";
+    const edited = await update(company.cookie, meena, {
+      name: "Meena K",
+      mobile: second.typed,
+      email: null,
+      roleId: labourRole,
+      projectIds: [tower, villa],
+    });
+    expect(edited.status).toBe(StatusCodes.OK);
+    expect(await member()).toMatchObject({
+      name: "Meena K",
+      mobile: second.e164,
+      email: null,
+      roleId: labourRole,
+    });
+    expect(
+      (await member()).projects.map((item) => item.projectId).sort(),
+    ).toEqual([tower, villa].sort());
+
+    // A transfer moves the sign-in's Projects too.
+    const mall = await seedProject(company.workspaceId, `Mall ${newId()}`);
+    const moved = await transferLabours(
+      jsonRequest(`${BASE}/transfer`, company.cookie, {
+        employeeIds: [meena.id],
+        fromProjectId: villa,
+        toProjectId: mall,
+        transferDate: "2030-01-01",
+      }),
+    );
+    expect(moved.status).toBe(StatusCodes.OK);
+    expect(
+      (await member()).projects.map((item) => item.projectId).sort(),
+    ).toEqual([tower, mall].sort());
+
+    // Set password: for one who signs in only.
+    const reset = await setPassword(
+      jsonRequest(`${BASE}/${meena.id}/password`, company.cookie, {
+        password: "second-pass-2",
+      }),
+      params(meena.id),
+    );
+    expect(reset.status).toBe(StatusCodes.OK);
+    expect(await json(reset)).toMatchObject({ passwordIgnored: null });
+    const plain = await created(company.cookie, labourBody(tower));
+    const none = await setPassword(
+      jsonRequest(`${BASE}/${plain.id}/password`, company.cookie, {
+        password: "second-pass-2",
+      }),
+      params(plain.id),
+    );
+    expect(none.status).toBe(StatusCodes.CONFLICT);
+    expect(await codeOf(none)).toBe("EMPLOYEE_NO_SIGN_IN");
+
+    // Turned off on Edit, the sign-in goes; turned on again, a new one.
+    const off = await update(
+      company.cookie,
+      await get(company.cookie, meena.id),
+      { mobile: second.typed, signIn: { canSignIn: false } },
+    );
+    expect(await json(off)).toMatchObject({ canSignIn: false, signIn: null });
+    expect((await member()).deletedAt).not.toBeNull();
+    const again = await update(
+      company.cookie,
+      await get(company.cookie, meena.id),
+      {
+        mobile: second.typed,
+        signIn: { canSignIn: true, password: "third-pass-3" },
+      },
+    );
+    const back = await json<Employee>(again);
+    expect(back.canSignIn).toBe(true);
+    expect(back.signIn?.memberId).not.toBe(memberId);
+
+    // Deleting the Employee removes it.
+    const deleted = await deleteLabour(
+      jsonRequest(`${BASE}/${meena.id}/delete`, company.cookie, {}),
+      params(meena.id),
+    );
+    expect(deleted.status).toBe(StatusCodes.NO_CONTENT);
+    expect(
+      (
+        await prisma.constructionOrganizationTeamMember.findUniqueOrThrow({
+          where: { id: back.signIn?.memberId ?? "" },
+        })
+      ).deletedAt,
+    ).not.toBeNull();
+  });
+
+  it("needs every cell of the Role to give a sign-in (403 CANNOT_GRANT)", async () => {
+    const company = await ownerWithCompany();
+    const { tower } = await fixtures(company);
+    const engineerRole = await seededRoleId(
+      company.workspaceId,
+      "Site Engineer",
+    );
+    const clerk = await memberOn(company, {
+      "masters.labours": ["read", "create"],
+    });
+    const refused = await create(
+      clerk.cookie,
+      labourBody(tower, {
+        mobile: freshMobile().typed,
+        roleId: engineerRole,
+        signIn: { canSignIn: true, password: "first-pass-1" },
+      }),
+    );
+    expect(refused.status).toBe(StatusCodes.FORBIDDEN);
+    expect(await codeOf(refused)).toBe("CANNOT_GRANT");
+    expect(
+      await prisma.constructionLabourEmployee.count({
+        where: { workspaceId: company.workspaceId },
+      }),
+    ).toBe(0);
+    // Without a sign-in the Role gives no access, so anyone may add them.
+    const plain = await create(
+      clerk.cookie,
+      labourBody(tower, { roleId: engineerRole }),
+    );
+    expect(plain.status).toBe(StatusCodes.CREATED);
   });
 
   it("lists with filters and pages", async () => {
@@ -599,7 +853,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
     );
 
     type Page = {
-      items: Labour[];
+      items: Employee[];
       total: number;
       nextCursor: string | null;
       prevCursor: string | null;
@@ -620,8 +874,6 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect(
       (await page(`categoryId=${mason}`)).items.map((item) => item.id),
     ).toEqual([a.id]);
-    // The Site Engineer filter is gone (ADR CM-0041): ignored if sent.
-    expect((await page(`supervisorId=${newId()}`)).total).toBe(3);
 
     const first = await page("limit=2");
     expect(first.items).toHaveLength(2);
@@ -647,7 +899,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
       transferLabours(jsonRequest(`${BASE}/transfer`, cookie, body));
 
     const same = await transfer(company.cookie, {
-      labourIds: [dhuresh.id],
+      employeeIds: [dhuresh.id],
       toProjectId: tower,
       transferDate: "2026-10-01",
     });
@@ -656,7 +908,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
 
     await markAttendance(company.workspaceId, dhuresh.id, tower, "2026-10-03");
     const early = await transfer(company.cookie, {
-      labourIds: [dhuresh.id, shyam.id],
+      employeeIds: [dhuresh.id, shyam.id],
       toProjectId: villa,
       transferDate: "2026-10-03",
     });
@@ -668,20 +920,20 @@ describe("Labour register (CM-205 – CM-207)", () => {
     ]);
 
     const moved = await transfer(company.cookie, {
-      labourIds: [dhuresh.id, shyam.id],
+      employeeIds: [dhuresh.id, shyam.id],
       toProjectId: villa,
       transferDate: "2026-10-04",
       remark: "Slab work",
     });
     expect(moved.status).toBe(StatusCodes.OK);
-    const body = await json<{ items: Labour[] }>(moved);
+    const body = await json<{ items: Employee[] }>(moved);
     expect(body.items.map((item) => item.projects.map((p) => p.id))).toEqual([
       [villa],
       [villa],
     ]);
 
     const back = await transfer(company.cookie, {
-      labourIds: [shyam.id],
+      employeeIds: [shyam.id],
       toProjectId: tower,
       transferDate: "2026-10-02",
     });
@@ -727,7 +979,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect(await options(tower, "2026-08-01")).toEqual([]);
   });
 
-  it("puts a Labour on none, one or many Projects, with history (ADR CM-0033)", async () => {
+  it("puts an Employee on none, one or many Projects, with history (ADR CM-0033)", async () => {
     const company = await ownerWithCompany();
     const { tower, villa, suffix } = await fixtures(company);
     const mall = await seedProject(company.workspaceId, `Mall ${suffix}`);
@@ -776,7 +1028,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
     );
     expect(await options(tower, "2026-09-02")).toEqual([meena.id]);
     expect(await options(villa, "2026-09-02")).toEqual([meena.id]);
-    const inVilla = await json<{ items: Labour[] }>(
+    const inVilla = await json<{ items: Employee[] }>(
       await listLabours(
         jsonRequest(`${BASE}?projectId=${villa}`, company.cookie),
       ),
@@ -787,13 +1039,13 @@ describe("Labour register (CM-205 – CM-207)", () => {
     const transfer = (body: Record<string, unknown>) =>
       transferLabours(jsonRequest(`${BASE}/transfer`, company.cookie, body));
     const unnamed = await transfer({
-      labourIds: [meena.id],
+      employeeIds: [meena.id],
       toProjectId: mall,
       transferDate: "2026-10-01",
     });
     expect(await codeOf(unnamed)).toBe("TRANSFER_FROM_PROJECT_REQUIRED");
     const moved = await transfer({
-      labourIds: [meena.id],
+      employeeIds: [meena.id],
       fromProjectId: villa,
       toProjectId: mall,
       transferDate: "2026-10-01",
@@ -812,7 +1064,9 @@ describe("Labour register (CM-205 – CM-207)", () => {
     );
     expect(edited.status).toBe(StatusCodes.OK);
     expect(
-      (await json<Labour>(edited)).projects.map((project) => project.id).sort(),
+      (await json<Employee>(edited)).projects
+        .map((project) => project.id)
+        .sort(),
     ).toEqual([mall, villa].sort());
     const rows = (await history(meena.id)).items;
     const [left, joined] = rows.slice(-2);
@@ -834,7 +1088,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
       await get(company.cookie, meena.id),
       { name: "Meena S" },
     );
-    expect((await json<Labour>(kept)).projects).toHaveLength(2);
+    expect((await json<Employee>(kept)).projects).toHaveLength(2);
     const missing = await update(
       company.cookie,
       await get(company.cookie, meena.id),
@@ -843,7 +1097,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect(await codeOf(missing)).toBe("PROJECT_NOT_FOUND");
   });
 
-  it("needs Labour transfer on the destination and every source Project", async () => {
+  it("needs Employees transfer on the destination and every source Project", async () => {
     const company = await ownerWithCompany();
     const { tower, villa } = await fixtures(company);
     const labour = await created(company.cookie, labourBody(tower));
@@ -854,7 +1108,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
     );
     const refused = await transferLabours(
       jsonRequest(`${BASE}/transfer`, onlyVilla.cookie, {
-        labourIds: [labour.id],
+        employeeIds: [labour.id],
         toProjectId: villa,
         transferDate: "2026-10-01",
       }),
@@ -868,7 +1122,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
     );
     const allowed = await transferLabours(
       jsonRequest(`${BASE}/transfer`, both.cookie, {
-        labourIds: [labour.id],
+        employeeIds: [labour.id],
         toProjectId: villa,
         transferDate: "2026-10-01",
       }),
@@ -902,14 +1156,14 @@ describe("Labour register (CM-205 – CM-207)", () => {
       company.cookie,
       labourBody(tower, { openingBalance: 10_000 }),
     );
-    const inactive = await json<Labour>(
+    const inactive = await json<Employee>(
       await deactivateLabour(
         jsonRequest(`${BASE}/${kept.id}/deactivate`, company.cookie, {}),
         params(kept.id),
       ),
     );
     expect(inactive.isActive).toBe(false);
-    const active = await json<Labour>(
+    const active = await json<Employee>(
       await activateLabour(
         jsonRequest(`${BASE}/${kept.id}/activate`, company.cookie, {}),
         params(kept.id),
@@ -923,14 +1177,14 @@ describe("Labour register (CM-205 – CM-207)", () => {
       params(kept.id),
     );
     expect(blocked.status).toBe(StatusCodes.CONFLICT);
-    expect(await codeOf(blocked)).toBe("LABOUR_HAS_RECORDS");
+    expect(await codeOf(blocked)).toBe("EMPLOYEE_HAS_RECORDS");
 
     const fresh = await created(
       company.cookie,
       labourBody(tower, {
         name: "Temp",
         openingBalance: 5_000,
-        labourCode: "T-1",
+        employeeCode: "T-1",
       }),
     );
     const deleted = await deleteLabour(
@@ -945,11 +1199,11 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect(gone.status).toBe(StatusCodes.NOT_FOUND);
     const entries = await openingEntries(fresh.id);
     expect(entries.reduce((sum, entry) => sum + entry.amount, 0)).toBe(0);
-    // The Labour Id is free again.
-    await created(company.cookie, labourBody(tower, { labourCode: "T-1" }));
+    // The Employee Id is free again.
+    await created(company.cookie, labourBody(tower, { employeeCode: "T-1" }));
   });
 
-  it("keeps Reports To: another active Labour, never themselves or a loop, cleared when they go (ADR CM-0035)", async () => {
+  it("keeps Reports To: another active Employee, never themselves or a loop, cleared when they go (ADR CM-0035)", async () => {
     const company = await ownerWithCompany();
     const other = await ownerWithCompany("Sakthi Constructions");
     const { tower } = await fixtures(company);
@@ -966,18 +1220,18 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect((await get(company.cookie, helper.id)).reportsTo?.name).toBe(
       "Mason",
     );
-    const listed = await json<{ items: Labour[] }>(
+    const listed = await json<{ items: Employee[] }>(
       await listLabours(jsonRequest(`${BASE}?q=Helper`, company.cookie)),
     );
     expect(listed.items[0]?.reportsTo?.id).toBe(mason.id);
 
     // Left out on update keeps it.
-    const kept = await json<Labour>(
+    const kept = await json<Employee>(
       await update(company.cookie, helper, { name: "Helper One" }),
     );
     expect(kept.reportsTo?.id).toBe(mason.id);
     // An explicit null clears it.
-    const cleared = await json<Labour>(
+    const cleared = await json<Employee>(
       await update(company.cookie, kept, { reportsToId: null }),
     );
     expect(cleared.reportsTo).toBeNull();
@@ -1022,7 +1276,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect(deleted.status).toBe(StatusCodes.NO_CONTENT);
     expect((await get(company.cookie, helper.id)).reportsTo).toBeNull();
     const audit = await prisma.constructionOrganizationAuditEvent.findFirst({
-      where: { entityId: mason.id, action: "labour.deleted" },
+      where: { entityId: mason.id, action: "employee.deleted" },
     });
     expect(audit?.after).toEqual({ reportsCleared: [helper.id] });
   });
@@ -1072,7 +1326,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect(await codeOf(foreign)).toBe("PROJECT_NOT_FOUND");
     const move = await transferLabours(
       jsonRequest(`${BASE}/transfer`, second.cookie, {
-        labourIds: [labour.id],
+        employeeIds: [labour.id],
         toProjectId: theirs.tower,
         transferDate: "2026-10-01",
       }),
@@ -1083,7 +1337,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
   it("imports from the sample sheet: preview with errors, then all or nothing", async () => {
     const company = await ownerWithCompany();
     const { tower, villa, mason, suffix } = await fixtures(company);
-    await created(company.cookie, labourBody(tower, { labourCode: "DB-1" }));
+    await created(company.cookie, labourBody(tower, { employeeCode: "DB-1" }));
 
     const templateResponse = await importTemplate(
       jsonRequest(`${BASE}/import-template`, company.cookie),
@@ -1091,19 +1345,23 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect(templateResponse.status).toBe(StatusCodes.OK);
     expect(templateResponse.headers.get("content-type")).toBe(XLSX);
     const template = await workbookOf(templateResponse);
-    const sheet = template.getWorksheet("Labours");
+    const sheet = template.getWorksheet("Employees");
     const lists = template.getWorksheet("Lists");
-    expect(sheet?.getRow(1).getCell(1).value).toBe("Labour Name*");
+    expect(sheet?.getRow(1).getCell(1).value).toBe("Employee Name*");
+    expect(sheet?.getRow(2).getCell(4).value).toBe("Labour");
     expect(sheet?.getRow(2).getCell(1).value).toBe("Dhuresh Nawin");
     const listed: unknown[] = [];
     lists?.getColumn(1).eachCell((cell) => listed.push(cell.value));
     expect(listed).toContain(`Tower A ${suffix}`);
-    // No Site Engineer column or list (ADR CM-0041).
+    // Departments and Roles to pick from; no Site Engineer list.
     const listTitles: unknown[] = [];
     lists?.getRow(1).eachCell((cell) => listTitles.push(cell.value));
+    expect(listTitles).toEqual(
+      expect.arrayContaining(["Departments", "Roles"]),
+    );
     expect(listTitles).not.toContain("Site Engineers");
 
-    if (sheet == null) throw new Error("No Labours sheet");
+    if (sheet == null) throw new Error("No Employees sheet");
     const headers: string[] = [];
     sheet.getRow(1).eachCell((cell) => headers.push(cell.text));
     const column = (header: string) => headers.indexOf(header) + 1;
@@ -1116,7 +1374,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
         sheet.getRow(row).getCell(column(header)).value = value;
     };
     const good = {
-      "Labour Name*": "Ganesh",
+      "Employee Name*": "Ganesh",
       "Joining Date*": new Date("2026-09-01T00:00:00Z"),
       "Wage Type*": "Daily",
       "Wage per Day (₹)": 650,
@@ -1126,19 +1384,23 @@ describe("Labour register (CM-205 – CM-207)", () => {
       // Many Projects, separated by ";" (ADR CM-0033).
       Projects: `tower a ${suffix}; Villa ${suffix}`,
       "Labour Category": `Mason ${suffix}`,
-      "Labour Id": "IMP-1",
+      "Employee Id": "IMP-1",
       "Working Hours per Day": 9,
     };
     fill(2, good);
     fill(3, {
-      "Labour Name*": "",
+      "Employee Name*": "",
       "Joining Date*": "31/02/2026",
       "Wage Type*": "Daily",
       "Overtime Wage per Hour (₹)*": 50,
       Projects: "Nowhere",
-      "Labour Id": "DB-1",
+      "Employee Id": "DB-1",
     });
-    fill(4, { ...good, "Labour Name*": "Manikandan", "Labour Id": "imp-1" });
+    fill(4, {
+      ...good,
+      "Employee Name*": "Manikandan",
+      "Employee Id": "imp-1",
+    });
     const bytes = await xlsxBytes(template);
 
     const preview = await importLabours(
@@ -1161,14 +1423,14 @@ describe("Labour register (CM-205 – CM-207)", () => {
     const codes = body.rows.map((row) =>
       row.errors.map((error) => error.code).sort(),
     );
-    expect(codes[0]).toEqual(["LABOUR_CODE_DUPLICATE"]);
+    expect(codes[0]).toEqual(["EMPLOYEE_CODE_DUPLICATE"]);
     expect(codes[1]).toEqual(
       expect.arrayContaining([
-        "LABOUR_NAME_REQUIRED",
+        "EMPLOYEE_NAME_REQUIRED",
         "JOINING_DATE_INVALID",
         "WAGE_REQUIRED",
         "PROJECT_NOT_FOUND",
-        "LABOUR_CODE_TAKEN",
+        "EMPLOYEE_CODE_TAKEN",
       ]),
     );
     expect(body.rows[0]?.values.wagePerDay).toBe(65_000);
@@ -1179,7 +1441,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect(refused.status).toBe(StatusCodes.BAD_REQUEST);
     expect(await codeOf(refused)).toBe("IMPORT_HAS_ERRORS");
     expect(
-      await prisma.constructionLabourLabour.count({
+      await prisma.constructionLabourEmployee.count({
         where: { workspaceId: company.workspaceId },
       }),
     ).toBe(1);
@@ -1187,7 +1449,13 @@ describe("Labour register (CM-205 – CM-207)", () => {
     sheet.spliceRows(3, 2);
     // Blank working hours are 8.
     const { "Working Hours per Day": _hours, ...noHours } = good;
-    fill(3, { ...noHours, "Labour Name*": "Manikandan", "Labour Id": "IMP-2" });
+    fill(3, {
+      ...noHours,
+      "Employee Name*": "Manikandan",
+      "Employee Id": "IMP-2",
+      Department: "Human Resources",
+      Role: "Site Engineer",
+    });
     const fixed = await xlsxBytes(template);
     const imported = await importLabours(
       upload(`${BASE}/import?dryRun=false`, company.cookie, fixed, XLSX),
@@ -1197,7 +1465,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
       valid: 2,
       imported: 2,
     });
-    const list = await json<{ items: Labour[] }>(
+    const list = await json<{ items: Employee[] }>(
       await listLabours(jsonRequest(`${BASE}?q=IMP`, company.cookie)),
     );
     expect(list.items).toHaveLength(2);
@@ -1217,6 +1485,54 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect(list.items[0]?.projects.map((project) => project.id).sort()).toEqual(
       [tower, villa].sort(),
     );
+    // A blank Role is Labour; a named one under its Department.
+    expect(
+      list.items.map((item) => [item.name, item.role.name]).sort(),
+    ).toEqual([
+      ["Ganesh", "Labour"],
+      ["Manikandan", "Site Engineer"],
+    ]);
+
+    // A sheet from the Labour template (before ADR CM-0055) still imports.
+    const old = new ExcelJS.Workbook();
+    const oldSheet = old.addWorksheet("Labours");
+    oldSheet.addRow([
+      "Labour Name*",
+      "Labour Id",
+      "Contact Number",
+      "Joining Date*",
+      "Wage Type*",
+      "Wage per Day (₹)",
+      "Overtime Wage per Hour (₹)*",
+    ]);
+    oldSheet.addRow([
+      "Old Ravi",
+      "OLD-1",
+      "7708165767",
+      "2026-09-01",
+      "Daily",
+      600,
+      50,
+    ]);
+    const oldImport = await importLabours(
+      upload(
+        `${BASE}/import?dryRun=false`,
+        company.cookie,
+        await xlsxBytes(old),
+        XLSX,
+      ),
+    );
+    expect(oldImport.status).toBe(StatusCodes.CREATED);
+    const ravi = (
+      await json<{ items: Employee[] }>(
+        await listLabours(jsonRequest(`${BASE}?q=OLD-1`, company.cookie)),
+      )
+    ).items[0];
+    expect(ravi).toMatchObject({
+      employeeCode: "OLD-1",
+      mobile: "+917708165767",
+      role: { name: "Labour" },
+    });
 
     const garbage = await importLabours(
       upload(`${BASE}/import`, company.cookie, pngBytes(), XLSX),
@@ -1226,7 +1542,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
 
   it("exports the filtered register; amounts only with Financial", async () => {
     const company = await ownerWithCompany();
-    const { tower, villa, suffix } = await fixtures(company);
+    const { tower, villa } = await fixtures(company);
     await created(
       company.cookie,
       labourBody(tower, { name: "Tower man", aadhaar: VALID_AADHAAR }),
@@ -1237,26 +1553,26 @@ describe("Labour register (CM-205 – CM-207)", () => {
       jsonRequest(`${BASE}/export?projectId=${tower}`, company.cookie),
     );
     expect(response.status).toBe(StatusCodes.OK);
-    const sheet = (await workbookOf(response)).getWorksheet("Labours");
+    const sheet = (await workbookOf(response)).getWorksheet("Employees");
     expect(sheet?.rowCount).toBe(2);
     const headers: string[] = [];
     sheet?.getRow(1).eachCell((cell) => headers.push(cell.text));
     const cell = (header: string) =>
       sheet?.getRow(2).getCell(headers.indexOf(header) + 1).value;
-    expect(cell("Labour Name")).toBe("Tower man");
+    expect(cell("Employee Name")).toBe("Tower man");
     expect(cell("Wage per Day (₹)")).toBe(700);
     expect(cell("Aadhaar Number")).toBe("XXXXXXXX2346");
     expect(cell("Working Hours per Day")).toBe(8);
-    // From the Labour's Projects (ADR CM-0041).
-    expect(cell("Site Engineers")).toBe(`Sundar ${suffix}`);
-    expect(headers).not.toContain("Site Engineer");
+    expect(cell("Department")).toBe("Human Resources");
+    expect(cell("Role")).toBe("Labour");
+    expect(headers).not.toContain("Site Engineers");
 
     const clerk = await memberOn(company, { "masters.labours": ["read"] });
     const hidden = (
       await workbookOf(
         await exportLabours(jsonRequest(`${BASE}/export`, clerk.cookie)),
       )
-    ).getWorksheet("Labours");
+    ).getWorksheet("Employees");
     expect(hidden?.rowCount).toBe(3);
     expect(
       hidden?.getRow(2).getCell(headers.indexOf("Wage per Day (₹)") + 1).value,
@@ -1286,7 +1602,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
     expect(photo.status).toBe(StatusCodes.OK);
     const { photoUrl } = await json<{ photoUrl: string }>(photo);
     expect(photoUrl).toMatch(
-      new RegExp(`^/api/construction/labour/labours/${labour.id}/photo\\?v=`),
+      new RegExp(`^/api/construction/labour/employees/${labour.id}/photo\\?v=`),
     );
     expect((await get(company.cookie, labour.id)).photoUrl).toBe(photoUrl);
     const streamed = await getPhoto(
@@ -1299,7 +1615,7 @@ describe("Labour register (CM-205 – CM-207)", () => {
       await prisma.constructionOrganizationStoredFile.count({
         where: {
           workspaceId: company.workspaceId,
-          kind: "labour_photo",
+          kind: "employee_photo",
           deletedAt: null,
         },
       }),
@@ -1391,31 +1707,41 @@ describe("Labour register (CM-205 – CM-207)", () => {
       paths: Record<string, Record<string, unknown>>;
     }>(getOpenApi());
     const paths = [
-      ["/api/construction/labour/labours", "get"],
-      ["/api/construction/labour/labours", "post"],
-      ["/api/construction/labour/labours/options", "get"],
-      ["/api/construction/labour/labours/transfer", "post"],
-      ["/api/construction/labour/labours/import-template", "get"],
-      ["/api/construction/labour/labours/import", "post"],
-      ["/api/construction/labour/labours/export", "get"],
-      ["/api/construction/labour/labours/{id}", "get"],
-      ["/api/construction/labour/labours/{id}/update", "post"],
-      ["/api/construction/labour/labours/{id}/activate", "post"],
-      ["/api/construction/labour/labours/{id}/deactivate", "post"],
-      ["/api/construction/labour/labours/{id}/delete", "post"],
-      ["/api/construction/labour/labours/{id}/transfers", "get"],
-      ["/api/construction/labour/labours/{id}/photo", "get"],
-      ["/api/construction/labour/labours/{id}/photo", "post"],
-      ["/api/construction/labour/labours/{id}/photo/remove", "post"],
-      ["/api/construction/labour/labours/{id}/documents", "get"],
-      ["/api/construction/labour/labours/{id}/documents", "post"],
-      ["/api/construction/labour/labours/{id}/documents/{docId}", "get"],
+      ["/api/construction/labour/employees", "get"],
+      ["/api/construction/labour/employees", "post"],
+      ["/api/construction/labour/employees/options", "get"],
+      ["/api/construction/labour/employees/transfer", "post"],
+      ["/api/construction/labour/employees/import-template", "get"],
+      ["/api/construction/labour/employees/import", "post"],
+      ["/api/construction/labour/employees/export", "get"],
+      ["/api/construction/labour/employees/{id}", "get"],
+      ["/api/construction/labour/employees/{id}/update", "post"],
+      ["/api/construction/labour/employees/{id}/activate", "post"],
+      ["/api/construction/labour/employees/{id}/deactivate", "post"],
+      ["/api/construction/labour/employees/{id}/delete", "post"],
+      ["/api/construction/labour/employees/{id}/transfers", "get"],
+      ["/api/construction/labour/employees/{id}/photo", "get"],
+      ["/api/construction/labour/employees/{id}/photo", "post"],
+      ["/api/construction/labour/employees/{id}/photo/remove", "post"],
+      ["/api/construction/labour/employees/{id}/documents", "get"],
+      ["/api/construction/labour/employees/{id}/documents", "post"],
+      ["/api/construction/labour/employees/{id}/documents/{docId}", "get"],
       [
-        "/api/construction/labour/labours/{id}/documents/{docId}/delete",
+        "/api/construction/labour/employees/{id}/documents/{docId}/delete",
         "post",
       ],
+      ["/api/construction/labour/employees/{id}/password", "post"],
+      ["/api/construction/labour/employees/{id}/attendance", "get"],
+      ["/api/construction/labour/employees/{id}/activity", "get"],
     ] as const;
     for (const [path, method] of paths)
       expect(document.paths[path]?.[method], `${method} ${path}`).toBeDefined();
+    // Labours and Site Engineers are Employees now (ADR CM-0055 §6).
+    for (const gone of [
+      "/api/construction/labour/labours",
+      "/api/construction/masters/site-engineers",
+      "/api/construction/masters/supervisors",
+    ])
+      expect(document.paths[gone]).toBeUndefined();
   });
 });

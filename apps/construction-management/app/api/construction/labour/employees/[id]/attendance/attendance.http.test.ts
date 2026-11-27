@@ -3,7 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import { describe, expect, it } from "vitest";
 
 import { POST as markDays } from "@/app/api/construction/labour/attendance/labour/mark/route";
-import { POST as createLabour } from "@/app/api/construction/labour/labours/route";
+import { POST as createLabour } from "@/app/api/construction/labour/employees/route";
 import type { ConstructionPersonAttendanceResponseModel } from "@/app/api/_lib/person-attendance-models";
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import type { Flag } from "@/src/shared-kernel/access";
@@ -14,11 +14,12 @@ import {
   memberWith,
   ownerWithCompany,
 } from "@/test/companies";
+import { seededRoleId } from "@/test/employees";
 import { TEST_ORIGIN } from "@/test/sessions";
 
 import { GET as getAttendance } from "./route";
 
-const LABOURS = `${TEST_ORIGIN}/api/construction/labour/labours`;
+const LABOURS = `${TEST_ORIGIN}/api/construction/labour/employees`;
 const MARK = `${TEST_ORIGIN}/api/construction/labour/attendance/labour/mark`;
 const TODAY = todayIn("Asia/Kolkata");
 const day = (offset: number) => addDays(TODAY, offset);
@@ -30,15 +31,15 @@ function params(id: string) {
   return { params: Promise.resolve({ id }) };
 }
 
-function read(cookie: string, labourId: string, query = "") {
+function read(cookie: string, employeeId: string, query = "") {
   return getAttendance(
-    jsonRequest(`${LABOURS}/${labourId}/attendance${query}`, cookie),
-    params(labourId),
+    jsonRequest(`${LABOURS}/${employeeId}/attendance${query}`, cookie),
+    params(employeeId),
   );
 }
 
-async function page(cookie: string, labourId: string, query = "") {
-  const response = await read(cookie, labourId, query);
+async function page(cookie: string, employeeId: string, query = "") {
+  const response = await read(cookie, employeeId, query);
   if (response.status !== 200)
     throw new Error(`attendance: ${await response.text()}`);
   return (await response.json()) as Page;
@@ -74,6 +75,7 @@ async function history(company: Company) {
   ]);
   const response = await createLabour(
     jsonRequest(LABOURS, company.cookie, {
+      roleId: await seededRoleId(company.workspaceId),
       name: "Dhuresh Nawin",
       wageType: "daily",
       wagePerDay: 70_000,
@@ -85,11 +87,11 @@ async function history(company: Company) {
   );
   if (response.status !== 201)
     throw new Error(`labour: ${await response.text()}`);
-  const { id: labourId } = (await response.json()) as { id: string };
+  const { id: employeeId } = (await response.json()) as { id: string };
 
   await mark(company, sky, day(-3), [
     {
-      labourId,
+      employeeId,
       status: "present",
       checkIn: "09:00",
       checkOut: "18:00",
@@ -97,10 +99,10 @@ async function history(company: Company) {
       overtime: [{ labourCategoryId: null, hours: "1.5" }],
     },
   ]);
-  await mark(company, green, day(-3), [{ labourId, status: "half_day" }]);
-  await mark(company, sky, day(-2), [{ labourId, status: "absent" }]);
-  await mark(company, sky, day(-1), [{ labourId, status: "present" }]);
-  return { sky, green, labourId };
+  await mark(company, green, day(-3), [{ employeeId, status: "half_day" }]);
+  await mark(company, sky, day(-2), [{ employeeId, status: "absent" }]);
+  await mark(company, sky, day(-1), [{ employeeId, status: "present" }]);
+  return { sky, green, employeeId };
 }
 
 async function memberOn(
@@ -119,12 +121,12 @@ async function memberOn(
   return member;
 }
 
-describe("GET /api/construction/labour/labours/{id}/attendance (ADR CM-0051)", () => {
+describe("GET /api/construction/labour/employees/{id}/attendance (ADR CM-0051)", () => {
   it("gives each day its Projects and hours, and the all-time figures", async () => {
     const company = await ownerWithCompany();
-    const { sky, green, labourId } = await history(company);
+    const { sky, green, employeeId } = await history(company);
 
-    const result = await page(company.cookie, labourId);
+    const result = await page(company.cookie, employeeId);
     expect(result).toMatchObject({
       measure: "hours",
       recordsAbsence: true,
@@ -190,37 +192,37 @@ describe("GET /api/construction/labour/labours/{id}/attendance (ADR CM-0051)", (
 
   it("pages back a month at a time to the first month, all-time only on the first page", async () => {
     const company = await ownerWithCompany();
-    const { labourId } = await history(company);
+    const { employeeId } = await history(company);
     const thisMonth = TODAY.slice(0, 7);
     const firstMonth = day(-40).slice(0, 7);
 
-    const latest = await page(company.cookie, labourId, "?months=1");
+    const latest = await page(company.cookie, employeeId, "?months=1");
     expect(latest.months.map((m) => m.month)).toEqual([thisMonth]);
     expect(latest.earlierTo).not.toBeNull();
     expect(latest.allTime).not.toBeNull();
 
     const earliest = await page(
       company.cookie,
-      labourId,
+      employeeId,
       `?to=${firstMonth}&months=1`,
     );
     expect(earliest.months.map((m) => m.month)).toEqual([firstMonth]);
     expect(earliest.earlierTo).toBeNull();
     expect(earliest.allTime).toBeNull();
 
-    const before = await page(company.cookie, labourId, "?to=2001-01");
+    const before = await page(company.cookie, employeeId, "?to=2001-01");
     expect(before.months).toEqual([]);
     expect(before.earlierTo).toBeNull();
   });
 
   it("leaves out the Projects the viewer may not open", async () => {
     const company = await ownerWithCompany();
-    const { sky, labourId } = await history(company);
+    const { sky, employeeId } = await history(company);
     const member = await memberOn(company, { "masters.labours": ["read"] }, [
       sky,
     ]);
 
-    const result = await page(member.cookie, labourId);
+    const result = await page(member.cookie, employeeId);
     const threeAgo = days(result).find((d) => d.date === day(-3));
     expect(threeAgo?.places.map((p) => p.place.name)).toEqual(["Sky Towers"]);
     expect(threeAgo?.workedMinutes).toBe(480);
@@ -231,38 +233,37 @@ describe("GET /api/construction/labour/labours/{id}/attendance (ADR CM-0051)", (
       { "masters.labours": ["read"] },
       [],
     );
-    expect(days(await page(nowhere.cookie, labourId))).toEqual([]);
+    expect(days(await page(nowhere.cookie, employeeId))).toEqual([]);
   });
 
   it("needs Labours Read, a real Labour and a real month", async () => {
     const company = await ownerWithCompany();
-    const { labourId } = await history(company);
+    const { employeeId } = await history(company);
     const outsider = await memberWith(company, {
       "masters.vendors": ["read"],
     });
-    expect((await read(outsider.cookie, labourId)).status).toBe(
+    expect((await read(outsider.cookie, employeeId)).status).toBe(
       StatusCodes.FORBIDDEN,
     );
     const missing = "0195f0a0-0000-7000-8000-000000000999";
     expect((await read(company.cookie, missing)).status).toBe(
       StatusCodes.NOT_FOUND,
     );
-    expect((await read(company.cookie, labourId, "?to=2026-13")).status).toBe(
+    expect((await read(company.cookie, employeeId, "?to=2026-13")).status).toBe(
       StatusCodes.BAD_REQUEST,
     );
-    expect((await read(company.cookie, labourId, "?months=13")).status).toBe(
+    expect((await read(company.cookie, employeeId, "?months=13")).status).toBe(
       StatusCodes.BAD_REQUEST,
     );
   });
 
-  it("is in the OpenAPI document, all four routes on one model", async () => {
+  it("is in the OpenAPI document, every route on one model", async () => {
     const document = (await getOpenApi().json()) as {
       paths: Record<string, unknown>;
       components: { schemas: Record<string, unknown> };
     };
     for (const path of [
-      "/api/construction/labour/labours/{id}/attendance",
-      "/api/construction/masters/site-engineers/{id}/attendance",
+      "/api/construction/labour/employees/{id}/attendance",
       "/api/construction/labour/vendors/{id}/attendance",
       "/api/construction/organization/team-members/{id}/attendance",
     ])

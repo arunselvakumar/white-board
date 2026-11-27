@@ -1,7 +1,7 @@
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
-import { toPersonActivityResponse } from "@/app/api/construction/labour/labours/[id]/activity/activity-models";
+import { toPersonActivityResponse } from "@/app/api/_lib/person-activity-models";
 import { createVendorActivity } from "@/src/composition/person-activity";
 
 import { ConstructionLabourVendorParamsModel } from "../vendor-params-model";
