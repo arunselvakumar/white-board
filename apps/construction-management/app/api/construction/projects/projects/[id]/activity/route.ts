@@ -14,8 +14,8 @@ export const dynamic = "force-dynamic";
 const activity = createProjectActivity();
 
 /**
- * The Project's Activity (ADR CM-0038 §1, §4): Site Engineers and Labours
- * added and removed, Labours transferred in and out, and everyone's
+ * The Project's Activity (ADR CM-0038 §1, §4, CM-0055): Employees added,
+ * removed and transferred in and out, and everyone's
  * check-in entries with Attendance Read (ADR CM-0044), 30 a page, newest
  * effective date first. 404 for another Company's Project or one the
  * Member is not on.

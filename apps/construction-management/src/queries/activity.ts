@@ -34,12 +34,7 @@ export type LabourActivityType = (typeof LABOUR_ACTIVITY_TYPES)[number];
 export const PERSON_ACTIVITY_TYPES = ["all", "projects", "check_ins"] as const;
 export type PersonActivityType = (typeof PERSON_ACTIVITY_TYPES)[number];
 
-export const PROJECT_ACTIVITY_WHO = [
-  "all",
-  "site_engineers",
-  "labours",
-  "vendors",
-] as const;
+export const PROJECT_ACTIVITY_WHO = ["all", "employees", "vendors"] as const;
 export type ProjectActivityWho = (typeof PROJECT_ACTIVITY_WHO)[number];
 
 export const PROJECT_ACTIVITY_TYPES = ["all", "team", "check_ins"] as const;
