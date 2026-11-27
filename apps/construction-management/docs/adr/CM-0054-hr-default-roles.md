@@ -38,11 +38,11 @@ Every change writes the audit event the screens write: `role.created`, `role.upd
 
 ### 3. Role assignment on the Labour, Site Engineer and Vendor forms
 
-- A **Role assignment** card on Add and Edit of each, after the first card (Basic, Details): **Department** shows Human Resources and **Role** shows Labour, Site Engineer or Vendor, both disabled. The hint reads "Every Labour is on the Labour Role under Human Resources."
+- A **Role assignment** card on Add and Edit of each, after the first card (Basic, Details): **Department** shows Human Resources and **Role** shows Labour, Site Engineer or Vendor, both disabled. The hint reads "The default Department and Role for a Labour. Shown for reference; not saved.", since an admin may have moved the Role (or, for Site Engineer, kept it under another Department in the backfill).
 - The values are fixed in the page, not read from the Company's Roles, and nothing is sent or saved. A Site Engineer's sign-in is on the Site Engineer Role already (CM-0037 §1); Labours and Vendors have no Role field.
 
 ## Consequences
 
 - Role Management lists eleven default Roles. Labour and Vendor show 0 users and can be picked for Office Staff, where they give no access.
-- Staff who were on Site Supervisor can do slightly more on Site Engineer. An admin who wants the old access duplicates Site Engineer and removes cells.
+- Staff who were on Site Supervisor can do slightly more on Site Engineer. An admin who wants the old access duplicates Site Engineer, compares its matrix with Site Supervisor's (the migration keeps it on the deleted Role), removes the extra cells and adds the missing ones: as seeded, Labour Categories read.
 - The Role assignment card can disagree with the data: if an admin moves the Labour Role to another Department, the card still says Human Resources. Making it read the Role, or saving a Role on Labours and Vendors, is a later decision.

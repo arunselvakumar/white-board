@@ -38,13 +38,15 @@ function FixedSelect({ label, value }: { label: string; value: string }) {
 /**
  * Role assignment on Add and Edit Labour, Site Engineer and Vendor (ADR
  * CM-0054): the Department and Role this kind of staff is under, shown in
- * two disabled dropdowns. Nothing here is saved; the page decides the Role.
+ * two disabled dropdowns. These are the defaults, fixed in the page, not
+ * read from the Company's Roles: an admin may have moved the Role to
+ * another Department. Nothing here is saved.
  */
 export function RoleAssignment({ role }: { role: StaffRoleName }) {
   return (
     <FormSection
       title="Role assignment"
-      hint={`Every ${role} is on the ${role} Role under ${DEPARTMENT}.`}
+      hint={`The default Department and Role for a ${role}. Shown for reference; not saved.`}
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <FixedSelect label="Department" value={DEPARTMENT} />
