@@ -31,6 +31,8 @@ export type SeedEmployee = {
   projectIds?: readonly string[];
   teamMemberId?: string | null;
   photoKey?: string | null;
+  /** Paise owed (positive) or advanced (negative) before the app. */
+  openingBalance?: number;
   by?: string;
 };
 
@@ -83,6 +85,22 @@ export async function seedEmployee(input: SeedEmployee): Promise<string> {
       updatedBy: by,
     },
   });
+  if (input.openingBalance != null && input.openingBalance !== 0)
+    await prisma.constructionLabourLedgerEntry.create({
+      data: {
+        id: randomUUID(),
+        workspaceId: input.workspaceId,
+        partyType: "employee",
+        partyId: id,
+        projectId: null,
+        entryDate: joiningDate,
+        kind: "opening",
+        amount: input.openingBalance,
+        sourceType: "employee",
+        sourceId: id,
+        createdBy: by,
+      },
+    });
   for (const projectId of input.projectIds ?? []) {
     await prisma.constructionLabourEmployeeProject.create({
       data: {

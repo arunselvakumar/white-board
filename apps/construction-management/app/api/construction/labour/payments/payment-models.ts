@@ -4,7 +4,7 @@ import type { WagePaymentReadModel } from "@/src/labour/application/wage-payment
 
 export const PAYMENTS_PATH = "/api/construction/labour/payments";
 
-const partyType = z.enum(["labour", "vendor"]);
+const partyType = z.enum(["employee", "vendor"]);
 const kind = z.enum(["payment", "advance"]);
 const mode = z.enum(["cash", "bank"]);
 
@@ -12,7 +12,7 @@ const mode = z.enum(["cash", "bank"]);
 
 export const RecordConstructionLabourWagePaymentRequestModel = z.object({
   partyType,
-  /** A labourer or vendor of the Active Company. */
+  /** An Employee or vendor of the Active Company. */
   partyId: z.uuid(),
   /** A live Project; a vendor must be assigned to it. */
   projectId: z.uuid(),

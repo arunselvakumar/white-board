@@ -31,11 +31,11 @@ import {
 
 export const dynamic = "force-dynamic";
 
-const PARTY_TYPES: PartyType[] = ["labour", "vendor"];
+const PARTY_TYPES: PartyType[] = ["employee", "vendor"];
 
 /**
  * Recorded payments of a Project, newest recorded first, by party type,
- * party, kind and payment date. Labour payments need Labour read
+ * party, kind and payment date. Employee payments need Labour read
  * on the Project and vendor payments Vendor read; without `partyType` the
  * list holds the types the caller may read. Amounts need Financial.
  */

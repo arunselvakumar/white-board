@@ -9,6 +9,7 @@ import {
   calendarDateToDb,
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
+import { companyToday } from "@/src/shared-kernel/company-today";
 
 import type {
   BalanceEntry,
@@ -17,7 +18,6 @@ import type {
   BalanceStore,
 } from "../application/balance-handlers";
 import type { LedgerSourceType, PartyType, Period } from "../domain/ledger";
-import { companyToday } from "./prisma-labour-queries";
 
 function byName<T extends { name: string }>(items: T[]): T[] {
   const collator = new Intl.Collator("en", {

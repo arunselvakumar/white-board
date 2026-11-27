@@ -23,7 +23,7 @@ export const GetConstructionLabourProjectSummaryRequestModel = z.object({
 
 const balance = z
   .object({
-    /** Paise owed to labourers or vendors. */
+    /** Paise owed to Employees or vendors. */
     toPay: z.int(),
     /** Paise advanced ahead of wages. */
     advanced: z.int(),
@@ -33,7 +33,8 @@ const balance = z
 
 export const GetConstructionLabourProjectSummaryResponseModel = z.object({
   date: z.iso.date(),
-  labourers: z.object({
+  /** The Project's Employees (ADR CM-0055). */
+  employees: z.object({
     onProject: z.int(),
     present: z.int(),
     halfDay: z.int(),
@@ -53,7 +54,7 @@ export const GetConstructionLabourProjectSummaryResponseModel = z.object({
       vendorHeadcount: z.int(),
     }),
   ),
-  labourBalance: balance,
+  employeeBalance: balance,
   vendorBalance: balance,
 });
 
@@ -63,11 +64,11 @@ export type GetConstructionLabourProjectSummaryResponseModel = z.infer<
 
 export function toProjectSummaryResponse(
   summary: ProjectLabourSummary,
-  financial: { labour: boolean; vendor: boolean },
+  financial: { employee: boolean; vendor: boolean },
 ): GetConstructionLabourProjectSummaryResponseModel {
   return {
     ...summary,
-    labourBalance: financial.labour ? summary.labourBalance : null,
+    employeeBalance: financial.employee ? summary.employeeBalance : null,
     vendorBalance: financial.vendor ? summary.vendorBalance : null,
   };
 }

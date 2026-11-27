@@ -20,6 +20,7 @@ import {
   markStoredFileDeleted,
   recordStoredFile,
 } from "@/src/shared-kernel/files/stored-files";
+import { companyToday } from "@/src/shared-kernel/company-today";
 
 import type {
   PaymentParty,
@@ -33,7 +34,6 @@ import type {
 } from "../application/wage-payment-handlers";
 import type { PartyType } from "../domain/ledger";
 import { paymentLedgerEntries } from "../domain/wage-payment";
-import { companyToday } from "./prisma-labour-queries";
 import { lockLiveParties } from "./party-locks";
 import { paiseFromBigint, prismaLedger } from "./prisma-ledger";
 
