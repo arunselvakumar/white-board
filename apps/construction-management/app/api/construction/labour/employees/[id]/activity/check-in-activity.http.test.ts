@@ -171,7 +171,7 @@ async function history(company: Company) {
       workspaceId: company.workspaceId,
       userId: company.userId,
       projectId,
-      kind: "labour",
+      kind: "employee",
       personId: employeeId,
       action,
       photo: PHOTO,
