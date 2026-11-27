@@ -1,0 +1,1747 @@
+import { prisma } from "@repo/construction-db";
+import ExcelJS from "exceljs";
+import { StatusCodes } from "http-status-codes";
+import { describe, expect, it } from "vitest";
+
+import { GET as getOpenApi } from "@/app/api/openapi.json/route";
+import { GET as listStaff } from "@/app/api/construction/organization/team-members/route";
+import { calendarDateToDb } from "@/src/shared-kernel/calendar-date";
+import type { Flag } from "@/src/shared-kernel/access";
+import { newId } from "@/src/shared-kernel/ids";
+import { jsonRequest, memberWith, ownerWithCompany } from "@/test/companies";
+import { bytesOf, gifBytes, pngBytes } from "@/test/files";
+import { seededRoleId } from "@/test/employees";
+import { TEST_ORIGIN } from "@/test/sessions";
+
+import { POST as activateLabour } from "./[id]/activate/route";
+import { POST as deactivateLabour } from "./[id]/deactivate/route";
+import { POST as deleteLabour } from "./[id]/delete/route";
+import { POST as deleteDocument } from "./[id]/documents/[docId]/delete/route";
+import { GET as getDocument } from "./[id]/documents/[docId]/route";
+import {
+  GET as listDocuments,
+  POST as addDocument,
+} from "./[id]/documents/route";
+import { POST as removePhoto } from "./[id]/photo/remove/route";
+import { GET as getPhoto, POST as setPhoto } from "./[id]/photo/route";
+import { GET as getLabour } from "./[id]/route";
+import { GET as listTransfers } from "./[id]/transfers/route";
+import { POST as setPassword } from "./[id]/password/route";
+import { POST as updateLabour } from "./[id]/update/route";
+import { GET as exportLabours } from "./export/route";
+import { GET as importTemplate } from "./import-template/route";
+import { POST as importLabours } from "./import/route";
+import { GET as labourOptions } from "./options/route";
+import { GET as listLabours, POST as createLabour } from "./route";
+import { POST as transferLabours } from "./transfer/route";
+
+const BASE = `${TEST_ORIGIN}/api/construction/labour/employees`;
+const XLSX =
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+const VALID_AADHAAR = "234123412346";
+
+type Employee = {
+  id: string;
+  name: string;
+  employeeCode: string | null;
+  role: { id: string; name: string };
+  department: { id: string; name: string } | null;
+  joiningDate: string;
+  wageType: "daily" | "monthly";
+  wagePerDay: number | null;
+  wagePerMonth: number | null;
+  overtimeWagePerHour: number | null;
+  workingHoursPerDay: string;
+  weeklyHolidays: number[];
+  openingBalance: number | null;
+  balance: number | null;
+  aadhaarMasked: string | null;
+  mobile: string | null;
+  projects: { id: string; name: string }[];
+  labourCategory: { id: string; name: string } | null;
+  canSignIn: boolean;
+  signIn: { memberId: string; status: string } | null;
+  reportsTo: { id: string; name: string } | null;
+  isActive: boolean;
+  photoUrl: string | null;
+  updatedAt: string;
+};
+
+type Company = Awaited<ReturnType<typeof ownerWithCompany>>;
+
+function params(id: string) {
+  return { params: Promise.resolve({ id }) };
+}
+
+function docParams(id: string, docId: string) {
+  return { params: Promise.resolve({ id, docId }) };
+}
+
+async function json<T>(response: Response): Promise<T> {
+  return (await response.json()) as T;
+}
+
+async function codeOf(response: Response): Promise<string> {
+  return (await json<{ code: string }>(response)).code;
+}
+
+async function seedProject(workspaceId: string, name: string) {
+  const id = newId();
+  await prisma.constructionProjectsProject.create({
+    data: { id, workspaceId, name, createdBy: "test", updatedBy: "test" },
+  });
+  return id;
+}
+
+async function seedCategory(
+  workspaceId: string,
+  name: string,
+  disabled = false,
+) {
+  const id = newId();
+  await prisma.constructionMastersLabourCategory.create({
+    data: {
+      id,
+      workspaceId,
+      name,
+      disabledAt: disabled ? new Date() : null,
+      createdBy: "test",
+      updatedBy: "test",
+    },
+  });
+  return id;
+}
+
+/** A mobile nobody signs in with yet: sign-ins outlive a test run. */
+function freshMobile(): { typed: string; e164: string } {
+  const digits = `9${String(Math.floor(Math.random() * 1e9)).padStart(9, "0")}`;
+  return { typed: digits, e164: `+91${digits}` };
+}
+
+/** The seeded Labour Role of each Company a test signs in to, by cookie. */
+const ROLES = new Map<string, string>();
+
+async function fixtures(company: Company) {
+  const suffix = newId().slice(-6);
+  const [tower, villa, mason, welder] = await Promise.all([
+    seedProject(company.workspaceId, `Tower A ${suffix}`),
+    seedProject(company.workspaceId, `Villa ${suffix}`),
+    seedCategory(company.workspaceId, `Mason ${suffix}`),
+    seedCategory(company.workspaceId, `Welder ${suffix}`, true),
+  ]);
+  const labourRole = await seededRoleId(company.workspaceId);
+  ROLES.set(company.cookie, labourRole);
+  return { tower, villa, mason, welder, labourRole, suffix };
+}
+
+function labourBody(projectId: string, extra: Record<string, unknown> = {}) {
+  return {
+    name: "Dhuresh Nawin",
+    joiningDate: "2026-09-01",
+    wageType: "daily",
+    wagePerDay: 70_000,
+    overtimeWagePerHour: 10_000,
+    weeklyHolidays: [0],
+    projectIds: [projectId],
+    ...extra,
+  };
+}
+
+/** Add Employee; the Company's Labour Role unless the body names one. */
+async function create(cookie: string, body: Record<string, unknown>) {
+  return createLabour(
+    jsonRequest(BASE, cookie, { roleId: ROLES.get(cookie), ...body }),
+  );
+}
+
+async function created(
+  cookie: string,
+  body: Record<string, unknown>,
+): Promise<Employee> {
+  const response = await create(cookie, body);
+  expect(response.status).toBe(StatusCodes.CREATED);
+  return json<Employee>(response);
+}
+
+async function get(cookie: string, id: string): Promise<Employee> {
+  const response = await getLabour(
+    jsonRequest(`${BASE}/${id}`, cookie),
+    params(id),
+  );
+  expect(response.status).toBe(StatusCodes.OK);
+  return json<Employee>(response);
+}
+
+function update(
+  cookie: string,
+  labour: Employee,
+  body: Record<string, unknown>,
+) {
+  return updateLabour(
+    jsonRequest(`${BASE}/${labour.id}/update`, cookie, {
+      name: labour.name,
+      roleId: labour.role.id,
+      joiningDate: labour.joiningDate,
+      wageType: labour.wageType,
+      expectedUpdatedAt: labour.updatedAt,
+      ...body,
+    }),
+    params(labour.id),
+  );
+}
+
+function openingEntries(labourId: string) {
+  return prisma.constructionLabourLedgerEntry.findMany({
+    where: { partyType: "employee", partyId: labourId },
+    // A reversal and its repost share one transaction's timestamp; the
+    // reversal (it names the entry it reverses) comes first.
+    orderBy: [
+      { createdAt: "asc" },
+      { reversesEntryId: { sort: "asc", nulls: "last" } },
+    ],
+  });
+}
+
+async function markAttendance(
+  workspaceId: string,
+  labourId: string,
+  projectId: string,
+  date: string,
+) {
+  await prisma.constructionLabourAttendance.create({
+    data: {
+      id: newId(),
+      workspaceId,
+      projectId,
+      employeeId: labourId,
+      attendanceDate: calendarDateToDb(date),
+      status: "present",
+      wageType: "daily",
+      wageRate: 70_000,
+      earned: 70_000,
+      createdBy: "test",
+      updatedBy: "test",
+    },
+  });
+}
+
+async function memberOn(
+  company: Company,
+  permissions: Record<string, Flag[]>,
+  projectIds: string[] = [],
+) {
+  const member = await memberWith(company, permissions);
+  const role = ROLES.get(company.cookie);
+  if (role != null) ROLES.set(member.cookie, role);
+  if (projectIds.length > 0)
+    await prisma.constructionOrganizationTeamMemberProject.createMany({
+      data: projectIds.map((projectId) => ({
+        memberId: member.memberId,
+        projectId,
+      })),
+    });
+  return member;
+}
+
+async function workbookOf(response: Response): Promise<ExcelJS.Workbook> {
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(await response.arrayBuffer());
+  return workbook;
+}
+
+async function xlsxBytes(
+  workbook: ExcelJS.Workbook,
+): Promise<Uint8Array<ArrayBuffer>> {
+  const written = (await workbook.xlsx.writeBuffer()) as unknown as Uint8Array;
+  return Uint8Array.from(written);
+}
+
+function upload(
+  url: string,
+  cookie: string,
+  bytes: Uint8Array<ArrayBuffer>,
+  type: string,
+) {
+  return new Request(url, {
+    method: "POST",
+    headers: { cookie, "content-type": type },
+    body: bytes,
+  });
+}
+
+describe("Employees (CM-205 – CM-207, ADR CM-0055)", () => {
+  it("adds an Employee with an opening balance posted to the ledger", async () => {
+    const company = await ownerWithCompany();
+    const { tower, mason, labourRole } = await fixtures(company);
+    const labour = await created(
+      company.cookie,
+      labourBody(tower, {
+        employeeCode: "L-001",
+        openingBalance: 150_000,
+        aadhaar: "2341 2341 2346",
+        mobile: "77081 65767",
+        labourCategoryId: mason,
+        uanNumber: "100123456789",
+        // What a Site Engineer had (ADR CM-0055 §1).
+        email: "Dhuresh@Site.Test",
+        dateOfBirth: "1990-04-01",
+        bloodGroup: "O+",
+        pan: "ABCPE1234F",
+        qualification: "Diploma in Civil Engineering",
+        experienceYears: 6,
+        specialisation: "Steel / PEB",
+        address: "12 Gandhi Road, Madurai",
+        emergencyContact: "Wife, 98400 12345",
+        bankAccountHolder: "Dhuresh Nawin",
+        bankAccountNumber: "1234 5678 9012",
+        bankIfsc: "hdfc0001234",
+        bankName: "HDFC Bank",
+      }),
+    );
+    expect(labour).toMatchObject({
+      name: "Dhuresh Nawin",
+      employeeCode: "L-001",
+      wageType: "daily",
+      wagePerDay: 70_000,
+      wagePerMonth: null,
+      workingHoursPerDay: "8",
+      openingBalance: 150_000,
+      balance: 150_000,
+      aadhaarMasked: "XXXXXXXX2346",
+      mobile: "+917708165767",
+      projects: [{ id: tower }],
+      labourCategory: { id: mason },
+      role: { id: labourRole, name: "Labour" },
+      department: { name: "Human Resources" },
+      email: "dhuresh@site.test",
+      dateOfBirth: "1990-04-01",
+      bloodGroup: "O+",
+      panMasked: "XXXXXX234F",
+      experienceYears: 6,
+      bank: {
+        accountHolder: "Dhuresh Nawin",
+        accountLast4: "9012",
+        ifsc: "HDFC0001234",
+        bankName: "HDFC Bank",
+      },
+      canSignIn: false,
+      signIn: null,
+      isActive: true,
+    });
+    const entries = await openingEntries(labour.id);
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).toMatchObject({
+      kind: "opening",
+      amount: 150_000,
+      sourceType: "employee",
+      sourceId: labour.id,
+      projectId: null,
+    });
+    expect(entries[0]?.entryDate.toISOString().slice(0, 10)).toBe("2026-09-01");
+    const row = await prisma.constructionLabourEmployee.findUniqueOrThrow({
+      where: { id: labour.id },
+    });
+    expect(row.aadhaarEncrypted).not.toContain(VALID_AADHAAR);
+    expect(row.aadhaarLast4).toBe("2346");
+    expect(row.panEncrypted).not.toContain("ABCPE1234F");
+    expect(row.bankAccountEncrypted).not.toContain("123456789012");
+    expect(row.bankAccountLast4).toBe("9012");
+
+    const history = await json<{
+      items: {
+        fromProject: unknown;
+        toProject: { id: string };
+        transferDate: string;
+      }[];
+    }>(
+      await listTransfers(
+        jsonRequest(`${BASE}/${labour.id}/transfers`, company.cookie),
+        params(labour.id),
+      ),
+    );
+    expect(history.items).toEqual([
+      expect.objectContaining({
+        fromProject: null,
+        toProject: expect.objectContaining({ id: tower }) as unknown,
+        transferDate: "2026-09-01",
+      }),
+    ]);
+  });
+
+  it("reverses the old opening entry when the balance or joining date changes", async () => {
+    const company = await ownerWithCompany();
+    const { tower } = await fixtures(company);
+    const labour = await created(
+      company.cookie,
+      labourBody(tower, { openingBalance: 50_000 }),
+    );
+
+    const changed = await update(company.cookie, labour, {
+      openingBalance: -20_000,
+    });
+    expect(changed.status).toBe(StatusCodes.OK);
+    const after = await json<Employee>(changed);
+    expect(after.openingBalance).toBe(-20_000);
+    expect(after.balance).toBe(-20_000);
+    expect(after.wagePerDay).toBe(70_000);
+
+    let entries = await openingEntries(labour.id);
+    expect(entries.map((entry) => entry.amount)).toEqual([
+      50_000, -50_000, -20_000,
+    ]);
+    expect(entries[1]?.reversesEntryId).toBe(entries[0]?.id);
+
+    const moved = await update(company.cookie, after, {
+      joiningDate: "2026-08-15",
+    });
+    expect(moved.status).toBe(StatusCodes.OK);
+    entries = await openingEntries(labour.id);
+    expect(entries).toHaveLength(5);
+    expect(entries.at(-1)?.entryDate.toISOString().slice(0, 10)).toBe(
+      "2026-08-15",
+    );
+    expect((await json<Employee>(moved)).openingBalance).toBe(-20_000);
+    const first =
+      await prisma.constructionLabourEmployeeTransfer.findFirstOrThrow({
+        where: { employeeId: labour.id },
+      });
+    expect(first.transferDate.toISOString().slice(0, 10)).toBe("2026-08-15");
+
+    const stale = await update(company.cookie, labour, { name: "Old copy" });
+    expect(stale.status).toBe(StatusCodes.CONFLICT);
+    expect(await codeOf(stale)).toBe("EMPLOYEE_CHANGED");
+  });
+
+  it("switches wage type and clears the other wage", async () => {
+    const company = await ownerWithCompany();
+    const { tower } = await fixtures(company);
+    const labour = await created(company.cookie, labourBody(tower));
+    const missing = await update(company.cookie, labour, {
+      wageType: "monthly",
+    });
+    expect(missing.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await codeOf(missing)).toBe("WAGE_REQUIRED");
+    const monthly = await json<Employee>(
+      await update(company.cookie, labour, {
+        wageType: "monthly",
+        wagePerMonth: 18_00_000,
+      }),
+    );
+    expect(monthly).toMatchObject({
+      wageType: "monthly",
+      wagePerMonth: 18_00_000,
+      wagePerDay: null,
+    });
+  });
+
+  it("keeps working hours a day: 8 by default, kept when an edit leaves them out, shown without Financial", async () => {
+    const company = await ownerWithCompany();
+    const { tower } = await fixtures(company);
+    const labour = await created(
+      company.cookie,
+      labourBody(tower, { workingHoursPerDay: "9.50" }),
+    );
+    expect(labour.workingHoursPerDay).toBe("9.5");
+    const row = await prisma.constructionLabourEmployee.findUniqueOrThrow({
+      where: { id: labour.id },
+    });
+    expect(row.workingHoursPerDay.toString()).toBe("9.5");
+
+    const renamed = await json<Employee>(
+      await update(company.cookie, labour, { name: "Dhuresh P" }),
+    );
+    expect(renamed.workingHoursPerDay).toBe("9.5");
+    const cleared = await json<Employee>(
+      await update(company.cookie, renamed, { workingHoursPerDay: null }),
+    );
+    expect(cleared.workingHoursPerDay).toBe("9.5");
+    const changed = await json<Employee>(
+      await update(company.cookie, cleared, { workingHoursPerDay: 12 }),
+    );
+    expect(changed.workingHoursPerDay).toBe("12");
+    const invalid = await update(company.cookie, changed, {
+      workingHoursPerDay: "25",
+    });
+    expect(invalid.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await codeOf(invalid)).toBe("WORKING_HOURS_INVALID");
+
+    const clerk = await memberOn(
+      company,
+      { "masters.labours": ["read"], "labour.attendance": ["read"] },
+      [tower],
+    );
+    expect((await get(clerk.cookie, labour.id)).workingHoursPerDay).toBe("12");
+    const options = await json<{
+      items: { id: string; workingHoursPerDay: string; wagePerDay: unknown }[];
+    }>(
+      await labourOptions(
+        jsonRequest(
+          `${BASE}/options?projectId=${tower}&date=2026-10-01`,
+          clerk.cookie,
+        ),
+      ),
+    );
+    expect(options.items).toEqual([
+      expect.objectContaining({
+        id: labour.id,
+        workingHoursPerDay: "12",
+        wagePerDay: null,
+      }),
+    ]);
+  });
+
+  it("validates fields, references and the Employee Id", async () => {
+    const company = await ownerWithCompany();
+    const { tower, welder } = await fixtures(company);
+    const cases: [Record<string, unknown>, string][] = [
+      [{ name: " " }, "EMPLOYEE_NAME_REQUIRED"],
+      [{ wagePerDay: 0 }, "WAGE_REQUIRED"],
+      [{ uanNumber: "123" }, "UAN_INVALID"],
+      [{ esicNumber: "12345" }, "ESIC_INVALID"],
+      [{ aadhaar: "234123412345" }, "AADHAAR_INVALID"],
+      [{ mobile: "12345" }, "MOBILE_INVALID"],
+      [{ weeklyHolidays: [1, 1] }, "WEEKLY_HOLIDAYS_INVALID"],
+      [{ joiningDate: "2026-13-01" }, "JOINING_DATE_INVALID"],
+      [{ projectIds: [newId()] }, "PROJECT_NOT_FOUND"],
+      [{ labourCategoryId: welder }, "LABOUR_CATEGORY_NOT_FOUND"],
+    ];
+    for (const [extra, code] of cases) {
+      const response = await create(company.cookie, labourBody(tower, extra));
+      expect([StatusCodes.BAD_REQUEST, StatusCodes.NOT_FOUND]).toContain(
+        response.status,
+      );
+      expect(await codeOf(response)).toBe(code);
+    }
+
+    await created(company.cookie, labourBody(tower, { employeeCode: "M-7" }));
+    const clash = await create(
+      company.cookie,
+      labourBody(tower, { employeeCode: "m-7" }),
+    );
+    expect(clash.status).toBe(StatusCodes.CONFLICT);
+    expect(await codeOf(clash)).toBe("EMPLOYEE_CODE_TAKEN");
+  });
+
+  it("nulls amounts for a Team Member without Financial and refuses one without the menu", async () => {
+    const company = await ownerWithCompany();
+    const { tower } = await fixtures(company);
+    const labour = await created(
+      company.cookie,
+      labourBody(tower, { openingBalance: 30_000 }),
+    );
+    const clerk = await memberOn(company, {
+      "masters.labours": ["read", "update"],
+    });
+    const seen = await get(clerk.cookie, labour.id);
+    expect(seen).toMatchObject({
+      wagePerDay: null,
+      wagePerMonth: null,
+      overtimeWagePerHour: null,
+      openingBalance: null,
+      balance: null,
+    });
+    // Omitted amounts are kept.
+    const renamed = await update(clerk.cookie, seen, { name: "Dhuresh P." });
+    expect(renamed.status).toBe(StatusCodes.OK);
+    const owner = await get(company.cookie, labour.id);
+    expect(owner).toMatchObject({
+      name: "Dhuresh P.",
+      wagePerDay: 70_000,
+      openingBalance: 30_000,
+    });
+
+    const outsider = await memberOn(company, { "masters.vendors": ["read"] });
+    expect((await listLabours(jsonRequest(BASE, outsider.cookie))).status).toBe(
+      StatusCodes.FORBIDDEN,
+    );
+    expect((await create(outsider.cookie, labourBody(tower))).status).toBe(
+      StatusCodes.FORBIDDEN,
+    );
+  });
+
+  it("needs a live Role of the Company and reads the Department from it (ADR CM-0055 §2)", async () => {
+    const company = await ownerWithCompany();
+    const other = await ownerWithCompany("Sakthi Constructions");
+    const { tower, labourRole } = await fixtures(company);
+    const engineerRole = await seededRoleId(
+      company.workspaceId,
+      "Site Engineer",
+    );
+    const foreignRole = await seededRoleId(other.workspaceId);
+    const refused = await create(
+      company.cookie,
+      labourBody(tower, { roleId: foreignRole }),
+    );
+    expect(refused.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await json(refused)).toMatchObject({
+      code: "EMPLOYEE_ROLE_NOT_FOUND",
+      details: { field: "roleId" },
+    });
+
+    const labour = await created(
+      company.cookie,
+      labourBody(tower, { name: "Anbu" }),
+    );
+    const engineer = await created(
+      company.cookie,
+      labourBody(tower, { name: "Meena", roleId: engineerRole }),
+    );
+    expect(engineer.role).toEqual({ id: engineerRole, name: "Site Engineer" });
+    const department = engineer.department?.id ?? "";
+    expect(engineer.department?.name).toBe("Human Resources");
+
+    // A Role moved to another Department moves its Employees with it.
+    const site = newId();
+    await prisma.constructionOrganizationDepartment.create({
+      data: {
+        id: site,
+        workspaceId: company.workspaceId,
+        name: "Site",
+        createdBy: "test",
+        updatedBy: "test",
+      },
+    });
+    await prisma.constructionOrganizationRole.update({
+      where: { id: engineerRole },
+      data: { departmentId: site },
+    });
+    expect((await get(company.cookie, engineer.id)).department).toEqual({
+      id: site,
+      name: "Site",
+    });
+
+    const ids = async (query: string) =>
+      (
+        await json<{ items: Employee[] }>(
+          await listLabours(jsonRequest(`${BASE}?${query}`, company.cookie)),
+        )
+      ).items.map((item) => item.id);
+    expect(await ids(`roleId=${labourRole}`)).toEqual([labour.id]);
+    expect(await ids(`departmentId=${site}`)).toEqual([engineer.id]);
+    expect(await ids(`departmentId=${department}`)).toEqual([labour.id]);
+
+    // A new Role on Edit.
+    const moved = await update(company.cookie, labour, {
+      roleId: engineerRole,
+    });
+    expect(moved.status).toBe(StatusCodes.OK);
+    expect((await json<Employee>(moved)).role.id).toBe(engineerRole);
+  });
+
+  it("signs in with the mobile and a password when Can sign in is on (ADR CM-0055 §4)", async () => {
+    const company = await ownerWithCompany();
+    const { tower, villa } = await fixtures(company);
+    const engineerRole = await seededRoleId(
+      company.workspaceId,
+      "Site Engineer",
+    );
+    const signIn = { canSignIn: true, password: "first-pass-1" };
+    const first = freshMobile();
+    const second = freshMobile();
+
+    const noMobile = await create(
+      company.cookie,
+      labourBody(tower, { signIn }),
+    );
+    expect(noMobile.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await codeOf(noMobile)).toBe("MOBILE_REQUIRED");
+    const noPassword = await create(
+      company.cookie,
+      labourBody(tower, {
+        mobile: first.typed,
+        signIn: { canSignIn: true },
+      }),
+    );
+    expect(await codeOf(noPassword)).toBe("PASSWORD_REQUIRED");
+    // Nothing was written by the refusals.
+    expect(
+      await prisma.constructionOrganizationTeamMember.count({
+        where: { workspaceId: company.workspaceId, employee: true },
+      }),
+    ).toBe(0);
+
+    const response = await create(
+      company.cookie,
+      labourBody(tower, {
+        name: "Meena Kumari",
+        mobile: first.typed,
+        email: "meena@site.test",
+        roleId: engineerRole,
+        signIn,
+      }),
+    );
+    expect(response.status).toBe(StatusCodes.CREATED);
+    const meena = await json<
+      Employee & { passwordIgnored: unknown; passwordSet: boolean }
+    >(response);
+    expect(meena).toMatchObject({
+      canSignIn: true,
+      signIn: { status: "active" },
+      passwordIgnored: null,
+      passwordSet: true,
+    });
+    const memberId = meena.signIn?.memberId ?? "";
+    const member = () =>
+      prisma.constructionOrganizationTeamMember.findUniqueOrThrow({
+        where: { id: memberId },
+        include: { projects: true },
+      });
+    expect(await member()).toMatchObject({
+      name: "Meena Kumari",
+      mobile: first.e164,
+      email: "meena@site.test",
+      roleId: engineerRole,
+      employee: true,
+      deletedAt: null,
+    });
+    expect((await member()).projects.map((row) => row.projectId)).toEqual([
+      tower,
+    ]);
+    const row = await prisma.constructionLabourEmployee.findUniqueOrThrow({
+      where: { id: meena.id },
+    });
+    expect(row.teamMemberId).toBe(memberId);
+
+    // Not on Office Staff.
+    const staff = await json<{ items: { id: string }[] }>(
+      await listStaff(
+        jsonRequest(
+          `${TEST_ORIGIN}/api/construction/organization/team-members`,
+          company.cookie,
+        ),
+      ),
+    );
+    expect(staff.items.map((item) => item.id)).not.toContain(memberId);
+
+    // Name, mobile, email, Role and Projects follow the Employee.
+    const labourRole = ROLES.get(company.cookie) ?? "";
+    const edited = await update(company.cookie, meena, {
+      name: "Meena K",
+      mobile: second.typed,
+      email: null,
+      roleId: labourRole,
+      projectIds: [tower, villa],
+    });
+    expect(edited.status).toBe(StatusCodes.OK);
+    expect(await member()).toMatchObject({
+      name: "Meena K",
+      mobile: second.e164,
+      email: null,
+      roleId: labourRole,
+    });
+    expect(
+      (await member()).projects.map((item) => item.projectId).sort(),
+    ).toEqual([tower, villa].sort());
+
+    // A transfer moves the sign-in's Projects too.
+    const mall = await seedProject(company.workspaceId, `Mall ${newId()}`);
+    const moved = await transferLabours(
+      jsonRequest(`${BASE}/transfer`, company.cookie, {
+        employeeIds: [meena.id],
+        fromProjectId: villa,
+        toProjectId: mall,
+        transferDate: "2030-01-01",
+      }),
+    );
+    expect(moved.status).toBe(StatusCodes.OK);
+    expect(
+      (await member()).projects.map((item) => item.projectId).sort(),
+    ).toEqual([tower, mall].sort());
+
+    // Set password: for one who signs in only.
+    const reset = await setPassword(
+      jsonRequest(`${BASE}/${meena.id}/password`, company.cookie, {
+        password: "second-pass-2",
+      }),
+      params(meena.id),
+    );
+    expect(reset.status).toBe(StatusCodes.OK);
+    expect(await json(reset)).toMatchObject({ passwordIgnored: null });
+    const plain = await created(company.cookie, labourBody(tower));
+    const none = await setPassword(
+      jsonRequest(`${BASE}/${plain.id}/password`, company.cookie, {
+        password: "second-pass-2",
+      }),
+      params(plain.id),
+    );
+    expect(none.status).toBe(StatusCodes.CONFLICT);
+    expect(await codeOf(none)).toBe("EMPLOYEE_NO_SIGN_IN");
+
+    // Turned off on Edit, the sign-in goes; turned on again, a new one.
+    const off = await update(
+      company.cookie,
+      await get(company.cookie, meena.id),
+      { mobile: second.typed, signIn: { canSignIn: false } },
+    );
+    expect(await json(off)).toMatchObject({ canSignIn: false, signIn: null });
+    expect((await member()).deletedAt).not.toBeNull();
+    const again = await update(
+      company.cookie,
+      await get(company.cookie, meena.id),
+      {
+        mobile: second.typed,
+        signIn: { canSignIn: true, password: "third-pass-3" },
+      },
+    );
+    const back = await json<Employee>(again);
+    expect(back.canSignIn).toBe(true);
+    expect(back.signIn?.memberId).not.toBe(memberId);
+
+    // Deleting the Employee removes it.
+    const deleted = await deleteLabour(
+      jsonRequest(`${BASE}/${meena.id}/delete`, company.cookie, {}),
+      params(meena.id),
+    );
+    expect(deleted.status).toBe(StatusCodes.NO_CONTENT);
+    expect(
+      (
+        await prisma.constructionOrganizationTeamMember.findUniqueOrThrow({
+          where: { id: back.signIn?.memberId ?? "" },
+        })
+      ).deletedAt,
+    ).not.toBeNull();
+  });
+
+  it("needs every cell of the Role to give a sign-in (403 CANNOT_GRANT)", async () => {
+    const company = await ownerWithCompany();
+    const { tower } = await fixtures(company);
+    const engineerRole = await seededRoleId(
+      company.workspaceId,
+      "Site Engineer",
+    );
+    const clerk = await memberOn(company, {
+      "masters.labours": ["read", "create"],
+    });
+    const refused = await create(
+      clerk.cookie,
+      labourBody(tower, {
+        mobile: freshMobile().typed,
+        roleId: engineerRole,
+        signIn: { canSignIn: true, password: "first-pass-1" },
+      }),
+    );
+    expect(refused.status).toBe(StatusCodes.FORBIDDEN);
+    expect(await codeOf(refused)).toBe("CANNOT_GRANT");
+    expect(
+      await prisma.constructionLabourEmployee.count({
+        where: { workspaceId: company.workspaceId },
+      }),
+    ).toBe(0);
+    // Without a sign-in the Role gives no access, so anyone may add them.
+    const plain = await create(
+      clerk.cookie,
+      labourBody(tower, { roleId: engineerRole }),
+    );
+    expect(plain.status).toBe(StatusCodes.CREATED);
+  });
+
+  it("lists with filters and pages", async () => {
+    const company = await ownerWithCompany();
+    const { tower, villa, mason } = await fixtures(company);
+    const a = await created(
+      company.cookie,
+      labourBody(tower, { name: "Anbu", labourCategoryId: mason }),
+    );
+    const b = await created(
+      company.cookie,
+      labourBody(villa, { name: "Bhim" }),
+    );
+    await created(company.cookie, labourBody(tower, { name: "Chetan" }));
+    await deactivateLabour(
+      jsonRequest(`${BASE}/${a.id}/deactivate`, company.cookie, {}),
+      params(a.id),
+    );
+
+    type Page = {
+      items: Employee[];
+      total: number;
+      nextCursor: string | null;
+      prevCursor: string | null;
+    };
+    const page = async (query: string) =>
+      json<Page>(
+        await listLabours(jsonRequest(`${BASE}?${query}`, company.cookie)),
+      );
+
+    expect((await page("")).total).toBe(3);
+    expect(
+      (await page(`projectId=${tower}`)).items.map((item) => item.name),
+    ).toEqual(["Chetan", "Anbu"]);
+    expect((await page("active=false")).items.map((item) => item.id)).toEqual([
+      a.id,
+    ]);
+    expect((await page("q=bhi")).items.map((item) => item.id)).toEqual([b.id]);
+    expect(
+      (await page(`categoryId=${mason}`)).items.map((item) => item.id),
+    ).toEqual([a.id]);
+
+    const first = await page("limit=2");
+    expect(first.items).toHaveLength(2);
+    expect(first.prevCursor).toBeNull();
+    const second = await page(`limit=2&after=${first.nextCursor ?? ""}`);
+    expect(second.items.map((item) => item.name)).toEqual(["Anbu"]);
+    expect(second.nextCursor).toBeNull();
+    const back = await page(`limit=2&before=${second.prevCursor ?? ""}`);
+    expect(back.items.map((item) => item.id)).toEqual(
+      first.items.map((item) => item.id),
+    );
+  });
+
+  it("transfers one or many Labours, with history and date rules", async () => {
+    const company = await ownerWithCompany();
+    const { tower, villa } = await fixtures(company);
+    const dhuresh = await created(company.cookie, labourBody(tower));
+    const shyam = await created(
+      company.cookie,
+      labourBody(tower, { name: "Shyam" }),
+    );
+    const transfer = (cookie: string, body: Record<string, unknown>) =>
+      transferLabours(jsonRequest(`${BASE}/transfer`, cookie, body));
+
+    const same = await transfer(company.cookie, {
+      employeeIds: [dhuresh.id],
+      toProjectId: tower,
+      transferDate: "2026-10-01",
+    });
+    expect(same.status).toBe(StatusCodes.CONFLICT);
+    expect(await codeOf(same)).toBe("TRANSFER_SAME_PROJECT");
+
+    await markAttendance(company.workspaceId, dhuresh.id, tower, "2026-10-03");
+    const early = await transfer(company.cookie, {
+      employeeIds: [dhuresh.id, shyam.id],
+      toProjectId: villa,
+      transferDate: "2026-10-03",
+    });
+    expect(early.status).toBe(StatusCodes.CONFLICT);
+    expect(await codeOf(early)).toBe("TRANSFER_BEFORE_ATTENDANCE");
+    // All or none: Shyam did not move either.
+    expect((await get(company.cookie, shyam.id)).projects).toMatchObject([
+      { id: tower },
+    ]);
+
+    const moved = await transfer(company.cookie, {
+      employeeIds: [dhuresh.id, shyam.id],
+      toProjectId: villa,
+      transferDate: "2026-10-04",
+      remark: "Slab work",
+    });
+    expect(moved.status).toBe(StatusCodes.OK);
+    const body = await json<{ items: Employee[] }>(moved);
+    expect(body.items.map((item) => item.projects.map((p) => p.id))).toEqual([
+      [villa],
+      [villa],
+    ]);
+
+    const back = await transfer(company.cookie, {
+      employeeIds: [shyam.id],
+      toProjectId: tower,
+      transferDate: "2026-10-02",
+    });
+    expect(await codeOf(back)).toBe("TRANSFER_BEFORE_LAST_TRANSFER");
+
+    const history = await json<{
+      items: {
+        fromProject: { id: string } | null;
+        toProject: { id: string; name: string };
+        transferDate: string;
+        remark: string | null;
+      }[];
+    }>(
+      await listTransfers(
+        jsonRequest(`${BASE}/${dhuresh.id}/transfers`, company.cookie),
+        params(dhuresh.id),
+      ),
+    );
+    expect(history.items).toHaveLength(2);
+    expect(history.items[1]).toMatchObject({
+      fromProject: { id: tower },
+      toProject: { id: villa },
+      transferDate: "2026-10-04",
+      remark: "Slab work",
+    });
+
+    // The Project on a date follows the history (attendance pickers).
+    type Options = { items: { id: string; wagePerDay: number | null }[] };
+    const options = async (projectId: string, date: string) =>
+      (
+        await json<Options>(
+          await labourOptions(
+            jsonRequest(
+              `${BASE}/options?projectId=${projectId}&date=${date}`,
+              company.cookie,
+            ),
+          ),
+        )
+      ).items.map((item) => item.id);
+    expect(await options(tower, "2026-10-03")).toEqual([dhuresh.id, shyam.id]);
+    expect(await options(villa, "2026-10-03")).toEqual([]);
+    expect(await options(villa, "2026-10-04")).toEqual([dhuresh.id, shyam.id]);
+    expect(await options(tower, "2026-08-01")).toEqual([]);
+  });
+
+  it("puts an Employee on none, one or many Projects, with history (ADR CM-0033)", async () => {
+    const company = await ownerWithCompany();
+    const { tower, villa, suffix } = await fixtures(company);
+    const mall = await seedProject(company.workspaceId, `Mall ${suffix}`);
+    type History = {
+      items: {
+        fromProject: { id: string } | null;
+        toProject: { id: string } | null;
+        transferDate: string;
+      }[];
+    };
+    const history = async (id: string) =>
+      json<History>(
+        await listTransfers(
+          jsonRequest(`${BASE}/${id}/transfers`, company.cookie),
+          params(id),
+        ),
+      );
+    const options = async (projectId: string, date: string) =>
+      (
+        await json<{ items: { id: string }[] }>(
+          await labourOptions(
+            jsonRequest(
+              `${BASE}/options?projectId=${projectId}&date=${date}`,
+              company.cookie,
+            ),
+          ),
+        )
+      ).items.map((item) => item.id);
+
+    // None: Projects can be ticked later.
+    const ravi = await created(
+      company.cookie,
+      labourBody(tower, { name: "Ravi", projectIds: [] }),
+    );
+    expect(ravi.projects).toEqual([]);
+    expect((await history(ravi.id)).items).toEqual([]);
+    expect(await options(tower, "2026-09-02")).not.toContain(ravi.id);
+
+    // Many: on the sheet of each, and in each Project's list.
+    const meena = await created(
+      company.cookie,
+      labourBody(tower, { name: "Meena", projectIds: [tower, villa] }),
+    );
+    expect(meena.projects.map((project) => project.id).sort()).toEqual(
+      [tower, villa].sort(),
+    );
+    expect(await options(tower, "2026-09-02")).toEqual([meena.id]);
+    expect(await options(villa, "2026-09-02")).toEqual([meena.id]);
+    const inVilla = await json<{ items: Employee[] }>(
+      await listLabours(
+        jsonRequest(`${BASE}?projectId=${villa}`, company.cookie),
+      ),
+    );
+    expect(inVilla.items.map((item) => item.id)).toEqual([meena.id]);
+
+    // Transfer names the Project they leave; the other stays.
+    const transfer = (body: Record<string, unknown>) =>
+      transferLabours(jsonRequest(`${BASE}/transfer`, company.cookie, body));
+    const unnamed = await transfer({
+      employeeIds: [meena.id],
+      toProjectId: mall,
+      transferDate: "2026-10-01",
+    });
+    expect(await codeOf(unnamed)).toBe("TRANSFER_FROM_PROJECT_REQUIRED");
+    const moved = await transfer({
+      employeeIds: [meena.id],
+      fromProjectId: villa,
+      toProjectId: mall,
+      transferDate: "2026-10-01",
+    });
+    expect(moved.status).toBe(StatusCodes.OK);
+    expect(await options(villa, "2026-09-30")).toEqual([meena.id]);
+    expect(await options(villa, "2026-10-01")).toEqual([]);
+    expect(await options(mall, "2026-10-01")).toEqual([meena.id]);
+    expect(await options(tower, "2026-10-01")).toEqual([meena.id]);
+
+    // Edit ticks and unticks, each with a history row from today.
+    const edited = await update(
+      company.cookie,
+      await get(company.cookie, meena.id),
+      { projectIds: [mall, villa] },
+    );
+    expect(edited.status).toBe(StatusCodes.OK);
+    expect(
+      (await json<Employee>(edited)).projects
+        .map((project) => project.id)
+        .sort(),
+    ).toEqual([mall, villa].sort());
+    const rows = (await history(meena.id)).items;
+    const [left, joined] = rows.slice(-2);
+    expect(left).toMatchObject({ fromProject: { id: tower }, toProject: null });
+    expect(joined).toMatchObject({
+      fromProject: null,
+      toProject: { id: villa },
+    });
+    const today = left?.transferDate ?? "";
+    expect(joined?.transferDate).toBe(today);
+    expect(await options(tower, today)).toEqual([]);
+    expect(await options(villa, today)).toEqual([meena.id]);
+    // Before today the history still puts them on Tower A.
+    expect(await options(tower, "2026-10-02")).toEqual([meena.id]);
+
+    // Leaving them out on Edit keeps them; a deleted Project cannot be ticked.
+    const kept = await update(
+      company.cookie,
+      await get(company.cookie, meena.id),
+      { name: "Meena S" },
+    );
+    expect((await json<Employee>(kept)).projects).toHaveLength(2);
+    const missing = await update(
+      company.cookie,
+      await get(company.cookie, meena.id),
+      { projectIds: [newId()] },
+    );
+    expect(await codeOf(missing)).toBe("PROJECT_NOT_FOUND");
+  });
+
+  it("needs Employees transfer on the destination and every source Project", async () => {
+    const company = await ownerWithCompany();
+    const { tower, villa } = await fixtures(company);
+    const labour = await created(company.cookie, labourBody(tower));
+    const onlyVilla = await memberOn(
+      company,
+      { "labour.labour": ["read", "transfer"] },
+      [villa],
+    );
+    const refused = await transferLabours(
+      jsonRequest(`${BASE}/transfer`, onlyVilla.cookie, {
+        employeeIds: [labour.id],
+        toProjectId: villa,
+        transferDate: "2026-10-01",
+      }),
+    );
+    expect(refused.status).toBe(StatusCodes.FORBIDDEN);
+
+    const both = await memberOn(
+      company,
+      { "labour.labour": ["read", "transfer"], "labour.attendance": ["read"] },
+      [villa, tower],
+    );
+    const allowed = await transferLabours(
+      jsonRequest(`${BASE}/transfer`, both.cookie, {
+        employeeIds: [labour.id],
+        toProjectId: villa,
+        transferDate: "2026-10-01",
+      }),
+    );
+    expect(allowed.status).toBe(StatusCodes.OK);
+
+    // Options: attendance read on that Project; no Financial → no rates.
+    const options = await labourOptions(
+      jsonRequest(
+        `${BASE}/options?projectId=${villa}&date=2026-10-02`,
+        both.cookie,
+      ),
+    );
+    expect(options.status).toBe(StatusCodes.OK);
+    expect(
+      (await json<{ items: { wagePerDay: number | null }[] }>(options)).items,
+    ).toEqual([expect.objectContaining({ wagePerDay: null })]);
+    expect(
+      (
+        await labourOptions(
+          jsonRequest(`${BASE}/options?projectId=${villa}`, onlyVilla.cookie),
+        )
+      ).status,
+    ).toBe(StatusCodes.FORBIDDEN);
+  });
+
+  it("deactivates, activates and deletes only without records", async () => {
+    const company = await ownerWithCompany();
+    const { tower } = await fixtures(company);
+    const kept = await created(
+      company.cookie,
+      labourBody(tower, { openingBalance: 10_000 }),
+    );
+    const inactive = await json<Employee>(
+      await deactivateLabour(
+        jsonRequest(`${BASE}/${kept.id}/deactivate`, company.cookie, {}),
+        params(kept.id),
+      ),
+    );
+    expect(inactive.isActive).toBe(false);
+    const active = await json<Employee>(
+      await activateLabour(
+        jsonRequest(`${BASE}/${kept.id}/activate`, company.cookie, {}),
+        params(kept.id),
+      ),
+    );
+    expect(active.isActive).toBe(true);
+
+    await markAttendance(company.workspaceId, kept.id, tower, "2026-09-10");
+    const blocked = await deleteLabour(
+      jsonRequest(`${BASE}/${kept.id}/delete`, company.cookie, {}),
+      params(kept.id),
+    );
+    expect(blocked.status).toBe(StatusCodes.CONFLICT);
+    expect(await codeOf(blocked)).toBe("EMPLOYEE_HAS_RECORDS");
+
+    const fresh = await created(
+      company.cookie,
+      labourBody(tower, {
+        name: "Temp",
+        openingBalance: 5_000,
+        employeeCode: "T-1",
+      }),
+    );
+    const deleted = await deleteLabour(
+      jsonRequest(`${BASE}/${fresh.id}/delete`, company.cookie, {}),
+      params(fresh.id),
+    );
+    expect(deleted.status).toBe(StatusCodes.NO_CONTENT);
+    const gone = await getLabour(
+      jsonRequest(`${BASE}/${fresh.id}`, company.cookie),
+      params(fresh.id),
+    );
+    expect(gone.status).toBe(StatusCodes.NOT_FOUND);
+    const entries = await openingEntries(fresh.id);
+    expect(entries.reduce((sum, entry) => sum + entry.amount, 0)).toBe(0);
+    // The Employee Id is free again.
+    await created(company.cookie, labourBody(tower, { employeeCode: "T-1" }));
+  });
+
+  it("keeps Reports To: another active Employee, never themselves or a loop, cleared when they go (ADR CM-0035)", async () => {
+    const company = await ownerWithCompany();
+    const other = await ownerWithCompany("Sakthi Constructions");
+    const { tower } = await fixtures(company);
+    const theirs = await fixtures(other);
+    const mason = await created(
+      company.cookie,
+      labourBody(tower, { name: "Mason" }),
+    );
+    const helper = await created(
+      company.cookie,
+      labourBody(tower, { name: "Helper", reportsToId: mason.id }),
+    );
+    expect(helper.reportsTo).toEqual({ id: mason.id, name: "Mason" });
+    expect((await get(company.cookie, helper.id)).reportsTo?.name).toBe(
+      "Mason",
+    );
+    const listed = await json<{ items: Employee[] }>(
+      await listLabours(jsonRequest(`${BASE}?q=Helper`, company.cookie)),
+    );
+    expect(listed.items[0]?.reportsTo?.id).toBe(mason.id);
+
+    // Left out on update keeps it.
+    const kept = await json<Employee>(
+      await update(company.cookie, helper, { name: "Helper One" }),
+    );
+    expect(kept.reportsTo?.id).toBe(mason.id);
+    // An explicit null clears it.
+    const cleared = await json<Employee>(
+      await update(company.cookie, kept, { reportsToId: null }),
+    );
+    expect(cleared.reportsTo).toBeNull();
+    expect((await get(company.cookie, helper.id)).reportsTo).toBeNull();
+    const restored = await update(company.cookie, cleared, {
+      reportsToId: mason.id,
+    });
+    expect(restored.status).toBe(StatusCodes.OK);
+
+    expect(
+      await codeOf(
+        await update(company.cookie, mason, {
+          reportsToId: mason.id,
+        }),
+      ),
+    ).toBe("REPORTS_TO_SELF");
+    const loop = await update(company.cookie, mason, {
+      reportsToId: helper.id,
+    });
+    expect(loop.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(
+      await json<{ code: string; details?: { field?: string } }>(loop),
+    ).toMatchObject({
+      code: "REPORTS_TO_LOOP",
+      details: { field: "reportsToId" },
+    });
+    const foreign = await created(other.cookie, labourBody(theirs.tower));
+    expect(
+      await codeOf(
+        await create(
+          company.cookie,
+          labourBody(tower, { reportsToId: foreign.id }),
+        ),
+      ),
+    ).toBe("REPORTS_TO_NOT_FOUND");
+
+    // Deleting the Mason clears it on the Helper, and the audit names them.
+    const deleted = await deleteLabour(
+      jsonRequest(`${BASE}/${mason.id}/delete`, company.cookie, {}),
+      params(mason.id),
+    );
+    expect(deleted.status).toBe(StatusCodes.NO_CONTENT);
+    expect((await get(company.cookie, helper.id)).reportsTo).toBeNull();
+    const audit = await prisma.constructionOrganizationAuditEvent.findFirst({
+      where: { entityId: mason.id, action: "employee.deleted" },
+    });
+    expect(audit?.after).toEqual({ reportsCleared: [helper.id] });
+  });
+
+  it("refuses the second of two saves at once that would make a Reports To loop (ADR CM-0035)", async () => {
+    const company = await ownerWithCompany();
+    const { tower } = await fixtures(company);
+    const [first, second] = await Promise.all([
+      created(company.cookie, labourBody(tower, { name: "First" })),
+      created(company.cookie, labourBody(tower, { name: "Second" })),
+    ]);
+    // Both pass the check before the write; the lock lets only one through.
+    const results = await Promise.all([
+      update(company.cookie, first, { reportsToId: second.id }),
+      update(company.cookie, second, { reportsToId: first.id }),
+    ]);
+    const statuses = results.map((response) => response.status).sort();
+    expect(statuses).toEqual([StatusCodes.OK, StatusCodes.BAD_REQUEST]);
+    const refused = results.find((response) => !response.ok);
+    expect(refused == null ? null : await codeOf(refused)).toBe(
+      "REPORTS_TO_LOOP",
+    );
+    const [one, two] = await Promise.all([
+      get(company.cookie, first.id),
+      get(company.cookie, second.id),
+    ]);
+    expect([one.reportsTo, two.reportsTo].filter(Boolean)).toHaveLength(1);
+  });
+
+  it("keeps Companies apart", async () => {
+    const first = await ownerWithCompany();
+    const second = await ownerWithCompany("Sakthi Constructions");
+    const { tower } = await fixtures(first);
+    const theirs = await fixtures(second);
+    const labour = await created(first.cookie, labourBody(tower));
+    const peek = await getLabour(
+      jsonRequest(`${BASE}/${labour.id}`, second.cookie),
+      params(labour.id),
+    );
+    expect(peek.status).toBe(StatusCodes.NOT_FOUND);
+    const list = await json<{ total: number }>(
+      await listLabours(jsonRequest(BASE, second.cookie)),
+    );
+    expect(list.total).toBe(0);
+    // Another Company's Project is not found.
+    const foreign = await create(second.cookie, labourBody(tower));
+    expect(await codeOf(foreign)).toBe("PROJECT_NOT_FOUND");
+    const move = await transferLabours(
+      jsonRequest(`${BASE}/transfer`, second.cookie, {
+        employeeIds: [labour.id],
+        toProjectId: theirs.tower,
+        transferDate: "2026-10-01",
+      }),
+    );
+    expect(move.status).toBe(StatusCodes.NOT_FOUND);
+  });
+
+  it("imports from the sample sheet: preview with errors, then all or nothing", async () => {
+    const company = await ownerWithCompany();
+    const { tower, villa, mason, suffix } = await fixtures(company);
+    await created(company.cookie, labourBody(tower, { employeeCode: "DB-1" }));
+
+    const templateResponse = await importTemplate(
+      jsonRequest(`${BASE}/import-template`, company.cookie),
+    );
+    expect(templateResponse.status).toBe(StatusCodes.OK);
+    expect(templateResponse.headers.get("content-type")).toBe(XLSX);
+    const template = await workbookOf(templateResponse);
+    const sheet = template.getWorksheet("Employees");
+    const lists = template.getWorksheet("Lists");
+    expect(sheet?.getRow(1).getCell(1).value).toBe("Employee Name*");
+    expect(sheet?.getRow(2).getCell(4).value).toBe("Labour");
+    expect(sheet?.getRow(2).getCell(1).value).toBe("Dhuresh Nawin");
+    const listed: unknown[] = [];
+    lists?.getColumn(1).eachCell((cell) => listed.push(cell.value));
+    expect(listed).toContain(`Tower A ${suffix}`);
+    // Departments and Roles to pick from; no Site Engineer list.
+    const listTitles: unknown[] = [];
+    lists?.getRow(1).eachCell((cell) => listTitles.push(cell.value));
+    expect(listTitles).toEqual(
+      expect.arrayContaining(["Departments", "Roles"]),
+    );
+    expect(listTitles).not.toContain("Site Engineers");
+
+    if (sheet == null) throw new Error("No Employees sheet");
+    const headers: string[] = [];
+    sheet.getRow(1).eachCell((cell) => headers.push(cell.text));
+    const column = (header: string) => headers.indexOf(header) + 1;
+    const fill = (
+      row: number,
+      values: Record<string, string | number | Date>,
+    ) => {
+      sheet.getRow(row).values = [];
+      for (const [header, value] of Object.entries(values))
+        sheet.getRow(row).getCell(column(header)).value = value;
+    };
+    const good = {
+      "Employee Name*": "Ganesh",
+      "Joining Date*": new Date("2026-09-01T00:00:00Z"),
+      "Wage Type*": "Daily",
+      "Wage per Day (₹)": 650,
+      "Overtime Wage per Hour (₹)*": 80.5,
+      "Weekly Holidays": "Sun, Sat",
+      "Opening Balance (₹)": -1500,
+      // Many Projects, separated by ";" (ADR CM-0033).
+      Projects: `tower a ${suffix}; Villa ${suffix}`,
+      "Labour Category": `Mason ${suffix}`,
+      "Employee Id": "IMP-1",
+      "Working Hours per Day": 9,
+    };
+    fill(2, good);
+    fill(3, {
+      "Employee Name*": "",
+      "Joining Date*": "31/02/2026",
+      "Wage Type*": "Daily",
+      "Overtime Wage per Hour (₹)*": 50,
+      Projects: "Nowhere",
+      "Employee Id": "DB-1",
+    });
+    fill(4, {
+      ...good,
+      "Employee Name*": "Manikandan",
+      "Employee Id": "imp-1",
+    });
+    const bytes = await xlsxBytes(template);
+
+    const preview = await importLabours(
+      upload(`${BASE}/import?dryRun=true`, company.cookie, bytes, XLSX),
+    );
+    expect(preview.status).toBe(StatusCodes.OK);
+    type Preview = {
+      rows: {
+        row: number;
+        ok: boolean;
+        errors: { field: string; code: string }[];
+        values: { wagePerDay: number | null };
+      }[];
+      valid: number;
+      invalid: number;
+      imported: number;
+    };
+    const body = await json<Preview>(preview);
+    expect(body).toMatchObject({ valid: 0, invalid: 3, imported: 0 });
+    const codes = body.rows.map((row) =>
+      row.errors.map((error) => error.code).sort(),
+    );
+    expect(codes[0]).toEqual(["EMPLOYEE_CODE_DUPLICATE"]);
+    expect(codes[1]).toEqual(
+      expect.arrayContaining([
+        "EMPLOYEE_NAME_REQUIRED",
+        "JOINING_DATE_INVALID",
+        "WAGE_REQUIRED",
+        "PROJECT_NOT_FOUND",
+        "EMPLOYEE_CODE_TAKEN",
+      ]),
+    );
+    expect(body.rows[0]?.values.wagePerDay).toBe(65_000);
+
+    const refused = await importLabours(
+      upload(`${BASE}/import?dryRun=false`, company.cookie, bytes, XLSX),
+    );
+    expect(refused.status).toBe(StatusCodes.BAD_REQUEST);
+    expect(await codeOf(refused)).toBe("IMPORT_HAS_ERRORS");
+    expect(
+      await prisma.constructionLabourEmployee.count({
+        where: { workspaceId: company.workspaceId },
+      }),
+    ).toBe(1);
+
+    sheet.spliceRows(3, 2);
+    // Blank working hours are 8.
+    const { "Working Hours per Day": _hours, ...noHours } = good;
+    fill(3, {
+      ...noHours,
+      "Employee Name*": "Manikandan",
+      "Employee Id": "IMP-2",
+      Department: "Human Resources",
+      Role: "Site Engineer",
+    });
+    const fixed = await xlsxBytes(template);
+    const imported = await importLabours(
+      upload(`${BASE}/import?dryRun=false`, company.cookie, fixed, XLSX),
+    );
+    expect(imported.status).toBe(StatusCodes.CREATED);
+    expect(await json<Preview>(imported)).toMatchObject({
+      valid: 2,
+      imported: 2,
+    });
+    const list = await json<{ items: Employee[] }>(
+      await listLabours(jsonRequest(`${BASE}?q=IMP`, company.cookie)),
+    );
+    expect(list.items).toHaveLength(2);
+    expect(
+      list.items.map((item) => [item.name, item.workingHoursPerDay]).sort(),
+    ).toEqual([
+      ["Ganesh", "9"],
+      ["Manikandan", "8"],
+    ]);
+    expect(list.items[0]).toMatchObject({
+      wagePerDay: 65_000,
+      overtimeWagePerHour: 8_050,
+      weeklyHolidays: [0, 6],
+      openingBalance: -150_000,
+      labourCategory: { id: mason },
+    });
+    expect(list.items[0]?.projects.map((project) => project.id).sort()).toEqual(
+      [tower, villa].sort(),
+    );
+    // A blank Role is Labour; a named one under its Department.
+    expect(
+      list.items.map((item) => [item.name, item.role.name]).sort(),
+    ).toEqual([
+      ["Ganesh", "Labour"],
+      ["Manikandan", "Site Engineer"],
+    ]);
+
+    // A sheet from the Labour template (before ADR CM-0055) still imports.
+    const old = new ExcelJS.Workbook();
+    const oldSheet = old.addWorksheet("Labours");
+    oldSheet.addRow([
+      "Labour Name*",
+      "Labour Id",
+      "Contact Number",
+      "Joining Date*",
+      "Wage Type*",
+      "Wage per Day (₹)",
+      "Overtime Wage per Hour (₹)*",
+    ]);
+    oldSheet.addRow([
+      "Old Ravi",
+      "OLD-1",
+      "7708165767",
+      "2026-09-01",
+      "Daily",
+      600,
+      50,
+    ]);
+    const oldImport = await importLabours(
+      upload(
+        `${BASE}/import?dryRun=false`,
+        company.cookie,
+        await xlsxBytes(old),
+        XLSX,
+      ),
+    );
+    expect(oldImport.status).toBe(StatusCodes.CREATED);
+    const ravi = (
+      await json<{ items: Employee[] }>(
+        await listLabours(jsonRequest(`${BASE}?q=OLD-1`, company.cookie)),
+      )
+    ).items[0];
+    expect(ravi).toMatchObject({
+      employeeCode: "OLD-1",
+      mobile: "+917708165767",
+      role: { name: "Labour" },
+    });
+
+    const garbage = await importLabours(
+      upload(`${BASE}/import`, company.cookie, pngBytes(), XLSX),
+    );
+    expect(await codeOf(garbage)).toBe("IMPORT_FILE_INVALID");
+  });
+
+  it("exports the filtered register; amounts only with Financial", async () => {
+    const company = await ownerWithCompany();
+    const { tower, villa } = await fixtures(company);
+    await created(
+      company.cookie,
+      labourBody(tower, { name: "Tower man", aadhaar: VALID_AADHAAR }),
+    );
+    await created(company.cookie, labourBody(villa, { name: "Villa man" }));
+
+    const response = await exportLabours(
+      jsonRequest(`${BASE}/export?projectId=${tower}`, company.cookie),
+    );
+    expect(response.status).toBe(StatusCodes.OK);
+    const sheet = (await workbookOf(response)).getWorksheet("Employees");
+    expect(sheet?.rowCount).toBe(2);
+    const headers: string[] = [];
+    sheet?.getRow(1).eachCell((cell) => headers.push(cell.text));
+    const cell = (header: string) =>
+      sheet?.getRow(2).getCell(headers.indexOf(header) + 1).value;
+    expect(cell("Employee Name")).toBe("Tower man");
+    expect(cell("Wage per Day (₹)")).toBe(700);
+    expect(cell("Aadhaar Number")).toBe("XXXXXXXX2346");
+    expect(cell("Working Hours per Day")).toBe(8);
+    expect(cell("Department")).toBe("Human Resources");
+    expect(cell("Role")).toBe("Labour");
+    expect(headers).not.toContain("Site Engineers");
+
+    const clerk = await memberOn(company, { "masters.labours": ["read"] });
+    const hidden = (
+      await workbookOf(
+        await exportLabours(jsonRequest(`${BASE}/export`, clerk.cookie)),
+      )
+    ).getWorksheet("Employees");
+    expect(hidden?.rowCount).toBe(3);
+    expect(
+      hidden?.getRow(2).getCell(headers.indexOf("Wage per Day (₹)") + 1).value,
+    ).toBeNull();
+    // Working hours are not an amount.
+    expect(
+      hidden?.getRow(2).getCell(headers.indexOf("Working Hours per Day") + 1)
+        .value,
+    ).toBe(8);
+  });
+
+  it("keeps a photo and documents", async () => {
+    const company = await ownerWithCompany();
+    const { tower } = await fixtures(company);
+    const labour = await created(company.cookie, labourBody(tower));
+    const url = `${BASE}/${labour.id}`;
+
+    const wrong = await setPhoto(
+      upload(`${url}/photo`, company.cookie, gifBytes(), "image/gif"),
+      params(labour.id),
+    );
+    expect(await codeOf(wrong)).toBe("FILE_TYPE_NOT_ALLOWED");
+    const photo = await setPhoto(
+      upload(`${url}/photo`, company.cookie, pngBytes(), "image/png"),
+      params(labour.id),
+    );
+    expect(photo.status).toBe(StatusCodes.OK);
+    const { photoUrl } = await json<{ photoUrl: string }>(photo);
+    expect(photoUrl).toMatch(
+      new RegExp(`^/api/construction/labour/employees/${labour.id}/photo\\?v=`),
+    );
+    expect((await get(company.cookie, labour.id)).photoUrl).toBe(photoUrl);
+    const streamed = await getPhoto(
+      jsonRequest(`${url}/photo`, company.cookie),
+      params(labour.id),
+    );
+    expect(streamed.headers.get("content-type")).toBe("image/png");
+    expect(await bytesOf(streamed)).toEqual(pngBytes());
+    expect(
+      await prisma.constructionOrganizationStoredFile.count({
+        where: {
+          workspaceId: company.workspaceId,
+          kind: "employee_photo",
+          deletedAt: null,
+        },
+      }),
+    ).toBe(1);
+    await removePhoto(
+      jsonRequest(`${url}/photo/remove`, company.cookie, {}),
+      params(labour.id),
+    );
+    expect((await get(company.cookie, labour.id)).photoUrl).toBeNull();
+
+    const pdf = Uint8Array.from(
+      new TextEncoder().encode("%PDF-1.7\nhello\n%%EOF"),
+    );
+    const added = await addDocument(
+      upload(
+        `${url}/documents?fileName=${encodeURIComponent("Aadhaar card.pdf")}`,
+        company.cookie,
+        pdf,
+        "application/pdf",
+      ),
+      params(labour.id),
+    );
+    expect(added.status).toBe(StatusCodes.CREATED);
+    const document = await json<{
+      id: string;
+      fileName: string;
+      url: string;
+      bytes: number;
+    }>(added);
+    expect(document).toMatchObject({
+      fileName: "Aadhaar card.pdf",
+      bytes: pdf.byteLength,
+    });
+    const listed = await json<{ items: { id: string }[] }>(
+      await listDocuments(
+        jsonRequest(`${url}/documents`, company.cookie),
+        params(labour.id),
+      ),
+    );
+    expect(listed.items.map((item) => item.id)).toEqual([document.id]);
+    const file = await getDocument(
+      jsonRequest(`${TEST_ORIGIN}${document.url}`, company.cookie),
+      docParams(labour.id, document.id),
+    );
+    expect(file.headers.get("content-type")).toBe("application/pdf");
+    expect(file.headers.get("content-disposition")).toContain("attachment");
+    expect(await bytesOf(file)).toEqual(pdf);
+
+    const reader = await memberOn(company, { "masters.labours": ["read"] });
+    expect(
+      (
+        await deleteDocument(
+          jsonRequest(
+            `${url}/documents/${document.id}/delete`,
+            reader.cookie,
+            {},
+          ),
+          docParams(labour.id, document.id),
+        )
+      ).status,
+    ).toBe(StatusCodes.FORBIDDEN);
+    const removed = await deleteDocument(
+      jsonRequest(`${url}/documents/${document.id}/delete`, company.cookie, {}),
+      docParams(labour.id, document.id),
+    );
+    expect(removed.status).toBe(StatusCodes.NO_CONTENT);
+    expect(
+      (
+        await getDocument(
+          jsonRequest(`${TEST_ORIGIN}${document.url}`, company.cookie),
+          docParams(labour.id, document.id),
+        )
+      ).status,
+    ).toBe(StatusCodes.NOT_FOUND);
+
+    const other = await ownerWithCompany("Sakthi Constructions");
+    expect(
+      (
+        await listDocuments(
+          jsonRequest(`${url}/documents`, other.cookie),
+          params(labour.id),
+        )
+      ).status,
+    ).toBe(StatusCodes.NOT_FOUND);
+  });
+
+  it("is listed in OpenAPI", async () => {
+    const document = await json<{
+      paths: Record<string, Record<string, unknown>>;
+    }>(getOpenApi());
+    const paths = [
+      ["/api/construction/labour/employees", "get"],
+      ["/api/construction/labour/employees", "post"],
+      ["/api/construction/labour/employees/options", "get"],
+      ["/api/construction/labour/employees/transfer", "post"],
+      ["/api/construction/labour/employees/import-template", "get"],
+      ["/api/construction/labour/employees/import", "post"],
+      ["/api/construction/labour/employees/export", "get"],
+      ["/api/construction/labour/employees/{id}", "get"],
+      ["/api/construction/labour/employees/{id}/update", "post"],
+      ["/api/construction/labour/employees/{id}/activate", "post"],
+      ["/api/construction/labour/employees/{id}/deactivate", "post"],
+      ["/api/construction/labour/employees/{id}/delete", "post"],
+      ["/api/construction/labour/employees/{id}/transfers", "get"],
+      ["/api/construction/labour/employees/{id}/photo", "get"],
+      ["/api/construction/labour/employees/{id}/photo", "post"],
+      ["/api/construction/labour/employees/{id}/photo/remove", "post"],
+      ["/api/construction/labour/employees/{id}/documents", "get"],
+      ["/api/construction/labour/employees/{id}/documents", "post"],
+      ["/api/construction/labour/employees/{id}/documents/{docId}", "get"],
+      [
+        "/api/construction/labour/employees/{id}/documents/{docId}/delete",
+        "post",
+      ],
+      ["/api/construction/labour/employees/{id}/password", "post"],
+      ["/api/construction/labour/employees/{id}/attendance", "get"],
+      ["/api/construction/labour/employees/{id}/activity", "get"],
+    ] as const;
+    for (const [path, method] of paths)
+      expect(document.paths[path]?.[method], `${method} ${path}`).toBeDefined();
+    // Labours and Site Engineers are Employees now (ADR CM-0055 §6).
+    for (const gone of [
+      "/api/construction/labour/labours",
+      "/api/construction/masters/site-engineers",
+      "/api/construction/masters/supervisors",
+    ])
+      expect(document.paths[gone]).toBeUndefined();
+  });
+});

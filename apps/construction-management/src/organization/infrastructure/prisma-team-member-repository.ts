@@ -79,7 +79,7 @@ export class PrismaTeamMemberRepository implements TeamMemberRepository {
         weeklyHolidays: row.weeklyHolidays,
       }),
       memberType: row.memberType,
-      siteEngineer: row.siteEngineer,
+      employee: row.employee,
       isOwner: row.isOwner,
       status: row.status,
       projectIds: row.projects.map((project) => project.projectId).sort(),
@@ -120,7 +120,7 @@ export class PrismaTeamMemberRepository implements TeamMemberRepository {
       workingHoursPerDay: member.salary.workingHoursPerDay,
       weeklyHolidays: [...member.salary.weeklyHolidays],
       memberType: member.memberType,
-      siteEngineer: member.siteEngineer,
+      employee: member.employee,
       isOwner: member.isOwner,
       status: member.status,
       inviteToken: member.inviteToken,
@@ -271,8 +271,7 @@ export class PrismaTeamMemberRepository implements TeamMemberRepository {
     if (params.status != null) filters.push({ status: params.status });
     if (params.memberType != null)
       filters.push({ memberType: params.memberType });
-    if (params.includeSiteEngineers !== true)
-      filters.push({ siteEngineer: false });
+    if (params.includeEmployees !== true) filters.push({ employee: false });
     if (search.length > 0)
       filters.push({
         OR: [

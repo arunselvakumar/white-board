@@ -5,11 +5,6 @@ import {
 } from "@tanstack/react-query";
 
 import type { LookupResponseModel } from "@/app/api/construction/masters/_lib/master-models";
-import type {
-  ConstructionMastersSupervisorResponseModel,
-  ListConstructionMastersSupervisorsResponseModel,
-} from "@/app/api/construction/masters/supervisors/supervisor-models";
-
 import type { LabourSkill } from "@/src/masters/domain/master-kind";
 
 import { apiJson } from "./http";
@@ -21,8 +16,6 @@ export type LookupList = "labour-categories";
 
 /** A lookup row; Labour Categories carry their `skill` (CM-601). */
 export type LookupItem = LookupResponseModel;
-
-export type SupervisorItem = ConstructionMastersSupervisorResponseModel;
 
 /** Every masters query key starts here, so one invalidation covers a list. */
 const MASTERS_KEY = ["masters"] as const;
@@ -90,13 +83,3 @@ export function useLookupCommand(list: LookupList) {
       queryClient.invalidateQueries({ queryKey: [...MASTERS_KEY, list] }),
   });
 }
-
-const SUPERVISORS = "supervisors";
-
-export const supervisorsQuery = queryOptions({
-  queryKey: [...MASTERS_KEY, SUPERVISORS, "list"],
-  queryFn: () =>
-    apiJson<ListConstructionMastersSupervisorsResponseModel>(
-      `${BASE}/${SUPERVISORS}`,
-    ),
-});

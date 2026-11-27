@@ -11,8 +11,8 @@ import {
 import { checkDocument } from "@/src/shared-kernel/files/document-file";
 import { newId } from "@/src/shared-kernel/ids";
 
-/** Whose photo and "Other Documents" these are: a labourer or a vendor. */
-export type PartyOwnerType = "labour" | "vendor";
+/** Whose photo and "Other Documents" these are: an Employee or a vendor. */
+export type PartyOwnerType = "employee" | "vendor";
 
 export type PartyRef = {
   workspaceId: string;
@@ -75,18 +75,18 @@ export type PartyFilesStore = {
 };
 
 const FOLDERS: Record<PartyOwnerType, { photo: string; document: string }> = {
-  labour: { photo: "labour-photos", document: "labour-documents" },
+  employee: { photo: "employee-photos", document: "employee-documents" },
   vendor: { photo: "vendor-photos", document: "vendor-documents" },
 };
 
 const NOUNS: Record<PartyOwnerType, string> = {
-  labour: "Labour",
+  employee: "Employee",
   vendor: "vendor",
 };
 
 function ownerNotFound(ownerType: PartyOwnerType): DomainError {
   return notFound(
-    ownerType === "labour" ? "LABOUR_NOT_FOUND" : "VENDOR_NOT_FOUND",
+    ownerType === "employee" ? "EMPLOYEE_NOT_FOUND" : "VENDOR_NOT_FOUND",
     `This ${NOUNS[ownerType]} was not found.`,
   );
 }
@@ -98,7 +98,7 @@ export const partyDocumentNotFound = () =>
   notFound("DOCUMENT_NOT_FOUND", "This document was not found.");
 
 /**
- * Photo and "Other Documents" of a labourer or a vendor (CM-205, CM-208):
+ * Photo and "Other Documents" of an Employee or a vendor (CM-205, CM-208):
  * checks the file by content, uploads it under the Company's prefix, and
  * records it (`stored_files`) in the same transaction as the row that
  * points at it. A failed write deletes the new object; a replaced or

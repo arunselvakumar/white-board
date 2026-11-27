@@ -164,25 +164,21 @@ import {
   vendorOpenApiOperations,
 } from "@/app/api/construction/labour/vendors/vendor-openapi";
 import {
-  labourOpenApiComponents,
-  labourOpenApiOperations,
-} from "@/app/api/construction/labour/labours/labour-openapi";
+  employeeOpenApiComponents,
+  employeeOpenApiOperations,
+} from "@/app/api/construction/labour/employees/employee-openapi";
 import {
   labourSummaryOpenApiComponents,
   labourSummaryOpenApiOperations,
 } from "@/app/api/construction/labour/summary/summary-openapi";
 import {
-  labourActivityOpenApiComponents,
-  labourActivityOpenApiOperations,
-} from "@/app/api/construction/labour/labours/[id]/activity/activity-openapi";
+  employeeActivityOpenApiComponents,
+  employeeActivityOpenApiOperations,
+} from "@/app/api/construction/labour/employees/[id]/activity/activity-openapi";
 import {
   vendorActivityOpenApiComponents,
   vendorActivityOpenApiOperations,
 } from "@/app/api/construction/labour/vendors/[id]/activity/activity-openapi";
-import {
-  siteEngineerActivityOpenApiComponents,
-  siteEngineerActivityOpenApiOperations,
-} from "@/app/api/construction/masters/site-engineers/[id]/activity/activity-openapi";
 import {
   vendorAttendanceOpenApiComponents,
   vendorAttendanceOpenApiOperations,
@@ -902,21 +898,19 @@ openApiOperations.push(...partiesOpenApiOperations);
 Object.assign(openApiComponents, vendorOpenApiComponents);
 openApiOperations.push(...vendorOpenApiOperations);
 
-// The Labour register lists its own models and routes.
-Object.assign(openApiComponents, labourOpenApiComponents);
-openApiOperations.push(...labourOpenApiOperations);
+// The Employee record lists its own models and routes (ADR CM-0055).
+Object.assign(openApiComponents, employeeOpenApiComponents);
+openApiOperations.push(...employeeOpenApiOperations);
 
-// The Labour Activity feed (ADR CM-0038).
-Object.assign(openApiComponents, labourActivityOpenApiComponents);
-openApiOperations.push(...labourActivityOpenApiOperations);
+// The Employee Activity feed (ADR CM-0038).
+Object.assign(openApiComponents, employeeActivityOpenApiComponents);
+openApiOperations.push(...employeeActivityOpenApiOperations);
 
-// A Site Engineer's and a Vendor's Activity feeds (ADR CM-0044 §7).
-Object.assign(openApiComponents, siteEngineerActivityOpenApiComponents);
-openApiOperations.push(...siteEngineerActivityOpenApiOperations);
+// A Vendor's Activity feed (ADR CM-0044 §7).
 Object.assign(openApiComponents, vendorActivityOpenApiComponents);
 openApiOperations.push(...vendorActivityOpenApiOperations);
 
-// Every person's Attendance tab (ADR CM-0051): one model, four routes.
+// Every person's Attendance tab (ADR CM-0051): one model, one route each.
 Object.assign(openApiComponents, personAttendanceOpenApiComponents);
 openApiOperations.push(...personAttendanceOpenApiOperations);
 

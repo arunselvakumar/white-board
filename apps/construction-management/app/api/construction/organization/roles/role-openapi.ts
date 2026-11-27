@@ -102,7 +102,7 @@ export const roleOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: `${ITEM}/delete`,
     summary:
-      "Delete a Role (409 ROLE_IS_DEFAULT for a default Role; 409 ROLE_IN_USE with `{ userCount }` while anyone is on it)",
+      "Delete a Role (409 ROLE_IS_DEFAULT for a default Role; 409 ROLE_IN_USE with `{ userCount, employeeCount }` while Team Members or Employees are on it)",
     tags: ORGANIZATION,
     params: ConstructionOrganizationRoleParamsModel,
     successStatus: StatusCodes.NO_CONTENT,

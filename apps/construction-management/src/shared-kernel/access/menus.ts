@@ -9,7 +9,7 @@ export const MENU_CATEGORIES = [
   { key: "materials", label: "Materials" },
   { key: "master_records", label: "Master records" },
   { key: "central_store", label: "Central store" },
-  // Staff, Roles, Labours and Vendors (ADR CM-0034, CM-0035).
+  // Staff, Roles, Employees and Vendors (ADR CM-0034, CM-0035, CM-0055).
   { key: "human_resources", label: "Human Resources" },
   { key: "hrms", label: "HRMS" },
   { key: "others", label: "Others" },
@@ -75,7 +75,8 @@ const DEFINITIONS = [
   ],
   ["reporting.project_reports", "Reports", "project_management", "RP", true],
   ["labour.attendance", "Attendance", "project_management", "CRUDPO", true],
-  ["labour.labour", "Labour", "project_management", "CRUDPTOF", true],
+  // A Project's Employees; the key stays (ADR CM-0055 §5).
+  ["labour.labour", "Employees", "project_management", "CRUDPTOF", true],
   ["labour.vendor", "Vendor", "project_management", "CRUDPOF", true],
   ["sales.bookings", "Booking Details", "project_management", "CRUDPNO", true],
   ["sales.inquiries", "Inquiry", "project_management", "CRUDPNVO", true],
@@ -187,7 +188,7 @@ const DEFINITIONS = [
     "RP",
     false,
   ],
-  // Master records. Staff, Role Management, Labours and Vendors sit in the
+  // Master records. Staff, Role Management, Employees and Vendors sit in the
   // Human Resources category, like the sidebar (ADR CM-0034); Labour
   // Categories went back to Masters with the sidebar (ADR CM-0035).
   ["masters.master_records", "Master Records", "master_records", "R", false],
@@ -232,7 +233,8 @@ const DEFINITIONS = [
     false,
   ],
   ["masters.work_types", "Work Type", "master_records", "CRUD", false],
-  ["masters.labours", "Labours", "human_resources", "CRUDF", false],
+  // The Employees record; the key stays (ADR CM-0055 §5).
+  ["masters.labours", "Employees", "human_resources", "CRUDF", false],
   [
     "masters.labour_categories",
     "Labour Categories",

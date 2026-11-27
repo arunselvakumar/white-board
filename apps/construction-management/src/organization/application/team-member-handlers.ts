@@ -67,12 +67,17 @@ function assertPassword(password: string): void {
     );
 }
 
-/** 400 `MOBILE_REQUIRED`: a Site Engineer signs in with it (ADR CM-0053). */
+/** 400 `MOBILE_REQUIRED`: an Employee signs in with it (ADR CM-0053, CM-0055). */
 export function mobileRequired(): DomainError {
   return new DomainError(
     "MOBILE_REQUIRED",
-    "A Site Engineer signs in with their mobile number: enter it.",
+    "An Employee signs in with their mobile number: enter it.",
   );
+}
+
+/** The Owner, or a member who is not an Employee's sign-in. */
+function notEmployee(member: TeamMember): boolean {
+  return member.isOwner || !member.employee;
 }
 
 /** One line of a Project's Resources (CM-406). */
@@ -249,8 +254,8 @@ export class TeamMemberHandlers {
      */
     salary?: StaffSalaryInput;
     memberType: MemberType;
-    /** A Site Engineer's sign-in (ADR CM-0037), left off Office Staff. */
-    siteEngineer?: boolean;
+    /** An Employee's sign-in (ADR CM-0055 §4), left off Office Staff. */
+    employee?: boolean;
     projectIds?: readonly string[];
     roleId?: string | null;
     invite?: boolean;
@@ -280,7 +285,7 @@ export class TeamMemberHandlers {
       details,
       salary,
       memberType: input.memberType,
-      siteEngineer: input.siteEngineer ?? false,
+      employee: input.employee ?? false,
       projectIds: input.memberType === "hrms" ? [] : (input.projectIds ?? []),
       roleId: role?.id ?? null,
       by: input.by,
@@ -316,7 +321,7 @@ export class TeamMemberHandlers {
    * member stays (or is again) a Join Request, invited when there is an
    * email.
    *
-   * A Site Engineer signs in with their mobile only (ADR CM-0053): the
+   * An Employee signs in with their mobile only (ADR CM-0053, CM-0055): the
    * account is made from the mobile, their email stays a contact, and no
    * invitation is sent.
    */
@@ -327,7 +332,7 @@ export class TeamMemberHandlers {
   ): Promise<TeamMemberWithPassword> {
     const { accounts, memberships } = this.passwordAccounts();
     const { details } = member;
-    const mobileOnly = member.siteEngineer;
+    const mobileOnly = member.employee;
     if (mobileOnly && details.mobile == null) throw mobileRequired();
     const account = await accounts.createPasswordAccount({
       name: details.name,
@@ -399,14 +404,14 @@ export class TeamMemberHandlers {
           ? member.details.pan
           : input.details.pan,
     });
-    // A Site Engineer's mobile is the one they sign in with whatever the
+    // An Employee's mobile is the one they sign in with whatever the
     // SMS switch (ADR CM-0053): a change moves their sign-in with it.
     const moveSignIn =
-      member.siteEngineer &&
+      member.employee &&
       member.userId != null &&
       details.mobile !== member.details.mobile;
     member.updateDetails(details, input.by, now, {
-      mobileIsSignIn: this.mobileSignIn() && !member.siteEngineer,
+      mobileIsSignIn: this.mobileSignIn() && !member.employee,
     });
     if (moveSignIn)
       await this.moveSignInMobile(input.workspaceId, member, details.mobile);
@@ -430,7 +435,7 @@ export class TeamMemberHandlers {
   }
 
   /**
-   * Points a Site Engineer's sign-in at their new mobile (ADR CM-0053). 400
+   * Points an Employee's sign-in at their new mobile (ADR CM-0053). 400
    * `MOBILE_REQUIRED` to clear it; 409 `MOBILE_LOCKED` when their User also
    * works with another Company; 409 `MOBILE_IN_USE` when someone else signs
    * in with it.
@@ -490,7 +495,7 @@ export class TeamMemberHandlers {
    * with a password. With one: only when that User belongs to no other
    * Company (409 `USER_IN_OTHER_COMPANY`), never the Owner's (409
    * `OWNER_PASSWORD`); they must change it at their next sign-in and every
-   * session of theirs ends. A Site Engineer's needs a mobile (400
+   * session of theirs ends. An Employee's needs a mobile (400
    * `MOBILE_REQUIRED`), which their sign-in then uses (ADR CM-0053).
    */
   async setPassword(input: {
@@ -516,7 +521,7 @@ export class TeamMemberHandlers {
         );
     }
     assertPassword(input.password);
-    if (member.siteEngineer && member.details.mobile == null)
+    if (member.employee && member.details.mobile == null)
       throw mobileRequired();
     const { accounts } = this.passwordAccounts();
     if (member.userId == null)
@@ -529,9 +534,9 @@ export class TeamMemberHandlers {
         "USER_IN_OTHER_COMPANY",
         "This User also works with another Company, so only they can change their password.",
       );
-    // A Site Engineer who joined by email before ADR CM-0053 may have no
-    // sign-in mobile yet: the password they get works with their mobile.
-    if (member.siteEngineer)
+    // A sign-in made by email before ADR CM-0053 may have no sign-in mobile
+    // yet: the password they get works with their mobile.
+    if (member.employee)
       await this.moveSignInMobile(
         input.workspaceId,
         member,
@@ -591,26 +596,33 @@ export class TeamMemberHandlers {
   }
 
   /**
-   * A Project's Team Members for its Resources (CM-406): the Owner, who is
-   * on every Project without being assigned, and those assigned, by name.
+   * A Project's Team Members for its Teams (CM-406): the Owner, who is on
+   * every Project without being assigned, and those assigned, by name.
+   * Employees' sign-ins are left out: they are on the Project as Employees
+   * (ADR CM-0055 §5).
    */
   async projectTeam(
     workspaceId: string,
     projectId: string,
   ): Promise<ProjectTeamMemberReadModel[]> {
-    const members = await this.members.listForProject(workspaceId, projectId);
+    const members = (
+      await this.members.listForProject(workspaceId, projectId)
+    ).filter(notEmployee);
     const owners = members.filter((member) => member.isOwner);
     const others = members.filter((member) => !member.isOwner);
     return this.projectLines(workspaceId, [...owners, ...others]);
   }
 
-  /** Who a Project's Resources can add: Normal, not declined, not the Owner. */
+  /**
+   * Who a Project's Teams can add: Normal, not declined, not the Owner, not
+   * an Employee's sign-in.
+   */
   async assignableToProjects(
     workspaceId: string,
   ): Promise<ProjectTeamMemberReadModel[]> {
     return this.projectLines(
       workspaceId,
-      await this.members.listAssignable(workspaceId),
+      (await this.members.listAssignable(workspaceId)).filter(notEmployee),
     );
   }
 
@@ -624,11 +636,9 @@ export class TeamMemberHandlers {
    * the Company, `TEAM_MEMBER_DECLINED` for a declined one newly added.
    * The caller has checked the Project is live and visible.
    *
-   * `scope` narrows the save to some sign-ins: `only` those, or all
-   * `except` those. Sign-ins outside it are ignored in `ids` and
-   * `expectedIds` and keep their Projects, so the Team Members section
-   * cannot add or drop a Site Engineer's sign-in, and the Site Engineers
-   * section touches nothing else (ADR CM-0038 §3).
+   * An Employee's sign-in follows the Employee's Projects (ADR CM-0055
+   * §4): it is ignored in `ids` and `expectedIds` and keeps its Projects,
+   * and adding one is 400 `TEAM_MEMBER_NOT_FOUND`.
    */
   async setProjectTeam(input: {
     workspaceId: string;
@@ -636,17 +646,18 @@ export class TeamMemberHandlers {
     ids: readonly string[];
     expectedIds: readonly string[];
     by: string;
-    scope?: {
-      only?: ReadonlySet<string>;
-      except?: ReadonlySet<string>;
-    };
   }): Promise<void> {
-    const { only, except } = input.scope ?? {};
-    const inScope = (id: string) =>
-      (only == null || only.has(id)) && !(except?.has(id) ?? false);
-    const current = (
-      await this.members.listForProject(input.workspaceId, input.projectId)
-    ).filter((member) => !member.isOwner && inScope(member.id));
+    const onProject = await this.members.listForProject(
+      input.workspaceId,
+      input.projectId,
+    );
+    const employees = new Set(
+      onProject.filter((member) => member.employee).map((member) => member.id),
+    );
+    const inScope = (id: string) => !employees.has(id);
+    const current = onProject.filter(
+      (member) => !member.isOwner && !member.employee,
+    );
     const currentIds = new Set(current.map((member) => member.id));
     const expected = new Set(input.expectedIds.filter(inScope));
     const ids = input.ids.filter(inScope);
@@ -659,7 +670,9 @@ export class TeamMemberHandlers {
         "Someone else changed this Project's Teams after you opened them. Reload to see their changes.",
       );
     const addedIds = [...new Set(ids)].filter((id) => !currentIds.has(id));
-    const found = await this.members.findByIds(input.workspaceId, addedIds);
+    const found = (
+      await this.members.findByIds(input.workspaceId, addedIds)
+    ).filter(notEmployee);
     const foundIds = new Set(found.map((member) => member.id));
     const missing = addedIds.filter((id) => !foundIds.has(id));
     if (missing.length > 0)

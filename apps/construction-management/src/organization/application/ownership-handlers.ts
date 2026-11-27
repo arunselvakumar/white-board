@@ -84,7 +84,7 @@ export class OwnershipHandlers {
         limit: 1000,
         status: "active",
         memberType: "normal",
-        includeSiteEngineers: true,
+        includeEmployees: true,
       }),
       this.roles.listAll(workspaceId),
     ]);

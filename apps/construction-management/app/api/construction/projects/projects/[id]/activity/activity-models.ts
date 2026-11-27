@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { checkInActivityFields } from "@/app/api/construction/labour/labours/[id]/activity/activity-models";
+import { checkInActivityFields } from "@/app/api/_lib/person-activity-models";
 import type { ActivityPage } from "@/src/composition/labour-activity";
 import {
   PROJECT_ACTIVITY_TYPES,

@@ -5,21 +5,19 @@ import {
 } from "@tanstack/react-query";
 
 import type {
-  ListConstructionProjectsProjectLabourOptionsResponseModel,
-  ListConstructionProjectsProjectLaboursResponseModel,
-} from "@/app/api/construction/projects/projects/[id]/resources/labours/project-labours-models";
+  ListConstructionProjectsProjectEmployeeOptionsResponseModel,
+  ListConstructionProjectsProjectEmployeesResponseModel,
+} from "@/app/api/construction/projects/projects/[id]/resources/employees/project-employees-models";
 import type {
   ConstructionProjectsProjectResourcesResponseModel,
   ListConstructionProjectsResourceOptionsResponseModel,
-  ListConstructionProjectsSiteEngineerOptionsResponseModel,
 } from "@/app/api/construction/projects/projects/[id]/resources/resources-models";
 
 import { apiJson, QueryHttpError } from "./http";
 import { LABOUR_ATTENDANCE_KEY } from "./labour-attendance";
-import { LABOURS_KEY } from "./labours";
+import { EMPLOYEES_KEY } from "./employees";
 import { PARTIES_KEY } from "./parties";
 import { PROJECT_ACTIVITY_KEY } from "./projects";
-import { SITE_ENGINEERS_KEY } from "./site-engineers";
 import { TEAM_MEMBERS_KEY } from "./team-members";
 import { VENDORS_KEY } from "./vendors";
 
@@ -30,7 +28,7 @@ export type ProjectResource =
 
 /**
  * A section of the Resources tab saved as a set of parties; also its key
- * in the response. Site Engineers and Labours have their own queries.
+ * in the response. Employees have their own queries.
  */
 export type ResourceSection = Extract<
   keyof ProjectResources,
@@ -45,19 +43,16 @@ export const RESOURCE_PATHS: Record<ResourceSection, string> = {
   vendors: "vendors",
 };
 
-export type ProjectSiteEngineer = ProjectResources["siteEngineers"][number];
-export type ProjectSiteEngineerOption =
-  ListConstructionProjectsSiteEngineerOptionsResponseModel["items"][number];
-export type ProjectLabourPage =
-  ListConstructionProjectsProjectLaboursResponseModel;
-export type ProjectLabour = ProjectLabourPage["items"][number];
-export type ProjectLabourOption =
-  ListConstructionProjectsProjectLabourOptionsResponseModel["items"][number];
+export type ProjectEmployeePage =
+  ListConstructionProjectsProjectEmployeesResponseModel;
+export type ProjectEmployee = ProjectEmployeePage["items"][number];
+export type ProjectEmployeeOption =
+  ListConstructionProjectsProjectEmployeeOptionsResponseModel["items"][number];
 
 /** The Resources routes, Next-style, for a page's prefetch (ADR-0052). */
 export const RESOURCES_API =
   "/api/construction/projects/projects/[id]/resources";
-export const PROJECT_LABOURS_API = `${RESOURCES_API}/labours`;
+export const PROJECT_EMPLOYEES_API = `${RESOURCES_API}/employees`;
 
 function resourcesUrl(projectId: string): string {
   return `/api/construction/projects/projects/${encodeURIComponent(projectId)}/resources`;
@@ -65,14 +60,14 @@ function resourcesUrl(projectId: string): string {
 
 const RESOURCES_KEY = ["projects", "resources"] as const;
 
-/** Every read of one Project's Resources, its Labours and pickers included. */
+/** Every read of one Project's Resources, its Employees and pickers included. */
 function projectResourcesKey(projectId: string) {
   return [...RESOURCES_KEY, projectId] as const;
 }
 
 /**
- * A Project's Site Engineers, Labour count, Team Members, Contractors,
- * Suppliers and Vendors (ADR CM-0038), and the Company's today.
+ * A Project's Employee count, Team Members, Contractors, Suppliers and
+ * Vendors (ADR CM-0038, CM-0055), and the Company's today.
  */
 export function projectResourcesQuery(projectId: string) {
   return queryOptions({
@@ -82,62 +77,55 @@ export function projectResourcesQuery(projectId: string) {
   });
 }
 
-/** Rows a page of the Labours section shows. */
-export const PROJECT_LABOURS_PAGE_SIZE = 50;
+/** Rows a page of the Employees section shows. */
+export const PROJECT_EMPLOYEES_PAGE_SIZE = 50;
 
-export type ProjectLaboursPosition = {
+export type ProjectEmployeesPosition = {
   search: string;
   after?: string;
   before?: string;
 };
 
-/** One page of the Labours on a Project, by name (ADR CM-0038 §2). */
-export function projectLaboursQuery(
+/** One page of the Employees on a Project, by name (ADR CM-0055 §5). */
+export function projectEmployeesQuery(
   projectId: string,
-  position: ProjectLaboursPosition = { search: "" },
+  position: ProjectEmployeesPosition = { search: "" },
 ) {
   const query = new URLSearchParams({
-    limit: String(PROJECT_LABOURS_PAGE_SIZE),
+    limit: String(PROJECT_EMPLOYEES_PAGE_SIZE),
   });
   const search = position.search.trim();
   if (search !== "") query.set("search", search);
   if (position.after != null) query.set("after", position.after);
   if (position.before != null) query.set("before", position.before);
   return queryOptions({
-    queryKey: [...projectResourcesKey(projectId), "labours", query.toString()],
+    queryKey: [
+      ...projectResourcesKey(projectId),
+      "employees",
+      query.toString(),
+    ],
     queryFn: ({ meta }) =>
-      apiJson<ProjectLabourPage>(
-        `${resourcesUrl(projectId)}/labours?${query.toString()}`,
+      apiJson<ProjectEmployeePage>(
+        `${resourcesUrl(projectId)}/employees?${query.toString()}`,
         undefined,
         meta,
       ),
   });
 }
 
-/** Active Labours not on the Project, for Add Labours. */
-export function projectLabourOptionsQuery(projectId: string, search: string) {
+/** Active Employees not on the Project, for Add Employees. */
+export function projectEmployeeOptionsQuery(projectId: string, search: string) {
   const query = new URLSearchParams({ limit: "100" });
   if (search.trim() !== "") query.set("search", search.trim());
   return queryOptions({
     queryKey: [
       ...projectResourcesKey(projectId),
-      "labour-options",
+      "employee-options",
       search.trim(),
     ],
     queryFn: () =>
-      apiJson<ListConstructionProjectsProjectLabourOptionsResponseModel>(
-        `${resourcesUrl(projectId)}/labours/options?${query.toString()}`,
-      ),
-  });
-}
-
-/** Enabled Site Engineers not on the Project, for Add Site Engineers. */
-export function siteEngineerOptionsQuery(projectId: string) {
-  return queryOptions({
-    queryKey: [...projectResourcesKey(projectId), "site-engineer-options"],
-    queryFn: () =>
-      apiJson<ListConstructionProjectsSiteEngineerOptionsResponseModel>(
-        `${resourcesUrl(projectId)}/site-engineers/options`,
+      apiJson<ListConstructionProjectsProjectEmployeeOptionsResponseModel>(
+        `${resourcesUrl(projectId)}/employees/options?${query.toString()}`,
       ),
   });
 }
@@ -195,33 +183,35 @@ export function useSetProjectResources(projectId: string) {
 }
 
 /**
- * After a Labour joins or leaves the Project: this Project's Resources, the
- * Labour register (their Projects and their Activity), attendance (who is
- * on a Project on a date) and the Projects' Activity are refreshed.
+ * After an Employee joins or leaves the Project: this Project's Resources,
+ * the Employees (their Projects and their Activity), Office Staff (an
+ * Employee's sign-in follows), attendance (who is on a Project on a date)
+ * and the Projects' Activity are refreshed.
  */
-function useLabourMoved(projectId: string) {
+function useEmployeeMoved(projectId: string) {
   const queryClient = useQueryClient();
   return () =>
     Promise.all(
       [
         projectResourcesKey(projectId),
-        LABOURS_KEY,
+        EMPLOYEES_KEY,
+        TEAM_MEMBERS_KEY,
         LABOUR_ATTENDANCE_KEY,
         PROJECT_ACTIVITY_KEY,
       ].map((queryKey) => queryClient.invalidateQueries({ queryKey })),
     );
 }
 
-/** Adds Labours from a date; all or none (ADR CM-0038 §2). */
-export function useAddProjectLabours(projectId: string) {
-  const refresh = useLabourMoved(projectId);
+/** Adds Employees from a date; all or none (ADR CM-0038 §2). */
+export function useAddProjectEmployees(projectId: string) {
+  const refresh = useEmployeeMoved(projectId);
   return useMutation({
     mutationFn: (input: {
-      labourIds: string[];
+      employeeIds: string[];
       from: string;
       remark: string | null;
     }) =>
-      apiJson<undefined>(`${resourcesUrl(projectId)}/labours`, {
+      apiJson<undefined>(`${resourcesUrl(projectId)}/employees`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(input),
@@ -230,17 +220,17 @@ export function useAddProjectLabours(projectId: string) {
   });
 }
 
-/** Takes a Labour off the Project after their Last day. */
-export function useRemoveProjectLabour(projectId: string) {
-  const refresh = useLabourMoved(projectId);
+/** Takes an Employee off the Project after their Last day. */
+export function useRemoveProjectEmployee(projectId: string) {
+  const refresh = useEmployeeMoved(projectId);
   return useMutation({
     mutationFn: (input: {
-      labourId: string;
+      employeeId: string;
       lastDay: string;
       remark: string | null;
     }) =>
       apiJson<undefined>(
-        `${resourcesUrl(projectId)}/labours/${encodeURIComponent(input.labourId)}/remove`,
+        `${resourcesUrl(projectId)}/employees/${encodeURIComponent(input.employeeId)}/remove`,
         {
           method: "POST",
           headers: { "content-type": "application/json" },
@@ -254,39 +244,12 @@ export function useRemoveProjectLabour(projectId: string) {
   });
 }
 
-/** Saves the Site Engineers on the Project (Site Engineer ids). */
-export function useSetProjectSiteEngineers(projectId: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (input: { ids: string[]; expectedIds: string[] }) =>
-      apiJson<ProjectResources>(`${resourcesUrl(projectId)}/site-engineers`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(input),
-      }),
-    onSuccess: async (updated) => {
-      queryClient.setQueryData(
-        projectResourcesQuery(projectId).queryKey,
-        updated,
-      );
-      await Promise.all(
-        [
-          [...projectResourcesKey(projectId), "site-engineer-options"],
-          SITE_ENGINEERS_KEY,
-          TEAM_MEMBERS_KEY,
-          PROJECT_ACTIVITY_KEY,
-        ].map((queryKey) => queryClient.invalidateQueries({ queryKey })),
-      );
-    },
-  });
-}
-
 /** Whether a failed save means the screen's copy is stale. */
 export function isResourcesChanged(error: unknown): boolean {
   return (
     error instanceof QueryHttpError &&
     (error.code === "PROJECT_RESOURCES_CHANGED" ||
-      error.code === "LABOUR_CHANGED")
+      error.code === "EMPLOYEE_CHANGED")
   );
 }
 

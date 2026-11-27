@@ -21,16 +21,6 @@ import {
   materialMastersOpenApiOperations,
 } from "./material-masters-openapi";
 import {
-  siteEngineerOpenApiComponents,
-  siteEngineerOpenApiOperations,
-} from "./site-engineers/site-engineer-openapi";
-import {
-  ConstructionMastersSupervisorResponseModel,
-  CreateConstructionMastersSupervisorRequestModel,
-  ListConstructionMastersSupervisorsResponseModel,
-  UpdateConstructionMastersSupervisorRequestModel,
-} from "./supervisors/supervisor-models";
-import {
   workTypeOpenApiComponents,
   workTypeOpenApiOperations,
 } from "./work-types/work-types-openapi";
@@ -43,11 +33,6 @@ export const mastersOpenApiComponents: OpenApiComponents = {
   ConstructionMastersLabourCategoryResponseModel,
   CreateConstructionMastersLabourCategoryRequestModel,
   UpdateConstructionMastersLabourCategoryRequestModel,
-  ListConstructionMastersSupervisorsResponseModel,
-  ConstructionMastersSupervisorResponseModel,
-  CreateConstructionMastersSupervisorRequestModel,
-  UpdateConstructionMastersSupervisorRequestModel,
-  ...siteEngineerOpenApiComponents,
   ...materialMastersOpenApiComponents,
   ...workTypeOpenApiComponents,
 };
@@ -166,24 +151,12 @@ export const mastersOpenApiOperations: OpenApiOperation[] = [
     plural: "Labour Categories",
     menu: "masters.labour_categories",
     inUse:
-      "409 SEED_IS_READ_ONLY for a seed row, LABOUR_CATEGORY_IN_USE while Labours, rate cards or attendance use it.",
+      "409 SEED_IS_READ_ONLY for a seed row, LABOUR_CATEGORY_IN_USE while Employees, rate cards or attendance use it.",
     list: ListConstructionMastersLabourCategoriesResponseModel,
     item: ConstructionMastersLabourCategoryResponseModel,
     create: CreateConstructionMastersLabourCategoryRequestModel,
     update: UpdateConstructionMastersLabourCategoryRequestModel,
   }),
-  ...masterOperations({
-    path: `${BASE}/supervisors`,
-    label: "Site Engineer",
-    plural: "Site Engineers",
-    menu: "masters.labours",
-    inUse: "409 SUPERVISOR_IN_USE while Labours or attendance name them.",
-    list: ListConstructionMastersSupervisorsResponseModel,
-    item: ConstructionMastersSupervisorResponseModel,
-    create: CreateConstructionMastersSupervisorRequestModel,
-    update: UpdateConstructionMastersSupervisorRequestModel,
-  }),
-  ...siteEngineerOpenApiOperations,
   ...materialMastersOpenApiOperations,
   ...workTypeOpenApiOperations,
 ];

@@ -49,11 +49,7 @@ export type TrackingMasterKind = (typeof TRACKING_MASTER_KINDS)[number];
 
 /** Every masters list this context owns (CM-203, CM-404, CM-501, CM-601, CM-801). */
 export type MasterKind =
-  | NamedMasterKind
-  | "supervisor"
-  | MaterialMasterKind
-  | "work_type"
-  | TrackingMasterKind;
+  NamedMasterKind | MaterialMasterKind | "work_type" | TrackingMasterKind;
 
 type MasterKindInfo = {
   /** Prefix of the list's error codes: `LABOUR_CATEGORY_NAME_IN_USE`. */
@@ -68,11 +64,6 @@ export const MASTER_KINDS: Record<MasterKind, MasterKindInfo> = {
     code: "LABOUR_CATEGORY",
     label: "Labour Category",
     plural: "Labour Categories",
-  },
-  supervisor: {
-    code: "SUPERVISOR",
-    label: "Site Engineer",
-    plural: "Site Engineers",
   },
   amenity: {
     code: "AMENITY",
@@ -183,12 +174,8 @@ export function masterInUse(kind: MasterKind): DomainError {
       `${code}_IN_USE`,
       `Projects are assigned this ${label}, so it cannot be deleted. Remove it from those Projects or disable it instead.`,
     );
-  const users =
-    kind === "supervisor"
-      ? "Labours or attendance"
-      : "Labours, Vendors or attendance";
   return conflict(
     `${code}_IN_USE`,
-    `${users} use this ${label}, so it cannot be deleted. Disable it instead.`,
+    `Employees, Vendors or attendance use this ${label}, so it cannot be deleted. Disable it instead.`,
   );
 }
