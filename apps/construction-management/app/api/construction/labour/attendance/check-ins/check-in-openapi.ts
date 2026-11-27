@@ -74,7 +74,7 @@ export const checkInOpenApiOperations: OpenApiOperation[] = [
     method: "get",
     path: `${BASE}/person`,
     summary:
-      "One person for the capture screen, with their entries of today and of a still open earlier day, oldest first (LABOUR_INACTIVE, LABOUR_NOT_ON_PROJECT, VENDOR_INACTIVE, VENDOR_NOT_ON_PROJECT, SITE_ENGINEER_DISABLED, SITE_ENGINEER_NOT_ON_PROJECT 400; *_NOT_FOUND 404)",
+      "One person for the capture screen, with their entries of today and of a still open earlier day, oldest first (EMPLOYEE_INACTIVE, EMPLOYEE_NOT_ON_PROJECT, VENDOR_INACTIVE, VENDOR_NOT_ON_PROJECT 400; EMPLOYEE_NOT_FOUND, VENDOR_NOT_FOUND 404)",
     tags: LABOUR,
     query: GetConstructionLabourCheckInPersonRequestModel,
     successStatus: StatusCodes.OK,

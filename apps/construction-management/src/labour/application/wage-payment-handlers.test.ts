@@ -151,7 +151,7 @@ describe("WagePaymentHandlers", () => {
       amount: 50_000,
       receiptVersion: null,
     });
-    expect(guarded).toEqual(["create:labour:2026-10-05"]);
+    expect(guarded).toEqual(["create:employee:2026-10-05"]);
   });
 
   it.each([
@@ -205,7 +205,7 @@ describe("WagePaymentHandlers", () => {
       expectedUpdatedAt: payment.updatedAt,
     });
     expect(cancelled.has(payment.id)).toBe(true);
-    expect(guarded.at(-1)).toBe("edit:labour:2026-10-05");
+    expect(guarded.at(-1)).toBe("edit:employee:2026-10-05");
     await expect(handlers.get("w", payment.id)).rejects.toMatchObject({
       code: "PAYMENT_NOT_FOUND",
     });

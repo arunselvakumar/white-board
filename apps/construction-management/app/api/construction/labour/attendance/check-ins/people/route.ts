@@ -16,8 +16,8 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * The find screen: the Project's Site Engineers, the Labours on it today
- * and the Vendors assigned to it, each group by name, with where each
+ * The find screen: the Employees on the Project today (any Role, ADR
+ * CM-0055) and the Vendors assigned to it, each group by name, with where each
  * person stands today, the server's time and the Site fence. Needs
  * Attendance read on the Project.
  */
