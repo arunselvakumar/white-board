@@ -119,10 +119,11 @@ export type TeamMemberProps = {
   salary: StaffSalary;
   memberType: MemberType;
   /**
-   * The sign-in of a Site Engineer (ADR CM-0037): made and managed from
-   * their Site Engineer page, left off Office Staff.
+   * The sign-in of an Employee (ADR CM-0055 §4): made and managed from
+   * their Employee page, left off Office Staff and a Project's Team
+   * Members.
    */
-  siteEngineer: boolean;
+  employee: boolean;
   isOwner: boolean;
   status: TeamMemberStatus;
   projectIds: readonly string[];
@@ -158,8 +159,8 @@ export class TeamMember {
     /** Validated with `staffSalary`; none when left out. */
     salary?: StaffSalary;
     memberType: MemberType;
-    /** A Site Engineer's sign-in (ADR CM-0037); false when left out. */
-    siteEngineer?: boolean;
+    /** An Employee's sign-in (ADR CM-0055 §4); false when left out. */
+    employee?: boolean;
     projectIds?: readonly string[];
     roleId: string | null;
     by: string;
@@ -172,7 +173,7 @@ export class TeamMember {
       details: input.details,
       salary: input.salary ?? NO_SALARY,
       memberType: input.memberType,
-      siteEngineer: input.siteEngineer ?? false,
+      employee: input.employee ?? false,
       isOwner: false,
       status: "joining_pending",
       projectIds: [],
@@ -205,7 +206,7 @@ export class TeamMember {
       details: input.details,
       salary: NO_SALARY,
       memberType: "normal",
-      siteEngineer: false,
+      employee: false,
       isOwner: true,
       status: "active",
       projectIds: [],
@@ -243,8 +244,8 @@ export class TeamMember {
   get memberType(): MemberType {
     return this.props.memberType;
   }
-  get siteEngineer(): boolean {
-    return this.props.siteEngineer;
+  get employee(): boolean {
+    return this.props.employee;
   }
   get isOwner(): boolean {
     return this.props.isOwner;

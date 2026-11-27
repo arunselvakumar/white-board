@@ -511,12 +511,12 @@ export type Headcount = { skilled: number; unskilled: number };
 
 /**
  * Heads from one attendance source, grouped by the Labour Category's skill
- * (null: no category). Labour attendance gives one head per labourer present
+ * (null: no category). Labour attendance gives one head per Employee present
  * or on a half day; vendor attendance gives full-day plus half-day heads.
  */
 export type AttendanceHeads = { skill: LabourSkill | null; heads: number };
 
-/** Attendance heads by skill; a labourer with no category counts as unskilled. */
+/** Attendance heads by skill; an Employee with no category counts as unskilled. */
 export function attendanceHeadcount(
   rows: readonly AttendanceHeads[],
 ): Headcount {

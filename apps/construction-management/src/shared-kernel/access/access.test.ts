@@ -75,13 +75,21 @@ describe("the menu catalogue", () => {
       // from Human Resources (ADR CM-0035) − Departments CRUD (ADR CM-0048).
       master_records: 78,
       central_store: 20,
-      // Staff (5), Role Management (4), Labours (5) and Vendors (5), out of
-      // Master records (ADR CM-0034, CM-0035).
+      // Staff (5), Role Management (4), Employees (5) and Vendors (5), out of
+      // Master records (ADR CM-0034, CM-0035, CM-0055).
       human_resources: 19,
       hrms: 57,
       // Central Reports (1) + Departments CRUD (ADR CM-0049).
       others: 5,
     });
+  });
+
+  // The keys stay so no Role changes; the labels name the record (ADR CM-0055 §5).
+  it("labels the Labour keys Employees", () => {
+    const label = (key: string) =>
+      MENUS.find((menu) => menu.key === key)?.label;
+    expect(label("masters.labours")).toBe("Employees");
+    expect(label("labour.labour")).toBe("Employees");
   });
 
   it("has unique keys", () => {

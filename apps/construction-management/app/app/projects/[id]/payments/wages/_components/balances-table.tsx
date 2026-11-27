@@ -57,12 +57,12 @@ export function BalancesTable({
     return (
       <EmptyState
         className="bg-card border"
-        icon={partyType === "labour" ? UsersThreeIcon : StorefrontIcon}
-        tone={partyType === "labour" ? "violet" : "orange"}
+        icon={partyType === "employee" ? UsersThreeIcon : StorefrontIcon}
+        tone={partyType === "employee" ? "violet" : "orange"}
         title={`No ${nouns.many} to pay`}
         description={
-          partyType === "labour"
-            ? "Labours on this Project, and anyone who worked here in this period, show here. Add them in Human Resources → Labours."
+          partyType === "employee"
+            ? "Employees on this Project, and anyone who worked here in this period, show here. Add them on the Project's Teams page."
             : "Vendors assigned to this Project, and any who worked here in this period, show here. Assign them in Human Resources → Vendors."
         }
       />

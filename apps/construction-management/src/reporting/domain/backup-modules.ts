@@ -361,7 +361,7 @@ const MASTER_MODULES: readonly BackupModule[] = [
   master("masters.contractors", "Contractors", "contractors", ["contractors"]),
   master("masters.suppliers", "Suppliers", "suppliers", ["suppliers"]),
   master("masters.vendors", "Vendors", "vendors", ["vendors"]),
-  master("masters.labours", "Labours", "labours", ["labours"], {
+  master("masters.labours", "Employees", "employees", ["employees"], {
     menu: "masters.labours",
     flag: "financial",
   }),

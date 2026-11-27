@@ -1,5 +1,7 @@
 # 01 — Organization, Identity & Access
 
+> **Since [ADR CM-0055](../adr/CM-0055-employees-replace-labours-and-site-engineers.md) (2026-11-27):** Labours and Site Engineers are one **Employee** record (Human Resources → Staff → Employees), told apart by their Role and its Department. Wherever this spec says Labour, Labourer, Supervisor or Site Engineer for a person, read Employee; the rules (wages, attendance, Check-In, transfers, ledger) apply to every Employee. The ADR wins where they differ.
+
 This module covers who can use BuildControl and in which organization. It defines the **Organization** (company, the tenant), the **User** (a person with a mobile number who signs in by OTP), and the **Team Member** (that user's employee record inside one organization). It also covers how members join, how designations and role permissions decide what each member can see and do, devices and web-login QR, personal and company profile, privacy and data rights, the paid **Subscription**, and the support channel to the BuildControl team.
 
 Who uses it:

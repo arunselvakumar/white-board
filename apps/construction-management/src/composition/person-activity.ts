@@ -8,10 +8,6 @@ import {
 } from "@/src/labour/application/labour-activity-ports";
 import type { CheckInPersonKind } from "@/src/labour/domain/check-in";
 import { PrismaLabourActivity } from "@/src/labour/infrastructure/prisma-labour-activity";
-import { masterNotFound } from "@/src/masters/domain/master-kind";
-import { siteEngineerSignIn } from "@/src/masters/infrastructure/prisma-site-engineer-sign-ins";
-import type { SignInProjectHistory } from "@/src/organization/application/sign-in-project-history";
-import { PrismaSignInProjectHistory } from "@/src/organization/infrastructure/prisma-sign-in-project-history";
 import { projectNames } from "@/src/projects/infrastructure/prisma-project-names";
 import type { MemberAccess } from "@/src/shared-kernel/access";
 import {
@@ -52,8 +48,7 @@ export type PersonActivityFilter = {
 };
 
 /**
- * An entry of a Site Engineer's or a Vendor's feed (ADR CM-0044 §7): the
- * Labour feed's shapes for the same facts. Project changes carry no
+ * An entry of a Vendor's feed (ADR CM-0044 §7): the Employee feed's shapes for the same facts. Project changes carry no
  * remark, so it is always null.
  */
 export type PersonActivityEntry = Extract<
@@ -204,52 +199,6 @@ async function personFeed(
   };
 }
 
-/** A live Site Engineer and the sign-in their row points at (masters). */
-export type SiteEngineerSignInOf = (
-  workspaceId: string,
-  id: string,
-) => Promise<{ teamMemberId: string | null } | null>;
-
-/**
- * A Site Engineer's Activity feed (ADR CM-0044 §7): their check-in entries
- * (labour context), and the Projects their sign-in was added to and
- * removed from (organization context, the source the Project feed reads),
- * dated the day it was recorded in the Company's time zone. A Site
- * Engineer without a sign-in has no Project history.
- */
-export class SiteEngineerActivityService {
-  constructor(
-    private readonly deps: PersonActivityDeps,
-    private readonly siteEngineer: SiteEngineerSignInOf,
-    private readonly signIns: SignInProjectHistory,
-  ) {}
-
-  /** 404 `SUPERVISOR_NOT_FOUND` for another Company's or a deleted Site Engineer. */
-  async feed(
-    access: MemberAccess,
-    id: string,
-    filter: PersonActivityFilter,
-  ): Promise<ActivityPage<PersonActivityEntry>> {
-    const found = await this.siteEngineer(access.workspaceId, id);
-    if (found == null) throw masterNotFound("supervisor");
-    const memberId = found.teamMemberId;
-    return personFeed(
-      this.deps,
-      access,
-      { kind: "site_engineer", id },
-      filter,
-      async (window) =>
-        memberId == null
-          ? []
-          : this.signIns.projectChanges(
-              window.workspaceId,
-              [memberId],
-              window.projectId,
-            ),
-    );
-  }
-}
-
 /**
  * A Vendor's Activity feed (ADR CM-0044 §7): their check-in entries and
  * the Projects they were added to and removed from, both from the labour
@@ -287,18 +236,7 @@ function prismaDeps(db: PrismaClient): PersonActivityDeps {
   };
 }
 
-/** The Prisma-backed compositions the routes use. */
-export function createSiteEngineerActivity(deps?: {
-  prisma?: PrismaClient;
-}): SiteEngineerActivityService {
-  const db = deps?.prisma ?? prisma;
-  return new SiteEngineerActivityService(
-    prismaDeps(db),
-    (workspaceId, id) => siteEngineerSignIn(workspaceId, id, db),
-    new PrismaSignInProjectHistory(db),
-  );
-}
-
+/** The Prisma-backed composition the route uses. */
 export function createVendorActivity(deps?: {
   prisma?: PrismaClient;
 }): VendorActivityService {

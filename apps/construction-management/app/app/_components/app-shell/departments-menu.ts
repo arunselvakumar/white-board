@@ -43,7 +43,7 @@ export function departmentsMenuGroups(
  *    Manage Departments ("manage").
  * 4. Otherwise its screens whose name, or whose group's name ("Staff",
  *    "HRMS"), matches show under the department's name ("pay" finds
- *    nothing; "lab" finds Human Resources → Labour).
+ *    nothing; "employ" finds Human Resources → Employees).
  * 5. Nothing matching leaves Departments out of the menu.
  */
 export function filterDepartments(

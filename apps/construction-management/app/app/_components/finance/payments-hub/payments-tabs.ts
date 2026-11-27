@@ -20,7 +20,7 @@ export const PAYMENTS_TABS = [
   },
   {
     segment: "wages",
-    label: "Labour & Vendor",
+    label: "Employee & Vendor",
     menus: ["labour.labour", "labour.vendor"],
   },
   {

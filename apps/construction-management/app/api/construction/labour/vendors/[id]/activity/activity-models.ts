@@ -3,9 +3,9 @@ import { z } from "zod";
 import {
   DATES_IN_ORDER,
   datesInOrder,
-  personActivityPageModel,
   personActivityQueryFields,
-} from "@/app/api/construction/labour/labours/[id]/activity/activity-models";
+  vendorActivityPageModel,
+} from "@/app/api/construction/labour/_activity/activity-fields";
 import { PERSON_ACTIVITY_TYPES } from "@/src/composition/person-activity";
 
 export const ListConstructionLabourVendorActivityRequestModel = z
@@ -21,4 +21,4 @@ export const ListConstructionLabourVendorActivityRequestModel = z
   .refine(datesInOrder, DATES_IN_ORDER);
 
 export const ListConstructionLabourVendorActivityResponseModel =
-  personActivityPageModel();
+  vendorActivityPageModel;

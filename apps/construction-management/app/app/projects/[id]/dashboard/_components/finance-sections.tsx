@@ -284,7 +284,7 @@ export function DuePaymentsTable({
 const MODULES = [
   { key: "contractor", label: "Contractor" },
   { key: "supplier", label: "Supplier" },
-  { key: "labour", label: "Labour" },
+  { key: "labour", label: "Employee" },
   { key: "vendor", label: "Vendor" },
   { key: "other_party", label: "Other Party" },
   { key: "other_expense", label: "Other Expenses" },

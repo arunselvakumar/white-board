@@ -13,18 +13,21 @@ import type {
 
 import { labourCalendarDays } from "../domain/attendance-calendar";
 
-/** A Labour's marked days (`labour_attendance`) for the Attendance tab (ADR CM-0051). */
+/**
+ * An Employee's marked days (`employee_attendance`, from the sheet or from
+ * Check-In) for the Attendance tab (ADR CM-0051, CM-0055).
+ */
 export class PrismaLabourAttendanceCalendar implements PersonAttendanceSource {
   constructor(private readonly db: PrismaClient = prisma) {}
 
   async person(workspaceId: string, personId: string, timeZone: string) {
-    const labour = await this.db.constructionLabourLabour.findFirst({
+    const employee = await this.db.constructionLabourEmployee.findFirst({
       where: { id: personId, workspaceId, deletedAt: null },
       select: { joiningDate: true, createdAt: true },
     });
-    if (labour == null) return null;
-    const joined = calendarDateFromDb(labour.joiningDate);
-    const added = todayIn(timeZone, labour.createdAt);
+    if (employee == null) return null;
+    const joined = calendarDateFromDb(employee.joiningDate);
+    const added = todayIn(timeZone, employee.createdAt);
     return { since: joined < added ? joined : added };
   }
 
@@ -79,7 +82,7 @@ export class PrismaLabourAttendanceCalendar implements PersonAttendanceSource {
   private where(window: Omit<PersonAttendanceWindow, "from" | "to">) {
     return {
       workspaceId: window.workspaceId,
-      labourId: window.personId,
+      employeeId: window.personId,
       deletedAt: null,
       ...(window.visibleProjectIds == null
         ? {}

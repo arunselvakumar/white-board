@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
 import { buildLabourAttendanceReport } from "./labour-attendance-report";
-import type { ReportLabour, ReportLabourDay } from "./labour-days";
+import type { ReportEmployee, ReportLabourDay } from "./labour-days";
 import { buildMonthWiseLabourReport } from "./labour-month-report";
 import { buildLabourPaymentReport } from "./labour-payment-report";
 import { paymentFigures, type ReportLedgerEntry } from "./ledger-summary";
@@ -18,40 +18,41 @@ import {
 import { datesIn, monthRange, rangeLabel } from "./report-period";
 import { buildVendorAttendanceReport } from "./vendor-attendance-report";
 
-const DHURESH: ReportLabour = {
+const DHURESH: ReportEmployee = {
   id: "dhuresh",
   name: "Dhuresh Nawin",
-  labourCode: "L-1",
+  employeeCode: "L-1",
   fatherName: "Nawin Kumar",
   category: "Mason",
+  role: "Labour",
   gender: "male",
   wageType: "daily",
   wageRate: 80_000,
 };
-const ABIRAMI: ReportLabour = {
+const ABIRAMI: ReportEmployee = {
   id: "abirami",
   name: "Abirami Priya",
-  labourCode: null,
+  employeeCode: null,
   fatherName: null,
   category: "Helper",
+  role: "Site Engineer",
   gender: "female",
   wageType: "monthly",
   wageRate: 1_550_000,
 };
-const IDLE: ReportLabour = { ...DHURESH, id: "idle", name: "Zed Idle" };
+const IDLE: ReportEmployee = { ...DHURESH, id: "idle", name: "Zed Idle" };
 
 function day(
-  labourId: string,
+  employeeId: string,
   date: string,
   overrides: Partial<ReportLabourDay> = {},
 ): ReportLabourDay {
   return {
-    labourId,
+    employeeId,
     date,
     status: "present",
     isPaidLeave: false,
     shift: null,
-    siteEngineers: null,
     checkIn: null,
     checkOut: null,
     breakMinutes: null,
@@ -106,7 +107,6 @@ function august(): ReportLabourDay[] {
           breakMinutes: 60,
           overtimeHundredths: 125,
           overtimeAmount: 12_500,
-          siteEngineers: "Murugan",
           shift: "Shift 1",
         }),
       );
@@ -145,13 +145,13 @@ function totalOf(table: ReportTable | undefined, label: string) {
   return table?.totals?.[index];
 }
 
-describe("All Labour Attendance", () => {
+describe("Employee Attendance", () => {
   const range = { from: "2026-08-01", to: "2026-08-31" };
 
   it("counts each status per Labour over a 31-day month, with OT hours and totals", () => {
     const report = buildLabourAttendanceReport({
       range,
-      labours: [DHURESH, ABIRAMI, IDLE],
+      employees: [DHURESH, ABIRAMI, IDLE],
       days: august(),
     });
     const [summary, byDay] = report.tables;
@@ -181,7 +181,8 @@ describe("All Labour Attendance", () => {
       null,
       "Present",
       null,
-      null,
+      // The Role in place of the old Site Engineers column (ADR CM-0055).
+      "Site Engineer",
       null,
       null,
       null,
@@ -193,7 +194,7 @@ describe("All Labour Attendance", () => {
       "L-1",
       "Present",
       "Shift 1",
-      "Murugan",
+      "Labour",
       "20:00",
       "06:15 (+1)",
       9.25,
@@ -208,7 +209,7 @@ describe("All Labour Attendance", () => {
   it("leaves out days outside the range", () => {
     const report = buildLabourAttendanceReport({
       range: { from: "2026-08-01", to: "2026-08-02" },
-      labours: [DHURESH, ABIRAMI],
+      employees: [DHURESH, ABIRAMI],
       days: august(),
     });
     expect(rowOf(report.tables[0], "Dhuresh Nawin")("Present")).toBe(2);
@@ -216,11 +217,11 @@ describe("All Labour Attendance", () => {
   });
 });
 
-describe("Month-wise Labour", () => {
+describe("Employee Month", () => {
   it("lays out Labour × 31 days with marks, counts and earnings", () => {
     const report = buildMonthWiseLabourReport({
       month: "2026-08",
-      labours: [DHURESH, ABIRAMI],
+      employees: [DHURESH, ABIRAMI],
       days: august(),
       financial: true,
     });
@@ -266,7 +267,7 @@ describe("Month-wise Labour", () => {
   it("leaves the money columns out without Financial", () => {
     const report = buildMonthWiseLabourReport({
       month: "2026-08",
-      labours: [DHURESH],
+      employees: [DHURESH],
       days: august(),
       financial: false,
     });
@@ -284,7 +285,7 @@ describe("Month-wise Labour", () => {
     ] as const) {
       const report = buildMonthWiseLabourReport({
         month,
-        labours: [],
+        employees: [],
         days: [],
         financial: false,
       });
@@ -293,7 +294,7 @@ describe("Month-wise Labour", () => {
   });
 });
 
-describe("All Labour Payment (ADR CM-0004 mapping)", () => {
+describe("Employee Payments (ADR CM-0004 mapping)", () => {
   const range = { from: "2026-08-01", to: "2026-08-31" };
   const entry = (
     partyId: string,
@@ -374,7 +375,7 @@ describe("All Labour Payment (ADR CM-0004 mapping)", () => {
   it("builds one row per Labour with totals, zero for a Labour with no entries", () => {
     const report = buildLabourPaymentReport({
       range,
-      labours: [DHURESH, ABIRAMI, IDLE],
+      employees: [DHURESH, ABIRAMI, IDLE],
       entries,
     });
     const [table] = report.tables;
@@ -478,7 +479,7 @@ describe("Muster roll (combined register)", () => {
   it("has the combined register columns and computes days, wages and net", () => {
     const report = buildMusterRoll({
       month: "2026-08",
-      labours: [DHURESH, ABIRAMI, IDLE],
+      employees: [DHURESH, ABIRAMI, IDLE],
       days: august(),
       entries: [
         {
@@ -604,7 +605,7 @@ describe("report requests", () => {
         from: "2026-08-01",
         to: "2026-08-31",
       }),
-    ).toBe("all-labour-attendance-2026-08-01-to-2026-08-31");
+    ).toBe("employee-attendance-2026-08-01-to-2026-08-31");
     expect(reportFileName({ kind: "muster_roll", month: "2026-08" })).toBe(
       "muster-roll-and-wage-register-2026-08",
     );

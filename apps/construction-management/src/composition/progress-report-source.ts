@@ -286,9 +286,9 @@ export async function dprEquipmentUsage(
 const zero = (): DprHeadcount => ({ skilled: 0, unskilled: 0 });
 
 /**
- * The Project's attendance that day (CM-0016 §6): Labours present or on a
+ * The Project's attendance that day (CM-0016 §6): Employees present or on a
  * half day, one head each; vendor full-day and half-day heads. Split by the
- * Labour Category's skill; a Labour without a category is unskilled.
+ * Labour Category's skill; an Employee without a category is unskilled.
  * Never filtered by Filled By: attendance is the Project's. The same rule
  * as `attendanceHeadsBetween` (`src/composition/attendance-heads.ts`),
  * which the worksheet panel and the dashboard use; the DPR keeps present /
@@ -305,8 +305,8 @@ export async function dprAttendance(
         SELECT a.status::text AS status,
                COALESCE(c.skill::text, 'unskilled') AS skill,
                COUNT(*)::int AS heads
-          FROM construction_labour.labour_attendance a
-          JOIN construction_labour.labours l ON l.id = a.labour_id
+          FROM construction_labour.employee_attendance a
+          JOIN construction_labour.employees l ON l.id = a.employee_id
           LEFT JOIN construction_masters.labour_categories c
                  ON c.id = l.labour_category_id
          WHERE a.workspace_id = ${query.workspaceId}
@@ -334,8 +334,8 @@ export async function dprAttendance(
     `),
   ]);
   const result: DprAttendance = {
-    labourPresent: zero(),
-    labourHalfDay: zero(),
+    employeesPresent: zero(),
+    employeesHalfDay: zero(),
     vendorFullDay: zero(),
     vendorHalfDay: zero(),
   };
@@ -343,7 +343,9 @@ export async function dprAttendance(
     skill === "skilled" ? "skilled" : "unskilled";
   for (const row of labour) {
     const bucket =
-      row.status === "present" ? result.labourPresent : result.labourHalfDay;
+      row.status === "present"
+        ? result.employeesPresent
+        : result.employeesHalfDay;
     bucket[key(row.skill)] += row.heads;
   }
   for (const row of vendor) {

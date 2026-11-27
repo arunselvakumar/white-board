@@ -1,8 +1,8 @@
 import { expect } from "@playwright/test";
 
 import {
-  createLabour,
-  markLabourAttendance,
+  createEmployee,
+  markEmployeeAttendance,
   todayInIndia,
 } from "../api/labour";
 import { projectTest } from "../helpers/projectTest";
@@ -41,7 +41,7 @@ projectTest.describe("Finance accounts", () => {
   );
 
   projectTest(
-    "should take a Labour's wage out of the cash account, when the Owner pays them in cash",
+    "should take an Employee's wage out of the cash account, when the Owner pays them in cash",
     async ({ owner, project, page }) => {
       const transactions = new TransactionsPage(page, project.id);
       await transactions.goto();
@@ -50,19 +50,19 @@ projectTest.describe("Finance accounts", () => {
         amount: "5000",
         account: CASH,
       });
-      const labour = await createLabour(owner.api, {
+      const employee = await createEmployee(owner.api, {
         projectId: project.id,
         wagePerDayRupees: 800,
       });
-      await markLabourAttendance(owner.api, {
+      await markEmployeeAttendance(owner.api, {
         projectId: project.id,
         date: todayInIndia(),
-        labourIds: [labour.id],
+        employeeIds: [employee.id],
       });
 
       const wages = new WagesPage(page, project.id);
       await wages.goto();
-      await wages.pay(labour.name, { amount: "800" });
+      await wages.pay(employee.name, { amount: "800" });
 
       const accounts = new BankAccountsPage(page);
       await accounts.goto();

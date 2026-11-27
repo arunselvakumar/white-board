@@ -11,7 +11,7 @@ import {
 import { ResponsiveListSkeleton } from "@/app/app/_components/finance/finance-skeletons";
 
 /*
- * Labour and vendor attendance while they load (ADR-0047). Month grids keep
+ * Employee and vendor attendance while they load (ADR-0047). Month grids keep
  * their real day and totals columns, so nothing moves when the codes land.
  */
 
@@ -27,7 +27,7 @@ export function dayHeaders(month: string): string[] {
   return Array.from({ length: days }, (_, day) => String(day + 1));
 }
 
-export const LABOUR_MONTH_TOTALS = [
+export const EMPLOYEE_MONTH_TOTALS = [
   "P",
   "H",
   "A",
@@ -70,8 +70,8 @@ export function MonthGridSkeleton({
   );
 }
 
-/** Mark: one card per Labour with the status buttons and the shift. */
-export function LabourMarkingSheetSkeleton() {
+/** Mark: one card per Employee with the status buttons and the shift. */
+export function EmployeeMarkingSheetSkeleton() {
   return (
     <SkeletonGroup label="Loading the day's sheet" className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -100,12 +100,11 @@ export function LabourMarkingSheetSkeleton() {
   );
 }
 
-export const LABOUR_RECORDED_COLUMNS: SkeletonColumn[] = [
+export const EMPLOYEE_RECORDED_COLUMNS: SkeletonColumn[] = [
   { header: "Date", kind: "muted" },
-  { header: "Labour" },
+  { header: "Employee" },
   { header: "Status", kind: "badge" },
   { header: "Shift", kind: "muted" },
-  { header: "Site Engineers", kind: "muted" },
   { header: "In", kind: "muted" },
   { header: "Out", kind: "muted" },
   { header: "Worked h", kind: "number", className: "text-right" },
@@ -115,13 +114,13 @@ export const LABOUR_RECORDED_COLUMNS: SkeletonColumn[] = [
 ];
 
 /** Recorded days under the real filters: the count, then the list. */
-export function LabourRecordedSkeleton() {
+export function EmployeeRecordedSkeleton() {
   return (
     <ResponsiveListSkeleton
       label="Loading recorded days"
       count
       breakpoint="lg"
-      columns={LABOUR_RECORDED_COLUMNS}
+      columns={EMPLOYEE_RECORDED_COLUMNS}
     />
   );
 }

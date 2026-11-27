@@ -67,7 +67,7 @@ const schema = z
           "contractor",
           "supplier",
           "other_party",
-          "labour",
+          "employee",
           "vendor",
           "team_member",
         ])

@@ -45,7 +45,7 @@ export const PAYMENT_COLUMNS: SkeletonColumn[] = [
   { header: srOnly("Actions"), kind: "actions", className: "w-32" },
 ];
 
-/** Labour or Vendor balances for the period. */
+/** Employee or Vendor balances for the period. */
 export function BalancesSkeleton({ noun }: { noun: string }) {
   return (
     <ResponsiveListSkeleton

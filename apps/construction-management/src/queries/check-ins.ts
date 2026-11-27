@@ -55,7 +55,7 @@ function search(params: Record<string, string | null | undefined>): string {
 }
 
 /**
- * The Project's Site Engineers, Labours and Vendors with where each stands
+ * The Project's Employees and Vendors with where each stands
  * today. Refreshed every minute and on focus, so a device left open at the
  * gate keeps true states.
  */
@@ -120,7 +120,7 @@ export function checkInPhotoUrl(entryId: string): string {
   return `${CHECK_INS_PATH}/${encodeURIComponent(entryId)}/photo`;
 }
 
-/** The Labour's or Vendor's photo from their record; 404 when none. */
+/** The Employee's or Vendor's photo from their record; 404 when none. */
 export function checkInPersonPhotoUrl(
   projectId: string,
   kind: CheckInKind,
@@ -154,7 +154,7 @@ export function voidCheckIn(input: {
 
 /**
  * After an entry or a void: the lists, the person and the log of the
- * Project, and its Labour attendance, since a Labour's day follows their
+ * Project, and its Employee attendance, since an Employee's day follows their
  * entries (ADR CM-0043 §3).
  */
 function invalidateAfter(

@@ -6,6 +6,7 @@ import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import { seedCompanyMasters } from "@/src/masters/infrastructure/seed-company-masters";
 import { newId } from "@/src/shared-kernel/ids";
 import { jsonRequest, memberWith, ownerWithCompany } from "@/test/companies";
+import { seedEmployee } from "@/test/employees";
 import { TEST_ORIGIN } from "@/test/sessions";
 
 import { POST as deleteCategory } from "./labour-categories/[id]/delete/route";
@@ -17,19 +18,9 @@ import {
   GET as listCategories,
   POST as createCategory,
 } from "./labour-categories/route";
-import { POST as deleteSupervisor } from "./supervisors/[id]/delete/route";
-import { POST as disableSupervisor } from "./supervisors/[id]/disable/route";
-import { POST as enableSupervisor } from "./supervisors/[id]/enable/route";
-import { GET as getSupervisor } from "./supervisors/[id]/route";
-import { POST as updateSupervisor } from "./supervisors/[id]/update/route";
-import {
-  GET as listSupervisors,
-  POST as createSupervisor,
-} from "./supervisors/route";
 
 const BASE = `${TEST_ORIGIN}/api/construction/masters`;
 const CATEGORIES = `${BASE}/labour-categories`;
-const SUPERVISORS = `${BASE}/supervisors`;
 
 type Lookup = {
   id: string;
@@ -38,16 +29,6 @@ type Lookup = {
   isSeed: boolean;
   disabled: boolean;
   createdAt: string;
-  updatedAt: string;
-};
-
-type SupervisorBody = {
-  id: string;
-  name: string;
-  mobile: string | null;
-  teamMemberId: string | null;
-  teamMemberName: string | null;
-  disabled: boolean;
   updatedAt: string;
 };
 
@@ -71,38 +52,10 @@ async function listOf<T>(
   return body.items;
 }
 
-/** A labourer row in the labour context pointing at a category. */
-async function labourUsing(
-  workspaceId: string,
-  refs: { labourCategoryId?: string },
-): Promise<string> {
-  const id = newId();
-  await prisma.constructionLabourLabour.create({
-    data: {
-      id,
-      workspaceId,
-      name: "Ravi Chandran",
-      joiningDate: new Date("2026-10-01"),
-      wageType: "daily",
-      wagePerDay: 80_000,
-      overtimeWagePerHour: 10_000,
-      createdBy: "test",
-      updatedBy: "test",
-      ...refs,
-    },
-  });
-  return id;
-}
-
 describe("Masters HTTP (CM-203)", () => {
   it("is 401 without a Session", async () => {
-    for (const [list, url] of [
-      [listCategories, CATEGORIES],
-      [listSupervisors, SUPERVISORS],
-    ] as const) {
-      const response = await list(new Request(url));
-      expect(response.status).toBe(StatusCodes.UNAUTHORIZED);
-    }
+    const response = await listCategories(new Request(CATEGORIES));
+    expect(response.status).toBe(StatusCodes.UNAUTHORIZED);
   });
 
   it("gives a new Company its own seed lists, once", async () => {
@@ -134,9 +87,6 @@ describe("Masters HTTP (CM-203)", () => {
     ).toEqual(["Helper", "Labour", "Unskilled"]);
     expect(categories.filter((item) => item.skill === "skilled")).toHaveLength(
       6,
-    );
-    expect(await listOf(listSupervisors, SUPERVISORS, owner.cookie)).toEqual(
-      [],
     );
 
     // Idempotent: a second run adds nothing.
@@ -388,184 +338,67 @@ describe("Masters HTTP (CM-203)", () => {
     expect(missing.status).toBe(StatusCodes.BAD_REQUEST);
   });
 
-  it("will not delete a Labour Category a Labour uses, or a Site Engineer a marked day names", async () => {
+  it("will not delete a Labour Category an Employee or an overtime line uses", async () => {
     const owner = await ownerWithCompany();
     const category = await json<Lookup>(
       await createCategory(
         jsonRequest(CATEGORIES, owner.cookie, { name: "Painter" }),
       ),
     );
-    const supervisor = await json<SupervisorBody>(
-      await createSupervisor(
-        jsonRequest(SUPERVISORS, owner.cookie, { name: "Rakesh Mirtha" }),
-      ),
-    );
-    const labourId = await labourUsing(owner.workspaceId, {
+    const employeeId = await seedEmployee({
+      workspaceId: owner.workspaceId,
       labourCategoryId: category.id,
     });
-    // Labours have no Site Engineer of their own (ADR CM-0041); a day marked
-    // before that change kept the one it was saved with.
+    const deleteIt = () =>
+      deleteCategory(
+        jsonRequest(`${CATEGORIES}/${category.id}/delete`, owner.cookie, {}),
+        params(category.id),
+      );
+
+    const refused = await deleteIt();
+    expect(refused.status).toBe(StatusCodes.CONFLICT);
+    expect(await json(refused)).toMatchObject({
+      code: "LABOUR_CATEGORY_IN_USE",
+    });
+
+    // Overtime on a live attendance day under the category also holds it.
+    await prisma.constructionLabourEmployee.update({
+      where: { id: employeeId },
+      data: { labourCategoryId: null },
+    });
     const dayId = newId();
     await prisma.constructionLabourAttendance.create({
       data: {
         id: dayId,
         workspaceId: owner.workspaceId,
         projectId: newId(),
-        labourId,
+        employeeId,
         attendanceDate: new Date("2026-10-02"),
         status: "present",
-        supervisorId: supervisor.id,
         wageType: "daily",
         wageRate: 80_000,
         earned: 80_000,
         createdBy: "test",
         updatedBy: "test",
+        overtime: {
+          create: {
+            id: newId(),
+            labourCategoryId: category.id,
+            hours: 1,
+            ratePerHour: 10_000,
+            amount: 10_000,
+          },
+        },
       },
     });
+    expect((await deleteIt()).status).toBe(StatusCodes.CONFLICT);
 
-    const refusedCategory = await deleteCategory(
-      jsonRequest(`${CATEGORIES}/${category.id}/delete`, owner.cookie, {}),
-      params(category.id),
-    );
-    expect(refusedCategory.status).toBe(StatusCodes.CONFLICT);
-    expect(await json(refusedCategory)).toMatchObject({
-      code: "LABOUR_CATEGORY_IN_USE",
-    });
-    const refusedSupervisor = await deleteSupervisor(
-      jsonRequest(`${SUPERVISORS}/${supervisor.id}/delete`, owner.cookie, {}),
-      params(supervisor.id),
-    );
-    expect(refusedSupervisor.status).toBe(StatusCodes.CONFLICT);
-    expect(await json(refusedSupervisor)).toMatchObject({
-      code: "SUPERVISOR_IN_USE",
-    });
-
-    // Once the labourer and the day are gone (tombstones), both can be deleted.
-    await prisma.constructionLabourLabour.update({
-      where: { id: labourId },
-      data: { deletedAt: new Date(), deletedBy: "test" },
-    });
+    // Once the day is gone (a tombstone), it can be deleted.
     await prisma.constructionLabourAttendance.update({
       where: { id: dayId },
       data: { deletedAt: new Date() },
     });
-    const deletedCategory = await deleteCategory(
-      jsonRequest(`${CATEGORIES}/${category.id}/delete`, owner.cookie, {}),
-      params(category.id),
-    );
-    expect(deletedCategory.status).toBe(StatusCodes.NO_CONTENT);
-    const deletedSupervisor = await deleteSupervisor(
-      jsonRequest(`${SUPERVISORS}/${supervisor.id}/delete`, owner.cookie, {}),
-      params(supervisor.id),
-    );
-    expect(deletedSupervisor.status).toBe(StatusCodes.NO_CONTENT);
-  });
-
-  it("keeps Supervisors with a mobile and an optional Team Member", async () => {
-    const owner = await ownerWithCompany();
-    const ownerMember =
-      await prisma.constructionOrganizationTeamMember.findFirst({
-        where: { workspaceId: owner.workspaceId, isOwner: true },
-      });
-    if (ownerMember == null) throw new Error("No Owner Team Member");
-
-    const created = await createSupervisor(
-      jsonRequest(SUPERVISORS, owner.cookie, {
-        name: "Arun Selva Kumar",
-        mobile: "77081 65767",
-        teamMemberId: ownerMember.id,
-      }),
-    );
-    expect(created.status).toBe(StatusCodes.CREATED);
-    const supervisor = await json<SupervisorBody>(created);
-    expect(supervisor).toMatchObject({
-      name: "Arun Selva Kumar",
-      mobile: "+917708165767",
-      teamMemberId: ownerMember.id,
-      teamMemberName: ownerMember.name,
-      disabled: false,
-    });
-
-    const badMobile = await createSupervisor(
-      jsonRequest(SUPERVISORS, owner.cookie, {
-        name: "Dhuresh",
-        mobile: "123",
-      }),
-    );
-    expect(badMobile.status).toBe(StatusCodes.BAD_REQUEST);
-    expect(await json(badMobile)).toMatchObject({ code: "MOBILE_INVALID" });
-
-    const other = await ownerWithCompany("Sakthi Constructions");
-    const theirMember =
-      await prisma.constructionOrganizationTeamMember.findFirst({
-        where: { workspaceId: other.workspaceId, isOwner: true },
-      });
-    const foreign = await createSupervisor(
-      jsonRequest(SUPERVISORS, owner.cookie, {
-        name: "Dhuresh",
-        teamMemberId: theirMember?.id,
-      }),
-    );
-    expect(foreign.status).toBe(StatusCodes.BAD_REQUEST);
-    expect(await json(foreign)).toMatchObject({
-      code: "SUPERVISOR_TEAM_MEMBER_NOT_FOUND",
-    });
-
-    const sameName = await createSupervisor(
-      jsonRequest(SUPERVISORS, owner.cookie, { name: "arun selva kumar" }),
-    );
-    expect(sameName.status).toBe(StatusCodes.CONFLICT);
-    expect(await json(sameName)).toMatchObject({
-      code: "SUPERVISOR_NAME_IN_USE",
-    });
-
-    const updated = await updateSupervisor(
-      jsonRequest(`${SUPERVISORS}/${supervisor.id}/update`, owner.cookie, {
-        name: "Muthu P.",
-        mobile: null,
-        teamMemberId: null,
-        expectedUpdatedAt: supervisor.updatedAt,
-      }),
-      params(supervisor.id),
-    );
-    expect(updated.status).toBe(StatusCodes.OK);
-    expect(await json(updated)).toMatchObject({
-      name: "Muthu P.",
-      mobile: null,
-      teamMemberId: null,
-      teamMemberName: null,
-    });
-    const stale = await updateSupervisor(
-      jsonRequest(`${SUPERVISORS}/${supervisor.id}/update`, owner.cookie, {
-        name: "Muthu",
-        expectedUpdatedAt: supervisor.updatedAt,
-      }),
-      params(supervisor.id),
-    );
-    expect(await json(stale)).toMatchObject({ code: "SUPERVISOR_CHANGED" });
-
-    const disabled = await disableSupervisor(
-      jsonRequest(`${SUPERVISORS}/${supervisor.id}/disable`, owner.cookie, {}),
-      params(supervisor.id),
-    );
-    expect(await json(disabled)).toMatchObject({ disabled: true });
-    expect(
-      await listOf(
-        listSupervisors,
-        `${SUPERVISORS}?status=enabled`,
-        owner.cookie,
-      ),
-    ).toEqual([]);
-    const enabled = await enableSupervisor(
-      jsonRequest(`${SUPERVISORS}/${supervisor.id}/enable`, owner.cookie, {}),
-      params(supervisor.id),
-    );
-    expect(await json(enabled)).toMatchObject({ disabled: false });
-    const read = await getSupervisor(
-      jsonRequest(`${SUPERVISORS}/${supervisor.id}`, owner.cookie),
-      params(supervisor.id),
-    );
-    expect(read.status).toBe(StatusCodes.OK);
+    expect((await deleteIt()).status).toBe(StatusCodes.NO_CONTENT);
   });
 
   it("does not show or change another Company's rows", async () => {
@@ -587,31 +420,12 @@ describe("Masters HTTP (CM-203)", () => {
       params(id),
     );
     expect(disabled.status).toBe(StatusCodes.NOT_FOUND);
-    const theirSupervisor = await json<SupervisorBody>(
-      await createSupervisor(
-        jsonRequest(SUPERVISORS, theirs.cookie, { name: "Dhuresh" }),
-      ),
-    );
-    const updated = await updateSupervisor(
-      jsonRequest(`${SUPERVISORS}/${theirSupervisor.id}/update`, mine.cookie, {
-        name: "Mine now",
-        expectedUpdatedAt: theirSupervisor.updatedAt,
-      }),
-      params(theirSupervisor.id),
-    );
-    expect(updated.status).toBe(StatusCodes.NOT_FOUND);
-    // The same name in two Companies is fine.
-    const same = await createSupervisor(
-      jsonRequest(SUPERVISORS, mine.cookie, { name: "Dhuresh" }),
-    );
-    expect(same.status).toBe(StatusCodes.CREATED);
   });
 
   it("checks each list's Menu in the Permission Matrix", async () => {
     const company = await ownerWithCompany();
     const reader = await memberWith(company, {
       "masters.labour_categories": ["read"],
-      "masters.labours": ["read", "create"],
     });
     expect(
       await listOf(listCategories, CATEGORIES, reader.cookie),
@@ -621,16 +435,6 @@ describe("Masters HTTP (CM-203)", () => {
     );
     expect(refused.status).toBe(StatusCodes.FORBIDDEN);
     expect(await json(refused)).toMatchObject({ code: "PERMISSION_DENIED" });
-    const supervisor = await createSupervisor(
-      jsonRequest(SUPERVISORS, reader.cookie, { name: "Dhuresh" }),
-    );
-    expect(supervisor.status).toBe(StatusCodes.CREATED);
-    const { id } = await json<SupervisorBody>(supervisor);
-    const deleted = await deleteSupervisor(
-      jsonRequest(`${SUPERVISORS}/${id}/delete`, reader.cookie, {}),
-      params(id),
-    );
-    expect(deleted.status).toBe(StatusCodes.FORBIDDEN);
   });
 
   it("is on /api/docs", async () => {
@@ -638,8 +442,8 @@ describe("Masters HTTP (CM-203)", () => {
       paths: Record<string, Record<string, { tags: string[] }>>;
       components: { schemas: Record<string, unknown> };
     }>(getOpenApi());
-    for (const list of ["labour-categories", "supervisors"]) {
-      const path = `/api/construction/masters/${list}`;
+    {
+      const path = "/api/construction/masters/labour-categories";
       for (const suffix of [
         "",
         "/{id}",
@@ -659,12 +463,16 @@ describe("Masters HTTP (CM-203)", () => {
         "ConstructionMastersLabourCategoryResponse",
         "CreateConstructionMastersLabourCategoryRequest",
         "UpdateConstructionMastersLabourCategoryRequest",
-        "ListConstructionMastersSupervisorsResponse",
-        "ConstructionMastersSupervisorResponse",
-        "CreateConstructionMastersSupervisorRequest",
-        "UpdateConstructionMastersSupervisorRequest",
       ]),
     );
+    // Site Engineers are Employees now (ADR CM-0055 §6).
+    for (const gone of ["supervisors", "site-engineers"])
+      expect(spec.paths[`/api/construction/masters/${gone}`]).toBeUndefined();
+    expect(
+      Object.keys(spec.components.schemas).filter((name) =>
+        /Supervisor|SiteEngineer/.test(name),
+      ),
+    ).toEqual([]);
     // The Department master is gone (ADR CM-0048).
     expect(spec.paths["/api/construction/masters/departments"]).toBeUndefined();
     expect(Object.keys(spec.components.schemas)).not.toContain(

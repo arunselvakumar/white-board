@@ -9,7 +9,7 @@ import {
 import { newId } from "@/src/shared-kernel/ids";
 import type { ListCursor } from "@/src/shared-kernel/list-cursor";
 
-import { MAX_PAISE } from "../domain/labour";
+import { MAX_PAISE } from "../domain/ledger";
 import {
   Vendor,
   type VendorDetailsInput,

@@ -5,7 +5,7 @@ import type { CheckInPerson } from "@/src/queries/check-ins";
 import { matchesPerson } from "./check-in-search";
 
 const murugan: CheckInPerson = {
-  kind: "labour",
+  kind: "employee",
   id: "0199c4a0-0000-7000-8000-0000000000a1",
   name: "Murugan Ganesan",
   role: "Mason",

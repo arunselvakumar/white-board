@@ -9,6 +9,7 @@ import {
   calendarDateToDb,
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
+import { companyToday } from "@/src/shared-kernel/company-today";
 
 import type {
   BalanceEntry,
@@ -17,7 +18,6 @@ import type {
   BalanceStore,
 } from "../application/balance-handlers";
 import type { LedgerSourceType, PartyType, Period } from "../domain/ledger";
-import { companyToday } from "./prisma-labour-queries";
 
 function byName<T extends { name: string }>(items: T[]): T[] {
   const collator = new Intl.Collator("en", {
@@ -27,7 +27,7 @@ function byName<T extends { name: string }>(items: T[]): T[] {
   return items.sort((a, b) => collator.compare(a.name, b.name));
 }
 
-/** Plain reads of labourers, vendors, the ledger and payments for balances. */
+/** Plain reads of Employees, vendors, the ledger and payments for balances. */
 export class PrismaBalanceStore implements BalanceStore {
   constructor(
     private readonly db: PrismaClient,
@@ -71,8 +71,8 @@ export class PrismaBalanceStore implements BalanceStore {
       range,
     );
     const joinedBy = { lte: calendarDateToDb(range.to) };
-    if (partyType === "labour") {
-      const rows = await this.db.constructionLabourLabour.findMany({
+    if (partyType === "employee") {
+      const rows = await this.db.constructionLabourEmployee.findMany({
         where: {
           workspaceId,
           deletedAt: null,
@@ -84,7 +84,7 @@ export class PrismaBalanceStore implements BalanceStore {
         select: {
           id: true,
           name: true,
-          labourCode: true,
+          employeeCode: true,
           isActive: true,
           projects: { where: { projectId }, select: { projectId: true } },
         },
@@ -93,7 +93,7 @@ export class PrismaBalanceStore implements BalanceStore {
         rows.map((row) => ({
           id: row.id,
           name: row.name,
-          code: row.labourCode,
+          code: row.employeeCode,
           isActive: row.isActive,
           onProject: row.projects.length > 0,
         })),
@@ -133,13 +133,13 @@ export class PrismaBalanceStore implements BalanceStore {
     projectId: string,
   ): Promise<BalanceParty | null> {
     const where = { id: partyId, workspaceId, deletedAt: null };
-    if (partyType === "labour") {
-      const row = await this.db.constructionLabourLabour.findFirst({
+    if (partyType === "employee") {
+      const row = await this.db.constructionLabourEmployee.findFirst({
         where,
         select: {
           id: true,
           name: true,
-          labourCode: true,
+          employeeCode: true,
           isActive: true,
           projects: { where: { projectId }, select: { projectId: true } },
         },
@@ -149,7 +149,7 @@ export class PrismaBalanceStore implements BalanceStore {
         : {
             id: row.id,
             name: row.name,
-            code: row.labourCode,
+            code: row.employeeCode,
             isActive: row.isActive,
             onProject: row.projects.length > 0,
           };

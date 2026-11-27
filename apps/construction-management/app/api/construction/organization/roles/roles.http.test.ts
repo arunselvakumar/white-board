@@ -11,6 +11,7 @@ import {
 } from "@/app/api/construction/organization/departments/route";
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import { jsonRequest, memberWith, ownerWithCompany } from "@/test/companies";
+import { seedEmployee } from "@/test/employees";
 import { TEST_ORIGIN } from "@/test/sessions";
 
 import { POST as deleteRole } from "./[id]/delete/route";
@@ -29,6 +30,7 @@ type Role = {
   department: { id: string; name: string } | null;
   permissions: Record<string, string[]>;
   userCount: number;
+  employeeCount: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -258,8 +260,45 @@ describe("Role Management HTTP (ADR CM-0030)", () => {
     expect(response.status).toBe(StatusCodes.CONFLICT);
     expect(await json(response)).toMatchObject({
       code: "ROLE_IN_USE",
-      details: { userCount: 1 },
+      details: { userCount: 1, employeeCount: 0 },
     });
+  });
+
+  it("will not delete a Role with live Employees on it, and counts them (ADR CM-0055 §2)", async () => {
+    const owner = await ownerWithCompany();
+    const created = await createRole(
+      jsonRequest(BASE, owner.cookie, { name: "Foreman", permissions: {} }),
+    );
+    expect(created.status).toBe(StatusCodes.CREATED);
+    const foreman = await json<Role>(created);
+    const employeeId = await seedEmployee({
+      workspaceId: owner.workspaceId,
+      roleId: foreman.id,
+    });
+    const listed = (await list(owner.cookie)).find(
+      (role) => role.id === foreman.id,
+    );
+    expect(listed).toMatchObject({ userCount: 0, employeeCount: 1 });
+    const refused = await deleteRole(
+      jsonRequest(`${BASE}/${foreman.id}/delete`, owner.cookie, {}),
+      params(foreman.id),
+    );
+    expect(refused.status).toBe(StatusCodes.CONFLICT);
+    expect(await json(refused)).toMatchObject({
+      code: "ROLE_IN_USE",
+      details: { userCount: 0, employeeCount: 1 },
+    });
+
+    // A deleted Employee no longer holds it.
+    await prisma.constructionLabourEmployee.update({
+      where: { id: employeeId },
+      data: { deletedAt: new Date(), deletedBy: "test" },
+    });
+    const deleted = await deleteRole(
+      jsonRequest(`${BASE}/${foreman.id}/delete`, owner.cookie, {}),
+      params(foreman.id),
+    );
+    expect(deleted.status).toBe(StatusCodes.NO_CONTENT);
   });
 
   it("gives a new Company the default Marketing Role with only its own Marketing cells, locked like every default (ADR CM-0040 §3)", async () => {
@@ -397,6 +436,9 @@ describe("Role Management HTTP (ADR CM-0030)", () => {
       jsonRequest(BASE, adder.cookie, { name: "X", permissions: {} }),
     );
     expect(refused.status).toBe(StatusCodes.FORBIDDEN);
+    // The Employee form offers each Employee's Role (ADR CM-0055).
+    const employees = await memberWith(owner, { "masters.labours": ["read"] });
+    expect(await list(employees.cookie)).not.toHaveLength(0);
     const outsider = await memberWith(owner, {
       "projects.project": ["read"],
     });

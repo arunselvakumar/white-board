@@ -1,26 +1,28 @@
 import { expect } from "@playwright/test";
 
 import {
-  createLabour,
-  markLabourAttendance,
+  createEmployee,
+  markEmployeeAttendance,
   todayInIndia,
 } from "../api/labour";
 import { projectTest } from "../helpers/projectTest";
 
 projectTest.describe("Central Reports", () => {
   projectTest(
-    "should put a ready Excel workbook in Downloads, when the Owner generates Central Labour Attendance",
+    "should put a ready Excel workbook in Downloads, when the Owner generates Central Employee Attendance",
     async ({ owner, project, page }) => {
-      const labour = await createLabour(owner.api, { projectId: project.id });
-      await markLabourAttendance(owner.api, {
+      const employee = await createEmployee(owner.api, {
+        projectId: project.id,
+      });
+      await markEmployeeAttendance(owner.api, {
         projectId: project.id,
         date: todayInIndia(),
-        labourIds: [labour.id],
+        employeeIds: [employee.id],
       });
 
       await page.goto("/app/workspace/central-reports");
       const form = page.getByRole("form", {
-        name: "Central Labour Attendance",
+        name: "Central Employee Attendance",
       });
       await form.getByRole("button", { name: "Generate" }).click();
 
@@ -28,7 +30,7 @@ projectTest.describe("Central Reports", () => {
       const row = page
         .getByRole("main")
         .getByRole("listitem")
-        .filter({ hasText: "Central Labour Attendance" })
+        .filter({ hasText: "Central Employee Attendance" })
         .first();
       await expect(async () => {
         await page.reload();

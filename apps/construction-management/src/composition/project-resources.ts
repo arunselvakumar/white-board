@@ -1,6 +1,6 @@
 import { prisma, type PrismaClient } from "@repo/construction-db";
 
-import { createLabourHandlers } from "@/src/labour/infrastructure/create-labour-handlers";
+import { createEmployeeHandlers } from "@/src/labour/infrastructure/create-employee-handlers";
 import { createVendorHandlers } from "@/src/labour/infrastructure/create-vendor-handlers";
 import { createPartyHandlers } from "@/src/masters/infrastructure/create-party-handlers";
 import { createTeamMemberHandlers } from "@/src/organization/infrastructure/create-team-member-handlers";
@@ -11,12 +11,6 @@ import {
 import { PrismaProjectRepository } from "@/src/projects/infrastructure/prisma-project-repository";
 import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 import { companyToday } from "@/src/shared-kernel/company-today";
-
-import {
-  createSiteEngineerHandlers,
-  type ProjectSiteEngineer,
-  type ProjectSiteEngineerChoice,
-} from "./site-engineers";
 
 /** The four kinds of party a Project's Resources assign (ADR CM-0013 §6). */
 export const RESOURCE_KINDS = [
@@ -43,12 +37,13 @@ export type ProjectTeamMemberResource = ProjectResource & {
 };
 
 export type ProjectResources = {
-  /** The Company's today: what Add Labours and Remove offer as the date. */
+  /** The Company's today: what Add Employees and Remove offer as the date. */
   today: CalendarDate;
-  /** Their sign-ins are left out of `teamMembers` (ADR CM-0038 §3). */
-  siteEngineers: ProjectSiteEngineer[];
-  /** How many; the list is paged on its own route (ADR CM-0038 §2). */
-  labours: { total: number };
+  /**
+   * How many; the list is paged on its own route (ADR CM-0038 §2, CM-0055
+   * §5). Their sign-ins are left out of `teamMembers`.
+   */
+  employees: { total: number };
   teamMembers: ProjectTeamMemberResource[];
   contractors: ProjectResource[];
   suppliers: ProjectResource[];
@@ -75,33 +70,17 @@ export type ResourceSides = {
   vendors: ResourceSide;
 };
 
-/** Site Engineers (masters and organization) and Labours (labour) on a Project. */
+/** Employees (labour) on a Project, and the Company's today. */
 export type StaffingSides = {
-  siteEngineers: {
-    onProject(
-      workspaceId: string,
-      projectId: string,
-    ): Promise<ProjectSiteEngineer[]>;
-    assignable(
-      workspaceId: string,
-      projectId: string,
-    ): Promise<ProjectSiteEngineerChoice[]>;
-    setOnProject(input: {
-      workspaceId: string;
-      projectId: string;
-      ids: readonly string[];
-      expectedIds: readonly string[];
-      by: string;
-    }): Promise<void>;
-  };
-  labourCount(workspaceId: string, projectId: string): Promise<number>;
+  employeeCount(workspaceId: string, projectId: string): Promise<number>;
   today(workspaceId: string): Promise<CalendarDate>;
 };
 
 /**
- * A Project's Resources (CM-406): where the organization (Team Members),
- * masters (Contractors, Suppliers, Site Engineers with their sign-ins) and
- * labour (Vendors, Labours) contexts meet a Project. Each party keeps its Projects in its own context, so every
+ * A Project's Resources (CM-406), shown as its Teams: where the
+ * organization (Team Members), masters (Contractors, Suppliers) and labour
+ * (Vendors, Employees) contexts meet a Project. Each party keeps its
+ * Projects in its own context, so every
  * write goes through that context's application layer; this module only
  * checks the Project is visible to the viewer (projects context) first.
  * The Permission Matrix is checked by the routes.
@@ -123,27 +102,18 @@ export class ProjectResourcesService {
   ): Promise<ProjectResources> {
     await this.assertVisible(viewer, projectId);
     const { workspaceId } = viewer;
-    const [
-      today,
-      siteEngineers,
-      labours,
-      teamMembers,
-      contractors,
-      suppliers,
-      vendors,
-    ] = await Promise.all([
-      this.staffing.today(workspaceId),
-      this.staffing.siteEngineers.onProject(workspaceId, projectId),
-      this.staffing.labourCount(workspaceId, projectId),
-      this.sides.team_members.onProject(workspaceId, projectId),
-      this.sides.contractors.onProject(workspaceId, projectId),
-      this.sides.suppliers.onProject(workspaceId, projectId),
-      this.sides.vendors.onProject(workspaceId, projectId),
-    ]);
+    const [today, employees, teamMembers, contractors, suppliers, vendors] =
+      await Promise.all([
+        this.staffing.today(workspaceId),
+        this.staffing.employeeCount(workspaceId, projectId),
+        this.sides.team_members.onProject(workspaceId, projectId),
+        this.sides.contractors.onProject(workspaceId, projectId),
+        this.sides.suppliers.onProject(workspaceId, projectId),
+        this.sides.vendors.onProject(workspaceId, projectId),
+      ]);
     return {
       today,
-      siteEngineers,
-      labours: { total: labours },
+      employees: { total: employees },
       teamMembers,
       contractors,
       suppliers,
@@ -159,35 +129,6 @@ export class ProjectResourcesService {
   ): Promise<ProjectResource[]> {
     await this.assertVisible(viewer, projectId);
     return this.sides[kind].assignable(viewer.workspaceId);
-  }
-
-  /** Site Engineers the Add Site Engineers picker lists (ADR CM-0038 §3). */
-  async assignableSiteEngineers(
-    viewer: ProjectViewer,
-    projectId: string,
-  ): Promise<ProjectSiteEngineerChoice[]> {
-    await this.assertVisible(viewer, projectId);
-    return this.staffing.siteEngineers.assignable(
-      viewer.workspaceId,
-      projectId,
-    );
-  }
-
-  /** Makes `ids` (Site Engineer rows) the Site Engineers on the Project. */
-  async setSiteEngineers(
-    viewer: ProjectViewer,
-    projectId: string,
-    input: { ids: readonly string[]; expectedIds: readonly string[] },
-  ): Promise<ProjectResources> {
-    await this.assertVisible(viewer, projectId);
-    await this.staffing.siteEngineers.setOnProject({
-      workspaceId: viewer.workspaceId,
-      projectId,
-      ids: input.ids,
-      expectedIds: input.expectedIds,
-      by: viewer.userId,
-    });
-    return this.get(viewer, projectId);
   }
 
   /** Makes `ids` the parties of a kind on the Project, through their own context. */
@@ -216,26 +157,10 @@ export function createProjectResources(deps?: {
   const db = deps?.prisma ?? prisma;
   const projects = new PrismaProjectRepository(db);
   const teamMembers = createTeamMemberHandlers({ prisma: db });
-  const siteEngineers = createSiteEngineerHandlers({
-    prisma: db,
-    members: teamMembers,
-  });
   const vendors = createVendorHandlers({ prisma: db });
-  const labours = createLabourHandlers({ prisma: db }).labours;
-  // Each person appears once: a Site Engineer's sign-in is listed, added
-  // and removed only in the Site Engineers section (ADR CM-0038 §3).
-  const notSiteEngineers = async <
-    Line extends { id: string; isOwner: boolean },
-  >(
-    workspaceId: string,
-    lines: Promise<Line[]>,
-  ) => {
-    const [signIns, items] = await Promise.all([
-      siteEngineers.signInIds(workspaceId),
-      lines,
-    ]);
-    return items.filter((line) => line.isOwner || !signIns.has(line.id));
-  };
+  const employees = createEmployeeHandlers({ prisma: db }).employees;
+  // Employees' sign-ins are left out of the Team Members by the
+  // organization context: each person appears once (ADR CM-0055 §5).
   return new ProjectResourcesService(
     async (viewer, projectId) => {
       await loadVisibleProject(projects, viewer, projectId);
@@ -243,38 +168,18 @@ export function createProjectResources(deps?: {
     {
       team_members: {
         onProject: (workspaceId, projectId) =>
-          notSiteEngineers(
-            workspaceId,
-            teamMembers.projectTeam(workspaceId, projectId),
-          ),
+          teamMembers.projectTeam(workspaceId, projectId),
         assignable: (workspaceId) =>
-          notSiteEngineers(
-            workspaceId,
-            teamMembers.assignableToProjects(workspaceId),
-          ),
-        setOnProject: async (input) => {
-          await teamMembers.setProjectTeam({
-            ...input,
-            scope: {
-              except: await siteEngineers.signInIds(input.workspaceId),
-            },
-          });
-        },
+          teamMembers.assignableToProjects(workspaceId),
+        setOnProject: (input) => teamMembers.setProjectTeam(input),
       },
       contractors: createPartyHandlers("contractor", { prisma: db }),
       suppliers: createPartyHandlers("supplier", { prisma: db }),
       vendors,
     },
     {
-      siteEngineers: {
-        onProject: (workspaceId, projectId) =>
-          siteEngineers.onProject(workspaceId, projectId),
-        assignable: (workspaceId, projectId) =>
-          siteEngineers.assignableToProject(workspaceId, projectId),
-        setOnProject: (input) => siteEngineers.setOnProject(input),
-      },
-      labourCount: (workspaceId, projectId) =>
-        labours.countOnProject(workspaceId, projectId),
+      employeeCount: (workspaceId, projectId) =>
+        employees.countOnProject(workspaceId, projectId),
       today: (workspaceId) => companyToday(db, workspaceId),
     },
   );

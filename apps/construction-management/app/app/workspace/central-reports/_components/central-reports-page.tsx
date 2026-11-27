@@ -28,9 +28,9 @@ const CENTRAL_GROUPS: {
 }[] = [
   {
     group: "labour",
-    title: "Labour and vendors",
+    title: "Employees and vendors",
     description:
-      "Labour and vendor attendance across the Projects you may see, as an Excel workbook and a PDF.",
+      "Employee and vendor attendance across the Projects you may see, as an Excel workbook and a PDF.",
   },
   {
     group: "procurement",

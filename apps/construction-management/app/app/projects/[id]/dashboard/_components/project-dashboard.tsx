@@ -170,7 +170,7 @@ function SummarySection({ projectId }: { projectId: string }) {
   );
 }
 
-/** Labour on the duration's last day and the day-wise trend. */
+/** Employees on the duration's last day and the day-wise trend. */
 function AttendanceSection({
   projectId,
   duration,
@@ -191,7 +191,7 @@ function AttendanceSection({
           facts={[
             {
               label: today
-                ? "Labours present today"
+                ? "Employees present today"
                 : `Present on ${formatCalendarDate(duration.to)}`,
               icon: HardHat,
             },
@@ -212,19 +212,19 @@ function AttendanceSection({
             <Fact
               label={
                 today
-                  ? "Labours present today"
+                  ? "Employees present today"
                   : `Present on ${formatCalendarDate(data.date)}`
               }
               icon={HardHat}
             >
-              {data.labourers.present + data.labourers.halfDay}
-              <Unit>/{data.labourers.onProject}</Unit>
+              {data.employees.present + data.employees.halfDay}
+              <Unit>/{data.employees.onProject}</Unit>
             </Fact>
             <Fact label="Absent" icon={UserX}>
-              {data.labourers.absent}
+              {data.employees.absent}
             </Fact>
             <Fact label="Not marked" icon={ClipboardCheck}>
-              {data.labourers.unmarked}
+              {data.employees.unmarked}
             </Fact>
             <Fact label="Vendor heads" icon={Handshake}>
               {data.vendors.headcountToday}

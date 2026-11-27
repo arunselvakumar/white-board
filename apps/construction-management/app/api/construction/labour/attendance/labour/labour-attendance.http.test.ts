@@ -2,9 +2,6 @@ import { prisma } from "@repo/construction-db";
 import { StatusCodes } from "http-status-codes";
 import { describe, expect, it } from "vitest";
 
-import { POST as deactivateLabour } from "@/app/api/construction/labour/labours/[id]/deactivate/route";
-import { POST as createLabour } from "@/app/api/construction/labour/labours/route";
-import { POST as transferLabours } from "@/app/api/construction/labour/labours/transfer/route";
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import { daysInMonth, weekdayOf } from "@/src/labour/domain/wages";
 import { prismaLedger } from "@/src/labour/infrastructure/prisma-ledger";
@@ -17,6 +14,7 @@ import {
   memberWith,
   ownerWithCompany,
 } from "@/test/companies";
+import { moveEmployee, seedEmployee } from "@/test/employees";
 import { TEST_ORIGIN } from "@/test/sessions";
 
 import { POST as setPaidLeave } from "./[id]/paid-leave/route";
@@ -27,19 +25,17 @@ import { GET as listDays } from "./route";
 import { GET as getSheet } from "./sheet/route";
 
 const BASE = `${TEST_ORIGIN}/api/construction/labour/attendance/labour`;
-const LABOURS = `${TEST_ORIGIN}/api/construction/labour/labours`;
 
 type Company = Awaited<ReturnType<typeof ownerWithCompany>>;
 
 type Day = {
   id: string;
-  labourId: string;
-  labourName: string;
+  employeeId: string;
+  employeeName: string;
   date: string;
   status: string;
   isPaidLeave: boolean;
   shift: string | null;
-  siteEngineers: { id: string; name: string }[];
   checkIn: string | null;
   checkOut: string | null;
   breakMinutes: number | null;
@@ -96,63 +92,22 @@ async function seedCategory(workspaceId: string, name: string) {
   return id;
 }
 
-/** A Site Engineer whose sign-in is on `projectIds` (ADR CM-0038 §3). */
-async function seedSiteEngineer(
-  workspaceId: string,
-  name: string,
-  projectIds: readonly string[] = [],
-) {
-  const id = newId();
-  const memberId = newId();
-  await prisma.constructionOrganizationTeamMember.create({
-    data: {
-      id: memberId,
-      workspaceId,
-      name,
-      email: `${memberId}@site.test`,
-      siteEngineer: true,
-      status: "active",
-      createdBy: "test",
-      updatedBy: "test",
-      projects: { create: projectIds.map((projectId) => ({ projectId })) },
-    },
-  });
-  await prisma.constructionMastersSupervisor.create({
-    data: {
-      id,
-      workspaceId,
-      name,
-      teamMemberId: memberId,
-      createdBy: "test",
-      updatedBy: "test",
-    },
-  });
-  return id;
-}
-
 async function fixtures(company: Company) {
   const [tower, villa, mason] = await Promise.all([
     addProject(company.workspaceId, company.userId, "Tower A"),
     addProject(company.workspaceId, company.userId, "Villa"),
     seedCategory(company.workspaceId, "Mason"),
   ]);
-  // Tower A's Site Engineer: its Labours answer to them (ADR CM-0041).
-  const sundar = await seedSiteEngineer(company.workspaceId, "Sundar", [tower]);
-  const labour = async (body: Record<string, unknown>) => {
-    const response = await createLabour(
-      jsonRequest(LABOURS, company.cookie, {
-        joiningDate: "2026-09-01",
-        overtimeWagePerHour: OT,
-        weeklyHolidays: [],
-        projectIds: [tower],
-        labourCategoryId: mason,
-        ...body,
-      }),
-    );
-    if (response.status !== 201)
-      throw new Error(`labour: ${await response.text()}`);
-    return (await json<{ id: string }>(response)).id;
-  };
+  const labour = (body: Partial<Parameters<typeof seedEmployee>[0]>) =>
+    seedEmployee({
+      workspaceId: company.workspaceId,
+      joiningDate: "2026-09-01",
+      overtimeWagePerHour: OT,
+      weeklyHolidays: [],
+      projectIds: [tower],
+      labourCategoryId: mason,
+      ...body,
+    });
   const dhuresh = await labour({
     name: "Dhuresh Nawin",
     wageType: "daily",
@@ -163,7 +118,7 @@ async function fixtures(company: Company) {
     wageType: "monthly",
     wagePerMonth: MONTHLY,
   });
-  return { tower, villa, mason, sundar, dhuresh, kavitha, labour };
+  return { tower, villa, mason, dhuresh, kavitha, labour };
 }
 
 type Fixtures = Awaited<ReturnType<typeof fixtures>>;
@@ -198,9 +153,9 @@ function sheet(cookie: string, projectId: string, date: string) {
   );
 }
 
-async function ledgerSum(labourId: string): Promise<number> {
+async function ledgerSum(employeeId: string): Promise<number> {
   const sum = await prisma.constructionLabourLedgerEntry.aggregate({
-    where: { partyId: labourId, sourceType: "labour_attendance" },
+    where: { partyId: employeeId, sourceType: "employee_attendance" },
     _sum: { amount: true },
   });
   return sum._sum.amount ?? 0;
@@ -225,13 +180,13 @@ function body(f: Fixtures, overrides: Record<string, unknown> = {}) {
     date: YESTERDAY,
     marks: [
       {
-        labourId: f.dhuresh,
+        employeeId: f.dhuresh,
         status: "present",
         shift: "Shift 1",
         overtime: [{ labourCategoryId: f.mason, hours: "1.5" }],
       },
       {
-        labourId: f.kavitha,
+        employeeId: f.kavitha,
         status: "half_day",
         overtime: [{ labourCategoryId: null, hours: 2, ratePerHour: 12_500 }],
       },
@@ -241,51 +196,14 @@ function body(f: Fixtures, overrides: Record<string, unknown> = {}) {
 }
 
 describe("labour attendance HTTP", () => {
-  it("saves no Site Engineer on a new day, and keeps one saved before ADR CM-0041", async () => {
-    const company = await ownerWithCompany();
-    const f = await fixtures(company);
-    const [dhuresh] = await marked(company.cookie, body(f));
-    if (dhuresh == null) throw new Error("not marked");
-    const row = await prisma.constructionLabourAttendance.findUniqueOrThrow({
-      where: { id: dhuresh.id },
-    });
-    expect(row.supervisorId).toBeNull();
-
-    // A day marked before the change carries the Labour's own Site Engineer.
-    const ravi = await seedSiteEngineer(company.workspaceId, "Ravi");
-    await prisma.constructionLabourAttendance.update({
-      where: { id: dhuresh.id },
-      data: { supervisorId: ravi },
-    });
-    const [again] = await marked(company.cookie, {
-      projectId: f.tower,
-      date: YESTERDAY,
-      // Sent by a screen from before the change: ignored.
-      marks: [
-        { labourId: f.dhuresh, status: "half_day", supervisorId: f.sundar },
-      ],
-      expected: { [f.dhuresh]: row.updatedAt.toISOString() },
-    });
-    expect(again).toMatchObject({
-      status: "half_day",
-      siteEngineers: [{ id: ravi, name: "Ravi" }],
-    });
-    const kept = await prisma.constructionLabourAttendance.findUniqueOrThrow({
-      where: { id: dhuresh.id },
-    });
-    expect(kept.supervisorId).toBe(ravi);
-  });
-
   it("marks many Labours, posts earned and overtime, re-marks with expected and clears", async () => {
     const company = await ownerWithCompany();
     const f = await fixtures(company);
     const [dhuresh, kavitha] = await marked(company.cookie, body(f));
     expect(dhuresh).toMatchObject({
-      labourId: f.dhuresh,
+      employeeId: f.dhuresh,
       status: "present",
       shift: "Shift 1",
-      // None saved: the Project's Site Engineers (ADR CM-0041).
-      siteEngineers: [{ id: f.sundar, name: "Sundar" }],
       wageRate: DAILY,
       earned: DAILY,
       overtimeHours: "1.5",
@@ -317,18 +235,18 @@ describe("labour attendance HTTP", () => {
     const again = await failure(
       await mark(company.cookie, {
         ...body(f),
-        marks: [{ labourId: f.dhuresh, status: "absent" }],
+        marks: [{ employeeId: f.dhuresh, status: "absent" }],
       }),
     );
     expect(again).toMatchObject({
       status: StatusCodes.CONFLICT,
       code: "ATTENDANCE_CHANGED",
-      details: { labourId: f.dhuresh },
+      details: { employeeId: f.dhuresh },
     });
     const stale = await failure(
       await mark(company.cookie, {
         ...body(f),
-        marks: [{ labourId: f.dhuresh, status: "absent" }],
+        marks: [{ employeeId: f.dhuresh, status: "absent" }],
         expected: { [f.dhuresh]: "2026-01-01T00:00:00.000Z" },
       }),
     );
@@ -337,7 +255,7 @@ describe("labour attendance HTTP", () => {
     // Re-mark: reverse and repost; the balance follows.
     const [changed] = await marked(company.cookie, {
       ...body(f),
-      marks: [{ labourId: f.dhuresh, status: "half_day" }],
+      marks: [{ employeeId: f.dhuresh, status: "half_day" }],
       expected: { [f.dhuresh]: dhuresh?.updatedAt },
     });
     expect(changed?.id).toBe(dhuresh?.id);
@@ -347,7 +265,7 @@ describe("labour attendance HTTP", () => {
     const balances = await prismaLedger.balances(
       prisma,
       company.workspaceId,
-      "labour",
+      "employee",
       [f.dhuresh],
       TODAY,
     );
@@ -363,18 +281,18 @@ describe("labour attendance HTTP", () => {
       await clear(company.cookie, {
         projectId: f.tower,
         date: YESTERDAY,
-        labourIds: [f.dhuresh],
+        employeeIds: [f.dhuresh],
         expected: { [f.dhuresh]: dhuresh?.updatedAt },
       }),
     );
     expect(staleClear).toMatchObject({
       status: StatusCodes.CONFLICT,
-      details: { labourId: f.dhuresh },
+      details: { employeeId: f.dhuresh },
     });
     const cleared = await clear(company.cookie, {
       projectId: f.tower,
       date: YESTERDAY,
-      labourIds: [f.dhuresh, f.kavitha],
+      employeeIds: [f.dhuresh, f.kavitha],
       expected: {
         [f.dhuresh]: changed?.updatedAt,
         [f.kavitha]: kavitha?.updatedAt,
@@ -403,8 +321,8 @@ describe("labour attendance HTTP", () => {
       projectId: f.tower,
       date: YESTERDAY,
       marks: [
-        { labourId: f.dhuresh, status: "holiday" },
-        { labourId: f.kavitha, status: "holiday" },
+        { employeeId: f.dhuresh, status: "holiday" },
+        { employeeId: f.kavitha, status: "holiday" },
       ],
     });
     expect(dhuresh?.earned).toBe(0);
@@ -414,7 +332,7 @@ describe("labour attendance HTTP", () => {
     const [leave] = await marked(company.cookie, {
       projectId: f.tower,
       date: YESTERDAY,
-      marks: [{ labourId: f.dhuresh, status: "on_leave" }],
+      marks: [{ employeeId: f.dhuresh, status: "on_leave" }],
       expected: { [f.dhuresh]: dhuresh?.updatedAt },
     });
     if (leave == null) throw new Error("no leave row");
@@ -454,7 +372,7 @@ describe("labour attendance HTTP", () => {
         ...body(f),
         marks: [
           {
-            labourId: f.kavitha,
+            employeeId: f.kavitha,
             status: "absent",
             overtime: [{ labourCategoryId: null, hours: 1 }],
           },
@@ -464,28 +382,27 @@ describe("labour attendance HTTP", () => {
     expect(absent).toMatchObject({
       status: StatusCodes.BAD_REQUEST,
       code: "OVERTIME_ON_ABSENT_DAY",
-      details: { labourId: f.kavitha },
+      details: { employeeId: f.kavitha },
     });
 
     // Dhuresh moves to the Villa from two days ago.
-    const moved = await transferLabours(
-      jsonRequest(`${LABOURS}/transfer`, company.cookie, {
-        labourIds: [f.dhuresh],
-        toProjectId: f.villa,
-        transferDate: addDays(TODAY, -2),
-      }),
-    );
-    expect(moved.status).toBe(StatusCodes.OK);
+    await moveEmployee({
+      workspaceId: company.workspaceId,
+      employeeId: f.dhuresh,
+      fromProjectId: f.tower,
+      toProjectId: f.villa,
+      date: addDays(TODAY, -2),
+    });
     const offProject = await failure(
       await mark(company.cookie, {
         ...body(f),
-        marks: [{ labourId: f.dhuresh, status: "present" }],
+        marks: [{ employeeId: f.dhuresh, status: "present" }],
       }),
     );
     expect(offProject).toMatchObject({
       status: StatusCodes.BAD_REQUEST,
-      code: "LABOUR_NOT_ON_PROJECT",
-      details: { labourId: f.dhuresh },
+      code: "EMPLOYEE_NOT_ON_PROJECT",
+      details: { employeeId: f.dhuresh },
     });
     // Before the transfer the day belongs to the Tower; after, to the Villa.
     expect(
@@ -493,7 +410,7 @@ describe("labour attendance HTTP", () => {
         await mark(company.cookie, {
           ...body(f),
           date: addDays(TODAY, -3),
-          marks: [{ labourId: f.dhuresh, status: "present" }],
+          marks: [{ employeeId: f.dhuresh, status: "present" }],
         })
       ).status,
     ).toBe(StatusCodes.OK);
@@ -502,30 +419,30 @@ describe("labour attendance HTTP", () => {
         await mark(company.cookie, {
           ...body(f),
           projectId: f.villa,
-          marks: [{ labourId: f.dhuresh, status: "present" }],
+          marks: [{ employeeId: f.dhuresh, status: "present" }],
         })
       ).status,
     ).toBe(StatusCodes.OK);
-    const towerSheet = await json<{ labourers: { labourId: string }[] }>(
+    const towerSheet = await json<{ employees: { employeeId: string }[] }>(
       await sheet(company.cookie, f.tower, YESTERDAY),
     );
-    expect(towerSheet.labourers.map((row) => row.labourId)).toEqual([
+    expect(towerSheet.employees.map((row) => row.employeeId)).toEqual([
       f.kavitha,
     ]);
 
-    await deactivateLabour(
-      jsonRequest(`${LABOURS}/${f.kavitha}/deactivate`, company.cookie, {}),
-      { params: Promise.resolve({ id: f.kavitha }) },
-    );
+    await prisma.constructionLabourEmployee.update({
+      where: { id: f.kavitha },
+      data: { isActive: false },
+    });
     const inactive = await failure(
       await mark(company.cookie, {
         ...body(f),
-        marks: [{ labourId: f.kavitha, status: "present" }],
+        marks: [{ employeeId: f.kavitha, status: "present" }],
       }),
     );
     expect(inactive).toMatchObject({
-      code: "LABOUR_INACTIVE",
-      details: { labourId: f.kavitha },
+      code: "EMPLOYEE_INACTIVE",
+      details: { employeeId: f.kavitha },
     });
     expect(await ledgerSum(f.kavitha)).toBe(0);
   });
@@ -539,7 +456,7 @@ describe("labour attendance HTTP", () => {
       wagePerDay: DAILY,
       projectIds: [f.tower, f.villa],
     });
-    const marks = [{ labourId: both, status: "present" }];
+    const marks = [{ employeeId: both, status: "present" }];
     const [tower] = await marked(company.cookie, { ...body(f), marks });
     const [villa] = await marked(company.cookie, {
       ...body(f),
@@ -550,17 +467,17 @@ describe("labour attendance HTTP", () => {
     expect(await ledgerSum(both)).toBe(2 * DAILY);
     for (const projectId of [f.tower, f.villa]) {
       const day = await json<{
-        labourers: { labourId: string; attendance: unknown }[];
+        employees: { employeeId: string; attendance: unknown }[];
       }>(await sheet(company.cookie, projectId, YESTERDAY));
       expect(
-        day.labourers.find((row) => row.labourId === both)?.attendance,
+        day.employees.find((row) => row.employeeId === both)?.attendance,
       ).toMatchObject({ status: "present" });
     }
     // Clearing one Project's day leaves the other.
     const cleared = await clear(company.cookie, {
       projectId: f.villa,
       date: YESTERDAY,
-      labourIds: [both],
+      employeeIds: [both],
       expected: { [both]: villa?.updatedAt },
     });
     expect(cleared.status).toBe(StatusCodes.NO_CONTENT);
@@ -602,7 +519,7 @@ describe("labour attendance HTTP", () => {
         clerk.cookie,
         body(f, {
           date: old,
-          marks: [{ labourId: f.dhuresh, status: "absent" }],
+          marks: [{ employeeId: f.dhuresh, status: "absent" }],
           expected: { [f.dhuresh]: ownerDay?.updatedAt },
         }),
       ),
@@ -612,7 +529,7 @@ describe("labour attendance HTTP", () => {
       await clear(clerk.cookie, {
         projectId: f.tower,
         date: old,
-        labourIds: [f.dhuresh],
+        employeeIds: [f.dhuresh],
         expected: { [f.dhuresh]: ownerDay?.updatedAt },
       }),
     );
@@ -653,7 +570,7 @@ describe("labour attendance HTTP", () => {
     const remark = await failure(
       await mark(creator.cookie, {
         ...body(f),
-        marks: [{ labourId: f.dhuresh, status: "absent" }],
+        marks: [{ employeeId: f.dhuresh, status: "absent" }],
         expected: { [f.dhuresh]: day?.updatedAt },
       }),
     );
@@ -663,19 +580,19 @@ describe("labour attendance HTTP", () => {
         await clear(creator.cookie, {
           projectId: f.tower,
           date: YESTERDAY,
-          labourIds: [f.dhuresh],
+          employeeIds: [f.dhuresh],
           expected: { [f.dhuresh]: day?.updatedAt },
         })
       ).status,
     ).toBe(StatusCodes.FORBIDDEN);
     const sheetBody = await json<{
-      labourers: {
+      employees: {
         overtimeWagePerHour: number | null;
         wagePerDay: number | null;
       }[];
       totals: { earned: number | null; marked: number };
     }>(await sheet(creator.cookie, f.tower, YESTERDAY));
-    expect(sheetBody.labourers[0]?.overtimeWagePerHour).toBeNull();
+    expect(sheetBody.employees[0]?.overtimeWagePerHour).toBeNull();
     expect(sheetBody.totals).toMatchObject({ earned: null, marked: 2 });
 
     const accountant = await member(
@@ -687,10 +604,10 @@ describe("labour attendance HTTP", () => {
       [f.tower],
     );
     const withMoney = await json<{
-      labourers: { name: string; overtimeWagePerHour: number | null }[];
+      employees: { name: string; overtimeWagePerHour: number | null }[];
       totals: { earned: number | null };
     }>(await sheet(accountant.cookie, f.tower, YESTERDAY));
-    expect(withMoney.labourers[0]).toMatchObject({
+    expect(withMoney.employees[0]).toMatchObject({
       name: "Dhuresh Nawin",
       overtimeWagePerHour: OT,
     });
@@ -701,14 +618,14 @@ describe("labour attendance HTTP", () => {
     const company = await ownerWithCompany();
     const f = await fixtures(company);
     // Kavitha's weekly holiday is the weekday of TODAY.
-    await prisma.constructionLabourLabour.update({
+    await prisma.constructionLabourEmployee.update({
       where: { id: f.kavitha },
       data: { weeklyHolidays: [weekdayOf(TODAY)] },
     });
     await marked(company.cookie, body(f));
     const today = await json<{
-      labourers: {
-        labourId: string;
+      employees: {
+        employeeId: string;
         suggestedStatus: string | null;
         isWeeklyHoliday: boolean;
         yesterday: { status: string; shift: string | null } | null;
@@ -717,11 +634,11 @@ describe("labour attendance HTTP", () => {
       }[];
       labourCategories: { id: string }[];
     }>(await sheet(company.cookie, f.tower, TODAY));
-    const dhureshRow = today.labourers.find(
-      (row) => row.labourId === f.dhuresh,
+    const dhureshRow = today.employees.find(
+      (row) => row.employeeId === f.dhuresh,
     );
-    const kavithaRow = today.labourers.find(
-      (row) => row.labourId === f.kavitha,
+    const kavithaRow = today.employees.find(
+      (row) => row.employeeId === f.kavitha,
     );
     expect(dhureshRow).toMatchObject({
       suggestedStatus: "present",
@@ -741,8 +658,8 @@ describe("labour attendance HTTP", () => {
       projectId: f.tower,
       date: twoDaysAgo,
       marks: [
-        { labourId: f.dhuresh, status: "on_leave", isPaidLeave: true },
-        { labourId: f.kavitha, status: "absent" },
+        { employeeId: f.dhuresh, status: "on_leave", isPaidLeave: true },
+        { employeeId: f.kavitha, status: "absent" },
       ],
     });
 
@@ -792,11 +709,11 @@ describe("labour attendance HTTP", () => {
         ),
       ),
     );
-    expect(paidOnly.items.map((item) => item.labourId)).toEqual([f.dhuresh]);
+    expect(paidOnly.items.map((item) => item.employeeId)).toEqual([f.dhuresh]);
     const byLabour = await json<{ total: number }>(
       await listDays(
         jsonRequest(
-          `${BASE}?projectId=${f.tower}&labourId=${f.kavitha}&from=${YESTERDAY}&to=${YESTERDAY}`,
+          `${BASE}?projectId=${f.tower}&employeeId=${f.kavitha}&from=${YESTERDAY}&to=${YESTERDAY}`,
           company.cookie,
         ),
       ),
@@ -807,8 +724,8 @@ describe("labour attendance HTTP", () => {
     const month = YESTERDAY.slice(0, 7);
     const grid = await json<{
       dates: string[];
-      labourers: {
-        labourId: string;
+      employees: {
+        employeeId: string;
         days: { date: string; code: string; overtimeHours: string }[];
         totals: Record<string, number | string | null>;
       }[];
@@ -821,8 +738,8 @@ describe("labour attendance HTTP", () => {
       ),
     );
     expect(grid.dates).toHaveLength(daysInMonth(YESTERDAY));
-    const dhureshGrid = grid.labourers.find(
-      (row) => row.labourId === f.dhuresh,
+    const dhureshGrid = grid.employees.find(
+      (row) => row.employeeId === f.dhuresh,
     );
     const sameMonth = twoDaysAgo.slice(0, 7) === month;
     expect(
@@ -847,14 +764,14 @@ describe("labour attendance HTTP", () => {
       name: "Watchman Velu",
       wageType: "daily",
       wagePerDay: DAILY,
-      workingHoursPerDay: 9,
+      workingHoursPerDay: "9",
     });
     const timed = (times: Record<string, unknown>) => ({
       projectId: f.tower,
       date: YESTERDAY,
       marks: [
         {
-          labourId: watchman,
+          employeeId: watchman,
           status: "present",
           ...times,
           overtime: [{ labourCategoryId: f.mason, fromTimes: true, hours: 7 }],
@@ -927,14 +844,14 @@ describe("labour attendance HTTP", () => {
 
     // The sheet carries working hours and yesterday's times.
     const today = await json<{
-      labourers: {
-        labourId: string;
+      employees: {
+        employeeId: string;
         workingHoursPerDay: string | null;
         yesterday: { checkIn: string | null; breakMinutes: number | null };
       }[];
     }>(await sheet(company.cookie, f.tower, TODAY));
     expect(
-      today.labourers.find((row) => row.labourId === watchman),
+      today.employees.find((row) => row.employeeId === watchman),
     ).toMatchObject({
       workingHoursPerDay: "9",
       yesterday: { checkIn: "08:00", breakMinutes: 60 },
@@ -945,13 +862,13 @@ describe("labour attendance HTTP", () => {
       await mark(company.cookie, {
         projectId: f.tower,
         date: YESTERDAY,
-        marks: [{ labourId: f.dhuresh, status: "absent", checkIn: "09:00" }],
+        marks: [{ employeeId: f.dhuresh, status: "absent", checkIn: "09:00" }],
       }),
     );
     expect(absent).toMatchObject({
       status: StatusCodes.BAD_REQUEST,
       code: "TIMES_NEED_PRESENT",
-      details: { labourId: f.dhuresh, field: "checkIn" },
+      details: { employeeId: f.dhuresh, field: "checkIn" },
     });
   });
 

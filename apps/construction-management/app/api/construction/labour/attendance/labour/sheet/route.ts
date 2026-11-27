@@ -7,21 +7,22 @@ import {
   labourFinancial,
 } from "../handlers";
 import {
-  GetConstructionLabourLabourAttendanceSheetRequestModel,
+  GetConstructionLabourEmployeeAttendanceSheetRequestModel,
   toLabourAttendanceSheetResponse,
 } from "../labour-attendance-models";
 
 export const dynamic = "force-dynamic";
 
 /**
- * The marking sheet for a Project and date: active labourers on the
- * Project that day with their category, Supervisor, weekly holidays, wage
- * type, the day's row and a pre-fill hint. Needs Attendance read.
+ * The marking sheet for a Project and date: every active Employee on the
+ * Project that day, whatever their Role (ADR CM-0055), with their Labour
+ * Category, Role, weekly holidays, wage type, the day's row and a pre-fill
+ * hint. Needs Attendance read.
  */
 export async function GET(request: Request): Promise<Response> {
   try {
     const model = parseOrThrow(
-      GetConstructionLabourLabourAttendanceSheetRequestModel.safeParse(
+      GetConstructionLabourEmployeeAttendanceSheetRequestModel.safeParse(
         Object.fromEntries(new URL(request.url).searchParams),
       ),
     );

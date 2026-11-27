@@ -18,14 +18,16 @@ export const dynamic = "force-dynamic";
 
 /**
  * Every live department of the Active Company, by name (ADR CM-0049).
- * Manage Departments reads it, and so does Add Role / Edit Role to offer
- * the Departments a Role may be under (ADR CM-0050).
+ * Manage Departments reads it, so does Add Role / Edit Role to offer
+ * the Departments a Role may be under (ADR CM-0050), and so do the
+ * Employee form and list to offer each Employee's Department (ADR CM-0055).
  */
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await requireAnyMenuRead(request, [
       "organization.departments",
       "organization.roles",
+      "masters.labours",
     ]);
     if (isResponse(session)) return session;
     const items = await handlers.list(session.workspaceId);

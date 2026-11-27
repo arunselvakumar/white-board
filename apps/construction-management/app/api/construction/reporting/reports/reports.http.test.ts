@@ -12,6 +12,7 @@ import {
   memberWith,
   ownerWithCompany,
 } from "@/test/companies";
+import { seededRoleId } from "@/test/employees";
 import { bytesOf } from "@/test/files";
 import { TEST_ORIGIN } from "@/test/sessions";
 
@@ -63,25 +64,22 @@ async function seed(company: Company) {
       ...AUDIT,
     },
   });
-  const supervisor = newId();
-  await prisma.constructionMastersSupervisor.create({
-    data: {
-      id: supervisor,
-      workspaceId: ws,
-      name: `Murugan ${supervisor.slice(-6)}`,
-      ...AUDIT,
-    },
-  });
+  const labourRole = await seededRoleId(ws);
   const labour = async (
     name: string,
-    extra: { fatherName?: string; gender?: "male" | "female" },
+    extra: {
+      fatherName?: string;
+      gender?: "male" | "female";
+      roleId?: string;
+    },
   ) => {
     const id = newId();
-    await prisma.constructionLabourLabour.create({
+    await prisma.constructionLabourEmployee.create({
       data: {
         id,
         workspaceId: ws,
         name,
+        roleId: extra.roleId ?? labourRole,
         joiningDate: date("2026-06-01"),
         wageType: "daily",
         wagePerDay: 80_000,
@@ -95,7 +93,8 @@ async function seed(company: Company) {
             since: date("2026-06-01"),
           },
         },
-        ...extra,
+        fatherName: extra.fatherName,
+        gender: extra.gender,
         ...AUDIT,
       },
     });
@@ -105,10 +104,14 @@ async function seed(company: Company) {
     fatherName: "Nawin Kumar",
     gender: "male",
   });
-  const abirami = await labour("Abirami Priya", { gender: "female" });
+  // A Site Engineer is an Employee too: on the sheet, in the reports.
+  const abirami = await labour("Abirami Priya", {
+    gender: "female",
+    roleId: await seededRoleId(ws, "Site Engineer"),
+  });
 
   const mark = async (
-    labourId: string,
+    employeeId: string,
     day: string,
     status: "present" | "half_day" | "absent" | "holiday",
     earned: number,
@@ -120,10 +123,9 @@ async function seed(company: Company) {
         id,
         workspaceId: ws,
         projectId: tower,
-        labourId,
+        employeeId,
         attendanceDate: date(day),
         status,
-        supervisorId: supervisor,
         wageType: "daily",
         wageRate: 80_000,
         earned,
@@ -158,7 +160,7 @@ async function seed(company: Company) {
       id: newId(),
       workspaceId: ws,
       projectId: villa,
-      labourId: abirami,
+      employeeId: abirami,
       attendanceDate: date("2026-08-03"),
       status: "present",
       wageType: "daily",
@@ -178,7 +180,7 @@ async function seed(company: Company) {
   ) => ({
     id: newId(),
     workspaceId: ws,
-    partyType: "labour" as const,
+    partyType: "employee" as const,
     partyId,
     projectId,
     entryDate: date(day),
@@ -329,7 +331,7 @@ async function member(
 }
 
 describe("report jobs HTTP", () => {
-  it("All Labour Attendance: an Excel with the header block and totals, and a PDF", async () => {
+  it("Employee Attendance: an Excel with the header block and totals, and a PDF", async () => {
     const company = await ownerWithCompany("Anugraha Engineers");
     const s: Seeded = await seed(company);
     const job = await generate(company.cookie, {
@@ -337,7 +339,7 @@ describe("report jobs HTTP", () => {
       projectId: s.tower,
       params: AUGUST,
     });
-    expect(job.title).toBe("All Labour Attendance");
+    expect(job.title).toBe("Employee Attendance");
     expect(job.includesMoney).toBe(false);
     expect(job.downloads.xlsx).toBe(
       `/api/construction/reporting/reports/${job.id}/download?format=xlsx`,
@@ -366,8 +368,8 @@ describe("report jobs HTTP", () => {
     expect(summary.rows.some((row) => row[0] === "Generated at")).toBe(false);
     expect(summary.header).toEqual([
       "Sl. No.",
-      "Labour",
-      "Labour Id",
+      "Employee",
+      "Employee Id",
       "Category",
       "Present",
       "Half day",
@@ -388,6 +390,10 @@ describe("report jobs HTTP", () => {
     expect(
       days.body.filter((row) => row.includes("Abirami Priya")),
     ).toHaveLength(2);
+    // Each day names the Employee's Role (ADR CM-0055).
+    expect(days.header).toContain("Role");
+    expect(days.header).not.toContain("Site Engineers");
+    expect(days.cell(days.find("Abirami Priya"), "Role")).toBe("Site Engineer");
     await expectPdf(company.cookie, job);
 
     const stored = await prisma.constructionOrganizationStoredFile.findMany({
@@ -396,7 +402,7 @@ describe("report jobs HTTP", () => {
     expect(stored).toHaveLength(2);
   });
 
-  it("All Labour Payment follows the ledger mapping (opening inside the period, a reversal)", async () => {
+  it("Employee Payments follows the ledger mapping (opening inside the period, a reversal)", async () => {
     const company = await ownerWithCompany();
     const s = await seed(company);
     const job = await generate(company.cookie, {
@@ -421,7 +427,7 @@ describe("report jobs HTTP", () => {
     await expectPdf(company.cookie, job);
   });
 
-  it("Month-wise Labour has a column per day and earnings with Financial", async () => {
+  it("Employee Month has a column per day and earnings with Financial", async () => {
     const company = await ownerWithCompany();
     const s = await seed(company);
     const job = await generate(company.cookie, {

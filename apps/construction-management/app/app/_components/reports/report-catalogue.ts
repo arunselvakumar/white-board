@@ -208,7 +208,7 @@ export const REPORT_GROUP_COPY: Record<
   { title: string; description: string }
 > = {
   labour: {
-    title: "Labour and vendor reports",
+    title: "Employee and vendor reports",
     description:
       "Each report is an Excel workbook and a PDF with the Company header, the period and totals.",
   },

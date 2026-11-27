@@ -4,7 +4,6 @@ import type {
   LookupKind,
   MasterKind,
 } from "../domain/master-kind";
-import type { Supervisor } from "../domain/supervisor";
 
 /** How a write is recorded in the audit log, in the same transaction. */
 export type MasterChange = {
@@ -38,19 +37,8 @@ export type LookupStore = {
   ): Promise<void>;
 };
 
-export type SupervisorStore = {
-  list(workspaceId: string): Promise<Supervisor[]>;
-  find(workspaceId: string, id: string): Promise<Supervisor | null>;
-  insert(supervisor: Supervisor, change: MasterChange): Promise<void>;
-  update(
-    supervisor: Supervisor,
-    expectedUpdatedAt: Date,
-    change: MasterChange,
-  ): Promise<void>;
-};
-
 /**
- * Whether another context still points at a masters row (labourers, vendor
+ * Whether another context still points at a masters row (Employees, vendor
  * rate cards, attendance). Implemented with plain reads of those tables.
  */
 export type MasterUsage = (
@@ -58,15 +46,6 @@ export type MasterUsage = (
   workspaceId: string,
   id: string,
 ) => Promise<boolean>;
-
-/** Live Team Members of a Company, read from the organization context by id. */
-export type TeamMemberDirectory = {
-  /** Names of the ids that are live Team Members of the Company. */
-  namesOf(
-    workspaceId: string,
-    ids: readonly string[],
-  ): Promise<Map<string, string>>;
-};
 
 /** An Amenity or Common Development with the live Projects it is assigned to. */
 export type DevelopmentRow = {

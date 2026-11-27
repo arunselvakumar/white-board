@@ -30,7 +30,7 @@ export const APP_NAV = [
     label: "Departments",
     title: "Departments",
     description:
-      "Human Resources for your Labours, Staff and HRMS, and Marketing for Visits, Follow-ups and Prospect Companies.",
+      "Human Resources for your Employees, Office Staff and HRMS, and Marketing for Visits, Follow-ups and Prospect Companies.",
   },
   {
     href: "/app/workspace",

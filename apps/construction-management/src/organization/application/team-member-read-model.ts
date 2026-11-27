@@ -37,8 +37,8 @@ export type TeamMemberReadModel = {
   /** 0 = Sunday … 6 = Saturday. */
   weeklyHolidays: number[];
   memberType: MemberType;
-  /** A Site Engineer's sign-in (ADR CM-0037), managed from their page. */
-  siteEngineer: boolean;
+  /** An Employee's sign-in (ADR CM-0055 §4), managed from their page. */
+  employee: boolean;
   isOwner: boolean;
   status: TeamMemberStatus;
   projectIds: string[];
@@ -100,14 +100,14 @@ export function toTeamMemberReadModel(
     workingHoursPerDay: member.salary.workingHoursPerDay,
     weeklyHolidays: [...member.salary.weeklyHolidays],
     memberType: member.memberType,
-    siteEngineer: member.siteEngineer,
+    employee: member.employee,
     isOwner: member.isOwner,
     status: member.status,
     projectIds: [...member.projectIds],
     permissions: permissions.toGrants(),
     canSetPassword:
       !member.isOwner &&
-      (member.siteEngineer
+      (member.employee
         ? details.mobile != null
         : details.mobile != null || details.email != null) &&
       !inOtherCompany,

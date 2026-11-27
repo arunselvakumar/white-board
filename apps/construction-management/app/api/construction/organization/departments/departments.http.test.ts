@@ -178,6 +178,12 @@ describe("Manage Departments HTTP (ADR CM-0049)", () => {
       StatusCodes.FORBIDDEN,
     );
 
+    // The Employee form offers each Employee's Department (ADR CM-0055).
+    const employees = await memberWith(owner, { "masters.labours": ["read"] });
+    expect(
+      (await listDepartments(jsonRequest(BASE, employees.cookie))).status,
+    ).toBe(StatusCodes.OK);
+
     const reader = await memberWith(owner, {
       "organization.departments": ["read"],
     });

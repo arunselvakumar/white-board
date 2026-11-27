@@ -1,5 +1,7 @@
 # 10 — HRMS (office and staff employees)
 
+> **Since [ADR CM-0055](../adr/CM-0055-employees-replace-labours-and-site-engineers.md) (2026-11-27):** Labours and Site Engineers are one **Employee** record (Human Resources → Staff → Employees), told apart by their Role and its Department. Wherever this spec says Labour, Labourer, Supervisor or Site Engineer for a person, read Employee; the rules (wages, attendance, Check-In, transfers, ledger) apply to every Employee. The ADR wins where they differ.
+
 HRMS manages the company's own salaried staff: office employees, engineers, supervisors, store keepers and other Team Members. It covers GPS / geo-fenced attendance, shifts and rotations, holidays, leave types, leave structures and balances, leave requests with approvals, salary structures, and monthly salary runs with payslips.
 
 HRMS is **separate from site labour** (module 08, Labour & Vendor Attendance). Labours and vendor gangs are master records attached to projects and paid daily or monthly wages through Labour/Vendor payments. HRMS employees are **Team Members** (module 01) who log in to the app, check in on their own phones, apply for leave and see their own payslips.

@@ -45,8 +45,8 @@ import {
 
 /**
  * A person's Attendance tab (ADR CM-0051): the picked month's cards, the
- * all-time line and the calendar. The same on a Labour's, a Site
- * Engineer's, a Vendor's and an Office Staff member's page; the query says
+ * all-time line and the calendar. The same on an Employee's, a Vendor's
+ * and an Office Staff member's page; the query says
  * whose. The month is kept in the address (`?month=YYYY-MM`).
  */
 export function PersonAttendance({

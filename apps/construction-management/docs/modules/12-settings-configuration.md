@@ -1,5 +1,7 @@
 # 12 — Settings & Configuration
 
+> **Since [ADR CM-0055](../adr/CM-0055-employees-replace-labours-and-site-engineers.md) (2026-11-27):** Labours and Site Engineers are one **Employee** record (Human Resources → Staff → Employees), told apart by their Role and its Department. Wherever this spec says Labour, Labourer, Supervisor or Site Engineer for a person, read Employee; the rules (wages, attendance, Check-In, transfers, ledger) apply to every Employee. The ADR wins where they differ.
+
 Company-wide and per-project configuration that changes how other modules behave without changing their data:
 
 - **Manage Sequence IDs** — numbering rules for document numbers (PR, PO, GRN, Material Transfer, Petty Cash, Central Store MR, Delivery Note, Inspection Request, Other Party Sales Invoice).

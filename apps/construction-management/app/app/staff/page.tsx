@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 
-import { LABOURS_PAGE_PATH } from "@/lib/staff-nav";
+import { EMPLOYEES_PATH } from "@/lib/staff-nav";
 
-/** Staff opens on Labour. */
+/** Staff opens on Employees (ADR CM-0055 §5). */
 export default function StaffArea() {
-  redirect(LABOURS_PAGE_PATH);
+  redirect(EMPLOYEES_PATH);
 }

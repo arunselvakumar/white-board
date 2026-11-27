@@ -28,21 +28,22 @@ const timeOfDay = z
 
 // Requests
 
-export const GetConstructionLabourLabourAttendanceSheetRequestModel = z.object({
-  projectId: z.uuid(),
-  /** `YYYY-MM-DD`. */
-  date: z.iso.date(),
-});
+export const GetConstructionLabourEmployeeAttendanceSheetRequestModel =
+  z.object({
+    projectId: z.uuid(),
+    /** `YYYY-MM-DD`. */
+    date: z.iso.date(),
+  });
 
-export const MarkConstructionLabourLabourAttendanceRequestModel = z.object({
+export const MarkConstructionLabourEmployeeAttendanceRequestModel = z.object({
   projectId: z.uuid(),
   /** `YYYY-MM-DD`, not in the future. */
   date: z.iso.date(),
-  /** One per labourer; send only the rows that changed. */
+  /** One per Employee; send only the rows that changed. */
   marks: z
     .array(
       z.object({
-        labourId: z.uuid(),
+        employeeId: z.uuid(),
         status,
         /** Only on `on_leave`. */
         isPaidLeave: z.boolean().optional(),
@@ -66,11 +67,11 @@ export const MarkConstructionLabourLabourAttendanceRequestModel = z.object({
                 .union([z.string().max(12), z.number()])
                 .nullable()
                 .optional(),
-              /** Paise per hour; leave out for the labourer's overtime wage. */
+              /** Paise per hour; leave out for the Employee's overtime wage. */
               ratePerHour: z.int().nullable().optional(),
               /**
                * The server works the hours out from check-in, check-out,
-               * break and the Labour's working hours (ADR CM-0011); the line
+               * break and the Employee's working hours (ADR CM-0011); the line
                * is dropped while there is no check-out or no extra time. At
                * most one per day.
                */
@@ -84,48 +85,48 @@ export const MarkConstructionLabourLabourAttendanceRequestModel = z.object({
     .min(1)
     .max(500),
   /**
-   * `updatedAt` of every already-marked row being changed, by labourer id.
+   * `updatedAt` of every already-marked row being changed, by Employee id.
    * A marked row without its entry, or with a stale one, is 409
-   * `ATTENDANCE_CHANGED` with `details.labourId`.
+   * `ATTENDANCE_CHANGED` with `details.employeeId`.
    */
   expected: z.record(z.string(), z.iso.datetime()).optional(),
 });
 
-export type MarkConstructionLabourLabourAttendanceRequestModel = z.infer<
-  typeof MarkConstructionLabourLabourAttendanceRequestModel
+export type MarkConstructionLabourEmployeeAttendanceRequestModel = z.infer<
+  typeof MarkConstructionLabourEmployeeAttendanceRequestModel
 >;
 
-export const ClearConstructionLabourLabourAttendanceRequestModel = z.object({
+export const ClearConstructionLabourEmployeeAttendanceRequestModel = z.object({
   projectId: z.uuid(),
   date: z.iso.date(),
-  labourIds: z.array(z.uuid()).min(1).max(500),
-  /** `updatedAt` of each row as last seen, by labourer id. */
+  employeeIds: z.array(z.uuid()).min(1).max(500),
+  /** `updatedAt` of each row as last seen, by Employee id. */
   expected: z.record(z.string(), z.iso.datetime()),
 });
 
-export type ClearConstructionLabourLabourAttendanceRequestModel = z.infer<
-  typeof ClearConstructionLabourLabourAttendanceRequestModel
+export type ClearConstructionLabourEmployeeAttendanceRequestModel = z.infer<
+  typeof ClearConstructionLabourEmployeeAttendanceRequestModel
 >;
 
-export const ConstructionLabourLabourAttendanceParamsModel = z.object({
+export const ConstructionLabourEmployeeAttendanceParamsModel = z.object({
   id: z.uuid(),
 });
 
-export const SetConstructionLabourLabourAttendancePaidLeaveRequestModel =
+export const SetConstructionLabourEmployeeAttendancePaidLeaveRequestModel =
   z.object({
     isPaidLeave: z.boolean(),
     expectedUpdatedAt: z.iso.datetime(),
   });
 
-export type SetConstructionLabourLabourAttendancePaidLeaveRequestModel =
-  z.infer<typeof SetConstructionLabourLabourAttendancePaidLeaveRequestModel>;
+export type SetConstructionLabourEmployeeAttendancePaidLeaveRequestModel =
+  z.infer<typeof SetConstructionLabourEmployeeAttendancePaidLeaveRequestModel>;
 
-export const ListConstructionLabourLabourAttendanceRequestModel = z
+export const ListConstructionLabourEmployeeAttendanceRequestModel = z
   .object({
     projectId: z.uuid(),
     from: z.iso.date().optional(),
     to: z.iso.date().optional(),
-    labourId: z.uuid().optional(),
+    employeeId: z.uuid().optional(),
     /** `on_leave` is every leave day; `paid_leave` only the paid ones. */
     status: z.enum([...STATUSES, "paid_leave"]).optional(),
     limit: z.coerce.number().int().min(1).max(200).optional().default(50),
@@ -137,19 +138,20 @@ export const ListConstructionLabourLabourAttendanceRequestModel = z
     path: ["after"],
   });
 
-export const GetConstructionLabourLabourAttendanceMonthRequestModel = z.object({
-  projectId: z.uuid(),
-  /** `YYYY-MM`. */
-  month: z.string().regex(MONTH_RE, "Use YYYY-MM."),
-});
+export const GetConstructionLabourEmployeeAttendanceMonthRequestModel =
+  z.object({
+    projectId: z.uuid(),
+    /** `YYYY-MM`. */
+    month: z.string().regex(MONTH_RE, "Use YYYY-MM."),
+  });
 
 // Responses (amounts are paise; null without `labour.labour` Financial)
 
 const money = z.int().nullable();
 const ref = z.object({ id: z.uuid(), name: z.string() });
 
-export const ConstructionLabourLabourAttendanceOvertimeResponseModel = z.object(
-  {
+export const ConstructionLabourEmployeeAttendanceOvertimeResponseModel =
+  z.object({
     labourCategoryId: z.uuid().nullable(),
     labourCategoryName: z.string().nullable(),
     /** Decimal hours. */
@@ -158,24 +160,18 @@ export const ConstructionLabourLabourAttendanceOvertimeResponseModel = z.object(
     amount: money,
     /** Hours worked out from the day's times (ADR CM-0011). */
     fromTimes: z.boolean(),
-  },
-);
+  });
 
-export const ConstructionLabourLabourAttendanceDayResponseModel = z.object({
+export const ConstructionLabourEmployeeAttendanceDayResponseModel = z.object({
   id: z.uuid(),
   projectId: z.uuid(),
-  labourId: z.uuid(),
-  labourName: z.string(),
-  labourCode: z.string().nullable(),
+  employeeId: z.uuid(),
+  employeeName: z.string(),
+  employeeCode: z.string().nullable(),
   date: z.iso.date(),
   status,
   isPaidLeave: z.boolean(),
   shift: z.string().nullable(),
-  /**
-   * The Site Engineer saved with the day (days marked before ADR CM-0041),
-   * else the Project's Site Engineers today, by name.
-   */
-  siteEngineers: z.array(ref),
   /** `HH:MM`, or null. */
   checkIn: z.string().nullable(),
   /** `HH:MM`, or null; at or before `checkIn` is the next day. */
@@ -187,7 +183,7 @@ export const ConstructionLabourLabourAttendanceDayResponseModel = z.object({
    * times on the sheet turns it off (ADR CM-0043).
    */
   timesFromCheckIn: z.boolean(),
-  /** Snapshot of the Labour's working hours a day (decimal hours). */
+  /** Snapshot of the Employee's working hours a day (decimal hours). */
   workingHours: z.string(),
   /** check-out − check-in − break, decimal hours; null without both times. */
   workedHours: z.string().nullable(),
@@ -196,7 +192,7 @@ export const ConstructionLabourLabourAttendanceDayResponseModel = z.object({
   wageRate: money,
   /** What the day pays before overtime. */
   earned: money,
-  overtime: z.array(ConstructionLabourLabourAttendanceOvertimeResponseModel),
+  overtime: z.array(ConstructionLabourEmployeeAttendanceOvertimeResponseModel),
   overtimeHours: z.string(),
   overtimeAmount: money,
   total: money,
@@ -205,28 +201,30 @@ export const ConstructionLabourLabourAttendanceDayResponseModel = z.object({
   updatedAt: z.iso.datetime(),
 });
 
-export type ConstructionLabourLabourAttendanceDayResponseModel = z.infer<
-  typeof ConstructionLabourLabourAttendanceDayResponseModel
+export type ConstructionLabourEmployeeAttendanceDayResponseModel = z.infer<
+  typeof ConstructionLabourEmployeeAttendanceDayResponseModel
 >;
 
-export const MarkConstructionLabourLabourAttendanceResponseModel = z.object({
-  items: z.array(ConstructionLabourLabourAttendanceDayResponseModel),
+export const MarkConstructionLabourEmployeeAttendanceResponseModel = z.object({
+  items: z.array(ConstructionLabourEmployeeAttendanceDayResponseModel),
 });
 
-export type MarkConstructionLabourLabourAttendanceResponseModel = z.infer<
-  typeof MarkConstructionLabourLabourAttendanceResponseModel
+export type MarkConstructionLabourEmployeeAttendanceResponseModel = z.infer<
+  typeof MarkConstructionLabourEmployeeAttendanceResponseModel
 >;
 
-export const GetConstructionLabourLabourAttendanceSheetResponseModel = z.object(
-  {
+export const GetConstructionLabourEmployeeAttendanceSheetResponseModel =
+  z.object({
     projectId: z.uuid(),
     date: z.iso.date(),
-    labourers: z.array(
+    employees: z.array(
       z.object({
-        labourId: z.uuid(),
+        employeeId: z.uuid(),
         name: z.string(),
-        labourCode: z.string().nullable(),
+        employeeCode: z.string().nullable(),
         labourCategory: ref.nullable(),
+        /** The Employee's Role (ADR CM-0055); null once it was deleted. */
+        role: ref.nullable(),
         /** 0 = Sunday … 6 = Saturday. */
         weeklyHolidays: z.array(z.int()),
         wageType: z.enum(["daily", "monthly"]).nullable(),
@@ -254,7 +252,7 @@ export const GetConstructionLabourLabourAttendanceSheetResponseModel = z.object(
           })
           .nullable(),
         attendance:
-          ConstructionLabourLabourAttendanceDayResponseModel.nullable(),
+          ConstructionLabourEmployeeAttendanceDayResponseModel.nullable(),
       }),
     ),
     labourCategories: z.array(ref),
@@ -268,22 +266,21 @@ export const GetConstructionLabourLabourAttendanceSheetResponseModel = z.object(
       earned: money,
       overtimeAmount: money,
     }),
-  },
-);
+  });
 
-export type GetConstructionLabourLabourAttendanceSheetResponseModel = z.infer<
-  typeof GetConstructionLabourLabourAttendanceSheetResponseModel
+export type GetConstructionLabourEmployeeAttendanceSheetResponseModel = z.infer<
+  typeof GetConstructionLabourEmployeeAttendanceSheetResponseModel
 >;
 
-export const ListConstructionLabourLabourAttendanceResponseModel = z.object({
-  items: z.array(ConstructionLabourLabourAttendanceDayResponseModel),
+export const ListConstructionLabourEmployeeAttendanceResponseModel = z.object({
+  items: z.array(ConstructionLabourEmployeeAttendanceDayResponseModel),
   nextCursor: z.string().nullable(),
   prevCursor: z.string().nullable(),
   total: z.int().nonnegative(),
 });
 
-export type ListConstructionLabourLabourAttendanceResponseModel = z.infer<
-  typeof ListConstructionLabourLabourAttendanceResponseModel
+export type ListConstructionLabourEmployeeAttendanceResponseModel = z.infer<
+  typeof ListConstructionLabourEmployeeAttendanceResponseModel
 >;
 
 const totalsModel = z.object({
@@ -300,18 +297,18 @@ const totalsModel = z.object({
   total: money,
 });
 
-export const GetConstructionLabourLabourAttendanceMonthResponseModel = z.object(
-  {
+export const GetConstructionLabourEmployeeAttendanceMonthResponseModel =
+  z.object({
     projectId: z.uuid(),
     month: z.string(),
     from: z.iso.date(),
     to: z.iso.date(),
     dates: z.array(z.iso.date()),
-    labourers: z.array(
+    employees: z.array(
       z.object({
-        labourId: z.uuid(),
+        employeeId: z.uuid(),
         name: z.string(),
-        labourCode: z.string().nullable(),
+        employeeCode: z.string().nullable(),
         /** Marked dates only. */
         days: z.array(
           z.object({
@@ -338,11 +335,10 @@ export const GetConstructionLabourLabourAttendanceMonthResponseModel = z.object(
       }),
     ),
     totals: totalsModel,
-  },
-);
+  });
 
-export type GetConstructionLabourLabourAttendanceMonthResponseModel = z.infer<
-  typeof GetConstructionLabourLabourAttendanceMonthResponseModel
+export type GetConstructionLabourEmployeeAttendanceMonthResponseModel = z.infer<
+  typeof GetConstructionLabourEmployeeAttendanceMonthResponseModel
 >;
 
 // Mappers
@@ -354,18 +350,17 @@ function amount(value: number | null, financial: boolean): number | null {
 export function toLabourAttendanceDayResponse(
   day: LabourAttendanceDayReadModel,
   financial: boolean,
-): ConstructionLabourLabourAttendanceDayResponseModel {
+): ConstructionLabourEmployeeAttendanceDayResponseModel {
   return {
     id: day.id,
     projectId: day.projectId,
-    labourId: day.labourId,
-    labourName: day.labourName,
-    labourCode: day.labourCode,
+    employeeId: day.employeeId,
+    employeeName: day.employeeName,
+    employeeCode: day.employeeCode,
     date: day.date,
     status: day.status,
     isPaidLeave: day.isPaidLeave,
     shift: day.shift,
-    siteEngineers: day.siteEngineers,
     checkIn: day.checkIn,
     checkOut: day.checkOut,
     breakMinutes: day.breakMinutes,
@@ -394,11 +389,11 @@ export function toLabourAttendanceDayResponse(
 export function toLabourAttendanceSheetResponse(
   sheet: LabourSheetReadModel,
   financial: boolean,
-): GetConstructionLabourLabourAttendanceSheetResponseModel {
+): GetConstructionLabourEmployeeAttendanceSheetResponseModel {
   return {
     projectId: sheet.projectId,
     date: sheet.date,
-    labourers: sheet.labourers.map((row) => ({
+    employees: sheet.employees.map((row) => ({
       ...row,
       wagePerDay: amount(row.wagePerDay, financial),
       wagePerMonth: amount(row.wagePerMonth, financial),
@@ -429,17 +424,17 @@ function totals(value: LabourMonthTotals, financial: boolean) {
 export function toLabourAttendanceMonthResponse(
   month: LabourMonthReadModel,
   financial: boolean,
-): GetConstructionLabourLabourAttendanceMonthResponseModel {
+): GetConstructionLabourEmployeeAttendanceMonthResponseModel {
   return {
     projectId: month.projectId,
     month: month.month,
     from: month.from,
     to: month.to,
     dates: month.dates,
-    labourers: month.labourers.map((row) => ({
-      labourId: row.labourId,
+    employees: month.employees.map((row) => ({
+      employeeId: row.employeeId,
       name: row.name,
-      labourCode: row.labourCode,
+      employeeCode: row.employeeCode,
       days: row.days.map((day) => ({
         ...day,
         earned: amount(day.earned, financial),
@@ -452,7 +447,7 @@ export function toLabourAttendanceMonthResponse(
   };
 }
 
-/** `{ labourId: iso }` → `{ labourId: Date }`. */
+/** `{ employeeId: iso }` → `{ employeeId: Date }`. */
 export function expectedDates(
   expected: Record<string, string> | undefined,
 ): Record<string, Date> {

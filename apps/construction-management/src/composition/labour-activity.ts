@@ -194,7 +194,7 @@ export async function resolveProjects(
 const MORE = 1;
 
 /**
- * A Labour's Activity feed (ADR CM-0038 §1, §5): Project moves, attendance
+ * An Employee's Activity feed (ADR CM-0038 §1, §5, CM-0055): Project moves, attendance
  * and its changes, check-in entries (ADR CM-0044) and the profile entries,
  * read from the labour context's history and merged here. Entries for
  * Projects the viewer may not open are left out at the source, and
@@ -212,17 +212,17 @@ export class LabourActivityService {
 
   async feed(
     access: MemberAccess,
-    labourId: string,
+    employeeId: string,
     filter: LabourActivityFilter,
   ): Promise<ActivityPage<LabourActivityEntry>> {
     const { workspaceId } = access;
-    const labour = await this.source.find(workspaceId, labourId);
-    if (labour == null)
-      throw notFound("LABOUR_NOT_FOUND", "This Labour was not found.");
+    const employee = await this.source.find(workspaceId, employeeId);
+    if (employee == null)
+      throw notFound("EMPLOYEE_NOT_FOUND", "This Employee was not found.");
     const timeZone = await this.timeZoneOf(workspaceId);
     const window: LabourActivityWindow = {
       workspaceId,
-      labourId,
+      employeeId,
       before:
         filter.cursor == null ? null : decodeActivityCursor(filter.cursor),
       limit: ACTIVITY_PAGE_SIZE + MORE,
@@ -240,7 +240,7 @@ export class LabourActivityService {
       wants("check_ins")
         ? this.source.checkIns({
             ...window,
-            person: { kind: "labour", id: labourId },
+            person: { kind: "employee", id: employeeId },
             visibleProjectIds: checkInProjectIds(access),
           })
         : none,

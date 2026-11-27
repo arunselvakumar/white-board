@@ -22,7 +22,7 @@ import type { ConstructionLabourPartyDocumentResponseModel } from "@/app/api/con
 import { StaffDocumentsSkeleton } from "./staff-skeletons";
 import { DOCUMENT_CONTENT_TYPES } from "@/src/shared-kernel/files/document-file";
 
-/** A Labour's or Vendor's documents: both are "party" files. */
+/** An Employee's or Vendor's documents: both are "party" files. */
 type StaffDocuments = { items: ConstructionLabourPartyDocumentResponseModel[] };
 
 const MB = 1024 * 1024;
@@ -45,7 +45,7 @@ function size(bytes: number): string {
     : `${String(Math.max(1, Math.round(bytes / 1024)))} KB`;
 }
 
-/** How one kind of staff (Labour, Vendor) stores its photo and documents. */
+/** How one kind of staff (Employee, Vendor) stores its photo and documents. */
 export type StaffFilesApi = {
   /** Invalidated after each change, so the record's photo URL refreshes. */
   queryKey: QueryKey;
@@ -59,7 +59,7 @@ export type StaffFilesApi = {
 };
 
 /**
- * Photo & documents, the first card on Edit Labour and Edit Vendor. The
+ * Photo & documents, the first card on Edit Employee and Edit Vendor. The
  * photo is taken with the camera or uploaded; each change saves at once.
  */
 export function StaffFiles({
@@ -214,7 +214,7 @@ export function StaffFiles({
 export type PendingPhotoValue = { file: File; previewUrl: string };
 
 /**
- * The photo on Add Labour and Add Vendor: taken or chosen now, kept in the
+ * The photo on Add Employee and Add Vendor: taken or chosen now, kept in the
  * browser, and uploaded once the record is saved. Documents need the saved
  * record, so they come after Save.
  */

@@ -8,7 +8,7 @@ import type { PeriodSummary } from "@/src/labour/domain/ledger";
 
 export const BALANCES_PATH = "/api/construction/labour/balances";
 
-const partyType = z.enum(["labour", "vendor"]);
+const partyType = z.enum(["employee", "vendor"]);
 
 // Requests
 
@@ -59,7 +59,7 @@ export const ConstructionLabourBalanceRowResponseModel =
     /** "Labour Id"; null for vendors. */
     code: z.string().nullable(),
     isActive: z.boolean(),
-    /** On the Project now (labour) or assigned to it (vendor). */
+    /** On the Project now (employee) or assigned to it (vendor). */
     onProject: z.boolean(),
   });
 
@@ -90,7 +90,7 @@ export const ConstructionLabourStatementLineResponseModel = z.object({
   balance: money,
   projectId: z.uuid().nullable(),
   projectName: z.string().nullable(),
-  /** What wrote the entry: `labour`/`vendor` (opening), `labour_attendance`, `vendor_attendance`, `wage_payment`. */
+  /** What wrote the entry: `employee`/`vendor` (opening), `employee_attendance`, `vendor_attendance`, `wage_payment`. */
   sourceType: z.string(),
   sourceId: z.uuid(),
   /** This entry cancels an earlier one. */

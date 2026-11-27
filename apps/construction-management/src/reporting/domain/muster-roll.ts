@@ -1,13 +1,13 @@
 import {
   byName,
-  daysByLabour,
+  daysByEmployee,
   daysWorked,
   hours,
   markOf,
   markWithOvertime,
   paidDays,
   tally,
-  type ReportLabour,
+  type ReportEmployee,
   type ReportLabourDay,
 } from "./labour-days";
 import type { ReportLedgerEntry } from "./ledger-summary";
@@ -25,18 +25,18 @@ const SEX = { male: "M", female: "F", other: "O" } as const;
 /**
  * The combined attendance register-cum-muster roll and wage register
  * (CM-218; CLRA Forms XVI and XVII as combined by the Ease of Compliance
- * rules) for one Project and one month: the Company's own Labours with
+ * rules) for one Project and one month: the Company's own Employees with
  * a column per day, days worked, wage rate, basic, overtime, gross,
  * deductions, net and a blank signature column.
  *
  * Wages come from the attendance snapshots (ADR CM-0004). M2 has no
  * deductions engine: Deductions is 0, advances paid in the month are shown
  * as Advance and taken off Net payable. Advance and Paid are the
- * Labour's ledger entries for this Project in the month.
+ * Employee's ledger entries for this Project in the month.
  */
 export function buildMusterRoll(input: {
   month: string;
-  labours: readonly ReportLabour[];
+  employees: readonly ReportEmployee[];
   days: readonly ReportLabourDay[];
   /** Advance and payment entries for this Project in the month. */
   entries: readonly ReportLedgerEntry[];
@@ -46,7 +46,7 @@ export function buildMusterRoll(input: {
   const inMonth = input.days.filter(
     (day) => day.date >= range.from && day.date <= range.to,
   );
-  const byLabour = daysByLabour(inMonth);
+  const byEmployee = daysByEmployee(inMonth);
   const money = new Map<string, { advance: number; paid: number }>();
   for (const entry of input.entries) {
     if (entry.entryDate < range.from || entry.entryDate > range.to) continue;
@@ -78,26 +78,27 @@ export function buildMusterRoll(input: {
     column("Signature / thumb impression", "text", 14),
   ];
 
-  const labours = [...input.labours].sort(byName);
-  const rows: Cell[][] = labours.map((labour, index) => {
-    const own = byLabour.get(labour.id) ?? new Map<string, ReportLabourDay>();
+  const employees = [...input.employees].sort(byName);
+  const rows: Cell[][] = employees.map((employee, index) => {
+    const own =
+      byEmployee.get(employee.id) ?? new Map<string, ReportLabourDay>();
     const marked = [...own.values()].sort((a, b) =>
       a.date.localeCompare(b.date),
     );
     const sum = tally(marked);
     // The wage as on the last marked day; the current wage when none is.
     const latest = marked.at(-1);
-    const wageType = latest?.wageType ?? labour.wageType;
-    const wageRate = latest?.wageRate ?? labour.wageRate;
+    const wageType = latest?.wageType ?? employee.wageType;
+    const wageRate = latest?.wageRate ?? employee.wageRate;
     const gross = sum.earned + sum.overtimeAmount;
-    const { advance, paid } = money.get(labour.id) ?? { advance: 0, paid: 0 };
+    const { advance, paid } = money.get(employee.id) ?? { advance: 0, paid: 0 };
     const deductions = 0;
     return [
       index + 1,
-      labour.name,
-      labour.fatherName,
-      labour.category,
-      labour.gender == null ? null : SEX[labour.gender],
+      employee.name,
+      employee.fatherName,
+      employee.category,
+      employee.gender == null ? null : SEX[employee.gender],
       ...dates.map((date) => {
         const day = own.get(date);
         return day == null ? null : markWithOvertime(day);
@@ -123,8 +124,8 @@ export function buildMusterRoll(input: {
   const wageRateIndex = columns.findIndex((col) => col.label === "Wage rate");
   totals[wageRateIndex] = null;
   dates.forEach((_, index) => {
-    const at = labours.filter((labour) => {
-      const day = byLabour.get(labour.id)?.get(dates[index] ?? "");
+    const at = employees.filter((employee) => {
+      const day = byEmployee.get(employee.id)?.get(dates[index] ?? "");
       if (day == null) return false;
       const mark = markOf(day);
       return mark === "P" || mark === "½";
@@ -136,7 +137,7 @@ export function buildMusterRoll(input: {
     title: "Register of Workmen cum Muster Roll and Wages",
     notes: [
       "Combined attendance register-cum-muster roll and wage register (CLRA Forms XVI and XVII, as combined by the Ease of Compliance rules).",
-      "Covers the Company's own Labours on this Project. Vendor headcount is not named, so vendor labour is not on this register.",
+      "Covers the Company's own Employees on this Project. Vendor headcount is not named, so vendor employee is not on this register.",
       "P present, ½ half day, A absent, L leave, PL paid leave, H holiday; P+2 is present with 2 overtime hours. Days worked = present + ½ x half days; Paid days follow the wage rules (holidays are paid on a monthly wage).",
       "Deductions are 0: there is no deductions engine yet. Advances paid in the month are shown as Advance and taken off Net payable.",
     ],

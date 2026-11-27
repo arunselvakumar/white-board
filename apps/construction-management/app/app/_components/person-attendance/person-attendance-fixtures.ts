@@ -81,7 +81,7 @@ function noise(date: string): number {
   return hash % 100;
 }
 
-/** A Labour: Sundays off, Saturdays half, some overtime, two Projects on Mondays in November. */
+/** An Employee on a daily wage: Sundays off, Saturdays half, some overtime, two Projects on Mondays in November. */
 export function labourDay(date: string): PersonAttendanceDay | undefined {
   const dow = weekday(date);
   const n = noise(date);
@@ -296,11 +296,11 @@ export const NO_ATTENDANCE: AttendanceFixture = {
 };
 
 /**
- * A Site Engineer, from the Check-In log: no status but Present, no
+ * Someone known only from the Check-In log: no status but Present, no
  * absences, sometimes two Projects in a day, and now and then a Check In
  * left with no Check Out (open, no hours), as on Tue 17 Nov 2026.
  */
-export function siteEngineerDay(date: string): PersonAttendanceDay | undefined {
+export function checkInOnlyDay(date: string): PersonAttendanceDay | undefined {
   const n = noise(date);
   if (weekday(date) === 0 || n < 12) return undefined;
   if (n < 18 || date === "2026-11-17")
@@ -334,10 +334,10 @@ export function siteEngineerDay(date: string): PersonAttendanceDay | undefined {
   ]);
 }
 
-export const SITE_ENGINEER_ATTENDANCE: AttendanceFixture = {
+export const CHECK_IN_ONLY_ATTENDANCE: AttendanceFixture = {
   recordsAbsence: false,
   firstMonth: "2026-02",
-  dayFor: siteEngineerDay,
+  dayFor: checkInOnlyDay,
 };
 
 /** HRMS's place for an entry that matched no fence (ADR CM-0051 §3). */

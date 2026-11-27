@@ -21,13 +21,12 @@ import {
   type ResourceSection,
 } from "@/src/queries/project-resources";
 
-import { LaboursSection } from "./labours-section";
+import { EmployeesSection } from "./employees-section";
 import { ResourcePickerDialog } from "./resource-picker-dialog";
 import {
   RESOURCE_SECTIONS,
   type ResourceSectionInfo,
 } from "./resource-sections";
-import { SiteEngineersSection } from "./site-engineers-section";
 import { TeamRow } from "./team-row";
 import type { AppHref } from "@/lib/page-href";
 
@@ -45,8 +44,8 @@ function StepBanner({
       <ListChecks aria-hidden="true" />
       <AlertTitle>Step 2 of 2 · Teams</AlertTitle>
       <AlertDescription>
-        Choose the Site Engineers, Labours, Team Members, Contractors, Suppliers
-        and Vendors on this Project. You can change them any time from Teams.
+        Choose the Employees, Team Members, Contractors, Suppliers and Vendors
+        on this Project. You can change them any time from Teams.
       </AlertDescription>
       <AlertAction className="static col-span-full mt-2 sm:absolute sm:top-2.5 sm:right-3 sm:mt-0">
         <Link
@@ -190,20 +189,20 @@ function ResourceCard({
 export type ResourcesAccess = {
   /** Project menu Update: change every section. */
   canEdit: boolean;
-  /** Labours Read: the Add Labours picker, Labour and Site Engineer pages. */
-  canReadLabours?: boolean;
+  /** Employees Read: the Add Employees picker and the Employee pages. */
+  canReadEmployees?: boolean;
   /**
    * Read on the menu of each section's pages (Team Members, Contractors,
    * Suppliers, Vendors): their rows open those pages.
    */
   canOpenSections?: Partial<Record<ResourceSection, boolean>>;
-  /** Labour Transfer on this Project. */
+  /** Transfer on the Project's Employees (`labour.labour`). */
   canTransfer?: boolean;
 };
 
 /**
- * A Project's Resources: who works on it. Site Engineers and Labours come
- * first (ADR CM-0038), then four sections each edited in its own dialog
+ * A Project's Teams: who works on it. Employees come first (ADR CM-0038,
+ * CM-0055 §5), then four sections each edited in its own dialog
  * and saved on its own. Opened with `?step=resources` right after Add
  * Project, as the wizard's second step; the Project is saved by then, so
  * every section works there too.
@@ -211,7 +210,7 @@ export type ResourcesAccess = {
 export function ProjectResourcesPage({
   projectId,
   canEdit,
-  canReadLabours = false,
+  canReadEmployees = false,
   canOpenSections = {},
   canTransfer = false,
   wizard = false,
@@ -222,8 +221,7 @@ export function ProjectResourcesPage({
 }) {
   const { data } = useSuspenseQuery(projectResourcesQuery(projectId));
   const assignedAny =
-    data.siteEngineers.length > 0 ||
-    data.labours.total > 0 ||
+    data.employees.total > 0 ||
     data.teamMembers.some((line) => !line.isOwner) ||
     data.contractors.length > 0 ||
     data.suppliers.length > 0 ||
@@ -232,19 +230,13 @@ export function ProjectResourcesPage({
     <div className="w-full max-w-5xl space-y-6 p-6">
       {wizard && <StepBanner projectId={projectId} assignedAny={assignedAny} />}
       <div className="grid w-full gap-6 lg:grid-cols-2">
-        <SiteEngineersSection
+        <EmployeesSection
           projectId={projectId}
-          engineers={data.siteEngineers}
-          canEdit={canEdit}
-          canOpenPages={canReadLabours}
-        />
-        <LaboursSection
-          projectId={projectId}
-          total={data.labours.total}
+          total={data.employees.total}
           today={data.today}
           canEdit={canEdit}
-          canPickLabours={canReadLabours}
-          canOpenLabours={canReadLabours}
+          canPickEmployees={canReadEmployees}
+          canOpenEmployees={canReadEmployees}
           canTransfer={canTransfer}
         />
         {RESOURCE_SECTIONS.map((section) => (

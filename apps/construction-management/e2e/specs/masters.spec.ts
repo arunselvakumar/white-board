@@ -1,17 +1,18 @@
 import { expect } from "@playwright/test";
 
+import { todayInIndia } from "../api/dates";
 import { PASSWORD, newMobile, unique } from "../api/session";
 import { projectTest } from "../helpers/projectTest";
-import { AddLabourPage } from "../pages/AddLabourPage";
-import { AddSiteEngineerPage } from "../pages/AddSiteEngineerPage";
+import { AddEmployeePage } from "../pages/AddEmployeePage";
+import { EmployeesPage } from "../pages/EmployeesPage";
 import { MasterListPage } from "../pages/MasterListPage";
 
 projectTest.describe("Masters", () => {
   projectTest(
-    "should offer the new Labour Category on a Labour and list the new Site Engineer, when the Owner adds them",
+    "should offer the new Labour Category on an Employee and list a new Site Engineer who signs in, when the Owner adds them",
     async ({ page }) => {
       const category = unique("Bar Bender");
-      const supervisor = unique("Selvam");
+      const engineer = unique("Selvam");
 
       const categories = new MasterListPage(
         page,
@@ -28,45 +29,42 @@ projectTest.describe("Masters", () => {
       await categories.dialog.getByRole("button", { name: "Save" }).click();
       await expect(categories.item(category)).toBeVisible();
 
-      const supervisors = new MasterListPage(
-        page,
-        "/app/staff/site-engineers",
-        "Site Engineers",
+      // Add Employee starts on Human Resources → Labour; a Site Engineer
+      // is an Employee on that Role, and may sign in (ADR CM-0055).
+      const employees = new EmployeesPage(page);
+      await employees.goto();
+      await employees.addEmployeeLink.first().click();
+      const addEmployeePage = new AddEmployeePage(page);
+      await expect(addEmployeePage.pageHeading).toBeVisible();
+      await expect(addEmployeePage.departmentSelect).toContainText(
+        "Human Resources",
       );
-      await supervisors.goto();
-      // A page of its own, and every new Site Engineer signs in (ADR CM-0037).
-      await page
-        .getByRole("link", { name: "Add Site Engineer" })
-        .first()
-        .click();
-      const addSiteEngineerPage = new AddSiteEngineerPage(page);
-      await expect(addSiteEngineerPage.pageHeading).toBeVisible();
-      // They sign in with their mobile; nobody is invited (ADR CM-0053).
-      await expect(addSiteEngineerPage.mobileLoginCheckbox).toBeChecked();
-      await addSiteEngineerPage.fillDetails({
-        name: supervisor,
+      await expect(addEmployeePage.roleSelect).toContainText("Labour");
+      await expect(addEmployeePage.canSignInSwitch).not.toBeChecked();
+      await addEmployeePage.fill({
+        name: engineer,
         mobile: newMobile().slice(3),
-        password: PASSWORD,
+        joiningDate: todayInIndia(-1),
+        role: "Site Engineer",
+        wagePerDay: "1200",
       });
-      await addSiteEngineerPage.button("Add Site Engineer").click();
+      await addEmployeePage.canSignInSwitch.click();
+      // They sign in with their mobile; nobody is invited (ADR CM-0053).
+      await expect(addEmployeePage.mobileLoginCheckbox).toBeChecked();
+      await addEmployeePage.passwordField.fill(PASSWORD);
+      await addEmployeePage.saveButton.click();
       await expect(
-        addSiteEngineerPage.heading(`${supervisor} can sign in now`),
+        addEmployeePage.heading(`${engineer} can sign in now`),
       ).toBeVisible();
-      await supervisors.goto();
-      await expect(supervisors.item(supervisor)).toBeVisible();
+      await employees.goto();
+      await expect(employees.row(engineer)).toContainText("Site Engineer");
 
-      const addLabourPage = new AddLabourPage(page);
-      await addLabourPage.goto();
-      await addLabourPage.choose("Labour Category", category);
+      await addEmployeePage.goto();
+      await addEmployeePage.choose("Labour Category", category);
       await expect(
         page.getByRole("combobox", { name: "Labour Category" }),
       ).toContainText(category);
-      // A Labour answers to the Site Engineers on their Projects; there is
-      // no Site Engineer to pick (ADR CM-0041), and no Projects either:
-      // both are set from the Project.
-      await expect(
-        page.getByRole("combobox", { name: "Site Engineer" }),
-      ).toHaveCount(0);
+      // Projects are set from the Project's Teams, not here.
       await expect(
         page.getByRole("combobox", { name: "Projects" }),
       ).toHaveCount(0);

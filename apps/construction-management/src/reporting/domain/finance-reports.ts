@@ -68,7 +68,7 @@ export const COUNTERPARTY_LABELS: Record<CounterpartyKind, string> = {
   contractor: "Contractor",
   supplier: "Supplier",
   other_party: "Other Party",
-  labour: "Labour",
+  employee: "Employee",
   vendor: "Vendor",
   team_member: "Team Member",
 };

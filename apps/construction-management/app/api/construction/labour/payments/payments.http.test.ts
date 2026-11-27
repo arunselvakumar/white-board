@@ -2,7 +2,6 @@ import { prisma } from "@repo/construction-db";
 import { StatusCodes } from "http-status-codes";
 import { describe, expect, it } from "vitest";
 
-import { POST as createLabour } from "@/app/api/construction/labour/labours/route";
 import { POST as createVendor } from "@/app/api/construction/labour/vendors/route";
 import { GET as getOpenApi } from "@/app/api/openapi.json/route";
 import type { Flag } from "@/src/shared-kernel/access";
@@ -15,6 +14,7 @@ import {
   ownerWithCompany,
 } from "@/test/companies";
 import { bytesOf, pngBytes } from "@/test/files";
+import { seedEmployee } from "@/test/employees";
 import { accountBalance, addAccount, seededAccounts } from "@/test/finance";
 import { TEST_ORIGIN } from "@/test/sessions";
 
@@ -26,7 +26,6 @@ import { GET as listPayers } from "./payers/route";
 import { GET as listPayments, POST as recordPayment } from "./route";
 
 const BASE = `${TEST_ORIGIN}/api/construction/labour/payments`;
-const LABOURS = `${TEST_ORIGIN}/api/construction/labour/labours`;
 const VENDORS = `${TEST_ORIGIN}/api/construction/labour/vendors`;
 
 const TODAY = todayIn("Asia/Kolkata");
@@ -35,7 +34,7 @@ type Company = Awaited<ReturnType<typeof ownerWithCompany>>;
 
 type Payment = {
   id: string;
-  partyType: "labour" | "vendor";
+  partyType: "employee" | "vendor";
   partyId: string;
   partyName: string;
   projectId: string;
@@ -73,20 +72,19 @@ async function fixtures(company: Company) {
     addProject(company.workspaceId, company.userId, "Tower A"),
     addProject(company.workspaceId, company.userId, "Villa"),
   ]);
-  const labour = await json<{ id: string }>(
-    await createLabour(
-      jsonRequest(LABOURS, company.cookie, {
-        name: "Dhuresh Nawin",
-        joiningDate: "2026-08-01",
-        wageType: "daily",
-        wagePerDay: 70_000,
-        overtimeWagePerHour: 10_000,
-        weeklyHolidays: [0],
-        projectIds: [tower],
-        openingBalance: 100_000,
-      }),
-    ),
-  );
+  const labour = {
+    id: await seedEmployee({
+      workspaceId: company.workspaceId,
+      name: "Dhuresh Nawin",
+      joiningDate: "2026-08-01",
+      wagePerDay: 70_000,
+      overtimeWagePerHour: 10_000,
+      weeklyHolidays: [0],
+      projectIds: [tower],
+      openingBalance: 100_000,
+      by: company.userId,
+    }),
+  };
   const vendor = await json<{ id: string }>(
     await createVendor(
       jsonRequest(VENDORS, company.cookie, {
@@ -101,7 +99,7 @@ async function fixtures(company: Company) {
   return {
     tower,
     villa,
-    labourId: labour.id,
+    employeeId: labour.id,
     vendorId: vendor.id,
     cashId,
     bankId,
@@ -113,8 +111,8 @@ type Fixtures = Awaited<ReturnType<typeof fixtures>>;
 /** Cash from the Company's Cash Account, Bank from its Bank Account. */
 function payBody(f: Fixtures, overrides: Record<string, unknown> = {}) {
   return {
-    partyType: "labour",
-    partyId: f.labourId,
+    partyType: "employee",
+    partyId: f.employeeId,
     projectId: f.tower,
     paymentDate: "2026-09-12",
     kind: "payment",
@@ -178,7 +176,7 @@ describe("wage payments HTTP", () => {
     }>(
       await listPayers(
         jsonRequest(
-          `${BASE}/payers?projectId=${f.tower}&partyType=labour`,
+          `${BASE}/payers?projectId=${f.tower}&partyType=employee`,
           company.cookie,
         ),
       ),
@@ -207,8 +205,8 @@ describe("wage payments HTTP", () => {
       receiptUrl: null,
     });
     expect(payment.paidBy?.id).toBe(payers.currentMemberId);
-    expect(await balance(f.labourId)).toBe(70_000);
-    const entries = await ledger(f.labourId);
+    expect(await balance(f.employeeId)).toBe(70_000);
+    const entries = await ledger(f.employeeId);
     expect(entries.at(-1)).toMatchObject({
       kind: "payment",
       amount: -30_000,
@@ -233,7 +231,7 @@ describe("wage payments HTTP", () => {
       mode: "bank",
       reference: null,
     });
-    expect(await balance(f.labourId)).toBe(60_000);
+    expect(await balance(f.employeeId)).toBe(60_000);
 
     const fetched = await getPayment(
       jsonRequest(`${BASE}/${payment.id}`, company.cookie),
@@ -248,7 +246,7 @@ describe("wage payments HTTP", () => {
     );
     expect(stale.status).toBe(StatusCodes.CONFLICT);
     expect(await errorCode(stale)).toBe("PAYMENT_CHANGED");
-    expect(await balance(f.labourId)).toBe(60_000);
+    expect(await balance(f.employeeId)).toBe(60_000);
 
     const cancelled = await cancel(
       company.cookie,
@@ -256,8 +254,8 @@ describe("wage payments HTTP", () => {
       payment.updatedAt,
     );
     expect(cancelled.status).toBe(StatusCodes.NO_CONTENT);
-    expect(await balance(f.labourId)).toBe(90_000);
-    const reversal = (await ledger(f.labourId)).find(
+    expect(await balance(f.employeeId)).toBe(90_000);
+    const reversal = (await ledger(f.employeeId)).find(
       (entry) => entry.reversesEntryId != null,
     );
     expect(reversal).toMatchObject({ amount: 30_000, kind: "payment" });
@@ -316,10 +314,10 @@ describe("wage payments HTTP", () => {
     const theirs = await fixtures(other);
     const foreign = await record(
       company.cookie,
-      payBody(f, { partyId: theirs.labourId }),
+      payBody(f, { partyId: theirs.employeeId }),
     );
     expect(foreign.status).toBe(StatusCodes.NOT_FOUND);
-    expect(await errorCode(foreign)).toBe("LABOUR_NOT_FOUND");
+    expect(await errorCode(foreign)).toBe("EMPLOYEE_NOT_FOUND");
     const foreignProject = await record(
       company.cookie,
       payBody(f, { projectId: theirs.tower }),
@@ -330,7 +328,7 @@ describe("wage payments HTTP", () => {
       idContext(vendorPayment.id),
     );
     expect(peek.status).toBe(StatusCodes.NOT_FOUND);
-    expect(await balance(theirs.labourId)).toBe(100_000);
+    expect(await balance(theirs.employeeId)).toBe(100_000);
   });
 
   it("lists payments by type and kind with cursors and a total", async () => {
@@ -412,7 +410,7 @@ describe("wage payments HTTP", () => {
     expect(recorded.status).toBe(StatusCodes.CREATED);
     const payment = await json<Payment>(recorded);
     expect(payment.amount).toBeNull();
-    expect(await balance(f.labourId)).toBe(70_000);
+    expect(await balance(f.employeeId)).toBe(70_000);
 
     const page = await json<Page>(
       await listPayments(
@@ -511,8 +509,8 @@ describe("wage payments HTTP", () => {
         kind: "payment",
         amount: -45_000n,
         mode: "cash",
-        counterpartyKind: "labour",
-        counterpartyId: f.labourId,
+        counterpartyKind: "employee",
+        counterpartyId: f.employeeId,
         counterpartyName: "Dhuresh Nawin",
         narration: "Wage payment",
       }),
@@ -623,7 +621,7 @@ describe("wage payments HTTP", () => {
     expect(foreign.status).toBe(StatusCodes.NOT_FOUND);
     expect(await errorCode(foreign)).toBe("ACCOUNT_NOT_FOUND");
     // Nothing refused reached either ledger.
-    expect(await balance(f.labourId)).toBe(40_000);
+    expect(await balance(f.employeeId)).toBe(40_000);
     expect(await accountBalance(company.workspaceId, f.cashId)).toBe(0n);
   });
 

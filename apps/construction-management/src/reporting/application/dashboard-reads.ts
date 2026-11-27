@@ -192,7 +192,7 @@ export class CompanyDashboardReader {
     const trackingIds = ids.filter(
       (id) => issueIds.includes(id) || may(INSPECTIONS, id),
     );
-    const labourIds = ids.filter((id) => may(ATTENDANCE, id));
+    const attendanceIds = ids.filter((id) => may(ATTENDANCE, id));
     const dueIds = ids.filter((id) => may(PAYMENTS, id));
 
     const [approvals, tracking, labour, dues, progress] = await Promise.all([
@@ -209,9 +209,9 @@ export class CompanyDashboardReader {
               own,
             }),
           ),
-      labourIds.length === 0
+      attendanceIds.length === 0
         ? new Map<string, number>()
-        : source.labourPresent(workspaceId, labourIds, today),
+        : source.labourPresent(workspaceId, attendanceIds, today),
       dueIds.length === 0
         ? new Map<string, bigint>()
         : source.payableDueToday(workspaceId, dueIds),
@@ -238,7 +238,9 @@ export class CompanyDashboardReader {
         pendingInspections: may(INSPECTIONS, id)
           ? (pending?.pendingInspections ?? 0)
           : null,
-        labourToday: labourIds.includes(id) ? (labour.get(id) ?? 0) : null,
+        employeesToday: attendanceIds.includes(id)
+          ? (labour.get(id) ?? 0)
+          : null,
         due: dueIds.includes(id) ? (dues.get(id) ?? 0n) : null,
       };
     });

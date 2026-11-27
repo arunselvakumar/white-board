@@ -6,20 +6,20 @@ import type {
 } from "@/app/api/_lib/openapi";
 
 import {
-  ClearConstructionLabourLabourAttendanceRequestModel,
-  ConstructionLabourLabourAttendanceDayResponseModel,
-  ConstructionLabourLabourAttendanceOvertimeResponseModel,
-  ConstructionLabourLabourAttendanceParamsModel,
-  GetConstructionLabourLabourAttendanceMonthRequestModel,
-  GetConstructionLabourLabourAttendanceMonthResponseModel,
-  GetConstructionLabourLabourAttendanceSheetRequestModel,
-  GetConstructionLabourLabourAttendanceSheetResponseModel,
+  ClearConstructionLabourEmployeeAttendanceRequestModel,
+  ConstructionLabourEmployeeAttendanceDayResponseModel,
+  ConstructionLabourEmployeeAttendanceOvertimeResponseModel,
+  ConstructionLabourEmployeeAttendanceParamsModel,
+  GetConstructionLabourEmployeeAttendanceMonthRequestModel,
+  GetConstructionLabourEmployeeAttendanceMonthResponseModel,
+  GetConstructionLabourEmployeeAttendanceSheetRequestModel,
+  GetConstructionLabourEmployeeAttendanceSheetResponseModel,
   LABOUR_ATTENDANCE_PATH,
-  ListConstructionLabourLabourAttendanceRequestModel,
-  ListConstructionLabourLabourAttendanceResponseModel,
-  MarkConstructionLabourLabourAttendanceRequestModel,
-  MarkConstructionLabourLabourAttendanceResponseModel,
-  SetConstructionLabourLabourAttendancePaidLeaveRequestModel,
+  ListConstructionLabourEmployeeAttendanceRequestModel,
+  ListConstructionLabourEmployeeAttendanceResponseModel,
+  MarkConstructionLabourEmployeeAttendanceRequestModel,
+  MarkConstructionLabourEmployeeAttendanceResponseModel,
+  SetConstructionLabourEmployeeAttendancePaidLeaveRequestModel,
 } from "./labour-attendance-models";
 
 const LABOUR = ["Construction · Labour"];
@@ -41,15 +41,15 @@ const BASE = LABOUR_ATTENDANCE_PATH;
 
 /** Labour attendance models. */
 export const labourAttendanceOpenApiComponents: OpenApiComponents = {
-  ConstructionLabourLabourAttendanceOvertimeResponseModel,
-  ConstructionLabourLabourAttendanceDayResponseModel,
-  GetConstructionLabourLabourAttendanceSheetResponseModel,
-  MarkConstructionLabourLabourAttendanceRequestModel,
-  MarkConstructionLabourLabourAttendanceResponseModel,
-  ClearConstructionLabourLabourAttendanceRequestModel,
-  SetConstructionLabourLabourAttendancePaidLeaveRequestModel,
-  ListConstructionLabourLabourAttendanceResponseModel,
-  GetConstructionLabourLabourAttendanceMonthResponseModel,
+  ConstructionLabourEmployeeAttendanceOvertimeResponseModel,
+  ConstructionLabourEmployeeAttendanceDayResponseModel,
+  GetConstructionLabourEmployeeAttendanceSheetResponseModel,
+  MarkConstructionLabourEmployeeAttendanceRequestModel,
+  MarkConstructionLabourEmployeeAttendanceResponseModel,
+  ClearConstructionLabourEmployeeAttendanceRequestModel,
+  SetConstructionLabourEmployeeAttendancePaidLeaveRequestModel,
+  ListConstructionLabourEmployeeAttendanceResponseModel,
+  GetConstructionLabourEmployeeAttendanceMonthResponseModel,
 };
 
 /** Labour attendance routes. Menu `labour.attendance` on the Project. */
@@ -58,36 +58,36 @@ export const labourAttendanceOpenApiOperations: OpenApiOperation[] = [
     method: "get",
     path: BASE,
     summary:
-      "Marked labour days of a Project, newest date first, by dates, Labour, Site Engineer and status (amounts null without Labour Financial)",
+      "Marked labour days of a Project, newest date first, by dates, Employee and status (amounts null without Labour Financial)",
     tags: LABOUR,
-    query: ListConstructionLabourLabourAttendanceRequestModel,
+    query: ListConstructionLabourEmployeeAttendanceRequestModel,
     successStatus: StatusCodes.OK,
     successDescription: "A page of labour days",
-    successSchema: ListConstructionLabourLabourAttendanceResponseModel,
+    successSchema: ListConstructionLabourEmployeeAttendanceResponseModel,
     errors: READ_ERRORS,
   },
   {
     method: "get",
     path: `${BASE}/sheet`,
     summary:
-      "The labour marking sheet for a Project and date: Labours on the Project that day, their row and a pre-fill hint",
+      "The labour marking sheet for a Project and date: every active Employee on the Project that day, their row and a pre-fill hint",
     tags: LABOUR,
-    query: GetConstructionLabourLabourAttendanceSheetRequestModel,
+    query: GetConstructionLabourEmployeeAttendanceSheetRequestModel,
     successStatus: StatusCodes.OK,
     successDescription: "The marking sheet",
-    successSchema: GetConstructionLabourLabourAttendanceSheetResponseModel,
+    successSchema: GetConstructionLabourEmployeeAttendanceSheetResponseModel,
     errors: READ_ERRORS,
   },
   {
     method: "post",
     path: `${BASE}/mark`,
     summary:
-      "Mark many Labours' day in one transaction, priced and posted to the labour ledger (LABOUR_INACTIVE, LABOUR_NOT_ON_PROJECT, OVERTIME_ON_ABSENT_DAY, TIMES_NEED_PRESENT, CHECK_IN_REQUIRED, BREAK_TOO_LONG 400; overtime `fromTimes` hours worked out from check-in, check-out and break; ATTENDANCE_CHANGED 409 with details.labourId; back-dated 403)",
+      "Mark many Employees' day in one transaction, priced and posted to the labour ledger (EMPLOYEE_INACTIVE, EMPLOYEE_NOT_ON_PROJECT, OVERTIME_ON_ABSENT_DAY, TIMES_NEED_PRESENT, CHECK_IN_REQUIRED, BREAK_TOO_LONG 400; overtime `fromTimes` hours worked out from check-in, check-out and break; ATTENDANCE_CHANGED 409 with details.employeeId; back-dated 403)",
     tags: LABOUR,
-    body: MarkConstructionLabourLabourAttendanceRequestModel,
+    body: MarkConstructionLabourEmployeeAttendanceRequestModel,
     successStatus: StatusCodes.OK,
     successDescription: "The saved rows",
-    successSchema: MarkConstructionLabourLabourAttendanceResponseModel,
+    successSchema: MarkConstructionLabourEmployeeAttendanceResponseModel,
     errors: WRITE_ERRORS,
   },
   {
@@ -96,7 +96,7 @@ export const labourAttendanceOpenApiOperations: OpenApiOperation[] = [
     summary:
       "Clear Labours' marked day: tombstones and ledger reversals, all or none (needs Attendance delete; back-dated edit limit)",
     tags: LABOUR,
-    body: ClearConstructionLabourLabourAttendanceRequestModel,
+    body: ClearConstructionLabourEmployeeAttendanceRequestModel,
     successStatus: StatusCodes.NO_CONTENT,
     successDescription: "Cleared",
     errors: WRITE_ERRORS,
@@ -107,23 +107,23 @@ export const labourAttendanceOpenApiOperations: OpenApiOperation[] = [
     summary:
       "Mark Paid Leave: toggle Paid Leave on an On Leave day and repost its ledger entries (PAID_LEAVE_NEEDS_LEAVE 400)",
     tags: LABOUR,
-    params: ConstructionLabourLabourAttendanceParamsModel,
-    body: SetConstructionLabourLabourAttendancePaidLeaveRequestModel,
+    params: ConstructionLabourEmployeeAttendanceParamsModel,
+    body: SetConstructionLabourEmployeeAttendancePaidLeaveRequestModel,
     successStatus: StatusCodes.OK,
     successDescription: "The changed day",
-    successSchema: ConstructionLabourLabourAttendanceDayResponseModel,
+    successSchema: ConstructionLabourEmployeeAttendanceDayResponseModel,
     errors: WRITE_ERRORS,
   },
   {
     method: "get",
     path: `${BASE}/month`,
     summary:
-      "Month grid: Labour × day codes (P/H/A/L/PL/HO) with overtime hours and totals per Labour",
+      "Month grid: Employee × day codes (P/H/A/L/PL/HO) with overtime hours and totals per Employee",
     tags: LABOUR,
-    query: GetConstructionLabourLabourAttendanceMonthRequestModel,
+    query: GetConstructionLabourEmployeeAttendanceMonthRequestModel,
     successStatus: StatusCodes.OK,
     successDescription: "The month grid",
-    successSchema: GetConstructionLabourLabourAttendanceMonthResponseModel,
+    successSchema: GetConstructionLabourEmployeeAttendanceMonthResponseModel,
     errors: READ_ERRORS,
   },
 ];

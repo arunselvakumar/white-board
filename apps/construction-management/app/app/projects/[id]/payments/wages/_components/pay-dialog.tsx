@@ -62,7 +62,7 @@ const NO_PAYER = "none";
 const RECEIPT_MAX_BYTES = 10 * 1024 * 1024;
 
 /**
- * Pay a labourer or a vendor: date (today), Payment or Advance, Cash or
+ * Pay an Employee or a vendor: date (today), Payment or Advance, Cash or
  * Bank with a reference, the account it was paid from (a Cash or petty-cash
  * account for Cash, a Bank account for Bank), the amount (the Final Amount
  * when something is owed), who paid, remarks and an optional receipt.

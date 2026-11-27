@@ -5,7 +5,7 @@ import type { ProjectUsage } from "../domain/project-repository";
 /**
  * Site records that point at a Project, read by id from the labour
  * context's tables (contexts refer to each other by id; no import of their
- * code): live labours assigned to it, live vendors assigned
+ * code): live Employees assigned to it, live vendors assigned
  * to it, live labour or vendor attendance on it, and live wage payments.
  * Its own live documents (CM-414) count too: deleting the Project would
  * leave their files in storage with nothing to show them. So do its live
@@ -21,8 +21,8 @@ export class PrismaProjectUsage implements ProjectUsage {
     const rows = await this.db.$queryRaw<{ used: boolean }[]>(Prisma.sql`
       SELECT
         EXISTS (
-          SELECT 1 FROM construction_labour.labour_projects lp
-          JOIN construction_labour.labours l ON l.id = lp.labour_id
+          SELECT 1 FROM construction_labour.employee_projects lp
+          JOIN construction_labour.employees l ON l.id = lp.employee_id
           WHERE lp.workspace_id = ${workspaceId}
             AND lp.project_id = ${projectId}::uuid
             AND l.deleted_at IS NULL
@@ -35,7 +35,7 @@ export class PrismaProjectUsage implements ProjectUsage {
             AND v.deleted_at IS NULL
         )
         OR EXISTS (
-          SELECT 1 FROM construction_labour.labour_attendance
+          SELECT 1 FROM construction_labour.employee_attendance
           WHERE workspace_id = ${workspaceId}
             AND project_id = ${projectId}::uuid
             AND deleted_at IS NULL

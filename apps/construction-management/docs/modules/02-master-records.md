@@ -1,5 +1,7 @@
 # 02 — Master Records
 
+> **Since [ADR CM-0055](../adr/CM-0055-employees-replace-labours-and-site-engineers.md) (2026-11-27):** Labours and Site Engineers are one **Employee** record (Human Resources → Staff → Employees), told apart by their Role and its Department. Wherever this spec says Labour, Labourer, Supervisor or Site Engineer for a person, read Employee; the rules (wages, attendance, Check-In, transfers, ledger) apply to every Employee. The ADR wins where they differ.
+
 Master Records are the reference lists every other module picks from: the Work Types work is booked against; the parties the company pays or bills (Contractors, Suppliers, labour-supply Vendors, Labours, Other Parties); Equipment; the company's own Bank and Cash accounts; Materials with their category, unit, rate, GST and HSN; and small lookup lists (Measurement Units, Labour Categories, Payment Categories, Issue Categories, Amenities and Common Developments, Tags, Terms & Conditions, Lead Sources, Funnel statuses).
 
 Many lists ship with **global seed records** (`companyId = null`) that every company sees; a company adds its own records beside them (`companyId = <company>`). Parties (Contractors, Suppliers, Vendors, Labours, Other Parties) are **assigned to projects** so that project screens only offer the relevant ones.

@@ -12,9 +12,9 @@ import { checkInHandlers as handlers } from "../../../../handlers";
 export const dynamic = "force-dynamic";
 
 /**
- * The photo on a Labour's or Vendor's record, for the capture screen: for
+ * The photo on an Employee's or Vendor's record, for the capture screen: for
  * a member with Attendance read on the Project, of someone on it. 404
- * `PHOTO_NOT_FOUND` when there is none, and always for a Site Engineer.
+ * `PHOTO_NOT_FOUND` when there is none.
  */
 export async function GET(
   request: Request,

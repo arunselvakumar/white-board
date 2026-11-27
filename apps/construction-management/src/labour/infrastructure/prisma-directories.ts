@@ -3,18 +3,16 @@ import type { PrismaClient } from "@repo/construction-db";
 import type {
   LabourCategoryDirectory,
   ProjectDirectory,
-  SupervisorDirectory,
+  RoleDirectory,
   TeamMemberDirectory,
 } from "../application/directories";
-import { siteEngineersOnProjects } from "./project-site-engineers";
 
 type Db = Pick<
   PrismaClient,
   | "constructionProjectsProject"
   | "constructionMastersLabourCategory"
-  | "constructionMastersSupervisor"
+  | "constructionOrganizationRole"
   | "constructionOrganizationTeamMember"
-  | "constructionOrganizationTeamMemberProject"
 >;
 
 function unique(ids: readonly string[]): string[] {
@@ -52,22 +50,31 @@ export class PrismaDirectories {
     },
   };
 
-  readonly supervisors: SupervisorDirectory = {
+  readonly roles: RoleDirectory = {
     find: async (workspaceId, ids) => {
       if (ids.length === 0) return new Map();
-      const rows = await this.db.constructionMastersSupervisor.findMany({
+      const rows = await this.db.constructionOrganizationRole.findMany({
         where: { workspaceId, id: { in: unique(ids) }, deletedAt: null },
-        select: { id: true, name: true, disabledAt: true },
+        select: {
+          id: true,
+          name: true,
+          department: { select: { id: true, name: true, deletedAt: true } },
+        },
       });
       return new Map(
         rows.map((row) => [
           row.id,
-          { id: row.id, name: row.name, disabled: row.disabledAt != null },
+          {
+            id: row.id,
+            name: row.name,
+            department:
+              row.department != null && row.department.deletedAt == null
+                ? { id: row.department.id, name: row.department.name }
+                : null,
+          },
         ]),
       );
     },
-    onProjects: (workspaceId, projectIds) =>
-      siteEngineersOnProjects(this.db, workspaceId, projectIds),
   };
 
   readonly teamMembers: TeamMemberDirectory = {

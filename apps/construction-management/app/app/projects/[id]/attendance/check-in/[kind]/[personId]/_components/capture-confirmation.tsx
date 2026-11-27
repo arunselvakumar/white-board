@@ -26,7 +26,7 @@ export function confirmationTitle(
 
 /**
  * Covers the capture screen after an entry is recorded: the photo taken,
- * the time from the saved entry, the name, any note about the Labour's day
+ * the time from the saved entry, the name, any note about the Employee's day
  * and the fence result. Gone after four seconds, or on a tap.
  */
 export function CaptureConfirmation({

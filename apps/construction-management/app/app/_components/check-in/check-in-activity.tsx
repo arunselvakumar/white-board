@@ -19,7 +19,7 @@ export type ActivityCheckInEntry = CheckInPlace & {
   by: string | null;
 };
 
-/** The verb after the person's name, or the start of the Labour feed's line. */
+/** The verb after the person's name, or the start of an Employee feed's line. */
 export const CHECKED: Record<ActivityCheckInEntry["action"], string> = {
   check_in: "checked in",
   check_out: "checked out",

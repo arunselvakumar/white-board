@@ -5,31 +5,31 @@ import {
 } from "@tanstack/react-query";
 
 import type {
-  ClearConstructionLabourLabourAttendanceRequestModel,
-  ConstructionLabourLabourAttendanceDayResponseModel,
-  GetConstructionLabourLabourAttendanceMonthResponseModel,
-  GetConstructionLabourLabourAttendanceSheetResponseModel,
-  ListConstructionLabourLabourAttendanceResponseModel,
-  MarkConstructionLabourLabourAttendanceRequestModel,
-  MarkConstructionLabourLabourAttendanceResponseModel,
+  ClearConstructionLabourEmployeeAttendanceRequestModel,
+  ConstructionLabourEmployeeAttendanceDayResponseModel,
+  GetConstructionLabourEmployeeAttendanceMonthResponseModel,
+  GetConstructionLabourEmployeeAttendanceSheetResponseModel,
+  ListConstructionLabourEmployeeAttendanceResponseModel,
+  MarkConstructionLabourEmployeeAttendanceRequestModel,
+  MarkConstructionLabourEmployeeAttendanceResponseModel,
 } from "@/app/api/construction/labour/attendance/labour/labour-attendance-models";
 
 import { apiJson } from "./http";
 
-export type LabourAttendanceDay =
-  ConstructionLabourLabourAttendanceDayResponseModel;
-export type LabourSheet =
-  GetConstructionLabourLabourAttendanceSheetResponseModel;
-export type LabourSheetRow = LabourSheet["labourers"][number];
-export type LabourAttendanceMonth =
-  GetConstructionLabourLabourAttendanceMonthResponseModel;
-export type LabourAttendanceList =
-  ListConstructionLabourLabourAttendanceResponseModel;
-export type MarkLabourDayInput =
-  MarkConstructionLabourLabourAttendanceRequestModel;
-export type ClearLabourDayInput =
-  ClearConstructionLabourLabourAttendanceRequestModel;
-export type AttendanceStatus = LabourAttendanceDay["status"];
+export type EmployeeAttendanceDay =
+  ConstructionLabourEmployeeAttendanceDayResponseModel;
+export type EmployeeSheet =
+  GetConstructionLabourEmployeeAttendanceSheetResponseModel;
+export type EmployeeSheetRow = EmployeeSheet["employees"][number];
+export type EmployeeAttendanceMonth =
+  GetConstructionLabourEmployeeAttendanceMonthResponseModel;
+export type EmployeeAttendanceList =
+  ListConstructionLabourEmployeeAttendanceResponseModel;
+export type MarkEmployeeDayInput =
+  MarkConstructionLabourEmployeeAttendanceRequestModel;
+export type ClearEmployeeDayInput =
+  ClearConstructionLabourEmployeeAttendanceRequestModel;
+export type AttendanceStatus = EmployeeAttendanceDay["status"];
 
 export const LABOUR_ATTENDANCE_API =
   "/api/construction/labour/attendance/labour";
@@ -53,41 +53,43 @@ function postJson<T>(url: string, body: unknown): Promise<T> {
 }
 
 /** The marking sheet for a Project and date. */
-export function labourSheetQuery(projectId: string, date: string) {
+export function employeeSheetQuery(projectId: string, date: string) {
   return queryOptions({
     queryKey: [...LABOUR_ATTENDANCE_KEY, "sheet", projectId, date],
     queryFn: () =>
-      apiJson<LabourSheet>(
+      apiJson<EmployeeSheet>(
         `${LABOUR_ATTENDANCE_API}/sheet?${search({ projectId, date })}`,
       ),
   });
 }
 
-export function labourAttendanceMonthQuery(projectId: string, month: string) {
+export function employeeAttendanceMonthQuery(projectId: string, month: string) {
   return queryOptions({
     queryKey: [...LABOUR_ATTENDANCE_KEY, "month", projectId, month],
     queryFn: () =>
-      apiJson<LabourAttendanceMonth>(
+      apiJson<EmployeeAttendanceMonth>(
         `${LABOUR_ATTENDANCE_API}/month?${search({ projectId, month })}`,
       ),
   });
 }
 
-export type LabourAttendanceListFilter = {
+export type EmployeeAttendanceListFilter = {
   projectId: string;
   from?: string;
   to?: string;
-  labourId?: string;
+  employeeId?: string;
   status?: string;
   cursor?: { after: string } | { before: string } | null;
 };
 
-export function labourAttendanceListQuery(filter: LabourAttendanceListFilter) {
+export function employeeAttendanceListQuery(
+  filter: EmployeeAttendanceListFilter,
+) {
   const query = search({
     projectId: filter.projectId,
     from: filter.from,
     to: filter.to,
-    labourId: filter.labourId,
+    employeeId: filter.employeeId,
     status: filter.status,
     limit: "25",
     after:
@@ -102,25 +104,25 @@ export function labourAttendanceListQuery(filter: LabourAttendanceListFilter) {
   return queryOptions({
     queryKey: [...LABOUR_ATTENDANCE_KEY, "list", query],
     queryFn: () =>
-      apiJson<LabourAttendanceList>(`${LABOUR_ATTENDANCE_API}?${query}`),
+      apiJson<EmployeeAttendanceList>(`${LABOUR_ATTENDANCE_API}?${query}`),
   });
 }
 
-export function markLabourDay(
-  input: MarkLabourDayInput,
-): Promise<MarkConstructionLabourLabourAttendanceResponseModel> {
+export function markEmployeeDay(
+  input: MarkEmployeeDayInput,
+): Promise<MarkConstructionLabourEmployeeAttendanceResponseModel> {
   return postJson(`${LABOUR_ATTENDANCE_API}/mark`, input);
 }
 
-export function clearLabourDay(input: ClearLabourDayInput): Promise<void> {
+export function clearEmployeeDay(input: ClearEmployeeDayInput): Promise<void> {
   return postJson(`${LABOUR_ATTENDANCE_API}/clear`, input);
 }
 
-export function setLabourPaidLeave(input: {
+export function setEmployeePaidLeave(input: {
   id: string;
   isPaidLeave: boolean;
   expectedUpdatedAt: string;
-}): Promise<LabourAttendanceDay> {
+}): Promise<EmployeeAttendanceDay> {
   return postJson(
     `${LABOUR_ATTENDANCE_API}/${encodeURIComponent(input.id)}/paid-leave`,
     {
@@ -136,17 +138,20 @@ function useInvalidate() {
     queryClient.invalidateQueries({ queryKey: LABOUR_ATTENDANCE_KEY });
 }
 
-export function useMarkLabourDay() {
+export function useMarkEmployeeDay() {
   const invalidate = useInvalidate();
-  return useMutation({ mutationFn: markLabourDay, onSuccess: invalidate });
+  return useMutation({ mutationFn: markEmployeeDay, onSuccess: invalidate });
 }
 
-export function useClearLabourDay() {
+export function useClearEmployeeDay() {
   const invalidate = useInvalidate();
-  return useMutation({ mutationFn: clearLabourDay, onSuccess: invalidate });
+  return useMutation({ mutationFn: clearEmployeeDay, onSuccess: invalidate });
 }
 
-export function useSetLabourPaidLeave() {
+export function useSetEmployeePaidLeave() {
   const invalidate = useInvalidate();
-  return useMutation({ mutationFn: setLabourPaidLeave, onSuccess: invalidate });
+  return useMutation({
+    mutationFn: setEmployeePaidLeave,
+    onSuccess: invalidate,
+  });
 }

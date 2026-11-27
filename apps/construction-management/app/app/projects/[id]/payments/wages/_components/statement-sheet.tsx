@@ -71,7 +71,7 @@ export function StatementSheet({
           <SheetTitle>{target?.name ?? "Statement"}</SheetTitle>
           <SheetDescription>
             {formatDate(range.from)} – {formatDate(range.to)}. A balance belongs
-            to the {partyType === "labour" ? "Labour" : "Vendor"} across
+            to the {partyType === "employee" ? "Employee" : "Vendor"} across
             Projects.
           </SheetDescription>
         </SheetHeader>

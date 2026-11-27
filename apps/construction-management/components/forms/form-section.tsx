@@ -2,7 +2,7 @@ import { useId, type ReactNode } from "react";
 import { RequiredIndicator } from "@repo/ui/components/label";
 
 /**
- * One card of a one-page form (Add Labour, Add Staff): a title, an
+ * One card of a one-page form (Add Employee, Add Staff): a title, an
  * optional hint, then its fields. The section is named by its title.
  */
 export function FormSection({

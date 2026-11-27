@@ -1,8 +1,8 @@
 import { expect } from "@playwright/test";
 
 import {
-  createLabour,
-  markLabourAttendance,
+  createEmployee,
+  markEmployeeAttendance,
   todayInIndia,
 } from "../api/labour";
 import { createMaterial, createSupplier } from "../api/masters";
@@ -14,7 +14,7 @@ import { CompanyDashboardPage } from "../pages/CompanyDashboardPage";
 
 companyTest.describe("Company Dashboard", () => {
   companyTest(
-    "should count today's labour, open issues and the amount due, when the Projects have them",
+    "should count today's Employees, open issues and the amount due, when the Projects have them",
     { tag: ["@pr"] },
     async ({ owner, page }) => {
       const project = await createProject(owner.api, {
@@ -25,14 +25,14 @@ companyTest.describe("Company Dashboard", () => {
         project.id,
         "Pump house",
       );
-      const labours = await Promise.all([
-        createLabour(owner.api, { projectId: project.id }),
-        createLabour(owner.api, { projectId: project.id }),
+      const employees = await Promise.all([
+        createEmployee(owner.api, { projectId: project.id }),
+        createEmployee(owner.api, { projectId: project.id }),
       ]);
-      await markLabourAttendance(owner.api, {
+      await markEmployeeAttendance(owner.api, {
         projectId: project.id,
         date: todayInIndia(),
-        labourIds: labours.map((labour) => labour.id),
+        employeeIds: employees.map((employee) => employee.id),
       });
       await createIssue(owner.api, {
         projectId: project.id,
@@ -57,7 +57,9 @@ companyTest.describe("Company Dashboard", () => {
       const dashboard = new CompanyDashboardPage(page);
       await dashboard.goto();
       await expect(dashboard.total("Active Projects")).toContainText("1");
-      await expect(dashboard.total("Labours present today")).toContainText("2");
+      await expect(dashboard.total("Employees present today")).toContainText(
+        "2",
+      );
       await expect(dashboard.total("Pending Issues & Snags")).toContainText(
         "1",
       );

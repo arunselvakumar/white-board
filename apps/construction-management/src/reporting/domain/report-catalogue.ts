@@ -175,12 +175,12 @@ const PROJECTS_FILTER = { key: "projects", scopes: CENTRAL } as const;
  * is display order (string keys keep it).
  */
 const DEFINITIONS = {
-  // Labour and vendor reports (CM-217, CM-218).
+  // Employee and vendor reports (CM-217, CM-218, ADR CM-0055).
   labour_attendance: {
-    title: "All Labour Attendance",
+    title: "Employee Attendance",
     description:
-      "Every Labour's days in the period: present, half day, absent, leave, paid leave, holiday and overtime hours, with a day-by-day list.",
-    needs: "Needs Labour Report.",
+      "Every Employee's days in the period: present, half day, absent, leave, paid leave, holiday and overtime hours, with a day-by-day list.",
+    needs: "Needs Employees Report.",
     group: "labour",
     scopes: PROJECT,
     menu: "labour.labour",
@@ -194,10 +194,10 @@ const DEFINITIONS = {
     available: true,
   },
   labour_payment: {
-    title: "All Labour Payment",
+    title: "Employee Payments",
     description:
-      "Previous Balance, To Pay, Advance, Paid and Final Amount for each Labour, from the ledger.",
-    needs: "Needs Labour Report and Financial.",
+      "Previous Balance, To Pay, Advance, Paid and Final Amount for each Employee, from the ledger.",
+    needs: "Needs Employees Report and Financial.",
     group: "labour",
     scopes: PROJECT,
     menu: "labour.labour",
@@ -211,10 +211,10 @@ const DEFINITIONS = {
     available: true,
   },
   labour_month: {
-    title: "Month-wise Labour",
+    title: "Employee Month",
     description:
-      "Labour × day grid for a month (P, ½, A, L, PL, H) with totals; wages earned with Financial.",
-    needs: "Needs Labour Report.",
+      "Employee × day grid for a month (P, ½, A, L, PL, H) with totals; wages earned with Financial.",
+    needs: "Needs Employees Report.",
     group: "labour",
     scopes: PROJECT,
     menu: "labour.labour",
@@ -253,7 +253,7 @@ const DEFINITIONS = {
     title: "Muster roll and wage register",
     description:
       "The combined register of workmen, muster roll and wages for a month: father's name, days, wage rate, overtime, gross, deductions, net and a signature column.",
-    needs: "Needs Labour Report and Financial.",
+    needs: "Needs Employees Report and Financial.",
     group: "labour",
     scopes: PROJECT,
     menu: "labour.labour",
@@ -267,10 +267,10 @@ const DEFINITIONS = {
     available: true,
   },
   labour_attendance_central: {
-    title: "Central Labour Attendance",
+    title: "Central Employee Attendance",
     description:
-      "Every Project's labour days in the period: present, half day, absent, leave, paid leave, holiday and overtime hours per Project and Labour, with each Project's totals.",
-    needs: "Needs Labour Report; a member sees the Projects they are on.",
+      "Every Project's labour days in the period: present, half day, absent, leave, paid leave, holiday and overtime hours per Project and Employee, with each Project's totals.",
+    needs: "Needs Employees Report; a member sees the Projects they are on.",
     group: "labour",
     scopes: CENTRAL,
     menu: "labour.labour",

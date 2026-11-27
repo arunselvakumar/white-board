@@ -21,7 +21,7 @@ const WIDTH = 600;
 const HEIGHT = 160;
 
 /**
- * "Labours present at site" day by day over the dashboard's duration: one
+ * "Employees present at site" day by day over the dashboard's duration: one
  * series, so the title names it and there is no legend. A 2px line over a
  * light area on a recessive baseline; hover, touch or the arrow keys move a
  * crosshair whose day is read out above the chart. A table of every day sits
@@ -58,7 +58,7 @@ export function AttendanceTrend({ series }: { series: readonly Day[] }) {
     <figure aria-labelledby={titleId} className="min-w-0 space-y-3">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <figcaption id={titleId} className="text-sm font-semibold">
-          Labours present per day
+          Employees present per day
         </figcaption>
         {shown == null ? null : (
           <p className="text-muted-foreground text-xs" aria-live="polite">
@@ -152,16 +152,16 @@ export function AttendanceTrend({ series }: { series: readonly Day[] }) {
       </div>
       <p className="text-muted-foreground text-xs">
         {total === 0
-          ? "No labour was marked present in this period."
-          : `${String(total)} labour-days in all; most on ${dayLabel(peak?.date ?? "")} (${String(peak?.present ?? 0)}).`}
+          ? "No Employee was marked present in this period."
+          : `${String(total)} Employee-days in all; most on ${dayLabel(peak?.date ?? "")} (${String(peak?.present ?? 0)}).`}
       </p>
       <div className="sr-only">
         <table>
-          <caption>Labours present and vendor heads per day</caption>
+          <caption>Employees present and vendor heads per day</caption>
           <thead>
             <tr>
               <th scope="col">Day</th>
-              <th scope="col">Labours present</th>
+              <th scope="col">Employees present</th>
               <th scope="col">Vendor heads</th>
             </tr>
           </thead>

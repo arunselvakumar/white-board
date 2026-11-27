@@ -1,5 +1,7 @@
 # 04 — Daily Site Work
 
+> **Since [ADR CM-0055](../adr/CM-0055-employees-replace-labours-and-site-engineers.md) (2026-11-27):** Labours and Site Engineers are one **Employee** record (Human Resources → Staff → Employees), told apart by their Role and its Department. Wherever this spec says Labour, Labourer, Supervisor or Site Engineer for a person, read Employee; the rules (wages, attendance, Check-In, transfers, ledger) apply to every Employee. The ADR wins where they differ.
+
 Daily Site Work is the record of what happened on a project site on a given day. It covers four related things:
 
 - **Daily Worksheet.** Each entry records work done at a location by a contractor's crew: the labour headcount, the approximate quantity of work done, the materials consumed and photos. Material consumption reduces project inventory.

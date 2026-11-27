@@ -1,7 +1,7 @@
 import { mapError, parseOrThrow } from "@/app/api/_lib/map-error";
 import { requireAccess } from "@/app/api/_lib/require-access";
 import { isResponse } from "@/app/api/_lib/require-session";
-import { toPersonActivityResponse } from "@/app/api/construction/labour/labours/[id]/activity/activity-models";
+import { toVendorActivityResponse } from "@/app/api/construction/labour/_activity/activity-fields";
 import { createVendorActivity } from "@/src/composition/person-activity";
 
 import { ConstructionLabourVendorParamsModel } from "../vendor-params-model";
@@ -39,7 +39,7 @@ export async function GET(
       to: query.to ?? null,
       cursor: query.cursor ?? null,
     });
-    return Response.json(toPersonActivityResponse(page));
+    return Response.json(toVendorActivityResponse(page));
   } catch (error) {
     return mapError(error);
   }

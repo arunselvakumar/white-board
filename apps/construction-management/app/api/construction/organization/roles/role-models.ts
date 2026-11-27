@@ -26,7 +26,13 @@ export const ConstructionOrganizationRoleResponseModel = z.object({
   userCount: z
     .int()
     .nonnegative()
-    .describe("Live Team Members other than the Owner on this Role"),
+    .describe(
+      "Live Team Members other than the Owner on this Role; Employees' sign-ins are counted as Employees",
+    ),
+  employeeCount: z
+    .int()
+    .nonnegative()
+    .describe("Live Employees on this Role (ADR CM-0055 §2)"),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 });

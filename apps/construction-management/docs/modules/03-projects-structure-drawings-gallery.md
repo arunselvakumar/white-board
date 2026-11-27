@@ -1,5 +1,7 @@
 # 03 — Projects, Structure, Drawings & Gallery
 
+> **Since [ADR CM-0055](../adr/CM-0055-employees-replace-labours-and-site-engineers.md) (2026-11-27):** Labours and Site Engineers are one **Employee** record (Human Resources → Staff → Employees), told apart by their Role and its Department. Wherever this spec says Labour, Labourer, Supervisor or Site Engineer for a person, read Employee; the rules (wages, attendance, Check-In, transfers, ledger) apply to every Employee. The ADR wins where they differ.
+
 A **Project** is the construction site or development every site entry, purchase, payment, attendance and sale belongs to. This module covers creating and managing projects (two-step wizard, status, type, budget, logo, resource assignment), the project home (tiles, pinning, hiding modules, tile order, backup, project chat), the **physical structure** of a building project — **Phases → Wings → Floors → Units** — and **Locations** for non-building projects, the **Location Type** taxonomy every site entry uses, **Project Drawings** (albums of files), the **Gallery** of project media, **Testing Reports**, and the **Project Dashboard**.
 
 Who uses it:

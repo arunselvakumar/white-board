@@ -5,7 +5,7 @@ import {
   attendanceAuditDay,
   auditProjectChanges,
   readAuditEvents,
-  readLabourImports,
+  readEmployeeImports,
   VENDOR_PROJECT_ACTIONS,
   vendorProjectIdsAfter,
   type AttendanceAuditDay,
@@ -21,7 +21,7 @@ import {
   PROJECT_CHECK_IN_ACTIVITY_RANK,
   PROJECT_LABOUR_ACTIVITY_RANK,
   type ActivityCheckInPerson,
-  type ActivityLabour,
+  type ActivityEmployee,
   type CheckInActivityRow,
   type AttendanceLabel,
   type LabourActivitySource,
@@ -113,7 +113,7 @@ type ProjectMoveSqlRow = {
   rank: number;
   kind: ProjectLabourMoveKind;
   other_project_id: string | null;
-  labour_ids: string[];
+  employee_ids: string[];
   remark: string | null;
   created_by: string;
 };
@@ -206,8 +206,8 @@ function checkInSql(
 
 /**
  * The labour context's reads for the Activity feeds (ADR CM-0038 §1):
- * `labour_transfers`, `labour_attendance`, `check_in_events`, and the
- * labourer's, their attendance rows' and a Vendor's audit events through
+ * `employee_transfers`, `employee_attendance`, `check_in_events`, and the
+ * Employee's, their attendance rows' and a Vendor's audit events through
  * the shared-kernel reader.
  */
 export class PrismaLabourActivity implements LabourActivitySource {
@@ -217,9 +217,9 @@ export class PrismaLabourActivity implements LabourActivitySource {
     this.directories = new PrismaDirectories(db);
   }
 
-  async find(workspaceId: string, labourId: string) {
-    return this.db.constructionLabourLabour.findFirst({
-      where: { id: labourId, workspaceId, deletedAt: null },
+  async find(workspaceId: string, employeeId: string) {
+    return this.db.constructionLabourEmployee.findFirst({
+      where: { id: employeeId, workspaceId, deletedAt: null },
       select: { id: true },
     });
   }
@@ -240,9 +240,9 @@ export class PrismaLabourActivity implements LabourActivitySource {
             WHEN t.to_project_id IS NULL THEN ${LABOUR_ACTIVITY_RANK.project_removed}::int
             ELSE ${LABOUR_ACTIVITY_RANK.transferred}::int
           END AS rank
-        FROM construction_labour.labour_transfers t
+        FROM construction_labour.employee_transfers t
         WHERE t.workspace_id = ${window.workspaceId}
-          AND t.labour_id = ${window.labourId}::uuid
+          AND t.employee_id = ${window.employeeId}::uuid
           ${
             projectId == null
               ? Prisma.empty
@@ -302,11 +302,11 @@ export class PrismaLabourActivity implements LabourActivitySource {
         a.created_at AS recorded_at, ${rank}::int AS rank,
         a.project_id::text AS project_id, a.status::text AS status,
         a.is_paid_leave, a.shift, a.check_in, a.check_out, a.created_by,
-        (SELECT SUM(o.hours)::text FROM construction_labour.labour_overtime o
+        (SELECT SUM(o.hours)::text FROM construction_labour.employee_overtime o
           WHERE o.attendance_id = a.id) AS overtime_hours
-      FROM construction_labour.labour_attendance a
+      FROM construction_labour.employee_attendance a
       WHERE a.workspace_id = ${window.workspaceId}
-        AND a.labour_id = ${window.labourId}::uuid
+        AND a.employee_id = ${window.employeeId}::uuid
         AND a.deleted_at IS NULL
         ${this.projectScope(window)}
         ${dateRange("a.attendance_date", window.from, window.to)}
@@ -353,9 +353,9 @@ export class PrismaLabourActivity implements LabourActivitySource {
     >(Prisma.sql`
       SELECT a.id::text AS id, to_char(a.attendance_date, 'YYYY-MM-DD') AS eff,
         a.project_id::text AS project_id
-      FROM construction_labour.labour_attendance a
+      FROM construction_labour.employee_attendance a
       WHERE a.workspace_id = ${window.workspaceId}
-        AND a.labour_id = ${window.labourId}::uuid
+        AND a.employee_id = ${window.employeeId}::uuid
         ${this.projectScope(window)}
         ${dateRange("a.attendance_date", from, to)}
     `);
@@ -416,31 +416,31 @@ export class PrismaLabourActivity implements LabourActivitySource {
   ): Promise<LabourProfileRow[]> {
     // Profile entries name no Project.
     if (window.projectId != null) return [];
-    const labour = await this.db.constructionLabourLabour.findFirst({
-      where: { id: window.labourId, workspaceId: window.workspaceId },
+    const employee = await this.db.constructionLabourEmployee.findFirst({
+      where: { id: window.employeeId, workspaceId: window.workspaceId },
       select: { id: true, joiningDate: true, createdAt: true, createdBy: true },
     });
-    if (labour == null) return [];
+    if (employee == null) return [];
     const [imports, events] = await Promise.all([
-      readLabourImports(this.db, window.workspaceId, labour.id),
+      readEmployeeImports(this.db, window.workspaceId, employee.id),
       readAuditEvents(this.db, {
         workspaceId: window.workspaceId,
-        entityType: "labour",
-        entityIds: [labour.id],
-        actions: ["labour.activated", "labour.deactivated"],
+        entityType: "employee",
+        entityIds: [employee.id],
+        actions: ["employee.activated", "employee.deactivated"],
       }),
     ]);
     const rows: LabourProfileRow[] = [
       {
         key: {
-          date: calendarDateFromDb(labour.joiningDate),
-          recordedAt: labour.createdAt,
+          date: calendarDateFromDb(employee.joiningDate),
+          recordedAt: employee.createdAt,
           rank: LABOUR_ACTIVITY_RANK.added,
-          id: labour.id,
+          id: employee.id,
         },
         kind: "added",
         imported: imports.length > 0,
-        by: labour.createdBy,
+        by: employee.createdBy,
       },
       ...events.map((event): LabourProfileRow => ({
         key: {
@@ -449,7 +449,8 @@ export class PrismaLabourActivity implements LabourActivitySource {
           rank: LABOUR_ACTIVITY_RANK.activated,
           id: event.id,
         },
-        kind: event.action === "labour.activated" ? "activated" : "deactivated",
+        kind:
+          event.action === "employee.activated" ? "activated" : "deactivated",
         imported: false,
         by: event.actorUserId,
       })),
@@ -539,41 +540,27 @@ export class PrismaLabourActivity implements LabourActivitySource {
       ),
     ];
     const vendorIds = ids("vendor");
-    const engineerIds = ids("site_engineer");
-    const [labours, vendors, engineers] = await Promise.all([
-      this.labours(workspaceId, ids("labour")),
+    const [employees, vendors] = await Promise.all([
+      this.employees(workspaceId, ids("employee")),
       vendorIds.length === 0
         ? []
         : this.db.constructionLabourVendor.findMany({
             where: { workspaceId, id: { in: vendorIds } },
             select: { id: true, name: true, deletedAt: true },
           }),
-      // Site Engineers are masters rows, read by id like the Check-In directory does.
-      engineerIds.length === 0
-        ? []
-        : this.db.constructionMastersSupervisor.findMany({
-            where: { workspaceId, id: { in: engineerIds } },
-            select: { id: true, name: true, deletedAt: true },
-          }),
     ]);
     const found = new Map<string, ActivityCheckInPerson>();
-    for (const labour of labours.values())
-      found.set(`labour:${labour.id}`, {
-        name: labour.name,
-        role: labour.labourCategory,
-        deleted: labour.deleted,
+    for (const employee of employees.values())
+      found.set(`employee:${employee.id}`, {
+        name: employee.name,
+        role: employee.role,
+        deleted: employee.deleted,
       });
     for (const vendor of vendors)
       found.set(`vendor:${vendor.id}`, {
         name: vendor.name,
         role: ROLE_WORDS.vendor,
         deleted: vendor.deletedAt != null,
-      });
-    for (const engineer of engineers)
-      found.set(`site_engineer:${engineer.id}`, {
-        name: engineer.name,
-        role: ROLE_WORDS.site_engineer,
-        deleted: engineer.deletedAt != null,
       });
     return found;
   }
@@ -585,37 +572,37 @@ export class PrismaLabourActivity implements LabourActivitySource {
     const rank = PROJECT_LABOUR_ACTIVITY_RANK;
     const rows = await this.db.$queryRaw<ProjectMoveSqlRow[]>(Prisma.sql`
       WITH moves AS (
-        SELECT t.id, t.labour_id, t.transfer_date, t.remark, t.created_at,
+        SELECT t.id, t.employee_id, t.transfer_date, t.remark, t.created_at,
           t.created_by,
           CASE
-            WHEN t.to_project_id = ${project}::uuid AND t.from_project_id IS NULL THEN 'labour_added'
+            WHEN t.to_project_id = ${project}::uuid AND t.from_project_id IS NULL THEN 'employee_added'
             WHEN t.to_project_id = ${project}::uuid THEN 'transferred_in'
-            WHEN t.to_project_id IS NULL THEN 'labour_removed'
+            WHEN t.to_project_id IS NULL THEN 'employee_removed'
             ELSE 'transferred_out'
           END AS kind,
           CASE WHEN t.to_project_id = ${project}::uuid THEN t.from_project_id ELSE t.to_project_id END
             AS other_project_id
-        FROM construction_labour.labour_transfers t
+        FROM construction_labour.employee_transfers t
         WHERE t.workspace_id = ${window.workspaceId}
           AND (t.to_project_id = ${project}::uuid OR t.from_project_id = ${project}::uuid)
       ), batches AS (
         SELECT kind, other_project_id, remark, created_by,
           created_at AS recorded_at,
-          CASE WHEN kind = 'labour_removed' THEN transfer_date - 1 ELSE transfer_date END AS eff_date,
+          CASE WHEN kind = 'employee_removed' THEN transfer_date - 1 ELSE transfer_date END AS eff_date,
           CASE kind
-            WHEN 'labour_added' THEN ${rank.labour_added}::int
+            WHEN 'employee_added' THEN ${rank.employee_added}::int
             WHEN 'transferred_in' THEN ${rank.transferred_in}::int
             WHEN 'transferred_out' THEN ${rank.transferred_out}::int
-            ELSE ${rank.labour_removed}::int
+            ELSE ${rank.employee_removed}::int
           END AS rank,
           (array_agg(id ORDER BY id))[1] AS id,
-          array_agg(labour_id::text ORDER BY labour_id) AS labour_ids
+          array_agg(employee_id::text ORDER BY employee_id) AS employee_ids
         FROM moves
         GROUP BY kind, other_project_id, transfer_date, remark, created_at, created_by
       )
       SELECT b.id::text AS id, to_char(b.eff_date, 'YYYY-MM-DD') AS eff,
         b.recorded_at, b.rank, b.kind, b.other_project_id::text AS other_project_id,
-        b.labour_ids, b.remark, b.created_by
+        b.employee_ids, b.remark, b.created_by
       FROM batches b
       WHERE TRUE
         ${dateRange("b.eff_date", window.from, window.to)}
@@ -632,32 +619,30 @@ export class PrismaLabourActivity implements LabourActivitySource {
       },
       kind: row.kind,
       otherProjectId: row.other_project_id,
-      labourIds: row.labour_ids,
+      employeeIds: row.employee_ids,
       remark: row.remark,
       by: row.created_by,
     }));
   }
 
-  async labours(
+  async employees(
     workspaceId: string,
     ids: readonly string[],
-  ): Promise<Map<string, ActivityLabour>> {
+  ): Promise<Map<string, ActivityEmployee>> {
     if (ids.length === 0) return new Map();
-    const rows = await this.db.constructionLabourLabour.findMany({
+    const rows = await this.db.constructionLabourEmployee.findMany({
       where: { workspaceId, id: { in: [...new Set(ids)] } },
       select: {
         id: true,
         name: true,
-        labourCode: true,
-        labourCategoryId: true,
+        employeeCode: true,
+        roleId: true,
         deletedAt: true,
       },
     });
-    const categories = await this.directories.labourCategories.find(
+    const roles = await this.directories.roles.find(
       workspaceId,
-      rows.flatMap((row) =>
-        row.labourCategoryId == null ? [] : [row.labourCategoryId],
-      ),
+      rows.map((row) => row.roleId),
     );
     return new Map(
       rows.map((row) => [
@@ -665,11 +650,8 @@ export class PrismaLabourActivity implements LabourActivitySource {
         {
           id: row.id,
           name: row.name,
-          labourCode: row.labourCode,
-          labourCategory:
-            row.labourCategoryId == null
-              ? null
-              : (categories.get(row.labourCategoryId)?.name ?? null),
+          employeeCode: row.employeeCode,
+          role: roles.get(row.roleId)?.name ?? null,
           deleted: row.deletedAt != null,
         },
       ]),

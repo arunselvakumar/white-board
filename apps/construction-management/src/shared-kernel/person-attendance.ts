@@ -3,7 +3,7 @@ import { DomainError } from "./domain-error";
 
 /**
  * A person's attendance as the Attendance tab shows it (ADR CM-0051): the
- * same shape for a Labour, a Site Engineer, a Vendor and an Office Staff
+ * same shape for an Employee (ADR CM-0055), a Vendor and an Office Staff
  * member, read by each context's own source. Pure: no I/O, no money.
  */
 
@@ -37,7 +37,7 @@ export type AttendancePlaceRef =
 /** One place on one day, as a source reads it. */
 export type AttendancePlaceRow = {
   place: AttendancePlaceRef;
-  /** The status marked at this place, when the source marks one (Labours). */
+  /** The status marked at this place, when the source marks one (Employees). */
   status: AttendanceDayStatus | null;
   /** `HH:MM`, Company time. */
   checkIn: string | null;

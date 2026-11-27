@@ -43,9 +43,9 @@ import {
 import { createdDayMark, timesDayMark } from "../domain/check-in-day";
 import { priceDay, type PricedDay } from "../domain/labour-attendance";
 import type { AttendanceStatus } from "../domain/wages";
-import type { LabourCategoryDirectory, ProjectDirectory } from "./directories";
+import type { ProjectDirectory, RoleDirectory } from "./directories";
 import type {
-  AttendanceLabourer,
+  AttendanceEmployee,
   LabourAttendanceBackdatedGuard,
   LabourDayWrite,
   StoredLabourDay,
@@ -56,12 +56,12 @@ export type CheckInPersonRecord = {
   kind: CheckInPersonKind;
   id: string;
   name: string;
-  /** Labours only: their Labour Category, named by the handlers. */
-  labourCategoryId: string | null;
-  /** The Labour Id or the Site Engineer's employee code. */
+  /** Employees only: their Role, named by the handlers (ADR CM-0055). */
+  roleId: string | null;
+  /** The Employee Id; null for a Vendor. */
   code: string | null;
   phone: string | null;
-  /** The record's photo (Labours and Vendors). */
+  /** The record's photo. */
   photoKey: string | null;
 };
 
@@ -123,16 +123,16 @@ export type CheckInTransaction = {
   ): Promise<boolean>;
   /** The person's live entries of an attendance day on the Project, oldest first. */
   liveEntriesOn(projectId: string, date: CalendarDate): Promise<LiveEntry[]>;
-  /** The labourer, share-locked against a delete; null when deleted. */
-  labourer(labourId: string): Promise<AttendanceLabourer | null>;
+  /** The Employee, share-locked against a delete; null when deleted. */
+  employee(employeeId: string): Promise<AttendanceEmployee | null>;
   onProject(
-    labourId: string,
+    employeeId: string,
     projectId: string,
     date: CalendarDate,
   ): Promise<boolean>;
   /** The live day, its row locked until the transaction ends. */
   day(
-    labourId: string,
+    employeeId: string,
     projectId: string,
     date: CalendarDate,
   ): Promise<StoredLabourDay | null>;
@@ -146,22 +146,22 @@ export type CheckInTransaction = {
 export type CheckInStore = {
   /** The Company's IANA time zone. */
   timeZone(workspaceId: string): Promise<string>;
-  /** A live labourer with their wages, active or not. */
-  labour(
+  /** A live Employee with their wages, active or not. */
+  employee(
     workspaceId: string,
     id: string,
   ): Promise<{
     person: CheckInPersonRecord;
-    labourer: AttendanceLabourer;
+    employee: AttendanceEmployee;
   } | null>;
-  labourOnProject(
+  employeeOnProject(
     workspaceId: string,
-    labourId: string,
+    employeeId: string,
     projectId: string,
     date: CalendarDate,
   ): Promise<boolean>;
-  /** Active labourers on the Project on `date`. */
-  laboursOn(
+  /** Active Employees on the Project on `date`, whatever their Role. */
+  employeesOn(
     workspaceId: string,
     projectId: string,
     date: CalendarDate,
@@ -209,16 +209,16 @@ export type CheckInStore = {
   list(
     params: CheckInListParams,
   ): Promise<{ items: CheckInEntry[]; total: number; hasMore: boolean }>;
-  /** Labours and Vendors whose name contains `q`, deleted ones too. */
+  /** Employees and Vendors whose name contains `q`, deleted ones too. */
   partiesNamed(
     workspaceId: string,
     q: string,
-  ): Promise<{ kind: "labour" | "vendor"; id: string }[]>;
-  /** Names of Labours (with their category) and Vendors by id, deleted ones too. */
+  ): Promise<{ kind: CheckInPersonKind; id: string }[]>;
+  /** Names of Employees (with their Role) and Vendors by `kind:id`, deleted ones too. */
   partyNames(
     workspaceId: string,
-    refs: readonly { kind: "labour" | "vendor"; id: string }[],
-  ): Promise<Map<string, { name: string; labourCategoryId: string | null }>>;
+    refs: readonly { kind: CheckInPersonKind; id: string }[],
+  ): Promise<Map<string, { name: string; roleId: string | null }>>;
   /** "Who did it" names by User id. */
   userNames(
     workspaceId: string,
@@ -229,38 +229,6 @@ export type CheckInStore = {
     person: { kind: CheckInPersonKind; id: string },
     work: (tx: CheckInTransaction) => Promise<T>,
   ): Promise<T>;
-};
-
-/** A Site Engineer as Check-In lists them. */
-export type SiteEngineerContact = {
-  id: string;
-  name: string;
-  mobile: string | null;
-  employeeCode: string | null;
-};
-
-/**
- * Site Engineers (`construction_masters.supervisors`) as Check-In needs
- * them: the ones on a Project are enabled with their sign-in on it
- * (ADR CM-0041).
- */
-export type SiteEngineerDirectory = {
-  onProject(
-    workspaceId: string,
-    projectId: string,
-  ): Promise<SiteEngineerContact[]>;
-  /** Live rows among `ids`, enabled or not. */
-  find(
-    workspaceId: string,
-    ids: readonly string[],
-  ): Promise<Map<string, { id: string; name: string; disabled: boolean }>>;
-  /** Names by id, deleted ones too. */
-  names(
-    workspaceId: string,
-    ids: readonly string[],
-  ): Promise<Map<string, string>>;
-  /** Ids whose name contains `q`, deleted ones too. */
-  idsNamed(workspaceId: string, q: string): Promise<string[]>;
 };
 
 /** The Project's Site fence (HRMS Branches & Sites, ADR CM-0012). */
@@ -324,13 +292,13 @@ export type CheckInContext = {
 /** What the viewer may do, from their access on the Project. */
 export type CheckInViewer = {
   canCheckIn: boolean;
-  /** Attendance Delete: a Vendor's or a Site Engineer's entry. */
+  /** Attendance Delete: a Vendor's entry. */
   canVoid: boolean;
   /**
-   * Attendance Delete and Update: a Labour's entry, whose void changes an
+   * Attendance Delete and Update: an Employee's entry, whose void changes an
    * attendance day (ADR CM-0043 §8).
    */
-  canVoidLabour: boolean;
+  canVoidEmployee: boolean;
 };
 
 export type RecordCheckInInput = {
@@ -414,14 +382,14 @@ function byName(
 function dayChanged(): DomainError {
   return conflict(
     "ATTENDANCE_CHANGED",
-    "This Labour's day was marked on the attendance sheet just now. Try again.",
+    "This Employee's day was marked on the attendance sheet just now. Try again.",
   );
 }
 
 /**
  * Check-In on a Project (ADR CM-0043): records and voids check-in entries
- * of Labours, Vendors and Site Engineers, and a Labour's entries write
- * their attendance day in the same transaction, priced and posted as the
+ * of Employees and Vendors, and an Employee's entries write their
+ * attendance day, whatever their Role (ADR CM-0055 §3), in the same transaction, priced and posted as the
  * marking sheet does it. The route checks `labour.attendance` on the
  * Project; recording needs Create alone (no Update, no Back-dated Entry
  * check: the day is today, or the night shift that began yesterday).
@@ -430,8 +398,7 @@ export class CheckInHandlers {
   constructor(
     private readonly store: CheckInStore,
     private readonly projects: ProjectDirectory,
-    private readonly labourCategories: LabourCategoryDirectory,
-    private readonly siteEngineers: SiteEngineerDirectory,
+    private readonly roles: RoleDirectory,
     private readonly fences: SiteFenceDirectory,
     private readonly storage: ObjectStorage,
     private readonly backdated: LabourAttendanceBackdatedGuard,
@@ -478,18 +445,16 @@ export class CheckInHandlers {
     workspaceId: string,
     person: CheckInPersonRecord,
   ): Promise<string | null> {
-    if (person.kind !== "labour") return ROLE_WORDS[person.kind];
-    if (person.labourCategoryId == null) return null;
-    const found = await this.labourCategories.find(workspaceId, [
-      person.labourCategoryId,
-    ]);
-    return found.get(person.labourCategoryId)?.name ?? null;
+    if (person.kind !== "employee") return ROLE_WORDS[person.kind];
+    if (person.roleId == null) return null;
+    const found = await this.roles.find(workspaceId, [person.roleId]);
+    return found.get(person.roleId)?.name ?? null;
   }
 
   /**
    * The person, refused unless they may be checked in on the Project on
-   * `date`: a live, active Labour on the Project that day; a live, active
-   * Vendor assigned to it; an enabled Site Engineer whose sign-in is on it.
+   * `date`: a live, active Employee on the Project that day; a live, active
+   * Vendor assigned to it.
    */
   private async checkable(
     workspaceId: string,
@@ -499,20 +464,19 @@ export class CheckInHandlers {
     date: CalendarDate,
   ): Promise<{
     person: CheckInPersonRecord;
-    labourer: AttendanceLabourer | null;
+    employee: AttendanceEmployee | null;
   }> {
-    if (kind === "labour") {
-      const found = await this.store.labour(workspaceId, personId);
-      if (found == null)
-        throw notFound("LABOUR_NOT_FOUND", "This Labour was not found.");
-      const { person, labourer } = found;
-      if (!labourer.isActive)
+    if (kind === "employee") {
+      const found = await this.store.employee(workspaceId, personId);
+      if (found == null) throw employeeNotFound();
+      const { person, employee } = found;
+      if (!employee.isActive)
         throw new DomainError(
-          "LABOUR_INACTIVE",
-          `${person.name} is inactive. Activate them on their Labour page to check them in.`,
+          "EMPLOYEE_INACTIVE",
+          `${person.name} is inactive. Activate them on their Employee page to check them in.`,
         );
       if (
-        !(await this.store.labourOnProject(
+        !(await this.store.employeeOnProject(
           workspaceId,
           personId,
           projectId,
@@ -520,63 +484,25 @@ export class CheckInHandlers {
         ))
       )
         throw new DomainError(
-          "LABOUR_NOT_ON_PROJECT",
+          "EMPLOYEE_NOT_ON_PROJECT",
           `${person.name} is not on this Project.`,
         );
-      return { person, labourer };
+      return { person, employee };
     }
-    if (kind === "vendor") {
-      const found = await this.store.vendor(workspaceId, personId, projectId);
-      if (found == null)
-        throw notFound("VENDOR_NOT_FOUND", "This Vendor was not found.");
-      if (!found.isActive)
-        throw new DomainError(
-          "VENDOR_INACTIVE",
-          `${found.person.name} is inactive. Activate them on their Vendor page to check them in.`,
-        );
-      if (!found.assigned)
-        throw new DomainError(
-          "VENDOR_NOT_ON_PROJECT",
-          `${found.person.name} is not assigned to this Project.`,
-        );
-      return { person: found.person, labourer: null };
-    }
-    const onProject = await this.siteEngineers.onProject(
-      workspaceId,
-      projectId,
-    );
-    const engineer = onProject.find((item) => item.id === personId);
-    if (engineer == null) {
-      const found = (
-        await this.siteEngineers.find(workspaceId, [personId])
-      ).get(personId);
-      if (found == null)
-        throw notFound(
-          "SITE_ENGINEER_NOT_FOUND",
-          "This Site Engineer was not found.",
-        );
-      if (found.disabled)
-        throw new DomainError(
-          "SITE_ENGINEER_DISABLED",
-          `${found.name} is disabled. Enable them on their Site Engineer page to check them in.`,
-        );
+    const found = await this.store.vendor(workspaceId, personId, projectId);
+    if (found == null)
+      throw notFound("VENDOR_NOT_FOUND", "This Vendor was not found.");
+    if (!found.isActive)
       throw new DomainError(
-        "SITE_ENGINEER_NOT_ON_PROJECT",
-        `${found.name} is not on this Project.`,
+        "VENDOR_INACTIVE",
+        `${found.person.name} is inactive. Activate them on their Vendor page to check them in.`,
       );
-    }
-    return {
-      person: {
-        kind: "site_engineer",
-        id: engineer.id,
-        name: engineer.name,
-        labourCategoryId: null,
-        code: engineer.employeeCode,
-        phone: engineer.mobile,
-        photoKey: null,
-      },
-      labourer: null,
-    };
+    if (!found.assigned)
+      throw new DomainError(
+        "VENDOR_NOT_ON_PROJECT",
+        `${found.person.name} is not assigned to this Project.`,
+      );
+    return { person: found.person, employee: null };
   }
 
   private personModel(
@@ -594,7 +520,7 @@ export class CheckInHandlers {
       role,
       code: person.code,
       phone: person.phone,
-      hasPhoto: person.kind !== "site_engineer" && person.photoKey != null,
+      hasPhoto: person.photoKey != null,
       state: {
         status: state.status,
         since: state.status === "none" ? null : state.since,
@@ -623,57 +549,42 @@ export class CheckInHandlers {
     entries: readonly CheckInEntry[],
   ): Promise<CheckInEntryReadModel[]> {
     if (entries.length === 0) return [];
-    const parties = entries
-      .filter((entry) => entry.kind !== "site_engineer")
-      .map((entry) => ({
-        kind: entry.kind as "labour" | "vendor",
-        id: entry.personId,
-      }));
-    const engineerIds = entries
-      .filter((entry) => entry.kind === "site_engineer")
-      .map((entry) => entry.personId);
+    const parties = entries.map((entry) => ({
+      kind: entry.kind,
+      id: entry.personId,
+    }));
     const userIds = entries.flatMap((entry) =>
       entry.voided == null
         ? [entry.recordedBy]
         : [entry.recordedBy, entry.voided.by],
     );
-    const [partyNames, engineerNames, users] = await Promise.all([
+    const [partyNames, users] = await Promise.all([
       this.store.partyNames(workspaceId, parties),
-      this.siteEngineers.names(workspaceId, engineerIds),
       this.store.userNames(workspaceId, userIds),
     ]);
-    const categoryIds = [
+    const roleIds = [
       ...new Set(
         [...partyNames.values()]
-          .map((party) => party.labourCategoryId)
+          .map((party) => party.roleId)
           .filter((id): id is string => id != null),
       ),
     ];
-    const categories = await this.labourCategories.find(
-      workspaceId,
-      categoryIds,
-    );
+    const roles = await this.roles.find(workspaceId, roleIds);
     const user = (id: string): Ref => ({ id, name: users.get(id) ?? "" });
     return entries.map((entry) => {
-      const party =
-        entry.kind === "site_engineer"
-          ? null
-          : partyNames.get(key(entry.kind, entry.personId));
+      const party = partyNames.get(key(entry.kind, entry.personId));
       const role =
-        entry.kind === "labour"
-          ? party?.labourCategoryId == null
+        entry.kind === "employee"
+          ? party?.roleId == null
             ? null
-            : (categories.get(party.labourCategoryId)?.name ?? null)
+            : (roles.get(party.roleId)?.name ?? null)
           : ROLE_WORDS[entry.kind];
       return {
         id: entry.id,
         projectId: entry.projectId,
         kind: entry.kind,
         personId: entry.personId,
-        personName:
-          entry.kind === "site_engineer"
-            ? (engineerNames.get(entry.personId) ?? "")
-            : (party?.name ?? ""),
+        personName: party?.name ?? "",
         role,
         action: entry.action,
         at: entry.occurredAt,
@@ -717,13 +628,13 @@ export class CheckInHandlers {
   }
 
   /**
-   * Works a Labour's attendance day out again from their live entries of
+   * Works an Employee's attendance day out again from their live entries of
    * that day (ADR CM-0043 §3), inside the entry's transaction.
    */
   private async workOutDay(
     tx: CheckInTransaction,
     input: {
-      labourId: string;
+      employeeId: string;
       projectId: string;
       date: CalendarDate;
       cause: CheckInAction | "void";
@@ -732,13 +643,13 @@ export class CheckInHandlers {
       now: Date;
     },
   ): Promise<CheckInDayReadModel> {
-    const { labourId, projectId, date, by, now } = input;
+    const { employeeId, projectId, date, by, now } = input;
     const entries = await tx.liveEntriesOn(projectId, date);
     const times = timesFromEntries(entries, input.timeZone);
-    // The labourer's share lock before the day's row lock, the order the
+    // The Employee's share lock before the day's row lock, the order the
     // sheet's save takes them in.
-    const labourer = await tx.labourer(labourId);
-    const stored = await tx.day(labourId, projectId, date);
+    const employee = await tx.employee(employeeId);
+    const stored = await tx.day(employeeId, projectId, date);
     const effect: DayEffect = dayEffect({
       day:
         stored == null
@@ -783,18 +694,17 @@ export class CheckInHandlers {
         };
       }
       case "create": {
-        if (labourer == null) throw labourNotFound();
+        if (employee == null) throw employeeNotFound();
         const day: PricedDay = {
           ...priceDay({
             mark: createdDayMark({
-              labourId,
+              employeeId,
               times: effect.times,
-              labourCategoryId: labourer.labourCategoryId,
+              labourCategoryId: employee.labourCategoryId,
             }),
-            card: labourer.card,
+            card: employee.card,
             projectId,
             date,
-            supervisorId: null,
           }),
           fromCheckIn: true,
           timesFromCheckIn: true,
@@ -817,18 +727,17 @@ export class CheckInHandlers {
       }
       case "set_times": {
         if (stored == null) throw new Error("unreachable");
-        if (labourer == null) throw labourNotFound();
+        if (employee == null) throw employeeNotFound();
         const day: PricedDay = {
           ...priceDay({
             mark: timesDayMark({
               day: stored,
               times: effect.times,
-              labourCategoryId: labourer.labourCategoryId,
+              labourCategoryId: employee.labourCategoryId,
             }),
-            card: labourer.card,
+            card: employee.card,
             projectId,
             date,
-            supervisorId: stored.supervisorId,
           }),
           fromCheckIn: stored.fromCheckIn,
           timesFromCheckIn: effect.times != null,
@@ -917,11 +826,11 @@ export class CheckInHandlers {
         });
         if (decision.kind === "repeat") return { repeated: decision.entryId };
         if (
-          kind === "labour" &&
+          kind === "employee" &&
           !(await tx.onProject(personId, projectId, decision.attendanceDate))
         )
           throw new DomainError(
-            "LABOUR_NOT_ON_PROJECT",
+            "EMPLOYEE_NOT_ON_PROJECT",
             `${found.person.name} is not on this Project.`,
           );
         const entry: CheckInEntry = {
@@ -969,9 +878,9 @@ export class CheckInHandlers {
           },
         );
         const day =
-          kind === "labour"
+          kind === "employee"
             ? await this.workOutDay(tx, {
-                labourId: personId,
+                employeeId: personId,
                 projectId,
                 date: entry.attendanceDate,
                 cause: action,
@@ -1041,7 +950,7 @@ export class CheckInHandlers {
 
   /**
    * Voids an entry with a reason (ADR CM-0043 §1, §3): the row stays, with
-   * who voided it and why, and a Labour's day is worked out again from the
+   * who voided it and why, and an Employee's day is worked out again from the
    * entries left. The photo stays until retention removes it.
    */
   async void(input: {
@@ -1059,11 +968,10 @@ export class CheckInHandlers {
     const found = await this.find(workspaceId, input.id);
     const reason = voidReason(input.reason);
     if (found.voided != null) throw alreadyVoided();
-    // A Labour's void works their day out again, and can clear it and
+    // An Employee's void works their day out again, and can clear it and
     // reverse its wage: it is an edit of that day, so the Back-dated Entry
-    // check of the marking sheet applies. A Vendor's and a Site Engineer's
-    // entries change no day.
-    if (found.kind === "labour")
+    // check of the marking sheet applies. A Vendor's entries change no day.
+    if (found.kind === "employee")
       await this.backdated.assert(
         "edit",
         { workspaceId, userId: input.userId, role: input.role },
@@ -1088,9 +996,9 @@ export class CheckInHandlers {
       });
       if (!changed) throw alreadyVoided();
       const day =
-        found.kind === "labour"
+        found.kind === "employee"
           ? await this.workOutDay(tx, {
-              labourId: found.personId,
+              employeeId: found.personId,
               projectId: found.projectId,
               date: found.attendanceDate,
               cause: "void",
@@ -1117,39 +1025,23 @@ export class CheckInHandlers {
     workspaceId: string,
     entry: CheckInEntry,
   ): Promise<CheckInPersonRecord> {
-    if (entry.kind === "labour") {
-      const found = await this.store.labour(workspaceId, entry.personId);
+    if (entry.kind === "employee") {
+      const found = await this.store.employee(workspaceId, entry.personId);
       if (found != null) return found.person;
-    } else if (entry.kind === "vendor") {
+    } else {
       const found = await this.store.vendor(
         workspaceId,
         entry.personId,
         entry.projectId,
       );
       if (found != null) return found.person;
-    } else {
-      const onProject = await this.siteEngineers.onProject(
-        workspaceId,
-        entry.projectId,
-      );
-      const engineer = onProject.find((item) => item.id === entry.personId);
-      if (engineer != null)
-        return {
-          kind: "site_engineer",
-          id: engineer.id,
-          name: engineer.name,
-          labourCategoryId: null,
-          code: engineer.employeeCode,
-          phone: engineer.mobile,
-          photoKey: null,
-        };
     }
     const [model] = await this.entryModels(workspaceId, [entry]);
     return {
       kind: entry.kind,
       id: entry.personId,
       name: model?.personName ?? "",
-      labourCategoryId: null,
+      roleId: null,
       code: null,
       phone: null,
       photoKey: null,
@@ -1157,8 +1049,9 @@ export class CheckInHandlers {
   }
 
   /**
-   * The find screen: the Project's Site Engineers, Labours on it today and
-   * Vendors assigned to it, each group by name, with where each one stands.
+   * The find screen: the Employees on the Project today (any Role, ADR
+   * CM-0055) and the Vendors assigned to it, each group by name, with where
+   * each one stands.
    */
   async people(
     workspaceId: string,
@@ -1167,8 +1060,7 @@ export class CheckInHandlers {
   ): Promise<
     CheckInContext &
       CheckInViewer & {
-        siteEngineers: CheckInPersonReadModel[];
-        labours: CheckInPersonReadModel[];
+        employees: CheckInPersonReadModel[];
         vendors: CheckInPersonReadModel[];
       }
   > {
@@ -1178,9 +1070,8 @@ export class CheckInHandlers {
       projectId,
     );
     const { now, today } = context;
-    const [labours, engineers, vendors, standings] = await Promise.all([
-      this.store.laboursOn(workspaceId, projectId, today),
-      this.siteEngineers.onProject(workspaceId, projectId),
+    const [employees, vendors, standings] = await Promise.all([
+      this.store.employeesOn(workspaceId, projectId, today),
       this.store.vendorsOn(workspaceId, projectId),
       this.store.standings(
         workspaceId,
@@ -1189,10 +1080,10 @@ export class CheckInHandlers {
         today,
       ),
     ]);
-    const categories = await this.labourCategories.find(workspaceId, [
+    const roles = await this.roles.find(workspaceId, [
       ...new Set(
-        labours
-          .map((labour) => labour.labourCategoryId)
+        employees
+          .map((employee) => employee.roleId)
           .filter((id): id is string => id != null),
       ),
     ]);
@@ -1208,29 +1099,13 @@ export class CheckInHandlers {
     return {
       ...context,
       ...viewer,
-      siteEngineers: engineers
-        .map((engineer) =>
+      employees: employees
+        .map((employee) =>
           model(
-            {
-              kind: "site_engineer",
-              id: engineer.id,
-              name: engineer.name,
-              labourCategoryId: null,
-              code: engineer.employeeCode,
-              phone: engineer.mobile,
-              photoKey: null,
-            },
-            ROLE_WORDS.site_engineer,
-          ),
-        )
-        .sort(byName),
-      labours: labours
-        .map((labour) =>
-          model(
-            labour,
-            labour.labourCategoryId == null
+            employee,
+            employee.roleId == null
               ? null
-              : (categories.get(labour.labourCategoryId)?.name ?? null),
+              : (roles.get(employee.roleId)?.name ?? null),
           ),
         )
         .sort(byName),
@@ -1338,14 +1213,7 @@ export class CheckInHandlers {
     const q = params.q?.trim() ?? "";
     let people: { kind: CheckInPersonKind; id: string }[] | undefined;
     if (q.length > 0) {
-      const [parties, engineerIds] = await Promise.all([
-        this.store.partiesNamed(workspaceId, q),
-        this.siteEngineers.idsNamed(workspaceId, q),
-      ]);
-      people = [
-        ...parties,
-        ...engineerIds.map((id) => ({ kind: "site_engineer" as const, id })),
-      ];
+      people = await this.store.partiesNamed(workspaceId, q);
     }
     const page =
       people?.length === 0
@@ -1380,8 +1248,8 @@ export class CheckInHandlers {
   }
 
   /**
-   * A Labour's or Vendor's record photo, for the capture screen: only for
-   * someone on the Project; a Site Engineer has none here.
+   * An Employee's or Vendor's record photo, for the capture screen: only
+   * for someone on the Project.
    */
   async recordPhoto(
     workspaceId: string,
@@ -1390,25 +1258,23 @@ export class CheckInHandlers {
     personId: string,
   ): Promise<StoredObject> {
     await this.assertProject(workspaceId, projectId);
-    if (kind === "site_engineer") throw photoNotFound();
     let photoKey: string | null;
-    if (kind === "labour") {
-      const found = await this.store.labour(workspaceId, personId);
-      if (found == null)
-        throw notFound("LABOUR_NOT_FOUND", "This Labour was not found.");
+    if (kind === "employee") {
+      const found = await this.store.employee(workspaceId, personId);
+      if (found == null) throw employeeNotFound();
       const today = todayIn(
         await this.store.timeZone(workspaceId),
         this.clock(),
       );
-      // Today or yesterday: a night shift's Labour is still shown.
+      // Today or yesterday: a night shift's Employee is still shown.
       const on =
-        (await this.store.labourOnProject(
+        (await this.store.employeeOnProject(
           workspaceId,
           personId,
           projectId,
           today,
         )) ||
-        (await this.store.labourOnProject(
+        (await this.store.employeeOnProject(
           workspaceId,
           personId,
           projectId,
@@ -1430,8 +1296,8 @@ export class CheckInHandlers {
   }
 }
 
-function labourNotFound(): DomainError {
-  return notFound("LABOUR_NOT_FOUND", "This Labour was not found.");
+function employeeNotFound(): DomainError {
+  return notFound("EMPLOYEE_NOT_FOUND", "This Employee was not found.");
 }
 
 function alreadyVoided(): DomainError {

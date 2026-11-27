@@ -7,7 +7,7 @@ import type { PartyType } from "../domain/ledger";
 type Tx = Prisma.TransactionClient;
 
 const TABLES: Record<PartyType, Prisma.Sql> = {
-  labour: Prisma.raw("construction_labour.labours"),
+  employee: Prisma.raw("construction_labour.employees"),
   vendor: Prisma.raw("construction_labour.vendors"),
 };
 
@@ -17,15 +17,15 @@ const MODES = {
 } as const;
 
 export function partyNotFound(partyType: PartyType) {
-  return partyType === "labour"
-    ? notFound("LABOUR_NOT_FOUND", "This Labour was not found.")
+  return partyType === "employee"
+    ? notFound("EMPLOYEE_NOT_FOUND", "This Employee was not found.")
     : notFound("VENDOR_NOT_FOUND", "This Vendor was not found.");
 }
 
 /**
- * Locks live labourers or vendors until the transaction ends, in id order
- * so two commands marking many labourers never deadlock. Throws
- * `LABOUR_NOT_FOUND` / `VENDOR_NOT_FOUND` when any is missing or deleted.
+ * Locks live Employees or vendors until the transaction ends, in id order
+ * so two commands marking many Employees never deadlock. Throws
+ * `EMPLOYEE_NOT_FOUND` / `VENDOR_NOT_FOUND` when any is missing or deleted.
  *
  * Writers of attendance and payments take `share`; deleting a party takes
  * `update`. A delete therefore waits for a payment or attendance being

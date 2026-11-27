@@ -41,7 +41,7 @@ export const reportingOpenApiOperations: OpenApiOperation[] = [
     method: "post",
     path: REPORTS_PATH,
     summary:
-      "Request a report: All Labour Attendance, All Labour Payment, Month-wise Labour, Vendor Attendance (projectId null = central) or the muster roll and wage register. The job goes on the queue and the response is the queued job (REPORT_NOT_AVAILABLE 409 for a catalogued report not built yet). Needs Report on Labour or Vendor for the Project; the payment report and the muster roll also need Financial (403)",
+      "Request a report: Employee Attendance, Employee Payments, Employee Month, Vendor Attendance (projectId null = central) or the muster roll and wage register. The job goes on the queue and the response is the queued job (REPORT_NOT_AVAILABLE 409 for a catalogued report not built yet). Needs Report on Employees (`labour.labour`) or Vendor for the Project; the payment report and the muster roll also need Financial (403)",
     tags: REPORTING,
     body: RequestConstructionReportingReportRequestModel,
     successStatus: StatusCodes.CREATED,

@@ -18,7 +18,10 @@ export type RoleRepository = {
   findById(workspaceId: string, id: string): Promise<Role | null>;
   /** Live Roles, by name. */
   listAll(workspaceId: string): Promise<Role[]>;
-  /** Live non-Owner Team Members per Role id; Roles with none are absent. */
+  /**
+   * Live non-Owner Team Members per Role id, Employees' sign-ins left out;
+   * Roles with none are absent.
+   */
   userCounts(workspaceId: string): Promise<Map<string, number>>;
   /** Names of the Company's live Departments, by id (ADR CM-0050). */
   departmentNames(workspaceId: string): Promise<Map<string, string>>;

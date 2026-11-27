@@ -1,7 +1,7 @@
 /**
- * The wage set-up a Labour has and Staff share (ADR CM-0033): Daily or
+ * The wage set-up an Employee has and Staff share (ADR CM-0033): Daily or
  * Monthly, the amount, overtime per hour, working hours per day and weekly
- * holidays. A form keeps it as one nested object (`wage` on Add Labour,
+ * holidays. A form keeps it as one nested object (`wage` on Add Employee,
  * `salary` on Add Staff) and renders it with `WageFields`.
  *
  * Staff use it with `noun: "Salary"`, an optional amount (blank is no
@@ -18,7 +18,7 @@
  * const fields = wageErrorFields("salary", values.salary); // server codes
  * ```
  *
- * Opening balance stays on the Labour form: Staff have no ledger.
+ * Opening balance stays on the Employee form: Staff have no ledger.
  */
 import { z } from "zod";
 
@@ -58,7 +58,7 @@ export type WageNoun = "Wage" | "Salary";
 /** How a form uses the set-up. */
 export type WageOptions = {
   noun: WageNoun;
-  /** The amount must be typed (a Labour) or may be blank (Staff). */
+  /** The amount must be typed (an Employee) or may be blank (Staff). */
   required: boolean;
   /** The type a new record starts with. */
   defaultType: WageType;
@@ -66,8 +66,8 @@ export type WageOptions = {
   overtimeOnlyWithAmount: boolean;
 };
 
-/** A Labour's wage: required, Daily by default. */
-export const LABOUR_WAGE: WageOptions = {
+/** An Employee's wage: required, Daily by default. */
+export const EMPLOYEE_WAGE: WageOptions = {
   noun: "Wage",
   required: true,
   defaultType: "daily",

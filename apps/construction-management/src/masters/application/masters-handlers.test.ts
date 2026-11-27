@@ -9,15 +9,8 @@ import {
   type LookupKind,
   type MasterKind,
 } from "../domain/master-kind";
-import { Supervisor } from "../domain/supervisor";
 import { LookupHandlers } from "./lookup-handlers";
-import type {
-  LookupStore,
-  MasterChange,
-  SupervisorStore,
-  TeamMemberDirectory,
-} from "./ports";
-import { SupervisorHandlers } from "./supervisor-handlers";
+import type { LookupStore, MasterChange } from "./ports";
 
 const WS = "ws_1";
 const OWNER = "user_1";
@@ -41,7 +34,7 @@ async function codeOf(run: () => Promise<unknown>): Promise<string> {
   return "none";
 }
 
-type Item = LookupEntry | Supervisor;
+type Item = LookupEntry;
 
 /** Live rows in memory with the database's name and updatedAt rules. */
 class Memory<T extends Item> {
@@ -137,55 +130,6 @@ function lookupStore(): LookupStore & { memory: Memory<LookupEntry> } {
         stored.get(entry.id) ?? new Date(0),
       );
       stored.set(entry.id, entry.updatedAt);
-      return Promise.resolve();
-    },
-  };
-}
-
-function supervisorStore(): SupervisorStore & { memory: Memory<Supervisor> } {
-  const memory = new Memory<Supervisor>(() => "supervisor");
-  const stored = new Map<string, Date>();
-  const copy = (row: Supervisor) =>
-    Supervisor.reconstitute({
-      id: row.id,
-      workspaceId: row.workspaceId,
-      name: row.name,
-      mobile: row.mobile,
-      teamMemberId: row.teamMemberId,
-      profile: row.profile,
-      bank: row.bank,
-      disabledAt: row.disabledAt,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-      createdBy: row.createdBy,
-      updatedBy: row.updatedBy,
-      deletedAt: row.deletedAt,
-      deletedBy: row.deletedBy,
-    });
-  return {
-    memory,
-    list: (workspaceId) => Promise.resolve(memory.live(workspaceId).map(copy)),
-    find: (workspaceId, id) => {
-      const row = memory.rows.get(id);
-      return Promise.resolve(
-        row?.workspaceId === workspaceId && row.deletedAt == null
-          ? copy(row)
-          : null,
-      );
-    },
-    insert: (supervisor, change) => {
-      memory.insert(supervisor, change);
-      stored.set(supervisor.id, supervisor.updatedAt);
-      return Promise.resolve();
-    },
-    update: (supervisor, expected, change) => {
-      memory.update(
-        supervisor,
-        expected,
-        change,
-        stored.get(supervisor.id) ?? new Date(0),
-      );
-      stored.set(supervisor.id, supervisor.updatedAt);
       return Promise.resolve();
     },
   };
@@ -373,120 +317,5 @@ describe("LookupHandlers", () => {
     expect(await codeOf(() => handlers.get(WS, theirs.id))).toBe(
       "LABOUR_CATEGORY_NOT_FOUND",
     );
-  });
-});
-
-describe("SupervisorHandlers", () => {
-  const MEMBER = "0199a1b2-0000-7000-8000-0000000000aa";
-  const directory: TeamMemberDirectory = {
-    namesOf: (workspaceId, ids) =>
-      Promise.resolve(
-        new Map(
-          workspaceId === WS && ids.includes(MEMBER)
-            ? [[MEMBER, "Prabhu Saravanan"]]
-            : [],
-        ),
-      ),
-  };
-
-  it("creates with a Team Member and shows their name", async () => {
-    const handlers = new SupervisorHandlers(
-      supervisorStore(),
-      directory,
-      ticking(),
-    );
-    const made = await handlers.create({
-      workspaceId: WS,
-      name: "Prabhu",
-      mobile: "7708165767",
-      teamMemberId: MEMBER,
-      by: OWNER,
-    });
-    expect(made).toMatchObject({
-      name: "Prabhu",
-      mobile: "+917708165767",
-      teamMemberId: MEMBER,
-      teamMemberName: "Prabhu Saravanan",
-      disabled: false,
-    });
-    expect(await handlers.list(WS)).toEqual([made]);
-  });
-
-  it("refuses a Team Member of another Company", async () => {
-    const handlers = new SupervisorHandlers(
-      supervisorStore(),
-      directory,
-      ticking(),
-    );
-    expect(
-      await codeOf(() =>
-        handlers.create({
-          workspaceId: WS,
-          name: "Dhuresh",
-          teamMemberId: "0199a1b2-0000-7000-8000-0000000000bb",
-          by: OWNER,
-        }),
-      ),
-    ).toBe("SUPERVISOR_TEAM_MEMBER_NOT_FOUND");
-  });
-
-  it("updates with optimistic concurrency, toggles and deletes unless used", async () => {
-    const store = supervisorStore();
-    let used = true;
-    const handlers = new SupervisorHandlers(store, directory, ticking(), () =>
-      Promise.resolve(used),
-    );
-    const made = await handlers.create({
-      workspaceId: WS,
-      name: "Dhuresh",
-      by: OWNER,
-    });
-    const updated = await handlers.update({
-      workspaceId: WS,
-      id: made.id,
-      name: "Rakesh Mirtha",
-      mobile: "+917708165767",
-      teamMemberId: null,
-      expectedUpdatedAt: made.updatedAt,
-      by: OWNER,
-    });
-    expect(updated).toMatchObject({
-      name: "Rakesh Mirtha",
-      mobile: "+917708165767",
-    });
-    expect(
-      await codeOf(() =>
-        handlers.update({
-          workspaceId: WS,
-          id: made.id,
-          name: "Stale",
-          expectedUpdatedAt: made.updatedAt,
-          by: OWNER,
-        }),
-      ),
-    ).toBe("SUPERVISOR_CHANGED");
-    expect(
-      (await handlers.disable({ workspaceId: WS, id: made.id, by: OWNER }))
-        .disabled,
-    ).toBe(true);
-    expect(
-      (await handlers.enable({ workspaceId: WS, id: made.id, by: OWNER }))
-        .disabled,
-    ).toBe(false);
-    expect(
-      await codeOf(() =>
-        handlers.delete({ workspaceId: WS, id: made.id, by: OWNER }),
-      ),
-    ).toBe("SUPERVISOR_IN_USE");
-    used = false;
-    await handlers.delete({ workspaceId: WS, id: made.id, by: OWNER });
-    expect(await handlers.list(WS)).toEqual([]);
-    expect(store.memory.audit.map((item) => item.action)).toEqual([
-      "supervisor.created",
-      "supervisor.updated",
-      "supervisor.disabled",
-      "supervisor.enabled",
-      "supervisor.deleted",
-    ]);
   });
 });

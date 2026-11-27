@@ -41,19 +41,13 @@ function operation(
   };
 }
 
-/** All four routes, listed here so they share one place in the document. */
+/** Every such route, listed here so they share one place in the document. */
 export const personAttendanceOpenApiOperations: OpenApiOperation[] = [
   operation(
-    "/api/construction/labour/labours/{id}/attendance",
-    "A Labour",
+    "/api/construction/labour/employees/{id}/attendance",
+    "An Employee",
     "Construction · Labour",
-    "Labours Read; days at Projects the viewer may not open are left out.",
-  ),
-  operation(
-    "/api/construction/masters/site-engineers/{id}/attendance",
-    "A Site Engineer",
-    "Construction · Masters",
-    "Labours Read; from the Check-In log, on Projects with Attendance Read.",
+    "Employees Read; days at Projects the viewer may not open are left out.",
   ),
   operation(
     "/api/construction/labour/vendors/{id}/attendance",

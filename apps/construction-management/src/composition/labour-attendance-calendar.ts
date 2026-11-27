@@ -9,7 +9,8 @@ import { visibleProjectIds } from "./labour-activity";
 import { PersonAttendanceService } from "./person-attendance";
 
 /**
- * A Labour's Attendance tab (ADR CM-0051): their marked days, at the
+ * An Employee's Attendance tab (ADR CM-0051, CM-0055): their marked days
+ * (from the sheet or from Check-In, whatever their Role), at the
  * Projects the viewer may open, with hours from In and Out or the working
  * hours marked.
  */
@@ -25,7 +26,8 @@ export function createLabourAttendanceCalendar(deps?: {
     visibleProjectIds,
     projectNames: (workspaceId, ids) => projectNames(workspaceId, ids, db),
     timeZoneOf: (workspaceId) => companyTimezone(db, workspaceId),
-    notFound: () => notFound("LABOUR_NOT_FOUND", "This Labour was not found."),
+    notFound: () =>
+      notFound("EMPLOYEE_NOT_FOUND", "This Employee was not found."),
     now: deps?.now,
   });
 }
