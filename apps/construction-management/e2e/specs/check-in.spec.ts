@@ -171,6 +171,8 @@ checkInPageTest.describe("Check-In", () => {
         projectId: project.id,
         name: unique("Sundar Rajan"),
         role: "Site Engineer",
+        // Joined today, so "Added to" the Project sits under Today too.
+        joiningDate: todayInIndia(),
       });
       await checkInPage.goto();
       for (const name of [vendorName, engineer.name]) {
@@ -186,7 +188,10 @@ checkInPageTest.describe("Check-In", () => {
         await page.goto(`${path}?tab=activity`);
         const today = page.getByRole("region", { name: "Today" });
         await expect(today.getByText(/^Checked in at /)).toBeVisible();
-        await expect(today.getByText(/^Added to /)).toBeVisible();
+        // "Added to" the Project (an Employee also has "Added to Employees").
+        await expect(
+          today.getByText(/^Added to /).filter({ has: page.getByRole("link") }),
+        ).toBeVisible();
         await expect(
           today.getByRole("link", { name: "Open in Maps" }),
         ).toBeVisible();
