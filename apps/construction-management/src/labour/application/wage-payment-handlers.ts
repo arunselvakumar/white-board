@@ -36,11 +36,11 @@ export type StoredWagePayment = WagePayment & {
   updatedBy: string;
 };
 
-/** A labourer or vendor a payment can be made to. */
+/** An Employee or vendor a payment can be made to. */
 export type PaymentParty = {
   id: string;
   name: string;
-  /** Labour: the current Project. Vendor: the Projects it is assigned to. */
+  /** Employee: the current Project. Vendor: the Projects it is assigned to. */
   projectIds: readonly string[];
 };
 
@@ -76,7 +76,7 @@ export type WagePaymentStore = {
   find(workspaceId: string, id: string): Promise<StoredWagePayment | null>;
   /** Live payments of a Project, newest recorded first (root ADR-0020). */
   list(params: WagePaymentListParams): Promise<WagePaymentListPage>;
-  /** A live labourer or vendor of the Company, or null. */
+  /** A live Employee or vendor of the Company, or null. */
   party(
     workspaceId: string,
     partyType: PartyType,
@@ -92,7 +92,7 @@ export type WagePaymentStore = {
    * The payment row, its negative ledger entry, its account entry (through
    * `AccountPosting`, which checks the account: 404 `ACCOUNT_NOT_FOUND`,
    * 403 `ACCOUNT_NOT_YOURS`, 400 `ACCOUNT_MODE_MISMATCH`) and the audit
-   * event, after locking the party's row (404 `LABOUR_NOT_FOUND` /
+   * event, after locking the party's row (404 `EMPLOYEE_NOT_FOUND` /
    * `VENDOR_NOT_FOUND` when it was deleted meanwhile).
    */
   insert(
@@ -221,13 +221,13 @@ const receiptNotFound = () =>
   notFound("RECEIPT_NOT_FOUND", "This payment has no receipt.");
 
 function partyNotFound(partyType: PartyType): DomainError {
-  return partyType === "labour"
-    ? notFound("LABOUR_NOT_FOUND", "This Labour was not found.")
+  return partyType === "employee"
+    ? notFound("EMPLOYEE_NOT_FOUND", "This Employee was not found.")
     : notFound("VENDOR_NOT_FOUND", "This Vendor was not found.");
 }
 
 /**
- * Wage payments to labourers and vendors (CM-215, `modules/08` "Decisions
+ * Wage payments to Employees and vendors (CM-215, `modules/08` "Decisions
  * for the build"). A payment is never edited: cancel it (its ledger entry
  * is reversed) and record it again. Access is checked by the caller.
  */
@@ -253,28 +253,30 @@ export class WagePaymentHandlers {
   ): Promise<WagePaymentReadModel[]> {
     const ids = (type: PartyType) =>
       payments.filter((item) => item.partyType === type).map((p) => p.partyId);
-    const [labours, vendors, projects, members, accounts] = await Promise.all([
-      this.store.partyNames(workspaceId, "labour", ids("labour")),
-      this.store.partyNames(workspaceId, "vendor", ids("vendor")),
-      this.projects.find(
-        workspaceId,
-        payments.map((item) => item.projectId),
-      ),
-      this.teamMembers.find(
-        workspaceId,
-        payments.flatMap((item) =>
-          item.paidByMemberId == null ? [] : [item.paidByMemberId],
+    const [employees, vendors, projects, members, accounts] = await Promise.all(
+      [
+        this.store.partyNames(workspaceId, "employee", ids("employee")),
+        this.store.partyNames(workspaceId, "vendor", ids("vendor")),
+        this.projects.find(
+          workspaceId,
+          payments.map((item) => item.projectId),
         ),
-      ),
-      this.store.accountNames(
-        workspaceId,
-        payments.flatMap((item) =>
-          item.accountId == null ? [] : [item.accountId],
+        this.teamMembers.find(
+          workspaceId,
+          payments.flatMap((item) =>
+            item.paidByMemberId == null ? [] : [item.paidByMemberId],
+          ),
         ),
-      ),
-    ]);
+        this.store.accountNames(
+          workspaceId,
+          payments.flatMap((item) =>
+            item.accountId == null ? [] : [item.accountId],
+          ),
+        ),
+      ],
+    );
     return payments.map((payment) => {
-      const names = payment.partyType === "labour" ? labours : vendors;
+      const names = payment.partyType === "employee" ? employees : vendors;
       const member =
         payment.paidByMemberId == null
           ? undefined
@@ -356,7 +358,7 @@ export class WagePaymentHandlers {
    * a live Team Member, the date not in the future and inside the
    * back-dated limits, the account one the payer may use and fitting the
    * mode (Cash → Cash or petty cash, Bank → Bank). Inactive parties can
-   * still be paid (settling a labourer who left). Writes the payment, its
+   * still be paid (settling an Employee who left). Writes the payment, its
    * ledger entry, its account entry and the audit event in one transaction.
    */
   async record(input: RecordWagePaymentInput): Promise<WagePaymentReadModel> {

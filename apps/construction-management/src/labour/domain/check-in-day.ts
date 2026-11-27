@@ -7,19 +7,19 @@ import type {
 import type { AttendanceStatus } from "./wages";
 
 /**
- * The marks Check-In prices a Labour's day from (ADR CM-0043 §3), so the
+ * The marks Check-In prices an Employee's day from (ADR CM-0043 §3), so the
  * day is priced and posted exactly as the marking sheet prices it.
  */
 
 /** A day Check-In creates: Present, the times, one overtime line from them. */
 export function createdDayMark(input: {
-  labourId: string;
+  employeeId: string;
   times: EntryTimes;
-  /** The Labour's Labour Category, for the overtime line. */
+  /** The Employee's Labour Category, for the overtime line. */
   labourCategoryId: string | null;
 }): DayMark {
   return {
-    labourId: input.labourId,
+    employeeId: input.employeeId,
     status: "present",
     checkIn: input.times.checkIn,
     checkOut: input.times.checkOut,
@@ -30,7 +30,7 @@ export function createdDayMark(input: {
 
 /** What a stored day keeps when Check-In replaces its times. */
 export type StoredDayForTimes = {
-  labourId: string;
+  employeeId: string;
   status: AttendanceStatus;
   isPaidLeave: boolean;
   shift: string | null;
@@ -68,7 +68,7 @@ export function timesDayMark(input: {
       ? [{ labourCategoryId: input.labourCategoryId, fromTimes: true }]
       : kept;
   return {
-    labourId: day.labourId,
+    employeeId: day.employeeId,
     status: day.status,
     isPaidLeave: day.isPaidLeave,
     shift: day.shift,

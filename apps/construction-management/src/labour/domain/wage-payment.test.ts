@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { MAX_PAISE } from "./labour";
+import { MAX_PAISE } from "./ledger";
 import { paymentLedgerEntries, wagePayment } from "./wage-payment";
 
 const base = {
-  partyType: "labour" as const,
+  partyType: "employee" as const,
   partyId: "l1",
   projectId: "p1",
   paymentDate: "2026-10-31",

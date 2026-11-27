@@ -1,8 +1,7 @@
 import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
-import { MAX_PAISE } from "./labour";
-import type { NewLedgerEntry, PartyType } from "./ledger";
+import { MAX_PAISE, type NewLedgerEntry, type PartyType } from "./ledger";
 
 export type PaymentKind = "payment" | "advance";
 export type PaymentMode = "cash" | "bank";
@@ -58,7 +57,7 @@ function text(
 }
 
 /**
- * Money paid to a labourer or a vendor (CM-215, `modules/08` "Decisions
+ * Money paid to an Employee or a vendor (CM-215, `modules/08` "Decisions
  * for the build"): against wages earned (`payment`) or ahead of them
  * (`advance`), by cash or bank, from a finance account (ADR CM-0017 §12).
  */

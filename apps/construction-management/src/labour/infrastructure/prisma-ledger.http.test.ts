@@ -9,16 +9,16 @@ import { prismaLedger } from "./prisma-ledger";
 describe("prismaLedger (ADR CM-0004)", () => {
   it("appends, reverses a source's live entries once, and sums balances", async () => {
     const workspaceId = randomUUID();
-    const labourId = randomUUID();
+    const employeeId = randomUUID();
     const attendanceId = randomUUID();
-    const party = { partyType: "labour" as const, partyId: labourId };
+    const party = { partyType: "employee" as const, partyId: employeeId };
     const posted = (amount: number, kind: "earned" | "overtime") => ({
       ...party,
       projectId: randomUUID(),
       entryDate: "2026-10-05",
       kind,
       amount,
-      sourceType: "labour_attendance" as const,
+      sourceType: "employee_attendance" as const,
       sourceId: attendanceId,
       reversesEntryId: null,
     });
@@ -31,8 +31,8 @@ describe("prismaLedger (ADR CM-0004)", () => {
           entryDate: "2026-10-01",
           kind: "opening",
           amount: 5000,
-          sourceType: "labour",
-          sourceId: labourId,
+          sourceType: "employee",
+          sourceId: employeeId,
           reversesEntryId: null,
         },
         posted(80_000, "earned"),
@@ -47,7 +47,7 @@ describe("prismaLedger (ADR CM-0004)", () => {
           tx,
           workspaceId,
           "user",
-          "labour_attendance",
+          "employee_attendance",
           attendanceId,
         ),
       ).toBe(2);
@@ -62,7 +62,7 @@ describe("prismaLedger (ADR CM-0004)", () => {
           tx,
           workspaceId,
           "user",
-          "labour_attendance",
+          "employee_attendance",
           attendanceId,
         ),
       ).toBe(1);
@@ -80,11 +80,11 @@ describe("prismaLedger (ADR CM-0004)", () => {
     const balances = await prismaLedger.balances(
       prisma,
       workspaceId,
-      "labour",
-      [labourId, randomUUID()],
+      "employee",
+      [employeeId, randomUUID()],
       "2026-10-31",
     );
-    expect(balances.get(labourId)).toBe(5000);
+    expect(balances.get(employeeId)).toBe(5000);
     expect(balances.size).toBe(1);
   });
 });

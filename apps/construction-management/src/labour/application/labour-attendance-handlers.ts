@@ -13,7 +13,7 @@ import { newId } from "@/src/shared-kernel/ids";
 import type { ListCursor } from "@/src/shared-kernel/list-cursor";
 
 import {
-  assertDistinctLabourers,
+  assertDistinctEmployees,
   priceDay,
   withPaidLeave,
   type DayMark,
@@ -34,14 +34,18 @@ import {
 import type {
   LabourCategoryDirectory,
   ProjectDirectory,
-  SupervisorDirectory,
+  RoleDirectory,
 } from "./directories";
 
-/** A labourer as attendance needs them: who, where they report, what they earn. */
-export type AttendanceLabourer = {
+/**
+ * An Employee as attendance needs them (ADR CM-0055 §3): who, their Role,
+ * what they earn. Every Employee is on the sheet, whatever their Role.
+ */
+export type AttendanceEmployee = {
   id: string;
   name: string;
-  labourCode: string | null;
+  employeeCode: string | null;
+  roleId: string;
   isActive: boolean;
   labourCategoryId: string | null;
   weeklyHolidays: Weekday[];
@@ -74,7 +78,7 @@ export type LabourDayListParams = {
   projectId: string;
   from?: CalendarDate;
   to?: CalendarDate;
-  labourId?: string;
+  employeeId?: string;
   status?: LabourDayStatusFilter;
   limit: number;
   /** Newest date first; the cursor's `createdAt` carries the attendance date. */
@@ -86,20 +90,20 @@ export type LabourDayListParams = {
  * Where labour attendance lives (Prisma in infrastructure). `save` and
  * `clear` are one transaction each: rows, overtime lines, ledger reversal
  * and reposting, and the audit events (ADR CM-0004). A stale
- * `expectedUpdatedAt`, or a second live row for a labourer and date, is 409
- * `ATTENDANCE_CHANGED` with `details.labourId`.
+ * `expectedUpdatedAt`, or a second live row for a employee and date, is 409
+ * `ATTENDANCE_CHANGED` with `details.employeeId`.
  */
 export type LabourAttendanceStore = {
   /** Today in the Company's time zone. */
   today(workspaceId: string): Promise<CalendarDate>;
-  /** Live (not deleted) labourers among `ids`, active or not. */
-  labourers(
+  /** Live (not deleted) employees among `ids`, active or not. */
+  employees(
     workspaceId: string,
     ids: readonly string[],
-  ): Promise<Map<string, AttendanceLabourer>>;
+  ): Promise<Map<string, AttendanceEmployee>>;
   /**
-   * Which labourers worked on `projectId` on `date` (transfer history); a
-   * labourer may be on several Projects (ADR CM-0033).
+   * Which employees worked on `projectId` on `date` (transfer history); a
+   * employee may be on several Projects (ADR CM-0033).
    */
   onProject(
     workspaceId: string,
@@ -107,16 +111,16 @@ export type LabourAttendanceStore = {
     projectId: string,
     date: CalendarDate,
   ): Promise<Set<string>>;
-  /** Active labourers on the Project on `date`, by name. */
-  labourersOn(
+  /** Active employees on the Project on `date`, by name. */
+  employeesOn(
     workspaceId: string,
     projectId: string,
     date: CalendarDate,
-  ): Promise<AttendanceLabourer[]>;
-  /** Live rows of these labourers on `projectId` on `date`. */
+  ): Promise<AttendanceEmployee[]>;
+  /** Live rows of these employees on `projectId` on `date`. */
   daysOf(
     workspaceId: string,
-    labourIds: readonly string[],
+    employeeIds: readonly string[],
     projectId: string,
     date: CalendarDate,
   ): Promise<StoredLabourDay[]>;
@@ -132,8 +136,8 @@ export type LabourAttendanceStore = {
     params: LabourDayListParams,
   ): Promise<{ items: StoredLabourDay[]; total: number; hasMore: boolean }>;
   /**
-   * Writes every day in one transaction, after locking the labourers' rows
-   * (404 `LABOUR_NOT_FOUND` when one was deleted meanwhile).
+   * Writes every day in one transaction, after locking the employees' rows
+   * (404 `EMPLOYEE_NOT_FOUND` when one was deleted meanwhile).
    */
   save(input: {
     workspaceId: string;
@@ -149,11 +153,11 @@ export type LabourAttendanceStore = {
     by: string;
     now: Date;
   }): Promise<void>;
-  /** Names of labourers by id, including inactive and deleted ones. */
-  labourNames(
+  /** Names of employees by id, including inactive and deleted ones. */
+  employeeNames(
     workspaceId: string,
     ids: readonly string[],
-  ): Promise<Map<string, { name: string; labourCode: string | null }>>;
+  ): Promise<Map<string, { name: string; employeeCode: string | null }>>;
   /** Live, enabled Labour Categories for the overtime picker, by name. */
   categoryOptions(workspaceId: string): Promise<{ id: string; name: string }[]>;
 };
@@ -191,24 +195,19 @@ export type LabourOvertimeReadModel = {
 export type LabourAttendanceDayReadModel = {
   id: string;
   projectId: string;
-  labourId: string;
-  labourName: string;
-  labourCode: string | null;
+  employeeId: string;
+  employeeName: string;
+  employeeCode: string | null;
   date: CalendarDate;
   status: AttendanceStatus;
   isPaidLeave: boolean;
   shift: string | null;
-  /**
-   * The Site Engineer saved with the day (days marked before ADR CM-0041),
-   * else the Project's Site Engineers today, by name.
-   */
-  siteEngineers: Ref[];
   checkIn: string | null;
   checkOut: string | null;
   breakMinutes: number | null;
   /** The times follow the Check-In log (ADR CM-0043). */
   timesFromCheckIn: boolean;
-  /** Snapshot of the Labour's working hours a day. */
+  /** Snapshot of the Employee's working hours a day. */
   workingHours: string;
   /** check-out − check-in − break; null without both times. */
   workedHours: string | null;
@@ -227,22 +226,24 @@ export type LabourAttendanceDayReadModel = {
 };
 
 export type LabourSheetRowReadModel = {
-  labourId: string;
+  employeeId: string;
   name: string;
-  labourCode: string | null;
+  employeeCode: string | null;
   labourCategory: Ref | null;
+  /** The Employee's Role (ADR CM-0055 §2); null once it was deleted. */
+  role: Ref | null;
   weeklyHolidays: number[];
   wageType: WageCard["wageType"] | null;
   wagePerDay: number | null;
   wagePerMonth: number | null;
   overtimeWagePerHour: number | null;
-  /** Decimal hours a day; null for a labourer no longer listed. */
+  /** Decimal hours a day; null for a employee no longer listed. */
   workingHoursPerDay: string | null;
   /** Active and on this Project on the date: the row can be marked. */
   canMark: boolean;
   isActive: boolean;
   onProject: boolean;
-  /** The date is one of the labourer's weekly holidays. */
+  /** The date is one of the employee's weekly holidays. */
   isWeeklyHoliday: boolean;
   /** Pre-fill for an unmarked row: Holiday on a weekly holiday, else yesterday's status. */
   suggestedStatus: AttendanceStatus | null;
@@ -261,7 +262,7 @@ export type LabourSheetRowReadModel = {
 export type LabourSheetReadModel = {
   projectId: string;
   date: CalendarDate;
-  labourers: LabourSheetRowReadModel[];
+  employees: LabourSheetRowReadModel[];
   /** For the overtime line picker. */
   labourCategories: Ref[];
   totals: {
@@ -298,10 +299,10 @@ export type LabourMonthReadModel = {
   from: CalendarDate;
   to: CalendarDate;
   dates: CalendarDate[];
-  labourers: {
-    labourId: string;
+  employees: {
+    employeeId: string;
     name: string;
-    labourCode: string | null;
+    employeeCode: string | null;
     /** Marked dates only. */
     days: {
       date: CalendarDate;
@@ -332,7 +333,7 @@ export type MarkLabourDayInput = {
   marks: readonly DayMark[];
   /**
    * The `updatedAt` of each already-marked row this save changes, by
-   * labourer. A marked row without an entry (or with a stale one) is 409
+   * employee. A marked row without an entry (or with a stale one) is 409
    * `ATTENDANCE_CHANGED`, so a stale screen never overwrites a newer mark.
    */
   expected?: Readonly<Record<string, Date>>;
@@ -395,10 +396,10 @@ function workedHoursOf(day: PricedDay): string | null {
   }).worked;
 }
 
-/** A copy of a domain error with `labourId` (and more) added to its details. */
-function forLabourer(
+/** A copy of a domain error with `employeeId` (and more) added to its details. */
+function forEmployee(
   error: unknown,
-  labourId: string,
+  employeeId: string,
   extra: Record<string, unknown> = {},
 ): unknown {
   if (!(error instanceof DomainError)) return error;
@@ -408,7 +409,7 @@ function forLabourer(
       : {};
   return new DomainError(error.code, error.message, {
     kind: error.kind,
-    details: { ...details, ...extra, labourId },
+    details: { ...details, ...extra, employeeId },
   });
 }
 
@@ -478,12 +479,12 @@ function stripHundredths(
 }
 
 /**
- * Labour attendance (CM-210, CM-211): mark many labourers' day on a Project
+ * Labour attendance (CM-210, CM-211): mark many employees' day on a Project
  * in one command, clear days, "Mark Paid Leave", and the marking sheet,
  * recorded list and month grid. Menu access is checked by the route; the
  * create/update split, the back-dated guard and the concurrency check here.
  *
- * A new day is priced from the labourer's current wages. A re-marked day is
+ * A new day is priced from the employee's current wages. A re-marked day is
  * re-priced from the current wages too (the day changed, so it is a new
  * pricing); days that are not touched keep their snapshot. "Mark Paid
  * Leave" alone keeps the snapshot wage (`withPaidLeave`).
@@ -493,7 +494,7 @@ export class LabourAttendanceHandlers {
     private readonly store: LabourAttendanceStore,
     private readonly projects: ProjectDirectory,
     private readonly labourCategories: LabourCategoryDirectory,
-    private readonly supervisors: SupervisorDirectory,
+    private readonly roles: RoleDirectory,
     private readonly backdated: LabourAttendanceBackdatedGuard,
     private readonly clock: () => Date = () => new Date(),
   ) {}
@@ -520,16 +521,16 @@ export class LabourAttendanceHandlers {
       );
   }
 
-  /** Read models with labour, category and Site Engineer names. */
+  /** Read models with Employee and category names. */
   private async readModels(
     workspaceId: string,
     days: readonly StoredLabourDay[],
   ): Promise<LabourAttendanceDayReadModel[]> {
     if (days.length === 0) return [];
-    const [names, categories, saved, onProjects] = await Promise.all([
-      this.store.labourNames(
+    const [names, categories] = await Promise.all([
+      this.store.employeeNames(
         workspaceId,
-        days.map((day) => day.labourId),
+        days.map((day) => day.employeeId),
       ),
       this.labourCategories.find(workspaceId, [
         ...new Set(
@@ -540,41 +541,19 @@ export class LabourAttendanceHandlers {
           ),
         ),
       ]),
-      this.supervisors.find(workspaceId, [
-        ...new Set(
-          days
-            .map((day) => day.supervisorId)
-            .filter((id): id is string => id != null),
-        ),
-      ]),
-      this.supervisors.onProjects(workspaceId, [
-        ...new Set(
-          days
-            .filter((day) => day.supervisorId == null)
-            .map((day) => day.projectId),
-        ),
-      ]),
     ]);
     return days.map((day) => {
       const overtimeAmount = overtimeAmountOf(day);
-      const own =
-        day.supervisorId == null ? undefined : saved.get(day.supervisorId);
       return {
         id: day.id,
         projectId: day.projectId,
-        labourId: day.labourId,
-        labourName: names.get(day.labourId)?.name ?? "",
-        labourCode: names.get(day.labourId)?.labourCode ?? null,
+        employeeId: day.employeeId,
+        employeeName: names.get(day.employeeId)?.name ?? "",
+        employeeCode: names.get(day.employeeId)?.employeeCode ?? null,
         date: day.date,
         status: day.status,
         isPaidLeave: day.isPaidLeave,
         shift: day.shift,
-        siteEngineers:
-          day.supervisorId == null
-            ? (onProjects.get(day.projectId) ?? [])
-            : own == null
-              ? []
-              : [{ id: own.id, name: own.name }],
         checkIn: day.checkIn,
         checkOut: day.checkOut,
         breakMinutes: day.breakMinutes,
@@ -605,9 +584,9 @@ export class LabourAttendanceHandlers {
   }
 
   /**
-   * Marks many labourers' day on a Project in one transaction (CM-210).
-   * Every labourer must be live, active and on this Project on that date;
-   * a labourer already marked that day needs their row's `updatedAt` in
+   * Marks many employees' day on a Project in one transaction (CM-210).
+   * Every employee must be live, active and on this Project on that date;
+   * a employee already marked that day needs their row's `updatedAt` in
    * `expected`. Returns the saved rows.
    */
   async markDay(
@@ -616,38 +595,38 @@ export class LabourAttendanceHandlers {
     const { actor } = input;
     const workspaceId = actor.workspaceId;
     const date = assertCalendarDate(input.date.trim(), "DATE_INVALID");
-    assertDistinctLabourers(input.marks);
+    assertDistinctEmployees(input.marks);
     await this.assertNotFuture(workspaceId, date);
     await this.assertProject(workspaceId, input.projectId);
 
-    const ids = input.marks.map((mark) => mark.labourId);
-    const [labourers, onProject, existingDays] = await Promise.all([
-      this.store.labourers(workspaceId, ids),
+    const ids = input.marks.map((mark) => mark.employeeId);
+    const [employees, onProject, existingDays] = await Promise.all([
+      this.store.employees(workspaceId, ids),
       this.store.onProject(workspaceId, ids, input.projectId, date),
       this.store.daysOf(workspaceId, ids, input.projectId, date),
     ]);
     for (const mark of input.marks) {
-      const labourer = labourers.get(mark.labourId);
-      if (labourer == null)
+      const employee = employees.get(mark.employeeId);
+      if (employee == null)
         throw rowError(
-          "LABOUR_NOT_FOUND",
-          "This Labour was not found.",
+          "EMPLOYEE_NOT_FOUND",
+          "This Employee was not found.",
           "not_found",
-          { labourId: mark.labourId },
+          { employeeId: mark.employeeId },
         );
-      if (!labourer.isActive)
+      if (!employee.isActive)
         throw rowError(
-          "LABOUR_INACTIVE",
-          `${labourer.name} is inactive. Activate them in Human Resources → Labours to mark attendance.`,
+          "EMPLOYEE_INACTIVE",
+          `${employee.name} is inactive. Activate them in Human Resources → Employees to mark attendance.`,
           "invalid",
-          { labourId: labourer.id },
+          { employeeId: employee.id },
         );
-      if (!onProject.has(labourer.id))
+      if (!onProject.has(employee.id))
         throw rowError(
-          "LABOUR_NOT_ON_PROJECT",
-          `${labourer.name} was not on this Project on ${date}.`,
+          "EMPLOYEE_NOT_ON_PROJECT",
+          `${employee.name} was not on this Project on ${date}.`,
           "invalid",
-          { labourId: labourer.id },
+          { employeeId: employee.id },
         );
     }
 
@@ -671,34 +650,34 @@ export class LabourAttendanceHandlers {
             "An overtime line's Labour Category was not found.",
             "invalid",
             {
-              labourId: mark.labourId,
+              employeeId: mark.employeeId,
               labourCategoryId: line.labourCategoryId,
             },
           );
     }
 
     // Concurrency and the create/update split, per row.
-    const existing = new Map(existingDays.map((day) => [day.labourId, day]));
+    const existing = new Map(existingDays.map((day) => [day.employeeId, day]));
     const expected = input.expected ?? {};
     let creates = false;
     let edits = false;
     for (const mark of input.marks) {
-      const row = existing.get(mark.labourId);
-      const seen = expected[mark.labourId];
-      const name = labourers.get(mark.labourId)?.name ?? "This Labour";
+      const row = existing.get(mark.employeeId);
+      const seen = expected[mark.employeeId];
+      const name = employees.get(mark.employeeId)?.name ?? "This Employee";
       if (row == null) {
         if (seen != null)
           throw conflict(
             "ATTENDANCE_CHANGED",
             `${name}'s day was cleared after you opened it. Reload to see the latest.`,
-            { labourId: mark.labourId },
+            { employeeId: mark.employeeId },
           );
         if (!input.canCreate)
           throw rowError(
             "PERMISSION_DENIED",
             "You do not have permission to mark new attendance.",
             "forbidden",
-            { labourId: mark.labourId },
+            { employeeId: mark.employeeId },
           );
         creates = true;
       } else {
@@ -706,14 +685,14 @@ export class LabourAttendanceHandlers {
           throw conflict(
             "ATTENDANCE_CHANGED",
             `${name}'s day was changed after you opened it. Reload to see the latest.`,
-            { labourId: mark.labourId },
+            { employeeId: mark.employeeId },
           );
         if (!input.canEdit)
           throw rowError(
             "PERMISSION_DENIED",
             "You do not have permission to change marked attendance.",
             "forbidden",
-            { labourId: mark.labourId },
+            { employeeId: mark.employeeId },
           );
         edits = true;
       }
@@ -723,13 +702,13 @@ export class LabourAttendanceHandlers {
 
     const now = this.clock();
     const writes: LabourDayWrite[] = input.marks.map((mark, index) => {
-      const labourer = labourers.get(mark.labourId);
-      if (labourer == null) throw new Error("unreachable");
+      const employee = employees.get(mark.employeeId);
+      if (employee == null) throw new Error("unreachable");
       // A line sent without a rate (a member without Financial cannot see
       // it) keeps the rate the saved day had for that category, so a
       // re-mark never silently resets a custom overtime rate. The line from
       // the times keeps the saved line from the times first.
-      const saved = existing.get(mark.labourId)?.overtime ?? [];
+      const saved = existing.get(mark.employeeId)?.overtime ?? [];
       const overtime = mark.overtime?.map((line) => {
         if (line.ratePerHour != null) return line;
         const fromTimes = line.fromTimes === true;
@@ -745,17 +724,14 @@ export class LabourAttendanceHandlers {
       try {
         priced = priceDay({
           mark: { ...mark, overtime },
-          card: labourer.card,
+          card: employee.card,
           projectId: input.projectId,
           date,
-          // A new day saves no Site Engineer; a re-mark keeps the one it
-          // was saved with (ADR CM-0041).
-          supervisorId: existing.get(mark.labourId)?.supervisorId ?? null,
         });
       } catch (error) {
-        throw forLabourer(error, mark.labourId);
+        throw forEmployee(error, mark.employeeId);
       }
-      const row = existing.get(mark.labourId);
+      const row = existing.get(mark.employeeId);
       // Saved on the sheet, the day is the sheet's; its times still follow
       // the Check-In log only when sent back unchanged (ADR CM-0043 §3).
       const day: PricedDay = {
@@ -784,7 +760,7 @@ export class LabourAttendanceHandlers {
     );
     const order = new Map(ids.map((id, index) => [id, index]));
     saved.sort(
-      (a, b) => (order.get(a.labourId) ?? 0) - (order.get(b.labourId) ?? 0),
+      (a, b) => (order.get(a.employeeId) ?? 0) - (order.get(b.employeeId) ?? 0),
     );
     return this.readModels(workspaceId, saved);
   }
@@ -797,44 +773,44 @@ export class LabourAttendanceHandlers {
     actor: LabourAttendanceActor;
     projectId: string;
     date: string;
-    labourIds: readonly string[];
+    employeeIds: readonly string[];
     expected: Readonly<Record<string, Date>>;
   }): Promise<void> {
     const { actor } = input;
     const date = assertCalendarDate(input.date.trim(), "DATE_INVALID");
-    if (input.labourIds.length === 0)
+    if (input.employeeIds.length === 0)
       throw new DomainError(
         "ATTENDANCE_EMPTY",
-        "Choose at least one Labour to clear.",
+        "Choose at least one Employee to clear.",
       );
-    if (new Set(input.labourIds).size !== input.labourIds.length)
+    if (new Set(input.employeeIds).size !== input.employeeIds.length)
       throw new DomainError(
-        "LABOUR_MARKED_TWICE",
-        "A Labour appears twice in this request.",
+        "EMPLOYEE_MARKED_TWICE",
+        "An Employee appears twice in this request.",
       );
     await this.assertProject(actor.workspaceId, input.projectId);
     const days = await this.store.daysOf(
       actor.workspaceId,
-      input.labourIds,
+      input.employeeIds,
       input.projectId,
       date,
     );
-    const byLabour = new Map(days.map((day) => [day.labourId, day]));
-    const clears = input.labourIds.map((labourId) => {
-      const day = byLabour.get(labourId);
+    const byEmployee = new Map(days.map((day) => [day.employeeId, day]));
+    const clears = input.employeeIds.map((employeeId) => {
+      const day = byEmployee.get(employeeId);
       if (day == null)
         throw rowError(
           "ATTENDANCE_NOT_FOUND",
-          "This Labour has no attendance on this Project that day.",
+          "This Employee has no attendance on this Project that day.",
           "not_found",
-          { labourId },
+          { employeeId },
         );
-      const seen = input.expected[labourId];
+      const seen = input.expected[employeeId];
       if (seen?.getTime() !== day.updatedAt.getTime())
         throw conflict(
           "ATTENDANCE_CHANGED",
           "This day was changed after you opened it. Reload to see the latest.",
-          { labourId },
+          { employeeId },
         );
       return { day, expectedUpdatedAt: seen };
     });
@@ -868,13 +844,13 @@ export class LabourAttendanceHandlers {
       throw conflict(
         "ATTENDANCE_CHANGED",
         "This day was changed after you opened it. Reload to see the latest.",
-        { labourId: stored.labourId },
+        { employeeId: stored.employeeId },
       );
     let day: PricedDay;
     try {
       day = withPaidLeave(stored, input.isPaidLeave);
     } catch (error) {
-      throw forLabourer(error, stored.labourId);
+      throw forEmployee(error, stored.employeeId);
     }
     await this.backdated.assert("edit", actor, stored.date);
     await this.store.save({
@@ -883,13 +859,12 @@ export class LabourAttendanceHandlers {
         {
           id: stored.id,
           day: {
-            labourId: day.labourId,
+            employeeId: day.employeeId,
             projectId: day.projectId,
             date: day.date,
             status: day.status,
             isPaidLeave: day.isPaidLeave,
             shift: day.shift,
-            supervisorId: day.supervisorId,
             checkIn: day.checkIn,
             checkOut: day.checkOut,
             breakMinutes: day.breakMinutes,
@@ -925,9 +900,9 @@ export class LabourAttendanceHandlers {
   }
 
   /**
-   * The marking sheet for a Project and date: every active labourer on the
+   * The marking sheet for a Project and date: every active employee on the
    * Project that day (transfer history) with the day's row if marked, the
-   * pre-fill hint, and labourers marked here who since became inactive
+   * pre-fill hint, and employees marked here who since became inactive
    * (read-only).
    */
   async sheet(
@@ -938,19 +913,19 @@ export class LabourAttendanceHandlers {
     const date = assertCalendarDate(rawDate.trim(), "DATE_INVALID");
     await this.assertProject(workspaceId, projectId);
     const [onProject, marked, categoryOptions] = await Promise.all([
-      this.store.labourersOn(workspaceId, projectId, date),
+      this.store.employeesOn(workspaceId, projectId, date),
       this.store.daysBetween(workspaceId, projectId, date, date),
       this.store.categoryOptions(workspaceId),
     ]);
-    const listed = new Set(onProject.map((labourer) => labourer.id));
+    const listed = new Set(onProject.map((employee) => employee.id));
     const otherIds = marked
-      .map((day) => day.labourId)
+      .map((day) => day.employeeId)
       .filter((id) => !listed.has(id));
-    const others = await this.store.labourers(workspaceId, otherIds);
+    const others = await this.store.employees(workspaceId, otherIds);
     const everyone = [
-      ...onProject.map((labourer) => ({ labourer, canMark: true })),
+      ...onProject.map((employee) => ({ employee, canMark: true })),
       ...otherIds.map((id) => ({
-        labourer: others.get(id) ?? null,
+        employee: others.get(id) ?? null,
         id,
         canMark: false,
       })),
@@ -960,42 +935,56 @@ export class LabourAttendanceHandlers {
       this.store.daysOf(workspaceId, allIds, projectId, addDays(date, -1)),
       this.readModels(workspaceId, marked),
     ]);
-    const yesterday = new Map(yesterdayDays.map((day) => [day.labourId, day]));
-    const today = new Map(models.map((model) => [model.labourId, model]));
-    const categories = await this.labourCategories.find(workspaceId, [
-      ...new Set(
-        everyone
-          .map((entry) => entry.labourer?.labourCategoryId)
-          .filter((id): id is string => id != null),
-      ),
+    const yesterday = new Map(
+      yesterdayDays.map((day) => [day.employeeId, day]),
+    );
+    const today = new Map(models.map((model) => [model.employeeId, model]));
+    const [categories, roles] = await Promise.all([
+      this.labourCategories.find(workspaceId, [
+        ...new Set(
+          everyone
+            .map((entry) => entry.employee?.labourCategoryId)
+            .filter((id): id is string => id != null),
+        ),
+      ]),
+      this.roles.find(workspaceId, [
+        ...new Set(
+          everyone
+            .map((entry) => entry.employee?.roleId)
+            .filter((id): id is string => id != null),
+        ),
+      ]),
     ]);
     const weekday = weekdayOf(date);
 
     const rows: LabourSheetRowReadModel[] = everyone.map((entry) => {
-      const labourer = entry.labourer;
-      const labourId = labourer?.id ?? ("id" in entry ? entry.id : "");
-      const attendance = today.get(labourId) ?? null;
-      const before = yesterday.get(labourId);
-      const weeklyHolidays = labourer?.weeklyHolidays ?? [];
+      const employee = entry.employee;
+      const employeeId = employee?.id ?? ("id" in entry ? entry.id : "");
+      const attendance = today.get(employeeId) ?? null;
+      const before = yesterday.get(employeeId);
+      const weeklyHolidays = employee?.weeklyHolidays ?? [];
       const isWeeklyHoliday = weeklyHolidays.includes(weekday);
       const category =
-        labourer?.labourCategoryId == null
+        employee?.labourCategoryId == null
           ? undefined
-          : categories.get(labourer.labourCategoryId);
+          : categories.get(employee.labourCategoryId);
+      const role = employee == null ? undefined : roles.get(employee.roleId);
       return {
-        labourId,
-        name: labourer?.name ?? attendance?.labourName ?? "",
-        labourCode: labourer?.labourCode ?? attendance?.labourCode ?? null,
+        employeeId,
+        name: employee?.name ?? attendance?.employeeName ?? "",
+        employeeCode:
+          employee?.employeeCode ?? attendance?.employeeCode ?? null,
         labourCategory:
           category == null ? null : { id: category.id, name: category.name },
+        role: role == null ? null : { id: role.id, name: role.name },
         weeklyHolidays,
-        wageType: labourer?.card.wageType ?? attendance?.wageType ?? null,
-        wagePerDay: labourer?.card.wagePerDay ?? null,
-        wagePerMonth: labourer?.card.wagePerMonth ?? null,
-        overtimeWagePerHour: labourer?.card.overtimeWagePerHour ?? null,
-        workingHoursPerDay: labourer?.card.workingHours ?? null,
+        wageType: employee?.card.wageType ?? attendance?.wageType ?? null,
+        wagePerDay: employee?.card.wagePerDay ?? null,
+        wagePerMonth: employee?.card.wagePerMonth ?? null,
+        overtimeWagePerHour: employee?.card.overtimeWagePerHour ?? null,
+        workingHoursPerDay: employee?.card.workingHours ?? null,
         canMark: entry.canMark,
-        isActive: labourer?.isActive ?? false,
+        isActive: employee?.isActive ?? false,
         onProject: entry.canMark,
         isWeeklyHoliday,
         suggestedStatus: isWeeklyHoliday ? "holiday" : (before?.status ?? null),
@@ -1036,7 +1025,7 @@ export class LabourAttendanceHandlers {
     return {
       projectId,
       date,
-      labourers: rows,
+      employees: rows,
       labourCategories: categoryOptions,
       totals,
     };
@@ -1075,9 +1064,9 @@ export class LabourAttendanceHandlers {
   }
 
   /**
-   * The month grid: labourer × day codes with overtime, and totals per
-   * labourer. Lists every labourer marked here that month, plus the active
-   * labourers on the Project at the month's end (or today) with no marks.
+   * The month grid: employee × day codes with overtime, and totals per
+   * employee. Lists every employee marked here that month, plus the active
+   * employees on the Project at the month's end (or today) with no marks.
    */
   async month(
     workspaceId: string,
@@ -1096,42 +1085,42 @@ export class LabourAttendanceHandlers {
     const [days, roster] = await Promise.all([
       this.store.daysBetween(workspaceId, projectId, from, to),
       daysBetween(from, rosterDate) >= 0
-        ? this.store.labourersOn(workspaceId, projectId, rosterDate)
+        ? this.store.employeesOn(workspaceId, projectId, rosterDate)
         : Promise.resolve([]),
     ]);
-    const names = await this.store.labourNames(workspaceId, [
-      ...days.map((day) => day.labourId),
-      ...roster.map((labourer) => labourer.id),
+    const names = await this.store.employeeNames(workspaceId, [
+      ...days.map((day) => day.employeeId),
+      ...roster.map((employee) => employee.id),
     ]);
 
     type Totals = LabourMonthTotals & { hundredths?: number };
     const rows = new Map<
       string,
-      Omit<LabourMonthReadModel["labourers"][number], "totals"> & {
+      Omit<LabourMonthReadModel["employees"][number], "totals"> & {
         totals: Totals;
       }
     >();
-    const ensure = (labourId: string) => {
-      const found = rows.get(labourId);
+    const ensure = (employeeId: string) => {
+      const found = rows.get(employeeId);
       if (found != null) return found;
       const created = {
-        labourId,
-        name: names.get(labourId)?.name ?? "",
-        labourCode: names.get(labourId)?.labourCode ?? null,
+        employeeId,
+        name: names.get(employeeId)?.name ?? "",
+        employeeCode: names.get(employeeId)?.employeeCode ?? null,
         days: [],
         totals: emptyTotals() as Totals,
       };
-      rows.set(labourId, created);
+      rows.set(employeeId, created);
       return created;
     };
-    for (const labourer of roster) ensure(labourer.id);
+    for (const employee of roster) ensure(employee.id);
     const totals: Totals = emptyTotals();
     const counts = new Map<
       CalendarDate,
       { date: CalendarDate; present: number; halfDay: number; marked: number }
     >();
     for (const day of days) {
-      const row = ensure(day.labourId);
+      const row = ensure(day.employeeId);
       row.days.push({
         date: day.date,
         attendanceId: day.id,
@@ -1165,7 +1154,7 @@ export class LabourAttendanceHandlers {
       from,
       to,
       dates: datesBetween(from, to),
-      labourers: [...rows.values()]
+      employees: [...rows.values()]
         .map((row) => ({ ...row, totals: stripHundredths(row.totals) }))
         .sort((a, b) => collator.compare(a.name, b.name)),
       dayCounts: [...counts.values()].sort((a, b) =>

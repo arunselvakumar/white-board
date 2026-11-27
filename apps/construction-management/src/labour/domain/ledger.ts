@@ -37,6 +37,13 @@ export type NewLedgerEntry = {
 };
 
 /**
+ * The most a wage, rate or payment typed in can be: ₹2 crore in paise.
+ * (Was on the Labour record; kept here so attendance, payments and vendors
+ * share it with the Employee record, ADR CM-0055.)
+ */
+export const MAX_PAISE = 2_000_000_000;
+
+/**
  * The most one amount (an entry, a payment, a day's pay) can be: a Postgres
  * `integer` of paise, about ₹21.47 crore. Sums of amounts are bigint.
  */

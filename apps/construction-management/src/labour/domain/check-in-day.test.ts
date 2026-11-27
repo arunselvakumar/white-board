@@ -19,7 +19,7 @@ describe("createdDayMark", () => {
   it("is Present with the times and one overtime line from them", () => {
     const day = price(
       createdDayMark({
-        labourId: "l1",
+        employeeId: "l1",
         times: { checkIn: "08:00", checkOut: "18:30", breakMinutes: 60 },
         labourCategoryId: "mason",
       }),
@@ -46,7 +46,7 @@ describe("createdDayMark", () => {
   it("has no overtime while the Labour is in", () => {
     const day = price(
       createdDayMark({
-        labourId: "l1",
+        employeeId: "l1",
         times: { checkIn: "08:00", checkOut: null, breakMinutes: 60 },
         labourCategoryId: null,
       }),
@@ -58,7 +58,7 @@ describe("createdDayMark", () => {
 
 describe("timesDayMark", () => {
   const stored = {
-    labourId: "l1",
+    employeeId: "l1",
     status: "half_day" as const,
     isPaidLeave: false,
     shift: "Night",

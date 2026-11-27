@@ -63,7 +63,7 @@ export type AccountPaymentPosting = {
   amount: bigint;
   reference: string | null;
   counterparty: {
-    kind: "labour" | "vendor" | "team_member";
+    kind: "employee" | "vendor" | "team_member";
     id: string;
     name: string;
   };

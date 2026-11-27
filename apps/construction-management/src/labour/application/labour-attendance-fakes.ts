@@ -5,7 +5,7 @@ import { newId } from "@/src/shared-kernel/ids";
 import { dayLedgerEntries } from "../domain/labour-attendance";
 import { liveEntries, reversalOf, type NewLedgerEntry } from "../domain/ledger";
 import type {
-  AttendanceLabourer,
+  AttendanceEmployee,
   LabourAttendanceActor,
   LabourAttendanceBackdatedGuard,
   LabourAttendanceStore,
@@ -20,8 +20,8 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
   readonly days = new Map<string, StoredLabourDay & { deleted: boolean }>();
   readonly ledger: FakeEntry[] = [];
   readonly audits: string[] = [];
-  readonly people = new Map<string, AttendanceLabourer>();
-  /** labourId → history rows (date, off a Project, onto one), oldest first. */
+  readonly people = new Map<string, AttendanceEmployee>();
+  /** employeeId → history rows (date, off a Project, onto one), oldest first. */
   readonly history = new Map<
     string,
     { date: CalendarDate; off: string | null; onto: string | null }[]
@@ -31,35 +31,35 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
   constructor(private readonly todayIs: CalendarDate) {}
 
   add(
-    labourer: AttendanceLabourer,
+    employee: AttendanceEmployee,
     projectId: string,
     from: CalendarDate,
   ): void {
-    this.people.set(labourer.id, labourer);
-    this.history.set(labourer.id, [{ date: from, off: null, onto: projectId }]);
+    this.people.set(employee.id, employee);
+    this.history.set(employee.id, [{ date: from, off: null, onto: projectId }]);
   }
 
   /** On another Project as well, from a date (ADR CM-0033). */
-  alsoOn(labourId: string, projectId: string, from: CalendarDate): void {
+  alsoOn(employeeId: string, projectId: string, from: CalendarDate): void {
     this.history
-      .get(labourId)
+      .get(employeeId)
       ?.push({ date: from, off: null, onto: projectId });
   }
 
   transfer(
-    labourId: string,
+    employeeId: string,
     fromProjectId: string,
     projectId: string,
     date: CalendarDate,
   ): void {
     this.history
-      .get(labourId)
+      .get(employeeId)
       ?.push({ date, off: fromProjectId, onto: projectId });
   }
 
-  balance(labourId: string): number {
+  balance(employeeId: string): number {
     return this.ledger
-      .filter((entry) => entry.partyId === labourId)
+      .filter((entry) => entry.partyId === employeeId)
       .reduce((sum, entry) => sum + entry.amount, 0);
   }
 
@@ -67,9 +67,9 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
     return [...this.days.values()].filter((day) => !day.deleted);
   }
 
-  private isOn(labourId: string, projectId: string, date: CalendarDate) {
+  private isOn(employeeId: string, projectId: string, date: CalendarDate) {
     let on = false;
-    for (const row of this.history.get(labourId) ?? [])
+    for (const row of this.history.get(employeeId) ?? [])
       if (row.date <= date && (row.onto === projectId || row.off === projectId))
         on = row.onto === projectId;
     return on;
@@ -79,11 +79,11 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
     return Promise.resolve(this.todayIs);
   }
 
-  labourers(
+  employees(
     _workspaceId: string,
     ids: readonly string[],
-  ): Promise<Map<string, AttendanceLabourer>> {
-    const result = new Map<string, AttendanceLabourer>();
+  ): Promise<Map<string, AttendanceEmployee>> {
+    const result = new Map<string, AttendanceEmployee>();
     for (const id of ids) {
       const found = this.people.get(id);
       if (found != null) result.set(id, structuredClone(found));
@@ -102,11 +102,11 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
     );
   }
 
-  labourersOn(
+  employeesOn(
     _workspaceId: string,
     projectId: string,
     date: CalendarDate,
-  ): Promise<AttendanceLabourer[]> {
+  ): Promise<AttendanceEmployee[]> {
     return Promise.resolve(
       [...this.people.values()]
         .filter((item) => item.isActive && this.isOn(item.id, projectId, date))
@@ -116,7 +116,7 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
 
   daysOf(
     workspaceId: string,
-    labourIds: readonly string[],
+    employeeIds: readonly string[],
     projectId: string,
     date: CalendarDate,
   ): Promise<StoredLabourDay[]> {
@@ -125,7 +125,7 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
         .filter(
           (day) =>
             day.workspaceId === workspaceId &&
-            labourIds.includes(day.labourId) &&
+            employeeIds.includes(day.employeeId) &&
             day.projectId === projectId &&
             day.date === date,
         )
@@ -174,7 +174,7 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
           day.projectId === params.projectId &&
           (params.from == null || day.date >= params.from) &&
           (params.to == null || day.date <= params.to) &&
-          (params.labourId == null || day.labourId === params.labourId) &&
+          (params.employeeId == null || day.employeeId === params.employeeId) &&
           (params.status == null ||
             (params.status === "paid_leave"
               ? day.status === "on_leave" && day.isPaidLeave
@@ -208,13 +208,13 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
       if (write.expectedUpdatedAt == null) {
         const clash = this.live().find(
           (day) =>
-            day.labourId === write.day.labourId &&
+            day.employeeId === write.day.employeeId &&
             day.projectId === write.day.projectId &&
             day.date === write.day.date,
         );
         if (clash != null)
           throw conflict("ATTENDANCE_CHANGED", "Changed.", {
-            labourId: write.day.labourId,
+            employeeId: write.day.employeeId,
           });
       } else if (
         row == null ||
@@ -222,7 +222,7 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
         row.updatedAt.getTime() !== write.expectedUpdatedAt.getTime()
       )
         throw conflict("ATTENDANCE_CHANGED", "Changed.", {
-          labourId: write.day.labourId,
+          employeeId: write.day.employeeId,
         });
     }
     for (const write of input.writes) {
@@ -259,7 +259,7 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
         row.updatedAt.getTime() !== expectedUpdatedAt.getTime()
       )
         throw conflict("ATTENDANCE_CHANGED", "Changed.", {
-          labourId: day.labourId,
+          employeeId: day.employeeId,
         });
     }
     for (const { day } of input.days) {
@@ -272,18 +272,18 @@ export class FakeLabourAttendanceStore implements LabourAttendanceStore {
     return Promise.resolve();
   }
 
-  labourNames(
+  employeeNames(
     _workspaceId: string,
     ids: readonly string[],
-  ): Promise<Map<string, { name: string; labourCode: string | null }>> {
+  ): Promise<Map<string, { name: string; employeeCode: string | null }>> {
     const result = new Map<
       string,
-      { name: string; labourCode: string | null }
+      { name: string; employeeCode: string | null }
     >();
     for (const id of ids) {
       const found = this.people.get(id);
       if (found != null)
-        result.set(id, { name: found.name, labourCode: found.labourCode });
+        result.set(id, { name: found.name, employeeCode: found.employeeCode });
     }
     return Promise.resolve(result);
   }
@@ -317,34 +317,25 @@ export class FakeLabourBackdatedGuard implements LabourAttendanceBackdatedGuard 
 }
 
 /**
- * A directory over a fixed id → name table (Projects, categories, Site
- * Engineers). `onProjects` lists the Site Engineer ids on each Project.
+ * A directory over a fixed id → name table (Projects, categories, Roles).
+ * A Role found here has no Department.
  */
-export function fakeDirectory(
-  names: Record<string, string>,
-  onProjects: Record<string, string[]> = {},
-) {
+export function fakeDirectory(names: Record<string, string>) {
   return {
-    onProjects: (_workspaceId: string, projectIds: readonly string[]) =>
-      Promise.resolve(
-        new Map(
-          projectIds
-            .filter((id) => (onProjects[id] ?? []).length > 0)
-            .map((id) => [
-              id,
-              (onProjects[id] ?? []).map((engineer) => ({
-                id: engineer,
-                name: names[engineer] ?? "",
-              })),
-            ]),
-        ),
-      ),
     find: (_workspaceId: string, ids: readonly string[]) =>
       Promise.resolve(
         new Map(
           ids
             .filter((id) => names[id] != null)
-            .map((id) => [id, { id, name: names[id] ?? "", disabled: false }]),
+            .map((id) => [
+              id,
+              {
+                id,
+                name: names[id] ?? "",
+                disabled: false,
+                department: null,
+              },
+            ]),
         ),
       ),
   };

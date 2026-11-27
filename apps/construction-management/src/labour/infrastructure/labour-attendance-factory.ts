@@ -18,7 +18,7 @@ export function createLabourAttendanceHandlers(deps?: {
     store,
     directories.projects,
     directories.labourCategories,
-    directories.supervisors,
+    directories.roles,
     new PrismaLabourAttendanceBackdatedGuard(db, (workspaceId) =>
       store.today(workspaceId),
     ),

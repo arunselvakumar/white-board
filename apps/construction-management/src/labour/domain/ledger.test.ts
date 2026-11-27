@@ -124,9 +124,9 @@ describe("reversals", () => {
     const original = entry("earned", 80_000, "2026-10-05");
     const reversal = reversalOf({
       ...original,
-      partyType: "labour",
+      partyType: "employee",
       partyId: "l1",
-      sourceType: "labour_attendance",
+      sourceType: "employee_attendance",
       sourceId: "a1",
     });
     expect(reversal).toMatchObject({
@@ -147,9 +147,9 @@ describe("reversals", () => {
       reversalOf({
         ...entry("earned", -1, "2026-10-05"),
         reversesEntryId: "x",
-        partyType: "labour",
+        partyType: "employee",
         partyId: "l1",
-        sourceType: "labour_attendance",
+        sourceType: "employee_attendance",
         sourceId: "a1",
       }),
     ).toThrow(expect.objectContaining({ code: "LEDGER_REVERSAL_OF_REVERSAL" }));

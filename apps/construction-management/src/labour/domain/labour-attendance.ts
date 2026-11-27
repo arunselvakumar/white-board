@@ -1,8 +1,7 @@
 import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
-import { MAX_PAISE } from "./labour";
-import { assertAmountFits, type NewLedgerEntry } from "./ledger";
+import { MAX_PAISE, assertAmountFits, type NewLedgerEntry } from "./ledger";
 import {
   DEFAULT_BREAK_MINUTES,
   MAX_OVERTIME_HOURS_PER_DAY,
@@ -19,9 +18,9 @@ import {
 } from "./wages";
 
 const OVERTIME_TOO_LARGE =
-  "A Labour's overtime for one day is at most ₹21,47,48,364. Check the overtime rate.";
+  "An Employee's overtime for one day is at most ₹21,47,48,364. Check the overtime rate.";
 
-/** One overtime line as a supervisor enters it. */
+/** One overtime line as the sheet sends it. */
 export type OvertimeInput = {
   labourCategoryId: string | null;
   /**
@@ -29,7 +28,7 @@ export type OvertimeInput = {
    * worked out from the times (`fromTimes`).
    */
   hours?: string | number | null;
-  /** Paise per hour; defaults to the labourer's overtime wage. */
+  /** Paise per hour; defaults to the Employee's overtime wage. */
   ratePerHour?: number | null;
   /**
    * The line's hours are the time worked beyond the working hours, from
@@ -39,9 +38,9 @@ export type OvertimeInput = {
   fromTimes?: boolean;
 };
 
-/** One labourer's day as the marking screen sends it. */
+/** One Employee's day as the marking screen sends it. */
 export type DayMark = {
-  labourId: string;
+  employeeId: string;
   status: AttendanceStatus;
   isPaidLeave?: boolean;
   shift?: string | null;
@@ -54,7 +53,7 @@ export type DayMark = {
   overtime?: readonly OvertimeInput[];
 };
 
-/** What the day is priced from: the labourer's current wages. */
+/** What the day is priced from: the Employee's current wages. */
 export type WageCard = {
   wageType: WageType;
   wagePerDay: number | null;
@@ -75,24 +74,17 @@ export type PricedOvertime = {
 
 /** A day ready to store: the row, its overtime lines and its money. */
 export type PricedDay = {
-  labourId: string;
+  employeeId: string;
   projectId: string;
   date: CalendarDate;
   status: AttendanceStatus;
   isPaidLeave: boolean;
   shift: string | null;
-  /**
-   * The Labour's Site Engineer, saved on days marked before ADR CM-0041;
-   * null on days marked since. A re-mark keeps it. History only: a Labour
-   * has no Site Engineer of their own any more, they answer to the Site
-   * Engineers on their Projects.
-   */
-  supervisorId: string | null;
   checkIn: string | null;
   checkOut: string | null;
   /** Null without a check-in. */
   breakMinutes: number | null;
-  /** Snapshot of the Labour's working hours a day. */
+  /** Snapshot of the Employee's working hours a day. */
   workingHours: string;
   wageType: WageType;
   wageRate: number;
@@ -163,7 +155,7 @@ function dayTimes(mark: DayMark, workingHours: string): DayTimes {
 const SHIFT_MAX = 40;
 
 /**
- * Prices one labourer's day (CM-210, `modules/08` "Decisions for the
+ * Prices one Employee's day (CM-210, `modules/08` "Decisions for the
  * build"): validates the status, paid leave, times and overtime, snapshots
  * the wage and working hours, and works out what the day pays. Overtime
  * from the times (ADR CM-0011) is worked out here, so the server is the
@@ -174,8 +166,6 @@ export function priceDay(input: {
   card: WageCard;
   projectId: string;
   date: CalendarDate;
-  /** The Site Engineer a re-marked day was saved with (ADR CM-0041). */
-  supervisorId?: string | null;
 }): PricedDay {
   const { mark, card } = input;
   const isPaidLeave = mark.isPaidLeave ?? false;
@@ -189,7 +179,7 @@ export function priceDay(input: {
   if (wageRate == null)
     throw new DomainError(
       "WAGE_REQUIRED",
-      "This Labour has no wage for their wage type.",
+      "This Employee has no wage for their wage type.",
     );
   const shift = mark.shift?.trim() ?? "";
   if (shift.length > SHIFT_MAX)
@@ -217,7 +207,7 @@ export function priceDay(input: {
   if (lines.length > 0 && mark.status === "absent")
     throw new DomainError(
       "OVERTIME_ON_ABSENT_DAY",
-      "An Absent Labour cannot have overtime on that day.",
+      "An Absent Employee cannot have overtime on that day.",
     );
   const overtime = lines.map((line) => {
     if (line.hours == null) throw invalidOvertimeHours();
@@ -253,17 +243,16 @@ export function priceDay(input: {
   if (totalHundredths > MAX_OVERTIME_HOURS_PER_DAY * 100)
     throw new DomainError(
       "OVERTIME_HOURS_INVALID",
-      "A Labour's overtime adds up to at most 24 hours a day.",
+      "An Employee's overtime adds up to at most 24 hours a day.",
     );
 
   return {
-    labourId: mark.labourId,
+    employeeId: mark.employeeId,
     projectId: input.projectId,
     date: input.date,
     status: mark.status,
     isPaidLeave,
     shift: shift.length === 0 ? null : shift,
-    supervisorId: input.supervisorId ?? null,
     checkIn: times.checkIn,
     checkOut: times.checkOut,
     breakMinutes: times.breakMinutes,
@@ -319,11 +308,11 @@ export function dayLedgerEntries(
   attendanceId: string,
 ): NewLedgerEntry[] {
   const base = {
-    partyType: "labour" as const,
-    partyId: day.labourId,
+    partyType: "employee" as const,
+    partyId: day.employeeId,
     projectId: day.projectId,
     entryDate: day.date,
-    sourceType: "labour_attendance" as const,
+    sourceType: "employee_attendance" as const,
     sourceId: attendanceId,
     reversesEntryId: null,
   };
@@ -334,21 +323,21 @@ export function dayLedgerEntries(
   ];
 }
 
-/** Marking many labourers in one command: each at most once. */
-export function assertDistinctLabourers(marks: readonly DayMark[]): void {
+/** Marking many Employees in one command: each at most once. */
+export function assertDistinctEmployees(marks: readonly DayMark[]): void {
   const seen = new Set<string>();
   for (const mark of marks) {
-    if (seen.has(mark.labourId))
+    if (seen.has(mark.employeeId))
       throw new DomainError(
-        "LABOUR_MARKED_TWICE",
-        "A Labour appears twice in this attendance.",
-        { details: { labourId: mark.labourId } },
+        "EMPLOYEE_MARKED_TWICE",
+        "An Employee appears twice in this attendance.",
+        { details: { employeeId: mark.employeeId } },
       );
-    seen.add(mark.labourId);
+    seen.add(mark.employeeId);
   }
   if (marks.length === 0)
     throw new DomainError(
       "ATTENDANCE_EMPTY",
-      "Choose at least one Labour to mark.",
+      "Choose at least one Employee to mark.",
     );
 }

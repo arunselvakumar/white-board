@@ -189,8 +189,8 @@ export class PrismaWagePaymentStore implements WagePaymentStore {
     partyId: string,
   ): Promise<PaymentParty | null> {
     const where = { id: partyId, workspaceId, deletedAt: null };
-    if (partyType === "labour") {
-      const row = await this.db.constructionLabourLabour.findFirst({
+    if (partyType === "employee") {
+      const row = await this.db.constructionLabourEmployee.findFirst({
         where,
         select: {
           id: true,
@@ -232,8 +232,8 @@ export class PrismaWagePaymentStore implements WagePaymentStore {
     const where = { workspaceId, id: { in: [...new Set(ids)] } };
     const select = { id: true, name: true } as const;
     const rows =
-      partyType === "labour"
-        ? await this.db.constructionLabourLabour.findMany({ where, select })
+      partyType === "employee"
+        ? await this.db.constructionLabourEmployee.findMany({ where, select })
         : await this.db.constructionLabourVendor.findMany({ where, select });
     return new Map(rows.map((row) => [row.id, row.name]));
   }
@@ -439,7 +439,7 @@ export class PrismaWagePaymentBackdatedGuard implements WagePaymentBackdatedGuar
       loadBackdatedActor(this.db, actor),
       companyToday(this.db, actor.workspaceId),
     ]);
-    const key = partyType === "labour" ? "labour_payment" : "vendor_payment";
+    const key = partyType === "employee" ? "labour_payment" : "vendor_payment";
     if (action === "create") assertCanCreate(policy, key, date, who, today);
     else assertCanEdit(policy, key, date, who, today);
   }
