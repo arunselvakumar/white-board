@@ -35,7 +35,7 @@ import {
 export type PartyFileRouteConfig = {
   ownerType: PartyOwnerType;
   menu: MenuKey;
-  /** `/api/construction/labour/labours`; URLs in responses start here. */
+  /** `/api/construction/labour/employees`; URLs in responses start here. */
   basePath: string;
 };
 

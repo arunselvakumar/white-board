@@ -101,7 +101,7 @@ function summary(entries: readonly Entry[]) {
 }
 
 /**
- * History rows written by one command (CM-206): one recorded time and
+ * History rows written by one command: one recorded time and
  * actor, so the Project feed shows them as one entry. Joining rows also put
  * the Employee on the Project; leaving rows take them off.
  */

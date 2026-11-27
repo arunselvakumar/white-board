@@ -28,15 +28,14 @@ The owner asked for one **Employees** page in their place. Adding a Labour becom
 
 | Card (form order) | Fields                                                                                                                    |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Photo             | photo (CM-0052: the form opens with it)                                                                                   |
+| Photo             | photo (CM-0052: the form opens with it); on Edit, **Photo & documents** also holds Other Documents, as Labours had        |
 | Basic             | name\*, mobile, email, gender, date of birth, father's name, blood group, Employee Id, joining date\*                     |
 | Role assignment   | Department\*, Role\*                                                                                                      |
 | Details           | address, emergency contact, Aadhaar, PAN, UAN, ESIC                                                                       |
 | Work              | qualification, experience (years), specialisation, Labour Category, Reports To                                            |
 | Wage              | wage type\*, wage per day or per month\*, overtime wage per hour\*, working hours a day, weekly holidays, opening balance |
-| Bank              | account holder, account number, IFSC, bank name                                                                           |
+| Bank              | account holder, account number, IFSC, bank name (shown and saved only with Financial)                                     |
 | Sign-in           | "Can sign in" (§4)                                                                                                        |
-| Other Documents   | files, as Labours and Vendors have                                                                                        |
 
 - Aadhaar, PAN and the bank account number are encrypted as before; the last four characters are kept for masking.
 - The **Employee Id** (`employee_code`, was the Labour Id and the Site Engineer's employee code) is unique among live Employees of a Company.
@@ -51,6 +50,7 @@ The owner asked for one **Employees** page in their place. Adding a Labour becom
 - Add Employee starts on Human Resources → Labour, the most common case.
 - 400 `EMPLOYEE_ROLE_NOT_FOUND` for a Role that is not live in the Company, shown on the Role field.
 - Deleting a Role stays refused while it is in use (CM-0030 `ROLE_IN_USE`): live Employees on it now count, as well as Team Members.
+- The Roles and Departments lists are readable with Employees Read (`masters.labours`) as well as Role Management or Departments Read, so whoever adds Employees can choose them.
 - The Role gives access only to an Employee who signs in (§4). It does not change the form, the wage or the attendance: every Employee is handled the same way.
 - The Employees list shows the Role and Department of each Employee and can be filtered by them.
 
@@ -76,9 +76,10 @@ Everything that was a Labour's is now an Employee's, with the same rules:
 ### 5. Screens and addresses
 
 - Human Resources → **Staff** lists **Employees, Vendor, Office Staff, Role Management**, in that order. `/app/staff` opens Employees.
-- Employees live at `/app/staff/employees` (list), `/new`, `/<id>` (profile with Attendance, Activity and Documents tabs, as Labours had) and `/<id>/edit`. `/app/staff/labours/…` and `/app/staff/site-engineers/…` are removed with **no redirects** (CM-0036's choice; the app is not in production).
+- Employees live at `/app/staff/employees` (list, with Department and Role filters), `/new` and `/<id>`: the Employee page, with **Details** (the form; Edit is this tab, as for Labours), **Attendance** (CM-0051) and **Activity** tabs. `/app/staff/labours/…` and `/app/staff/site-engineers/…` are removed with **no redirects** (CM-0036's choice; the app is not in production).
+- A Project's Employee attendance sheet is at `/app/projects/<id>/attendance/employees` (was `…/attendance/labour`); each row shows the Employee's Role. Check-In captures at `…/attendance/check-in/employee/<id>`; its find screen and log group people as Employees and Vendors, and an Employee's entry shows their Role.
 - A Project's **Teams** page has one **Employees** section (paged, Add Employees with a first day, Remove with a last day, each row showing the Role) in place of the Site Engineers and Labours sections. Team Members stays, without Employees' sign-ins.
-- Screen text that named the person says **Employee** ("Add Employee", "1 Employee", "Employee" columns in sheets, reports and Excel). Words for the kind of work stay: **Labour Category**, the labour-supply **Vendor**, "labour shortage" on a hindrance, labour cost. Report titles about the Company's own people say Employee (Employee Attendance, Employee Payments, Employee Month, Central Employee Attendance); Muster Roll stays.
+- Screen text that named the person says **Employee** ("Add Employee", "1 Employee", "Employee" columns in sheets, reports and Excel). Words for the kind of work stay: **Labour Category**, the labour-supply **Vendor**, "labour shortage" on a hindrance, labour cost. Report titles about the Company's own people say Employee (Employee Attendance, Employee Payments, Employee Month, Central Employee Attendance); Muster Roll stays. Where a report or sheet had a Site Engineers column, it shows the Employee's **Role**.
 - The Permission Matrix keeps its keys, so no Role changes: `masters.labours` (Human Resources) and `labour.labour` (Project) are labelled **Employees**. Site Engineers were already gated by `masters.labours`.
 
 ### 6. API and code
