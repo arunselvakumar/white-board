@@ -2,17 +2,20 @@ import { describe, expect, it } from "vitest";
 
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
-import type { LabourSheetRow } from "./labour-columns";
-import { FakeLabourRepository } from "./labour-fakes";
+import type { EmployeeSheetRow } from "./employee-columns";
+import { FakeEmployeeRepository } from "./employee-fakes";
 import {
-  LabourImport,
+  EmployeeImport,
   sheetDate,
   sheetMoney,
   sheetWeekdays,
-} from "./labour-import";
-import type { LabourLookups } from "./labour-ports";
+} from "./employee-import";
+import type { EmployeeLookups } from "./employee-ports";
 
-const LOOKUPS: LabourLookups = {
+const HR = { id: "d-hr", name: "Human Resources" };
+const SITE = { id: "d-site", name: "Site" };
+
+const LOOKUPS: EmployeeLookups = {
   all: () =>
     Promise.resolve({
       projects: [
@@ -23,10 +26,28 @@ const LOOKUPS: LabourLookups = {
         { id: "c1", name: "Mason", disabled: false },
         { id: "c2", name: "Welder", disabled: true },
       ],
+      departments: [
+        { id: "d-hr", name: "Human Resources" },
+        { id: "d-site", name: "Site" },
+      ],
+      roles: [
+        { id: "r-labour", name: "Labour", department: HR, isSeed: true },
+        {
+          id: "r-engineer",
+          name: "Site Engineer",
+          department: HR,
+          isSeed: true,
+        },
+        { id: "r-lead", name: "Lead", department: HR, isSeed: false },
+        { id: "r-lead-site", name: "Lead", department: SITE, isSeed: false },
+      ],
     }),
 };
 
-function row(number: number, cells: LabourSheetRow["cells"]): LabourSheetRow {
+function row(
+  number: number,
+  cells: EmployeeSheetRow["cells"],
+): EmployeeSheetRow {
   return {
     row: number,
     cells: {
@@ -64,38 +85,38 @@ describe("sheet cells", () => {
   });
 });
 
-describe("LabourImport", () => {
+describe("EmployeeImport", () => {
   it("previews every row with its errors and matches names case-insensitively", async () => {
-    const importer = new LabourImport(new FakeLabourRepository(), LOOKUPS);
+    const importer = new EmployeeImport(new FakeEmployeeRepository(), LOOKUPS);
     const preview = await importer.preview("w1", [
       row(2, {
         labourCategory: "MASON",
-        labourCode: "X1",
+        employeeCode: "X1",
       }),
       row(3, {
         name: "",
         wagePerDay: "abc",
         projects: "Tower A; Nowhere",
         labourCategory: "Welder",
-        labourCode: "x1",
+        employeeCode: "x1",
       }),
     ]);
     expect(preview).toMatchObject({ valid: 0, invalid: 2 });
     expect(preview.rows[0]?.errors.map((error) => error.code)).toEqual([
-      "LABOUR_CODE_DUPLICATE",
+      "EMPLOYEE_CODE_DUPLICATE",
     ]);
     expect(preview.rows[1]?.errors.map((error) => error.code).sort()).toEqual([
       "AMOUNT_INVALID",
+      "EMPLOYEE_CODE_DUPLICATE",
+      "EMPLOYEE_NAME_REQUIRED",
       "LABOUR_CATEGORY_NOT_FOUND",
-      "LABOUR_CODE_DUPLICATE",
-      "LABOUR_NAME_REQUIRED",
       "PROJECT_NOT_FOUND",
     ]);
   });
 
   it("commits all rows or none", async () => {
-    const repository = new FakeLabourRepository();
-    const importer = new LabourImport(repository, LOOKUPS);
+    const repository = new FakeEmployeeRepository();
+    const importer = new EmployeeImport(repository, LOOKUPS);
     let refused: unknown;
     try {
       await importer.commit({
@@ -108,7 +129,7 @@ describe("LabourImport", () => {
     }
     expect(refused).toBeInstanceOf(DomainError);
     expect((refused as DomainError).code).toBe("IMPORT_HAS_ERRORS");
-    expect(repository.labours.size).toBe(0);
+    expect(repository.employees.size).toBe(0);
 
     const result = await importer.commit({
       workspaceId: "w1",
@@ -120,7 +141,7 @@ describe("LabourImport", () => {
       by: "u1",
     });
     expect(result.imported).toBe(3);
-    const [first, second, third] = [...repository.labours.values()];
+    const [first, second, third] = [...repository.employees.values()];
     expect(first?.details).toMatchObject({
       wagePerDay: 65_000,
       overtimeWagePerHour: 8_050,
@@ -132,13 +153,55 @@ describe("LabourImport", () => {
     expect(third?.projectIds).toEqual([]);
     expect([...repository.ledger.values()]).toEqual([[-10_000], [], []]);
     expect(repository.audits.map((audit) => audit.action)).toEqual([
-      "labour.imported",
+      "employee.imported",
+    ]);
+  });
+
+  it("finds the Role by name, under the Department; a blank Role is Labour", async () => {
+    const repository = new FakeEmployeeRepository();
+    const importer = new EmployeeImport(repository, LOOKUPS);
+    const preview = await importer.preview("w1", [
+      row(2, {}),
+      row(3, { role: "site engineer" }),
+      row(4, { role: "Lead" }),
+      row(5, { role: "Lead", department: "site" }),
+      row(6, { role: "Foreman" }),
+      row(7, { department: "Nowhere" }),
+      row(8, { department: "Site" }),
+    ]);
+    expect(preview.rows.map((item) => item.errors.map((e) => e.code))).toEqual([
+      [],
+      [],
+      ["EMPLOYEE_ROLE_AMBIGUOUS"],
+      [],
+      ["EMPLOYEE_ROLE_NOT_FOUND"],
+      ["DEPARTMENT_NOT_FOUND"],
+      ["EMPLOYEE_ROLE_REQUIRED"],
+    ]);
+    await importer.commit({
+      workspaceId: "w1",
+      sheet: [
+        row(2, {}),
+        row(3, { name: "Meena", role: "Site Engineer", mobile: "7708165767" }),
+        row(4, { name: "Kumar", role: "lead", department: "Site" }),
+      ],
+      by: "u1",
+    });
+    expect(
+      [...repository.employees.values()].map((employee) => [
+        employee.details.roleId,
+        employee.details.mobile,
+      ]),
+    ).toEqual([
+      ["r-labour", null],
+      ["r-engineer", "+917708165767"],
+      ["r-lead-site", null],
     ]);
   });
 
   it("reads working hours a day, 8 when the cell is blank", async () => {
-    const repository = new FakeLabourRepository();
-    const importer = new LabourImport(repository, LOOKUPS);
+    const repository = new FakeEmployeeRepository();
+    const importer = new EmployeeImport(repository, LOOKUPS);
     const preview = await importer.preview("w1", [
       row(2, { workingHoursPerDay: "25" }),
     ]);
@@ -154,14 +217,14 @@ describe("LabourImport", () => {
       by: "u1",
     });
     expect(
-      [...repository.labours.values()].map(
-        (labour) => labour.details.workingHoursPerDay,
+      [...repository.employees.values()].map(
+        (employee) => employee.details.workingHoursPerDay,
       ),
     ).toEqual(["9.5", "8"]);
   });
 
   it("refuses an empty sheet and more than 1000 rows", async () => {
-    const importer = new LabourImport(new FakeLabourRepository(), LOOKUPS);
+    const importer = new EmployeeImport(new FakeEmployeeRepository(), LOOKUPS);
     await expect(importer.preview("w1", [])).rejects.toMatchObject({
       code: "IMPORT_EMPTY",
     });

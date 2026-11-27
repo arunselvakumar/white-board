@@ -6,7 +6,7 @@ import {
   calendarDateToDb,
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
-import { DomainError, conflict } from "@/src/shared-kernel/domain-error";
+import { DomainError } from "@/src/shared-kernel/domain-error";
 import { newId } from "@/src/shared-kernel/ids";
 import {
   isPrismaError,
@@ -15,19 +15,25 @@ import {
 import type { PrivateDataCipher } from "@/src/shared-kernel/private-data";
 
 import {
-  labourCodeTaken,
-  labourNotFound,
+  employeeChanged,
+  employeeCodeTaken,
+  employeeNotFound,
   reportsToLoop,
   reportsToNotFound,
-} from "../application/labour-handlers";
+} from "../application/employee-handlers";
 import type {
-  LabourMove,
-  LabourProjectChange,
-  LabourRepository,
-  LabourTransferRecord,
-  NewLabour,
-} from "../application/labour-ports";
-import { Labour, type ProjectChanges } from "../domain/labour";
+  EmployeeMove,
+  EmployeeProjectChange,
+  EmployeeRepository,
+  EmployeeTransferRecord,
+  NewEmployee,
+} from "../application/employee-ports";
+import {
+  Employee,
+  last4,
+  type BloodGroup,
+  type ProjectChanges,
+} from "../domain/employee";
 import { workingHours, type Weekday } from "../domain/wages";
 import { lockLiveParties } from "./party-locks";
 import { companyToday } from "./prisma-labour-queries";
@@ -35,31 +41,45 @@ import { prismaLedger } from "./prisma-ledger";
 
 type Tx = Prisma.TransactionClient;
 
-/** The labourer's Projects, oldest first (ADR CM-0033). */
+/** The Employee's Projects, oldest first (ADR CM-0033). */
 const WITH_PROJECTS = {
   projects: {
     select: { projectId: true },
     orderBy: [{ since: "asc" }, { projectId: "asc" }],
   },
-} as const satisfies Prisma.ConstructionLabourLabourInclude;
+} as const satisfies Prisma.ConstructionLabourEmployeeInclude;
 
-export type LabourRow = Prisma.ConstructionLabourLabourGetPayload<{
+export type EmployeeRow = Prisma.ConstructionLabourEmployeeGetPayload<{
   include: typeof WITH_PROJECTS;
 }>;
 
-/** A labourer row as the aggregate; Aadhaar decrypted. */
-export function labourFromRow(
-  row: LabourRow,
+/** An Employee row as the aggregate; Aadhaar, PAN and bank account decrypted. */
+export function employeeFromRow(
+  row: EmployeeRow,
   cipher: () => PrivateDataCipher,
-): Labour {
-  return Labour.reconstitute({
+): Employee {
+  const open = (sealed: string | null) =>
+    sealed == null ? null : cipher().decrypt(sealed);
+  return Employee.reconstitute({
     id: row.id,
     workspaceId: row.workspaceId,
     details: {
       name: row.name,
-      labourCode: row.labourCode,
+      employeeCode: row.employeeCode,
+      roleId: row.roleId,
       fatherName: row.fatherName,
+      dateOfBirth:
+        row.dateOfBirth == null ? null : calendarDateFromDb(row.dateOfBirth),
+      gender: row.gender,
+      bloodGroup: row.bloodGroup as BloodGroup | null,
       joiningDate: calendarDateFromDb(row.joiningDate),
+      mobile: row.mobile,
+      email: row.email,
+      address: row.address,
+      emergencyContact: row.emergencyContact,
+      qualification: row.qualification,
+      experienceYears: row.experienceYears,
+      specialisation: row.specialisation,
       wageType: row.wageType,
       wagePerDay: row.wagePerDay,
       wagePerMonth: row.wagePerMonth,
@@ -68,16 +88,17 @@ export function labourFromRow(
       weeklyHolidays: row.weeklyHolidays as Weekday[],
       uanNumber: row.uanNumber,
       esicNumber: row.esicNumber,
-      aadhaar:
-        row.aadhaarEncrypted == null
-          ? null
-          : cipher().decrypt(row.aadhaarEncrypted),
+      aadhaar: open(row.aadhaarEncrypted),
+      pan: open(row.panEncrypted),
+      bankAccountHolder: row.bankAccountHolder,
+      bankAccountNumber: open(row.bankAccountEncrypted),
+      bankIfsc: row.bankIfsc,
+      bankName: row.bankName,
       labourCategoryId: row.labourCategoryId,
       reportsToId: row.reportsToId,
-      contactNumber: row.contactNumber,
-      gender: row.gender,
     },
     projectIds: row.projects.map((project) => project.projectId),
+    teamMemberId: row.teamMemberId,
     isActive: row.isActive,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
@@ -95,31 +116,31 @@ function isCodeClash(error: unknown): boolean {
   );
 }
 
-function openingEntry(labour: Labour, amount: number) {
+function openingEntry(employee: Employee, amount: number) {
   return {
-    partyType: "labour" as const,
-    partyId: labour.id,
+    partyType: "employee" as const,
+    partyId: employee.id,
     projectId: null,
-    entryDate: labour.details.joiningDate,
+    entryDate: employee.details.joiningDate,
     kind: "opening" as const,
     amount,
-    sourceType: "labour" as const,
-    sourceId: labour.id,
+    sourceType: "employee" as const,
+    sourceId: employee.id,
     reversesEntryId: null,
   };
 }
 
-/** The labour register's writes, each in one transaction (ADR CM-0004). */
-/** Whether any live attendance or wage payment exists for the labourer. */
 /**
  * Reports To inside the write (ADR CM-0035). The handler checks the choice
  * first; this repeats it under locks so two edits at once cannot make a
  * loop (A → B and B → A) and a delete cannot slip in between: one advisory
- * lock per Company serialises Reports To writes, and the chosen Labour's
+ * lock per Company serialises Reports To writes, and the chosen Employee's
  * row is held FOR SHARE, which a delete's FOR UPDATE waits on.
  */
-async function guardReportsTo(tx: Tx, labours: readonly Labour[]) {
-  const chosen = labours.filter((labour) => labour.details.reportsToId != null);
+async function guardReportsTo(tx: Tx, employees: readonly Employee[]) {
+  const chosen = employees.filter(
+    (employee) => employee.details.reportsToId != null,
+  );
   const [first] = chosen;
   if (first == null) return;
   const workspaceId = first.workspaceId;
@@ -128,32 +149,33 @@ async function guardReportsTo(tx: Tx, labours: readonly Labour[]) {
     await lockLiveParties(
       tx,
       workspaceId,
-      "labour",
-      chosen.map((labour) => labour.details.reportsToId ?? ""),
+      "employee",
+      chosen.map((employee) => employee.details.reportsToId ?? ""),
       "share",
     );
   } catch (error) {
-    if (error instanceof DomainError && error.code === "LABOUR_NOT_FOUND")
+    if (error instanceof DomainError && error.code === "EMPLOYEE_NOT_FOUND")
       throw reportsToNotFound();
     throw error;
   }
-  for (const labour of chosen) {
-    // Walk up from the chosen Labour; reaching this one is a loop.
+  for (const employee of chosen) {
+    // Walk up from the chosen Employee; reaching this one is a loop.
     const [found] = await tx.$queryRaw<{ loops: boolean }[]>`
       WITH RECURSIVE chain(id, depth) AS (
-        SELECT reports_to_id, 1 FROM construction_labour.labours
-         WHERE id = ${labour.details.reportsToId}::uuid
+        SELECT reports_to_id, 1 FROM construction_labour.employees
+         WHERE id = ${employee.details.reportsToId}::uuid
         UNION
         SELECT l.reports_to_id, c.depth + 1
-          FROM construction_labour.labours l
+          FROM construction_labour.employees l
           JOIN chain c ON l.id = c.id
          WHERE c.depth < 1000
       )
-      SELECT EXISTS (SELECT 1 FROM chain WHERE id = ${labour.id}::uuid) AS loops`;
+      SELECT EXISTS (SELECT 1 FROM chain WHERE id = ${employee.id}::uuid) AS loops`;
     if (found?.loops === true) throw reportsToLoop();
   }
 }
 
+/** Whether any live attendance or wage payment exists for the Employee. */
 async function hasRecords(
   tx: Tx,
   workspaceId: string,
@@ -161,29 +183,52 @@ async function hasRecords(
 ): Promise<boolean> {
   const [attendance, payments] = await Promise.all([
     tx.constructionLabourAttendance.count({
-      where: { workspaceId, labourId: id, deletedAt: null },
+      where: { workspaceId, employeeId: id, deletedAt: null },
     }),
     tx.constructionLabourWagePayment.count({
-      where: { workspaceId, partyType: "labour", partyId: id, deletedAt: null },
+      where: {
+        workspaceId,
+        partyType: "employee",
+        partyId: id,
+        deletedAt: null,
+      },
     }),
   ]);
   return attendance + payments > 0;
 }
 
-export class PrismaLabourRepository implements LabourRepository {
+/** The Employee record's writes, each in one transaction (ADR CM-0004). */
+export class PrismaEmployeeRepository implements EmployeeRepository {
   constructor(
     private readonly db: PrismaClient,
     private readonly cipher: () => PrivateDataCipher,
   ) {}
 
-  /** The columns the aggregate owns, Aadhaar sealed. */
-  private columns(labour: Labour) {
-    const details = labour.details;
+  /** The columns the aggregate owns; Aadhaar, PAN and bank account sealed. */
+  private columns(employee: Employee) {
+    const details = employee.details;
+    const seal = (plain: string | null) =>
+      plain == null ? null : this.cipher().encrypt(plain);
     return {
       name: details.name,
-      labourCode: details.labourCode,
+      employeeCode: details.employeeCode,
+      roleId: details.roleId,
+      teamMemberId: employee.teamMemberId,
       fatherName: details.fatherName,
+      dateOfBirth:
+        details.dateOfBirth == null
+          ? null
+          : calendarDateToDb(details.dateOfBirth),
+      gender: details.gender,
+      bloodGroup: details.bloodGroup,
       joiningDate: calendarDateToDb(details.joiningDate),
+      mobile: details.mobile,
+      email: details.email,
+      address: details.address,
+      emergencyContact: details.emergencyContact,
+      qualification: details.qualification,
+      experienceYears: details.experienceYears,
+      specialisation: details.specialisation,
       wageType: details.wageType,
       wagePerDay: details.wagePerDay,
       wagePerMonth: details.wagePerMonth,
@@ -192,37 +237,41 @@ export class PrismaLabourRepository implements LabourRepository {
       weeklyHolidays: details.weeklyHolidays,
       uanNumber: details.uanNumber,
       esicNumber: details.esicNumber,
-      aadhaarEncrypted:
-        details.aadhaar == null ? null : this.cipher().encrypt(details.aadhaar),
-      aadhaarLast4: details.aadhaar?.slice(-4) ?? null,
+      aadhaarEncrypted: seal(details.aadhaar),
+      aadhaarLast4: last4(details.aadhaar),
+      panEncrypted: seal(details.pan),
+      panLast4: last4(details.pan),
+      bankAccountHolder: details.bankAccountHolder,
+      bankAccountEncrypted: seal(details.bankAccountNumber),
+      bankAccountLast4: last4(details.bankAccountNumber),
+      bankIfsc: details.bankIfsc,
+      bankName: details.bankName,
       labourCategoryId: details.labourCategoryId,
       reportsToId: details.reportsToId,
-      contactNumber: details.contactNumber,
-      gender: details.gender,
-      isActive: labour.isActive,
-      updatedAt: labour.updatedAt,
-      updatedBy: labour.updatedBy,
+      isActive: employee.isActive,
+      updatedAt: employee.updatedAt,
+      updatedBy: employee.updatedBy,
     };
   }
 
-  async findById(workspaceId: string, id: string): Promise<Labour | null> {
-    const row = await this.db.constructionLabourLabour.findFirst({
+  async findById(workspaceId: string, id: string): Promise<Employee | null> {
+    const row = await this.db.constructionLabourEmployee.findFirst({
       where: { id, workspaceId, deletedAt: null },
       include: WITH_PROJECTS,
     });
-    return row == null ? null : labourFromRow(row, this.cipher);
+    return row == null ? null : employeeFromRow(row, this.cipher);
   }
 
   async findMany(
     workspaceId: string,
     ids: readonly string[],
-  ): Promise<Labour[]> {
+  ): Promise<Employee[]> {
     if (ids.length === 0) return [];
-    const rows = await this.db.constructionLabourLabour.findMany({
+    const rows = await this.db.constructionLabourEmployee.findMany({
       where: { workspaceId, id: { in: [...ids] }, deletedAt: null },
       include: WITH_PROJECTS,
     });
-    return rows.map((row) => labourFromRow(row, this.cipher));
+    return rows.map((row) => employeeFromRow(row, this.cipher));
   }
 
   async codesTaken(
@@ -233,11 +282,11 @@ export class PrismaLabourRepository implements LabourRepository {
     const lowered = [...new Set(codes.map((code) => code.toLowerCase()))];
     if (lowered.length === 0) return new Set();
     const rows = await this.db.$queryRaw<{ code: string }[]>`
-      SELECT lower(labour_code) AS code
-      FROM construction_labour.labours
+      SELECT lower(employee_code) AS code
+      FROM construction_labour.employees
       WHERE workspace_id = ${workspaceId}
         AND deleted_at IS NULL
-        AND lower(labour_code) = ANY(${lowered})
+        AND lower(employee_code) = ANY(${lowered})
         AND id::text <> ${exceptId ?? ""}
     `;
     return new Set(rows.map((row) => row.code));
@@ -247,14 +296,14 @@ export class PrismaLabourRepository implements LabourRepository {
     const sums = await prismaLedger.openingBalances(
       this.db,
       workspaceId,
-      "labour",
+      "employee",
       [id],
     );
     return sums.get(id) ?? 0;
   }
 
   async insert(
-    items: readonly NewLabour[],
+    items: readonly NewEmployee[],
     audits: readonly AuditEvent[],
   ): Promise<void> {
     if (items.length === 0) return;
@@ -263,49 +312,49 @@ export class PrismaLabourRepository implements LabourRepository {
         async (tx) => {
           await guardReportsTo(
             tx,
-            items.map(({ labour }) => labour),
+            items.map(({ employee }) => employee),
           );
-          await tx.constructionLabourLabour.createMany({
-            data: items.map(({ labour }) => ({
-              id: labour.id,
-              workspaceId: labour.workspaceId,
-              createdAt: labour.createdAt,
-              createdBy: labour.createdBy,
-              ...this.columns(labour),
+          await tx.constructionLabourEmployee.createMany({
+            data: items.map(({ employee }) => ({
+              id: employee.id,
+              workspaceId: employee.workspaceId,
+              createdAt: employee.createdAt,
+              createdBy: employee.createdBy,
+              ...this.columns(employee),
             })),
           });
           // On each Project from the joining date, with its first history row.
-          const joined = items.flatMap(({ labour }) =>
-            labour.projectIds.map((projectId) => ({ labour, projectId })),
+          const joined = items.flatMap(({ employee }) =>
+            employee.projectIds.map((projectId) => ({ employee, projectId })),
           );
-          await tx.constructionLabourLabourProject.createMany({
-            data: joined.map(({ labour, projectId }) => ({
-              workspaceId: labour.workspaceId,
-              labourId: labour.id,
+          await tx.constructionLabourEmployeeProject.createMany({
+            data: joined.map(({ employee, projectId }) => ({
+              workspaceId: employee.workspaceId,
+              employeeId: employee.id,
               projectId,
-              since: calendarDateToDb(labour.details.joiningDate),
+              since: calendarDateToDb(employee.details.joiningDate),
             })),
           });
-          await tx.constructionLabourTransfer.createMany({
-            data: joined.map(({ labour, projectId }) => ({
+          await tx.constructionLabourEmployeeTransfer.createMany({
+            data: joined.map(({ employee, projectId }) => ({
               id: newId(),
-              workspaceId: labour.workspaceId,
-              labourId: labour.id,
+              workspaceId: employee.workspaceId,
+              employeeId: employee.id,
               fromProjectId: null,
               toProjectId: projectId,
-              transferDate: calendarDateToDb(labour.details.joiningDate),
-              createdAt: labour.createdAt,
-              createdBy: labour.createdBy,
+              transferDate: calendarDateToDb(employee.details.joiningDate),
+              createdAt: employee.createdAt,
+              createdBy: employee.createdBy,
             })),
           });
           const [first] = items;
           if (first != null)
             await prismaLedger.post(
               tx,
-              first.labour.workspaceId,
-              first.labour.createdBy,
-              items.map(({ labour, openingBalance }) =>
-                openingEntry(labour, openingBalance),
+              first.employee.workspaceId,
+              first.employee.createdBy,
+              items.map(({ employee, openingBalance }) =>
+                openingEntry(employee, openingBalance),
               ),
             );
           for (const audit of audits) await recordAudit(tx, audit);
@@ -313,65 +362,65 @@ export class PrismaLabourRepository implements LabourRepository {
         { timeout: 60_000 },
       );
     } catch (error) {
-      if (isCodeClash(error)) throw labourCodeTaken();
+      if (isCodeClash(error)) throw employeeCodeTaken();
       throw error;
     }
   }
 
   async update(input: {
-    labour: Labour;
+    employee: Employee;
     expectedUpdatedAt: Date | null;
     opening: number | null;
     joiningDateChanged: boolean;
     projects?: (ProjectChanges & { date: CalendarDate }) | null;
     audit: AuditEvent;
   }): Promise<void> {
-    const { labour, projects } = input;
+    const { employee, projects } = input;
     try {
       await this.db.$transaction(async (tx) => {
-        await guardReportsTo(tx, [labour]);
+        await guardReportsTo(tx, [employee]);
         const joinedOn = input.joiningDateChanged
           ? ((
-              await tx.constructionLabourLabour.findUnique({
-                where: { id: labour.id },
+              await tx.constructionLabourEmployee.findUnique({
+                where: { id: employee.id },
                 select: { joiningDate: true },
               })
             )?.joiningDate ?? null)
           : null;
-        const written = await tx.constructionLabourLabour.updateMany({
+        const written = await tx.constructionLabourEmployee.updateMany({
           where: {
-            id: labour.id,
-            workspaceId: labour.workspaceId,
+            id: employee.id,
+            workspaceId: employee.workspaceId,
             deletedAt: null,
             ...(input.expectedUpdatedAt == null
               ? {}
               : { updatedAt: input.expectedUpdatedAt }),
           },
-          data: this.columns(labour),
+          data: this.columns(employee),
         });
         if (written.count === 0) {
-          if (input.expectedUpdatedAt == null) throw labourNotFound();
-          throw labourChanged();
+          if (input.expectedUpdatedAt == null) throw employeeNotFound();
+          throw employeeChanged();
         }
         if (joinedOn != null) {
-          // The rows written with the labourer, onto a Project on the old
+          // The rows written with the Employee, onto a Project on the old
           // joining date, move to the new one, and so do those Projects.
-          const initial = await tx.constructionLabourTransfer.findMany({
+          const initial = await tx.constructionLabourEmployeeTransfer.findMany({
             where: {
-              labourId: labour.id,
+              employeeId: employee.id,
               fromProjectId: null,
               transferDate: joinedOn,
             },
             select: { id: true, toProjectId: true },
           });
-          const joiningDate = calendarDateToDb(labour.details.joiningDate);
-          await tx.constructionLabourTransfer.updateMany({
+          const joiningDate = calendarDateToDb(employee.details.joiningDate);
+          await tx.constructionLabourEmployeeTransfer.updateMany({
             where: { id: { in: initial.map((row) => row.id) } },
             data: { transferDate: joiningDate },
           });
-          await tx.constructionLabourLabourProject.updateMany({
+          await tx.constructionLabourEmployeeProject.updateMany({
             where: {
-              labourId: labour.id,
+              employeeId: employee.id,
               since: joinedOn,
               projectId: {
                 in: initial.flatMap((row) =>
@@ -384,18 +433,21 @@ export class PrismaLabourRepository implements LabourRepository {
         }
         if (projects != null) {
           const date = calendarDateToDb(projects.date);
-          await tx.constructionLabourLabourProject.deleteMany({
-            where: { labourId: labour.id, projectId: { in: projects.removed } },
+          await tx.constructionLabourEmployeeProject.deleteMany({
+            where: {
+              employeeId: employee.id,
+              projectId: { in: projects.removed },
+            },
           });
-          await tx.constructionLabourLabourProject.createMany({
+          await tx.constructionLabourEmployeeProject.createMany({
             data: projects.added.map((projectId) => ({
-              workspaceId: labour.workspaceId,
-              labourId: labour.id,
+              workspaceId: employee.workspaceId,
+              employeeId: employee.id,
               projectId,
               since: date,
             })),
           });
-          await tx.constructionLabourTransfer.createMany({
+          await tx.constructionLabourEmployeeTransfer.createMany({
             data: [
               ...projects.removed.map((projectId) => ({
                 fromProjectId: projectId,
@@ -407,81 +459,84 @@ export class PrismaLabourRepository implements LabourRepository {
               })),
             ].map((move, index) => ({
               // Removals list before additions in the history.
-              id: newId(labour.updatedAt.getTime() + index),
-              workspaceId: labour.workspaceId,
-              labourId: labour.id,
+              id: newId(employee.updatedAt.getTime() + index),
+              workspaceId: employee.workspaceId,
+              employeeId: employee.id,
               ...move,
               transferDate: date,
-              createdAt: labour.updatedAt,
-              createdBy: labour.updatedBy,
+              createdAt: employee.updatedAt,
+              createdBy: employee.updatedBy,
             })),
           });
         }
         if (input.opening != null) {
           await prismaLedger.reverseSource(
             tx,
-            labour.workspaceId,
-            labour.updatedBy,
-            "labour",
-            labour.id,
+            employee.workspaceId,
+            employee.updatedBy,
+            "employee",
+            employee.id,
           );
-          await prismaLedger.post(tx, labour.workspaceId, labour.updatedBy, [
-            openingEntry(labour, input.opening),
-          ]);
+          await prismaLedger.post(
+            tx,
+            employee.workspaceId,
+            employee.updatedBy,
+            [openingEntry(employee, input.opening)],
+          );
         }
         await recordAudit(tx, input.audit);
       });
     } catch (error) {
-      if (isCodeClash(error)) throw labourCodeTaken();
+      if (isCodeClash(error)) throw employeeCodeTaken();
       throw error;
     }
   }
 
   async delete(
-    labour: Labour,
+    employee: Employee,
     audit: AuditEvent,
   ): Promise<"deleted" | "has_records"> {
     return this.db.$transaction(async (tx) => {
       // FOR UPDATE waits for any attendance or payment being written for
-      // this labourer (they hold FOR SHARE), so the check below sees it.
+      // this Employee (they hold FOR SHARE), so the check below sees it.
       await lockLiveParties(
         tx,
-        labour.workspaceId,
-        "labour",
-        [labour.id],
+        employee.workspaceId,
+        "employee",
+        [employee.id],
         "update",
       );
-      if (await hasRecords(tx, labour.workspaceId, labour.id))
+      if (await hasRecords(tx, employee.workspaceId, employee.id))
         return "has_records";
-      await tx.constructionLabourLabour.update({
-        where: { id: labour.id },
+      await tx.constructionLabourEmployee.update({
+        where: { id: employee.id },
         data: {
-          deletedAt: labour.deletedAt,
-          deletedBy: labour.updatedBy,
-          updatedAt: labour.updatedAt,
-          updatedBy: labour.updatedBy,
+          deletedAt: employee.deletedAt,
+          deletedBy: employee.updatedBy,
+          updatedAt: employee.updatedAt,
+          updatedBy: employee.updatedBy,
         },
       });
       await prismaLedger.reverseSource(
         tx,
-        labour.workspaceId,
-        labour.updatedBy,
-        "labour",
-        labour.id,
+        employee.workspaceId,
+        employee.updatedBy,
+        "employee",
+        employee.id,
       );
       // Whoever reported to them now reports to no one (ADR CM-0035); the
       // audit event names them.
-      const reports = await tx.constructionLabourLabour.findMany({
-        where: { workspaceId: labour.workspaceId, reportsToId: labour.id },
+      const reports = await tx.constructionLabourEmployee.findMany({
+        where: { workspaceId: employee.workspaceId, reportsToId: employee.id },
         select: { id: true },
       });
       if (reports.length > 0)
-        await tx.constructionLabourLabour.updateMany({
+        await tx.constructionLabourEmployee.updateMany({
           where: { id: { in: reports.map((report) => report.id) } },
           data: {
             reportsToId: null,
-            updatedAt: labour.updatedAt,
-            updatedBy: labour.updatedBy,
+            updatedAt: employee.updatedAt,
+            updatedBy: employee.updatedBy,
           },
         });
       await recordAudit(
@@ -498,51 +553,51 @@ export class PrismaLabourRepository implements LabourRepository {
   }
 
   async transfer(
-    moves: readonly LabourMove[],
+    moves: readonly EmployeeMove[],
     audits: readonly AuditEvent[],
   ): Promise<void> {
     await this.db.$transaction(
       async (tx: Tx) => {
         for (const move of moves) {
-          const { labour } = move;
-          // Compare-and-set: a labourer moved or edited meanwhile is refused.
-          const written = await tx.constructionLabourLabour.updateMany({
+          const { employee } = move;
+          // Compare-and-set: a Employee moved or edited meanwhile is refused.
+          const written = await tx.constructionLabourEmployee.updateMany({
             where: {
-              id: labour.id,
-              workspaceId: labour.workspaceId,
+              id: employee.id,
+              workspaceId: employee.workspaceId,
               deletedAt: null,
               updatedAt: move.loadedUpdatedAt,
             },
             data: {
-              updatedAt: labour.updatedAt,
-              updatedBy: labour.updatedBy,
+              updatedAt: employee.updatedAt,
+              updatedBy: employee.updatedBy,
             },
           });
-          if (written.count === 0) throw labourChanged();
-          const left = await tx.constructionLabourLabourProject.deleteMany({
-            where: { labourId: labour.id, projectId: move.fromProjectId },
+          if (written.count === 0) throw employeeChanged();
+          const left = await tx.constructionLabourEmployeeProject.deleteMany({
+            where: { employeeId: employee.id, projectId: move.fromProjectId },
           });
-          if (left.count === 0) throw labourChanged();
-          await tx.constructionLabourLabourProject.create({
+          if (left.count === 0) throw employeeChanged();
+          await tx.constructionLabourEmployeeProject.create({
             data: {
-              workspaceId: labour.workspaceId,
-              labourId: labour.id,
+              workspaceId: employee.workspaceId,
+              employeeId: employee.id,
               projectId: move.toProjectId,
               since: calendarDateToDb(move.transferDate),
             },
           });
         }
-        await tx.constructionLabourTransfer.createMany({
+        await tx.constructionLabourEmployeeTransfer.createMany({
           data: moves.map((move) => ({
             id: newId(),
-            workspaceId: move.labour.workspaceId,
-            labourId: move.labour.id,
+            workspaceId: move.employee.workspaceId,
+            employeeId: move.employee.id,
             fromProjectId: move.fromProjectId,
             toProjectId: move.toProjectId,
             transferDate: calendarDateToDb(move.transferDate),
             remark: move.remark,
-            createdAt: move.labour.updatedAt,
-            createdBy: move.labour.updatedBy,
+            createdAt: move.employee.updatedAt,
+            createdBy: move.employee.updatedBy,
           })),
         });
         for (const audit of audits) await recordAudit(tx, audit);
@@ -551,55 +606,55 @@ export class PrismaLabourRepository implements LabourRepository {
     );
   }
 
-  async changeProject(change: LabourProjectChange): Promise<void> {
-    const [first] = change.labours;
+  async changeProject(change: EmployeeProjectChange): Promise<void> {
+    const [first] = change.employees;
     if (first == null) return;
     const date = calendarDateToDb(change.date);
     await this.db.$transaction(
       async (tx: Tx) => {
-        for (const { labour, loadedUpdatedAt } of change.labours) {
-          const written = await tx.constructionLabourLabour.updateMany({
+        for (const { employee, loadedUpdatedAt } of change.employees) {
+          const written = await tx.constructionLabourEmployee.updateMany({
             where: {
-              id: labour.id,
-              workspaceId: labour.workspaceId,
+              id: employee.id,
+              workspaceId: employee.workspaceId,
               deletedAt: null,
               updatedAt: loadedUpdatedAt,
             },
             data: {
-              updatedAt: labour.updatedAt,
-              updatedBy: labour.updatedBy,
+              updatedAt: employee.updatedAt,
+              updatedBy: employee.updatedBy,
             },
           });
-          if (written.count === 0) throw labourChanged();
+          if (written.count === 0) throw employeeChanged();
         }
-        const ids = change.labours.map(({ labour }) => labour.id);
+        const ids = change.employees.map(({ employee }) => employee.id);
         if (change.direction === "join")
-          await tx.constructionLabourLabourProject.createMany({
-            data: ids.map((labourId) => ({
-              workspaceId: first.labour.workspaceId,
-              labourId,
+          await tx.constructionLabourEmployeeProject.createMany({
+            data: ids.map((employeeId) => ({
+              workspaceId: first.employee.workspaceId,
+              employeeId,
               projectId: change.projectId,
               since: date,
             })),
           });
         else {
-          const left = await tx.constructionLabourLabourProject.deleteMany({
-            where: { labourId: { in: ids }, projectId: change.projectId },
+          const left = await tx.constructionLabourEmployeeProject.deleteMany({
+            where: { employeeId: { in: ids }, projectId: change.projectId },
           });
-          if (left.count !== ids.length) throw labourChanged();
+          if (left.count !== ids.length) throw employeeChanged();
         }
-        await tx.constructionLabourTransfer.createMany({
-          data: change.labours.map(({ labour }) => ({
+        await tx.constructionLabourEmployeeTransfer.createMany({
+          data: change.employees.map(({ employee }) => ({
             id: newId(),
-            workspaceId: labour.workspaceId,
-            labourId: labour.id,
+            workspaceId: employee.workspaceId,
+            employeeId: employee.id,
             fromProjectId:
               change.direction === "leave" ? change.projectId : null,
             toProjectId: change.direction === "join" ? change.projectId : null,
             transferDate: date,
             remark: change.remark,
-            createdAt: labour.updatedAt,
-            createdBy: labour.updatedBy,
+            createdAt: employee.updatedAt,
+            createdBy: employee.updatedBy,
           })),
         });
         for (const audit of change.audits) await recordAudit(tx, audit);
@@ -619,11 +674,11 @@ export class PrismaLabourRepository implements LabourRepository {
   ): Promise<Map<string, CalendarDate>> {
     if (ids.length === 0) return new Map();
     const rows = await this.db.constructionLabourAttendance.groupBy({
-      by: ["labourId"],
+      by: ["employeeId"],
       where: {
         workspaceId,
         projectId,
-        labourId: { in: [...ids] },
+        employeeId: { in: [...ids] },
         deletedAt: null,
       },
       _max: { attendanceDate: true },
@@ -631,7 +686,7 @@ export class PrismaLabourRepository implements LabourRepository {
     const latest = new Map<string, CalendarDate>();
     for (const row of rows)
       if (row._max.attendanceDate != null)
-        latest.set(row.labourId, calendarDateFromDb(row._max.attendanceDate));
+        latest.set(row.employeeId, calendarDateFromDb(row._max.attendanceDate));
     return latest;
   }
 
@@ -640,7 +695,7 @@ export class PrismaLabourRepository implements LabourRepository {
     id: string,
   ): Promise<CalendarDate | null> {
     const row = await this.db.constructionLabourAttendance.findFirst({
-      where: { workspaceId, labourId: id, deletedAt: null },
+      where: { workspaceId, employeeId: id, deletedAt: null },
       orderBy: { attendanceDate: "asc" },
       select: { attendanceDate: true },
     });
@@ -650,9 +705,9 @@ export class PrismaLabourRepository implements LabourRepository {
   async transfers(
     workspaceId: string,
     id: string,
-  ): Promise<LabourTransferRecord[]> {
-    const rows = await this.db.constructionLabourTransfer.findMany({
-      where: { workspaceId, labourId: id },
+  ): Promise<EmployeeTransferRecord[]> {
+    const rows = await this.db.constructionLabourEmployeeTransfer.findMany({
+      where: { workspaceId, employeeId: id },
       orderBy: [{ transferDate: "asc" }, { createdAt: "asc" }, { id: "asc" }],
     });
     return rows.map((row) => ({
@@ -665,11 +720,4 @@ export class PrismaLabourRepository implements LabourRepository {
       createdBy: row.createdBy,
     }));
   }
-}
-
-export function labourChanged() {
-  return conflict(
-    "LABOUR_CHANGED",
-    "Someone else changed this Labour after you opened it. Reload to see their changes.",
-  );
 }

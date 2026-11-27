@@ -14,7 +14,7 @@ import type {
 } from "../application/party-files";
 
 /**
- * `photo_key` on `labours` / `vendors` and the `documents` rows, each write
+ * `photo_key` on `employees` / `vendors` and the `documents` rows, each write
  * in one transaction with its `stored_files` row and audit event.
  */
 export class PrismaPartyFilesStore implements PartyFilesStore {
@@ -28,8 +28,8 @@ export class PrismaPartyFilesStore implements PartyFilesStore {
     };
     const select = { photoKey: true } as const;
     const row =
-      ref.ownerType === "labour"
-        ? await this.db.constructionLabourLabour.findFirst({ where, select })
+      ref.ownerType === "employee"
+        ? await this.db.constructionLabourEmployee.findFirst({ where, select })
         : await this.db.constructionLabourVendor.findFirst({ where, select });
     return row ?? null;
   }
@@ -46,8 +46,8 @@ export class PrismaPartyFilesStore implements PartyFilesStore {
       // `updated_at` stays: it guards edits of the details, not the photo.
       const data = { photoKey: input.key };
       const written =
-        ref.ownerType === "labour"
-          ? await tx.constructionLabourLabour.updateMany({ where, data })
+        ref.ownerType === "employee"
+          ? await tx.constructionLabourEmployee.updateMany({ where, data })
           : await tx.constructionLabourVendor.updateMany({ where, data });
       if (written.count === 0)
         throw conflict(

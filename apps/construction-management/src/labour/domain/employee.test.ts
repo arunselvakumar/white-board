@@ -3,19 +3,22 @@ import { describe, expect, it } from "vitest";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
 import {
-  Labour,
+  Employee,
   assertTransferDate,
-  checkLabourDetails,
-  labourDetails,
+  checkEmployeeDetails,
+  employeeDetails as check,
   maskAadhaar,
   openingBalance,
-  type LabourDetailsInput,
-} from "./labour";
+  type EmployeeDetailsInput,
+} from "./employee";
 
 const VALID_AADHAAR = "234123412346";
 
-const BASE: LabourDetailsInput = {
+const TODAY = "2026-10-08";
+
+const BASE: EmployeeDetailsInput = {
   name: "  Dhuresh   Nawin ",
+  roleId: "role-labour",
   joiningDate: "2026-10-01",
   wageType: "daily",
   wagePerDay: 70_000,
@@ -32,52 +35,57 @@ function codeOf(run: () => unknown): string | undefined {
   return undefined;
 }
 
-describe("labourDetails", () => {
-  it("tidies a daily-wage Labour", () => {
-    const details = labourDetails({
+function employeeDetails(input: EmployeeDetailsInput) {
+  return check(input, TODAY);
+}
+
+describe("employeeDetails", () => {
+  it("tidies a daily-wage Employee", () => {
+    const details = employeeDetails({
       ...BASE,
-      labourCode: " L-01 ",
+      employeeCode: " E-01 ",
       weeklyHolidays: [6, 0],
-      contactNumber: "77081 65767",
+      mobile: "77081 65767",
       aadhaar: "2341 2341 2346",
       gender: "male",
     });
     expect(details).toMatchObject({
       name: "Dhuresh Nawin",
-      labourCode: "L-01",
+      employeeCode: "E-01",
+      roleId: "role-labour",
       wageType: "daily",
       wagePerDay: 70_000,
       wagePerMonth: null,
       overtimeWagePerHour: 10_000,
       weeklyHolidays: [0, 6],
-      contactNumber: "+917708165767",
+      mobile: "+917708165767",
       aadhaar: VALID_AADHAAR,
       gender: "male",
     });
   });
 
   it("requires the wage of the chosen wage type, more than zero", () => {
-    expect(codeOf(() => labourDetails({ ...BASE, wagePerDay: null }))).toBe(
+    expect(codeOf(() => employeeDetails({ ...BASE, wagePerDay: null }))).toBe(
       "WAGE_REQUIRED",
     );
-    expect(codeOf(() => labourDetails({ ...BASE, wagePerDay: 0 }))).toBe(
+    expect(codeOf(() => employeeDetails({ ...BASE, wagePerDay: 0 }))).toBe(
       "WAGE_REQUIRED",
     );
-    expect(codeOf(() => labourDetails({ ...BASE, wagePerDay: -5 }))).toBe(
+    expect(codeOf(() => employeeDetails({ ...BASE, wagePerDay: -5 }))).toBe(
       "WAGE_INVALID",
     );
-    expect(codeOf(() => labourDetails({ ...BASE, wagePerDay: 10.5 }))).toBe(
+    expect(codeOf(() => employeeDetails({ ...BASE, wagePerDay: 10.5 }))).toBe(
       "WAGE_INVALID",
     );
     expect(
       codeOf(() =>
-        labourDetails({ ...BASE, wageType: "monthly", wagePerMonth: null }),
+        employeeDetails({ ...BASE, wageType: "monthly", wagePerMonth: null }),
       ),
     ).toBe("WAGE_REQUIRED");
   });
 
   it("clears the other wage when the wage type changes", () => {
-    const monthly = labourDetails({
+    const monthly = employeeDetails({
       ...BASE,
       wageType: "monthly",
       wagePerDay: 70_000,
@@ -89,85 +97,142 @@ describe("labourDetails", () => {
 
   it("takes an overtime wage of 0 or more", () => {
     expect(
-      labourDetails({ ...BASE, overtimeWagePerHour: 0 }).overtimeWagePerHour,
+      employeeDetails({ ...BASE, overtimeWagePerHour: 0 }).overtimeWagePerHour,
     ).toBe(0);
     expect(
-      codeOf(() => labourDetails({ ...BASE, overtimeWagePerHour: -1 })),
+      codeOf(() => employeeDetails({ ...BASE, overtimeWagePerHour: -1 })),
     ).toBe("OVERTIME_WAGE_INVALID");
     expect(
-      codeOf(() => labourDetails({ ...BASE, overtimeWagePerHour: null })),
+      codeOf(() => employeeDetails({ ...BASE, overtimeWagePerHour: null })),
     ).toBe("OVERTIME_WAGE_REQUIRED");
   });
 
   it("takes working hours a day, 8 when left out", () => {
-    expect(labourDetails(BASE).workingHoursPerDay).toBe("8");
+    expect(employeeDetails(BASE).workingHoursPerDay).toBe("8");
     expect(
-      labourDetails({ ...BASE, workingHoursPerDay: null }).workingHoursPerDay,
+      employeeDetails({ ...BASE, workingHoursPerDay: null }).workingHoursPerDay,
     ).toBe("8");
     expect(
-      labourDetails({ ...BASE, workingHoursPerDay: " " }).workingHoursPerDay,
+      employeeDetails({ ...BASE, workingHoursPerDay: " " }).workingHoursPerDay,
     ).toBe("8");
     expect(
-      labourDetails({ ...BASE, workingHoursPerDay: "8.50" }).workingHoursPerDay,
+      employeeDetails({ ...BASE, workingHoursPerDay: "8.50" })
+        .workingHoursPerDay,
     ).toBe("8.5");
     expect(
-      labourDetails({ ...BASE, workingHoursPerDay: 12 }).workingHoursPerDay,
+      employeeDetails({ ...BASE, workingHoursPerDay: 12 }).workingHoursPerDay,
     ).toBe("12");
     for (const bad of [0, 25, "8.123", "abc"])
       expect(
-        codeOf(() => labourDetails({ ...BASE, workingHoursPerDay: bad })),
+        codeOf(() => employeeDetails({ ...BASE, workingHoursPerDay: bad })),
       ).toBe("WORKING_HOURS_INVALID");
   });
 
   it("checks names, dates, weekdays and statutory numbers", () => {
-    expect(codeOf(() => labourDetails({ ...BASE, name: " " }))).toBe(
-      "LABOUR_NAME_REQUIRED",
+    expect(codeOf(() => employeeDetails({ ...BASE, name: " " }))).toBe(
+      "EMPLOYEE_NAME_REQUIRED",
     );
     expect(
-      codeOf(() => labourDetails({ ...BASE, joiningDate: "2026-02-30" })),
+      codeOf(() => employeeDetails({ ...BASE, joiningDate: "2026-02-30" })),
     ).toBe("JOINING_DATE_INVALID");
-    expect(codeOf(() => labourDetails({ ...BASE, wageType: "weekly" }))).toBe(
+    expect(codeOf(() => employeeDetails({ ...BASE, wageType: "weekly" }))).toBe(
       "WAGE_TYPE_INVALID",
     );
     expect(
-      codeOf(() => labourDetails({ ...BASE, weeklyHolidays: [0, 0] })),
+      codeOf(() => employeeDetails({ ...BASE, weeklyHolidays: [0, 0] })),
     ).toBe("WEEKLY_HOLIDAYS_INVALID");
-    expect(codeOf(() => labourDetails({ ...BASE, weeklyHolidays: [7] }))).toBe(
-      "WEEKLY_HOLIDAYS_INVALID",
-    );
-    expect(codeOf(() => labourDetails({ ...BASE, uanNumber: "12345" }))).toBe(
+    expect(
+      codeOf(() => employeeDetails({ ...BASE, weeklyHolidays: [7] })),
+    ).toBe("WEEKLY_HOLIDAYS_INVALID");
+    expect(codeOf(() => employeeDetails({ ...BASE, uanNumber: "12345" }))).toBe(
       "UAN_INVALID",
     );
     expect(
-      labourDetails({ ...BASE, uanNumber: "1001 2345 6789" }).uanNumber,
+      employeeDetails({ ...BASE, uanNumber: "1001 2345 6789" }).uanNumber,
     ).toBe("100123456789");
     expect(
-      codeOf(() => labourDetails({ ...BASE, esicNumber: "123456789012" })),
+      codeOf(() => employeeDetails({ ...BASE, esicNumber: "123456789012" })),
     ).toBe("ESIC_INVALID");
     expect(
-      labourDetails({ ...BASE, esicNumber: "1234567890" }).esicNumber,
+      employeeDetails({ ...BASE, esicNumber: "1234567890" }).esicNumber,
     ).toBe("1234567890");
     expect(
-      labourDetails({ ...BASE, esicNumber: "12345678901234567" }).esicNumber,
+      employeeDetails({ ...BASE, esicNumber: "12345678901234567" }).esicNumber,
     ).toBe("12345678901234567");
     expect(
-      codeOf(() => labourDetails({ ...BASE, aadhaar: "234123412345" })),
+      codeOf(() => employeeDetails({ ...BASE, aadhaar: "234123412345" })),
     ).toBe("AADHAAR_INVALID");
-    expect(
-      codeOf(() => labourDetails({ ...BASE, contactNumber: "12345" })),
-    ).toBe("MOBILE_INVALID");
-    expect(codeOf(() => labourDetails({ ...BASE, gender: "x" }))).toBe(
+    expect(codeOf(() => employeeDetails({ ...BASE, mobile: "12345" }))).toBe(
+      "MOBILE_INVALID",
+    );
+    expect(codeOf(() => employeeDetails({ ...BASE, gender: "x" }))).toBe(
       "GENDER_INVALID",
     );
   });
 
-  it("lists every problem at once for the import preview", () => {
-    const checked = checkLabourDetails({
+  it("checks the profile, contact, PAN and bank fields of a Site Engineer", () => {
+    const details = employeeDetails({
       ...BASE,
-      name: "",
-      wagePerDay: null,
-      uanNumber: "1",
+      dateOfBirth: "1990-04-01",
+      bloodGroup: "o+",
+      email: " Meena@Site.Test ",
+      pan: "abcpe1234f",
+      qualification: " B.E.  Civil ",
+      experienceYears: 6,
+      specialisation: "Steel / PEB",
+      bankAccountNumber: "1234 5678 9012",
+      bankIfsc: "hdfc0001234",
     });
+    expect(details).toMatchObject({
+      dateOfBirth: "1990-04-01",
+      bloodGroup: "O+",
+      email: "meena@site.test",
+      pan: "ABCPE1234F",
+      qualification: "B.E. Civil",
+      experienceYears: 6,
+      bankAccountNumber: "123456789012",
+      bankIfsc: "HDFC0001234",
+    });
+    expect(codeOf(() => employeeDetails({ ...BASE, dateOfBirth: TODAY }))).toBe(
+      "DATE_OF_BIRTH_INVALID",
+    );
+    expect(
+      codeOf(() =>
+        employeeDetails({
+          ...BASE,
+          dateOfBirth: "2026-10-01",
+          joiningDate: "2026-10-01",
+        }),
+      ),
+    ).toBe("JOINING_DATE_INVALID");
+    expect(codeOf(() => employeeDetails({ ...BASE, bloodGroup: "C+" }))).toBe(
+      "BLOOD_GROUP_INVALID",
+    );
+    expect(codeOf(() => employeeDetails({ ...BASE, email: "meena@" }))).toBe(
+      "EMAIL_INVALID",
+    );
+    expect(codeOf(() => employeeDetails({ ...BASE, pan: "ABCDE1234" }))).toBe(
+      "PAN_INVALID",
+    );
+    expect(
+      codeOf(() => employeeDetails({ ...BASE, experienceYears: 61 })),
+    ).toBe("EXPERIENCE_INVALID");
+    expect(
+      codeOf(() => employeeDetails({ ...BASE, bankAccountNumber: "12-3" })),
+    ).toBe("ACCOUNT_NUMBER_INVALID");
+    expect(
+      codeOf(() => employeeDetails({ ...BASE, bankIfsc: "HDFC1234" })),
+    ).toBe("IFSC_INVALID");
+    expect(codeOf(() => employeeDetails({ ...BASE, roleId: " " }))).toBe(
+      "EMPLOYEE_ROLE_REQUIRED",
+    );
+  });
+
+  it("lists every problem at once for the import preview", () => {
+    const checked = checkEmployeeDetails(
+      { ...BASE, name: "", wagePerDay: null, uanNumber: "1" },
+      TODAY,
+    );
     expect(checked.problems.map((problem) => problem.field)).toEqual([
       "name",
       "wagePerDay",
@@ -184,24 +249,24 @@ describe("openingBalance", () => {
   });
 });
 
-describe("Labour", () => {
+describe("Employee", () => {
   const now = new Date("2026-10-08T06:00:00Z");
-  const labour = () =>
-    Labour.create({
+  const employee = () =>
+    Employee.create({
       id: "l1",
       workspaceId: "w1",
-      details: labourDetails(BASE),
+      details: employeeDetails(BASE),
       projectIds: ["p1", "p3", "p1", " "],
       by: "u1",
       now,
     });
 
   it("can start on no Project, or on many, each once", () => {
-    expect(labour().projectIds).toEqual(["p1", "p3"]);
-    const none = Labour.create({
+    expect(employee().projectIds).toEqual(["p1", "p3"]);
+    const none = Employee.create({
       id: "l2",
       workspaceId: "w1",
-      details: labourDetails(BASE),
+      details: employeeDetails(BASE),
       by: "u1",
       now,
     });
@@ -209,7 +274,7 @@ describe("Labour", () => {
   });
 
   it("moves from one of its Projects to one it is not on", () => {
-    const item = labour();
+    const item = employee();
     expect(
       codeOf(() => {
         item.transfer("p1", "p3", "u1", now);
@@ -224,13 +289,13 @@ describe("Labour", () => {
       codeOf(() => {
         item.transfer("p9", "p2", "u1", now);
       }),
-    ).toBe("LABOUR_NOT_ON_PROJECT");
+    ).toBe("EMPLOYEE_NOT_ON_PROJECT");
     item.transfer("p1", "p2", "u1", now);
     expect(item.projectIds).toEqual(["p2", "p3"]);
   });
 
   it("ticks and unticks Projects, telling what changed", () => {
-    const item = labour();
+    const item = employee();
     const later = new Date("2026-10-09T06:00:00Z");
     expect(item.setProjects(["p3", "p1"], "u2", later)).toEqual({
       added: [],
@@ -248,7 +313,7 @@ describe("Labour", () => {
   });
 
   it("toggles active and stops after delete", () => {
-    const item = labour();
+    const item = employee();
     item.deactivate("u1", now);
     expect(item.isActive).toBe(false);
     item.activate("u1", now);
@@ -258,7 +323,17 @@ describe("Labour", () => {
       codeOf(() => {
         item.deactivate("u1", now);
       }),
-    ).toBe("LABOUR_NOT_FOUND");
+    ).toBe("EMPLOYEE_NOT_FOUND");
+  });
+
+  it("records and clears its sign-in", () => {
+    const item = employee();
+    const later = new Date("2026-10-09T06:00:00Z");
+    item.setSignIn("m1", "u2", later);
+    expect(item.teamMemberId).toBe("m1");
+    expect(item.updatedAt).toEqual(later);
+    item.setSignIn(null, "u2", later);
+    expect(item.teamMemberId).toBeNull();
   });
 
   it("masks Aadhaar to its last four digits", () => {

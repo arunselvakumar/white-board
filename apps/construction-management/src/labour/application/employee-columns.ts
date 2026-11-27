@@ -1,21 +1,30 @@
 /**
- * The columns of the labour Excel template, import and export (CM-206), in
- * sheet order. Amounts in the sheet are rupees; the API is paise.
+ * The columns of the Employee Excel template, import and export (CM-206,
+ * ADR CM-0055), in sheet order. Amounts in the sheet are rupees; the API
+ * is paise. Department and Role are names; a blank Role is the Company's
+ * default "Labour" Role, so sheets made before Employees still import.
  */
-export const LABOUR_COLUMNS = [
+export const EMPLOYEE_COLUMNS = [
   {
     key: "name",
-    header: "Labour Name*",
+    header: "Employee Name*",
     example: "Dhuresh Nawin",
     width: 24,
   },
   {
-    key: "labourCode",
-    header: "Labour Id",
-    example: "L-001",
+    key: "employeeCode",
+    header: "Employee Id",
+    example: "E-001",
     width: 12,
     text: true,
   },
+  {
+    key: "department",
+    header: "Department",
+    example: "Human Resources",
+    width: 20,
+  },
+  { key: "role", header: "Role", example: "Labour", width: 18 },
   {
     key: "fatherName",
     header: "Father's Name",
@@ -23,12 +32,29 @@ export const LABOUR_COLUMNS = [
     width: 22,
   },
   {
+    key: "dateOfBirth",
+    header: "Date of Birth",
+    example: null,
+    width: 14,
+    date: true,
+  },
+  { key: "gender", header: "Gender", example: "Male", width: 10 },
+  { key: "bloodGroup", header: "Blood Group", example: null, width: 12 },
+  {
     key: "joiningDate",
     header: "Joining Date*",
     example: "2026-10-01",
     width: 14,
     date: true,
   },
+  {
+    key: "mobile",
+    header: "Mobile",
+    example: "7708165767",
+    width: 16,
+    text: true,
+  },
+  { key: "email", header: "Email", example: null, width: 24 },
   { key: "wageType", header: "Wage Type*", example: "Daily", width: 12 },
   {
     key: "wagePerDay",
@@ -78,14 +104,26 @@ export const LABOUR_COLUMNS = [
     example: null,
     width: 18,
   },
+  { key: "address", header: "Address", example: null, width: 30 },
   {
-    key: "contactNumber",
-    header: "Contact Number",
-    example: "7708165767",
-    width: 16,
-    text: true,
+    key: "emergencyContact",
+    header: "Emergency Contact",
+    example: null,
+    width: 20,
   },
-  { key: "gender", header: "Gender", example: "Male", width: 10 },
+  { key: "qualification", header: "Qualification", example: null, width: 20 },
+  {
+    key: "experienceYears",
+    header: "Experience (Years)",
+    example: null,
+    width: 16,
+  },
+  {
+    key: "specialisation",
+    header: "Specialisation",
+    example: null,
+    width: 18,
+  },
   {
     key: "uanNumber",
     header: "UAN Number",
@@ -107,6 +145,22 @@ export const LABOUR_COLUMNS = [
     width: 18,
     text: true,
   },
+  { key: "pan", header: "PAN", example: null, width: 14, text: true },
+  {
+    key: "bankAccountHolder",
+    header: "Account Holder",
+    example: null,
+    width: 22,
+  },
+  {
+    key: "bankAccountNumber",
+    header: "Account Number",
+    example: null,
+    width: 20,
+    text: true,
+  },
+  { key: "bankIfsc", header: "IFSC", example: null, width: 14, text: true },
+  { key: "bankName", header: "Bank Name", example: null, width: 20 },
 ] as const satisfies readonly {
   key: string;
   header: string;
@@ -117,15 +171,15 @@ export const LABOUR_COLUMNS = [
   money?: boolean;
 }[];
 
-export type LabourColumnKey = (typeof LABOUR_COLUMNS)[number]["key"];
+export type EmployeeColumnKey = (typeof EMPLOYEE_COLUMNS)[number]["key"];
 
 /** A cell as the workbook reader hands it over. */
-export type LabourCell = string | number | Date | null;
+export type EmployeeCell = string | number | Date | null;
 
 /** One data row of an uploaded sheet; `row` is the Excel row number. */
-export type LabourSheetRow = {
+export type EmployeeSheetRow = {
   row: number;
-  cells: Partial<Record<LabourColumnKey, LabourCell>>;
+  cells: Partial<Record<EmployeeColumnKey, EmployeeCell>>;
 };
 
 export const WEEKDAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -134,3 +188,6 @@ export const WEEKDAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export const PROJECT_SEPARATOR = ";";
 
 export const MAX_IMPORT_ROWS = 1000;
+
+/** What a blank Role cell means: the Company's default Labour Role. */
+export const DEFAULT_IMPORT_ROLE = "Labour";

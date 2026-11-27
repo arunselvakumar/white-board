@@ -4,45 +4,46 @@ import type { AuditEvent } from "@/src/shared-kernel/audit";
 import type { CalendarDate } from "@/src/shared-kernel/calendar-date";
 import { conflict } from "@/src/shared-kernel/domain-error";
 
-import { Labour, type ProjectChanges } from "../domain/labour";
-import type { LabourDirectories } from "./labour-handlers";
+import { Employee, type ProjectChanges } from "../domain/employee";
+import type { EmployeeDirectories } from "./employee-handlers";
 import type {
-  LabourMove,
-  LabourProjectChange,
-  LabourQueries,
-  LabourReadModel,
-  LabourRepository,
-  LabourTransferRecord,
-  NewLabour,
-} from "./labour-ports";
+  EmployeeMove,
+  EmployeeProjectChange,
+  EmployeeQueries,
+  EmployeeReadModel,
+  EmployeeRepository,
+  EmployeeTransferRecord,
+  NewEmployee,
+} from "./employee-ports";
 
-/** In-memory labour register for handler tests (no Prisma). */
-export class FakeLabourRepository implements LabourRepository {
-  readonly labours = new Map<string, Labour>();
-  /** Opening entries per labourer, signed; reversals included. */
+/** In-memory Employee record for handler tests (no Prisma). */
+export class FakeEmployeeRepository implements EmployeeRepository {
+  readonly employees = new Map<string, Employee>();
+  /** Opening entries per Employee, signed; reversals included. */
   readonly ledger = new Map<string, number[]>();
-  readonly history = new Map<string, LabourTransferRecord[]>();
+  readonly history = new Map<string, EmployeeTransferRecord[]>();
   readonly attendance = new Map<string, CalendarDate[]>();
   readonly payments = new Set<string>();
   readonly audits: AuditEvent[] = [];
 
-  private copy(labour: Labour): Labour {
-    return Labour.reconstitute({
-      id: labour.id,
-      workspaceId: labour.workspaceId,
-      details: { ...labour.details },
-      projectIds: [...labour.projectIds],
-      isActive: labour.isActive,
-      createdAt: labour.createdAt,
-      updatedAt: labour.updatedAt,
-      createdBy: labour.createdBy,
-      updatedBy: labour.updatedBy,
-      deletedAt: labour.deletedAt,
+  private copy(employee: Employee): Employee {
+    return Employee.reconstitute({
+      id: employee.id,
+      workspaceId: employee.workspaceId,
+      details: { ...employee.details },
+      projectIds: [...employee.projectIds],
+      teamMemberId: employee.teamMemberId,
+      isActive: employee.isActive,
+      createdAt: employee.createdAt,
+      updatedAt: employee.updatedAt,
+      createdBy: employee.createdBy,
+      updatedBy: employee.updatedBy,
+      deletedAt: employee.deletedAt,
     });
   }
 
-  findById(workspaceId: string, id: string): Promise<Labour | null> {
-    const found = this.labours.get(id);
+  findById(workspaceId: string, id: string): Promise<Employee | null> {
+    const found = this.employees.get(id);
     return Promise.resolve(
       found?.workspaceId !== workspaceId || found.deletedAt != null
         ? null
@@ -53,11 +54,11 @@ export class FakeLabourRepository implements LabourRepository {
   async findMany(
     workspaceId: string,
     ids: readonly string[],
-  ): Promise<Labour[]> {
+  ): Promise<Employee[]> {
     const found = await Promise.all(
       ids.map((id) => this.findById(workspaceId, id)),
     );
-    return found.filter((item): item is Labour => item != null);
+    return found.filter((item): item is Employee => item != null);
   }
 
   codesTaken(
@@ -67,13 +68,13 @@ export class FakeLabourRepository implements LabourRepository {
   ): Promise<Set<string>> {
     const wanted = new Set(codes.map((code) => code.toLowerCase()));
     const taken = new Set<string>();
-    for (const labour of this.labours.values()) {
-      const code = labour.details.labourCode?.toLowerCase();
+    for (const employee of this.employees.values()) {
+      const code = employee.details.employeeCode?.toLowerCase();
       if (
         code != null &&
-        labour.workspaceId === workspaceId &&
-        labour.deletedAt == null &&
-        labour.id !== exceptId &&
+        employee.workspaceId === workspaceId &&
+        employee.deletedAt == null &&
+        employee.id !== exceptId &&
         wanted.has(code)
       )
         taken.add(code);
@@ -88,22 +89,25 @@ export class FakeLabourRepository implements LabourRepository {
   }
 
   insert(
-    items: readonly NewLabour[],
+    items: readonly NewEmployee[],
     audits: readonly AuditEvent[],
   ): Promise<void> {
-    for (const { labour, openingBalance } of items) {
-      this.labours.set(labour.id, this.copy(labour));
-      this.ledger.set(labour.id, openingBalance === 0 ? [] : [openingBalance]);
+    for (const { employee, openingBalance } of items) {
+      this.employees.set(employee.id, this.copy(employee));
+      this.ledger.set(
+        employee.id,
+        openingBalance === 0 ? [] : [openingBalance],
+      );
       this.history.set(
-        labour.id,
-        labour.projectIds.map((projectId, index) => ({
-          id: `${labour.id}-${String(index)}`,
+        employee.id,
+        employee.projectIds.map((projectId, index) => ({
+          id: `${employee.id}-${String(index)}`,
           fromProjectId: null,
           toProjectId: projectId,
-          transferDate: labour.details.joiningDate,
+          transferDate: employee.details.joiningDate,
           remark: null,
-          createdAt: labour.createdAt,
-          createdBy: labour.createdBy,
+          createdAt: employee.createdAt,
+          createdBy: employee.createdBy,
         })),
       );
     }
@@ -112,110 +116,113 @@ export class FakeLabourRepository implements LabourRepository {
   }
 
   update(input: {
-    labour: Labour;
+    employee: Employee;
     expectedUpdatedAt: Date | null;
     opening: number | null;
     joiningDateChanged: boolean;
     projects?: (ProjectChanges & { date: CalendarDate }) | null;
     audit: AuditEvent;
   }): Promise<void> {
-    const stored = this.labours.get(input.labour.id);
+    const stored = this.employees.get(input.employee.id);
     if (
       input.expectedUpdatedAt != null &&
       stored?.updatedAt.getTime() !== input.expectedUpdatedAt.getTime()
     )
-      return Promise.reject(conflict("LABOUR_CHANGED", "Changed."));
-    this.labours.set(input.labour.id, this.copy(input.labour));
-    const history = this.history.get(input.labour.id) ?? [];
+      return Promise.reject(conflict("EMPLOYEE_CHANGED", "Changed."));
+    this.employees.set(input.employee.id, this.copy(input.employee));
+    const history = this.history.get(input.employee.id) ?? [];
     const row = (from: string | null, to: string | null, date: CalendarDate) =>
       history.push({
-        id: `${input.labour.id}-${String(history.length)}`,
+        id: `${input.employee.id}-${String(history.length)}`,
         fromProjectId: from,
         toProjectId: to,
         transferDate: date,
         remark: null,
-        createdAt: input.labour.updatedAt,
-        createdBy: input.labour.updatedBy,
+        createdAt: input.employee.updatedAt,
+        createdBy: input.employee.updatedBy,
       });
     if (input.projects != null) {
       const { date } = input.projects;
       for (const id of input.projects.removed) row(id, null, date);
       for (const id of input.projects.added) row(null, id, date);
     }
-    this.history.set(input.labour.id, history);
+    this.history.set(input.employee.id, history);
     if (input.opening != null) {
-      const entries = this.ledger.get(input.labour.id) ?? [];
+      const entries = this.ledger.get(input.employee.id) ?? [];
       const live = entries.reduce((sum, amount) => sum + amount, 0);
-      this.ledger.set(input.labour.id, [...entries, -live, input.opening]);
+      this.ledger.set(input.employee.id, [...entries, -live, input.opening]);
     }
     this.audits.push(input.audit);
     return Promise.resolve();
   }
 
   delete(
-    labour: Labour,
+    employee: Employee,
     audit: AuditEvent,
   ): Promise<"deleted" | "has_records"> {
     if (
-      (this.attendance.get(labour.id)?.length ?? 0) > 0 ||
-      this.payments.has(labour.id)
+      (this.attendance.get(employee.id)?.length ?? 0) > 0 ||
+      this.payments.has(employee.id)
     )
       return Promise.resolve("has_records");
-    this.labours.set(labour.id, this.copy(labour));
-    const entries = this.ledger.get(labour.id) ?? [];
+    this.employees.set(employee.id, this.copy(employee));
+    const entries = this.ledger.get(employee.id) ?? [];
     const live = entries.reduce((sum, amount) => sum + amount, 0);
-    this.ledger.set(labour.id, [...entries, -live]);
-    for (const report of this.labours.values())
-      if (report.deletedAt == null && report.details.reportsToId === labour.id)
+    this.ledger.set(employee.id, [...entries, -live]);
+    for (const report of this.employees.values())
+      if (
+        report.deletedAt == null &&
+        report.details.reportsToId === employee.id
+      )
         report.update(
           { ...report.details, reportsToId: null },
-          labour.updatedBy,
-          labour.updatedAt,
+          employee.updatedBy,
+          employee.updatedAt,
         );
     this.audits.push(audit);
     return Promise.resolve("deleted");
   }
 
   transfer(
-    moves: readonly LabourMove[],
+    moves: readonly EmployeeMove[],
     audits: readonly AuditEvent[],
   ): Promise<void> {
     for (const move of moves) {
-      this.labours.set(move.labour.id, this.copy(move.labour));
-      this.history.get(move.labour.id)?.push({
-        id: `${move.labour.id}-${String(this.history.get(move.labour.id)?.length ?? 0)}`,
+      this.employees.set(move.employee.id, this.copy(move.employee));
+      this.history.get(move.employee.id)?.push({
+        id: `${move.employee.id}-${String(this.history.get(move.employee.id)?.length ?? 0)}`,
         fromProjectId: move.fromProjectId,
         toProjectId: move.toProjectId,
         transferDate: move.transferDate,
         remark: move.remark,
-        createdAt: move.labour.updatedAt,
-        createdBy: move.labour.updatedBy,
+        createdAt: move.employee.updatedAt,
+        createdBy: move.employee.updatedBy,
       });
     }
     this.audits.push(...audits);
     return Promise.resolve();
   }
 
-  changeProject(change: LabourProjectChange): Promise<void> {
-    for (const { labour, loadedUpdatedAt } of change.labours)
+  changeProject(change: EmployeeProjectChange): Promise<void> {
+    for (const { employee, loadedUpdatedAt } of change.employees)
       if (
-        this.labours.get(labour.id)?.updatedAt.getTime() !==
+        this.employees.get(employee.id)?.updatedAt.getTime() !==
         loadedUpdatedAt.getTime()
       )
-        return Promise.reject(conflict("LABOUR_CHANGED", "Changed."));
-    for (const { labour } of change.labours) {
-      this.labours.set(labour.id, this.copy(labour));
-      const history = this.history.get(labour.id) ?? [];
+        return Promise.reject(conflict("EMPLOYEE_CHANGED", "Changed."));
+    for (const { employee } of change.employees) {
+      this.employees.set(employee.id, this.copy(employee));
+      const history = this.history.get(employee.id) ?? [];
       history.push({
-        id: `${labour.id}-${String(history.length)}`,
+        id: `${employee.id}-${String(history.length)}`,
         fromProjectId: change.direction === "leave" ? change.projectId : null,
         toProjectId: change.direction === "join" ? change.projectId : null,
         transferDate: change.date,
         remark: change.remark,
-        createdAt: labour.updatedAt,
-        createdBy: labour.updatedBy,
+        createdAt: employee.updatedAt,
+        createdBy: employee.updatedBy,
       });
-      this.history.set(labour.id, history);
+      this.history.set(employee.id, history);
     }
     this.audits.push(...change.audits);
     return Promise.resolve();
@@ -251,31 +258,39 @@ export class FakeLabourRepository implements LabourRepository {
     );
   }
 
-  transfers(_workspaceId: string, id: string): Promise<LabourTransferRecord[]> {
+  transfers(
+    _workspaceId: string,
+    id: string,
+  ): Promise<EmployeeTransferRecord[]> {
     return Promise.resolve([...(this.history.get(id) ?? [])]);
   }
 }
 
 /** Read models straight from the fake repository. */
-export function fakeQueries(repository: FakeLabourRepository): LabourQueries {
+export function fakeQueries(
+  repository: FakeEmployeeRepository,
+): EmployeeQueries {
   const view = async (
     workspaceId: string,
     id: string,
-  ): Promise<LabourReadModel | null> => {
-    const labour = await repository.findById(workspaceId, id);
-    if (labour == null) return null;
-    const { aadhaar, ...details } = labour.details;
+  ): Promise<EmployeeReadModel | null> => {
+    const employee = await repository.findById(workspaceId, id);
+    if (employee == null) return null;
+    const { aadhaar, pan, bankAccountNumber, ...details } = employee.details;
     const opening = await repository.openingBalance(workspaceId, id);
     return {
-      id: labour.id,
+      id: employee.id,
       details,
       aadhaarMasked: aadhaar == null ? null : `XXXXXXXX${aadhaar.slice(-4)}`,
-      projects: labour.projectIds.map((projectId) => ({
+      panMasked: pan == null ? null : `XXXXXX${pan.slice(-4)}`,
+      bankAccountLast4: bankAccountNumber?.slice(-4) ?? null,
+      role: { id: details.roleId, name: details.roleId },
+      department: null,
+      projects: employee.projectIds.map((projectId) => ({
         id: projectId,
         name: projectId,
       })),
       labourCategory: null,
-      siteEngineers: [],
       reportsTo:
         details.reportsToId == null
           ? null
@@ -286,12 +301,13 @@ export function fakeQueries(repository: FakeLabourRepository): LabourQueries {
                   ? null
                   : { id: manager.id, name: manager.details.name },
               ),
-      isActive: labour.isActive,
+      teamMemberId: employee.teamMemberId,
+      isActive: employee.isActive,
       photoKey: null,
       openingBalance: opening,
       balance: opening,
-      createdAt: labour.createdAt,
-      updatedAt: labour.updatedAt,
+      createdAt: employee.createdAt,
+      updatedAt: employee.updatedAt,
     };
   };
   return {
@@ -305,12 +321,16 @@ export function fakeQueries(repository: FakeLabourRepository): LabourQueries {
   };
 }
 
+/** The Role the fakes know by default. */
+export const ROLE = "role-labour";
+
 /** Directories holding exactly these ids; `disabled` ids exist but are off. */
 export function fakeDirectories(input: {
   projects?: string[];
   labourCategories?: string[];
+  roles?: string[];
   disabled?: string[];
-}): LabourDirectories {
+}): EmployeeDirectories {
   const find =
     (ids: string[] = []) =>
     (_workspaceId: string, wanted: readonly string[]) =>
@@ -327,6 +347,16 @@ export function fakeDirectories(input: {
   return {
     projects: { find: find(input.projects) },
     labourCategories: { find: find(input.labourCategories) },
+    roles: {
+      find: (_workspaceId, wanted) =>
+        Promise.resolve(
+          new Map(
+            wanted
+              .filter((id) => (input.roles ?? [ROLE]).includes(id))
+              .map((id) => [id, { id, name: id, department: null }]),
+          ),
+        ),
+    },
   };
 }
 

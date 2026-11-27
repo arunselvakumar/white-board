@@ -3,18 +3,22 @@ import { describe, expect, it } from "vitest";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
 import {
-  FakeLabourRepository,
+  FakeEmployeeRepository,
+  ROLE,
   fakeDirectories,
   fakeQueries,
   transferAccess,
-} from "./labour-fakes";
-import { LabourHandlers, type CreateLabourInput } from "./labour-handlers";
+} from "./employee-fakes";
+import {
+  EmployeeHandlers,
+  type CreateEmployeeInput,
+} from "./employee-handlers";
 
 const NOW = new Date("2026-10-08T06:00:00Z");
 
 function setup() {
-  const repository = new FakeLabourRepository();
-  const handlers = new LabourHandlers(
+  const repository = new FakeEmployeeRepository();
+  const handlers = new EmployeeHandlers(
     repository,
     fakeQueries(repository),
     fakeDirectories({
@@ -27,8 +31,9 @@ function setup() {
   return { repository, handlers };
 }
 
-const INPUT: CreateLabourInput = {
+const INPUT: CreateEmployeeInput = {
   name: "Dhuresh",
+  roleId: ROLE,
   joiningDate: "2026-09-01",
   wageType: "daily",
   wagePerDay: 70_000,
@@ -48,12 +53,12 @@ async function codeOf(
   return undefined;
 }
 
-describe("LabourHandlers", () => {
+describe("EmployeeHandlers", () => {
   it("creates with the opening balance and an audit without the Aadhaar number", async () => {
     const { repository, handlers } = setup();
     const created = await handlers.create({
       workspaceId: "w1",
-      labour: { ...INPUT, openingBalance: -5_000, aadhaar: "234123412346" },
+      employee: { ...INPUT, openingBalance: -5_000, aadhaar: "234123412346" },
       by: "u1",
     });
     expect(created.openingBalance).toBe(-5_000);
@@ -65,12 +70,90 @@ describe("LabourHandlers", () => {
     expect(JSON.stringify(repository.audits)).not.toContain("234123412346");
   });
 
-  it("checks Projects, categories and the Labour Id", async () => {
+  it("needs a live Role of the Company (ADR CM-0055 §2)", async () => {
     const { handlers } = setup();
-    const create = (extra: Partial<CreateLabourInput>) =>
+    const refused = await handlers
+      .create({
+        workspaceId: "w1",
+        employee: { ...INPUT, roleId: "role-gone" },
+        by: "u1",
+      })
+      .catch((error: unknown) => error);
+    expect(refused).toBeInstanceOf(DomainError);
+    expect(refused).toMatchObject({
+      code: "EMPLOYEE_ROLE_NOT_FOUND",
+      kind: "invalid",
+      details: { field: "roleId" },
+    });
+  });
+
+  it("runs beforeWrite after the checks, and keeps the sign-in it sets", async () => {
+    const { repository, handlers } = setup();
+    const seen: string[] = [];
+    expect(
+      await codeOf(() =>
+        handlers.create({
+          workspaceId: "w1",
+          employee: { ...INPUT, projectIds: ["p9"] },
+          by: "u1",
+          beforeWrite: (employee) => {
+            seen.push(employee.id);
+            return Promise.resolve();
+          },
+        }),
+      ),
+    ).toBe("PROJECT_NOT_FOUND");
+    expect(seen).toEqual([]);
+    const created = await handlers.create({
+      workspaceId: "w1",
+      employee: INPUT,
+      by: "u1",
+      beforeWrite: (employee) => {
+        employee.setSignIn("member-1", "u1", NOW);
+        return Promise.resolve();
+      },
+    });
+    expect(created.teamMemberId).toBe("member-1");
+    expect(repository.audits.at(-1)?.action).toBe("employee.created");
+    expect(
+      await handlers.delete({ workspaceId: "w1", id: created.id, by: "u1" }),
+    ).toEqual({ teamMemberId: "member-1" });
+  });
+
+  it("refuses an edit from a stale copy before beforeWrite runs", async () => {
+    const { handlers } = setup();
+    const created = await handlers.create({
+      workspaceId: "w1",
+      employee: INPUT,
+      by: "u1",
+    });
+    let ran = false;
+    expect(
+      await codeOf(() =>
+        handlers.update({
+          workspaceId: "w1",
+          id: created.id,
+          employee: {
+            ...INPUT,
+            expectedUpdatedAt: new Date("2026-01-01T00:00:00Z"),
+          },
+          by: "u1",
+          beforeWrite: () => {
+            ran = true;
+            return Promise.resolve();
+          },
+        }),
+      ),
+    ).toBe("EMPLOYEE_CHANGED");
+    expect(ran).toBe(false);
+  });
+
+  it("checks Projects, categories and the Employee Id", async () => {
+    const { handlers } = setup();
+    const create = (extra: Partial<CreateEmployeeInput>) =>
       handlers.create({
         workspaceId: "w1",
-        labour: { ...INPUT, ...extra },
+        employee: { ...INPUT, ...extra },
         by: "u1",
       });
     expect(await codeOf(() => create({ projectIds: ["p1", "p9"] }))).toBe(
@@ -79,9 +162,9 @@ describe("LabourHandlers", () => {
     expect(await codeOf(() => create({ labourCategoryId: "welder" }))).toBe(
       "LABOUR_CATEGORY_NOT_FOUND",
     );
-    await create({ labourCode: "A-1" });
-    expect(await codeOf(() => create({ labourCode: "a-1" }))).toBe(
-      "LABOUR_CODE_TAKEN",
+    await create({ employeeCode: "A-1" });
+    expect(await codeOf(() => create({ employeeCode: "a-1" }))).toBe(
+      "EMPLOYEE_CODE_TAKEN",
     );
   });
 
@@ -89,7 +172,7 @@ describe("LabourHandlers", () => {
     const { repository, handlers } = setup();
     const created = await handlers.create({
       workspaceId: "w1",
-      labour: {
+      employee: {
         ...INPUT,
         openingBalance: 1_000,
         labourCategoryId: "mason",
@@ -99,6 +182,7 @@ describe("LabourHandlers", () => {
     });
     const base = {
       name: "Dhuresh P",
+      roleId: ROLE,
       joiningDate: "2026-09-01",
       wageType: "daily",
       labourCategoryId: "mason",
@@ -107,7 +191,7 @@ describe("LabourHandlers", () => {
     const renamed = await handlers.update({
       workspaceId: "w1",
       id: created.id,
-      labour: base,
+      employee: base,
       by: "u1",
     });
     expect(renamed.details.wagePerDay).toBe(70_000);
@@ -117,7 +201,7 @@ describe("LabourHandlers", () => {
     const reposted = await handlers.update({
       workspaceId: "w1",
       id: created.id,
-      labour: {
+      employee: {
         ...base,
         openingBalance: 2_500,
         expectedUpdatedAt: renamed.updatedAt,
@@ -132,7 +216,7 @@ describe("LabourHandlers", () => {
     const { repository, handlers } = setup();
     const created = await handlers.create({
       workspaceId: "w1",
-      labour: INPUT,
+      employee: INPUT,
       by: "u1",
     });
     repository.attendance.set(created.id, ["2026-09-05"]);
@@ -141,7 +225,7 @@ describe("LabourHandlers", () => {
         handlers.update({
           workspaceId: "w1",
           id: created.id,
-          labour: {
+          employee: {
             ...INPUT,
             joiningDate: "2026-09-06",
             expectedUpdatedAt: created.updatedAt,
@@ -156,19 +240,19 @@ describe("LabourHandlers", () => {
     const { repository, handlers } = setup();
     const a = await handlers.create({
       workspaceId: "w1",
-      labour: INPUT,
+      employee: INPUT,
       by: "u1",
     });
     const b = await handlers.create({
       workspaceId: "w1",
-      labour: { ...INPUT, name: "Shyam" },
+      employee: { ...INPUT, name: "Shyam" },
       by: "u1",
     });
     const move = (projects: string[]) =>
       handlers.transfer({
         workspaceId: "w1",
         access: transferAccess(projects),
-        labourIds: [a.id, b.id],
+        employeeIds: [a.id, b.id],
         toProjectId: "p2",
         transferDate: "2026-10-01",
         by: "u2",
@@ -186,7 +270,7 @@ describe("LabourHandlers", () => {
     });
     expect(
       repository.audits.filter(
-        (audit) => audit.action === "labour.transferred",
+        (audit) => audit.action === "employee.transferred",
       ),
     ).toHaveLength(2);
   });
@@ -195,7 +279,7 @@ describe("LabourHandlers", () => {
     const { repository, handlers } = setup();
     const created = await handlers.create({
       workspaceId: "w1",
-      labour: { ...INPUT, projectIds: [] },
+      employee: { ...INPUT, projectIds: [] },
       by: "u1",
     });
     expect(created.projects).toEqual([]);
@@ -205,7 +289,7 @@ describe("LabourHandlers", () => {
       handlers.update({
         workspaceId: "w1",
         id: created.id,
-        labour: { ...INPUT, projectIds, expectedUpdatedAt },
+        employee: { ...INPUT, projectIds, expectedUpdatedAt },
         by: "u1",
       });
     expect(await codeOf(() => edit(["p9"], created.updatedAt))).toBe(
@@ -229,15 +313,15 @@ describe("LabourHandlers", () => {
     const kept = await handlers.update({
       workspaceId: "w1",
       id: created.id,
-      labour: { ...withoutProjects, expectedUpdatedAt: one.updatedAt },
+      employee: { ...withoutProjects, expectedUpdatedAt: one.updatedAt },
       by: "u1",
     });
     expect(kept.projects.map((project) => project.id)).toEqual(["p2"]);
   });
 
   it("moves a Labour on many Projects from the one named, keeping the others", async () => {
-    const repository = new FakeLabourRepository();
-    const handlers = new LabourHandlers(
+    const repository = new FakeEmployeeRepository();
+    const handlers = new EmployeeHandlers(
       repository,
       fakeQueries(repository),
       fakeDirectories({ projects: ["p1", "p2", "p3"] }),
@@ -245,7 +329,7 @@ describe("LabourHandlers", () => {
     );
     const created = await handlers.create({
       workspaceId: "w1",
-      labour: { ...INPUT, projectIds: ["p1", "p2"] },
+      employee: { ...INPUT, projectIds: ["p1", "p2"] },
       by: "u1",
     });
     const move = (
@@ -256,7 +340,7 @@ describe("LabourHandlers", () => {
       handlers.transfer({
         workspaceId: "w1",
         access: transferAccess(projects),
-        labourIds: [created.id],
+        employeeIds: [created.id],
         fromProjectId,
         toProjectId,
         transferDate: "2026-10-01",
@@ -266,7 +350,9 @@ describe("LabourHandlers", () => {
       "TRANSFER_FROM_PROJECT_REQUIRED",
     );
     expect(await codeOf(() => move("p1", "p2"))).toBe("TRANSFER_SAME_PROJECT");
-    expect(await codeOf(() => move("p3", "p1"))).toBe("LABOUR_NOT_ON_PROJECT");
+    expect(await codeOf(() => move("p3", "p1"))).toBe(
+      "EMPLOYEE_NOT_ON_PROJECT",
+    );
     expect(await codeOf(() => move("p1", "p3", ["p2", "p3"]))).toBe(
       "PERMISSION_DENIED",
     );
@@ -282,7 +368,7 @@ describe("LabourHandlers", () => {
     const { repository, handlers } = setup();
     const created = await handlers.create({
       workspaceId: "w1",
-      labour: { ...INPUT, openingBalance: 900 },
+      employee: { ...INPUT, openingBalance: 900 },
       by: "u1",
     });
     repository.payments.add(created.id);
@@ -290,12 +376,12 @@ describe("LabourHandlers", () => {
       await codeOf(() =>
         handlers.delete({ workspaceId: "w1", id: created.id, by: "u1" }),
       ),
-    ).toBe("LABOUR_HAS_RECORDS");
+    ).toBe("EMPLOYEE_HAS_RECORDS");
     repository.payments.clear();
     await handlers.delete({ workspaceId: "w1", id: created.id, by: "u1" });
     expect(repository.ledger.get(created.id)).toEqual([900, -900]);
     expect(await codeOf(() => handlers.get("w1", created.id))).toBe(
-      "LABOUR_NOT_FOUND",
+      "EMPLOYEE_NOT_FOUND",
     );
   });
   describe("from a Project's Resources (ADR CM-0038 §2)", () => {
@@ -313,12 +399,12 @@ describe("LabourHandlers", () => {
       const { repository, handlers } = setup();
       const a = await handlers.create({
         workspaceId: "w1",
-        labour: { ...INPUT, projectIds: [] },
+        employee: { ...INPUT, projectIds: [] },
         by: "u1",
       });
       const b = await handlers.create({
         workspaceId: "w1",
-        labour: { ...INPUT, name: "Shyam", projectIds: ["p2"] },
+        employee: { ...INPUT, name: "Shyam", projectIds: ["p2"] },
         by: "u1",
       });
       return { repository, handlers, a, b };
@@ -329,7 +415,7 @@ describe("LabourHandlers", () => {
       await handlers.addToProject({
         workspaceId: "w1",
         projectId: "p1",
-        labourIds: [a.id, b.id, a.id],
+        employeeIds: [a.id, b.id, a.id],
         from: "2026-09-15",
         remark: " Slab work ",
         by: "u2",
@@ -344,9 +430,9 @@ describe("LabourHandlers", () => {
           createdAt: NOW,
           createdBy: "u2",
         });
-      expect(repository.labours.get(b.id)?.projectIds).toEqual(["p2", "p1"]);
+      expect(repository.employees.get(b.id)?.projectIds).toEqual(["p2", "p1"]);
       const audits = repository.audits.filter(
-        (audit) => audit.action === "labour.projects_changed",
+        (audit) => audit.action === "employee.projects_changed",
       );
       expect(audits).toHaveLength(2);
       expect(audits[1]).toMatchObject({
@@ -367,7 +453,7 @@ describe("LabourHandlers", () => {
       await handlers.addToProject({
         workspaceId: "w1",
         projectId: "p1",
-        labourIds: [a.id],
+        employeeIds: [a.id],
         by: "u2",
       });
       expect(repository.history.get(a.id)?.at(-1)?.transferDate).toBe(
@@ -384,34 +470,34 @@ describe("LabourHandlers", () => {
           handlers.addToProject({
             workspaceId: "w1",
             projectId: "p2",
-            labourIds: [a.id, b.id],
+            employeeIds: [a.id, b.id],
             from: "2026-09-15",
             by: "u2",
             ...extra,
           }),
         );
       const already = await add({});
-      expect(already.code).toBe("LABOUR_ALREADY_ON_PROJECT");
-      expect(already.details).toMatchObject({ labourId: b.id });
-      expect(repository.labours.get(a.id)?.projectIds).toEqual([]);
+      expect(already.code).toBe("EMPLOYEE_ALREADY_ON_PROJECT");
+      expect(already.details).toMatchObject({ employeeId: b.id });
+      expect(repository.employees.get(a.id)?.projectIds).toEqual([]);
 
-      const early = await add({ labourIds: [a.id], from: "2026-08-31" });
+      const early = await add({ employeeIds: [a.id], from: "2026-08-31" });
       expect(early.code).toBe("FROM_BEFORE_JOINING_DATE");
-      expect(early.details).toMatchObject({ field: "from", labourId: a.id });
+      expect(early.details).toMatchObject({ field: "from", employeeId: a.id });
 
-      const unknown = await add({ labourIds: [a.id, "nobody"] });
-      expect(unknown.code).toBe("LABOUR_NOT_FOUND");
-      expect(unknown.details).toMatchObject({ labourId: "nobody" });
+      const unknown = await add({ employeeIds: [a.id, "nobody"] });
+      expect(unknown.code).toBe("EMPLOYEE_NOT_FOUND");
+      expect(unknown.details).toMatchObject({ employeeId: "nobody" });
 
       expect((await add({ projectId: "p9" })).code).toBe("PROJECT_NOT_FOUND");
-      expect((await add({ labourIds: [] })).code).toBe("LABOURS_REQUIRED");
+      expect((await add({ employeeIds: [] })).code).toBe("EMPLOYEES_REQUIRED");
       expect(
         (
           await add({
-            labourIds: Array.from({ length: 501 }, (_, i) => String(i)),
+            employeeIds: Array.from({ length: 501 }, (_, i) => String(i)),
           })
         ).code,
-      ).toBe("TOO_MANY_LABOURS");
+      ).toBe("TOO_MANY_EMPLOYEES");
       const remark = await add({ remark: "x".repeat(501) });
       expect(remark.code).toBe("REMARK_TOO_LONG");
       expect(remark.details).toMatchObject({ field: "remark" });
@@ -425,12 +511,12 @@ describe("LabourHandlers", () => {
         active: false,
         by: "u1",
       });
-      const inactive = await add({ labourIds: [a.id], projectId: "p1" });
-      expect(inactive.code).toBe("LABOUR_INACTIVE");
-      expect(inactive.details).toMatchObject({ labourId: a.id });
+      const inactive = await add({ employeeIds: [a.id], projectId: "p1" });
+      expect(inactive.code).toBe("EMPLOYEE_INACTIVE");
+      expect(inactive.details).toMatchObject({ employeeId: a.id });
       expect(
         repository.audits.filter(
-          (audit) => audit.action === "labour.projects_changed",
+          (audit) => audit.action === "employee.projects_changed",
         ),
       ).toEqual([]);
     });
@@ -440,7 +526,7 @@ describe("LabourHandlers", () => {
       await handlers.removeFromProject({
         workspaceId: "w1",
         projectId: "p2",
-        labourId: b.id,
+        employeeId: b.id,
         lastDay: "2026-09-30",
         by: "u2",
       });
@@ -448,7 +534,7 @@ describe("LabourHandlers", () => {
         handlers.addToProject({
           workspaceId: "w1",
           projectId: "p1",
-          labourIds: [b.id],
+          employeeIds: [b.id],
           from: "2026-09-20",
           by: "u2",
         }),
@@ -456,7 +542,7 @@ describe("LabourHandlers", () => {
       expect(early.code).toBe("TRANSFER_BEFORE_LAST_TRANSFER");
       expect(early.details).toMatchObject({
         field: "from",
-        labourId: b.id,
+        employeeId: b.id,
         lastTransferDate: "2026-10-01",
       });
     });
@@ -468,7 +554,7 @@ describe("LabourHandlers", () => {
       await handlers.removeFromProject({
         workspaceId: "w1",
         projectId: "p2",
-        labourId: b.id,
+        employeeId: b.id,
         lastDay: "2026-09-20",
         remark: "Work done",
         by: "u2",
@@ -479,9 +565,9 @@ describe("LabourHandlers", () => {
         transferDate: "2026-09-21",
         remark: "Work done",
       });
-      expect(repository.labours.get(b.id)?.projectIds).toEqual([]);
+      expect(repository.employees.get(b.id)?.projectIds).toEqual([]);
       expect(repository.audits.at(-1)).toMatchObject({
-        action: "labour.projects_changed",
+        action: "employee.projects_changed",
         after: { projectIds: [], projectId: "p2", lastDay: "2026-09-20" },
       });
 
@@ -489,13 +575,13 @@ describe("LabourHandlers", () => {
         handlers.removeFromProject({
           workspaceId: "w1",
           projectId: "p2",
-          labourId: b.id,
+          employeeId: b.id,
           lastDay: "2026-09-25",
           by: "u2",
         }),
       );
-      expect(again.code).toBe("LABOUR_NOT_ON_PROJECT");
-      expect(again.details).toMatchObject({ labourId: b.id });
+      expect(again.code).toBe("EMPLOYEE_NOT_ON_PROJECT");
+      expect(again.details).toMatchObject({ employeeId: b.id });
     });
 
     it("refuses a Last day before attendance or their last move, in Last-day words", async () => {
@@ -506,7 +592,7 @@ describe("LabourHandlers", () => {
           handlers.removeFromProject({
             workspaceId: "w1",
             projectId: "p2",
-            labourId: b.id,
+            employeeId: b.id,
             lastDay,
             by: "u2",
           }),
@@ -515,7 +601,7 @@ describe("LabourHandlers", () => {
       expect(beforeAttendance.code).toBe("TRANSFER_BEFORE_ATTENDANCE");
       expect(beforeAttendance.details).toMatchObject({
         field: "lastDay",
-        labourId: b.id,
+        employeeId: b.id,
         latestAttendanceDate: "2026-09-20",
       });
       expect(beforeAttendance.message).toContain("Last day");
@@ -532,7 +618,7 @@ describe("LabourHandlers", () => {
       await handlers.removeFromProject({
         workspaceId: "w1",
         projectId: "p2",
-        labourId: b.id,
+        employeeId: b.id,
         lastDay: "2026-08-31",
         by: "u2",
       });
@@ -543,13 +629,13 @@ describe("LabourHandlers", () => {
 
     it("refuses a Labour changed since it was loaded", async () => {
       const { repository, handlers, b } = await two();
-      const stale = repository.labours.get(b.id);
+      const stale = repository.employees.get(b.id);
       if (stale == null) throw new Error("missing");
       const original = repository.changeProject.bind(repository);
       repository.changeProject = async (change) => {
         // Someone else edits the Labour between the read and the write.
         stale.update(stale.details, "u3", new Date("2026-10-09T00:00:00Z"));
-        repository.labours.set(stale.id, stale);
+        repository.employees.set(stale.id, stale);
         return original(change);
       };
       expect(
@@ -558,13 +644,13 @@ describe("LabourHandlers", () => {
             handlers.removeFromProject({
               workspaceId: "w1",
               projectId: "p2",
-              labourId: b.id,
+              employeeId: b.id,
               lastDay: "2026-10-01",
               by: "u2",
             }),
           )
         ).code,
-      ).toBe("LABOUR_CHANGED");
+      ).toBe("EMPLOYEE_CHANGED");
     });
   });
 
@@ -574,7 +660,7 @@ describe("LabourHandlers", () => {
       const add = (name: string, reportsToId?: string) =>
         handlers.create({
           workspaceId: "w1",
-          labour: { ...INPUT, name, reportsToId },
+          employee: { ...INPUT, name, reportsToId },
           by: "u1",
         });
       const mason = await add("Mason");
@@ -584,19 +670,20 @@ describe("LabourHandlers", () => {
     }
 
     function edit(
-      handlers: LabourHandlers,
-      labour: { id: string; updatedAt: Date; details: { name: string } },
+      handlers: EmployeeHandlers,
+      employee: { id: string; updatedAt: Date; details: { name: string } },
       reportsToId: string | null | undefined,
     ) {
       return handlers.update({
         workspaceId: "w1",
-        id: labour.id,
-        labour: {
-          name: labour.details.name,
+        id: employee.id,
+        employee: {
+          name: employee.details.name,
+          roleId: ROLE,
           joiningDate: INPUT.joiningDate,
           wageType: "daily",
           reportsToId,
-          expectedUpdatedAt: labour.updatedAt,
+          expectedUpdatedAt: employee.updatedAt,
         },
         by: "u1",
       });
@@ -617,7 +704,7 @@ describe("LabourHandlers", () => {
         await codeOf(() =>
           handlers.create({
             workspaceId: "w1",
-            labour: { ...INPUT, reportsToId: "nobody" },
+            employee: { ...INPUT, reportsToId: "nobody" },
             by: "u1",
           }),
         ),
@@ -642,7 +729,7 @@ describe("LabourHandlers", () => {
         await codeOf(() =>
           handlers.create({
             workspaceId: "w1",
-            labour: { ...INPUT, reportsToId: mason.id },
+            employee: { ...INPUT, reportsToId: mason.id },
             by: "u1",
           }),
         ),
@@ -658,7 +745,9 @@ describe("LabourHandlers", () => {
       const { repository, handlers, mason, helper } = await three();
       await handlers.delete({ workspaceId: "w1", id: mason.id, by: "u1" });
       expect((await handlers.get("w1", helper.id)).reportsTo).toBeNull();
-      expect(repository.labours.get(helper.id)?.details.reportsToId).toBeNull();
+      expect(
+        repository.employees.get(helper.id)?.details.reportsToId,
+      ).toBeNull();
     });
   });
 });

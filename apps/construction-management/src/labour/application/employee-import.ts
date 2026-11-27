@@ -8,34 +8,39 @@ import { newId } from "@/src/shared-kernel/ids";
 import { Money } from "@/src/shared-kernel/money";
 
 import {
-  Labour,
+  Employee,
   MAX_PAISE,
-  checkLabourDetails,
-  type LabourDetails,
-} from "../domain/labour";
+  checkEmployeeDetails,
+  type EmployeeDetails,
+} from "../domain/employee";
 import {
+  DEFAULT_IMPORT_ROLE,
   MAX_IMPORT_ROWS,
   PROJECT_SEPARATOR,
   WEEKDAY_NAMES,
-  type LabourCell,
-  type LabourColumnKey,
-  type LabourSheetRow,
-} from "./labour-columns";
+  type EmployeeCell,
+  type EmployeeColumnKey,
+  type EmployeeSheetRow,
+} from "./employee-columns";
 import type {
-  LabourLookups,
-  LabourRepository,
-  NewLabour,
-} from "./labour-ports";
+  EmployeeLookups,
+  EmployeeRepository,
+  EmployeeRoleLookup,
+  NewEmployee,
+} from "./employee-ports";
 
 export type ImportRowError = {
-  field: LabourColumnKey;
+  field: EmployeeColumnKey;
   code: string;
   message: string;
 };
 
 export type ImportRowValues = {
   name: string;
-  labourCode: string | null;
+  employeeCode: string | null;
+  /** The Department and Role cells as typed. */
+  department: string | null;
+  role: string | null;
   joiningDate: string | null;
   wageType: string | null;
   /** Paise. */
@@ -62,12 +67,12 @@ export type ImportPreview = {
 };
 
 type Checked = ImportRow & {
-  details: LabourDetails | null;
+  details: EmployeeDetails | null;
   projectIds: string[];
   opening: number;
 };
 
-function text(cell: LabourCell | undefined): string {
+function text(cell: EmployeeCell | undefined): string {
   if (cell == null) return "";
   if (cell instanceof Date) return cell.toISOString().slice(0, 10);
   if (typeof cell === "number")
@@ -76,7 +81,7 @@ function text(cell: LabourCell | undefined): string {
 }
 
 /** A date cell, `YYYY-MM-DD`, or `DD/MM/YYYY` / `DD-MM-YYYY` (India). */
-export function sheetDate(cell: LabourCell | undefined): CalendarDate | null {
+export function sheetDate(cell: EmployeeCell | undefined): CalendarDate | null {
   if (cell instanceof Date)
     return Number.isNaN(cell.getTime())
       ? null
@@ -92,7 +97,7 @@ export function sheetDate(cell: LabourCell | undefined): CalendarDate | null {
 
 /** Rupees in a cell (`700`, `1,200.50`, `-500`) as paise; undefined when not money. */
 export function sheetMoney(
-  cell: LabourCell | undefined,
+  cell: EmployeeCell | undefined,
 ): number | null | undefined {
   const value = text(cell).replace(/[₹,\s]/g, "");
   if (value === "") return null;
@@ -122,45 +127,63 @@ export function sheetWeekdays(value: string): number[] | undefined {
   return days;
 }
 
+/** `5`, `5 years` → 5; undefined when not a whole number. */
+function sheetYears(cell: EmployeeCell | undefined): number | null | undefined {
+  const value = text(cell).replace(/\s*(years?|yrs?)$/i, "");
+  if (value === "") return null;
+  return /^\d+$/.test(value) ? Number(value) : undefined;
+}
+
 /**
- * The labour Excel import (CM-206): every row is checked and previewed;
- * nothing is written unless every row is valid, and then all rows are
- * written in one transaction. Names of Projects and Labour Categories match
- * case-insensitively. A Site Engineer column (templates before ADR CM-0041)
- * is not read: a Labour's Site Engineers come from their Projects.
+ * The Employee Excel import (CM-206, ADR CM-0055): every row is checked
+ * and previewed; nothing is written unless every row is valid, and then
+ * all rows are written in one transaction. Names of Projects, Labour
+ * Categories, Departments and Roles match case-insensitively. A blank Role
+ * is the Company's default Labour Role, so sheets from before Employees
+ * import as Labours. Old columns ("Labour Id", "Contact Number") are read;
+ * a Site Engineer column is not.
  */
-export class LabourImport {
+export class EmployeeImport {
   constructor(
-    private readonly labours: LabourRepository,
-    private readonly lookups: LabourLookups,
+    private readonly employees: EmployeeRepository,
+    private readonly lookups: EmployeeLookups,
     private readonly clock: () => Date = () => new Date(),
   ) {}
 
   private async check(
     workspaceId: string,
-    sheet: readonly LabourSheetRow[],
+    sheet: readonly EmployeeSheetRow[],
   ): Promise<Checked[]> {
     if (sheet.length === 0)
       throw new DomainError(
         "IMPORT_EMPTY",
-        "The sheet has no Labours. Fill in the template from row 2.",
+        "The sheet has no Employees. Fill in the template from row 2.",
       );
     if (sheet.length > MAX_IMPORT_ROWS)
       throw new DomainError(
         "IMPORT_TOO_MANY_ROWS",
-        `Import at most ${String(MAX_IMPORT_ROWS)} Labours at a time.`,
+        `Import at most ${String(MAX_IMPORT_ROWS)} Employees at a time.`,
         { details: { maxRows: MAX_IMPORT_ROWS, rows: sheet.length } },
       );
     const lookups = await this.lookups.all(workspaceId);
+    const today = await this.employees.today(workspaceId);
     const byName = <T extends { name: string }>(items: T[]) =>
       new Map(items.map((item) => [item.name.trim().toLowerCase(), item]));
     const projects = byName(lookups.projects);
     const categories = byName(lookups.labourCategories);
+    const departments = byName(lookups.departments);
+    const rolesNamed = (name: string) =>
+      lookups.roles.filter(
+        (role) => role.name.trim().toLowerCase() === name.toLowerCase(),
+      );
+    const defaultRole: EmployeeRoleLookup | undefined =
+      rolesNamed(DEFAULT_IMPORT_ROLE).find((role) => role.isSeed) ??
+      rolesNamed(DEFAULT_IMPORT_ROLE)[0];
 
     const codes = sheet
-      .map((row) => text(row.cells.labourCode))
+      .map((row) => text(row.cells.employeeCode))
       .filter((code) => code !== "");
-    const taken = await this.labours.codesTaken(workspaceId, codes);
+    const taken = await this.employees.codesTaken(workspaceId, codes);
     const seen = new Map<string, number>();
     for (const code of codes) {
       const key = code.toLowerCase();
@@ -169,11 +192,15 @@ export class LabourImport {
 
     return sheet.map(({ row, cells }) => {
       const errors: ImportRowError[] = [];
-      const fail = (field: LabourColumnKey, code: string, message: string) => {
+      const fail = (
+        field: EmployeeColumnKey,
+        code: string,
+        message: string,
+      ) => {
         errors.push({ field, code, message });
       };
 
-      const money = (key: LabourColumnKey): number | null => {
+      const money = (key: EmployeeColumnKey): number | null => {
         const value = sheetMoney(cells[key]);
         if (value === undefined) {
           fail(
@@ -191,6 +218,14 @@ export class LabourImport {
       const openingBalance = money("openingBalance");
 
       const joiningDate = sheetDate(cells.joiningDate);
+      const birthText = text(cells.dateOfBirth);
+      const dateOfBirth = sheetDate(cells.dateOfBirth);
+      if (birthText !== "" && dateOfBirth == null)
+        fail(
+          "dateOfBirth",
+          "DATE_OF_BIRTH_INVALID",
+          "Enter the date of birth as YYYY-MM-DD or DD/MM/YYYY.",
+        );
       const weeklyText = text(cells.weeklyHolidays);
       const weeklyHolidays = sheetWeekdays(weeklyText);
       if (weeklyHolidays === undefined)
@@ -199,9 +234,16 @@ export class LabourImport {
           "WEEKLY_HOLIDAYS_INVALID",
           "List weekdays like Sun, Sat.",
         );
+      const experienceYears = sheetYears(cells.experienceYears);
+      if (experienceYears === undefined)
+        fail(
+          "experienceYears",
+          "EXPERIENCE_INVALID",
+          "Experience is a whole number of years, 0 to 60.",
+        );
 
       const lookup = <T extends { id: string; disabled?: boolean }>(
-        key: LabourColumnKey,
+        key: EmployeeColumnKey,
         map: Map<string, T>,
         code: string,
         message: string,
@@ -237,46 +279,119 @@ export class LabourImport {
         "No live Labour Category has this name.",
       );
 
+      // The Role, under the Department when one is given (ADR CM-0055 §2).
+      const departmentText = text(cells.department);
+      const roleText = text(cells.role);
+      const department =
+        departmentText === ""
+          ? null
+          : departments.get(departmentText.toLowerCase());
+      if (department === undefined)
+        fail(
+          "department",
+          "DEPARTMENT_NOT_FOUND",
+          "No live Department has this name.",
+        );
+      let roleId = "";
+      if (roleText === "") {
+        if (defaultRole == null)
+          fail(
+            "role",
+            "EMPLOYEE_ROLE_NOT_FOUND",
+            `Enter the Role: this Company has no ${DEFAULT_IMPORT_ROLE} Role.`,
+          );
+        else if (
+          department != null &&
+          defaultRole.department?.id !== department.id
+        )
+          fail(
+            "role",
+            "EMPLOYEE_ROLE_REQUIRED",
+            "Enter the Role under this Department.",
+          );
+        else roleId = defaultRole.id;
+      } else if (department !== undefined) {
+        const matches = rolesNamed(roleText).filter(
+          (role) => department == null || role.department?.id === department.id,
+        );
+        const [only, ...others] = matches;
+        if (only == null)
+          fail(
+            "role",
+            "EMPLOYEE_ROLE_NOT_FOUND",
+            department == null
+              ? "No live Role has this name."
+              : `No live Role under ${department.name} has this name.`,
+          );
+        else if (others.length > 0)
+          fail(
+            "role",
+            "EMPLOYEE_ROLE_AMBIGUOUS",
+            "Several Roles have this name. Fill in the Department too.",
+          );
+        else roleId = only.id;
+      }
+
       const genderText = text(cells.gender).toLowerCase();
-      const checked = checkLabourDetails({
-        name: text(cells.name),
-        labourCode: text(cells.labourCode),
-        fatherName: text(cells.fatherName),
-        joiningDate: joiningDate ?? text(cells.joiningDate),
-        wageType: sheetWageType(text(cells.wageType)),
-        wagePerDay,
-        wagePerMonth,
-        overtimeWagePerHour,
-        // Blank is the default 8 hours.
-        workingHoursPerDay: text(cells.workingHoursPerDay),
-        weeklyHolidays: weeklyHolidays ?? [],
-        uanNumber: text(cells.uanNumber),
-        esicNumber: text(cells.esicNumber),
-        aadhaar: text(cells.aadhaar),
-        labourCategoryId,
-        contactNumber: text(cells.contactNumber),
-        gender: genderText === "" ? null : genderText,
-      });
+      const checked = checkEmployeeDetails(
+        {
+          name: text(cells.name),
+          employeeCode: text(cells.employeeCode),
+          // A missing Role is reported above, on its own cell.
+          roleId: roleId === "" ? "-" : roleId,
+          fatherName: text(cells.fatherName),
+          dateOfBirth: dateOfBirth ?? null,
+          gender: genderText === "" ? null : genderText,
+          bloodGroup: text(cells.bloodGroup),
+          joiningDate: joiningDate ?? text(cells.joiningDate),
+          mobile: text(cells.mobile),
+          email: text(cells.email),
+          address: text(cells.address),
+          emergencyContact: text(cells.emergencyContact),
+          qualification: text(cells.qualification),
+          experienceYears: experienceYears ?? null,
+          specialisation: text(cells.specialisation),
+          wageType: sheetWageType(text(cells.wageType)),
+          wagePerDay,
+          wagePerMonth,
+          overtimeWagePerHour,
+          // Blank is the default 8 hours.
+          workingHoursPerDay: text(cells.workingHoursPerDay),
+          weeklyHolidays: weeklyHolidays ?? [],
+          uanNumber: text(cells.uanNumber),
+          esicNumber: text(cells.esicNumber),
+          aadhaar: text(cells.aadhaar),
+          pan: text(cells.pan),
+          bankAccountHolder: text(cells.bankAccountHolder),
+          bankAccountNumber: text(cells.bankAccountNumber),
+          bankIfsc: text(cells.bankIfsc),
+          bankName: text(cells.bankName),
+          labourCategoryId,
+        },
+        today,
+      );
       for (const problem of checked.problems) {
-        const field = problem.field as LabourColumnKey;
-        // An amount already reported as unreadable is not reported twice.
+        const field = (
+          problem.field === "roleId" ? "role" : problem.field
+        ) as EmployeeColumnKey;
+        // A cell already reported as unreadable is not reported twice.
         if (!errors.some((error) => error.field === field))
           fail(field, problem.code, problem.message);
       }
 
-      const code = text(cells.labourCode);
+      const code = text(cells.employeeCode);
       if (code !== "") {
         if ((seen.get(code.toLowerCase()) ?? 0) > 1)
           fail(
-            "labourCode",
-            "LABOUR_CODE_DUPLICATE",
-            "This Labour Id appears on more than one row.",
+            "employeeCode",
+            "EMPLOYEE_CODE_DUPLICATE",
+            "This Employee Id appears on more than one row.",
           );
         else if (taken.has(code.toLowerCase()))
           fail(
-            "labourCode",
-            "LABOUR_CODE_TAKEN",
-            "Another Labour has this Labour Id.",
+            "employeeCode",
+            "EMPLOYEE_CODE_TAKEN",
+            "Another Employee has this Employee Id.",
           );
       }
 
@@ -287,7 +402,9 @@ export class LabourImport {
         errors,
         values: {
           name: text(cells.name),
-          labourCode: code === "" ? null : code,
+          employeeCode: code === "" ? null : code,
+          department: departmentText || null,
+          role: roleText || null,
           joiningDate: joiningDate ?? (text(cells.joiningDate) || null),
           wageType: text(cells.wageType) || null,
           wagePerDay,
@@ -306,7 +423,7 @@ export class LabourImport {
 
   async preview(
     workspaceId: string,
-    sheet: readonly LabourSheetRow[],
+    sheet: readonly EmployeeSheetRow[],
   ): Promise<ImportPreview> {
     return summary(await this.check(workspaceId, sheet));
   }
@@ -317,7 +434,7 @@ export class LabourImport {
    */
   async commit(input: {
     workspaceId: string;
-    sheet: readonly LabourSheetRow[];
+    sheet: readonly EmployeeSheetRow[];
     by: string;
   }): Promise<ImportPreview & { imported: number }> {
     const checked = await this.check(input.workspaceId, input.sheet);
@@ -329,10 +446,10 @@ export class LabourImport {
         { details: preview },
       );
     const now = this.clock();
-    const items: NewLabour[] = checked.map((row) => {
+    const items: NewEmployee[] = checked.map((row) => {
       if (row.details == null) throw new Error("A valid row has details.");
       return {
-        labour: Labour.create({
+        employee: Employee.create({
           id: newId(now.getTime()),
           workspaceId: input.workspaceId,
           details: row.details,
@@ -346,16 +463,16 @@ export class LabourImport {
     const audit: AuditEvent = {
       workspaceId: input.workspaceId,
       actorUserId: input.by,
-      action: "labour.imported",
-      entityType: "labour",
-      entityId: items[0]?.labour.id ?? newId(),
+      action: "employee.imported",
+      entityType: "employee",
+      entityId: items[0]?.employee.id ?? newId(),
       after: {
         count: items.length,
-        labourIds: items.map((item) => item.labour.id),
+        employeeIds: items.map((item) => item.employee.id),
       },
       occurredAt: now,
     };
-    await this.labours.insert(items, [audit]);
+    await this.employees.insert(items, [audit]);
     return { ...preview, imported: items.length };
   }
 }

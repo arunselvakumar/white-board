@@ -3,93 +3,138 @@ import type { Prisma, PrismaClient } from "@repo/construction-db";
 import {
   calendarDateFromDb,
   calendarDateToDb,
-  todayIn,
   type CalendarDate,
 } from "@/src/shared-kernel/calendar-date";
 import type { ListCursor, NameCursor } from "@/src/shared-kernel/list-cursor";
 
 import type {
-  LabourListFilter,
-  LabourListPage,
-  LabourLookups,
-  LabourOption,
-  LabourQueries,
-  LabourReadModel,
-  ProjectLabourChoice,
-  ProjectLabourPage,
-} from "../application/labour-ports";
+  EmployeeListFilter,
+  EmployeeListPage,
+  EmployeeLookups,
+  EmployeeOption,
+  EmployeeQueries,
+  EmployeeReadModel,
+  ProjectEmployeeChoice,
+  ProjectEmployeePage,
+} from "../application/employee-ports";
+import type { BloodGroup } from "../domain/employee";
 import { workingHours, type Weekday } from "../domain/wages";
 import { prismaLedger } from "./prisma-ledger";
-import {
-  siteEngineersOf,
-  siteEngineersOnProjects,
-} from "./project-site-engineers";
+import { companyToday } from "./prisma-labour-queries";
 
-/** The labourer's Projects, oldest first (ADR CM-0033). */
+/** The Employee's Projects, oldest first (ADR CM-0033). */
 const WITH_PROJECTS = {
   projects: {
     select: { projectId: true },
     orderBy: [{ since: "asc" }, { projectId: "asc" }],
   },
-} as const satisfies Prisma.ConstructionLabourLabourInclude;
+} as const satisfies Prisma.ConstructionLabourEmployeeInclude;
 
-type Row = Prisma.ConstructionLabourLabourGetPayload<{
+type Row = Prisma.ConstructionLabourEmployeeGetPayload<{
   include: typeof WITH_PROJECTS;
 }>;
 
-/** Today in the Company's time zone (its profile; India by default). */
-export async function companyToday(
-  db: Pick<PrismaClient, "constructionOrganizationCompanyProfile">,
-  workspaceId: string,
-  now: Date = new Date(),
-): Promise<CalendarDate> {
-  const profile = await db.constructionOrganizationCompanyProfile.findUnique({
-    where: { workspaceId },
-    select: { timezone: true },
-  });
-  try {
-    return todayIn(profile?.timezone ?? "Asia/Kolkata", now);
-  } catch {
-    return todayIn("Asia/Kolkata", now);
-  }
-}
+type Where = Prisma.ConstructionLabourEmployeeWhereInput;
 
-function whereOf(
-  filter: LabourListFilter,
-): Prisma.ConstructionLabourLabourWhereInput[] {
-  const filters: Prisma.ConstructionLabourLabourWhereInput[] = [
-    { workspaceId: filter.workspaceId, deletedAt: null },
-  ];
-  if (filter.projectId != null)
-    filters.push({ projects: { some: { projectId: filter.projectId } } });
-  if (filter.active != null) filters.push({ isActive: filter.active });
-  if (filter.labourCategoryId != null)
-    filters.push({ labourCategoryId: filter.labourCategoryId });
-  const search = filter.search?.trim() ?? "";
-  if (search.length > 0)
-    filters.push({
-      OR: [
-        { name: { contains: search, mode: "insensitive" } },
-        { labourCode: { contains: search, mode: "insensitive" } },
-        { fatherName: { contains: search, mode: "insensitive" } },
-        { contactNumber: { contains: search.replace(/\s/g, "") } },
-      ],
-    });
-  return filters;
-}
+/** The Role's name and its live Department, by Role id (ADR CM-0055 §2). */
+type RoleLine = {
+  id: string;
+  name: string;
+  department: { id: string; name: string } | null;
+};
 
-/** The register's reads, with names of other contexts' records by id. */
-export class PrismaLabourQueries implements LabourQueries {
+/** Shown for a Role whose row is gone. */
+const DELETED_ROLE = "Deleted Role";
+
+/** The Employee record's reads, with names of other contexts' records by id. */
+export class PrismaEmployeeQueries implements EmployeeQueries {
   constructor(
     private readonly db: PrismaClient,
     private readonly clock: () => Date = () => new Date(),
   ) {}
 
+  /** The Roles of the Company among `ids`, deleted ones included. */
+  private async roleLines(
+    workspaceId: string,
+    ids: readonly string[],
+  ): Promise<Map<string, RoleLine>> {
+    if (ids.length === 0) return new Map();
+    const rows = await this.db.constructionOrganizationRole.findMany({
+      where: { workspaceId, id: { in: [...new Set(ids)] } },
+      select: {
+        id: true,
+        name: true,
+        department: { select: { id: true, name: true, deletedAt: true } },
+      },
+    });
+    return new Map(
+      rows.map((row) => [
+        row.id,
+        {
+          id: row.id,
+          name: row.name,
+          department:
+            row.department != null && row.department.deletedAt == null
+              ? { id: row.department.id, name: row.department.name }
+              : null,
+        },
+      ]),
+    );
+  }
+
+  private roleOf(roles: Map<string, RoleLine>, roleId: string): RoleLine {
+    return (
+      roles.get(roleId) ?? { id: roleId, name: DELETED_ROLE, department: null }
+    );
+  }
+
+  private roleRef(
+    roles: Map<string, RoleLine>,
+    roleId: string,
+  ): { id: string; name: string } {
+    const { id, name } = this.roleOf(roles, roleId);
+    return { id, name };
+  }
+
+  /** The list filters as Prisma conditions; a Department means its Roles. */
+  private async whereOf(filter: EmployeeListFilter): Promise<Where[]> {
+    const filters: Where[] = [
+      { workspaceId: filter.workspaceId, deletedAt: null },
+    ];
+    if (filter.projectId != null)
+      filters.push({ projects: { some: { projectId: filter.projectId } } });
+    if (filter.active != null) filters.push({ isActive: filter.active });
+    if (filter.labourCategoryId != null)
+      filters.push({ labourCategoryId: filter.labourCategoryId });
+    if (filter.roleId != null) filters.push({ roleId: filter.roleId });
+    if (filter.departmentId != null) {
+      const roles = await this.db.constructionOrganizationRole.findMany({
+        where: {
+          workspaceId: filter.workspaceId,
+          departmentId: filter.departmentId,
+        },
+        select: { id: true },
+      });
+      filters.push({ roleId: { in: roles.map((role) => role.id) } });
+    }
+    const search = filter.search?.trim() ?? "";
+    if (search.length > 0)
+      filters.push({
+        OR: [
+          { name: { contains: search, mode: "insensitive" } },
+          { employeeCode: { contains: search, mode: "insensitive" } },
+          { fatherName: { contains: search, mode: "insensitive" } },
+          { mobile: { contains: search.replace(/\s/g, "") } },
+        ],
+      });
+    return filters;
+  }
+
   /** Read models for rows: names (including deleted records), opening, balance. */
   private async readModels(
     workspaceId: string,
     rows: readonly Row[],
-  ): Promise<LabourReadModel[]> {
+  ): Promise<EmployeeReadModel[]> {
     if (rows.length === 0) return [];
     const ids = rows.map((row) => row.id);
     const unique = (values: (string | null)[]) => [
@@ -99,7 +144,7 @@ export class PrismaLabourQueries implements LabourQueries {
     const projectIds = unique(
       rows.flatMap((row) => row.projects.map((project) => project.projectId)),
     );
-    const [projects, categories, engineers, managers, openings, balances] =
+    const [projects, categories, roles, managers, openings, balances] =
       await Promise.all([
         this.db.constructionProjectsProject.findMany({
           where: { workspaceId, id: { in: projectIds } },
@@ -112,8 +157,11 @@ export class PrismaLabourQueries implements LabourQueries {
           },
           select: { id: true, name: true },
         }),
-        siteEngineersOnProjects(this.db, workspaceId, projectIds),
-        this.db.constructionLabourLabour.findMany({
+        this.roleLines(
+          workspaceId,
+          rows.map((row) => row.roleId),
+        ),
+        this.db.constructionLabourEmployee.findMany({
           where: {
             workspaceId,
             deletedAt: null,
@@ -121,66 +169,89 @@ export class PrismaLabourQueries implements LabourQueries {
           },
           select: { id: true, name: true },
         }),
-        prismaLedger.openingBalances(this.db, workspaceId, "labour", ids),
-        prismaLedger.balances(this.db, workspaceId, "labour", ids, today),
+        prismaLedger.openingBalances(this.db, workspaceId, "employee", ids),
+        prismaLedger.balances(this.db, workspaceId, "employee", ids, today),
       ]);
     const byId = <T extends { id: string }>(items: T[]) =>
       new Map(items.map((item) => [item.id, item]));
     const projectNames = byId(projects);
     const categoryNames = byId(categories);
     const managerNames = byId(managers);
-    return rows.map((row) => ({
-      id: row.id,
-      details: {
-        name: row.name,
-        labourCode: row.labourCode,
-        fatherName: row.fatherName,
-        joiningDate: calendarDateFromDb(row.joiningDate),
-        wageType: row.wageType,
-        wagePerDay: row.wagePerDay,
-        wagePerMonth: row.wagePerMonth,
-        overtimeWagePerHour: row.overtimeWagePerHour,
-        workingHoursPerDay: workingHours(row.workingHoursPerDay.toString()),
-        weeklyHolidays: row.weeklyHolidays as Weekday[],
-        uanNumber: row.uanNumber,
-        esicNumber: row.esicNumber,
-        labourCategoryId: row.labourCategoryId,
-        reportsToId: row.reportsToId,
-        contactNumber: row.contactNumber,
-        gender: row.gender,
-      },
-      aadhaarMasked:
-        row.aadhaarLast4 == null ? null : `XXXXXXXX${row.aadhaarLast4}`,
-      projects: row.projects.map(
-        ({ projectId }) =>
-          projectNames.get(projectId) ?? {
-            id: projectId,
-            name: "Deleted Project",
-          },
-      ),
-      labourCategory:
-        row.labourCategoryId == null
-          ? null
-          : (categoryNames.get(row.labourCategoryId) ?? null),
-      siteEngineers: siteEngineersOf(
-        row.projects.map(({ projectId }) => projectId),
-        engineers,
-      ),
-      reportsTo:
-        row.reportsToId == null
-          ? null
-          : (managerNames.get(row.reportsToId) ?? null),
-      isActive: row.isActive,
-      photoKey: row.photoKey,
-      openingBalance: openings.get(row.id) ?? 0,
-      balance: balances.get(row.id) ?? 0,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-    }));
+    const masked = (last4: string | null, length: number) =>
+      last4 == null ? null : `${"X".repeat(length - 4)}${last4}`;
+    return rows.map((row) => {
+      const role = this.roleOf(roles, row.roleId);
+      return {
+        id: row.id,
+        details: {
+          name: row.name,
+          employeeCode: row.employeeCode,
+          roleId: row.roleId,
+          fatherName: row.fatherName,
+          dateOfBirth:
+            row.dateOfBirth == null
+              ? null
+              : calendarDateFromDb(row.dateOfBirth),
+          gender: row.gender,
+          bloodGroup: row.bloodGroup as BloodGroup | null,
+          joiningDate: calendarDateFromDb(row.joiningDate),
+          mobile: row.mobile,
+          email: row.email,
+          address: row.address,
+          emergencyContact: row.emergencyContact,
+          qualification: row.qualification,
+          experienceYears: row.experienceYears,
+          specialisation: row.specialisation,
+          wageType: row.wageType,
+          wagePerDay: row.wagePerDay,
+          wagePerMonth: row.wagePerMonth,
+          overtimeWagePerHour: row.overtimeWagePerHour,
+          workingHoursPerDay: workingHours(row.workingHoursPerDay.toString()),
+          weeklyHolidays: row.weeklyHolidays as Weekday[],
+          uanNumber: row.uanNumber,
+          esicNumber: row.esicNumber,
+          bankAccountHolder: row.bankAccountHolder,
+          bankIfsc: row.bankIfsc,
+          bankName: row.bankName,
+          labourCategoryId: row.labourCategoryId,
+          reportsToId: row.reportsToId,
+        },
+        aadhaarMasked: masked(row.aadhaarLast4, 12),
+        panMasked: masked(row.panLast4, 10),
+        bankAccountLast4: row.bankAccountLast4,
+        role: { id: role.id, name: role.name },
+        department: role.department,
+        projects: row.projects.map(
+          ({ projectId }) =>
+            projectNames.get(projectId) ?? {
+              id: projectId,
+              name: "Deleted Project",
+            },
+        ),
+        labourCategory:
+          row.labourCategoryId == null
+            ? null
+            : (categoryNames.get(row.labourCategoryId) ?? null),
+        reportsTo:
+          row.reportsToId == null
+            ? null
+            : (managerNames.get(row.reportsToId) ?? null),
+        teamMemberId: row.teamMemberId,
+        isActive: row.isActive,
+        photoKey: row.photoKey,
+        openingBalance: openings.get(row.id) ?? 0,
+        balance: balances.get(row.id) ?? 0,
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt,
+      };
+    });
   }
 
-  async get(workspaceId: string, id: string): Promise<LabourReadModel | null> {
-    const row = await this.db.constructionLabourLabour.findFirst({
+  async get(
+    workspaceId: string,
+    id: string,
+  ): Promise<EmployeeReadModel | null> {
+    const row = await this.db.constructionLabourEmployee.findFirst({
       where: { id, workspaceId, deletedAt: null },
       include: WITH_PROJECTS,
     });
@@ -190,17 +261,17 @@ export class PrismaLabourQueries implements LabourQueries {
   }
 
   async list(
-    filter: LabourListFilter & {
+    filter: EmployeeListFilter & {
       limit: number;
       after?: ListCursor;
       before?: ListCursor;
     },
-  ): Promise<LabourListPage> {
-    const filters = whereOf(filter);
+  ): Promise<EmployeeListPage> {
+    const filters = await this.whereOf(filter);
     // Newest first; `after` pages forward (older), `before` pages back.
     const backwards = filter.before != null;
     const cursor = filter.after ?? filter.before;
-    const page = await this.db.constructionLabourLabour.findMany({
+    const page = await this.db.constructionLabourEmployee.findMany({
       where: {
         AND:
           cursor == null
@@ -229,7 +300,7 @@ export class PrismaLabourQueries implements LabourQueries {
     const hasMore = page.length > filter.limit;
     const rows = page.slice(0, filter.limit);
     if (backwards) rows.reverse();
-    const total = await this.db.constructionLabourLabour.count({
+    const total = await this.db.constructionLabourEmployee.count({
       where: { AND: filters },
     });
     return {
@@ -239,9 +310,9 @@ export class PrismaLabourQueries implements LabourQueries {
     };
   }
 
-  async all(filter: LabourListFilter): Promise<LabourReadModel[]> {
-    const rows = await this.db.constructionLabourLabour.findMany({
-      where: { AND: whereOf(filter) },
+  async all(filter: EmployeeListFilter): Promise<EmployeeReadModel[]> {
+    const rows = await this.db.constructionLabourEmployee.findMany({
+      where: { AND: await this.whereOf(filter) },
       orderBy: [{ name: "asc" }, { id: "asc" }],
       take: 10_000,
       include: WITH_PROJECTS,
@@ -269,8 +340,8 @@ export class PrismaLabourQueries implements LabourQueries {
     limit: number;
     after?: NameCursor;
     before?: NameCursor;
-  }): Promise<ProjectLabourPage> {
-    const filters = whereOf({
+  }): Promise<ProjectEmployeePage> {
+    const filters = await this.whereOf({
       workspaceId: filter.workspaceId,
       projectId: filter.projectId,
       ...(filter.search == null ? {} : { search: filter.search }),
@@ -278,7 +349,7 @@ export class PrismaLabourQueries implements LabourQueries {
     // By name; `after` pages forward, `before` pages back.
     const backwards = filter.before != null;
     const cursor = filter.after ?? filter.before;
-    const page = await this.db.constructionLabourLabour.findMany({
+    const page = await this.db.constructionLabourEmployee.findMany({
       where: {
         AND:
           cursor == null
@@ -305,7 +376,8 @@ export class PrismaLabourQueries implements LabourQueries {
       select: {
         id: true,
         name: true,
-        labourCode: true,
+        employeeCode: true,
+        roleId: true,
         labourCategoryId: true,
         isActive: true,
         projects: {
@@ -317,18 +389,23 @@ export class PrismaLabourQueries implements LabourQueries {
     const hasMore = page.length > filter.limit;
     const rows = page.slice(0, filter.limit);
     if (backwards) rows.reverse();
-    const [total, categories] = await Promise.all([
-      this.db.constructionLabourLabour.count({ where: { AND: filters } }),
+    const [total, categories, roles] = await Promise.all([
+      this.db.constructionLabourEmployee.count({ where: { AND: filters } }),
       this.categoryNames(
         filter.workspaceId,
         rows.map((row) => row.labourCategoryId),
+      ),
+      this.roleLines(
+        filter.workspaceId,
+        rows.map((row) => row.roleId),
       ),
     ]);
     return {
       items: rows.map((row) => ({
         id: row.id,
         name: row.name,
-        labourCode: row.labourCode,
+        employeeCode: row.employeeCode,
+        role: this.roleRef(roles, row.roleId),
         labourCategory:
           row.labourCategoryId == null
             ? null
@@ -341,9 +418,12 @@ export class PrismaLabourQueries implements LabourQueries {
     };
   }
 
-  countOnProject(workspaceId: string, projectId: string): Promise<number> {
-    return this.db.constructionLabourLabour.count({
-      where: { AND: whereOf({ workspaceId, projectId }) },
+  async countOnProject(
+    workspaceId: string,
+    projectId: string,
+  ): Promise<number> {
+    return this.db.constructionLabourEmployee.count({
+      where: { AND: await this.whereOf({ workspaceId, projectId }) },
     });
   }
 
@@ -352,15 +432,15 @@ export class PrismaLabourQueries implements LabourQueries {
     projectId: string;
     search?: string;
     limit: number;
-  }): Promise<{ items: ProjectLabourChoice[]; hasMore: boolean }> {
-    const rows = await this.db.constructionLabourLabour.findMany({
+  }): Promise<{ items: ProjectEmployeeChoice[]; hasMore: boolean }> {
+    const rows = await this.db.constructionLabourEmployee.findMany({
       where: {
         AND: [
-          ...whereOf({
+          ...(await this.whereOf({
             workspaceId: input.workspaceId,
             active: true,
             ...(input.search == null ? {} : { search: input.search }),
-          }),
+          })),
           { projects: { none: { projectId: input.projectId } } },
         ],
       },
@@ -369,21 +449,29 @@ export class PrismaLabourQueries implements LabourQueries {
       select: {
         id: true,
         name: true,
-        labourCode: true,
+        employeeCode: true,
+        roleId: true,
         labourCategoryId: true,
         joiningDate: true,
       },
     });
     const kept = rows.slice(0, input.limit);
-    const categories = await this.categoryNames(
-      input.workspaceId,
-      kept.map((row) => row.labourCategoryId),
-    );
+    const [categories, roles] = await Promise.all([
+      this.categoryNames(
+        input.workspaceId,
+        kept.map((row) => row.labourCategoryId),
+      ),
+      this.roleLines(
+        input.workspaceId,
+        kept.map((row) => row.roleId),
+      ),
+    ]);
     return {
       items: kept.map((row) => ({
         id: row.id,
         name: row.name,
-        labourCode: row.labourCode,
+        employeeCode: row.employeeCode,
+        role: this.roleRef(roles, row.roleId),
         labourCategory:
           row.labourCategoryId == null
             ? null
@@ -398,22 +486,22 @@ export class PrismaLabourQueries implements LabourQueries {
     workspaceId: string,
     projectId: string,
     date: CalendarDate,
-  ): Promise<LabourOption[]> {
+  ): Promise<EmployeeOption[]> {
     const day = calendarDateToDb(date);
-    // Active labourers whose history puts them on the Project that day: the
+    // Active Employees whose history puts them on the Project that day: the
     // latest row on or before it that names the Project moves them onto it
     // (ADR CM-0033). Their other Projects do not matter.
     const ids = await this.db.$queryRaw<{ id: string }[]>`
       SELECT l.id::text AS id
-      FROM construction_labour.labours l
+      FROM construction_labour.employees l
       WHERE l.workspace_id = ${workspaceId}
         AND l.deleted_at IS NULL
         AND l.is_active
         AND l.joining_date <= ${day}
         AND (
           SELECT t.to_project_id IS NOT DISTINCT FROM ${projectId}::uuid
-          FROM construction_labour.labour_transfers t
-          WHERE t.labour_id = l.id
+          FROM construction_labour.employee_transfers t
+          WHERE t.employee_id = l.id
             AND t.transfer_date <= ${day}
             AND (t.to_project_id = ${projectId}::uuid
               OR t.from_project_id = ${projectId}::uuid)
@@ -422,14 +510,14 @@ export class PrismaLabourQueries implements LabourQueries {
         )
     `;
     if (ids.length === 0) return [];
-    const rows = await this.db.constructionLabourLabour.findMany({
+    const rows = await this.db.constructionLabourEmployee.findMany({
       where: { id: { in: ids.map((row) => row.id) } },
       orderBy: [{ name: "asc" }, { id: "asc" }],
     });
     return rows.map((row) => ({
       id: row.id,
       name: row.name,
-      labourCode: row.labourCode,
+      employeeCode: row.employeeCode,
       labourCategoryId: row.labourCategoryId,
       wageType: row.wageType,
       weeklyHolidays: row.weeklyHolidays,
@@ -440,9 +528,9 @@ export class PrismaLabourQueries implements LabourQueries {
     }));
   }
 
-  /** Every live Project and Labour Category (import, template). */
+  /** Every live Project, Labour Category, Role and Department (import, template). */
   async lookups(workspaceId: string) {
-    const [projects, labourCategories] = await Promise.all([
+    const [projects, labourCategories, roles, departments] = await Promise.all([
       this.db.constructionProjectsProject.findMany({
         where: { workspaceId, deletedAt: null },
         select: { id: true, name: true },
@@ -453,9 +541,34 @@ export class PrismaLabourQueries implements LabourQueries {
         select: { id: true, name: true, disabledAt: true },
         orderBy: { name: "asc" },
       }),
+      this.db.constructionOrganizationRole.findMany({
+        where: { workspaceId, deletedAt: null },
+        select: {
+          id: true,
+          name: true,
+          isSeed: true,
+          department: { select: { id: true, name: true, deletedAt: true } },
+        },
+        orderBy: { name: "asc" },
+      }),
+      this.db.constructionOrganizationDepartment.findMany({
+        where: { workspaceId, deletedAt: null },
+        select: { id: true, name: true },
+        orderBy: { name: "asc" },
+      }),
     ]);
     return {
       projects,
+      roles: roles.map((row) => ({
+        id: row.id,
+        name: row.name,
+        isSeed: row.isSeed,
+        department:
+          row.department != null && row.department.deletedAt == null
+            ? { id: row.department.id, name: row.department.name }
+            : null,
+      })),
+      departments,
       labourCategories: labourCategories.map((row) => ({
         id: row.id,
         name: row.name,
@@ -465,9 +578,9 @@ export class PrismaLabourQueries implements LabourQueries {
   }
 }
 
-/** `LabourLookups` over the same reads. */
-export function prismaLabourLookups(
-  queries: PrismaLabourQueries,
-): LabourLookups {
+/** `EmployeeLookups` over the same reads. */
+export function prismaEmployeeLookups(
+  queries: PrismaEmployeeQueries,
+): EmployeeLookups {
   return { all: (workspaceId) => queries.lookups(workspaceId) };
 }

@@ -3,20 +3,23 @@ import ExcelJS from "exceljs";
 import { DomainError } from "@/src/shared-kernel/domain-error";
 
 import {
-  LABOUR_COLUMNS,
+  EMPLOYEE_COLUMNS,
   MAX_IMPORT_ROWS,
   PROJECT_SEPARATOR,
   WEEKDAY_NAMES,
-  type LabourCell,
-  type LabourColumnKey,
-  type LabourSheetRow,
-} from "../application/labour-columns";
-import type { LabourReadModel } from "../application/labour-ports";
+  type EmployeeCell,
+  type EmployeeColumnKey,
+  type EmployeeSheetRow,
+} from "../application/employee-columns";
+import type { EmployeeReadModel } from "../application/employee-ports";
+import { BLOOD_GROUPS } from "../domain/employee";
 
 export const XLSX_CONTENT_TYPE =
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
-const SHEET = "Labours";
+const SHEET = "Employees";
+/** The data sheet of templates from before Employees (ADR CM-0055). */
+const OLD_SHEET = "Labours";
 const LISTS = "Lists";
 const HEADER_FILL: ExcelJS.Fill = {
   type: "pattern",
@@ -41,7 +44,7 @@ function addHeader(sheet: ExcelJS.Worksheet, headers: string[]): void {
 }
 
 function setColumns(sheet: ExcelJS.Worksheet): void {
-  LABOUR_COLUMNS.forEach((column, index) => {
+  EMPLOYEE_COLUMNS.forEach((column, index) => {
     const target = sheet.getColumn(index + 1);
     target.width = column.width;
     if ("text" in column) target.numFmt = "@";
@@ -59,12 +62,13 @@ async function toBytes(
 }
 
 /**
- * The sample sheet (CM-206): the header row, one example row, and a second
- * sheet listing the Company's Projects and Labour Categories with
- * drop-downs pointing at them. There is no Site Engineer column: a Labour's
- * Site Engineers come from their Projects (ADR CM-0041).
+ * The sample sheet (CM-206, ADR CM-0055): the header row, one example row,
+ * and a second sheet listing the Company's Departments, Roles, Projects and
+ * Labour Categories, with drop-downs pointing at them.
  */
-export async function labourTemplate(lists: {
+export async function employeeTemplate(lists: {
+  departments: string[];
+  roles: string[];
   projects: string[];
   labourCategories: string[];
 }): Promise<Uint8Array<ArrayBuffer>> {
@@ -74,13 +78,19 @@ export async function labourTemplate(lists: {
   setColumns(sheet);
   addHeader(
     sheet,
-    LABOUR_COLUMNS.map((column) => column.header),
+    EMPLOYEE_COLUMNS.map((column) => column.header),
   );
   sheet.addRow(
-    LABOUR_COLUMNS.map((column) => {
+    EMPLOYEE_COLUMNS.map((column) => {
       if (column.key === "projects") return lists.projects[0] ?? null;
       if (column.key === "labourCategory")
         return lists.labourCategories[0] ?? null;
+      // The example is a Labour, the most common Employee.
+      if (column.key === "department" || column.key === "role") {
+        const names =
+          column.key === "department" ? lists.departments : lists.roles;
+        return names.includes(column.example) ? column.example : null;
+      }
       return column.example;
     }),
   );
@@ -92,6 +102,9 @@ export async function labourTemplate(lists: {
     ["Wage Types", ["Daily", "Monthly"]],
     ["Genders", ["Male", "Female", "Other"]],
     ["Weekdays", WEEKDAY_NAMES],
+    ["Departments", lists.departments],
+    ["Roles", lists.roles],
+    ["Blood Groups", [...BLOOD_GROUPS]],
   ];
   addHeader(
     listSheet,
@@ -106,15 +119,18 @@ export async function labourTemplate(lists: {
 
   // Drop-downs on the data rows, pointing at the Lists sheet. Projects has
   // none: a cell may name several, separated by ";".
-  const dropDowns: [LabourColumnKey, number][] = [
+  const dropDowns: [EmployeeColumnKey, number][] = [
     ["labourCategory", 1],
     ["wageType", 2],
     ["gender", 3],
+    ["department", 5],
+    ["role", 6],
+    ["bloodGroup", 7],
   ];
   for (const [key, listIndex] of dropDowns) {
     const values = listColumns[listIndex]?.[1] ?? [];
     if (values.length === 0) continue;
-    const column = LABOUR_COLUMNS.findIndex((item) => item.key === key) + 1;
+    const column = EMPLOYEE_COLUMNS.findIndex((item) => item.key === key) + 1;
     const range = `${LISTS}!$${letter(listIndex)}$2:$${letter(listIndex)}$${String(values.length + 1)}`;
     for (let row = 2; row <= MAX_IMPORT_ROWS + 1; row += 1)
       sheet.getCell(row, column).dataValidation = {
@@ -132,12 +148,13 @@ const WEEKDAYS = (days: readonly number[]) =>
   days.map((day) => WEEKDAY_NAMES[day] ?? "").join(", ");
 
 /**
- * The register as a sheet (CM-206): the template's columns plus Site
- * Engineers (from their Projects, ADR CM-0041), Status and Balance, so an export reads like the import. Without Financial the
- * amounts are blank; Aadhaar is always masked.
+ * The Employees as a sheet (CM-206, ADR CM-0055): the template's columns
+ * plus Status and Balance, so an export reads like the import. Without
+ * Financial the amounts and bank details are blank; Aadhaar, PAN and the
+ * account number are always masked.
  */
-export async function labourExport(
-  labours: readonly LabourReadModel[],
+export async function employeeExport(
+  employees: readonly EmployeeReadModel[],
   financial: boolean,
 ): Promise<Uint8Array<ArrayBuffer>> {
   const workbook = new ExcelJS.Workbook();
@@ -145,23 +162,31 @@ export async function labourExport(
   const sheet = workbook.addWorksheet(SHEET);
   setColumns(sheet);
   addHeader(sheet, [
-    ...LABOUR_COLUMNS.map((column) => column.header.replace("*", "")),
-    "Site Engineers",
+    ...EMPLOYEE_COLUMNS.map((column) => column.header.replace("*", "")),
     "Status",
     "Balance (₹)",
   ]);
-  sheet.getColumn(LABOUR_COLUMNS.length + 1).width = 26;
-  sheet.getColumn(LABOUR_COLUMNS.length + 2).width = 10;
-  sheet.getColumn(LABOUR_COLUMNS.length + 3).width = 16;
-  sheet.getColumn(LABOUR_COLUMNS.length + 3).numFmt = "#,##0.00";
+  sheet.getColumn(EMPLOYEE_COLUMNS.length + 1).width = 10;
+  sheet.getColumn(EMPLOYEE_COLUMNS.length + 2).width = 16;
+  sheet.getColumn(EMPLOYEE_COLUMNS.length + 2).numFmt = "#,##0.00";
   const money = (paise: number | null) => (financial ? rupees(paise) : null);
-  for (const labour of labours) {
-    const { details } = labour;
-    const values: Record<LabourColumnKey, LabourCell> = {
+  const bank = (value: string | null) => (financial ? value : null);
+  const capital = (value: string | null) =>
+    value == null ? null : value.charAt(0).toUpperCase() + value.slice(1);
+  for (const employee of employees) {
+    const { details } = employee;
+    const values: Record<EmployeeColumnKey, EmployeeCell> = {
       name: details.name,
-      labourCode: details.labourCode,
+      employeeCode: details.employeeCode,
+      department: employee.department?.name ?? null,
+      role: employee.role.name,
       fatherName: details.fatherName,
+      dateOfBirth: details.dateOfBirth,
+      gender: capital(details.gender),
+      bloodGroup: details.bloodGroup,
       joiningDate: details.joiningDate,
+      mobile: details.mobile,
+      email: details.email,
       wageType: details.wageType === "daily" ? "Daily" : "Monthly",
       wagePerDay: money(details.wagePerDay),
       wagePerMonth: money(details.wagePerMonth),
@@ -169,31 +194,39 @@ export async function labourExport(
       // Not money: shown without Financial.
       workingHoursPerDay: Number(details.workingHoursPerDay),
       weeklyHolidays: WEEKDAYS(details.weeklyHolidays),
-      openingBalance: money(labour.openingBalance),
-      projects: labour.projects
+      openingBalance: money(employee.openingBalance),
+      projects: employee.projects
         .map((project) => project.name)
         .join(`${PROJECT_SEPARATOR} `),
-      labourCategory: labour.labourCategory?.name ?? null,
-      contactNumber: details.contactNumber,
-      gender:
-        details.gender == null
-          ? null
-          : details.gender.charAt(0).toUpperCase() + details.gender.slice(1),
+      labourCategory: employee.labourCategory?.name ?? null,
+      address: details.address,
+      emergencyContact: details.emergencyContact,
+      qualification: details.qualification,
+      experienceYears: details.experienceYears,
+      specialisation: details.specialisation,
       uanNumber: details.uanNumber,
       esicNumber: details.esicNumber,
-      aadhaar: labour.aadhaarMasked,
+      aadhaar: employee.aadhaarMasked,
+      pan: employee.panMasked,
+      bankAccountHolder: bank(details.bankAccountHolder),
+      bankAccountNumber: bank(
+        employee.bankAccountLast4 == null
+          ? null
+          : `XXXX${employee.bankAccountLast4}`,
+      ),
+      bankIfsc: bank(details.bankIfsc),
+      bankName: bank(details.bankName),
     };
     sheet.addRow([
-      ...LABOUR_COLUMNS.map((column) => values[column.key]),
-      labour.siteEngineers.map((engineer) => engineer.name).join(", "),
-      labour.isActive ? "Active" : "Inactive",
-      money(labour.balance),
+      ...EMPLOYEE_COLUMNS.map((column) => values[column.key]),
+      employee.isActive ? "Active" : "Inactive",
+      money(employee.balance),
     ]);
   }
   return toBytes(workbook);
 }
 
-function cellValue(value: ExcelJS.CellValue): LabourCell {
+function cellValue(value: ExcelJS.CellValue): EmployeeCell {
   if (value == null) return null;
   if (value instanceof Date || typeof value === "number") return value;
   if (typeof value === "string") return value;
@@ -217,12 +250,16 @@ function headerKey(raw: string): string {
   return raw.toLowerCase().replace(/\(₹\)|\*|[^a-z0-9]/g, "");
 }
 
-const KEYS_BY_HEADER = new Map<string, LabourColumnKey>([
-  ...LABOUR_COLUMNS.map(
+const KEYS_BY_HEADER = new Map<string, EmployeeColumnKey>([
+  ...EMPLOYEE_COLUMNS.map(
     (column) => [headerKey(column.header), column.key] as const,
   ),
   // Sheets from the template before ADR CM-0033 had one "Project*".
   ["project", "projects"],
+  // Sheets from the Labour template before ADR CM-0055.
+  ["labourname", "name"],
+  ["labourid", "employeeCode"],
+  ["contactnumber", "mobile"],
 ]);
 
 function fileInvalid(message: string): DomainError {
@@ -230,12 +267,13 @@ function fileInvalid(message: string): DomainError {
 }
 
 /**
- * The data rows of an uploaded sheet (the "Labours" sheet, or the first):
- * columns found by their header, blank rows skipped.
+ * The data rows of an uploaded sheet (the "Employees" sheet, an older
+ * "Labours" one, or the first): columns found by their header, blank rows
+ * skipped.
  */
-export async function readLabourSheet(
+export async function readEmployeeSheet(
   bytes: Uint8Array,
-): Promise<LabourSheetRow[]> {
+): Promise<EmployeeSheetRow[]> {
   // An .xlsx is a zip file: `PK\x03\x04`.
   if (
     bytes.byteLength < 4 ||
@@ -251,10 +289,13 @@ export async function readLabourSheet(
   } catch {
     throw fileInvalid("This file could not be read as an Excel workbook.");
   }
-  const sheet = workbook.getWorksheet(SHEET) ?? workbook.worksheets[0];
+  const sheet =
+    workbook.getWorksheet(SHEET) ??
+    workbook.getWorksheet(OLD_SHEET) ??
+    workbook.worksheets[0];
   if (sheet == null) throw fileInvalid("The workbook has no sheets.");
 
-  const columns = new Map<number, LabourColumnKey>();
+  const columns = new Map<number, EmployeeColumnKey>();
   sheet.getRow(1).eachCell((cell, column) => {
     const key = KEYS_BY_HEADER.get(
       headerKey(String(cellValue(cell.value) ?? "")),
@@ -266,10 +307,10 @@ export async function readLabourSheet(
       "The first row must be the template's headers. Download the sample sheet and fill it in.",
     );
 
-  const rows: LabourSheetRow[] = [];
+  const rows: EmployeeSheetRow[] = [];
   sheet.eachRow({ includeEmpty: false }, (row, number) => {
     if (number === 1) return;
-    const cells: LabourSheetRow["cells"] = {};
+    const cells: EmployeeSheetRow["cells"] = {};
     let blank = true;
     for (const [column, key] of columns) {
       const value = cellValue(row.getCell(column).value);
