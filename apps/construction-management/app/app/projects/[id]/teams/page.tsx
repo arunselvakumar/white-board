@@ -4,12 +4,12 @@ import type { Metadata } from "next";
 import { viewerCan } from "@/app/app/_lib/viewer-can";
 import { ProjectResourcesPage } from "@/app/app/projects/[id]/teams/_components/project-resources-page";
 import { RESOURCES_STEP } from "@/app/app/projects/_components/resources/resources-step";
-import { GET as listProjectLabours } from "@/app/api/construction/projects/projects/[id]/resources/labours/route";
+import { GET as listProjectEmployees } from "@/app/api/construction/projects/projects/[id]/resources/employees/route";
 import { GET as readResources } from "@/app/api/construction/projects/projects/[id]/resources/route";
 import {
-  PROJECT_LABOURS_API,
+  PROJECT_EMPLOYEES_API,
   RESOURCES_API,
-  projectLaboursQuery,
+  projectEmployeesQuery,
   projectResourcesQuery,
 } from "@/src/queries/project-resources";
 import { getQueryClient } from "@/src/queries/query-client";
@@ -35,11 +35,11 @@ export default async function ProjectResourcesRoute({
   const queryClient = getQueryClient();
   const routes = {
     [RESOURCES_API]: routeHandler(readResources),
-    [PROJECT_LABOURS_API]: routeHandler(listProjectLabours),
+    [PROJECT_EMPLOYEES_API]: routeHandler(listProjectEmployees),
   };
   const [
     canEdit,
-    canReadLabours,
+    canReadEmployees,
     canTransfer,
     teamMembers,
     contractors,
@@ -54,14 +54,14 @@ export default async function ProjectResourcesRoute({
     viewerCan("masters.suppliers", "read"),
     viewerCan("masters.vendors", "read"),
     prefetchRoute(queryClient, projectResourcesQuery(id), routes),
-    prefetchRoute(queryClient, projectLaboursQuery(id), routes),
+    prefetchRoute(queryClient, projectEmployeesQuery(id), routes),
   ]);
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <ProjectResourcesPage
         projectId={id}
         canEdit={canEdit}
-        canReadLabours={canReadLabours}
+        canReadEmployees={canReadEmployees}
         canOpenSections={{ teamMembers, contractors, suppliers, vendors }}
         canTransfer={canTransfer}
         wizard={step === RESOURCES_STEP}

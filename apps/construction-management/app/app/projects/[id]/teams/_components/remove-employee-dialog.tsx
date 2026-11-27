@@ -23,8 +23,8 @@ import { fieldForCode } from "@/lib/server-errors";
 import {
   isResourcesChanged,
   useReloadProjectResources,
-  useRemoveProjectLabour,
-  type ProjectLabour,
+  useRemoveProjectEmployee,
+  type ProjectEmployee,
 } from "@/src/queries/project-resources";
 
 const schema = z.object({
@@ -42,26 +42,26 @@ const SERVER_FIELDS: Record<string, keyof Values> = {
 };
 
 /**
- * Take a Labour off the Project after their Last day (the Company's today
+ * Take an Employee off the Project after their Last day (the Company's today
  * unless changed). Attendance, wages and payments already recorded stay.
  * A Last day before an attendance day on this Project is refused on the
  * field.
  */
-export function RemoveLabourDialog({
+export function RemoveEmployeeDialog({
   projectId,
-  labour,
+  employee,
   today,
   onClose,
 }: {
   projectId: string;
-  /** The Labour to remove; null keeps the dialog closed. */
-  labour: ProjectLabour | null;
+  /** The Employee to remove; null keeps the dialog closed. */
+  employee: ProjectEmployee | null;
   /** The Company's today, `YYYY-MM-DD`. */
   today: string;
   onClose: () => void;
 }) {
   const id = useId();
-  const remove = useRemoveProjectLabour(projectId);
+  const remove = useRemoveProjectEmployee(projectId);
   const reload = useReloadProjectResources(projectId);
   const form = useForm<Values>({
     resolver: zodResolver(schema),
@@ -72,17 +72,17 @@ export function RemoveLabourDialog({
   const resetMutation = remove.reset;
 
   useEffect(() => {
-    if (labour != null) {
+    if (employee != null) {
       reset({ lastDay: today, remark: "" });
       resetMutation();
     }
-  }, [labour, today, reset, resetMutation]);
+  }, [employee, today, reset, resetMutation]);
 
   const submit = form.handleSubmit(async (values) => {
-    if (labour == null) return;
+    if (employee == null) return;
     try {
       await remove.mutateAsync({
-        labourId: labour.id,
+        employeeId: employee.id,
         lastDay: values.lastDay,
         remark: values.remark === "" ? null : values.remark,
       });
@@ -96,7 +96,7 @@ export function RemoveLabourDialog({
 
   return (
     <Dialog
-      open={labour != null}
+      open={employee != null}
       onOpenChange={(open) => {
         if (!open) onClose();
       }}
@@ -110,7 +110,7 @@ export function RemoveLabourDialog({
           }}
         >
           <DialogHeader>
-            <DialogTitle>Remove {labour?.name} from this Project</DialogTitle>
+            <DialogTitle>Remove {employee?.name} from this Project</DialogTitle>
             <DialogDescription>
               Attendance, wages and payments already recorded stay. Their other
               Projects stay too.

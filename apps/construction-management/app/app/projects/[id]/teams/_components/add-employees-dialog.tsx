@@ -29,13 +29,13 @@ import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { fieldForCode } from "@/lib/server-errors";
 import {
-  projectLabourOptionsQuery,
-  useAddProjectLabours,
-  type ProjectLabourOption,
+  projectEmployeeOptionsQuery,
+  useAddProjectEmployees,
+  type ProjectEmployeeOption,
 } from "@/src/queries/project-resources";
 
 import { ResourcePickerSkeleton } from "./resources-skeletons";
-import { labourDetail } from "./labour-lines";
+import { employeeDetail } from "./employee-lines";
 
 const schema = z.object({
   from: z.string().min(1, "Enter the date they start on this Project"),
@@ -59,21 +59,21 @@ function Choices({
 }: {
   projectId: string;
   search: string;
-  chosen: ReadonlyMap<string, ProjectLabourOption>;
-  onToggle: (item: ProjectLabourOption, checked: boolean) => void;
+  chosen: ReadonlyMap<string, ProjectEmployeeOption>;
+  onToggle: (item: ProjectEmployeeOption, checked: boolean) => void;
 }) {
   const { data } = useSuspenseQuery(
-    projectLabourOptionsQuery(projectId, search),
+    projectEmployeeOptionsQuery(projectId, search),
   );
   return (
     <>
       <ul
-        aria-label="Labours not on this Project"
+        aria-label="Employees not on this Project"
         className="bg-card -mx-1 max-h-64 divide-y overflow-y-auto rounded-lg border"
       >
         {data.items.map((item) => {
-          const id = `add-labour-${item.id}`;
-          const detail = labourDetail(item);
+          const id = `add-employee-${item.id}`;
+          const detail = employeeDetail(item);
           return (
             <li key={item.id}>
               <label
@@ -91,7 +91,7 @@ function Choices({
                   <span className="block truncate text-sm font-medium">
                     {item.name}
                   </span>
-                  {detail != null && (
+                  {detail !== "" && (
                     <span className="text-muted-foreground block truncate text-xs">
                       {detail}
                     </span>
@@ -104,15 +104,15 @@ function Choices({
         {data.items.length === 0 && (
           <li className="text-muted-foreground px-3 py-6 text-center text-sm">
             {search.trim() === ""
-              ? "Every active Labour is on this Project already."
-              : `No Labours match “${search.trim()}”.`}
+              ? "Every active Employee is on this Project already."
+              : `No Employees match “${search.trim()}”.`}
           </li>
         )}
       </ul>
       {data.hasMore && (
         <p className="text-muted-foreground text-xs">
-          Showing the first {data.items.length}. Search by name, Labour Id or
-          phone to find others.
+          Showing the first {data.items.length}. Search by name, Employee Id or
+          mobile to find others.
         </p>
       )}
     </>
@@ -120,13 +120,14 @@ function Choices({
 }
 
 /**
- * Add Labours to a Project (ADR CM-0038 §2): tick active Labours not on
- * it (search by name, Labour Id or phone; ticks survive a new search),
+ * Add Employees to a Project (ADR CM-0038 §2, CM-0055 §5): tick active
+ * Employees not on it (search by name, Employee Id or mobile; ticks
+ * survive a new search),
  * choose the From date (the Company's today unless changed) and an
  * optional remark, and save them together. All or none: a refusal names
- * the Labour, and a date problem shows on the From field.
+ * the Employee, and a date problem shows on the From field.
  */
-export function AddLaboursDialog({
+export function AddEmployeesDialog({
   projectId,
   today,
   open,
@@ -139,11 +140,11 @@ export function AddLaboursDialog({
   onOpenChange: (open: boolean) => void;
 }) {
   const id = useId();
-  const add = useAddProjectLabours(projectId);
+  const add = useAddProjectEmployees(projectId);
   const [search, setSearch] = useState("");
   const deferredSearch = useDeferredValue(search);
   const [chosen, setChosen] = useState<
-    ReadonlyMap<string, ProjectLabourOption>
+    ReadonlyMap<string, ProjectEmployeeOption>
   >(() => new Map());
   const [pickError, setPickError] = useState<string | undefined>();
   const form = useForm<Values>({
@@ -163,12 +164,12 @@ export function AddLaboursDialog({
 
   const submit = form.handleSubmit(async (values) => {
     if (chosen.size === 0) {
-      setPickError("Tick at least one Labour.");
+      setPickError("Tick at least one Employee.");
       return;
     }
     try {
       await add.mutateAsync({
-        labourIds: [...chosen.keys()],
+        employeeIds: [...chosen.keys()],
         from: values.from,
         remark: values.remark === "" ? null : values.remark,
       });
@@ -196,22 +197,22 @@ export function AddLaboursDialog({
           }}
         >
           <DialogHeader>
-            <DialogTitle>Add Labours</DialogTitle>
+            <DialogTitle>Add Employees</DialogTitle>
             <DialogDescription>
               From the date you choose they are on this Project and its
               attendance sheet. Their other Projects stay.
             </DialogDescription>
           </DialogHeader>
           <fieldset className="min-w-0 space-y-2">
-            <legend className="sr-only">Labours</legend>
+            <legend className="sr-only">Employees</legend>
             <InputGroup>
               <InputGroupAddon>
                 <Search aria-hidden="true" />
               </InputGroupAddon>
               <InputGroupInput
                 type="search"
-                aria-label="Search Labours"
-                placeholder="Search name, Labour Id or phone"
+                aria-label="Search Employees"
+                placeholder="Search name, Employee Id or mobile"
                 value={search}
                 onKeyDown={(event) => {
                   if (event.key === "Enter") event.preventDefault();
@@ -222,7 +223,7 @@ export function AddLaboursDialog({
               />
             </InputGroup>
             {open && (
-              <Suspense fallback={<ResourcePickerSkeleton label="Labours" />}>
+              <Suspense fallback={<ResourcePickerSkeleton label="Employees" />}>
                 <Choices
                   projectId={projectId}
                   search={deferredSearch}
@@ -287,7 +288,7 @@ export function AddLaboursDialog({
               {add.isPending
                 ? "Adding…"
                 : chosen.size > 1
-                  ? `Add ${String(chosen.size)} Labours`
+                  ? `Add ${String(chosen.size)} Employees`
                   : "Add"}
             </Button>
           </DialogFooter>

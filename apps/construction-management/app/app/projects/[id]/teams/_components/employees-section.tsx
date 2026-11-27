@@ -19,52 +19,48 @@ import {
   InputGroupInput,
 } from "@repo/ui/components/input-group";
 
-import { TransferDialog } from "@/app/app/staff/labours/_components/transfer-dialog";
+import { TransferDialog } from "@/app/app/staff/employees/_components/transfer-dialog";
 import {
-  PROJECT_LABOURS_PAGE_SIZE,
-  projectLaboursQuery,
+  PROJECT_EMPLOYEES_PAGE_SIZE,
+  projectEmployeesQuery,
   useReloadProjectResources,
-  type ProjectLabour,
+  type ProjectEmployee,
 } from "@/src/queries/project-resources";
 import { projectQuery } from "@/src/queries/projects";
 
-import { AddLaboursDialog } from "./add-labours-dialog";
-import { labourDetail, sinceLabel } from "./labour-lines";
-import { RemoveLabourDialog } from "./remove-labour-dialog";
+import { AddEmployeesDialog } from "./add-employees-dialog";
+import { employeeDetail, sinceLabel } from "./employee-lines";
+import { RemoveEmployeeDialog } from "./remove-employee-dialog";
 import { TeamRow } from "./team-row";
-import { pageHref } from "@/lib/page-href";
+import { employeePagePath } from "@/lib/staff-nav";
 
 type Position = { after?: string; before?: string; page: number };
 
 const FIRST: Position = { page: 0 };
 
-function LabourRow({
-  labour,
+function EmployeeRow({
+  employee,
   canEdit,
-  canOpenLabours,
+  canOpenEmployees,
   canTransfer,
   onRemove,
   onTransfer,
 }: {
-  labour: ProjectLabour;
+  employee: ProjectEmployee;
   canEdit: boolean;
-  canOpenLabours: boolean;
+  canOpenEmployees: boolean;
   canTransfer: boolean;
   onRemove: () => void;
   onTransfer: () => void;
 }) {
   return (
     <TeamRow
-      name={labour.name}
-      href={
-        canOpenLabours
-          ? pageHref("/app/staff/labours/[id]", { id: labour.id })
-          : null
-      }
-      detail={[labourDetail(labour), sinceLabel(labour.since)]
+      name={employee.name}
+      href={canOpenEmployees ? employeePagePath(employee.id) : null}
+      detail={[employeeDetail(employee), sinceLabel(employee.since)]
         .filter(Boolean)
         .join(" · ")}
-      badges={!labour.isActive && <Badge variant="outline">Inactive</Badge>}
+      badges={!employee.isActive && <Badge variant="outline">Inactive</Badge>}
       actions={
         (canEdit || canTransfer) && (
           <DropdownMenu>
@@ -74,7 +70,7 @@ function LabourRow({
                   type="button"
                   variant="ghost"
                   size="icon"
-                  aria-label={`Actions for ${labour.name}`}
+                  aria-label={`Actions for ${employee.name}`}
                 />
               }
             >
@@ -100,32 +96,32 @@ function LabourRow({
 }
 
 /**
- * The Labours on a Project (ADR CM-0038 §2), by name, 50 a page: search
- * by name, Labour Id or phone, page with Previous and Next. Add Labours
- * picks many at once from a date; a row's menu removes one after a Last
- * day or opens the Transfer dialog. Every change writes the same history
- * as Edit Labour.
+ * The Employees on a Project (ADR CM-0038 §2, CM-0055 §5), by name, 50 a
+ * page, each with their Role: search by name, Employee Id or mobile, page
+ * with Previous and Next. Add Employees picks many at once from a date; a
+ * row's menu removes one after a Last day or opens the Transfer dialog.
+ * Every change writes the same history as Edit Employee.
  */
-export function LaboursSection({
+export function EmployeesSection({
   projectId,
   total,
   today,
   canEdit,
-  canPickLabours,
-  canOpenLabours,
+  canPickEmployees,
+  canOpenEmployees,
   canTransfer,
 }: {
   projectId: string;
-  /** Every Labour on the Project, whatever the search. */
+  /** Every Employee on the Project, whatever the search. */
   total: number;
   /** The Company's today, the dialogs' default date. */
   today: string;
   canEdit: boolean;
-  /** The Add Labours picker reads the register: Labours Read. */
-  canPickLabours: boolean;
-  /** The Labour page needs Labours Read. */
-  canOpenLabours: boolean;
-  /** Labour Transfer on this Project. */
+  /** The Add Employees picker reads the register: Employees Read. */
+  canPickEmployees: boolean;
+  /** The Employee page needs Employees Read. */
+  canOpenEmployees: boolean;
+  /** Transfer on the Project's Employees (`employee.employee`). */
   canTransfer: boolean;
 }) {
   const [search, setSearch] = useState("");
@@ -133,7 +129,7 @@ export function LaboursSection({
   const [position, setPosition] = useState<Position>(FIRST);
   const [isPaging, startPaging] = useTransition();
   const { data } = useSuspenseQuery(
-    projectLaboursQuery(projectId, {
+    projectEmployeesQuery(projectId, {
       search: deferredSearch,
       ...(position.after == null ? {} : { after: position.after }),
       ...(position.before == null ? {} : { before: position.before }),
@@ -145,11 +141,13 @@ export function LaboursSection({
   });
   const reload = useReloadProjectResources(projectId);
   const [adding, setAdding] = useState(false);
-  const [removing, setRemoving] = useState<ProjectLabour | null>(null);
-  const [transferring, setTransferring] = useState<ProjectLabour | null>(null);
-  const headingId = "resources-labours";
+  const [removing, setRemoving] = useState<ProjectEmployee | null>(null);
+  const [transferring, setTransferring] = useState<ProjectEmployee | null>(
+    null,
+  );
+  const headingId = "resources-employees";
   const searching = deferredSearch.trim() !== "";
-  const first = position.page * PROJECT_LABOURS_PAGE_SIZE + 1;
+  const first = position.page * PROJECT_EMPLOYEES_PAGE_SIZE + 1;
   const last = first + data.items.length - 1;
   const stale = search !== deferredSearch || isPaging;
 
@@ -161,15 +159,15 @@ export function LaboursSection({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 space-y-1">
           <h2 id={headingId} className="font-semibold">
-            Labours{" "}
+            Employees{" "}
             <span className="text-muted-foreground font-normal">{total}</span>
           </h2>
           <p className="text-muted-foreground text-sm">
-            Labours on a Project appear on its attendance sheet from their first
-            day.
+            Employees on a Project appear on its attendance sheet from their
+            first day, whatever their Role.
           </p>
         </div>
-        {canEdit && canPickLabours && (
+        {canEdit && canPickEmployees && (
           <Button
             type="button"
             variant="outline"
@@ -179,7 +177,7 @@ export function LaboursSection({
             }}
           >
             <Plus aria-hidden="true" />
-            Add Labours
+            Add Employees
           </Button>
         )}
       </div>
@@ -190,8 +188,8 @@ export function LaboursSection({
           </InputGroupAddon>
           <InputGroupInput
             type="search"
-            aria-label="Search Labours on this Project"
-            placeholder="Search name, Labour Id or phone"
+            aria-label="Search Employees on this Project"
+            placeholder="Search name, Employee Id or mobile"
             value={search}
             onChange={(event) => {
               setSearch(event.target.value);
@@ -212,35 +210,35 @@ export function LaboursSection({
           tone={searching ? "neutral" : "violet"}
           title={
             searching
-              ? `No Labours match “${deferredSearch.trim()}”`
-              : "No Labours on this Project"
+              ? `No Employees match “${deferredSearch.trim()}”`
+              : "No Employees on this Project"
           }
           description={
             searching
-              ? "Search by name, Labour Id or phone."
-              : canEdit && canPickLabours
-                ? "Add the Labours who work here, from the day they start."
-                : "Nobody has put Labours on this Project yet."
+              ? "Search by name, Employee Id or mobile."
+              : canEdit && canPickEmployees
+                ? "Add the Employees who work here, from the day they start."
+                : "Nobody has put Employees on this Project yet."
           }
         />
       ) : (
         <ul
-          aria-label="Labours"
+          aria-label="Employees"
           aria-busy={stale}
           className={`bg-card divide-y overflow-hidden rounded-lg border transition-opacity ${stale ? "opacity-60" : ""}`}
         >
-          {data.items.map((labour) => (
-            <LabourRow
-              key={labour.id}
-              labour={labour}
+          {data.items.map((employee) => (
+            <EmployeeRow
+              key={employee.id}
+              employee={employee}
               canEdit={canEdit}
-              canOpenLabours={canOpenLabours}
+              canOpenEmployees={canOpenEmployees}
               canTransfer={canTransfer}
               onRemove={() => {
-                setRemoving(labour);
+                setRemoving(employee);
               }}
               onTransfer={() => {
-                setTransferring(labour);
+                setTransferring(employee);
               }}
             />
           ))}
@@ -288,8 +286,8 @@ export function LaboursSection({
           </div>
         </div>
       )}
-      {canEdit && canPickLabours && (
-        <AddLaboursDialog
+      {canEdit && canPickEmployees && (
+        <AddEmployeesDialog
           projectId={projectId}
           today={today}
           open={adding}
@@ -297,9 +295,9 @@ export function LaboursSection({
         />
       )}
       {canEdit && (
-        <RemoveLabourDialog
+        <RemoveEmployeeDialog
           projectId={projectId}
-          labour={removing}
+          employee={removing}
           today={today}
           onClose={() => {
             setRemoving(null);
@@ -308,7 +306,7 @@ export function LaboursSection({
       )}
       {canTransfer && (
         <TransferDialog
-          labours={
+          employees={
             transferring == null
               ? []
               : [

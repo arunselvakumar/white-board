@@ -1,14 +1,18 @@
 import { formatCalendarDate } from "@/app/app/_components/projects/project-status";
 
-/** "L-001 · Mason", or null when they have neither. */
-export function labourDetail(labour: {
-  labourCode: string | null;
+/** "Labour · E-001 · Mason": their Role, Employee Id and Labour Category. */
+export function employeeDetail(employee: {
+  role: { name: string };
+  employeeCode: string | null;
   labourCategory: { name: string } | null;
-}): string | null {
-  const parts = [labour.labourCode, labour.labourCategory?.name].filter(
-    (part): part is string => part != null && part !== "",
-  );
-  return parts.length === 0 ? null : parts.join(" · ");
+}): string {
+  return [
+    employee.role.name,
+    employee.employeeCode,
+    employee.labourCategory?.name,
+  ]
+    .filter((part): part is string => part != null && part !== "")
+    .join(" · ");
 }
 
 /** "Since 2 Mar 2026". */
