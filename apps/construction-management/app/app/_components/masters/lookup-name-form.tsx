@@ -46,7 +46,7 @@ export type LookupNameForm = {
  * Add a row, or rename a Company-made one (with the `updatedAt` it loaded).
  * Labour Categories also set their skill; a Default one keeps its name and
  * changes only its skill. `onSaved` gets the saved row. Shared by the
- * Masters dialog and the Add Labour Category slide-over on the Labour form.
+ * Masters dialog and the Add Labour Category slide-over on the Employee form.
  */
 export function useLookupNameForm({
   config,

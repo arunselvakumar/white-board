@@ -56,7 +56,7 @@ export const HUMAN_RESOURCES: Department = {
   href: "/app/departments/human-resources",
   label: "Human Resources",
   description:
-    "Your Labours, Site Engineers and Vendors, your Office Staff and their Roles, and HRMS for attendance, leave and salary.",
+    "Your Employees and Vendors, your Office Staff and their Roles, and HRMS for attendance, leave and salary.",
   icon: UsersRound,
   areas: [STAFF_AREA_PATH, HRMS_PATH],
 };
@@ -94,7 +94,7 @@ function card({
 }
 
 /**
- * Human Resources' cards: Staff (Labour, Site Engineer, Vendor, then
+ * Human Resources' cards: Staff (Employees, Vendor, then
  * Office Staff and Role Management with Team Members or Role Management
  * Read, ADR CM-0030), then HRMS, one card per HRMS area.
  */

@@ -3,7 +3,7 @@
 /**
  * The wage set-up fields (ADR CM-0033): type, amount, overtime per hour,
  * working hours per day and weekly holidays, for the nested object `name`
- * of a react-hook-form form (see `wage-schema.ts`). Add and Edit Labour use
+ * of a react-hook-form form (see `wage-schema.ts`). Add and Edit Employee use
  * it as "Wage"; Add and Edit Staff as "Salary":
  *
  * ```tsx
@@ -16,7 +16,7 @@
  * />
  * ```
  *
- * `children` go after the amounts, before the weekly holidays (Labour puts
+ * `children` go after the amounts, before the weekly holidays (an Employee puts
  * its opening balance there). The caller draws the card around it.
  */
 import type { ReactNode } from "react";
@@ -76,7 +76,7 @@ export function WageFields<Values extends FieldValues>({
   form: UseFormReturn<Values>;
   /** The nested object holding `WageValues`, e.g. `"wage"` or `"salary"`. */
   name: string;
-  /** Prefix of the input ids, e.g. `"labour"` gives `labour-wage-day`. */
+  /** Prefix of the input ids, e.g. `"employee"` gives `employee-wage-day`. */
   idPrefix: string;
   options: WageOptions;
   /** False without Financial: the amounts are neither shown nor sent. */

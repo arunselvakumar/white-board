@@ -193,7 +193,7 @@ function Entry({
 /**
  * An Activity feed (ADR CM-0038): entries grouped by the day they apply
  * to, newest first, each with who recorded it and when, and Load more.
- * The Labour and Project feeds word their own entries.
+ * The Employee and Project feeds word their own entries.
  */
 export function ActivityFeed({
   items,

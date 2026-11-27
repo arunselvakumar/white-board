@@ -39,9 +39,8 @@ rolesPageTest.describe("Role Management", () => {
       const staff = page.getByRole("main").getByRole("region", {
         name: "Staff",
       });
-      await expect(staff.getByRole("link", { name: /^Labour/ })).toBeVisible();
       await expect(
-        staff.getByRole("link", { name: /^Site Engineer/ }),
+        staff.getByRole("link", { name: /^Employees/ }),
       ).toBeVisible();
       await expect(staff.getByRole("link", { name: /^Vendor/ })).toBeVisible();
       await expect(
@@ -74,7 +73,7 @@ rolesPageTest.describe("Role Management", () => {
         .getByRole("link", { name: /^Role Management/ });
       await memberPage.goto("/app/departments/human-resources");
       await expect(
-        memberPage.getByRole("main").getByRole("link", { name: /^Labour/ }),
+        memberPage.getByRole("main").getByRole("link", { name: /^Employees/ }),
       ).toBeVisible();
       await expect(roleCard).toHaveCount(0);
 

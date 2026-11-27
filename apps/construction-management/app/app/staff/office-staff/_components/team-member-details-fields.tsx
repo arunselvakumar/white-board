@@ -61,7 +61,7 @@ export const teamMemberDetailsObject = z.object({
       message: "Enter a valid 10-character PAN",
     }),
   emergencyContact: z.string().trim().max(120, "Too long"),
-  /** Like a Labour's wage, the amount optional (ADR CM-0033 §3). */
+  /** Like an Employee's wage, the amount optional (ADR CM-0033 §3). */
   salary: wageValuesSchema,
 });
 
@@ -388,7 +388,7 @@ export function TeamMemberDetailsFields<
         title="Salary"
         hint={
           canSeeSalary
-            ? "Optional, like a Labour's wage. Only people with the Financial right on Staff see the amounts."
+            ? "Optional, like an Employee's wage. Only people with the Financial right on Staff see the amounts."
             : "You cannot see salaries. Ask the Owner for the Financial right on Staff."
         }
       >

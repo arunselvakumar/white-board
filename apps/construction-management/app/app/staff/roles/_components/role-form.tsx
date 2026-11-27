@@ -31,7 +31,7 @@ import { FieldError } from "@/components/auth/field-error";
 import { FormAlert } from "@/components/auth/form-alert";
 import { PermissionMatrix } from "@/app/app/staff/_components/permission-matrix";
 import { fieldForCode } from "@/lib/server-errors";
-import { ROLES_PATH, staffCount } from "@/lib/staff-nav";
+import { ROLES_PATH, roleMembersLabel } from "@/lib/staff-nav";
 import { departmentsQuery } from "@/src/queries/departments";
 import { QueryHttpError } from "@/src/queries/http";
 import {
@@ -389,11 +389,11 @@ export function EditRoleScreen({
       meta={
         <span className="inline-flex items-center gap-1.5">
           <Users aria-hidden="true" className="size-4" />
-          {data.userCount === 0
-            ? "No staff are on this Role yet."
+          {data.userCount === 0 && data.employeeCount === 0
+            ? "No staff or Employees are on this Role yet."
             : canUpdate
-              ? `Changes apply to the ${staffCount(data.userCount)} on this Role.`
-              : `${staffCount(data.userCount)} on this Role.`}
+              ? `Changes apply to the ${roleMembersLabel(data, " and ")} on this Role.`
+              : `${roleMembersLabel(data, " and ")} on this Role.`}
         </span>
       }
     >

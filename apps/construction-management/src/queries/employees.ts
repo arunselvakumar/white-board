@@ -26,6 +26,11 @@ export type EmployeeTransfer =
 export type EmployeeImportPreview =
   ImportConstructionLabourEmployeesResponseModel;
 export type EmployeeDocument = ConstructionLabourPartyDocumentResponseModel;
+/** Add Employee's answer: whether the first password was set (ADR CM-0055 §4). */
+export type EmployeeCreated = EmployeeResponse & {
+  passwordIgnored: "existing_account" | null;
+  passwordSet: boolean;
+};
 
 export const EMPLOYEES_API = "/api/construction/labour/employees";
 
@@ -119,9 +124,7 @@ function postFile<T>(url: string, file: Blob, type?: string): Promise<T> {
   });
 }
 
-export function createEmployee(
-  input: EmployeeInput,
-): Promise<EmployeeResponse> {
+export function createEmployee(input: EmployeeInput): Promise<EmployeeCreated> {
   return postJson(EMPLOYEES_API, input);
 }
 

@@ -7,12 +7,7 @@ export class ResourcesPage extends ProjectPage {
 
   public section(
     name:
-      | "Site Engineers"
-      | "Labours"
-      | "Team Members"
-      | "Contractors"
-      | "Suppliers"
-      | "Vendors",
+      "Employees" | "Team Members" | "Contractors" | "Suppliers" | "Vendors",
   ) {
     return this.page.getByRole("region", { name: new RegExp(`^${name} \\d+`) });
   }
@@ -34,9 +29,9 @@ export class ResourcesPage extends ProjectPage {
     await this.dialog.waitFor({ state: "hidden" });
   }
 
-  /** Ticks Labours in Add Labours and saves them from today. */
-  public async addLabours(names: string[], remark?: string) {
-    await this.button("Add Labours").click();
+  /** Ticks Employees in Add Employees and saves them from today. */
+  public async addEmployees(names: string[], remark?: string) {
+    await this.button("Add Employees").click();
     for (const name of names)
       await this.dialog
         .getByRole("checkbox", { name: new RegExp(name) })
@@ -44,7 +39,8 @@ export class ResourcesPage extends ProjectPage {
     if (remark != null) await this.dialog.getByLabel(/Remark/).fill(remark);
     await this.dialog
       .getByRole("button", {
-        name: names.length > 1 ? `Add ${String(names.length)} Labours` : "Add",
+        name:
+          names.length > 1 ? `Add ${String(names.length)} Employees` : "Add",
         exact: true,
       })
       .click();

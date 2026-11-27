@@ -18,8 +18,7 @@ describe("Departments (ADR CM-0046)", () => {
     const groups = humanResourcesGroups(true);
     expect(groups.map((group) => group.label)).toEqual(["Staff", "HRMS"]);
     expect(groups[0]?.sections.map((card) => card.label)).toEqual([
-      "Labour",
-      "Site Engineer",
+      "Employees",
       "Vendor",
       "Office Staff",
       "Role Management",
@@ -35,7 +34,7 @@ describe("Departments (ADR CM-0046)", () => {
     const labels = humanResourcesGroups(false)[0]?.sections.map(
       (card) => card.label,
     );
-    expect(labels).toEqual(["Labour", "Site Engineer", "Vendor"]);
+    expect(labels).toEqual(["Employees", "Vendor"]);
   });
 
   it("shows Marketing's cards the Role opens, and no group without one", () => {
@@ -65,7 +64,7 @@ describe("Departments (ADR CM-0046)", () => {
     for (const path of [
       HUMAN_RESOURCES.href,
       "/app/staff",
-      "/app/staff/labours",
+      "/app/staff/employees",
       "/app/staff/roles/r1",
       "/app/hrms",
       "/app/hrms/attendance/team",
@@ -94,7 +93,7 @@ describe("a department's own sidebar menu (ADR CM-0047)", () => {
   it("shows on the department's page and every one of its screens", () => {
     for (const path of [
       HUMAN_RESOURCES.href,
-      "/app/staff/labours",
+      "/app/staff/employees",
       "/app/hrms/leave/my",
     ])
       expect(departmentMenuAt(path, ALL)?.department).toBe(HUMAN_RESOURCES);
@@ -109,7 +108,7 @@ describe("a department's own sidebar menu (ADR CM-0047)", () => {
   it("keeps the main menu on Marketing's screens for a Role without Marketing", () => {
     const access = { canOpenStaffRoles: false, marketing: NO_MARKETING_ACCESS };
     expect(departmentMenuAt("/app/marketing/visits", access)).toBeUndefined();
-    expect(departmentMenuAt("/app/staff/labours", access)?.department).toBe(
+    expect(departmentMenuAt("/app/staff/employees", access)?.department).toBe(
       HUMAN_RESOURCES,
     );
   });
@@ -120,7 +119,7 @@ describe("a department's own sidebar menu (ADR CM-0047)", () => {
     expect(at("/app/hrms")).toBe("Dashboard");
     expect(at("/app/hrms/attendance/team")).toBe("Attendance");
     expect(at("/app/staff/roles/r1")).toBe("Role Management");
-    expect(at("/app/staff/labours-old")).toBeUndefined();
+    expect(at("/app/staff/employees-old")).toBeUndefined();
     expect(at(HUMAN_RESOURCES.href)).toBeUndefined();
     expect(
       departmentCardAt(marketingGroups(FULL_MARKETING_ACCESS), "/app/marketing")
