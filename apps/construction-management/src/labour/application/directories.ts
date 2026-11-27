@@ -20,24 +20,23 @@ export type LabourCategoryDirectory = {
 };
 
 /**
- * Site Engineers (`supervisors` in code, ADR CM-0036). A Labour has none of
- * their own since ADR CM-0041: `find` names the one an old attendance day was
- * saved with, and `onProjects` gives the Site Engineers a Labour answers to.
+ * Roles (organization context): an Employee's Role, and through it their
+ * Department (ADR CM-0055 §2). Live Roles only.
  */
-export type SupervisorDirectory = {
+export type RoleDirectory = {
   find(
     workspaceId: string,
     ids: readonly string[],
-  ): Promise<Map<string, { id: string; name: string; disabled: boolean }>>;
-  /**
-   * The Site Engineers on each of `projectIds`, by name (ADR CM-0041):
-   * enabled ones whose sign-in is on the Project. Projects with none are
-   * left out.
-   */
-  onProjects(
-    workspaceId: string,
-    projectIds: readonly string[],
-  ): Promise<Map<string, { id: string; name: string }[]>>;
+  ): Promise<
+    Map<
+      string,
+      {
+        id: string;
+        name: string;
+        department: { id: string; name: string } | null;
+      }
+    >
+  >;
 };
 
 export type TeamMemberDirectory = {

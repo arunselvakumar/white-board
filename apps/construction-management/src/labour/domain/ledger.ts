@@ -11,7 +11,7 @@ import { weekdayOf } from "./wages";
 export type LedgerEntryKind =
   "opening" | "earned" | "overtime" | "payment" | "advance";
 
-export type PartyType = "labour" | "vendor";
+export type PartyType = "employee" | "vendor";
 
 export type LedgerEntry = {
   id: string;
@@ -51,9 +51,9 @@ export function assertAmountFits(amount: number, message: string): void {
 }
 
 export type LedgerSourceType =
-  | "labour"
+  | "employee"
   | "vendor"
-  | "labour_attendance"
+  | "employee_attendance"
   | "vendor_attendance"
   | "wage_payment";
 
