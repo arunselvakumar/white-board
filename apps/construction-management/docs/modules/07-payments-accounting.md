@@ -1,5 +1,7 @@
 # 07 — Payments & Accounting
 
+> **Since [ADR CM-0055](../adr/CM-0055-employees-replace-labours-and-site-engineers.md) (2026-11-27):** Labours and Site Engineers are one **Employee** record (Human Resources → Staff → Employees), told apart by their Role and its Department. Wherever this spec says Labour, Labourer, Supervisor or Site Engineer for a person, read Employee; the rules (wages, attendance, Check-In, transfers, ledger) apply to every Employee. The ADR wins where they differ.
+
 Payments & Accounting is where BuildControl records money: the company's own cash and bank accounts, per-user petty cash, general money-in/money-out transactions, and the money owed to and paid to every counter-party (contractors, suppliers, labour, labour-supply vendors, and "other parties"). It also holds the project-level "Payments" tile, the cross-project "Central payment" workspace, and the payment widgets on the project dashboard.
 
 It is not a general ledger. Legacy BuildControl keeps party-wise invoice and payment registers and a cash/bank ledger report; there is no chart of accounts, journal, or GST/TDS ledger beyond a TDS amount field on contractor payments (see Rebuild recommendations).

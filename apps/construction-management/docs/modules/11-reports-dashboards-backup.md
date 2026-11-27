@@ -1,5 +1,7 @@
 # 11 — Reports, Dashboards & Backup
 
+> **Since [ADR CM-0055](../adr/CM-0055-employees-replace-labours-and-site-engineers.md) (2026-11-27):** Labours and Site Engineers are one **Employee** record (Human Resources → Staff → Employees), told apart by their Role and its Department. Wherever this spec says Labour, Labourer, Supervisor or Site Engineer for a person, read Employee; the rules (wages, attendance, Check-In, transfers, ledger) apply to every Employee. The ADR wins where they differ.
+
 This module covers every read-only, aggregate surface of BuildControl:
 
 - **Dashboards**: the Projects home (project cards, status counts, HRMS check-in banner), the per-project **Dashboard** ("Charts & Performance Overview"), the **Inquiry dashboard** (sales CRM) and the **HRMS dashboard**.

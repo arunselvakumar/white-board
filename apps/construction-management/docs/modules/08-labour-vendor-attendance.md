@@ -1,5 +1,7 @@
 # 08 — Labour & Vendor Attendance
 
+> **Since [ADR CM-0055](../adr/CM-0055-employees-replace-labours-and-site-engineers.md) (2026-11-27):** Labours and Site Engineers are one **Employee** record (Human Resources → Staff → Employees), told apart by their Role and its Department. Wherever this spec says Labour, Labourer, Supervisor or Site Engineer for a person, read Employee; the rules (wages, attendance, Check-In, transfers, ledger) apply to every Employee. The ADR wins where they differ.
+
 This module covers the workers on site who are not team members: **Labour** (individual daily- or monthly-wage workers employed directly and assigned to a project) and **Vendor labour** (headcount supplied by a labour-supply vendor, a gang or piece-rate contractor, paid per category per shift). It records who turned up each day, overtime, shifts, and paid leave, and turns that into wages owed. The payments themselves are recorded in module 07 (Labour payments, Vendor payments).
 
 It is separate from **HRMS attendance** (module 10), which is geo-fenced check-in/check-out for team members on the payroll. Labour are records, not app users; they never log in.

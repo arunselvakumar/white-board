@@ -1,5 +1,7 @@
 # 05 — Tasks, Issues & Snags, Inspection Requests
 
+> **Since [ADR CM-0055](../adr/CM-0055-employees-replace-labours-and-site-engineers.md) (2026-11-27):** Labours and Site Engineers are one **Employee** record (Human Resources → Staff → Employees), told apart by their Role and its Department. Wherever this spec says Labour, Labourer, Supervisor or Site Engineer for a person, read Employee; the rules (wages, attendance, Check-In, transfers, ledger) apply to every Employee. The ADR wins where they differ.
+
 This module covers planning and quality control on a project, beyond the daily log:
 
 - **Task.** The project schedule. Tasks and sub-tasks have assignees, location, contractor and tags. They carry baseline vs actual dates and a work quantity with price, which gives an **earned value**. Progress is updated over time, there is a Gantt view, and tasks can be imported from Excel. The Project Dashboard's progress gauge and "Value Earned By Task" come from here.

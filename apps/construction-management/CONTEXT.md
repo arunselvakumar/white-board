@@ -19,7 +19,7 @@ A person who can sign in: by email and password, by mobile and password, and by 
 _Avoid_: account, login, customer
 
 **Team Member**:
-A User's membership and employee record inside one Company: name, mobile, email, ids, a salary set-up like a Labour's wage (the amount optional), Member Type, projects, and their Role. The Staff screens call them **Staff** (Add Staff, Edit Staff, "1 Staff member"); code, APIs, audit events and other modules say Team Member (ADR CM-0030, CM-0032, CM-0033).
+A User's membership and employee record inside one Company: name, mobile, email, ids, a salary set-up like an Employee's wage (the amount optional), Member Type, projects, and their Role. The Staff screens call them **Staff** (Add Staff, Edit Staff, "1 Staff member"); code, APIs, audit events and other modules say Team Member (ADR CM-0030, CM-0032, CM-0033).
 _Avoid_: employee; User (in UI copy for this record)
 
 **Owner**:
@@ -60,7 +60,7 @@ _Avoid_: default password
 ### Masters and parties
 
 **Masters**:
-The Company's reference lists (Work Types, Contractors, Suppliers, Materials, Units, Accounts…). A main-menu area. Staff, Labours and Vendors are not Masters: they are under Human Resources (ADR CM-0034). Labour Categories are: Masters → Labour → Categories (ADR CM-0035).
+The Company's reference lists (Work Types, Contractors, Suppliers, Materials, Units, Accounts…). A main-menu area. Employees, Vendors and Office Staff are not Masters: they are under Human Resources (ADR CM-0034). Labour Categories are: Masters → Labour → Categories (ADR CM-0035).
 _Avoid_: settings (for these lists), catalog
 
 There is no trade **Department** (RCC, Plumbing…) since ADR CM-0048. Nothing is filed under a trade; **Departments** in the main menu are Human Resources and Marketing (ADR CM-0046).
@@ -79,21 +79,17 @@ _Avoid_: vendor (for material sellers)
 A labour-supply party (a gang or mukadam). Attendance is counted per labour category per shift and priced from the Vendor's rate card. Not a User.
 _Avoid_: supplier, contractor (for gangs)
 
-**Labour**:
-An individual worker on the Company's own roll, with a daily or monthly wage and an OT rate. A record, not a User. May **Report To** another Labour (ADR CM-0035).
-_Avoid_: worker, employee, staff
+**Employee**:
+A person on the Company's own roll who works on its Projects, whatever their job (ADR CM-0055): one record for what were Labours and Site Engineers. Their **Role**, and through it the Role's **Department**, says what they are (Human Resources → Labour, Human Resources → Site Engineer, …). Every Employee has a daily or monthly wage and an OT rate, and is on the attendance sheet of the Projects they work on. A record that may sign in: with **Can sign in** on, they sign in with their mobile and a password, and their Role's Permission Matrix says what they may do; their sign-in is not listed on Office Staff. May **Report To** another Employee.
+_Avoid_: labour, labourer, worker (for the record); staff (that is Office Staff); Site Engineer (for the record: it is a Role)
 
 **Reports To**:
-The Labour a Labour answers to on site, like a helper to the mason. Optional, another active Labour of the Company, never themselves and never a loop. Not a Site Engineer: a Labour answers to the Site Engineers on their Projects (ADR CM-0041).
+The Employee an Employee answers to on site, like a helper to the mason or a mason to the Site Engineer. Optional, another active Employee of the Company, never themselves and never a loop (ADR CM-0035, CM-0055).
 _Avoid_: manager, reporting manager, boss
 
 **Labour Category**:
-The trade a Labour or a Vendor's headcount is booked under (Mason, Carpenter, Helper…). Seeded per Company; seed rows can be disabled, not renamed. Kept in Masters → Labour → Categories (ADR CM-0035), and addable from the Labour form.
+The trade an Employee or a Vendor's headcount is booked under (Mason, Carpenter, Helper…). Seeded per Company; seed rows can be disabled, not renamed. Kept in Masters → Labour → Categories (ADR CM-0035), and addable from the Employee form.
 _Avoid_: skill, trade (for this list)
-
-**Supervisor**:
-The person on site who looks after a Project's Labours, shown as **Site Engineer** (ADR CM-0036). Put on a Project from the Project; a Labour answers to the Site Engineers on the Projects they work on, and has no Site Engineer of their own (ADR CM-0041). A new Site Engineer signs in on the default Site Engineer Role, through a sign-in of their own that Office Staff does not list (ADR CM-0037); older ones may have none, or be an Office Staff member.
-_Avoid_: foreman, mukadam (that is a Vendor)
 
 **Rate Card**:
 A Vendor's shifts, each with a rate per day and an overtime rate per Labour Category.
@@ -137,11 +133,11 @@ The Client Order's value excluding GST, shown only to Team Members with the Proj
 _Avoid_: contract value, budget (that is the Company's own figure)
 
 **Teams**:
-Who works on a Project: its Site Engineers, Labours, Team Members (the Owner is on every Project), Contractors, Suppliers and Vendors. Each party keeps its Projects in its own master or sign-in; a Project's Teams page shows and changes all six, and each row opens that person's or party's page for a viewer who may read it (ADR CM-0044). Assigned on Add Project's second step, or any time after (ADR CM-0013 §6, CM-0038). A Site Engineer is listed only under Site Engineers, not again under Team Members. Called Resources until ADR CM-0042; code and the API still say Resources.
-_Avoid_: Resources (on a site that means manpower, material and machinery), members (for all six), assignment
+Who works on a Project: its Employees, Team Members (the Owner is on every Project), Contractors, Suppliers and Vendors. Each party keeps its Projects in its own record or sign-in; a Project's Teams page shows and changes all five, and each row opens that person's or party's page for a viewer who may read it (ADR CM-0044). Assigned on Add Project's second step, or any time after (ADR CM-0013 §6, CM-0038). An Employee who signs in is listed only under Employees, not again under Team Members (ADR CM-0055). Called Resources until ADR CM-0042; code and the API still say Resources.
+_Avoid_: Resources (on a site that means manpower, material and machinery), members (for all five), assignment
 
 **Activity**:
-A read-only feed, newest first, of what happened: on a Labour's page (Projects joined, left and moved between, attendance, each Check In and Check Out, marked inactive), on a Site Engineer's and a Vendor's page (Projects they were added to and removed from, and each Check In and Check Out; ADR CM-0044 §7), and as a Project module (Site Engineers and Labours added and removed, and everyone's Check In and Check Out). Each entry sits on the day it applies to, not the day it was typed, and says who recorded it and when (ADR CM-0038). A check-in entry shows its photo, where it was taken and Open in Maps, only to viewers with Attendance Read on its Project; a voided one stays, struck through (ADR CM-0044).
+A read-only feed, newest first, of what happened: on an Employee's page (Projects joined, left and moved between, attendance, each Check In and Check Out, marked inactive), on a Vendor's page (Projects they were added to and removed from, and each Check In and Check Out; ADR CM-0044 §7), and as a Project module (Employees added and removed, and everyone's Check In and Check Out). Each entry sits on the day it applies to, not the day it was typed, and says who recorded it and when (ADR CM-0038). A check-in entry shows its photo, where it was taken and Open in Maps, only to viewers with Attendance Read on its Project; a voided one stays, struck through (ADR CM-0044).
 _Avoid_: history (that is the transfer history), log, timeline, audit trail (for the screen)
 
 **Custom Field**:
@@ -197,7 +193,7 @@ A Project's figures over a chosen period (last 12 months by default): key figure
 _Avoid_: analytics, reports (those are files), Project home (there is none)
 
 **Company Dashboard**:
-The main menu's Dashboard: across the Projects a Team Member can see, the approvals waiting for them, open Issues & Snags, pending inspections, Labours present today and amounts due, with one row per Project leading to its Project Dashboard (ADR CM-0021 §4).
+The main menu's Dashboard: across the Projects a Team Member can see, the approvals waiting for them, open Issues & Snags, pending inspections, Employees present today and amounts due, with one row per Project leading to its Project Dashboard (ADR CM-0021 §4).
 _Avoid_: home, overview, analytics
 
 **Hidden module**:
@@ -241,7 +237,7 @@ _Avoid_: address, position (in UI copy)
 The cross-project area of the app: Central Store, Central Inventory, Central Payment, Party Balance, Central Reports. A main-menu area. HRMS was here until ADR CM-0034. Not the tenant — that is the Company.
 
 **Human Resources (area)**:
-The main-menu area for everyone the Company employs (ADR CM-0034), in three groups: Staff (Staff, Role Management), HRMS (attendance, leave and salary for staff) and Labour (Labours, Supervisors, Vendors; ADR CM-0035). Written out in the menu, never shortened. It opens on Staff.
+The main-menu area for everyone the Company employs (ADR CM-0034), in two groups: Staff (Employees, Vendor, Office Staff, Role Management; ADR CM-0036, CM-0055) and HRMS (attendance, leave and salary for Office Staff). Written out in the menu, never shortened. It opens on Employees.
 _Avoid_: HR, People, Team (for the area)
 
 ### Marketing
@@ -318,37 +314,37 @@ _Avoid_: backdate, past entry
 What the Company has bought (projects, Team Members, HRMS seats, storage) and until when. A new Company has no plan, and nothing is limited, until its Owner buys one.
 _Avoid_: license, package
 
-### Labour attendance and wages
+### Employee attendance and wages
 
 **Attendance**:
-Labour attendance is one status per Labour per day (Present, Half Day, Absent, On Leave, Holiday) in the Project they were on that day. Vendor attendance is a headcount per shift and Labour Category (Full day, Half day, OT hours).
+Employee attendance is one status per Employee per day (Present, Half Day, Absent, On Leave, Holiday) in the Project they were on that day. Vendor attendance is a headcount per shift and Labour Category (Full day, Half day, OT hours).
 _Avoid_: muster (for the daily entry)
 
 **Check-In** (a Project's):
-The screen under a Project's Attendance where the member holding the phone or tablet checks in a Labour, a Site Engineer or a Vendor of that Project: a photo from the camera, the server's time and the location (ADR CM-0043). Each **Check In** or **Check Out** is one **check-in entry** in the Project's **Check-In log**; a person may have several a day. A Labour's entries write their day's In, Out and break, and the first one marks them Present. A Vendor's and a Site Engineer's entries are a log only. Not HRMS check-in, which a member does for themselves on their own phone.
+The screen under a Project's Attendance where the member holding the phone or tablet checks in an Employee or a Vendor of that Project: a photo from the camera, the server's time and the location (ADR CM-0043). Each **Check In** or **Check Out** is one **check-in entry** in the Project's **Check-In log**; a person may have several a day. An Employee's entries write their day's In, Out and break, and the first one marks them Present, whatever their Role (ADR CM-0055). A Vendor's entries are a log only. Not HRMS check-in, which a member does for themselves on their own phone.
 _Avoid_: punch, kiosk, Attendance Mode, face attendance (nothing compares faces)
 
 **Void** (a check-in entry):
-Striking out a wrong check-in entry with a reason. Entries are never edited or deleted; a Labour's day is worked out again from the entries left.
+Striking out a wrong check-in entry with a reason. Entries are never edited or deleted; an Employee's day is worked out again from the entries left.
 _Avoid_: delete, cancel (for an entry)
 
 **Paid Leave**:
-An On Leave day that is paid. The only way a daily-wage Labour is paid for a day off.
+An On Leave day that is paid. The only way a daily-wage Employee is paid for a day off.
 
 **Overtime (OT)**:
-Hours beyond the day, at a rate per hour; at most 24 hours a day for a Labour.
+Hours beyond the day, at a rate per hour; at most 24 hours a day for an Employee.
 
 **Transfer**:
-Moving a Labour to another Project from a date. Their balance goes with them.
+Moving an Employee to another Project from a date. Their balance goes with them.
 _Avoid_: shift (for this), reassign
 
 **From / Last day**:
-A Labour's first and last working day on a Project, asked when they are added to it or removed from it on the Project's Teams. The history is dated the first day on (From) and the first day off (the day after the Last day) (ADR CM-0038).
+An Employee's first and last working day on a Project, asked when they are added to it or removed from it on the Project's Teams. The history is dated the first day on (From) and the first day off (the day after the Last day) (ADR CM-0038).
 _Avoid_: end date, relieving date
 
 **Ledger / Balance**:
-Every amount owed or paid is an entry that is never edited; a balance is the sum of entries (ADR CM-0004). Positive is owed to the Labour or Vendor; an Advance makes it smaller.
-_Avoid_: account (for a Labour's balance)
+Every amount owed or paid is an entry that is never edited; a balance is the sum of entries (ADR CM-0004). Positive is owed to the Employee or Vendor; an Advance makes it smaller.
+_Avoid_: account (for an Employee's balance)
 
 **Opening Balance**:
 What was owed (or advanced, if negative) on the joining date, before the app.
@@ -361,7 +357,7 @@ _Avoid_: salary (that is HRMS), settlement
 For a period: owed before it, earned in it (wages + OT), and owed at its end after Advances and Payments.
 
 **Muster Roll**:
-The monthly combined attendance and wage register for the Company's own Labours, printed for labour-law inspection.
+The monthly combined attendance and wage register for the Company's own Employees, printed for labour-law inspection.
 _Avoid_: attendance sheet
 
 ### HRMS (staff attendance, leave and salary)
@@ -370,9 +366,9 @@ _Avoid_: attendance sheet
 The HRMS group of the Human Resources area, for the Company's own salaried staff: check-in attendance, shifts, holidays, leave and monthly salary ([`modules/10`](./docs/modules/10-hrms.md)). Separate from Labour attendance and wages; the two registers never mix. Spelt in capitals.
 _Avoid_: HR (that is the Human Resources area, written out), payroll (for the whole module), Hrms
 
-**Employee**:
-A Team Member as HRMS pays them: a monthly salary, attendance on their own phone. The word names only the Employees page (Employee Management, each member's salary set-up); everywhere else say Team Member or member. An Employee is a User; a Labour is a record that never signs in, and nobody is both (ADR CM-0012 §18).
-_Avoid_: staff, worker, labour (for an Employee); employee (for a Labour)
+**Employee Management** (HRMS):
+The HRMS page of each Team Member's salary set-up: a monthly salary, attendance on their own phone (ADR CM-0012 §18). It is about Team Members, not the **Employee** record (ADR CM-0055); say Team Member or member there.
+_Avoid_: Employees (for this page)
 
 **HRMS Team Member**:
 A Team Member whose Member Type is HRMS: attendance, leave and salary only, no Projects. Counts against the plan's HRMS seats; the Projects home sends them to Human Resources → HRMS.
@@ -412,7 +408,7 @@ _Avoid_: leave (for On Leave), off, weekend, holiday (for a Week Off)
 
 **Shift**:
 A template of the working day: start and end, working hours, half-day hours, grace period and whether overtime is paid. A member with no Shift works the HRMS Settings day, shown as "Standard". Shift Management assigns Shifts and Rotations from a date until changed.
-_Avoid_: timing, schedule (for the template); shift (for a Labour Transfer)
+_Avoid_: timing, schedule (for the template); shift (for a Transfer)
 
 **Rotation**:
 A repeating cycle of Shifts and Week Offs: Week (7 slots from Monday), Month (31 slots from day 1) or Custom Cycle (2–12 slots from the assignment's start).
@@ -467,7 +463,7 @@ The PDF of an Approved or Paid Salary slip, stored once and never changed. Membe
 _Avoid_: salary slip (for the PDF), pay stub, salary certificate
 
 **Salary advance**:
-Salary paid ahead of the month ("Pay Advance"), with a number of instalments; later Salary slips recover it automatically and show "Advance recovered". Not the Labour Advance on the Labour ledger.
+Salary paid ahead of the month ("Pay Advance"), with a number of instalments; later Salary slips recover it automatically and show "Advance recovered". Not the Advance on an Employee's ledger.
 _Avoid_: loan, salary loan
 
 **Month lock**:
@@ -508,7 +504,7 @@ _Avoid_: price (unless it is a rate), cost
 | Team Member           | user, employee, staff           |
 | Owner                 | admin, super admin              |
 | Permission Matrix     | roles, ACL                      |
-| Labour                | worker, labourer                |
+| Employee              | labour, worker, labourer        |
 | Vendor (labour gang)  | supplier, contractor            |
 | Supplier (material)   | vendor                          |
 | Project               | site, job                       |
@@ -518,9 +514,9 @@ _Avoid_: price (unless it is a rate), cost
 | Sequence ID           | serial number                   |
 | Back-dated Entry      | backdate                        |
 | Sign in / Sign up     | log in, register                |
-| Labours (plural)      | labourers, workers              |
+| Employees (plural)    | labours, labourers, workers     |
 | Rate Card             | price list                      |
-| Wage Payment          | salary (for Labours)            |
+| Wage Payment          | salary (for Employees)          |
 | Client                | customer                        |
 | Album (Drawings)      | folder                          |
 | Revision (R1, R2 …)   | version                         |
